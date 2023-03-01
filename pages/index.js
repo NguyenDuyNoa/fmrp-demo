@@ -99,7 +99,11 @@ const TienDoSX = React.memo(() => {
         <button onClick={_HandleTab.bind(this, 2)} className={`${tab === 2 ? "text-black bg-white" : "text-[#667085] bg-[#F9FAFB] hover:text-black" } px-3 py-2 border`}>Chưa thực hiện</button>
         <button onClick={_HandleTab.bind(this, 3)} className={`${tab === 3 ? "text-black bg-white" : "text-[#667085] bg-[#F9FAFB] hover:text-black" } px-3 py-2 border`}>Tạm dừng</button>
       </div>
-      <div className='py-3 divide-y divide-[]'></div>
+      <div className='py-3 divide-y divide-slate-100'>
+        <div>hii</div>
+        <div>hii</div>
+        <div>hii</div>
+      </div>
     </div>
   )
 })
