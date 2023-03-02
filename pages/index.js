@@ -18,6 +18,9 @@ const Area = dynamic(() => import('@ant-design/plots').then(({ Area }) => Area),
 const Bar = dynamic(() => import('@ant-design/plots').then(({ Bar }) => Bar),
     { ssr: false }
 );
+const ScrollArea = dynamic(() => import("react-scrollbar"), {
+  ssr: false,
+});
 
 const Index = () => {
   return (
@@ -241,28 +244,64 @@ const Table_NVL = React.memo(() => {
       id: "asd",
       name: "Áo thun cotton chất lượng caooooo",
       quantity: 20000
+    },{
+      stt: 6,
+      id: "asd",
+      name: "Áo thun cotton chất lượng caooooo",
+      quantity: 20000
+    },{
+      stt: 7,
+      id: "asd",
+      name: "Áo thun cotton chất lượng caooooo",
+      quantity: 20000
+    },{
+      stt: 8,
+      id: "asd",
+      name: "Áo thun cotton chất lượng caooooo",
+      quantity: 20000
+    },{
+      stt: 9,
+      id: "asd",
+      name: "Áo thun cotton chất lượng caooooo",
+      quantity: 20000
+    },{
+      stt: 10,
+      id: "asd",
+      name: "Áo thun cotton chất lượng caooooo",
+      quantity: 20000
+    },{
+      stt: 11,
+      id: "asd",
+      name: "Áo thun cotton chất lượng caooooo",
+      quantity: 20000
     }
   ]
   return(
-    <div className='bg-slate-50/60 p-3 space-y-8 border border-slate-50 rounded-lg'>
+    <div className='bg-slate-50/60 p-3 space-y-8 border border-slate-50 rounded-lg '>
       <h2>Nguyên vật liệu cần mua</h2>
       <div>
-        <div className='grid grid-cols-8 gap-3 px-3 py-5 bg-slate-50'>
+        <div className='grid grid-cols-8 gap-3 pl-3 pr-4 py-5 bg-slate-50'>
           <h5 className='text-[#667085] text-[13px]'>STT</h5>
           <h5 className='text-[#667085] text-[13px] col-span-2 text-center'>Mã NVL</h5>
           <h5 className='text-[#667085] text-[13px] col-span-3'>Tên NVL</h5>
           <h5 className='text-[#667085] text-[13px] col-span-2 text-right'>Số lượng</h5>
         </div>
-        <div className='divide-y divide-slate-100'>
-          {data.map((e) => 
-            <div className='grid grid-cols-8 gap-3 px-3 py-4 hover:bg-white' key={e.stt.toString()}>
-              <h6>{e.stt}</h6>
-              <h6 className='col-span-2 text-center'>{e.id}</h6>
-              <h6 className='col-span-3 line-clamp-1'>{e.name}</h6>
-              <h6 className='col-span-2 text-right'>{e.quantity?.toLocaleString()}</h6>
-            </div>
-          )}
-        </div>
+        <ScrollArea 
+          className=" h-[350px] overflow-hidden" 
+          speed={1} 
+          smoothScrolling={true}
+        >
+          <div className='divide-y divide-slate-100'>
+            {data.map((e) => 
+              <div className='grid grid-cols-8 gap-3 pl-3 pr-4 py-4 hover:bg-white' key={e.stt.toString()}>
+                <h6>{e.stt}</h6>
+                <h6 className='col-span-2 text-center'>{e.id}</h6>
+                <h6 className='col-span-3 line-clamp-1'>{e.name}</h6>
+                <h6 className='col-span-2 text-right'>{e.quantity?.toLocaleString()}</h6>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
       </div>
     </div>
   )

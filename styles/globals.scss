@@ -97,3 +97,15 @@ div, h1, h2, h3, h4, h5, h5, a, p{
 	position: relative !important;
 	left: 63px;
 }
+
+//scroll bar
+.scrollarea .scrollbar-container.vertical .scrollbar {
+	background: #94a3b8 !important;
+	border-radius: 50px;
+}
+
+.scrollarea .scrollbar-container.active,
+.scrollarea .scrollbar-container:hover {
+	background: #f1f5f9 !important;
+	border-radius: 50px !important;
+}
