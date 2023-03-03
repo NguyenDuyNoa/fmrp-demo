@@ -2,12 +2,18 @@ import React, {useState} from 'react';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 
-import {Grid6 as IconExcel, Filter as IconFilter} from "iconsax-react"
+import {Grid6 as IconExcel, Filter as IconFilter} from "iconsax-react";
+import Select from 'react-select';
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
   });
 
 const Index = () => {
+    const dataMaChungTu = [
+        { value: 'chocolate', label: 'Chocolate' },
+        { value: 'strawberry', label: 'Strawberry' },
+        { value: 'vanilla', label: 'Vanilla' }
+    ]
     return (
         <React.Fragment>
             <Head>
@@ -28,21 +34,77 @@ const Index = () => {
                         </div>
                     </div>
                     <div className='grid grid-cols-4 gap-8'>
-                        <div className='space-y-1'>
+                        <div className=''>
                             <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>Mã chứng từ</h6>
-                            <div className='bg-gray-300 xl:h-9 h-7 w-full rounded' />
+                            <Select 
+                                options={dataMaChungTu}
+                                placeholder="Chọn mã chứng từ" 
+                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px]" 
+                                isSearchable={false}
+                                theme={(theme) => ({
+                                    ...theme,
+                                    colors: {
+                                        ...theme.colors,
+                                        primary25: '#EBF5FF',
+                                        primary50: '#92BFF7',
+                                        primary: '#0F4F9E',
+                                    },
+                                })}
+                            />
                         </div>
-                        <div className='space-y-1'>
-                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>Mã chứng từ</h6>
-                            <div className='bg-gray-300 xl:h-9 h-7 w-full rounded' />
+                        <div className=''>
+                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>Trạng thái giao hàng</h6>
+                            <Select 
+                                options={dataMaChungTu}
+                                placeholder="Chọn trạng thái giao hàng" 
+                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px]" 
+                                isSearchable={false}
+                                theme={(theme) => ({
+                                    ...theme,
+                                    colors: {
+                                        ...theme.colors,
+                                        primary25: '#EBF5FF',
+                                        primary50: '#92BFF7',
+                                        primary: '#0F4F9E',
+                                    },
+                                })}
+                            />
                         </div>
-                        <div className='space-y-1'>
-                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>Mã chứng từ</h6>
-                            <div className='bg-gray-300 xl:h-9 h-7 w-full rounded' />
+                        <div className=''>
+                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>Tên nhà cung cấp</h6>
+                            <Select 
+                                options={dataMaChungTu}
+                                placeholder="Chọn tên nhà cung cấp" 
+                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px]" 
+                                isSearchable={false}
+                                theme={(theme) => ({
+                                    ...theme,
+                                    colors: {
+                                        ...theme.colors,
+                                        primary25: '#EBF5FF',
+                                        primary50: '#92BFF7',
+                                        primary: '#0F4F9E',
+                                    },
+                                })}
+                            />
                         </div>
-                        <div className='space-y-1'>
-                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>Mã chứng từ</h6>
-                            <div className='bg-gray-300 xl:h-9 h-7 w-full rounded' />
+                        <div className=''>
+                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>Ngày chứng từ</h6>
+                            <Select 
+                                options={dataMaChungTu}
+                                placeholder="Chọn mã chứng từ" 
+                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px]" 
+                                isSearchable={false}
+                                theme={(theme) => ({
+                                    ...theme,
+                                    colors: {
+                                        ...theme.colors,
+                                        primary25: '#EBF5FF',
+                                        primary50: '#92BFF7',
+                                        primary: '#0F4F9E',
+                                    },
+                                })}
+                            />
                         </div>
                     </div>
                     <Tab_DanhSach />
