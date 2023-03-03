@@ -4,6 +4,7 @@ import React from 'react';
 import Layout from "../components/layout"
 import store from "/services/redux";
 
+import "react-datepicker/dist/react-datepicker.css";
 import '../styles/globals.scss'
 
 const Default = (props) => {

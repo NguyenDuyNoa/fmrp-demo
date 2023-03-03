@@ -2,8 +2,13 @@ import React, {useState} from 'react';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 
-import {Grid6 as IconExcel, Filter as IconFilter} from "iconsax-react";
+import {
+    Grid6 as IconExcel, Filter as IconFilter, Calendar as IconCalendar, SearchNormal1 as IconSearch,
+    ArrowDown2 as IconDown
+} from "iconsax-react";
 import Select from 'react-select';
+import DatePicker from "react-datepicker";
+import Popup from 'reactjs-popup';
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
   });
@@ -14,6 +19,9 @@ const Index = () => {
         { value: 'strawberry', label: 'Strawberry' },
         { value: 'vanilla', label: 'Vanilla' }
     ]
+
+    const [dateRange, setDateRange] = useState([null, null]);
+    const [startDate, endDate] = dateRange;
     return (
         <React.Fragment>
             <Head>
@@ -31,6 +39,7 @@ const Index = () => {
                         <div className='flex space-x-3 items-center'>
                             <button className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>Tạo mới</button>
                             <button className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#e2e8f0] via-[#e2e8f0] via-[#cbd5e1] to-[#e2e8f0] rounded btn-animation hover:scale-105'>Lập hóa đơn thuế tổng</button>
+                            <BtnTacVu className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#e2e8f0] via-[#e2e8f0] via-[#cbd5e1] to-[#e2e8f0] rounded btn-animation hover:scale-105 " />
                         </div>
                     </div>
                     <div className='grid grid-cols-4 gap-8'>
@@ -88,23 +97,21 @@ const Index = () => {
                                 })}
                             />
                         </div>
-                        <div className=''>
+                        <div className='z-20'>
                             <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>Ngày chứng từ</h6>
-                            <Select 
-                                options={dataMaChungTu}
-                                placeholder="Chọn mã chứng từ" 
-                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px]" 
-                                isSearchable={false}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: '#EBF5FF',
-                                        primary50: '#92BFF7',
-                                        primary: '#0F4F9E',
-                                    },
-                                })}
-                            />
+                            <div className='relative flex items-center'>
+                                <DatePicker
+                                    selectsRange={true}
+                                    startDate={startDate}
+                                    endDate={endDate}
+                                    onChange={(update) => {
+                                        setDateRange(update);
+                                    }}
+                                    isClearable={true}
+                                    className="bg-white w-full py-2 rounded border border-[#cccccc] pl-10 text-black outline-[#0F4F9E]"
+                                />
+                                <IconCalendar size={22} className="absolute left-3 text-[#cccccc]" />
+                            </div>
                         </div>
                     </div>
                     <Tab_DanhSach />
@@ -133,7 +140,14 @@ const Tab_DanhSach = React.memo(() => {
                 <button onClick={_HandleSelectTab.bind(this, 5)} className={`${tab === 5 ? "text-[#0F4F9E] border-[#0F4F9E] from-[#0F4F9E]/10" : "text-slate-400 hover:text-[#0F4F9E]/70 border-transparent" } xl:text-base text-xs bg-gradient-to-t border-b-[2px] xl:py-2 py-1 xl:px-4 px-3 font-medium`}>Chưa chi (17)</button>
             </div>
             <div className='bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2'>
-                <input/>
+                <form className="flex items-center relative">
+                    <IconSearch size={20} className='absolute left-3 z-10 text-[#cccccc]' />
+                    <input
+                        className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
+                        type="text"
+                        placeholder="Search by PO number, name, amount..."
+                    />
+                </form>
                 <div className='flex space-x-3'>
                     <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-base text-xs flex items-center space-x-2 bg-white rounded'>
                         <IconFilter size={18} />
@@ -287,12 +301,43 @@ const List_DanhSach = React.memo(() => {
                             <h6 className='xl:text-base text-xs px-2 w-[13%] text-right'>{e.amount?.toLocaleString()}</h6>
                             <h6 className='xl:text-base text-xs px-2 w-[13%]'>{e.note}</h6>
                             <div className='w-[8%] flex justify-end'>
-                                <button className='bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded xl:text-base text-xs'>Tác vụ</button>
+                                <BtnTacVu className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded xl:text-base text-xs" />
+                                {/* <button className='bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded xl:text-base text-xs'>Tác vụ</button> */}
                             </div>
                         </div>
                     )}
                 </div>
             </div>
+        </div>
+    )
+})
+
+const BtnTacVu = React.memo((props) => {
+    return(
+        <div>
+            <Popup
+                trigger={
+                    <button className={`flex space-x-1 items-center ` + props.className } >
+                        <span>Tác vụ</span>
+                        <IconDown size={15} />
+                    </button>
+                }
+                closeOnDocumentClick
+                arrow={false}
+                position="bottom right"
+                className={`dropdown-edit `}
+            >
+                <div className="w-auto">
+                    <div className="bg-white p-0.5 rounded-t w-52">
+                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Export Excel</button>
+                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Import Excel</button>
+                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Import BOM</button>
+                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Import công đoạn</button>
+                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Thống kê và tìm kiếm</button>
+                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Xóa</button>
+                    </div>
+                </div>
+            </Popup>
         </div>
     )
 })

@@ -72,6 +72,15 @@ div, h1, h2, h3, h4, h5, h5, a, p{
 	margin: 24px 0px 0px -65px !important;
 }
 
+.dropdown-edit-content{
+	margin: 5px 0px 0px 15px !important;
+	width: inherit !important;
+	border: none !important;
+	box-shadow: 0px 4px 40px rgba(47, 65, 110, 0.12) !important;
+	-webkit-animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
+
+}
+
 //arrow tooltip
 .arrow-danhmuc-arrow{
 	position: relative !important;
