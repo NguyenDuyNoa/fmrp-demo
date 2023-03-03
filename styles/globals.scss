@@ -109,3 +109,14 @@ div, h1, h2, h3, h4, h5, h5, a, p{
 	background: #f1f5f9 !important;
 	border-radius: 50px !important;
 }
+
+//button animation
+.btn-animation {
+	background-size: 300% 100%;
+	transition: all .4s ease-in-out;
+
+	&:hover {
+		background-position: 100% 0;
+		transition: all .4s ease-in-out;
+	}
+}

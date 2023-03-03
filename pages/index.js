@@ -28,7 +28,7 @@ const Index = () => {
       <Head>
         <title>Tổng quan</title>
       </Head>
-      <div className='px-10 py-8 space-y-5'>
+      <div className='px-10 py-8 space-y-5 pt-24'>
         <div className='flex space-x-5'>
           <h3 className="text-[#11315B] text-lg font-medium not-italic	leading-6">Lệnh sản xuất</h3>
         </div>

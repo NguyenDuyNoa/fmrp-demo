@@ -159,7 +159,10 @@ const Header = () => {
                     img: "/icon/header/muanhap/mua.png",
                     items: [
                         {name: "Yêu cầu mua hàng"},
-                        {name: "Đơn đặt hàng"},
+                        {
+                            name: "Đơn đặt hàng",
+                            link: '/purchase_order'
+                        },
                         {name: "Hợp đồng bán"}
                     ]
                 }
@@ -392,7 +395,7 @@ const Header = () => {
     ]
   
     return (
-      <header className="z-[999] w-full bg-[#0f4f9e] sticky top-0">
+      <header className="z-[999] w-full bg-[#0f4f9e] fixed top-0">
         <div className="mx-10 py-4">
           <div className="flex justify-between items-center">
             <div className='flex space-x-7 items-center'>
