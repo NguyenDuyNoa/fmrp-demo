@@ -1,7 +1,7 @@
 import { combineReducers, createStore } from 'redux'
 
 const adminState = {
-	auth: true,
+	auth: false,
 }
 
 function adminReducer(state = adminState, action) {

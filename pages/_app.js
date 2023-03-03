@@ -1,14 +1,19 @@
+import React, {useState, useEffect} from 'react';
 import { useSelector, Provider, useDispatch } from 'react-redux';
+import Head from 'next/head';
+import Image from 'next/image';
 
-import React from 'react';
 import Layout from "../components/layout"
 import store from "/services/redux";
+// import {_ServerInstance as Axios} from '/services/axios';
 
 import "react-datepicker/dist/react-datepicker.css";
 import '../styles/globals.scss'
 
+import axios from 'axios';
+import Popup from 'reactjs-popup';
+import {More as IconMore} from 'iconsax-react'
 import { Lexend_Deca } from "@next/font/google";
-
 const deca = Lexend_Deca({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700']
@@ -65,178 +70,136 @@ function MainPage({ Component, pageProps }) {
 }
 
 const LoginPage = () => {
-  return(
-    <div className="">
-      <div
-        className="bgc-image  
-      "
-      >
-        <div className="style h-[100vh] overflow-hidden">
-          <div className="flex justify-around  container pt-[45px] mx-auto  ">
-            <div className="style__form ">
-              <div className="form pt-[24px] px-[50px] ">
-                <div className="text-center mb-9">
-                  <h1 className="text-[#11315B] font-medium text-[32px]">
-                    Đăng nhập
-                  </h1>
-                </div>
-                <div className="flex style__h2 justify-between items-center gap-[16px]">
-                  <div className="style__bg-h2">
-                    <h2 className="px-[20px] py-2">Phiên bản chính thức</h2>
-                  </div>
-                  <div className="style__bg-h2">
-                    <h2 className="px-[20px] py-2">Phiên bản Trải nghiệm</h2>
-                  </div>
-                </div>
-                <form>
-                  <div className="py-[14px] style__input">
-                    <input
-                      // onChange={(e) => setEmail(e.target.value)}
+  const dispatch = useDispatch();
 
-                      name="company_code"
-                      type="text"
-                      placeholder="Mã công ty"
-                      className="w-full py-3 px-4"
-                    />
+  const [tab, sTab] = useState(0);
+  const _HandleSelectTab = (e) => sTab(e);
+
+  const [code, sCode] = useState("");
+  const [name, sName] = useState("");
+  const [password, sPassword] = useState("");
+
+  const _HandleInputChange = (type, value) => {
+    if(type === "code"){
+      sCode(value.target?.value)
+    }else if(type === "name"){
+      sName(value.target?.value)
+    }else if(type === "password"){
+      sPassword(value.target?.value)
+    }
+  }
+  const handleSubmit = e => {
+    e.preventDefault()
+    // axios
+    //   .post("http://192.168.1.178/FMRP/api_web/Api_Login/loginMain?csrf_protection=true", { name, password })
+    //   .then(response => {
+    //     console.log(response)
+    //     // Handle response
+    //   })
+    dispatch({type: "auth/update", payload: true})
+  }
+
+  return(
+    <React.Fragment>
+      <Head>
+        <title>Đăng nhập</title>
+      </Head>
+      <div className="bg-[#EEF1F8]">
+        <div className="bg-[url('/Logo-BG.png')] relative bg-repeat-round h-screen w-screen flex flex-col justify-center items-center">
+          <div className='flex space-x-20 w-full px-20 z-10'>
+            <div className='space-y-8'>
+              <div className='bg-white px-16 pt-20 pb-12 rounded-lg space-y-10 w-[600px]'>
+                <div className='space-y-3'>
+                  <h1 className="text-[#11315B] font-medium text-3xl text-center">Đăng nhập</h1>
+                  <div className='flex space-x-5 w-full'>
+                    <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ? "bg-[#E2F0FE] border-transparent text-[#11315B]" : "bg-white border-[#cccccc]"} px-5 py-3 rounded-md transition hover:scale-105 border w-full`}>Phiên Bản Chính Thức</button>
+                    <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ? "bg-[#E2F0FE] border-transparent text-[#11315B]" : "bg-white border-[#cccccc]"} px-5 py-3 rounded-md transition hover:scale-105 border w-full`}>Phiên Bản Trải nghiệm</button>
                   </div>
-                  <div className="style__input">
-                    <input
-                      // onChange={(e) => setTen(e.target.value)}
-                      type="text"
-                      placeholder="Tên truy cập"
-                      className="w-full py-3 px-4"
-                    />
-                  </div>
-                  <div className="py-[14px] style__input relative">
-                    <input
-                      type="password"
-                      name="password"
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <input type="checkbox" />
-                      <label className="font-normal text-sm text-[#344054]">
-                        Ghi nhớ cho lần đăng nhập sau
-                      </label>
+                </div>
+                <div className='space-y-3'>
+                  <input
+                    type="text"
+                    placeholder='Mã công ty'
+                    value={code}
+                    onChange={_HandleInputChange.bind(this, "code")}
+                    className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full'
+                  />
+                  <input
+                    type="text"
+                    placeholder="Tên truy cập"
+                    value={name}
+                    onChange={_HandleInputChange.bind(this, "name")}
+                    className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full'
+                  />
+                  <input
+                    type="password"
+                    placeholder='Mật khẩu'
+                    value={password}
+                    onChange={_HandleInputChange.bind(this, "password")}
+                    className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full'
+                  />
+                  <div className='flex w-full justify-between'>
+                    <div className='flex items-center space-x-1.5'>
+                      <input type="checkbox" id="saveAccount" />
+                      <label for="saveAccount">Ghi nhớ cho lần đăng nhập sau</label>
                     </div>
-                    <div className="">
-                      <p className="text-[#3276FA] font-normal text-sm cursor-pointer">
-                        Quên mật khẩu
-                      </p>
-                    </div>
+                    <button className='text-[#3276FA] text-sm'>Quên mật khẩu</button>
                   </div>
-                  <button className="text-[#FFFFFF] font-normal text-lg py-3 w-full bg-[#0F4F9E] mt-[18px]  style__button">
-                    Đăng nhập
-                  </button>
-                </form>
-                <h4 className="text-center text-[#667085] text-sm font-light py-[50px]">
-                  FOSOSOFT © 2021
-                </h4>
+                </div>
+                <button onClick={handleSubmit.bind(this)} className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] btn-animation hover:scale-105">Đăng nhập</button>
+                <h4 className="text-center text-[#667085] text-sm font-light">FOSOSOFT © 2021</h4>
               </div>
-              <div className="flex items-center justify-evenly mt-[55px]">
-                <div className="">
-                  <p className="text-[#344054] font-light text-sm cursor-pointer">
-                    Cổng dịch vụ khách hàng
-                  </p>
-                </div>
-                <div className="">
-                  <p className="text-[#344054] font-light text-sm cursor-pointer">
-                    User Pay
-                  </p>
-                </div>
-                <div className="">
-                  <p className="text-[#344054] font-light text-sm cursor-pointer">
-                    FMRP Website
-                  </p>
-                </div>
-                <div className="bg-[#c7dffb] cursor-pointer rounded-lg px-1 py-[15px] ">
-                  {/* <Popup
-                    trigger={
-                      <img
-                        src="../../image/login/more.png"
-                        alt=""
-                        className="w-full h-full object-cover cursor-pointer "
-                      />
-                    }
+              <div className='flex items-center space-x-6 justify-center'>
+                <a href="#" className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm">Cổng dịch vụ khách hàng</a>
+                <a href="#" className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm">User Pay</a>
+                <a href="#" className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm">FMRP Website</a>
+                <Popup
+                    trigger={<button className='text-[#344054] hover:text-[#0F4F9E]'><IconMore /></button>}
+                    closeOnDocumentClick
+                    arrow={false}
                     position="right bottom"
                     on={["hover"]}
-                    arrow={false}
-                  >
-                    <div className="bg-[#FFFFFF] border-[#D0D5DD] border-solid border style__help ml-4">
-                      <div className="">
-                        <ul>
-                          <li className="px-4 py-[10px] text-[#667085] font-normal text-sm hover:text-[#141522] hover:bg-[#F7F8F9] cursor-pointer ">
-                            Tạo phím tắt trên màn hình
-                          </li>
-                          <li className="px-4 py-[10px] text-[#667085] font-normal text-sm hover:text-[#141522] hover:bg-[#F7F8F9] cursor-pointer">
-                            Yêu cầu Tư vấn qua điện thoại
-                          </li>
-                          <li className="px-4 py-[10px] text-[#667085] font-normal text-sm hover:text-[#141522] hover:bg-[#F7F8F9] cursor-pointer">
-                            Tối ưu hóa trình duyệt
-                          </li>
-                          <li className="px-4 py-[10px] text-[#667085] font-normal text-sm hover:text-[#141522] hover:bg-[#F7F8F9] cursor-pointer">
-                            Báo cáo lỗi
-                          </li>
-                          <li className="px-4 py-[10px] text-[#667085] font-normal text-sm hover:text-[#141522] hover:bg-[#F7F8F9] cursor-pointer">
-                            Điều khiển
-                          </li>
-                          <li className="px-4 py-[10px] text-[#667085] font-normal text-sm hover:text-[#141522] hover:bg-[#F7F8F9] cursor-pointer">
-                            Liên hệ
-                          </li>
-                        </ul>
-                      </div>
+                    className={`dropdown-edit `}
+                >
+                    <div className="w-auto">
+                        <div className="bg-white p-0.5 rounded-t w-60">
+                            <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Tạo phím tắt trên màn hình</button>
+                            <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Yêu cầu Tư vấn qua điện thoại</button>
+                            <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Tối ưu hóa trình duyệt</button>
+                            <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Báo cáo lỗi</button>
+                            <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Điều khiển</button>
+                            <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Liên hệ</button>
+                        </div>
                     </div>
-                  </Popup> */}
+                </Popup>
+              </div>
+            </div>
+            <div className='space-y-9'>
+              <Image src="/logo_1.png" width={200} height={70} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+              <div className='space-y-6'>
+                <h1 className="text-[#344054] font-medium text-xl">Trợ lý sản xuất</h1>
+                <div className='space-y-1'>
+                  <p className="text-[#667085] font-light text-[16px]">Giải pháp phần mềm cho doanh nghiệp</p>
+                  <p className="text-[#667085] font-light text-[16px]">
+                    Hotline:
+                    <span className="text-[#0F4F9E] font-normal ml-1">0901.13.6968</span>
+                  </p>
+                  <p className="text-[#667085] font-light text-[16px]">
+                    Tổng đài:
+                    <span className="text-[#0F4F9E] font-normal mx-1">028.7776.8880</span>
+                    (Phím 1 - BP. Tư Vấn - Phím 2 - BP. Kỹ Thuật)
+                  </p>
                 </div>
               </div>
-            </div>
-            <div className="destion">
-              <div className="logo w-[195px] h-[70px]">
-                <img
-                  src="../../image/login/Logo.png"
-                  alt=""
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="title">
-                <h1 className="pt-[24px] text-[#344054] font-medium text-[32px]">
-                  Trợ lý sản xuất
-                </h1>
-                <p className="text-[#667085] font-light text-[16px]">
-                  Giải pháp phần mềm cho doanh nghiệp
-                </p>
-                <p className="text-[#667085] font-light text-[16px]">
-                  {" "}
-                  Hotline:{" "}
-                  <span className="text-[#0F4F9E] font-normal">
-                    0901.13.6968
-                  </span>
-                </p>
-                <p className="text-[#667085] font-light text-[16px]">
-                  Tổng đài:{" "}
-                  <span className="text-[#0F4F9E] font-normal">
-                    028.7776.8880
-                  </span>{" "}
-                  (Phím 1 - BP. Tư Vấn - Phím 2 - BP. Kỹ Thuật)
-                </p>
-                <div className="qrcode w-[140px] h-[140px] mt-[16px]">
-                  <img
-                    src="../../image/login/qr.png"
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                </div>{" "}
-              </div>
+              <Image src="/qr.png" width={140} height={140} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
             </div>
           </div>
-          <div className="style__user">
-            <img src="../../image/login/Illust.png" alt="" />
+          <div className='absolute bottom-0 right-0'>
+            <Image src="/Illust.png" width={550} height={550} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
           </div>
         </div>
       </div>
-    </div>
+    </React.Fragment>
   )
 }
 
