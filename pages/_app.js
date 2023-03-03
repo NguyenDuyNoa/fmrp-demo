@@ -7,8 +7,21 @@ import store from "/services/redux";
 import "react-datepicker/dist/react-datepicker.css";
 import '../styles/globals.scss'
 
+import { Lexend_Deca } from "@next/font/google";
+
+const deca = Lexend_Deca({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700']
+})
+
 const Default = (props) => {
-  return(<Provider store={store}><MainPage {...props}/></Provider>)
+  return(
+    <Provider store={store}>
+      <main className={deca.className}>
+        <MainPage {...props}/>
+      </main>
+    </Provider>
+  )
 }
 
 function MainPage({ Component, pageProps }) {
