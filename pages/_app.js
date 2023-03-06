@@ -5,12 +5,11 @@ import Image from 'next/image';
 
 import Layout from "../components/layout"
 import store from "/services/redux";
-// import {_ServerInstance as Axios} from '/services/axios';
+import {_ServerInstance as Axios} from '/services/axios';
 
 import "react-datepicker/dist/react-datepicker.css";
 import '../styles/globals.scss'
 
-import axios from 'axios';
 import Popup from 'reactjs-popup';
 import {More as IconMore} from 'iconsax-react'
 import { Lexend_Deca } from "@next/font/google";
@@ -78,6 +77,7 @@ const LoginPage = () => {
   const [code, sCode] = useState("");
   const [name, sName] = useState("");
   const [password, sPassword] = useState("");
+  const [onSending, sOnSending] = useState(false)
 
   const _HandleInputChange = (type, value) => {
     if(type === "code"){
@@ -88,15 +88,43 @@ const LoginPage = () => {
       sPassword(value.target?.value)
     }
   }
-  const handleSubmit = e => {
+
+  const _ServerSending = () => {
+    Axios("POST", "/Api_Login/loginMain?csrf_protection=true", {
+      data: {
+        company_code: code,
+        user_name: name,
+        password: password
+      }
+    }, (err, response) => {
+      console.log(response, err)
+      // if(!err){
+      //   var {status, info, token} = response.data;
+      //   if(status === 200){ // Đăng Nhập thành công
+      //     dispatch({type: "auth/update", payload: info})
+      //     localStorage.setItem("tokenPP", token)
+      //   }else{
+      //     // alert("sai");
+      //     swal({
+      //       title: "Thông tin không chính xác",
+      //       text: "Vui lòng nhập lại",
+      //       icon: "warning",
+      //       button: false,
+      //       timer: 1000
+      //     });
+      //   }
+      // }
+      // sOnSending(false)
+    })
+  }
+
+  useEffect(() => {
+    onSending && _ServerSending()
+  }, [onSending])
+
+  const _HandleSubmit = (e) => {
     e.preventDefault()
-    // axios
-    //   .post("http://192.168.1.178/FMRP/api_web/Api_Login/loginMain?csrf_protection=true", { name, password })
-    //   .then(response => {
-    //     console.log(response)
-    //     // Handle response
-    //   })
-    dispatch({type: "auth/update", payload: true})
+    name && password && sOnSending(true)
   }
 
   return(
@@ -106,7 +134,7 @@ const LoginPage = () => {
       </Head>
       <div className="bg-[#EEF1F8]">
         <div className="bg-[url('/Logo-BG.png')] relative bg-repeat-round h-screen w-screen flex flex-col justify-center items-center">
-          <div className='flex space-x-20 w-full px-20 z-10'>
+          <div className='flex justify-center space-x-20 w-full z-10'>
             <div className='space-y-8'>
               <div className='bg-white px-16 pt-20 pb-12 rounded-lg space-y-10 w-[600px]'>
                 <div className='space-y-3'>
@@ -141,12 +169,12 @@ const LoginPage = () => {
                   <div className='flex w-full justify-between'>
                     <div className='flex items-center space-x-1.5'>
                       <input type="checkbox" id="saveAccount" />
-                      <label for="saveAccount">Ghi nhớ cho lần đăng nhập sau</label>
+                      <label htmlFor="saveAccount">Ghi nhớ cho lần đăng nhập sau</label>
                     </div>
                     <button className='text-[#3276FA] text-sm'>Quên mật khẩu</button>
                   </div>
                 </div>
-                <button onClick={handleSubmit.bind(this)} className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] btn-animation hover:scale-105">Đăng nhập</button>
+                <button onClick={_HandleSubmit.bind(this)} className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] btn-animation hover:scale-105">Đăng nhập</button>
                 <h4 className="text-center text-[#667085] text-sm font-light">FOSOSOFT © 2021</h4>
               </div>
               <div className='flex items-center space-x-6 justify-center'>
@@ -175,7 +203,7 @@ const LoginPage = () => {
               </div>
             </div>
             <div className='space-y-9'>
-              <Image src="/logo_1.png" width={200} height={70} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+              <Image alt="" src="/logo_1.png" width={200} height={70} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
               <div className='space-y-6'>
                 <h1 className="text-[#344054] font-medium text-xl">Trợ lý sản xuất</h1>
                 <div className='space-y-1'>
@@ -191,11 +219,11 @@ const LoginPage = () => {
                   </p>
                 </div>
               </div>
-              <Image src="/qr.png" width={140} height={140} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+              <Image alt="" src="/qr.png" width={140} height={140} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
             </div>
           </div>
           <div className='absolute bottom-0 right-0'>
-            <Image src="/Illust.png" width={550} height={550} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+            <Image src="/Illust.png" alt="" width={550} height={550} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
           </div>
         </div>
       </div>
