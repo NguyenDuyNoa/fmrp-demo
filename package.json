@@ -23,7 +23,8 @@
     "react-select": "^5.7.0",
     "reactjs-popup": "^2.0.5",
     "redux": "^4.2.1",
-    "sass": "^1.58.3"
+    "sass": "^1.58.3",
+    "sweetalert2": "^11.7.3"
   },
   "devDependencies": {
     "@tailwindcss/line-clamp": "^0.4.2",

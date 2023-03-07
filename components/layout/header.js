@@ -1,8 +1,10 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSelector, useDispatch } from 'react-redux';
 
 import Dropdown from '../UI/dropdown';
+import {_ServerInstance as Axios} from '/services/axios';
 
 import Popup from 'reactjs-popup';
 import {ArrowDown2 as IconDown} from "iconsax-react"
@@ -425,9 +427,9 @@ const Header = () => {
                         placeholder="Tìm kiếm"
                     />
                 </form>
-                <a href="#" title='Cài đặt' className='hover:scale-105 transition'>
+                <Link href="/settings" title='Cài đặt' className='hover:scale-105 transition'>
                     <Image src="/icon/header/extent.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
-                </a>
+                </Link>
                 <a href="#" title='Thông báo' className='hover:scale-105 transition relative'>
                     <Image src="/icon/header/tb2.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                     <div className='text-[10px] bg-red-500 h-4 w-4 rounded-full absolute -top-[7px] -right-[7px] flex flex-col items-center justify-center text-white font-medium'>2</div>
@@ -444,14 +446,37 @@ const Header = () => {
   };
 
 const DropdownAvatar = React.memo(() => {
+    const dispatch = useDispatch();
+    var token = localStorage?.getItem('tokenFRMP')
+    const databaseApp = useSelector(state => state.databaseApp);
+
+    const [onSending, sOnSending] = useState(false)
+
+    const _ServerSending = () => {
+        Axios("POST", "/Api_Login/logout?csrf_protection=true", {}, (err, response) => {
+            dispatch({ type: "auth/update", payload: null });
+            localStorage.removeItem("tokenFMRP");
+            localStorage.removeItem("databaseappFMRP");
+            sOnSending(false)
+        })
+    }
+
+    useEffect(() => {
+        onSending && _ServerSending()
+    }, [onSending])
+
+    const _HandleLogout = () => {
+        sOnSending(true)
+    };
+
     return (
-        <div className="">
+        <React.Fragment>
             <Popup
                 trigger={
                     <button className={`hover:drop-shadow-[0_0_5px_#eabd7a99]`} >
                         <div className='flex items-center self-center space-x-1'>
-                            <Image src="/avt.png" width={35.5} height={35.5} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
-                            <Image src="/icon/header/dropdown.png" width={10} height={10} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                            <Image alt="" src="/avt.png" width={35.5} height={35.5} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                            <Image alt="" src="/icon/header/dropdown.png" width={10} height={10} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                         </div>
                     </button>
                 }
@@ -465,7 +490,7 @@ const DropdownAvatar = React.memo(() => {
                     <div className="bg-white rounded justify-between">
                         <div className='flex space-x-3 px-3 py-3.5 border-b border-[#F2F4F7]'>
                             <div className='h-fit min-w-[40px] relative'>
-                                <Image src="/avt.png" width={40} height={40} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                <Image alt="" src="/avt.png" width={40} height={40} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                 <div className='bg-green-500 w-2.5 h-2.5 rounded-full absolute bottom-0 right-1' />
                             </div>
                             <div>
@@ -475,24 +500,24 @@ const DropdownAvatar = React.memo(() => {
                         </div>
                         <div className=''>
                             <button className='w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2 outline-none'>
-                                <Image src="/icon/header/avatar/user.png" width={20} height={20} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                <Image alt="" src="/icon/header/avatar/user.png" width={20} height={20} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                 <span>Thông tin tài khoản</span>
                             </button>
                             <button className='w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2'>
-                                <Image src="/icon/header/avatar/pas.png" width={20} height={20} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                <Image alt="" src="/icon/header/avatar/pas.png" width={20} height={20} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                 <span>Đổi mật khẩu</span>
                             </button>
                             <button className='w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2'>
-                                <Image src="/icon/header/avatar/inbox.png" width={20} height={20} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                <Image alt="" src="/icon/header/avatar/inbox.png" width={20} height={20} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                 <span>Góp ý</span>
                             </button>
                             <button className='w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2'>
-                                <Image src="/icon/header/avatar/usermore.png" width={20} height={20} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                <Image alt="" src="/icon/header/avatar/usermore.png" width={20} height={20} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                 <span>Giới thiệu - Tích điểm</span>
                             </button>
                             <div className='flex px-4 py-2.5 justify-between items-center'>
                                 <div className='flex items-center space-x-2'>
-                                    <Image src="/icon/header/avatar/lang.png" width={20} height={20} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                    <Image alt="" src="/icon/header/avatar/lang.png" width={20} height={20} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                     <h6>Ngôn ngữ</h6>
                                 </div>
                                 <div className='relative flex items-center'>
@@ -503,18 +528,17 @@ const DropdownAvatar = React.memo(() => {
                                     <div className='absolute right-2'><IconDown size={15} /></div>
                                 </div>
                             </div>
-                            <button className='w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2'>
-                                <Image src="/icon/header/avatar/out.png" width={20} height={20} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                            <button onClick={_HandleLogout.bind(this)} className='w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2'>
+                                <Image alt="" src="/icon/header/avatar/out.png" width={20} height={20} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                 <span>Đăng xuất</span>
                             </button>
                         </div>
                     </div>
                 </div>
             </Popup>
-        </div>
+        </React.Fragment>
     );
 })
 
-DropdownAvatar.displayName = 'DropdownAvatar';
 export default Header;
   

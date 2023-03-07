@@ -7,9 +7,11 @@ import Layout from "../components/layout"
 import store from "/services/redux";
 import {_ServerInstance as Axios} from '/services/axios';
 
+import 'sweetalert2/src/sweetalert2.scss'
 import "react-datepicker/dist/react-datepicker.css";
 import '../styles/globals.scss'
 
+import Swal from 'sweetalert2'
 import Popup from 'reactjs-popup';
 import {More as IconMore} from 'iconsax-react'
 import { Lexend_Deca } from "@next/font/google";
@@ -29,39 +31,47 @@ const Default = (props) => {
 }
 
 function MainPage({ Component, pageProps }) {
-//   const dispatch = useDispatch();
+  const dispatch = useDispatch();
+
   const auth = useSelector(state => state.auth);
-//   const [onChecking, sOnChecking] = useState(false)
-//   const [error, sError] = useState(false)
+  const databaseApp = useSelector(state => state.databaseApp);
 
-//   const ServerFetching = () => {
-//     sError(false)
-//     Axios("GET", "/authentication", {}, (err, response) => {
-//       if(!err){
-//         var {status, info} = response.data;
-//         if(status === 200){ // Đã đăng nhập
-//           dispatch({type: "auth/update", payload: info})
-//         }else{ // Chưa đăng nhập
-//           dispatch({type: "auth/update", payload: false})
-//         }
-//       }
-//       sOnChecking(false)
-//     })
-//   }
+  const [onChecking, sOnChecking] = useState(false)
+  const [error, sError] = useState(false)
 
-//   useEffect(() => {
-//     onChecking && ServerFetching()
-//  }, [onChecking])
+  const ServerFetching = () => {
+    sError(false)
+    Axios("GET", "/Api_Authentication/authentication?csrf_protection=true", {}, (err, response) => {
+      if(!err){
+        // var {status, info} = response.data;
+        // if(status === 200){ // Đã đăng nhập
+        //   dispatch({type: "auth/update", payload: info})
+        // }else{ // Chưa đăng nhập
+        //   dispatch({type: "auth/update", payload: false})
+        // }
+        var isSuccess = response.data?.isSuccess;
+        if(isSuccess){
+          dispatch({type: "auth/update", payload: response.data?.info})
+        }else{
+          dispatch({type: "auth/update", payload: false})
+        }
+      }else{
+        <LoginPage/>
+      }
 
-//   useEffect(() => {
-//     auth === null && sOnChecking(true)
-//   }, [auth])
+      sOnChecking(false)
+    })
+  }
 
-  // if(auth == null){
-  //     return <LoadingPage/>
-  // }
+  useEffect(() => {
+    onChecking && ServerFetching()
+ }, [onChecking])
 
-  if(auth === false){
+  useEffect(() => {
+    auth === null && sOnChecking(true)
+  }, [auth])
+
+  if(auth === null){
     return <LoginPage/>
   }
 
@@ -88,7 +98,6 @@ const LoginPage = () => {
       sPassword(value.target?.value)
     }
   }
-
   const _ServerSending = () => {
     Axios("POST", "/Api_Login/loginMain?csrf_protection=true", {
       data: {
@@ -97,24 +106,30 @@ const LoginPage = () => {
         password: password
       }
     }, (err, response) => {
-      console.log(response, err)
-      // if(!err){
-      //   var {status, info, token} = response.data;
-      //   if(status === 200){ // Đăng Nhập thành công
-      //     dispatch({type: "auth/update", payload: info})
-      //     localStorage.setItem("tokenPP", token)
-      //   }else{
-      //     // alert("sai");
-      //     swal({
-      //       title: "Thông tin không chính xác",
-      //       text: "Vui lòng nhập lại",
-      //       icon: "warning",
-      //       button: false,
-      //       timer: 1000
-      //     });
-      //   }
-      // }
-      // sOnSending(false)
+      console.log("err", err)
+      console.log("response", response)
+      if(response !== null){
+        var isSuccess = response.data?.isSuccess;
+        if(isSuccess){
+          dispatch({type: "auth/update", payload: response.data?.data})
+          localStorage.setItem("tokenFMRP", response.data?.token)
+          localStorage.setItem("databaseappFMRP", response.data?.database_app)
+        }else{
+          Swal.fire({
+            title: "Lỗi",
+            text: "Thông tin của bạn chưa đúng",
+            icon: "error",
+            background: "#ffffff",
+            color: "#141522",
+            showConfirmButton: false,
+            timer: 1000,
+            width: "400px"
+          });
+        }
+      }else {
+        console.log("Lỗi")
+      }
+      sOnSending(false)
     })
   }
 
@@ -124,7 +139,20 @@ const LoginPage = () => {
 
   const _HandleSubmit = (e) => {
     e.preventDefault()
-    name && password && sOnSending(true)
+    if((name.length && code.length && password.length) === 0 ){
+      Swal.fire({
+        title: "Cảnh báo",
+        text: "Vui lòng điền đầy đủ thông tin",
+        icon: "warning",
+        background: "#ffffff",
+        color: "#141522",
+        showConfirmButton: false,
+        timer: 800,
+        width: "400px"
+      });
+    }else{
+        sOnSending(true)
+    }
   }
 
   return(
@@ -219,11 +247,11 @@ const LoginPage = () => {
                   </p>
                 </div>
               </div>
-              <Image alt="" src="/qr.png" width={140} height={140} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+              <Image alt="" src="/qr.png" width={140} height={140} quality={100} className="object-contain w-auto h-auto" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
             </div>
           </div>
           <div className='absolute bottom-0 right-0'>
-            <Image src="/Illust.png" alt="" width={550} height={550} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+            <Image src="/Illust.png" alt="" width={550} height={550} quality={100} className="object-contain w-auto h-auto" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
           </div>
         </div>
       </div>
