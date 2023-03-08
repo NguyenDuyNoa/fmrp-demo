@@ -7,10 +7,12 @@ import Layout from "../components/layout"
 import store from "/services/redux";
 import {_ServerInstance as Axios} from '/services/axios';
 
+import 'aos/dist/aos.css'; 
 import 'sweetalert2/src/sweetalert2.scss'
 import "react-datepicker/dist/react-datepicker.css";
 import '../styles/globals.scss'
 
+import AOS from 'aos';
 import Swal from 'sweetalert2'
 import Popup from 'reactjs-popup';
 import {More as IconMore} from 'iconsax-react'
@@ -34,25 +36,21 @@ function MainPage({ Component, pageProps }) {
   const dispatch = useDispatch();
 
   const auth = useSelector(state => state.auth);
-  const databaseApp = useSelector(state => state.databaseApp);
 
   const [onChecking, sOnChecking] = useState(false)
-  const [error, sError] = useState(false)
 
   const ServerFetching = () => {
-    sError(false)
     Axios("GET", "/Api_Authentication/authentication?csrf_protection=true", {}, (err, response) => {
-      if(!err){
+      if(err){
+        dispatch({type: "auth/update", payload: false})
+      }else{
         var isSuccess = response.data?.isSuccess;
         if(isSuccess){
           dispatch({type: "auth/update", payload: response.data?.info})
         }else{
           dispatch({type: "auth/update", payload: false})
         }
-      }else{
-        <LoginPage/>
       }
-
       sOnChecking(false)
     })
   }
@@ -82,6 +80,9 @@ const LoginPage = () => {
   const [tab, sTab] = useState(0);
   const _HandleSelectTab = (e) => sTab(e);
 
+  const [typePassword, sTypePassword] = useState(false);
+  const _TogglePassword = () => sTypePassword(!typePassword)
+
   const [code, sCode] = useState("");
   const [name, sName] = useState("");
   const [password, sPassword] = useState("");
@@ -104,8 +105,6 @@ const LoginPage = () => {
         password: password
       }
     }, (err, response) => {
-      console.log("err", err)
-      console.log("response", response)
       if(response !== null){
         var isSuccess = response.data?.isSuccess;
         if(isSuccess){
@@ -153,16 +152,23 @@ const LoginPage = () => {
     }
   }
 
+  useEffect(() => {
+    AOS.init({
+      duration : 1500,
+      once: true
+    });
+  }, []);
+
   return(
     <React.Fragment>
       <Head>
         <title>Đăng nhập</title>
       </Head>
       <div className="bg-[#EEF1F8]">
-        <div className="bg-[url('/Logo-BG.png')] relative bg-repeat-round h-screen w-screen flex flex-col justify-center items-center">
+        <div className="bg-[url('/Logo-BG.png')] relative bg-repeat-round h-screen w-screen flex flex-col justify-center items-center overflow-hidden">
           <div className='flex justify-center space-x-20 w-full z-10'>
             <div className='space-y-8'>
-              <div className='bg-white px-16 pt-20 pb-12 rounded-lg space-y-10 w-[600px]'>
+              <div data-aos="fade-up" className='bg-white px-16 pt-20 pb-12 rounded-lg space-y-10 w-[600px]'>
                 <div className='space-y-3'>
                   <h1 className="text-[#11315B] font-medium text-3xl text-center">Đăng nhập</h1>
                   <div className='flex space-x-5 w-full'>
@@ -185,13 +191,22 @@ const LoginPage = () => {
                     onChange={_HandleInputChange.bind(this, "name")}
                     className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full'
                   />
-                  <input
-                    type="password"
-                    placeholder='Mật khẩu'
-                    value={password}
-                    onChange={_HandleInputChange.bind(this, "password")}
-                    className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full'
-                  />
+                  <div className='relative flex flex-col justify-center'>
+                    <input
+                      type={typePassword ? "text" : "password"}
+                      placeholder='Mật khẩu'
+                      value={password}
+                      onChange={_HandleInputChange.bind(this, "password")}
+                      className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 py-3 pl-5 pr-12 rounded-md w-full'
+                    />
+                    <button onClick={_TogglePassword.bind(this)} className='absolute right-3'>
+                      {typePassword ? 
+                        <img alt="" src="/icon/EyeClosed.png" />
+                        :
+                        <img alt="" src="/icon/eye.png" />
+                      }
+                    </button>
+                  </div>
                   <div className='flex w-full justify-between'>
                     <div className='flex items-center space-x-1.5'>
                       <input type="checkbox" id="saveAccount" />
@@ -229,8 +244,8 @@ const LoginPage = () => {
               </div>
             </div>
             <div className='space-y-9'>
-              <Image alt="" src="/logo_1.png" width={200} height={70} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
-              <div className='space-y-6'>
+              <Image data-aos="fade-up-left" alt="" src="/logo_1.png" width={200} height={70} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+              <div data-aos="fade-right" className='space-y-6'>
                 <h1 className="text-[#344054] font-medium text-xl">Trợ lý sản xuất</h1>
                 <div className='space-y-1'>
                   <p className="text-[#667085] font-light text-[16px]">Giải pháp phần mềm cho doanh nghiệp</p>
@@ -245,11 +260,11 @@ const LoginPage = () => {
                   </p>
                 </div>
               </div>
-              <Image alt="" src="/qr.png" width={140} height={140} quality={100} className="object-contain w-auto h-auto" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+              <Image data-aos="flip-right" alt="" src="/qr.png" width={120} height={120} quality={100} className="object-contain w-auto h-auto" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
             </div>
           </div>
           <div className='absolute bottom-0 right-0'>
-            <Image src="/Illust.png" alt="" width={550} height={550} quality={100} className="object-contain w-auto h-auto" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+            <Image data-aos="zoom-out-left" src="/Illust.png" alt="" width={500} height={500} quality={100} className="object-contain w-[500px] h-auto" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
           </div>
         </div>
       </div>
