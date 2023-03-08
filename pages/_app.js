@@ -7,12 +7,10 @@ import Layout from "../components/layout"
 import store from "/services/redux";
 import {_ServerInstance as Axios} from '/services/axios';
 
-import 'aos/dist/aos.css'; 
 import 'sweetalert2/src/sweetalert2.scss'
 import "react-datepicker/dist/react-datepicker.css";
 import '../styles/globals.scss'
 
-import AOS from 'aos';
 import Swal from 'sweetalert2'
 import Popup from 'reactjs-popup';
 import {More as IconMore} from 'iconsax-react'
@@ -152,13 +150,6 @@ const LoginPage = () => {
     }
   }
 
-  useEffect(() => {
-    AOS.init({
-      duration : 1500,
-      once: true
-    });
-  }, []);
-
   return(
     <React.Fragment>
       <Head>
@@ -168,7 +159,7 @@ const LoginPage = () => {
         <div className="bg-[url('/Logo-BG.png')] relative bg-repeat-round h-screen w-screen flex flex-col justify-center items-center overflow-hidden">
           <div className='flex justify-center space-x-20 w-full z-10'>
             <div className='space-y-8'>
-              <div data-aos="fade-up" className='bg-white px-16 pt-20 pb-12 rounded-lg space-y-10 w-[600px]'>
+              <div className='bg-white px-16 pt-20 pb-12 rounded-lg space-y-10 w-[600px]'>
                 <div className='space-y-3'>
                   <h1 className="text-[#11315B] font-medium text-3xl text-center">Đăng nhập</h1>
                   <div className='flex space-x-5 w-full'>
@@ -244,8 +235,8 @@ const LoginPage = () => {
               </div>
             </div>
             <div className='space-y-9'>
-              <Image data-aos="fade-up-left" alt="" src="/logo_1.png" width={200} height={70} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
-              <div data-aos="fade-right" className='space-y-6'>
+              <Image alt="" src="/logo_1.png" width={200} height={70} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+              <div className='space-y-6'>
                 <h1 className="text-[#344054] font-medium text-xl">Trợ lý sản xuất</h1>
                 <div className='space-y-1'>
                   <p className="text-[#667085] font-light text-[16px]">Giải pháp phần mềm cho doanh nghiệp</p>
@@ -260,11 +251,11 @@ const LoginPage = () => {
                   </p>
                 </div>
               </div>
-              <Image data-aos="flip-right" alt="" src="/qr.png" width={120} height={120} quality={100} className="object-contain w-auto h-auto" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+              <Image alt="" src="/qr.png" width={120} height={120} quality={100} className="object-contain w-auto h-auto" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
             </div>
           </div>
           <div className='absolute bottom-0 right-0'>
-            <Image data-aos="zoom-out-left" src="/Illust.png" alt="" width={500} height={500} quality={100} className="object-contain w-[500px] h-auto" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+            <Image src="/Illust.png" alt="" width={500} height={500} quality={100} className="object-contain w-[500px] h-auto" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
           </div>
         </div>
       </div>
