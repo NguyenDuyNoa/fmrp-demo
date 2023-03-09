@@ -453,7 +453,7 @@ const DropdownAvatar = React.memo(() => {
     const [onSending, sOnSending] = useState(false)
 
     const _ServerSending = () => {
-        Axios("POST", "/Api_Login/logout?csrf_protection=true", {}, (err, response) => {
+        Axios("POST", "/api_web/Api_Login/logout?csrf_protection=true", {}, (err, response) => {
             dispatch({ type: "auth/update", payload: false });
             localStorage.removeItem("tokenFMRP");
             localStorage.removeItem("databaseappFMRP");
