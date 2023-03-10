@@ -54,7 +54,7 @@ const Index = (props) => {
         if(isSuccess){
           Toast.fire({
             icon: 'success',
-            title: dataLang?.aler_success_delete
+            title: `${dataLang?.aler_success_delete}`
           })     
         }
       }
@@ -197,7 +197,7 @@ const Popup_ChiNhanh = (props) => {
             if(isSuccess){
                 Toast.fire({
                     icon: 'success',
-                    title: `${props.id ? "Cập nhật thành công" : "Lưu thành công" }`
+                    title: `${dataLang?.aler_success}`
                 })
             }
             sName(props.name ? props.name : "")
