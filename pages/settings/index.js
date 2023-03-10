@@ -9,7 +9,9 @@ import LoadingItems from "/components/UI/loading"
 import {Camera as IconCamera} from "iconsax-react";
 import Swal from 'sweetalert2'
 
-const Index = () => {
+const Index = (props) => {
+    const dataLang = props.dataLang
+
     const inputUpload = useRef();
     const [hoverImg, sHoverImg] = useState(false);
 
@@ -17,66 +19,14 @@ const Index = () => {
 
     const [onFetching, sOnFetching] = useState(false);
     const [onSending, sOnSending] = useState(false);
-
-    ///hình
-    const [data, sData] = useState();
-    ////
-
-    const [name, sName] = useState("");;
-    const [phone, sPhone] = useState("");
-    const [email, sEmail] = useState("");
-    const [address, sAddress] = useState("");
-    const [website, sWebsite] = useState("");
-
-    const [nameDD, sNameDD] = useState("");
-    const [phoneDD, sPhoneDD] = useState("");
-    const [emailDD, sEmailDD] = useState("");
-    const [addressDD, sAddressDD] = useState("");
-
-    const _HandleChangeFileThumb = ({target: {files}}) => {
-        var [file] = files;
-        if(file){
-            sData({...data,thumb:URL.createObjectURL(file), file: file})
-        }
-        inputUpload.current.value = null;
-    }
-
-    const _HandleChangeValue = (type, value) => {
-        if(type == "name"){
-            sName(value.target?.value)
-        }else if(type == "phone"){
-            sPhone(value.target?.value)
-        }else if(type == "email"){
-            sEmail(value.target?.value)
-        }else if(type == "address"){
-            sAddress(value.target?.value)
-        }else if(type == "website"){
-            sWebsite(value.target?.value)
-        }else if(type == "nameDD"){
-            sNameDD(value.target?.value)
-        }else if(type == "phoneDD"){
-            sPhoneDD(value.target?.value)
-        }else if(type == "emailDD"){
-            sEmailDD(value.target?.value)
-        }else if(type == "addressDD"){
-            sAddressDD(value.target?.value)
-        }
-    }
+    const [data, sData] = useState([]);
 
     const _ServerFetching = () => {
         Axios("GET", "/api_web/Api_Setting/companyInfo?csrf_protection=true", {}, (err, response) => {
             if(!err){
                 var {isSuccess, data} = response.data;
                 if(isSuccess){
-                    sName(data?.company_name)
-                    sPhone(data?.company_phone_number)
-                    sEmail(data?.company_email)
-                    sAddress(data?.company_address)
-                    sWebsite(data?.company_website)
-                    sNameDD(data?.representative_name)
-                    sPhoneDD(data?.representative_phone_number)
-                    sEmailDD(data?.representative_email)
-                    sAddressDD(data?.representative_address)
+                    sData({...data})
                 }else {
                     dispatch({type: "auth/update", payload: false})
                 }
@@ -93,30 +43,68 @@ const Index = () => {
         sOnFetching(true)
     }, []);
 
+    const _HandleImg = (e) => {
+        let file = e.target.files[0]
+        if(file){
+            sData({...data, company_logo: file})
+        }
+        inputUpload.current.value = null;
+    }
+    // console.log(URL.createObjectURL(data?.company_logo))
+
+    const _HandleChangeValue = (type, value) => {
+        if(type == "name"){
+            sData({...data, company_name:value.target?.value})
+        }else if(type == "phone"){
+            sData({...data, company_phone_number:value.target?.value})
+        }else if(type == "email"){
+            sData({...data, company_email:value.target?.value})
+        }else if(type == "address"){
+            sData({...data, company_address:value.target?.value})
+        }else if(type == "website"){
+            sData({...data, company_website:value.target?.value})
+        }else if(type == "nameDD"){
+            sData({...data, representative_name:value.target?.value})
+        }else if(type == "phoneDD"){
+            sData({...data, representative_phone_number:value.target?.value})
+        }else if(type == "emailDD"){
+            sData({...data, representative_email:value.target?.value})
+        }else if(type == "addressDD"){
+            sData({...data, representative_address:value.target?.value})
+        }
+    }
+    
     const _ServerSending = () => {
-        Axios("POST", "/api_web/Api_Setting/companyInfo?csrf_protection=true", {
-            data: {
-                "form_data": {
-                    company_name: name,
-                    company_phone_number: phone,
-                    company_email: email,
-                    company_address: address,
-                    company_website: website,
-                    representative_name: nameDD,
-                    representative_phone_number: phoneDD,
-                    representative_email: emailDD,
-                    representative_address: addressDD
+        var formData = new  FormData()
+
+        formData.append("company_name", data?.company_name)
+        formData.append("company_email", data?.company_email)
+        formData.append("company_address", data?.company_address)
+        formData.append("company_phone_number", data?.company_phone_number)
+        formData.append("company_website", data?.company_website)
+        formData.append("representative_address", data?.representative_address)
+        formData.append("representative_email", data?.representative_email)
+        formData.append("representative_name", data?.representative_name)
+        formData.append("representative_phone_number", data?.representative_phone_number)
+
+        // formData.append("company_logo", data?.company_logo)
+        setTimeout(
+            Axios("POST", "/api_web/Api_Setting/companyInfo?csrf_protection=true", {
+                data: formData,
+                headers: {'Content-Type': 'multipart/form-data'}
+            }, (err, response) => {
+                if(!err){
+                    var {isSuccess} = response.data;
+                    if(isSuccess){
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Cập nhật dữ liệu thành công'
+                        })
+                    }
                 }
-            }
-        }, (err, response) => {
-            if(!err){
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Cập nhật dữ liệu thành công'
-                })
-            }
-            sOnSending(false)
-        })
+                sOnSending(false)
+            }), 1000
+        )
     }
 
     const Toast = Swal.mixin({
@@ -135,18 +123,6 @@ const Index = () => {
         sOnSending(true);
     }
 
-    ///Đếm thông tin thiếu
-    var listInfo = [];
-    if(name == ""){ listInfo.push("Tên Doanh Nghiệp") }
-    if(phone == ""){ listInfo.push("Số điện thoại Doanh Nghiệp") }
-    if(email == ""){ listInfo.push("Email Doanh Nghiệp") }
-    if(address == ""){ listInfo.push("Địa chỉ Doanh Nghiệp") }
-    if(website == ""){ listInfo.push("Website Doanh Nghiệp") }
-    if(nameDD == ""){ listInfo.push("Tên Người Đại Diện") }
-    if(phoneDD == ""){ listInfo.push("Số điện thoại Người Đại Diện") }
-    if(emailDD == ""){ listInfo.push("Email Người Đại Diện") }
-    if(addressDD == ""){ listInfo.push("Địa chỉ Người Đại Diện") }
-    ///
     
     return (
         <React.Fragment>
@@ -161,7 +137,7 @@ const Index = () => {
                 </div>
                 <div className='grid grid-cols-9 gap-5'>
                     <div className='col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky top-20'>
-                        <ListBtn_Setting />
+                        <ListBtn_Setting dataLang={dataLang} />
                     </div>
                     <div className='col-span-7 space-y-3'>
                         <h2 className='text-2xl text-[#52575E]'>Thông Tin Doanh Nghiệp</h2>
@@ -169,11 +145,11 @@ const Index = () => {
                             <div className='space-y-3'>
                                 <div className='flex justify-center'>
                                     <div className=''>
-                                        <input onChange={_HandleChangeFileThumb.bind(this)} ref={inputUpload} type="file" multiple accept="image/png, image/jpeg" hidden id="upload" />
+                                        <input onChange={_HandleImg.bind(this)} ref={inputUpload} type="file" accept="image/png, image/jpeg" hidden id="upload" />
                                         <label htmlFor="upload" className="w-28 h-28 rounded overflow-hidden bg-[#000000]/50 flex flex-col justify-center items-center cursor-pointer">
-                                            {data?.thumb && 
-                                                <div className='relative'>
-                                                    <img alt="logo" onMouseEnter={_HoverImg.bind(this, true)} onMouseLeave={_HoverImg.bind(this, false)} crossOrigin="anonymous" src={typeof(data?.thumb)==="string" ? data?.thumb : URL.createObjectURL(data?.thumb)} className="w-full h-full object-cover"/>
+                                            {data?.company_logo && 
+                                                <div className='relative h-full w-full'>
+                                                    <img alt="logo" onMouseEnter={_HoverImg.bind(this, true)} onMouseLeave={_HoverImg.bind(this, false)} crossOrigin="anonymous" src={data?.company_logo} className="w-full h-full object-cover"/>
                                                     {hoverImg ? 
                                                         <div onMouseEnter={_HoverImg.bind(this, true)} onMouseLeave={_HoverImg.bind(this, false)} className='absolute top-0 right-0 w-full h-full bg-[#000000]/50 z-10 flex flex-col justify-center items-center backdrop-blur-sm'>
                                                             <IconCamera size="30" variant='Bold' className='text-white' />
@@ -184,7 +160,7 @@ const Index = () => {
                                                     }
                                                 </div>
                                             }
-                                            {!data?.thumb && 
+                                            {!data?.company_logo && 
                                                 <React.Fragment>
                                                     <IconCamera size="30" variant='Bold' className='text-white' />
                                                     <span className='text-white text-xs'>Upload logo</span>
@@ -193,14 +169,12 @@ const Index = () => {
                                         </label>
                                     </div>
                                 </div>
-                                <p className='text-[#52575E] font-light text-sm'>
-                                    *Khi thay đổi Ảnh logo này sẽ được áp dụng cho toàn bộ logo trên Biểu mẫu in ấn của hệ thống
-                                </p>
+                                <p className='text-[#52575E] font-light text-sm'>*Khi thay đổi Ảnh logo này sẽ được áp dụng cho toàn bộ logo trên Biểu mẫu in ấn của hệ thống</p>
                             </div>
                             <div className='col-span-2 h-full flex flex-col justify-between'>
-                                <h3 className='text-[#344054]'>Hồ sơ HĐĐT của đơn vị đã hoàn thiện {(10 - listInfo.length)*10}%</h3>
+                                <h3 className='text-[#344054]'>Hồ sơ HĐĐT của đơn vị đã hoàn thiện 10%</h3>
                                 <div className='w-full h-2.5 bg-white rounded-full relative'>
-                                    <div className='absolute left-0 bg-gradient-to-r from-[#1556D9] to-[#8FE8FA] h-2.5 rounded-full' style={{width: `${(10 - listInfo.length)*10}%`}} />
+                                    <div className='absolute left-0 bg-gradient-to-r from-[#1556D9] to-[#8FE8FA] h-2.5 rounded-full' style={{width: `10%`}} />
                                 </div>
                                 <p className='text-[#667085] font-[300]'>Hãy hoàn thiện hồ sơ HĐĐT của bạn để phát hành hóa đơn điện tử nhanh chóng, tránh sai sót.</p>
                                 <div>
@@ -228,7 +202,7 @@ const Index = () => {
                                             <input
                                                 type="text"
                                                 placeholder='Nhập tên Doanh Nghiệp'
-                                                value={name}
+                                                value={data?.company_name}
                                                 onChange={_HandleChangeValue.bind(this, "name")}
                                                 className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
                                             />
@@ -238,7 +212,7 @@ const Index = () => {
                                             <input
                                                 type="email"
                                                 placeholder='Nhập email Doanh Nghiệp'
-                                                value={email}
+                                                value={data?.company_email}
                                                 onChange={_HandleChangeValue.bind(this, "email")}
                                                 className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
                                             />
@@ -248,7 +222,7 @@ const Index = () => {
                                             <input
                                                 type="text"
                                                 placeholder='Nhập website Doanh Nghiệp'
-                                                value={website}
+                                                value={data?.company_website}
                                                 onChange={_HandleChangeValue.bind(this, "website")}
                                                 className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
                                             />
@@ -260,7 +234,7 @@ const Index = () => {
                                             <input
                                                 type="text"
                                                 placeholder='Nhập số điện thoại Doanh Nghiệp'
-                                                value={phone}
+                                                value={data?.company_phone_number}
                                                 onChange={_HandleChangeValue.bind(this, "phone")}
                                                 className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
                                             />
@@ -271,7 +245,7 @@ const Index = () => {
                                                 type="text"
                                                 placeholder='Nhập địa chỉ Doanh Nghiệp'
                                                 rows={3}
-                                                value={address}
+                                                value={data?.company_address}
                                                 onChange={_HandleChangeValue.bind(this, "address")}
                                                 className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full resize-none'
                                             />
@@ -292,7 +266,7 @@ const Index = () => {
                                             <input
                                                 type="text"
                                                 placeholder='Nhập tên Người Đại Diện'
-                                                value={nameDD}
+                                                value={data?.representative_name}
                                                 onChange={_HandleChangeValue.bind(this, "nameDD")}
                                                 className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
                                             />
@@ -302,7 +276,7 @@ const Index = () => {
                                             <input
                                                 type="email"
                                                 placeholder='Nhập email Người Đại Diện'
-                                                value={emailDD}
+                                                value={data?.representative_email}
                                                 onChange={_HandleChangeValue.bind(this, "emailDD")}
                                                 className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
                                             />
@@ -314,7 +288,7 @@ const Index = () => {
                                             <input
                                                 type="text"
                                                 placeholder='Nhập số điện thoại Người Đại Diện'
-                                                value={phoneDD}
+                                                value={data?.representative_phone_number}
                                                 onChange={_HandleChangeValue.bind(this, "phoneDD")}
                                                 className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
                                             />
@@ -325,7 +299,7 @@ const Index = () => {
                                                 type="text"
                                                 placeholder='Nhập địa chỉ Người Đại Diện'
                                                 rows={3}
-                                                value={addressDD}
+                                                value={data?.representative_address}
                                                 onChange={_HandleChangeValue.bind(this, "addressDD")}
                                                 className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full resize-none'
                                             />
@@ -346,19 +320,19 @@ const Index = () => {
     );
 }
 
-const ListBtn_Setting = React.memo(() => {
+const ListBtn_Setting = React.memo((props) => {
     return(
         <React.Fragment>
-            <p className='font-[400] text-[15px] text-[#0F4F9E] uppercase'>Danh sách cài đặt</p>
+            <p className='font-[400] text-[15px] text-[#0F4F9E] uppercase'>{props.dataLang?.branch_settings_list}</p>
             <div>
-                <Btn_Setting url="/settings" isActive="/settings">Thông tin doanh nghiệp</Btn_Setting>
-                <Btn_Setting>Thông tin dịch vụ FMRP</Btn_Setting>
-                <Btn_Setting>Thiết lập chi nhánh</Btn_Setting>
-                <Btn_Setting>Tài chính</Btn_Setting>
-                <Btn_Setting>Báo giá</Btn_Setting>
-                <Btn_Setting>Đơn hàng</Btn_Setting>
-                <Btn_Setting>Giai đoạn sản xuất</Btn_Setting>
-                <Btn_Setting>Danh mục</Btn_Setting>
+                <Btn_Setting url="/settings" isActive="/settings">{props.dataLang?.list_btn_seting_information}</Btn_Setting>
+                <Btn_Setting>{props.dataLang?.list_btn_seting_services}</Btn_Setting>
+                <Btn_Setting url="/settings/branch" isActive="/settings/branch">{props.dataLang?.list_btn_seting_setup}</Btn_Setting>
+                <Btn_Setting>{props.dataLang?.list_btn_seting_finance}</Btn_Setting>
+                <Btn_Setting>{props.dataLang?.list_btn_seting_qt}</Btn_Setting>
+                <Btn_Setting>{props.dataLang?.list_btn_seting_order}</Btn_Setting>
+                <Btn_Setting>{props.dataLang?.list_btn_seting_stage}</Btn_Setting>
+                <Btn_Setting>{props.dataLang?.list_btn_seting_category}</Btn_Setting>
                 <Btn_Setting url="/settings/variant" isActive="/settings/variant">Thiết lập biến thể</Btn_Setting>
             </div>
         </React.Fragment>

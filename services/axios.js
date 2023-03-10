@@ -1,8 +1,8 @@
 import axios from 'axios'
 import store from "/services/redux";
 
-// axios.defaults.baseURL = 'https://demo.fososoft.com/FMRP';
-axios.defaults.baseURL = 'http://192.168.1.178/FMRP';
+axios.defaults.baseURL = 'https://demo.fososoft.com/FMRP';
+// axios.defaults.baseURL = 'http://192.168.1.178/FMRP';
 
 axios.defaults.withCredentials = false;
 axios.defaults.include = true;
@@ -29,7 +29,7 @@ const _ServerInstance = (method, url, dataObject, callback) => {
 	    include: true,
 		...dataObject,
 	    headers: {
-			'Content-Type': 'application/json',
+			'Content-Type': dataObject.headers?.["Content-Type"] ? dataObject.headers?.["Content-Type"] : "application/json",
 			'Authorization': `Bearer ${token}`,
 			'x-api-key': databaseApp,
 			// "Access-Control-Allow-Headers": "Origin, X-Api-Key, X-Requested-With, Content-Type, Accept, Authorization"

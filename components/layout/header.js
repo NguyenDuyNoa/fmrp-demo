@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSelector, useDispatch } from 'react-redux';
+import { useRouter } from 'next/router';
 
 import Dropdown from '../UI/dropdown';
 import {_ServerInstance as Axios} from '/services/axios';
@@ -446,15 +447,19 @@ const Header = () => {
   };
 
 const DropdownAvatar = React.memo(() => {
+    const router = useRouter()
     const dispatch = useDispatch();
 
     const [onSending, sOnSending] = useState(false)
 
     const _ServerSending = () => {
         Axios("POST", "/api_web/Api_Login/logout?csrf_protection=true", {}, (err, response) => {
-            dispatch({ type: "auth/update", payload: false });
-            localStorage.removeItem("tokenFMRP");
-            localStorage.removeItem("databaseappFMRP");
+            if(!err){
+                dispatch({ type: "auth/update", payload: false });
+                localStorage.removeItem("tokenFMRP");
+                localStorage.removeItem("databaseappFMRP");
+                router.push("/")
+            }
             sOnSending(false)
         })
     }

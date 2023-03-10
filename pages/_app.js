@@ -102,7 +102,7 @@ function MainPage({ Component, pageProps }) {
     return <LoginPage dataLang={data}/>
   }
 
-  return <Layout><Component {...pageProps} /></Layout>
+  return <Layout><Component dataLang={data} {...pageProps} /></Layout>
 }
 
 const LoginPage = React.memo((props) => {

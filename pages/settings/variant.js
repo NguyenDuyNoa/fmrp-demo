@@ -36,7 +36,11 @@ const Index = () => {
                                 />
                             </form>
                         </div>
-                        
+                        <div className='grid grid-cols-10 gap-5'>
+                            <h4 className="xl:text-[14px] text-[12px] col-span-3 text-[#667085] uppercase font-[300] text-left">tên biến thể</h4>
+                            <h4 className="xl:text-[14px] text-[12px] col-span-5 text-[#667085] uppercase font-[300] text-left">các tùy chọn</h4>
+                            <h4 className="xl:text-[14px] text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">thuộc tính</h4>
+                        </div>
                     </div>
                 </div>
             </div>
