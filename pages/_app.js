@@ -22,11 +22,16 @@ const deca = Lexend_Deca({
 
 const Default = (props) => {
   return(
-    <Provider store={store}>
-      <main className={deca.className}>
-        <MainPage {...props}/>
-      </main>
-    </Provider>
+    <React.Fragment>
+      <Head>
+        <link rel="shortcut icon" href="/favicon.ico" />
+      </Head>
+      <Provider store={store}>
+        <main className={deca.className}>
+          <MainPage {...props}/>
+        </main>
+      </Provider>
+    </React.Fragment>
   )
 }
 
@@ -144,6 +149,10 @@ const LoginPage = React.memo((props) => {
           dispatch({type: "auth/update", payload: response.data?.data})
           localStorage.setItem("tokenFMRP", response.data?.token)
           localStorage.setItem("databaseappFMRP", response.data?.database_app)
+          Toast.fire({
+            icon: 'success',
+            title: 'Đăng nhập thành công'
+          })
           if(rememberMe){
             localStorage.setItem("usernameFMRP", name)
             localStorage.setItem("usercodeFMRP", code)
@@ -171,6 +180,13 @@ const LoginPage = React.memo((props) => {
       sOnSending(false)
     })
   }
+  const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 2000,
+    timerProgressBar: true,
+  })
 
   useEffect(() => {
     onSending && _ServerSending()

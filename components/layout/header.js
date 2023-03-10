@@ -447,8 +447,6 @@ const Header = () => {
 
 const DropdownAvatar = React.memo(() => {
     const dispatch = useDispatch();
-    var token = localStorage?.getItem('tokenFRMP')
-    const databaseApp = useSelector(state => state.databaseApp);
 
     const [onSending, sOnSending] = useState(false)
 
@@ -468,6 +466,18 @@ const DropdownAvatar = React.memo(() => {
     const _HandleLogout = () => {
         sOnSending(true)
     };
+
+    ///languages
+    const data = useSelector(state=> state.availableLang)
+    const defaultLang = useSelector(state=> state.lang)
+
+    const [lang, sLang] = useState(defaultLang);
+    const _HandleChangeLang = (e) => sLang(e.target?.value)
+
+    useEffect(() => {
+        dispatch({type: "lang/update", payload: lang})
+        localStorage.setItem('LanguagesFMRP', lang);
+    }, [lang]);
 
     return (
         <React.Fragment>
@@ -520,12 +530,11 @@ const DropdownAvatar = React.memo(() => {
                                     <Image alt="" src="/icon/header/avatar/lang.png" width={20} height={20} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                     <h6>Ngôn ngữ</h6>
                                 </div>
-                                <div className='relative flex items-center'>
-                                    <select className="text-[#141522] appearance-none inline-block rounded leading-tight pl-4 pr-8 py-2.5 text-sm w-fit outline-none bg-[#F7F8F9]">
-                                        <option className="pt-6">Tiếng việt</option>
-                                        <option>Tiếng anh</option>
+                                <div className='relative flex items-center bg-[#F7F8F9]'>
+                                    <select onChange={_HandleChangeLang.bind(this)} value={lang} className="z-[2] text-[#141522] appearance-none inline-block rounded leading-tight pl-4 pr-8 py-2.5 text-sm w-fit outline-none bg-transparent">
+                                        {data.map((e, i) => <option key={i} value={e.code}>{e.label}</option>)}
                                     </select>
-                                    <div className='absolute right-2'><IconDown size={15} /></div>
+                                    <div className='absolute right-2 z-[1]'><IconDown size={15} /></div>
                                 </div>
                             </div>
                             <button onClick={_HandleLogout.bind(this)} className='w-full text-left px-4 py-2.5 hover:bg-[#F7F8F9] flex items-center space-x-2'>

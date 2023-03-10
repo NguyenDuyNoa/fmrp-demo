@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import {_ServerInstance as Axios} from '/services/axios';
+import LoadingItems from "/components/UI/loading"
 
 import {Camera as IconCamera} from "iconsax-react";
+import Swal from 'sweetalert2'
 
 const Index = () => {
     const inputUpload = useRef();
@@ -71,9 +73,14 @@ const Index = () => {
                     sEmail(data?.company_email)
                     sAddress(data?.company_address)
                     sWebsite(data?.company_website)
+                    sNameDD(data?.representative_name)
+                    sPhoneDD(data?.representative_phone_number)
+                    sEmailDD(data?.representative_email)
+                    sAddressDD(data?.representative_address)
                 }else {
                     dispatch({type: "auth/update", payload: false})
                 }
+                sOnFetching(false)
             }
         })
     }
@@ -94,15 +101,31 @@ const Index = () => {
                     company_phone_number: phone,
                     company_email: email,
                     company_address: address,
-                    company_website: website
+                    company_website: website,
+                    representative_name: nameDD,
+                    representative_phone_number: phoneDD,
+                    representative_email: emailDD,
+                    representative_address: addressDD
                 }
             }
         }, (err, response) => {
-            console.log("err", err)
-            console.log("response", response)
+            if(!err){
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Cập nhật dữ liệu thành công'
+                })
+            }
             sOnSending(false)
         })
     }
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+    })
 
     useEffect(() => {
         onSending && _ServerSending()
@@ -123,7 +146,7 @@ const Index = () => {
     if(phoneDD == ""){ listInfo.push("Số điện thoại Người Đại Diện") }
     if(emailDD == ""){ listInfo.push("Email Người Đại Diện") }
     if(addressDD == ""){ listInfo.push("Địa chỉ Người Đại Diện") }
-
+    ///
     
     return (
         <React.Fragment>
@@ -138,17 +161,7 @@ const Index = () => {
                 </div>
                 <div className='grid grid-cols-9 gap-5'>
                     <div className='col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky top-20'>
-                        <p className='font-[400] text-[15px] text-[#0F4F9E] uppercase'>Danh sách cài đặt</p>
-                        <div>
-                            <Btn_Setting url="/settings" isActive="/settings">Thông tin doanh nghiệp</Btn_Setting>
-                            <Btn_Setting>Thông tin dịch vụ FMRP</Btn_Setting>
-                            <Btn_Setting>Thiết lập chi nhánh</Btn_Setting>
-                            <Btn_Setting>Tài chính</Btn_Setting>
-                            <Btn_Setting>Báo giá</Btn_Setting>
-                            <Btn_Setting>Đơn hàng</Btn_Setting>
-                            <Btn_Setting>Giai đoạn sản xuất</Btn_Setting>
-                            <Btn_Setting>Danh mục</Btn_Setting>
-                        </div>
+                        <ListBtn_Setting />
                     </div>
                     <div className='col-span-7 space-y-3'>
                         <h2 className='text-2xl text-[#52575E]'>Thông Tin Doanh Nghiệp</h2>
@@ -193,9 +206,9 @@ const Index = () => {
                                 <div>
                                     <h5 className='text-[#11315B] '>Thông tin còn thiếu</h5>
                                     <div className='flex divide-x divide-red-500'>
-                                        {listInfo.map((e, i) => 
+                                        {/* {listInfo.map((e, i) => 
                                             <h6 key={i} className='text-[#EE1E1E] font-[300] text-[14px] px-2 w-fit'>{e}</h6>
-                                        )}
+                                        )} */}
                                     </div>
                                 </div>
                             </div>
@@ -205,113 +218,121 @@ const Index = () => {
                                 <span>Thông tin đơn vị</span>
                                 <img src="/icon/Verified.png" className='w-[25px] h-[25px]' />
                             </h1>
-                            <div className='grid grid-cols-2 gap-7'>
-                                <div className='space-y-3'>
-                                    <div className='space-y-1'>
-                                        <h6 className='text-[14.5px]'>Tên Doanh Nghiệp</h6>
-                                        <input
-                                            type="text"
-                                            placeholder='Nhập tên Doanh Nghiệp'
-                                            value={name}
-                                            onChange={_HandleChangeValue.bind(this, "name")}
-                                            className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
-                                        />
+                            {onFetching ? 
+                                <LoadingItems className="h-60"color="#0f4f9e" />
+                                :
+                                <div className='grid grid-cols-2 gap-7'>
+                                    <div className='space-y-3'>
+                                        <div className='space-y-1'>
+                                            <h6 className='text-[14.5px]'>Tên Doanh Nghiệp</h6>
+                                            <input
+                                                type="text"
+                                                placeholder='Nhập tên Doanh Nghiệp'
+                                                value={name}
+                                                onChange={_HandleChangeValue.bind(this, "name")}
+                                                className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
+                                            />
+                                        </div>
+                                        <div className='space-y-1'>
+                                            <h6 className='text-[14.5px]'>Email Doanh Nghiệp</h6>
+                                            <input
+                                                type="email"
+                                                placeholder='Nhập email Doanh Nghiệp'
+                                                value={email}
+                                                onChange={_HandleChangeValue.bind(this, "email")}
+                                                className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
+                                            />
+                                        </div>
+                                        <div className='space-y-1'>
+                                            <h6 className='text-[14.5px]'>Website Doanh Nghiệp</h6>
+                                            <input
+                                                type="text"
+                                                placeholder='Nhập website Doanh Nghiệp'
+                                                value={website}
+                                                onChange={_HandleChangeValue.bind(this, "website")}
+                                                className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
+                                            />
+                                        </div>
                                     </div>
-                                    <div className='space-y-1'>
-                                        <h6 className='text-[14.5px]'>Email Doanh Nghiệp</h6>
-                                        <input
-                                            type="email"
-                                            placeholder='Nhập email Doanh Nghiệp'
-                                            value={email}
-                                            onChange={_HandleChangeValue.bind(this, "email")}
-                                            className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
-                                        />
-                                    </div>
-                                    <div className='space-y-1'>
-                                        <h6 className='text-[14.5px]'>Website Doanh Nghiệp</h6>
-                                        <input
-                                            type="text"
-                                            placeholder='Nhập website Doanh Nghiệp'
-                                            value={website}
-                                            onChange={_HandleChangeValue.bind(this, "website")}
-                                            className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
-                                        />
+                                    <div className='space-y-3'>
+                                        <div className='space-y-1'>
+                                            <h6 className='text-[14.5px]'>Số điện thoại Doanh Nghiệp</h6>
+                                            <input
+                                                type="text"
+                                                placeholder='Nhập số điện thoại Doanh Nghiệp'
+                                                value={phone}
+                                                onChange={_HandleChangeValue.bind(this, "phone")}
+                                                className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
+                                            />
+                                        </div>
+                                        <div className='space-y-1'>
+                                            <h6 className='text-[14.5px]'>Địa chỉ Doanh Nghiệp</h6>
+                                            <textarea 
+                                                type="text"
+                                                placeholder='Nhập địa chỉ Doanh Nghiệp'
+                                                rows={3}
+                                                value={address}
+                                                onChange={_HandleChangeValue.bind(this, "address")}
+                                                className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full resize-none'
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                                <div className='space-y-3'>
-                                    <div className='space-y-1'>
-                                        <h6 className='text-[14.5px]'>Số điện thoại Doanh Nghiệp</h6>
-                                        <input
-                                            type="text"
-                                            placeholder='Nhập số điện thoại Doanh Nghiệp'
-                                            value={phone}
-                                            onChange={_HandleChangeValue.bind(this, "phone")}
-                                            className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
-                                        />
-                                    </div>
-                                    <div className='space-y-1'>
-                                        <h6 className='text-[14.5px]'>Địa chỉ Doanh Nghiệp</h6>
-                                        <textarea 
-                                            type="text"
-                                            placeholder='Nhập địa chỉ Doanh Nghiệp'
-                                            rows={3}
-                                            value={address}
-                                            onChange={_HandleChangeValue.bind(this, "address")}
-                                            className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full resize-none'
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+                            }
                         </div>
                         <div className='space-y-3 pt-3'>
                             <h1 className='text-[15px] uppercase w-full p-3 rounded bg-[#ECF0F4] flex items-center space-x-3'>Thông tin người đại diện pháp luật</h1>
-                            <div className='grid grid-cols-2 gap-7'>
-                                <div className='space-y-3'>
-                                    <div className='space-y-1'>
-                                        <h6 className='text-[14.5px]'>Tên Người Đại Diện</h6>
-                                        <input
-                                            type="text"
-                                            placeholder='Nhập tên Người Đại Diện'
-                                            value={nameDD}
-                                            onChange={_HandleChangeValue.bind(this, "nameDD")}
-                                            className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
-                                        />
+                            {onFetching ? 
+                                <LoadingItems className="h-60"color="#0f4f9e" />
+                                :
+                                <div className='grid grid-cols-2 gap-7'>
+                                    <div className='space-y-3'>
+                                        <div className='space-y-1'>
+                                            <h6 className='text-[14.5px]'>Tên Người Đại Diện</h6>
+                                            <input
+                                                type="text"
+                                                placeholder='Nhập tên Người Đại Diện'
+                                                value={nameDD}
+                                                onChange={_HandleChangeValue.bind(this, "nameDD")}
+                                                className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
+                                            />
+                                        </div>
+                                        <div className='space-y-1'>
+                                            <h6 className='text-[14.5px]'>Email Người Đại Diện</h6>
+                                            <input
+                                                type="email"
+                                                placeholder='Nhập email Người Đại Diện'
+                                                value={emailDD}
+                                                onChange={_HandleChangeValue.bind(this, "emailDD")}
+                                                className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
+                                            />
+                                        </div>
                                     </div>
-                                    <div className='space-y-1'>
-                                        <h6 className='text-[14.5px]'>Email Người Đại Diện</h6>
-                                        <input
-                                            type="email"
-                                            placeholder='Nhập email Người Đại Diện'
-                                            value={emailDD}
-                                            onChange={_HandleChangeValue.bind(this, "emailDD")}
-                                            className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
-                                        />
+                                    <div className='space-y-3'>
+                                        <div className='space-y-1'>
+                                            <h6 className='text-[14.5px]'>Số điện thoại Người Đại Diện</h6>
+                                            <input
+                                                type="text"
+                                                placeholder='Nhập số điện thoại Người Đại Diện'
+                                                value={phoneDD}
+                                                onChange={_HandleChangeValue.bind(this, "phoneDD")}
+                                                className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
+                                            />
+                                        </div>
+                                        <div className='space-y-1'>
+                                            <h6 className='text-[14.5px]'>Địa chỉ Người Đại Diện</h6>
+                                            <textarea 
+                                                type="text"
+                                                placeholder='Nhập địa chỉ Người Đại Diện'
+                                                rows={3}
+                                                value={addressDD}
+                                                onChange={_HandleChangeValue.bind(this, "addressDD")}
+                                                className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full resize-none'
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                                <div className='space-y-3'>
-                                    <div className='space-y-1'>
-                                        <h6 className='text-[14.5px]'>Số điện thoại Người Đại Diện</h6>
-                                        <input
-                                            type="text"
-                                            placeholder='Nhập số điện thoại Người Đại Diện'
-                                            value={phoneDD}
-                                            onChange={_HandleChangeValue.bind(this, "phoneDD")}
-                                            className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full'
-                                        />
-                                    </div>
-                                    <div className='space-y-1'>
-                                        <h6 className='text-[14.5px]'>Địa chỉ Người Đại Diện</h6>
-                                        <textarea 
-                                            type="text"
-                                            placeholder='Nhập địa chỉ Người Đại Diện'
-                                            rows={3}
-                                            value={addressDD}
-                                            onChange={_HandleChangeValue.bind(this, "addressDD")}
-                                            className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full resize-none'
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+                            }
                         </div>
                         <div className='flex space-x-5 pt-5'>
                             <button onClick={_HandleSubmit.bind(this)} className="px-8 py-2.5 rounded transition hover:scale-105 bg-[#0F4F9E] text-white">Lưu</button>
@@ -325,6 +346,25 @@ const Index = () => {
     );
 }
 
+const ListBtn_Setting = React.memo(() => {
+    return(
+        <React.Fragment>
+            <p className='font-[400] text-[15px] text-[#0F4F9E] uppercase'>Danh sách cài đặt</p>
+            <div>
+                <Btn_Setting url="/settings" isActive="/settings">Thông tin doanh nghiệp</Btn_Setting>
+                <Btn_Setting>Thông tin dịch vụ FMRP</Btn_Setting>
+                <Btn_Setting>Thiết lập chi nhánh</Btn_Setting>
+                <Btn_Setting>Tài chính</Btn_Setting>
+                <Btn_Setting>Báo giá</Btn_Setting>
+                <Btn_Setting>Đơn hàng</Btn_Setting>
+                <Btn_Setting>Giai đoạn sản xuất</Btn_Setting>
+                <Btn_Setting>Danh mục</Btn_Setting>
+                <Btn_Setting url="/settings/variant" isActive="/settings/variant">Thiết lập biến thể</Btn_Setting>
+            </div>
+        </React.Fragment>
+    )
+})
+
 const Btn_Setting = React.memo((props) => {
     const router = useRouter();
     return(
@@ -337,4 +377,5 @@ const Btn_Setting = React.memo((props) => {
     )
 })
 
+export {ListBtn_Setting};
 export default Index;
