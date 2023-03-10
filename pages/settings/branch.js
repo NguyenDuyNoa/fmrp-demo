@@ -197,7 +197,7 @@ const Popup_ChiNhanh = (props) => {
             if(isSuccess){
                 Toast.fire({
                     icon: 'success',
-                    title: `${dataLang?.aler_success}`
+                    title: `${props.dataLang?.aler_success}`
                 })
             }
             sName(props.name ? props.name : "")
