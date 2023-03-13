@@ -11,7 +11,7 @@ import DatePicker from "react-datepicker";
 import Popup from 'reactjs-popup';
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
-  });
+});
 
 const Index = () => {
     const dataMaChungTu = [
@@ -108,6 +108,7 @@ const Index = () => {
                                         setDateRange(update);
                                     }}
                                     isClearable={true}
+                                    placeholderText="Chọn ngày chứng từ"
                                     className="bg-white w-full py-2 rounded border border-[#cccccc] pl-10 text-black outline-[#0F4F9E]"
                                 />
                                 <IconCalendar size={22} className="absolute left-3 text-[#cccccc]" />

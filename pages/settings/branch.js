@@ -1,12 +1,12 @@
-
-
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
+import {useRouter} from 'next/router';
 
 import { ListBtn_Setting } from "./index";
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
 import {_ServerInstance as Axios} from '/services/axios';
+import Pagination from '/components/UI/pagination';
 
 import PhoneInput from "react-phone-input-2";
 import { Edit as IconEdit, Trash as IconDelete, SearchNormal1 as IconSearch } from "iconsax-react";
@@ -14,24 +14,35 @@ import Swal from "sweetalert2";
 import 'react-phone-input-2/lib/style.css'
  
 const Toast = Swal.mixin({
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-  })
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: true,
+})
 
 const Index = (props) => {
+  const router = useRouter();
   const dataLang = props.dataLang;
 
-  const [data, sData] =useState([])
+  const [data, sData] = useState([])
   const [onFetching, sOnFetching] = useState(true)
 
+  const [query, sQuery] = useState("")
+  const [limit, sLimit] = useState(15);
+  const [totalItem, sTotalItem] = useState(0);
+
   const _ServerFetching =  ()=>{
-    Axios("GET", "/api_web/Api_Branch/branch?csrf_protection=true", {}, (err, response) => {
+    Axios("GET", `/api_web/Api_Branch/branch?csrf_protection=true?&search=${query}&limit=${limit}`, {
+      params: {
+        page: router.query?.page || 1,
+      }
+    }, (err, response) => {
         if(!err){
             var data =  response.data.rResult;
+            var totalItem = response.data?.output?.iTotalRecords
             sData(data)
+            sTotalItem(totalItem)
         }
       sOnFetching(false)
     })
@@ -43,22 +54,41 @@ const Index = (props) => {
   
   useEffect(() => {
     sOnFetching(true)
-  }, [])
+  }, [query,limit,router.query?.page])
 
   const handleDelete = (event) => {
-    const id = event;
-    Axios("DELETE", `/api_web/Api_Branch/branch/${id}?csrf_protection=true`, {
-    }, (err, response) => {
-      if(!err){
-        var {isSuccess} = response.data;
-        if(isSuccess){
-          Toast.fire({
-            icon: 'success',
-            title: `${dataLang?.aler_success_delete}`
-          })     
-        }
+    Swal.fire({
+      title: `${dataLang?.aler_ask}`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#296dc1',
+      cancelButtonColor: '#d33',
+      confirmButtonText: `${dataLang?.aler_yes}`,
+      cancelButtonText:`${dataLang?.aler_cancel}`
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const id = event;
+        Axios("DELETE", `/api_web/Api_Branch/branch/${id}?csrf_protection=true`, {
+        }, (err, response) => {
+          if(!err){
+            var isSuccess = response.data?.isSuccess;
+            if(isSuccess){
+              Toast.fire({
+                icon: 'success',
+                title: dataLang?.aler_success_delete
+              })     
+            }
+          }
+          _ServerFetching()
+        })     
       }
-      _ServerFetching()
+    })
+  }
+
+  const paginate = pageNumber => {
+    router.push({
+        pathname: '/settings/branch',
+        query: { page: pageNumber }
     })
   }
 
@@ -90,15 +120,22 @@ const Index = (props) => {
                 <div className="xl:space-y-3 space-y-2">
                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
                         <form className="flex items-center relative">
-                        <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
-                        <input
-                            className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
-                            type="text"  
-                            // value={props.result}
-                            // onChange={props.onChange}
-                            placeholder={dataLang?.branch_search}
-                        />
+                          <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
+                          <input
+                              className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
+                              type="text" 
+                              onChange={(e) => sQuery(e.target.value)} 
+                              placeholder={dataLang?.branch_search}
+                          />
                         </form>
+                        <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
+                          <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
+                          <option value={15}>15</option>
+                          <option value={20}>20</option>
+                          <option value={40}>40</option>
+                          <option value={60}>60</option>
+                          <option value={-1}>Tất cả</option>
+                        </select>
                     </div>
                 </div>
                 
@@ -119,10 +156,7 @@ const Index = (props) => {
                         <>
                          <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">                       
                           {(data.map((e) => 
-                            <div
-                              className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 "
-                              key={e.id.toString()}
-                            >
+                            <div className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
                               <h6 className="xl:text-base text-xs px-2 w-[23%] text-left">{e.name}</h6>
                               <h6 className="xl:text-base text-xs px-2 w-[50%]">{e.address}</h6>
                               <h6 className="xl:text-base text-xs px-2 w-[20%] text-left">{e.number_phone}</h6>
@@ -132,8 +166,14 @@ const Index = (props) => {
                               </div>
                             </div>
                             ))}   
-                        <div className="flex justify-between fixed bottom-0 left-[24%] border-none">
+                        <div className="flex justify-between space-x-5 fixed bottom-0 left-[24%] border-none">
                           <p className="text-[#667085] font-[400] xl:text-base text-xs">{dataLang?.branch_pagination} 1 {dataLang?.branch_pagination_arrive} 15 {dataLang?.branch_pagination_to} 20 {dataLang?.branch_pagination_items}</p>
+                          <Pagination 
+                            postsPerPage={limit}
+                            totalPosts={Number(totalItem)}
+                            paginate={paginate}
+                            currentPage={router.query?.page || 1}
+                          />
                          </div>                  
                       </div>                     
                         </>
@@ -285,4 +325,5 @@ const Popup_ChiNhanh = (props) => {
     </PopupEdit>
   )
 }
+
 export default Index;

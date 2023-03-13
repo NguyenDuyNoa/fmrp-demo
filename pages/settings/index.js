@@ -14,12 +14,11 @@ const Index = (props) => {
 
     const inputUpload = useRef();
     const [hoverImg, sHoverImg] = useState(false);
-
     const _HoverImg = (e) => sHoverImg(e);
 
     const [onFetching, sOnFetching] = useState(false);
     const [onSending, sOnSending] = useState(false);
-    const [data, sData] = useState([]);
+    const [data, sData] = useState({});
 
     const _ServerFetching = () => {
         Axios("GET", "/api_web/Api_Setting/companyInfo?csrf_protection=true", {}, (err, response) => {
@@ -43,14 +42,13 @@ const Index = (props) => {
         sOnFetching(true)
     }, []);
 
-    const _HandleImg = (e) => {
-        let file = e.target.files[0]
+    const _HandleImg = ({target: {files}}) => {
+        var [file] = files;
         if(file){
-            sData({...data, company_logo: file})
+            sData({...data, company_logo: URL.createObjectURL(file), thumb: file})
         }
         inputUpload.current.value = null;
     }
-    // console.log(URL.createObjectURL(data?.company_logo))
 
     const _HandleChangeValue = (type, value) => {
         if(type == "name"){
@@ -86,24 +84,24 @@ const Index = (props) => {
         formData.append("representative_email", data?.representative_email)
         formData.append("representative_name", data?.representative_name)
         formData.append("representative_phone_number", data?.representative_phone_number)
+        formData.append("company_logo", data?.thumb)
 
-        // formData.append("company_logo", data?.company_logo)
-        setTimeout(
-            Axios("POST", "/api_web/Api_Setting/companyInfo?csrf_protection=true", {
-                data: formData,
-                headers: {'Content-Type': 'multipart/form-data'}
-            }, (err, response) => {
-                if(!err){
-                    var {isSuccess} = response.data;
-                    if(isSuccess){
-                        Toast.fire({
-                            icon: 'success',
-                            title: 'Cập nhật dữ liệu thành công'
-                        })
-                    }
+        Axios("POST", "/api_web/Api_Setting/companyInfo?csrf_protection=true", {
+            data: formData,
+            headers: {'Content-Type': 'multipart/form-data'}
+        }, (err, response) => {
+            if(!err){
+                var {isSuccess} = response.data;
+                if(isSuccess){
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Cập nhật dữ liệu thành công'
+                    })
                 }
-                sOnSending(false)
-            }), 1000
+            }
+            _ServerFetching()
+            sOnSending(false)
+        }
         )
     }
 
@@ -122,7 +120,8 @@ const Index = (props) => {
     const _HandleSubmit = () => {
         sOnSending(true);
     }
-
+    console.log("thumb", data?.thumb)
+    console.log("company_logo" ,data?.company_logo)
     
     return (
         <React.Fragment>
@@ -145,11 +144,12 @@ const Index = (props) => {
                             <div className='space-y-3'>
                                 <div className='flex justify-center'>
                                     <div className=''>
-                                        <input onChange={_HandleImg.bind(this)} ref={inputUpload} type="file" accept="image/png, image/jpeg" hidden id="upload" />
+                                        <input onChange={_HandleImg.bind(this)} ref={inputUpload} type="file" accept="image/png, image/jpeg, image/gif" hidden id="upload" />
                                         <label htmlFor="upload" className="w-28 h-28 rounded overflow-hidden bg-[#000000]/50 flex flex-col justify-center items-center cursor-pointer">
-                                            {data?.company_logo && 
+                                            {data?.company_logo  && 
                                                 <div className='relative h-full w-full'>
-                                                    <img alt="logo" onMouseEnter={_HoverImg.bind(this, true)} onMouseLeave={_HoverImg.bind(this, false)} crossOrigin="anonymous" src={data?.company_logo} className="w-full h-full object-cover"/>
+                                                    {/* <img alt="logo" crossOrigin="anonymous" src={typeof(data?.company_logo)==="string" ? data?.company_logo : URL.createObjectURL(data?.company_logo)} className="w-full h-full object-cover"/> */}
+                                                    <img alt="logo" onMouseEnter={_HoverImg.bind(this, true)} onMouseLeave={_HoverImg.bind(this, false)} crossOrigin="anonymous" src={typeof(data?.company_logo)==="string" ? data?.company_logo : URL.createObjectURL(data?.company_logo)} className="w-full h-full object-cover"/>
                                                     {hoverImg ? 
                                                         <div onMouseEnter={_HoverImg.bind(this, true)} onMouseLeave={_HoverImg.bind(this, false)} className='absolute top-0 right-0 w-full h-full bg-[#000000]/50 z-10 flex flex-col justify-center items-center backdrop-blur-sm'>
                                                             <IconCamera size="30" variant='Bold' className='text-white' />
@@ -160,7 +160,7 @@ const Index = (props) => {
                                                     }
                                                 </div>
                                             }
-                                            {!data?.company_logo && 
+                                            {!data?.company_logo  && 
                                                 <React.Fragment>
                                                     <IconCamera size="30" variant='Bold' className='text-white' />
                                                     <span className='text-white text-xs'>Upload logo</span>

@@ -65,18 +65,16 @@ const Header = () => {
                     title: "Nguyên vật liệu",
                     img: "/icon/header/danhmuc/nvl.png",
                     items: [
-                        {name: "Nhóm nguyên vật liệu"},
-                        {name: "Danh sách nguyên vật liệu"},
-                        {name: "Nhóm nguyên vật liệu"},
-                        {name: "Danh sách nguyên vật liệu"}
+                        {name: "Nhóm nguyên vật liệu", link: "/items/category"},
+                        {name: "Danh sách nguyên vật liệu", link: "/items"}
                     ]
                 },
                 {
                     title: "thành phẩm",
                     img: "/icon/header/danhmuc/tp.png",
                     items: [
-                        {name: "Nhóm nguyên vật liệu"},
-                        {name: "Danh sách nguyên vật liệu"}
+                        {name: "Nhóm thành phẩm"},
+                        {name: "Danh sách thành phẩm"}
                     ]
                 },{
                     title: "vật tư",
@@ -162,10 +160,7 @@ const Header = () => {
                     img: "/icon/header/muanhap/mua.png",
                     items: [
                         {name: "Yêu cầu mua hàng"},
-                        {
-                            name: "Đơn đặt hàng",
-                            link: '/purchase_order'
-                        },
+                        {name: "Đơn đặt hàng", link: '/purchase_order'},
                         {name: "Hợp đồng bán"}
                     ]
                 }
