@@ -294,7 +294,7 @@ const Popup_ChiNhanh = (props) => {
             </div>
             <label className="text-[#344054] font-normal text-sm mb-1">{props.dataLang?.branch_popup_phone}</label>
             <PhoneInput
-              country={"us"}
+              country={"vn"}
               value={phone}
               onChange={(phone)=>sPhone(phone)}
               inputProps={{
