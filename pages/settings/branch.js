@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import {useRouter} from 'next/router';
 
-import { ListBtn_Setting } from "./index";
+import { ListBtn_Setting } from "./information";
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
 import {_ServerInstance as Axios} from '/services/axios';
@@ -28,14 +28,15 @@ const Index = (props) => {
   const [data, sData] = useState([])
   const [onFetching, sOnFetching] = useState(true)
 
-  const [query, sQuery] = useState("")
+  const [keySearch, sKeySearch] = useState("")
   const [limit, sLimit] = useState(15);
   const [totalItem, sTotalItem] = useState(0);
 
   const _ServerFetching =  ()=>{
-    Axios("GET", `/api_web/Api_Branch/branch?csrf_protection=true?&search=${query}&limit=${limit}`, {
+    Axios("GET", `/api_web/Api_Branch/branch?csrf_protection=true?&limit=${limit}`, {
       params: {
         page: router.query?.page || 1,
+        search: keySearch
       }
     }, (err, response) => {
         if(!err){
@@ -54,7 +55,7 @@ const Index = (props) => {
   
   useEffect(() => {
     sOnFetching(true)
-  }, [query,limit,router.query?.page])
+  }, [keySearch,limit,router.query?.page])
 
   const handleDelete = (event) => {
     Swal.fire({
@@ -124,7 +125,7 @@ const Index = (props) => {
                           <input
                               className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
                               type="text" 
-                              onChange={(e) => sQuery(e.target.value)} 
+                              onChange={(e) => sKeySearch(e.target.value)} 
                               placeholder={dataLang?.branch_search}
                           />
                         </form>
@@ -167,7 +168,7 @@ const Index = (props) => {
                             </div>
                             ))}   
                         <div className="flex justify-between space-x-5 fixed bottom-0 left-[24%] border-none">
-                          <p className="text-[#667085] font-[400] xl:text-base text-xs">{dataLang?.branch_pagination} 1 {dataLang?.branch_pagination_arrive} 15 {dataLang?.branch_pagination_to} 20 {dataLang?.branch_pagination_items}</p>
+                          <p className="text-[#667085] font-[400] xl:text-base text-xs">Tổng số chi nhánh: {totalItem}</p>
                           <Pagination 
                             postsPerPage={limit}
                             totalPosts={Number(totalItem)}

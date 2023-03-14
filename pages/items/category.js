@@ -12,7 +12,7 @@ const Index = () => {
         {
             id: "01",
             name: "mnbsdf smnbsdf",
-            note: 'poi 098 wer',
+            note: 'asdasdasd asdasd',
             child: [
                 {id: "010", name: "mnbsdf smnbsdf", note: 'poi 098 wer'},
                 {
@@ -29,9 +29,7 @@ const Index = () => {
                                     id: "01100", 
                                     name: "mnbsdf smnbsdfyyyy", 
                                     note: 'poi 098 wer',
-                                    child: [
-                                        {id: "011000", name: "mnbsdf smnbsdf", note: 'poi 098 wer'},
-                                    ]
+                                    child: [{id: "011000", name: "mnbsdf smnbsdf", note: 'poi 098 wer'},]
                                 },
                             ]
                         },

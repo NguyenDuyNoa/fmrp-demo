@@ -15,7 +15,7 @@ const Index = React.memo(({ postsPerPage, totalPosts, paginate, currentPage }) =
         <div>
           <ul className='flex space-x-1'>
             {pageNumbers.map(number => (
-              <a key={number} onClick={() => paginate(number)} className={`${currentPage == number ? "bg-primary text-white" : "bg-[#f1f1f1] hover:bg-[#e3e3e3]"} cursor-pointer w-8 h-8 flex flex-col justify-center items-center font-[600] rounded-md`}>
+              <a key={number} onClick={() => paginate(number)} className={`${currentPage == number ? "bg-[#0F4F9E] text-white" : "bg-slate-200 hover:bg-[#e3e3e3]"} cursor-pointer w-8 h-8 flex flex-col justify-center items-center font-[600] rounded-md`}>
                 {number}
               </a>
             ))}
