@@ -28,7 +28,7 @@ const Index = (props) => {
             if(!err){
                 var {rResult, output} = response.data
                 sData(rResult)
-                sTotalItems(output?.iTotalRecords)
+                sTotalItems(output)
             }
             sOnFetching(false)
         })
@@ -52,79 +52,77 @@ const Index = (props) => {
                     <span className='text-[#141522]/40'>/</span>
                     <h6>Thiết lập biến thể</h6>
                 </div>
-                <div className='grid grid-cols-9 gap-5 h-full'>
+                <div className='grid grid-cols-9 gap-5 h-[99%]'>
                     <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
                         <ListBtn_Setting dataLang={dataLang} />
                     </div>
-                    <div className='col-span-7 h-[99%] flex flex-col justify-between'>
-                        <div className='space-y-3'>
+                    <div className='col-span-7 2xl:h-[99%] xl:h-[88%] h-[76%] flex flex-col justify-between'>
+                        <div className='space-y-3 h-[99%] overflow-hidden'>
                             <h2 className='text-2xl text-[#52575E]'>Thiết Lập Biến Thể</h2>
-                            <div className=" pb-3 space-y-2.5 flex flex-col justify-between">
-                                <div className="3xl:h-[65%] 2xl:h-[60%] xl:h-[55%] h-[57%] space-y-2">
-                                    <div className="flex justify-end">
-                                        <Popup_ChiNhanh dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
+                            <div className="space-y-2 xl:h-[72%] h-[68%]">
+                                <div className="flex justify-end">
+                                    <Popup_ChiNhanh dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
+                                </div>
+                                <div className="xl:space-y-3 space-y-2">
+                                    <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
+                                        <form className="flex items-center relative">
+                                            <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
+                                            <input
+                                                className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
+                                                type="text"  
+                                                // value={props.result}
+                                                // onChange={props.onChange}
+                                                placeholder={dataLang?.branch_search}
+                                            />
+                                        </form>
                                     </div>
-                                    <div className="xl:space-y-3 space-y-2">
-                                        <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
-                                            <form className="flex items-center relative">
-                                                <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
-                                                <input
-                                                    className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
-                                                    type="text"  
-                                                    // value={props.result}
-                                                    // onChange={props.onChange}
-                                                    placeholder={dataLang?.branch_search}
-                                                />
-                                            </form>
+                                </div>
+                                <div className="min:h-[100px] h-[100%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                    <div className="xl:w-[100%] w-[110%] pr-2">
+                                        <div className='grid grid-cols-10 gap-5 sticky top-0 bg-white p-2 z-10'>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-3 text-[#667085] uppercase font-[300] text-left">tên biến thể</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-5 text-[#667085] uppercase font-[300] text-left">các tùy chọn</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">thuộc tính</h4>
                                         </div>
-                                    </div>
-                                    <div className="min:h-[500px] h-[100%] max:h-[900px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                        <div className="xl:w-[100%] w-[110%] pr-2">
-                                            <div className='grid grid-cols-10 gap-5 sticky top-0 bg-white p-2 z-10'>
-                                                <h4 className="xl:text-[14px] px-2 text-[12px] col-span-3 text-[#667085] uppercase font-[300] text-left">tên biến thể</h4>
-                                                <h4 className="xl:text-[14px] px-2 text-[12px] col-span-5 text-[#667085] uppercase font-[300] text-left">các tùy chọn</h4>
-                                                <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">thuộc tính</h4>
-                                            </div>
-                                            {onFetching ? 
-                                                <Loading className="h-80"color="#0f4f9e" /> 
-                                                :
-                                                <React.Fragment>
-                                                    {data.length == 0 &&
-                                                        <div className=" max-w-[352px] mt-24 mx-auto" >
-                                                            <div className="text-center">
-                                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
-                                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">Không tìm thấy các mục</h1>
-                                                                <div className="flex items-center justify-around mt-6 ">
-                                                                    <Popup_ChiNhanh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />    
-                                                                </div>
+                                        {onFetching ? 
+                                            <Loading className="h-80"color="#0f4f9e" /> 
+                                            :
+                                            <React.Fragment>
+                                                {data.length == 0 &&
+                                                    <div className=" max-w-[352px] mt-24 mx-auto" >
+                                                        <div className="text-center">
+                                                            <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+                                                            <h1 className="textx-[#141522] text-base opacity-90 font-medium">Không tìm thấy các mục</h1>
+                                                            <div className="flex items-center justify-around mt-6 ">
+                                                                <Popup_ChiNhanh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />    
                                                             </div>
                                                         </div>
-                                                    }
-                                                    <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]"> 
-                                                        {data.map((e) => 
-                                                            <div key={e.id.toString()} className="grid grid-cols-10 gap-5 py-1.5 px-2 hover:bg-slate-100/40 ">
-                                                                <h6 className="xl:text-base text-xs px-2 col-span-3 ">{e?.name}</h6>
-                                                                <div className='col-span-5 px-2 flex flex-wrap'>
-                                                                    {e?.option?.map((e) =>
-                                                                        <h6 key={e.id.toString()} className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-lg">{e.name}</h6>
-                                                                    )}
-                                                                </div>
-                                                                <div className="space-x-2 col-span-2 flex justify-center items-start">
-                                                                    <Popup_ChiNhanh name={e.name} option={e.option} id={e.id} className="xl:text-base text-xs" dataLang={dataLang} />
-                                                                    <button onClick={()=>handleDelete(e.id)} className="xl:text-base text-xs"><IconDelete color="red"/></button>
-                                                                </div>
-                                                            </div>
-                                                        )}
                                                     </div>
-                                                </React.Fragment>
-                                            }
-                                        </div>
+                                                }
+                                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]"> 
+                                                    {data.map((e) => 
+                                                        <div key={e.id.toString()} className="grid grid-cols-10 gap-5 py-1.5 px-2 hover:bg-slate-100/40 ">
+                                                            <h6 className="xl:text-base text-xs px-2 col-span-3 ">{e?.name}</h6>
+                                                            <div className='col-span-5 px-2 flex flex-wrap'>
+                                                                {e?.option?.map((e) =>
+                                                                    <h6 key={e.id.toString()} className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-lg">{e.name}</h6>
+                                                                )}
+                                                            </div>
+                                                            <div className="space-x-2 col-span-2 flex justify-center items-start">
+                                                                <Popup_ChiNhanh name={e.name} option={e.option} id={e.id} className="xl:text-base text-xs" dataLang={dataLang} />
+                                                                <button onClick={()=>handleDelete(e.id)} className="xl:text-base text-xs"><IconDelete color="red"/></button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </React.Fragment>
+                                        }
                                     </div>
                                 </div>
                             </div>
                         </div>
                         {data?.length != 0 &&
-                            <div className='flex flex-col justify-end'>Hiển thị 2 trong số 2 biến thể</div>                   
+                            <h6 className=''>Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords} biến thể</h6>                   
                         }
                     </div>
                 </div>
@@ -165,22 +163,20 @@ const Popup_ChiNhanh = (props) => {
         option: option
       },
     }, (err, response) => {
-    //   if(!err){
-    //         var isSuccess = response.data?.isSuccess;
-    //         if(isSuccess){
-    //             Toast.fire({
-    //                 icon: 'success',
-    //                 title: `${props.dataLang?.aler_success}`
-    //             })
-    //         }
-    //         sName(props.name ? props.name : "")
-    //         sAddress(props.address ? props.address : "")
-    //         sPhone(props.phone ? props.phone : "")
-    //     }
-    //     props.onRefresh && props.onRefresh()
-    //     sOpen(false)
+      if(!err){
+            var {isSuccess} = response.data;
+            if(isSuccess){
+                Toast.fire({
+                    icon: 'success',
+                    title: "Lưu dữ liệu thành công"
+                })
+            }
+            sName(props.name ? props.name : "")
+            sOption(props.option ? props.option : [])
+        }
+        props.onRefresh && props.onRefresh()
+        sOpen(false)
         sOnSending(false)
-        console.log(err, response)
     })
   }
 
@@ -190,7 +186,16 @@ const Popup_ChiNhanh = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault()
-        sOnSending(true)
+        if(name.length == 0){
+            Toast.fire({
+                icon: 'warning',
+                title: "Dữ liệu còn thiếu!",
+                text: "Vui lòng kiểm tra dữ liệu"
+            })
+        }else{
+            sOnSending(true)
+
+        }
     }
 
     const _HandleAddNew = () => {
@@ -212,14 +217,14 @@ const Popup_ChiNhanh = (props) => {
       <div className="content mt-4 w-80">
         <form onSubmit={_HandleSubmit.bind(this)} className="space-y-6">
             <div className="flex flex-wrap justify-between">
-              <label className="text-[#344054] font-normal text-sm mb-1 ">Tên biến thể</label>
+              <label className="text-[#344054] font-normal text-sm mb-1 ">Tên biến thể <span className='text-red-500'>*</span></label>
               <input
-                required
                 value={name}
+                name="nameVariant"
                 onChange={_HandleChangeInput.bind(this, "name")}
-                name="fname"                       
+                placeholder="Nhập tên biến thể"                       
                 type="text"
-                className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none"
+                className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none"
               />
             </div>
             <div className="space-y-2">
@@ -229,7 +234,8 @@ const Popup_ChiNhanh = (props) => {
                     <input
                         value={e.name}
                         onChange={_OnChangeOption.bind(this, e.id)}
-                        placeholder="Nhập tùy chọn"                       
+                        placeholder="Nhập tùy chọn"      
+                        name="optionVariant"                 
                         type="text"
                         className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none"
                     />     
@@ -248,12 +254,8 @@ const Popup_ChiNhanh = (props) => {
               </div>
             </div>       
             <div className="text-right pt-5 space-x-2">
-              <button onClick={_ToggleModal.bind(this,false)} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-lg border border-solid border-[#D0D5DD]"
-              >{props.dataLang?.branch_popup_exit}</button>
-              <button 
-                type="submit"
-                className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-lg bg-[#0F4F9E]"
-              >{props.dataLang?.branch_popup_save}</button>
+              <button onClick={_ToggleModal.bind(this,false)} className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition">{props.dataLang?.branch_popup_exit}</button>
+              <button type="submit" className="text-[#FFFFFF] text-base py-2 px-4 rounded-lg bg-[#0F4F9E] hover:opacity-90 hover:scale-105 transition">{props.dataLang?.branch_popup_save}</button>
             </div>
         </form>
       </div>

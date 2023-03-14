@@ -35,15 +35,15 @@ const Index = (props) => {
   const _ServerFetching =  ()=>{
     Axios("GET", `/api_web/Api_Branch/branch?csrf_protection=true?&limit=${limit}`, {
       params: {
-        page: router.query?.page || 1,
-        search: keySearch
+        search: keySearch,
+        limit: limit,
+        page: keySearch ? null : router.query?.page || 1
       }
     }, (err, response) => {
         if(!err){
-            var data =  response.data.rResult;
-            var totalItem = response.data?.output?.iTotalRecords
-            sData(data)
-            sTotalItem(totalItem)
+            var {rResult, output} = response.data
+            sData(rResult)
+            sTotalItem(output)
         }
       sOnFetching(false)
     })
@@ -93,6 +93,14 @@ const Index = (props) => {
     })
   }
 
+  const _HandleOnChangeKeySearch = ({target: {value}}) => {
+    sKeySearch(value)
+    if(!value){
+      sOnFetching(true)
+    }
+    sOnFetching(true)
+  };
+
   return (
     <React.Fragment>
       <Head>
@@ -104,20 +112,19 @@ const Index = (props) => {
           <span className="text-[#141522]/40">/</span>
           <h6>{dataLang?.branch_title}</h6>
         </div>
-        <div className="grid grid-cols-9 gap-5">
+        <div className="grid grid-cols-9 gap-5 h-[99%] overflow-hidden">
           <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
             <ListBtn_Setting dataLang={dataLang} />
           </div>
-          <div className="col-span-7 space-y-3">
-            <h2 className="text-2xl text-[#52575E]">{dataLang?.branch_title}</h2>
-            <div className=" pb-3 space-y-2.5 h-screen flex flex-col justify-between">
-              <div className="3xl:h-[65%] 2xl:h-[60%] xl:h-[55%] h-[57%] space-y-2">
+          <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
+            <div className="space-y-3 h-[96%] overflow-hidden">
+              <h2 className="text-2xl text-[#52575E]">{dataLang?.branch_title}</h2>
+              <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
                 <div className="flex justify-end items-center">
                   <div className="flex space-x-3 items-center">
                     <Popup_ChiNhanh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
                   </div>
                 </div>
-
                 <div className="xl:space-y-3 space-y-2">
                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
                         <form className="flex items-center relative">
@@ -125,7 +132,7 @@ const Index = (props) => {
                           <input
                               className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
                               type="text" 
-                              onChange={(e) => sKeySearch(e.target.value)} 
+                              onChange={_HandleOnChangeKeySearch.bind(this)} 
                               placeholder={dataLang?.branch_search}
                           />
                         </form>
@@ -139,9 +146,7 @@ const Index = (props) => {
                         </select>
                     </div>
                 </div>
-                
-                {/* list danh sách */}
-                <div className="min:h-[500px] h-[100%] max:h-[900px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <div className="min:h-[200px] h-[82%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="xl:w-[100%] w-[110%] pr-2">
                     <div className="flex items-center sticky top-0 bg-white p-2 z-10">
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[23%] font-[300] text-left">{dataLang?.branch_popup_name}</h4>
@@ -155,7 +160,7 @@ const Index = (props) => {
                       data.length > 0 ? 
                       (
                         <>
-                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">                       
+                          <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">                       
                           {(data.map((e) => 
                             <div className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
                               <h6 className="xl:text-base text-xs px-2 w-[23%] text-left">{e.name}</h6>
@@ -166,35 +171,36 @@ const Index = (props) => {
                                 <button onClick={()=>handleDelete(e.id)} className="xl:text-base text-xs"><IconDelete color="red"/></button>
                               </div>
                             </div>
-                            ))}   
-                        <div className="flex justify-between space-x-5 fixed bottom-0 left-[24%] border-none">
-                          <p className="text-[#667085] font-[400] xl:text-base text-xs">Tổng số chi nhánh: {totalItem}</p>
-                          <Pagination 
-                            postsPerPage={limit}
-                            totalPosts={Number(totalItem)}
-                            paginate={paginate}
-                            currentPage={router.query?.page || 1}
-                          />
-                         </div>                  
-                      </div>                     
+                          ))}              
+                        </div>                     
                         </>
                       )  : 
                       (
                         <div className=" max-w-[352px] mt-24 mx-auto" >
-                            <div className="text-center">
-                              <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
-                              <h1 className="textx-[#141522] text-base opacity-90 font-medium">Không tìm thấy các mục</h1>
-                              <div className="flex items-center justify-around mt-6 ">
-                                  <Popup_ChiNhanh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />    
-                              </div>
+                          <div className="text-center">
+                            <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+                            <h1 className="textx-[#141522] text-base opacity-90 font-medium">Không tìm thấy các mục</h1>
+                            <div className="flex items-center justify-around mt-6 ">
+                                <Popup_ChiNhanh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />    
                             </div>
                           </div>
+                        </div>
                       )}    
                   </div>
-                  </div>
-                   
-              </div>             
-           </div>
+                </div>
+              </div>     
+            </div>
+            {data?.length != 0 &&
+              <div className='flex space-x-5 items-center'>
+                <h6>Hiển thị {totalItem?.iTotalDisplayRecords} trong số {totalItem?.iTotalRecords} biến thể</h6>
+                <Pagination 
+                  postsPerPage={limit}
+                  totalPosts={Number(totalItem?.iTotalRecords)}
+                  paginate={paginate}
+                  currentPage={router.query?.page || 1}
+                />
+              </div>                   
+            } 
           </div>
         </div>
       </div>
