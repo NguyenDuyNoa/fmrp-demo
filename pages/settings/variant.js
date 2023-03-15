@@ -1,10 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import Head from 'next/head';
+import {useRouter} from 'next/router';
 
 import {ListBtn_Setting} from "./information"
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
 import {_ServerInstance as Axios} from '/services/axios';
+import Pagination from '/components/UI/pagination';
 
 import { Edit as IconEdit, Trash as IconDelete, SearchNormal1 as IconSearch, Add as IconAdd } from "iconsax-react";
 import Swal from "sweetalert2";
@@ -18,13 +20,24 @@ const Toast = Swal.mixin({
 })
 
 const Index = (props) => {
+    const router = useRouter();
     const dataLang = props.dataLang;
-    const [onFetching, sOnFetching] = useState(false);
+
     const [data, sData] = useState([]);
-    const [totalItems, sTotalItems] = useState("");
+    const [onFetching, sOnFetching] = useState(false);
+    
+    const [totalItems, sTotalItems] = useState([]);
+    const [keySearch, sKeySearch] = useState("")
+    const [limit, sLimit] = useState(15);
 
     const _ServerFetching = () => {
-        Axios("GET", "/api_web/Api_variation/variation?csrf_protection=true", {}, (err, response) => {
+        Axios("GET", "/api_web/Api_variation/variation?csrf_protection=true", {
+            params: {
+                search: keySearch,
+                limit: limit,
+                page: router.query?.page || 1
+            }
+        }, (err, response) => {
             if(!err){
                 var {rResult, output} = response.data
                 sData(rResult)
@@ -37,9 +50,54 @@ const Index = (props) => {
     useEffect(() => {
         onFetching && _ServerFetching()
     }, [onFetching]);
+
     useEffect(() => {
         sOnFetching(true)
-    }, []);
+    }, [limit,router.query?.page]);
+
+    const handleDelete = (event) => {
+        Swal.fire({
+          title: `${dataLang?.aler_ask}`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#296dc1',
+          cancelButtonColor: '#d33',
+          confirmButtonText: `${dataLang?.aler_yes}`,
+          cancelButtonText:`${dataLang?.aler_cancel}`
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const id = event;
+            Axios("DELETE", `/api_web/Api_variation/variation/${id}?csrf_protection=true`, {
+            }, (err, response) => {
+              if(!err){
+                var {isSuccess, message} = response.data;
+                if(isSuccess){
+                  Toast.fire({
+                    icon: 'success',
+                    title: dataLang[message]
+                  })     
+                }
+              }
+              _ServerFetching()
+            })     
+          }
+        })
+    }
+
+    const paginate = pageNumber => {
+        router.push({
+            pathname: '/settings/variant',
+            query: { page: pageNumber }
+        })
+    }
+    
+    const _HandleOnChangeKeySearch = ({target: {value}}) => {
+        sKeySearch(value)
+        if(!value){
+          sOnFetching(true)
+        }
+        sOnFetching(true)
+    };
 
     return (
         <React.Fragment>
@@ -56,12 +114,12 @@ const Index = (props) => {
                     <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
                         <ListBtn_Setting dataLang={dataLang} />
                     </div>
-                    <div className='col-span-7 2xl:h-[99%] xl:h-[88%] h-[76%] flex flex-col justify-between'>
-                        <div className='space-y-3 h-[99%] overflow-hidden'>
+                    <div className='col-span-7 h-[100%] flex flex-col justify-between overflow-hidden'>
+                        <div className='space-y-3 h-[96%] overflow-hidden'>
                             <h2 className='text-2xl text-[#52575E]'>Thiết Lập Biến Thể</h2>
-                            <div className="space-y-2 xl:h-[72%] h-[68%]">
+                            <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
                                 <div className="flex justify-end">
-                                    <Popup_ChiNhanh dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
+                                    <Popup_ChiNhanh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
                                 </div>
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
@@ -70,14 +128,24 @@ const Index = (props) => {
                                             <input
                                                 className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
                                                 type="text"  
-                                                // value={props.result}
-                                                // onChange={props.onChange}
+                                                onChange={_HandleOnChangeKeySearch.bind(this)} 
                                                 placeholder={dataLang?.branch_search}
                                             />
                                         </form>
+                                        <div className="flex space-x-2">
+                                            <label className="font-[300] text-slate-400">Hiển thị :</label>
+                                            <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
+                                                <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
+                                                <option value={15}>15</option>
+                                                <option value={20}>20</option>
+                                                <option value={40}>40</option>
+                                                <option value={60}>60</option>
+                                                <option value={-1}>Tất cả</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="min:h-[100px] h-[100%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                <div className="min:h-[200px] h-[82%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="xl:w-[100%] w-[110%] pr-2">
                                         <div className='grid grid-cols-10 gap-5 sticky top-0 bg-white p-2 z-10'>
                                             <h4 className="xl:text-[14px] px-2 text-[12px] col-span-3 text-[#667085] uppercase font-[300] text-left">tên biến thể</h4>
@@ -109,7 +177,7 @@ const Index = (props) => {
                                                                 )}
                                                             </div>
                                                             <div className="space-x-2 col-span-2 flex justify-center items-start">
-                                                                <Popup_ChiNhanh name={e.name} option={e.option} id={e.id} className="xl:text-base text-xs" dataLang={dataLang} />
+                                                                <Popup_ChiNhanh onRefresh={_ServerFetching.bind(this)} name={e.name} option={e.option} id={e.id} className="xl:text-base text-xs" dataLang={dataLang} />
                                                                 <button onClick={()=>handleDelete(e.id)} className="xl:text-base text-xs"><IconDelete color="red"/></button>
                                                             </div>
                                                         </div>
@@ -122,7 +190,15 @@ const Index = (props) => {
                             </div>
                         </div>
                         {data?.length != 0 &&
-                            <h6 className=''>Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords} biến thể</h6>                   
+                            <div className='flex space-x-5 items-center'>
+                                <h6>Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords} biến thể</h6>
+                                <Pagination 
+                                postsPerPage={limit}
+                                totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                paginate={paginate}
+                                currentPage={router.query?.page || 1}
+                                />
+                            </div> 
                         }
                     </div>
                 </div>
@@ -137,8 +213,16 @@ const Popup_ChiNhanh = (props) => {
 
     const [onSending, sOnSending] = useState(false);
 
-    const [name, sName] = useState(props.name ? props.name : "");
-    const [option, sOption] = useState(props.option ? props.option : []);
+    const [name, sName] = useState("");
+    const [option, sOption] = useState([]);
+    const [optionErr, sOptionErr] = useState(false);
+    const [listOptErr, sListOptErr] = useState([]);
+
+    useEffect(() => {
+        sOption(props.option ? props.option : []) 
+        sName(props.name ? props.name : "")
+    }, [open]);
+
     const [optionName, sOptionName] = useState("");
     const id = props.id
 
@@ -164,21 +248,35 @@ const Popup_ChiNhanh = (props) => {
       },
     }, (err, response) => {
       if(!err){
-            var {isSuccess} = response.data;
+            var {isSuccess, message, same_option} = response.data;
             if(isSuccess){
                 Toast.fire({
                     icon: 'success',
-                    title: "Lưu dữ liệu thành công"
+                    title: `${props.dataLang[message]}`
                 })
+                sName("")
+                sOption([])
+                props.onRefresh && props.onRefresh()
+                sOpen(false)
+            }else{
+                Toast.fire({
+                    icon: 'warning',
+                    title: `${props.dataLang[message]}`
+                })
+                sListOptErr(same_option)
+                // console.log(listOptErr.length)
+                console.log(sOption.filter(x => x.name))
             }
-            sName(props.name ? props.name : "")
-            sOption(props.option ? props.option : [])
+            sOnSending(false)
         }
-        props.onRefresh && props.onRefresh()
-        sOpen(false)
-        sOnSending(false)
     })
   }
+
+    // const _OnChangeOption = (id, value) => {
+    //     var index = option.findIndex(x=> x.id === id);
+    //     option[index].name = value.target?.value;
+    //     sOption([...option])
+    // }
 
     useEffect(() => {
         onSending && _ServerSending()
@@ -186,16 +284,7 @@ const Popup_ChiNhanh = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault()
-        if(name.length == 0){
-            Toast.fire({
-                icon: 'warning',
-                title: "Dữ liệu còn thiếu!",
-                text: "Vui lòng kiểm tra dữ liệu"
-            })
-        }else{
-            sOnSending(true)
-
-        }
+        sOnSending(true)
     }
 
     const _HandleAddNew = () => {
@@ -237,7 +326,8 @@ const Popup_ChiNhanh = (props) => {
                         placeholder="Nhập tùy chọn"      
                         name="optionVariant"                 
                         type="text"
-                        className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none"
+                        onInvalid={true}
+                        className="invalid:border-red-500 placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none"
                     />     
                     <button onClick={_HandleDelete.bind(this, e.id)} type='button' title='Xóa' className='transition hover:scale-105 min-w-[40px] h-10 rounded-lg text-red-500 flex flex-col justify-center items-center'><IconDelete /></button>
                 </div>
@@ -254,7 +344,7 @@ const Popup_ChiNhanh = (props) => {
               </div>
             </div>       
             <div className="text-right pt-5 space-x-2">
-              <button onClick={_ToggleModal.bind(this,false)} className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition">{props.dataLang?.branch_popup_exit}</button>
+              <button type='button' onClick={_ToggleModal.bind(this,false)} className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition">{props.dataLang?.branch_popup_exit}</button>
               <button type="submit" className="text-[#FFFFFF] text-base py-2 px-4 rounded-lg bg-[#0F4F9E] hover:opacity-90 hover:scale-105 transition">{props.dataLang?.branch_popup_save}</button>
             </div>
         </form>

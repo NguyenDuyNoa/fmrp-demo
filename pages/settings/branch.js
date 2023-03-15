@@ -30,14 +30,14 @@ const Index = (props) => {
 
   const [keySearch, sKeySearch] = useState("")
   const [limit, sLimit] = useState(15);
-  const [totalItem, sTotalItem] = useState(0);
+  const [totalItem, sTotalItem] = useState([]);
 
   const _ServerFetching =  ()=>{
-    Axios("GET", `/api_web/Api_Branch/branch?csrf_protection=true?&limit=${limit}`, {
+    Axios("GET", `/api_web/Api_Branch/branch?csrf_protection=true`, {
       params: {
         search: keySearch,
         limit: limit,
-        page: keySearch ? null : router.query?.page || 1
+        page: router.query?.page || 1
       }
     }, (err, response) => {
         if(!err){
@@ -55,7 +55,7 @@ const Index = (props) => {
   
   useEffect(() => {
     sOnFetching(true)
-  }, [keySearch,limit,router.query?.page])
+  }, [limit,router.query?.page])
 
   const handleDelete = (event) => {
     Swal.fire({
@@ -121,9 +121,7 @@ const Index = (props) => {
               <h2 className="text-2xl text-[#52575E]">{dataLang?.branch_title}</h2>
               <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
                 <div className="flex justify-end items-center">
-                  <div className="flex space-x-3 items-center">
-                    <Popup_ChiNhanh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
-                  </div>
+                  <Popup_ChiNhanh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
                 </div>
                 <div className="xl:space-y-3 space-y-2">
                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
@@ -136,14 +134,17 @@ const Index = (props) => {
                               placeholder={dataLang?.branch_search}
                           />
                         </form>
-                        <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
-                          <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
-                          <option value={15}>15</option>
-                          <option value={20}>20</option>
-                          <option value={40}>40</option>
-                          <option value={60}>60</option>
-                          <option value={-1}>Tất cả</option>
-                        </select>
+                        <div className="flex space-x-2">
+                          <label className="font-[300] text-slate-400">Hiển thị :</label>
+                          <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
+                            <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
+                            <option value={15}>15</option>
+                            <option value={20}>20</option>
+                            <option value={40}>40</option>
+                            <option value={60}>60</option>
+                            <option value={-1}>Tất cả</option>
+                          </select>
+                        </div>
                     </div>
                 </div>
                 <div className="min:h-[200px] h-[82%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
@@ -195,7 +196,7 @@ const Index = (props) => {
                 <h6>Hiển thị {totalItem?.iTotalDisplayRecords} trong số {totalItem?.iTotalRecords} biến thể</h6>
                 <Pagination 
                   postsPerPage={limit}
-                  totalPosts={Number(totalItem?.iTotalRecords)}
+                  totalPosts={Number(totalItem?.iTotalDisplayRecords)}
                   paginate={paginate}
                   currentPage={router.query?.page || 1}
                 />
@@ -240,19 +241,24 @@ const Popup_ChiNhanh = (props) => {
       headers: {"Content-Type": "multipart/form-data"} 
     }, (err, response) => {
       if(!err){
-            var isSuccess = response.data?.isSuccess;
+            var {isSuccess, message} = response.data;
             if(isSuccess){
                 Toast.fire({
                     icon: 'success',
-                    title: `${props.dataLang?.aler_success}`
+                    title: `${props.dataLang[message]}`
                 })
+                sName(props.name ? props.name : "")
+                sAddress(props.address ? props.address : "")
+                sPhone(props.phone ? props.phone : "")
+                props.onRefresh && props.onRefresh()
+                sOpen(false)
+            }else{
+              Toast.fire({
+                icon: 'warning',
+                title: `${props.dataLang[message]}`
+              })
             }
-            sName(props.name ? props.name : "")
-            sAddress(props.address ? props.address : "")
-            sPhone(props.phone ? props.phone : "")
         }
-        props.onRefresh && props.onRefresh()
-        sOpen(false)
         sOnSending(false)
     })
   }
@@ -280,7 +286,6 @@ const Popup_ChiNhanh = (props) => {
             <div className="flex flex-wrap justify-between">
               <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_name}</label>
               <input
-                required
                 value={name}
                 onChange={_HandleChangeInput.bind(this, "name")}
                 name="fname"                       
@@ -291,7 +296,6 @@ const Popup_ChiNhanh = (props) => {
             <div className="flex flex-wrap justify-between">
               <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_address} </label>
               <input
-                required
                 value={address}
                 onChange={_HandleChangeInput.bind(this, "address")}
                 name="adress"                       

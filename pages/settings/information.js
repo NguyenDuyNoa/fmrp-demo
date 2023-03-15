@@ -120,8 +120,6 @@ const Index = (props) => {
     const _HandleSubmit = () => {
         sOnSending(true);
     }
-    console.log("thumb", data?.thumb)
-    console.log("company_logo" ,data?.company_logo)
     
     return (
         <React.Fragment>
