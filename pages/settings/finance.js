@@ -18,7 +18,7 @@ const Index = (props) => {
     const _HandleSelectTab = (e) => {
         router.push({
             pathname: '/settings/finance',    
-            query: { tab: e  }
+            query: { tab: e }
         })
     }
     useEffect(() => {

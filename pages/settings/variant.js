@@ -148,9 +148,9 @@ const Index = (props) => {
                                 <div className="min:h-[200px] h-[82%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="xl:w-[100%] w-[110%] pr-2">
                                         <div className='grid grid-cols-10 gap-5 sticky top-0 bg-white p-2 z-10'>
-                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-3 text-[#667085] uppercase font-[300] text-left">tên biến thể</h4>
-                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-5 text-[#667085] uppercase font-[300] text-left">các tùy chọn</h4>
-                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">thuộc tính</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-3 text-[#667085] uppercase font-[300] text-left">{dataLang?.variant_name}</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-5 text-[#667085] uppercase font-[300] text-left">{dataLang?.branch_popup_variant_option}</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">{dataLang?.branch_popup_properties}</h4>
                                         </div>
                                         {onFetching ? 
                                             <Loading className="h-80"color="#0f4f9e" /> 
@@ -216,7 +216,7 @@ const Popup_ChiNhanh = (props) => {
     const [name, sName] = useState("");
     const [option, sOption] = useState([]);
     const [optionErr, sOptionErr] = useState(false);
-    const [listOptErr, sListOptErr] = useState([]);
+    const [listOptErr, sListOptErr] = useState();
 
     useEffect(() => {
         sOption(props.option ? props.option : []) 
@@ -263,20 +263,13 @@ const Popup_ChiNhanh = (props) => {
                     icon: 'warning',
                     title: `${props.dataLang[message]}`
                 })
+                // const res = option.filter(i => same_option.some(item => i.name === item));
                 sListOptErr(same_option)
-                // console.log(listOptErr.length)
-                console.log(sOption.filter(x => x.name))
             }
             sOnSending(false)
         }
     })
   }
-
-    // const _OnChangeOption = (id, value) => {
-    //     var index = option.findIndex(x=> x.id === id);
-    //     option[index].name = value.target?.value;
-    //     sOption([...option])
-    // }
 
     useEffect(() => {
         onSending && _ServerSending()
@@ -306,18 +299,18 @@ const Popup_ChiNhanh = (props) => {
       <div className="content mt-4 w-80">
         <form onSubmit={_HandleSubmit.bind(this)} className="space-y-6">
             <div className="flex flex-wrap justify-between">
-              <label className="text-[#344054] font-normal text-sm mb-1 ">Tên biến thể <span className='text-red-500'>*</span></label>
+              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.variant_name} <span className='text-red-500'>*</span></label>
               <input
                 value={name}
                 name="nameVariant"
                 onChange={_HandleChangeInput.bind(this, "name")}
-                placeholder="Nhập tên biến thể"                       
+                placeholder={props.dataLang?.variant_name}                       
                 type="text"
                 className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none"
               />
             </div>
             <div className="space-y-2">
-              <h6 className="text-[#344054] font-normal text-sm mb-1 ">Các tùy chọn</h6>
+              <h6 className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_variant_option}</h6>
               {option.map((e) => 
                 <div className='flex space-x-3 items-center' key={e.id?.toString()}>
                     <input
@@ -326,8 +319,7 @@ const Popup_ChiNhanh = (props) => {
                         placeholder="Nhập tùy chọn"      
                         name="optionVariant"                 
                         type="text"
-                        onInvalid={true}
-                        className="invalid:border-red-500 placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none"
+                        className={`${listOptErr?.some(i => i === e.name) ? "border-red-500" : "border-[#d0d5dd] focus:border-[#92BFF7]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none`}
                     />     
                     <button onClick={_HandleDelete.bind(this, e.id)} type='button' title='Xóa' className='transition hover:scale-105 min-w-[40px] h-10 rounded-lg text-red-500 flex flex-col justify-center items-center'><IconDelete /></button>
                 </div>
