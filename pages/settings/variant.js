@@ -102,13 +102,13 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>Thiết lập biến thể</title>
+                <title>{dataLang?.list_btn_seting_variant}</title>
             </Head>
             <div className='px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen'>
                 <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
-                    <h6 className='text-[#141522]/40'>Cài đặt</h6>
+                    <h6 className='text-[#141522]/40'>{dataLang?.branch_seting}</h6>
                     <span className='text-[#141522]/40'>/</span>
-                    <h6>Thiết lập biến thể</h6>
+                    <h6>{dataLang?.list_btn_seting_variant}</h6>
                 </div>
                 <div className='grid grid-cols-9 gap-5 h-[99%]'>
                     <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
@@ -116,7 +116,7 @@ const Index = (props) => {
                     </div>
                     <div className='col-span-7 h-[100%] flex flex-col justify-between overflow-hidden'>
                         <div className='space-y-3 h-[96%] overflow-hidden'>
-                            <h2 className='text-2xl text-[#52575E]'>Thiết Lập Biến Thể</h2>
+                            <h2 className='text-2xl text-[#52575E]'>{dataLang?.list_btn_seting_variant}</h2>
                             <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
                                 <div className="flex justify-end">
                                     <Popup_ChiNhanh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
@@ -133,7 +133,7 @@ const Index = (props) => {
                                             />
                                         </form>
                                         <div className="flex space-x-2">
-                                            <label className="font-[300] text-slate-400">Hiển thị :</label>
+                                            <label className="font-[300] text-slate-400">{dataLang?.display} :</label>
                                             <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
                                                 <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
                                                 <option value={15}>15</option>
@@ -258,6 +258,7 @@ const Popup_ChiNhanh = (props) => {
                 sOption([])
                 props.onRefresh && props.onRefresh()
                 sOpen(false)
+                sListOptErr()
             }else{
                 Toast.fire({
                     icon: 'warning',
@@ -290,7 +291,7 @@ const Popup_ChiNhanh = (props) => {
 
   return(
     <PopupEdit  
-      title={props.id ? `${props.dataLang?.branch_popup_edit}` : `${props.dataLang?.branch_popup_create_new_branch}`} 
+      title={props.id ? `${props.dataLang?.variant_popup_edit}` : `${props.dataLang?.branch_popup_create_new_variant}`} 
       button={props.id ? <IconEdit/> : `${props.dataLang?.branch_popup_create_new}`} 
       onClickOpen={_ToggleModal.bind(this, true)} 
       open={open} onClose={_ToggleModal.bind(this,false)}
