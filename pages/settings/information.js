@@ -332,7 +332,7 @@ const ListBtn_Setting = React.memo((props) => {
                 <Btn_Setting>{props.dataLang?.list_btn_seting_qt}</Btn_Setting>
                 <Btn_Setting>{props.dataLang?.list_btn_seting_order}</Btn_Setting>
                 <Btn_Setting>{props.dataLang?.list_btn_seting_stage}</Btn_Setting>
-                <Btn_Setting url="/settings/category" isActive="/settings/category">{props.dataLang?.list_btn_seting_category}</Btn_Setting>
+                <Btn_Setting url={`/settings/category?tab=${router.query?.tab ? router.query?.tab : "units"}`} isActive="/settings/category">{props.dataLang?.list_btn_seting_category}</Btn_Setting>
                 <Btn_Setting url="/settings/variant" isActive="/settings/variant">{props.dataLang?.list_btn_seting_variant}</Btn_Setting>
             </div>
         </React.Fragment>

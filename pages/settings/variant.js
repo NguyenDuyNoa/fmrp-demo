@@ -325,7 +325,7 @@ const Popup_ChiNhanh = (props) => {
                     <button onClick={_HandleDelete.bind(this, e.id)} type='button' title='Xóa' className='transition hover:scale-105 min-w-[40px] h-10 rounded-lg text-red-500 flex flex-col justify-center items-center'><IconDelete /></button>
                 </div>
               )}
-              {/* <div className='flex space-x-3 items-center'>
+              <div className='flex space-x-3 items-center'>
                 <input
                     value={optionName}
                     onChange={_HandleChangeInput.bind(this, "optionName")}
@@ -334,8 +334,8 @@ const Popup_ChiNhanh = (props) => {
                     className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none"
                 />     
                 <button type='button' onClick={_HandleAddNew.bind(this)} title='Thêm' className='transition hover:scale-105 min-w-[40px] h-10 rounded-lg bg-slate-100 flex flex-col justify-center items-center'><IconAdd /></button>
-              </div> */}
-              <button className='w-full h-10 rounded-lg flex flex-col justify-center items-center bg-slate-100'><IconAdd /></button>
+              </div>
+              {/* <button className='w-full h-10 rounded-lg flex flex-col justify-center items-center bg-slate-100'><IconAdd /></button> */}
             </div>       
             <div className="text-right pt-5 space-x-2">
               <button type='button' onClick={_ToggleModal.bind(this,false)} className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition">{props.dataLang?.branch_popup_exit}</button>
