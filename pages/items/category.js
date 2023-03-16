@@ -90,7 +90,7 @@ const Index = () => {
                             <div className='divide-y divide-slate-200 overflow-auto min:h-[400px] h-[100%] max:h-[600px]'>
                                 {dataFake.map((e,i) => 
                                     <div>
-                                        <div key={i} className='flex items-center py-1.5 px-2 bg-white z-10 '>
+                                        <div key={i} className='flex items-center py-1.5 px-2 bg-white z-10 relative'>
                                             <div className='w-[2%] flex justify-center'>
                                                 <input type='checkbox' className='scale-125' />
                                             </div>
@@ -142,7 +142,7 @@ const Index = () => {
                                                 </div>
                                             </div>
                                         } */}
-                                        <div className={`${hasChild ? "translate-y-0" : "-translate-y-[100%]" } z-[-10] flex items-center py-1.5 px-2 hover:bg-red-100/40 transition `}>
+                                        <div className={`${hasChild ? "translate-y-0" : "-translate-y-[100%]" } flex items-center py-1.5 px-2 hover:bg-red-100/40 transition `}>
                                             <div className='w-[10%] h-2 bg-red-200'></div>
                                             <h6 className='xl:text-base text-xs px-2 w-[30%]'>{e.id}</h6>
                                             <h6 className='xl:text-base text-xs px-2 w-[20%]'>{e.name}</h6>
