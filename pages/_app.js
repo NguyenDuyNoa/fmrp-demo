@@ -252,9 +252,7 @@ const LoginPage = React.memo((props) => {
                       onChange={_HandleInputChange.bind(this, "password")}
                       className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 py-3 pl-5 pr-12 rounded-md w-full'
                     />
-                    <button onClick={_TogglePassword.bind(this)} className='absolute right-3'>
-                      {typePassword ? <IconEyeSlash /> : <IconEye />}
-                    </button>
+                    <button onClick={_TogglePassword.bind(this)} className='absolute right-3'>{typePassword ? <IconEyeSlash /> : <IconEye />}</button>
                   </div>
                   <div className='flex w-full justify-between'>
                     <div className='flex items-center space-x-1.5'>

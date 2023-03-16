@@ -40,11 +40,11 @@ const Index = (props) => {
         page: router.query?.page || 1
       }
     }, (err, response) => {
-        if(!err){
-            var {rResult, output} = response.data
-            sData(rResult)
-            sTotalItem(output)
-        }
+      if(!err){
+          var {rResult, output} = response.data
+          sData(rResult)
+          sTotalItem(output)
+      }
       sOnFetching(false)
     })
   }
@@ -95,6 +95,7 @@ const Index = (props) => {
 
   const _HandleOnChangeKeySearch = ({target: {value}}) => {
     sKeySearch(value)
+    router.replace('/settings/branch');
     setTimeout(() => {
       if(!value){
         sOnFetching(true)
@@ -257,7 +258,7 @@ const Popup_ChiNhanh = (props) => {
                 sOpen(false)
             }else{
               Toast.fire({
-                icon: 'warning',
+                icon: 'error',
                 title: `${props.dataLang[message]}`
               })
             }
