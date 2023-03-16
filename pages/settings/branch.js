@@ -26,7 +26,7 @@ const Index = (props) => {
   const dataLang = props.dataLang;
 
   const [data, sData] = useState([])
-  const [onFetching, sOnFetching] = useState(true)
+  const [onFetching, sOnFetching] = useState(false)
 
   const [keySearch, sKeySearch] = useState("")
   const [limit, sLimit] = useState(15);
@@ -103,7 +103,6 @@ const Index = (props) => {
       sOnFetching(true)
     }, 500);
   };
-  console.log(keySearch)
 
   return (
     <React.Fragment>

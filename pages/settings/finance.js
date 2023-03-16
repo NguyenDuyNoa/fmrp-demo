@@ -32,35 +32,37 @@ const Index = (props) => {
       })
   }, []);
   const [data, sData] = useState([]);
-  const [onFetching, sOnFetching] = useState(true);
+  const [onFetching, sOnFetching] = useState(false);
+  
   const [totalItems, sTotalItems] = useState([]);
   const [keySearch, sKeySearch] = useState("")
   const [limit, sLimit] = useState(15);
-const _ServerFetching = () => {
-  Axios("GET", `/api_web/${(router.query?.tab === "taxes" && "Api_tax/tax?csrf_protection=true") || (router.query?.tab === "currencies" && "Api_currency/currency?csrf_protection=true") || (router.query?.tab === "paymentmodes" && "Api_payment_method/payment_method?csrf_protection=true")}`, {
-      params: {
-          search: keySearch,
-          limit: limit,
-          page: router.query?.page || 1
-      }
-  }, (err, response) => {
-      if(!err){
-          var {rResult, output} = response.data
-          sData(rResult)
-          sTotalItems(output)
-      }
-      sOnFetching(false)
-  })
-}
 
-useEffect(() => {
-  onFetching && _ServerFetching()
-}, [onFetching]);
+  const _ServerFetching = () => {
+    Axios("GET", `/api_web/${(router.query?.tab === "taxes" && "Api_tax/tax?csrf_protection=true") || (router.query?.tab === "currencies" && "Api_currency/currency?csrf_protection=true") || (router.query?.tab === "paymentmodes" && "Api_payment_method/payment_method?csrf_protection=true")}`, {
+        params: {
+            search: keySearch,
+            limit: limit,
+            page: router.query?.page || 1
+        }
+    }, (err, response) => {
+        if(!err){
+            var {rResult, output} = response.data
+            sData(rResult)
+            sTotalItems(output)
+        }
+        sOnFetching(false)
+    })
+  }
 
-useEffect(() => {
-   router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true))
+  useEffect(() => {
+    onFetching && _ServerFetching()
+  }, [onFetching]);
 
-}, [limit,router.query?.page, router.query?.tab]);
+  useEffect(() => {
+    router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true))
+  }, [limit,router.query?.page, router.query?.tab]);
+
   const handleDelete = (event) => {
     Swal.fire({
       title: `${dataLang?.aler_ask}`,
@@ -90,6 +92,7 @@ useEffect(() => {
     })
    
   }
+  
   const paginate = pageNumber => {
     router.push({
       pathname: '/settings/finance',
@@ -160,18 +163,18 @@ useEffect(() => {
                               placeholder={dataLang?.branch_search}
                           />
                         </form>
-                                <div className="flex space-x-2">
-                                    <label className="font-[300] text-slate-400">Hiển thị :</label>
-                                    <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
-                                        <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
-                                        <option value={15}>15</option>
-                                        <option value={20}>20</option>
-                                        <option value={40}>40</option>
-                                        <option value={60}>60</option>
-                                        <option value={-1}>Tất cả</option>
-                                    </select>
-                                </div>
-                            </div>
+                          <div className="flex space-x-2">
+                              <label className="font-[300] text-slate-400">Hiển thị :</label>
+                              <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
+                                  <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
+                                  <option value={15}>15</option>
+                                  <option value={20}>20</option>
+                                  <option value={40}>40</option>
+                                  <option value={60}>60</option>
+                                  <option value={-1}>Tất cả</option>
+                              </select>
+                          </div>
+                          </div>
                         </div>
                         <div className="min:h-[200px] h-[100%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                             <div className={`${(router.query?.tab === "taxes") || (router.query?.tab === "currencies") ? "w-[100%]" : "w-[110%]" } 2xl:w-[100%] pr-2`}>
@@ -283,22 +286,33 @@ const Popup_TaiChinh = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
 
-    const [nameTax, sNameTax] = useState(props.data?.name ? props.data?.name : "");
-    const [rateTax, sRateTax] = useState(props.data?.tax_rate ? props.data?.tax_rate : null);
+    const [nameTax, sNameTax] = useState("");
+    const [rateTax, sRateTax] = useState(null);
 
-    const [codeCu, sCodeCu] = useState(props.data?.code ? props.data?.code : "");
-    const [symbolCu, sSymbolCu] = useState(props.data?.symbol ? props.data?.symbol : "");
+    const [codeCu, sCodeCu] = useState("");
+    const [symbolCu, sSymbolCu] = useState("");
 
-    const [nameMe, sNameMe] = useState(props.data?.name ? props.data?.name : "");
-    const [methodMe, sMethodMe] = useState(props.data?.cash_bank ? props.data?.cash_bank : "0");
-    const [balanceMe, sBalanceMe] = useState(props.data?.opening_balance ? props.data?.opening_balance : null);
-    const [descriptionMe, sDescriptionMe] = useState(props.data?.description ? props.data?.description : "");
+    const [nameMe, sNameMe] = useState("");
+    const [methodMe, sMethodMe] = useState("0");
+    const [balanceMe, sBalanceMe] = useState(null);
+    const [descriptionMe, sDescriptionMe] = useState("");
+
+    useEffect(() => {
+      sNameTax(props.data?.name ? props.data?.name : "")
+      sRateTax(props.data?.tax_rate ? props.data?.tax_rate : null)
+      sCodeCu(props.data?.code ? props.data?.code : "")
+      sSymbolCu(props.data?.symbol ? props.data?.symbol : "")
+      sNameMe(props.data?.name ? props.data?.name : "")
+      sMethodMe(props.data?.cash_bank ? props.data?.cash_bank : "0")
+      sBalanceMe(props.data?.opening_balance ? props.data?.opening_balance : null)
+      sDescriptionMe(props.data?.description ? props.data?.description : "")
+    }, [open]);
 
     const _HandleChangeInput = (type, value) => {
       if(type == "nameTax"){
         sNameTax(value.target?.value)
       }else if(type == "rateTax"){
-        sRateTax(value.target?.value.replace(/[^0-9]/g, ""))
+        sRateTax(value.target?.value)
       }else if(type == "codeCu"){
         sCodeCu(value.target?.value)
       }else if(type == "symbolCu"){
@@ -348,6 +362,7 @@ const Popup_TaiChinh = (props) => {
             sMethodMe("0")
             sBalanceMe(null)
             sDescriptionMe("")
+
             sOpen(false)
             props.onRefresh && props.onRefresh()
         }else {
@@ -394,11 +409,13 @@ const Popup_TaiChinh = (props) => {
                   <div className="flex flex-wrap justify-between">
                     <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_finance_rate} </label>
                     <input
-                      pattern="[0-9]*"
                       value={rateTax}
                       onChange={_HandleChangeInput.bind(this, "rateTax")}
-                      name="tax_rate"                       
-                      type="text"
+                      name="tax_rate" 
+                      type="number"
+                      min={0}
+                      max={100}
+                      step="0.01" 
                       className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
                     />     
                   </div>           

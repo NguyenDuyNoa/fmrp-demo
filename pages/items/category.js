@@ -25,12 +25,8 @@ const Index = () => {
                             name: "mnbsdf smnbsdf", 
                             note: 'poi 098 wer',
                             child: [
-                                {
-                                    id: "01100", 
-                                    name: "mnbsdf smnbsdfyyyy", 
-                                    note: 'poi 098 wer',
-                                    child: [{id: "011000", name: "mnbsdf smnbsdf", note: 'poi 098 wer'},]
-                                },
+                                {id: "01100", name: "mnbsdf smnbsdfyyyy", note: 'poi 098 wer'},
+                                {id: "01101", name: "mnbsdf smnbsdfyyyy", note: 'poi 098 wer'},
                             ]
                         },
                         {id: "0111", name: "mnbsdf smnbsdf", note: 'poi 098 wer'}
@@ -38,20 +34,40 @@ const Index = () => {
                 },
                 {id: "012", name: "mnbsdf smnbsdf", note: 'poi 098 wer'},
             ]
+        },{
+            id: "02",
+            name: "mnbsdf smnbsdf",
+            note: 'asdasdasd asdasd',
+            child: [
+                {id: "020", name: "mnbsdf smnbsdf", note: 'poi 098 wer'},
+                {
+                    id: "021", 
+                    name: "mnbsdf smnbsdf", 
+                    note: 'poi 098 wer',
+                    child: [
+                        {
+                            id: "0210", 
+                            name: "mnbsdf smnbsdf", 
+                            note: 'poi 098 wer',
+                            child: [
+                                {id: "02100", name: "mnbsdf smnbsdfyyyy", note: 'poi 098 wer'},
+                                {id: "02101", name: "mnbsdf smnbsdfyyyy", note: 'poi 098 wer'},
+                            ]
+                        },
+                        {id: "0211", name: "mnbsdf smnbsdf", note: 'poi 098 wer'}
+                    ]
+                },
+                {id: "022", name: "mnbsdf smnbsdf", note: 'poi 098 wer'},
+            ]
         }
     ]
-    console.log(dataFake)
-
-    const [hasChild, sHasChild] = useState(false);
-    const _ToggleHasChild = () => sHasChild(!hasChild);
-
     return (
         <React.Fragment>
             <Head>
                 <title>Nhóm nguyên vật liệu</title>
             </Head>
-            <div className='px-10 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen flex flex-col justify-between'>
-                <div className='3xl:h-[65%] 2xl:h-[60%] xl:h-[55%] h-[57%] space-y-3'>
+            <div className='px-10 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between'>
+                <div className='h-[72%] space-y-3'>
                     <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
                         <h6 className='text-[#141522]/40'>Danh mục</h6>
                         <span className='text-[#141522]/40'>/</span>
@@ -76,7 +92,7 @@ const Index = () => {
                             />
                         </form>
                     </div>
-                    <div className='min:h-[500px] h-[100%] max:h-[900px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+                    <div className='min:h-[800px] h-[100%] max:h-[1200px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
                         <div className='xl:w-[100%] w-[110%] pr-2'>
                             <div className='flex items-center sticky top-0 bg-white p-2 z-10'>
                                 <div className='w-[2%] flex justify-center'>
@@ -89,89 +105,90 @@ const Index = () => {
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center'>tác vụ</h4>
                             </div>
                             <div className='divide-y divide-slate-200 overflow-auto min:h-[400px] h-[100%] max:h-[600px]'>
-                                {dataFake.map((e,i) => 
-                                    <div>
-                                        <div key={i} className='flex items-center py-2.5 px-2 bg-white hover:bg-slate-50 z-10 relative'>
-                                            <div className='w-[2%] flex justify-center'>
-                                                <input type='checkbox' className='scale-125' />
-                                            </div>
-                                            <div className='w-[8%] flex justify-center'>
-                                                <button disabled={e?.child.length > 0 ? false : true} onClick={_ToggleHasChild.bind(this)} className={`${hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-green-800"} transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}>
-                                                    <IconMinus size={16} />
-                                                    <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
-                                                </button>
-                                            </div>
-                                            <h6 className='xl:text-base text-xs px-2 w-[30%]'>{e.id}</h6>
-                                            <h6 className='xl:text-base text-xs px-2 w-[20%]'>{e.name}</h6>
-                                            <h6 className='xl:text-base text-xs px-2 w-[30%]'>{e.note}</h6>
-                                            <div className='w-[10%] bg-red-500 h-2' />
-                                        </div>
-                                        {/* {hasChild && 
-                                            <div className='flex justify-end'>
-                                                <div className='bg-slate-200/20 rounded-md w-[95%] px-4 pb-3'>
-                                                    <div className='grid grid-cols-10 gap-5 py-2 px-5'>
-                                                        <h5 className='col-span-3'>Mã</h5>
-                                                        <h5 className='col-span-3'>Tên</h5>
-                                                        <h5 className='col-span-3'>Ghi chú</h5>
-                                                        <h5 className='col-span-1 text-center'>Tác vụ</h5>
-                                                    </div>
-                                                    {e?.child.map((e) => 
-                                                        <ItemsChild 
-                                                            sid={e.id} 
-                                                            name={e.name} 
-                                                            note={e.note} 
-                                                            child={
-                                                                (e.child?.map((e) => 
-                                                                    <ItemsChild 
-                                                                        id={e.id} 
-                                                                        name={e.name} 
-                                                                        note={e.note} 
-                                                                        child={
-                                                                            (e.child?.map((e) => 
-                                                                                <ItemsChild 
-                                                                                    id={e.id} 
-                                                                                    name={e.name} 
-                                                                                    note={e.note} 
-                                                                                />
-                                                                            ))
-                                                                        }
-                                                                    />
-                                                                ))
-                                                            } 
-                                                        />
-                                                    )}
-                                                </div>
-                                            </div>
-                                        } */}
-                                        <div className={`${hasChild ? "translate-y-0" : "-translate-y-[100%]" } transition`}>
-                                            {e?.child?.map((e) => 
-                                                <ItemsChild id={e.id} name={e.name} note={e.note} />
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
+                                {dataFake.map((e) => <Items id={e.id} name={e.name} note={e.note} child={e.child} />)}
                             </div>
                         </div>
                     </div>
+                </div>
+                <div>
+                    <h6>Hiển thị 8 trong số 8 biến thể</h6>
                 </div>
             </div>
         </React.Fragment>
     );
 }
 
-const ItemsChild = React.memo((props) => {
+const Items = React.memo((props) => {
+    const [hasChild, sHasChild] = useState(false);
+    const _ToggleHasChild = () => sHasChild(!hasChild);
+
     return(
-        <React.Fragment>
-            <div key={props.id} className={`flex items-center py-2.5 px-2 hover:bg-slate-100/40 `}>
-                <div className='w-[10%] h-full flex justify-center items-center'>
-                    <IconDown className='rotate-45' />
-                    <IconMinus className='mt-1.5' />
+        <div>
+            <div key={props.id} className='flex items-center py-2 px-2 bg-white hover:bg-slate-50 relative'>
+                <div className='w-[2%] flex justify-center'>
+                    <input type='checkbox' className='scale-125' />
+                </div>
+                <div className='w-[8%] flex justify-center'>
+                    <button disabled={props?.child.length > 0 ? false : true} onClick={_ToggleHasChild.bind(this)} className={`${hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-green-800"} transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}>
+                        <IconMinus size={16} />
+                        <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
+                    </button>
                 </div>
                 <h6 className='xl:text-base text-xs px-2 w-[30%]'>{props.id}</h6>
                 <h6 className='xl:text-base text-xs px-2 w-[20%]'>{props.name}</h6>
                 <h6 className='xl:text-base text-xs px-2 w-[30%]'>{props.note}</h6>
                 <div className='w-[10%] bg-red-500 h-2' />
             </div>
+            {hasChild &&
+                <React.Fragment>
+                    {props?.child?.map((e) => 
+                        <ItemsChild id={e.id} name={e.name} note={e.note} grandchild="0"
+                            child={e?.child?.map((e => 
+                                <ItemsChild id={e.id} name={e.name} note={e.note} grandchild="1" 
+                                    child={e?.child?.map((e => 
+                                        <ItemsChild id={e.id} name={e.name} note={e.note} grandchild="2" />
+                                    ))}
+                                />
+                            ))} 
+                        />
+                    )}
+                </React.Fragment>
+            }
+        </div>
+    )
+})
+
+const ItemsChild = React.memo((props) => {
+    return(
+        <React.Fragment>
+            <div key={props.id} className={`flex items-center py-2.5 px-2 hover:bg-slate-100/40 `}>
+                {props.grandchild == "2" && 
+                    <div className='w-[10%] h-full flex justify-center items-center pl-24'>
+                        <IconDown className='rotate-45' />
+                    </div>
+                }
+                {props.grandchild == "1" && 
+                    <div className='w-[10%] h-full flex justify-center items-center pl-12'>
+                        <IconDown className='rotate-45' />
+                        <IconMinus className='mt-1.5' />
+                        <IconMinus className='mt-1.5' />
+                    </div>
+                }
+                {props.grandchild == "0" && 
+                    <div className='w-[10%] h-full flex justify-center items-center '>
+                        <IconDown className='rotate-45' />
+                        <IconMinus className='mt-1.5' />
+                        <IconMinus className='mt-1.5' />
+                        <IconMinus className='mt-1.5' />
+                        <IconMinus className='mt-1.5' />
+                    </div>
+                }
+                <h6 className='xl:text-base text-xs px-2 w-[30%]'>{props.id}</h6>
+                <h6 className='xl:text-base text-xs px-2 w-[20%]'>{props.name}</h6>
+                <h6 className='xl:text-base text-xs px-2 w-[30%]'>{props.note}</h6>
+                <div className='w-[10%] bg-red-500 h-2' />
+            </div>
+            {props.child}
         </React.Fragment>
     )
 })
