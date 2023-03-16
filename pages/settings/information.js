@@ -319,6 +319,7 @@ const Index = (props) => {
 }
 
 const ListBtn_Setting = React.memo((props) => {
+    const router = useRouter();
     return(
         <React.Fragment>
             <p className='font-[400] text-[15px] text-[#0F4F9E] uppercase'>{props.dataLang?.branch_settings_list ? props.dataLang?.branch_settings_list : "branch_settings_list"}</p>
@@ -326,7 +327,7 @@ const ListBtn_Setting = React.memo((props) => {
                 <Btn_Setting url="/settings" isActive="/settings/information">{props.dataLang?.list_btn_seting_information}</Btn_Setting>
                 <Btn_Setting>{props.dataLang?.list_btn_seting_services}</Btn_Setting>
                 <Btn_Setting url="/settings/branch" isActive="/settings/branch">{props.dataLang?.list_btn_seting_setup}</Btn_Setting>
-                <Btn_Setting url="/settings/finance" isActive="/settings/finance">{props.dataLang?.list_btn_seting_finance}</Btn_Setting>
+                <Btn_Setting url={`/settings/finance?tab=${router.query?.tab ? router.query?.tab : "taxes"}`} isActive="/settings/finance">{props.dataLang?.list_btn_seting_finance}</Btn_Setting>
                 <Btn_Setting>{props.dataLang?.list_btn_seting_qt}</Btn_Setting>
                 <Btn_Setting>{props.dataLang?.list_btn_seting_order}</Btn_Setting>
                 <Btn_Setting>{props.dataLang?.list_btn_seting_stage}</Btn_Setting>
