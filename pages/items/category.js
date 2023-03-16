@@ -40,6 +40,7 @@ const Index = () => {
             ]
         }
     ]
+    console.log(dataFake)
 
     const [hasChild, sHasChild] = useState(false);
     const _ToggleHasChild = () => sHasChild(!hasChild);
@@ -90,7 +91,7 @@ const Index = () => {
                             <div className='divide-y divide-slate-200 overflow-auto min:h-[400px] h-[100%] max:h-[600px]'>
                                 {dataFake.map((e,i) => 
                                     <div>
-                                        <div key={i} className='flex items-center py-1.5 px-2 bg-white z-10 relative'>
+                                        <div key={i} className='flex items-center py-2.5 px-2 bg-white hover:bg-slate-50 z-10 relative'>
                                             <div className='w-[2%] flex justify-center'>
                                                 <input type='checkbox' className='scale-125' />
                                             </div>
@@ -142,13 +143,10 @@ const Index = () => {
                                                 </div>
                                             </div>
                                         } */}
-                                        <div className={`${hasChild ? "translate-y-0" : "-translate-y-[100%]" } transition`}></div>
-                                        <div className={`${hasChild ? "translate-y-0" : "-translate-y-[100%]" } flex items-center py-1.5 px-2 hover:bg-red-100/40 transition `}>
-                                            <div className='w-[10%] h-2 bg-red-200'></div>
-                                            <h6 className='xl:text-base text-xs px-2 w-[30%]'>{e.id}</h6>
-                                            <h6 className='xl:text-base text-xs px-2 w-[20%]'>{e.name}</h6>
-                                            <h6 className='xl:text-base text-xs px-2 w-[30%]'>{e.note}</h6>
-                                            <div className='w-[10%] bg-red-500 h-2' />
+                                        <div className={`${hasChild ? "translate-y-0" : "-translate-y-[100%]" } transition`}>
+                                            {e?.child?.map((e) => 
+                                                <ItemsChild id={e.id} name={e.name} note={e.note} />
+                                            )}
                                         </div>
                                     </div>
                                 )}
@@ -164,13 +162,16 @@ const Index = () => {
 const ItemsChild = React.memo((props) => {
     return(
         <React.Fragment>
-            <div key={props.id} className='grid grid-cols-10 gap-5 py-2 px-5 hover:bg-slate-100/40'>
-                <h5 className='col-span-3'>{props.id}</h5>
-                <h5 className='col-span-3'>{props.name}</h5>
-                <h5 className='col-span-3'>{props.note}</h5>
-                <h5 className='col-span-1 text-center'>Tác vụ</h5>
+            <div key={props.id} className={`flex items-center py-2.5 px-2 hover:bg-slate-100/40 `}>
+                <div className='w-[10%] h-full flex justify-center items-center'>
+                    <IconDown className='rotate-45' />
+                    <IconMinus className='mt-1.5' />
+                </div>
+                <h6 className='xl:text-base text-xs px-2 w-[30%]'>{props.id}</h6>
+                <h6 className='xl:text-base text-xs px-2 w-[20%]'>{props.name}</h6>
+                <h6 className='xl:text-base text-xs px-2 w-[30%]'>{props.note}</h6>
+                <div className='w-[10%] bg-red-500 h-2' />
             </div>
-            {props.child}
         </React.Fragment>
     )
 })
