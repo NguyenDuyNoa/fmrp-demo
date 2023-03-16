@@ -13,7 +13,7 @@ import '../styles/globals.scss'
 
 import Swal from 'sweetalert2'
 import Popup from 'reactjs-popup';
-import {More as IconMore} from 'iconsax-react'
+import {More as IconMore, Eye as IconEye, EyeSlash as IconEyeSlash} from 'iconsax-react'
 import { Lexend_Deca } from "@next/font/google";
 const deca = Lexend_Deca({
   subsets: ['latin'],
@@ -253,11 +253,7 @@ const LoginPage = React.memo((props) => {
                       className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 py-3 pl-5 pr-12 rounded-md w-full'
                     />
                     <button onClick={_TogglePassword.bind(this)} className='absolute right-3'>
-                      {typePassword ? 
-                        <img alt="" src="/icon/EyeClosed.png" />
-                        :
-                        <img alt="" src="/icon/eye.png" />
-                      }
+                      {typePassword ? <IconEyeSlash /> : <IconEye />}
                     </button>
                   </div>
                   <div className='flex w-full justify-between'>

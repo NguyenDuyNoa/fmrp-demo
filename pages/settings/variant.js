@@ -52,7 +52,7 @@ const Index = (props) => {
     }, [onFetching]);
 
     useEffect(() => {
-        sOnFetching(true)
+        sOnFetching(true) || (keySearch && sOnFetching(true))
     }, [limit,router.query?.page]);
 
     const handleDelete = (event) => {
@@ -93,10 +93,12 @@ const Index = (props) => {
     
     const _HandleOnChangeKeySearch = ({target: {value}}) => {
         sKeySearch(value)
-        if(!value){
-          sOnFetching(true)
-        }
-        sOnFetching(true)
+        setTimeout(() => {
+            if(!value){
+              sOnFetching(true)
+            }
+            sOnFetching(true)
+        }, 500);
     };
 
     return (
@@ -297,7 +299,7 @@ const Popup_ChiNhanh = (props) => {
       open={open} onClose={_ToggleModal.bind(this,false)}
       classNameBtn={props.className}
     >
-      <div className="content mt-4 w-80">
+      <div className="mt-4 w-[400px]">
         <form onSubmit={_HandleSubmit.bind(this)} className="space-y-6">
             <div className="flex flex-wrap justify-between">
               <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.variant_name} <span className='text-red-500'>*</span></label>
@@ -310,22 +312,24 @@ const Popup_ChiNhanh = (props) => {
                 className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <h6 className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_variant_option}</h6>
-              {option.map((e) => 
-                <div className='flex space-x-3 items-center' key={e.id?.toString()}>
-                    <input
-                        value={e.name}
-                        onChange={_OnChangeOption.bind(this, e.id)}
-                        placeholder="Nhập tùy chọn"      
-                        name="optionVariant"                 
-                        type="text"
-                        className={`${listOptErr?.some(i => i === e.name) ? "border-red-500" : "border-[#d0d5dd] focus:border-[#92BFF7]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none`}
-                    />     
-                    <button onClick={_HandleDelete.bind(this, e.id)} type='button' title='Xóa' className='transition hover:scale-105 min-w-[40px] h-10 rounded-lg text-red-500 flex flex-col justify-center items-center'><IconDelete /></button>
-                </div>
-              )}
-              <div className='flex space-x-3 items-center'>
+              <div className='pr-3 max-h-60 overflow-auto space-y-1.5 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+                {option.map((e) => 
+                    <div className='flex space-x-3 items-center' key={e.id?.toString()}>
+                        <input
+                            value={e.name}
+                            onChange={_OnChangeOption.bind(this, e.id)}
+                            placeholder="Nhập tùy chọn"      
+                            name="optionVariant"                 
+                            type="text"
+                            className={`${listOptErr?.some(i => i === e.name) ? "border-red-500" : "border-[#d0d5dd] focus:border-[#92BFF7]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none`}
+                        />     
+                        <button onClick={_HandleDelete.bind(this, e.id)} type='button' title='Xóa' className='transition hover:scale-105 min-w-[40px] h-10 rounded-lg text-red-500 flex flex-col justify-center items-center'><IconDelete /></button>
+                    </div>
+                )}
+              </div>
+              <div className='flex space-x-3 items-center pr-3'>
                 <input
                     value={optionName}
                     onChange={_HandleChangeInput.bind(this, "optionName")}
