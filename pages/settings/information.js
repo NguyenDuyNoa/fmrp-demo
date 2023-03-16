@@ -2,6 +2,7 @@ import React, {useState, useRef, useEffect} from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 
 import {_ServerInstance as Axios} from '/services/axios';
 import LoadingItems from "/components/UI/loading"
@@ -128,7 +129,7 @@ const Index = (props) => {
             </Head>
             <div className='px-10 xl:pt-24 pt-[88px] pb-10 space-y-4'>
                 <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
-                    <h6 className='text-[#141522]/40'>Cài đặt</h6>
+                    <h6 className='text-[#141522]/40'>{dataLang?.branch_seting}</h6>
                     <span className='text-[#141522]/40'>/</span>
                     <h6>Thông Tin Doanh Nghiệp</h6>
                 </div>
@@ -147,7 +148,7 @@ const Index = (props) => {
                                             {data?.company_logo  && 
                                                 <div className='relative h-full w-full'>
                                                     {/* <img alt="logo" crossOrigin="anonymous" src={typeof(data?.company_logo)==="string" ? data?.company_logo : URL.createObjectURL(data?.company_logo)} className="w-full h-full object-cover"/> */}
-                                                    <img alt="logo" onMouseEnter={_HoverImg.bind(this, true)} onMouseLeave={_HoverImg.bind(this, false)} crossOrigin="anonymous" src={typeof(data?.company_logo)==="string" ? data?.company_logo : URL.createObjectURL(data?.company_logo)} className="w-full h-full object-cover"/>
+                                                    <Image alt="logo" width={120} height={120} onMouseEnter={_HoverImg.bind(this, true)} onMouseLeave={_HoverImg.bind(this, false)} src={typeof(data?.company_logo)==="string" ? data?.company_logo : URL.createObjectURL(data?.company_logo)} quality={100} className="object-contain w-full h-full" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                                     {hoverImg ? 
                                                         <div onMouseEnter={_HoverImg.bind(this, true)} onMouseLeave={_HoverImg.bind(this, false)} className='absolute top-0 right-0 w-full h-full bg-[#000000]/50 z-10 flex flex-col justify-center items-center backdrop-blur-sm'>
                                                             <IconCamera size="30" variant='Bold' className='text-white' />
@@ -331,7 +332,7 @@ const ListBtn_Setting = React.memo((props) => {
                 <Btn_Setting>{props.dataLang?.list_btn_seting_qt}</Btn_Setting>
                 <Btn_Setting>{props.dataLang?.list_btn_seting_order}</Btn_Setting>
                 <Btn_Setting>{props.dataLang?.list_btn_seting_stage}</Btn_Setting>
-                <Btn_Setting>{props.dataLang?.list_btn_seting_category}</Btn_Setting>
+                <Btn_Setting url="/settings/category" isActive="/settings/category">{props.dataLang?.list_btn_seting_category}</Btn_Setting>
                 <Btn_Setting url="/settings/variant" isActive="/settings/variant">{props.dataLang?.list_btn_seting_variant}</Btn_Setting>
             </div>
         </React.Fragment>

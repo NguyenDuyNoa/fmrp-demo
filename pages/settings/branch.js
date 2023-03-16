@@ -32,7 +32,7 @@ const Index = (props) => {
   const [limit, sLimit] = useState(15);
   const [totalItem, sTotalItem] = useState([]);
 
-  const _ServerFetching =  ()=>{
+  const _ServerFetching =  () =>{
     Axios("GET", `/api_web/Api_Branch/branch?csrf_protection=true`, {
       params: {
         search: keySearch,
@@ -54,7 +54,7 @@ const Index = (props) => {
   }, [onFetching])
   
   useEffect(() => {
-    sOnFetching(true)
+    sOnFetching(true) || (keySearch && sOnFetching(true))
   }, [limit,router.query?.page])
 
   const handleDelete = (event) => {
@@ -95,11 +95,14 @@ const Index = (props) => {
 
   const _HandleOnChangeKeySearch = ({target: {value}}) => {
     sKeySearch(value)
-    if(!value){
+    setTimeout(() => {
+      if(!value){
+        sOnFetching(true)
+      }
       sOnFetching(true)
-    }
-    sOnFetching(true)
+    }, 500);
   };
+  console.log(keySearch)
 
   return (
     <React.Fragment>

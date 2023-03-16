@@ -142,6 +142,7 @@ const Index = () => {
                                                 </div>
                                             </div>
                                         } */}
+                                        <div className={`${hasChild ? "translate-y-0" : "-translate-y-[100%]" } transition`}></div>
                                         <div className={`${hasChild ? "translate-y-0" : "-translate-y-[100%]" } flex items-center py-1.5 px-2 hover:bg-red-100/40 transition `}>
                                             <div className='w-[10%] h-2 bg-red-200'></div>
                                             <h6 className='xl:text-base text-xs px-2 w-[30%]'>{e.id}</h6>
