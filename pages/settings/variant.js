@@ -93,6 +93,7 @@ const Index = (props) => {
     
     const _HandleOnChangeKeySearch = ({target: {value}}) => {
         sKeySearch(value)
+        router.replace("/settings/variant")
         setTimeout(() => {
             if(!value){
               sOnFetching(true)
