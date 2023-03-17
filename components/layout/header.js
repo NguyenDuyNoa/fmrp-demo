@@ -23,7 +23,7 @@ const Header = () => {
                         {name: "Danh sách khách hàng"},
                         {name: "Danh sách liên hệ"},
                         {name: "Trạng thái khách hàng"},
-                        {name: "Nhóm khách hàng"}
+                        {name: "Nhóm khách hàng", link: "/clients/groups"}
                     ]
                 },
                 {

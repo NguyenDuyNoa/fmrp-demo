@@ -7,16 +7,26 @@ import PopupEdit from "/components/UI/popup";
 import { Editor } from '@tinymce/tinymce-react';
 import Popup from 'reactjs-popup';
 import { Minus as IconMinus, SearchNormal1 as IconSearch, ArrowDown2 as IconDown } from "iconsax-react";
+import Swal from "sweetalert2";
 
-const Index = () => {
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 2000,
+    timerProgressBar: true,
+})
+
+const Index = (props) => {
+    const dataLang = props.dataLang;
+
     const [onFetching, sOnFetching] = useState(false);
     const [data, sData] = useState([]);
     const [totalItems, sTotalItems] = useState({});
 
     const _ServerFetching = () => {
-        Axios("GET", "/api_web/api_material/category", {}, (err, response) => {
+        Axios("GET", "/api_web/api_material/category?csrf_protection=true", {}, (err, response) => {
             if(!err){
-                console.log(response)
                 var {output, rResult} = response.data;
                 sData(rResult);
                 sTotalItems(output);
@@ -32,63 +42,6 @@ const Index = () => {
         sOnFetching(true)
     }, []);
 
-    const dataFake = [
-        {
-            id: "01",
-            name: "mnbsdf smnbsdf",
-            note: 'asdasdasd asdasd',
-            child: [
-                {id: "010", name: "mnbsdf smnbsdf", note: 'poi 098 wer'},
-                {
-                    id: "011", 
-                    name: "mnbsdf smnbsdf", 
-                    note: 'poi 098 wer',
-                    child: [
-                        {
-                            id: "0110", 
-                            name: "mnbsdf smnbsdf", 
-                            note: 'poi 098 wer',
-                            child: [
-                                {id: "01100", name: "mnbsdf smnbsdfyyyy", note: 'poi 098 wer'},
-                                {id: "01101", name: "mnbsdf smnbsdfyyyy", note: 'poi 098 wer'},
-                            ]
-                        },
-                        {id: "0111", name: "mnbsdf smnbsdf", note: 'poi 098 wer'}
-                    ]
-                },
-                {id: "012", name: "mnbsdf smnbsdf", note: 'poi 098 wer'},
-            ]
-        },{
-            id: "02",
-            name: "mnbsdf smnbsdf",
-            note: 'asdasdasd asdasd',
-            child: [
-                {id: "020", name: "mnbsdf smnbsdf", note: 'poi 098 wer'},
-                {
-                    id: "021", 
-                    name: "mnbsdf smnbsdf", 
-                    note: 'poi 098 wer',
-                    child: [
-                        {
-                            id: "0210", 
-                            name: "mnbsdf smnbsdf", 
-                            note: 'poi 098 wer',
-                            child: [
-                                {id: "02100", name: "mnbsdf smnbsdfyyyy", note: 'poi 098 wer'},
-                                {id: "02101", name: "mnbsdf smnbsdfyyyy", note: 'poi 098 wer'},
-                            ]
-                        },
-                        {id: "0211", name: "mnbsdf smnbsdf", note: 'poi 098 wer'}
-                    ]
-                },
-                {id: "022", name: "mnbsdf smnbsdf", note: 'poi 098 wer'},
-            ]
-        },{
-            id: "03",
-            name: "mnbsdf smnbsdf",
-            note: 'asdasdasd asdasd'
-        }
-    ]
     return (
         <React.Fragment>
             <Head>
@@ -106,7 +59,7 @@ const Index = () => {
                     <div className='flex justify-between items-center'>
                         <h2 className='xl:text-3xl text-xl font-medium '>Nhóm nguyên vật liệu</h2>
                         <div className='flex space-x-3 items-center'>
-                            <Popup_NVL className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105' />
+                            <Popup_NVL onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} data={data} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105' />
                             <BtnTacVu className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#e2e8f0] via-[#e2e8f0] via-[#cbd5e1] to-[#e2e8f0] rounded btn-animation hover:scale-105 " />
                         </div>
                     </div>
@@ -120,7 +73,7 @@ const Index = () => {
                             />
                         </form>
                     </div>
-                    {/* <div className='min:h-[500px] h-[81%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+                    <div className='min:h-[500px] h-[81%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
                         <div className='xl:w-[100%] w-[110%] pr-2'>
                             <div className='flex items-center sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]'>
                                 <div className='w-[2%] flex justify-center'>
@@ -133,11 +86,10 @@ const Index = () => {
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center'>tác vụ</h4>
                             </div>
                             <div className='divide-y divide-slate-200'>
-                                {data.map((e) => <Items id={e.id} name={e.name} code={e.code} note={e.note} children={e?.children} />)}
+                                {data.map((e) => <Items key={e.id} id={e.id} name={e.name} code={e.code} note={e.note} children={e?.children} />)}
                             </div>
                         </div>
-                    </div> */}
-                    <EditorForm />
+                    </div>
                 </div>
                 <div className=''>
                     <h6>Hiển thị 8 trong số 8 biến thể</h6>
@@ -152,8 +104,8 @@ const Items = React.memo((props) => {
     const _ToggleHasChild = () => sHasChild(!hasChild);
 
     return(
-        <div>
-            <div key={props.id} className='flex items-center py-2 px-2 bg-white hover:bg-slate-50 relative'>
+        <div key={props.id}>
+            <div className='flex items-center py-2 px-2 bg-white hover:bg-slate-50 relative'>
                 <div className='w-[2%] flex justify-center'>
                     <input type='checkbox' className='scale-125' />
                 </div>
@@ -163,7 +115,7 @@ const Items = React.memo((props) => {
                         <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
                     </button>
                 </div>
-                <h6 className='xl:text-base text-xs px-2 w-[30%]'>{props.id}</h6>
+                <h6 className='xl:text-base text-xs px-2 w-[30%]'>{props.code}</h6>
                 <h6 className='xl:text-base text-xs px-2 w-[20%]'>{props.name}</h6>
                 <h6 className='xl:text-base text-xs px-2 w-[30%]'>{props.note}</h6>
                 <div className='w-[10%] bg-red-500 h-2' />
@@ -171,11 +123,11 @@ const Items = React.memo((props) => {
             {hasChild &&
                 <React.Fragment>
                     {props?.children?.map((e) => 
-                        <ItemsChild id={e.id} name={e.name} note={e.note} grandchild="0"
+                        <ItemsChild key={e.id} id={e.id} code={e.code} name={e.name} note={e.note} grandchild="0"
                             children={e?.children?.map((e => 
-                                <ItemsChild id={e.id} name={e.name} note={e.note} grandchild="1" 
+                                <ItemsChild key={e.id} id={e.id} code={e.code} name={e.name} note={e.note} grandchild="1" 
                                     children={e?.children?.map((e => 
-                                        <ItemsChild id={e.id} name={e.name} note={e.note} grandchild="2" />
+                                        <ItemsChild key={e.id} id={e.id} code={e.code} name={e.name} note={e.note} grandchild="2" />
                                     ))}
                                 />
                             ))} 
@@ -189,8 +141,8 @@ const Items = React.memo((props) => {
 
 const ItemsChild = React.memo((props) => {
     return(
-        <React.Fragment>
-            <div key={props.id} className={`flex items-center py-2.5 px-2 hover:bg-slate-100/40 `}>
+        <React.Fragment key={props.id}>
+            <div className={`flex items-center py-2.5 px-2 hover:bg-slate-100/40 `}>
                 {props.grandchild == "2" && 
                     <div className='w-[10%] h-full flex justify-center items-center pl-24'>
                         <IconDown className='rotate-45' />
@@ -212,7 +164,7 @@ const ItemsChild = React.memo((props) => {
                         <IconMinus className='mt-1.5' />
                     </div>
                 }
-                <h6 className='xl:text-base text-xs px-2 w-[30%]'>{props.id}</h6>
+                <h6 className='xl:text-base text-xs px-2 w-[30%]'>{props.code}</h6>
                 <h6 className='xl:text-base text-xs px-2 w-[20%]'>{props.name}</h6>
                 <h6 className='xl:text-base text-xs px-2 w-[30%]'>{props.note}</h6>
                 <div className='w-[10%] bg-red-500 h-2' />
@@ -256,6 +208,81 @@ const Popup_NVL = React.memo((props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
 
+    const [onSending, sOnSending] = useState(false);
+    const [code, sCode] = useState("");
+    const [name, sName] = useState("");
+
+    const [errCode, sErrCode] = useState(false);
+    const [errName, sErrName] = useState(false);
+
+    useEffect(() => {
+        sCode(props.data?.code ? props.data?.code : "" )
+        sName(props.data?.name ? props.data?.name : "" )
+        sErrCode(false);
+        sErrName(false);
+    }, [open]);
+
+    const _HandleChangeInput = (type, value) => {
+        if(type == "name"){
+            sName(value.target?.value)
+        }else if(type == "code"){
+            sCode(value.target?.value)
+        }
+    }
+
+    const _ServerSending = () => {
+        Axios("POST", `${props.id ? `/api_web/Api_variation/variation/${id}?csrf_protection=true` : "/api_web/api_material/category?csrf_protection=true"}`, {
+            data: {}
+        }, (err, response) => {
+            if(!err){
+                var {isSuccess, message} = response.data;
+                if(isSuccess){
+                    Toast.fire({
+                        icon: 'success',
+                        title: `${props.dataLang[message]}`
+                    })
+                    sName("")
+                    sCode("")
+                    props.onRefresh && props.onRefresh()
+                    sOpen(false)
+                }else{
+                    Toast.fire({
+                        icon: 'error',
+                        title: `${props.dataLang[message]}`
+                    })
+                }
+                sOnSending(false)
+            }
+        })
+    }
+
+    useEffect(() => {
+        onSending && _ServerSending()
+    }, [onSending]);
+
+    const _HandleSubmit = (e) => {
+        e.preventDefault();
+        if(name.length == 0){
+            sErrName(true)
+        }else { 
+            sErrName(false) 
+        }
+        if(code.length == 0){
+            sErrCode(true)
+        }else { 
+            sErrCode(false) 
+        }
+        sOnSending(true)
+    }
+
+    useEffect(() => {
+        sErrName(false)
+    }, [name.length > 0]);
+
+    useEffect(() => {
+        sErrCode(false)
+    }, [code.length > 0]);
+
     return(
         <PopupEdit  
             title={props.id ? `Chỉnh sửa` : `Tạo mới`} 
@@ -268,15 +295,19 @@ const Popup_NVL = React.memo((props) => {
             <div className='py-4 w-96 space-y-5'>
                 <div className='space-y-1'>
                     <label className="text-[#344054] font-normal text-base">Mã danh mục <span className='text-red-500'>*</span></label>
-                    <input className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`} />
-                    <label className="text-sm text-red-500">Vui lòng nhập mã danh mục</label>
+                    <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder='Nhập mã danh mục' className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`} />
+                    {errCode && <label className="text-sm text-red-500">Vui lòng nhập mã danh mục</label>}
                 </div>
                 <div className='space-y-1'>
                     <label className="text-[#344054] font-normal text-base">Tên danh mục <span className='text-red-500'>*</span></label>
-                    <input className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`} />
-                    <label className="text-sm text-red-500">Vui lòng nhập tên danh mục</label>
+                    <input value={name} onChange={_HandleChangeInput.bind(this, "name")} type="text" placeholder='Nhập tên danh mục' className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`} />
+                    {errName && <label className="text-sm text-red-500">Vui lòng nhập tên danh mục</label>}
                 </div>
                 <div className='space-y-1'></div>
+                <div className='flex justify-end space-x-2'>
+                    <button onClick={_ToggleModal.bind(this,false)} className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition">{props.dataLang?.branch_popup_exit}</button>
+                    <button onClick={_HandleSubmit.bind(this)} className="text-[#FFFFFF] text-base py-2 px-4 rounded-lg bg-[#0F4F9E] hover:opacity-90 hover:scale-105 transition">{props.dataLang?.branch_popup_save}</button>
+                </div>
             </div>
         </PopupEdit>
     )
@@ -297,18 +328,18 @@ const EditorForm = React.memo(() => {
                 onInit={(evt, editor) => editorRef.current = editor}
                 initialValue="<p>This is the initial content of the editor.</p>"
                 init={{
-                height: 500,
-                menubar: true,
-                plugins: [
-                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                    'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                ],
-                toolbar: 'undo redo | blocks | ' +
-                    'bold italic forecolor | alignleft aligncenter ' +
-                    'alignright alignjustify | bullist numlist outdent indent | ' +
-                    'removeformat | help',
-                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                    height: 500,
+                    menubar: true,
+                    // plugins: [
+                    //     'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+                    //     'searchreplace', 'visualblocks', 'code',
+                    //     'media', 'table', 'code'
+                    // ],
+                    toolbar: 'undo redo | ' +
+                        'fontfamily fontsize bold italic forecolor | alignleft aligncenter ' +
+                        'alignright alignjustify | bullist numlist outdent indent | ' +
+                        'removeformat | help',
+                    // content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
                 }}
             />
             <button onClick={log}>Log editor content</button>
