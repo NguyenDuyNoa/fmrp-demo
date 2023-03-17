@@ -1,9 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 
 import {_ServerInstance as Axios} from '/services/axios';
 import PopupEdit from "/components/UI/popup";
 
+import { Editor } from '@tinymce/tinymce-react';
 import Popup from 'reactjs-popup';
 import { Minus as IconMinus, SearchNormal1 as IconSearch, ArrowDown2 as IconDown } from "iconsax-react";
 
@@ -119,7 +120,7 @@ const Index = () => {
                             />
                         </form>
                     </div>
-                    <div className='min:h-[500px] h-[81%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+                    {/* <div className='min:h-[500px] h-[81%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
                         <div className='xl:w-[100%] w-[110%] pr-2'>
                             <div className='flex items-center sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]'>
                                 <div className='w-[2%] flex justify-center'>
@@ -135,7 +136,8 @@ const Index = () => {
                                 {data.map((e) => <Items id={e.id} name={e.name} code={e.code} note={e.note} children={e?.children} />)}
                             </div>
                         </div>
-                    </div>
+                    </div> */}
+                    <EditorForm />
                 </div>
                 <div className=''>
                     <h6>Hiển thị 8 trong số 8 biến thể</h6>
@@ -277,6 +279,40 @@ const Popup_NVL = React.memo((props) => {
                 <div className='space-y-1'></div>
             </div>
         </PopupEdit>
+    )
+})
+
+const EditorForm = React.memo(() => {
+    const editorRef = useRef(null);
+    const log = () => {
+        if (editorRef.current) {
+        console.log(editorRef.current.getContent());
+        }
+    };
+    return(
+        <>
+            <Editor
+                apiKey='0l9ca7pyz0qyliy0v9mmkfl2cz69uodvc8l6md8o4cnf6rnc'
+                // apiKey='nssrs338lqa6e6i3l75tb9xs4d8aqerp74if4rqgvopo74pe'
+                onInit={(evt, editor) => editorRef.current = editor}
+                initialValue="<p>This is the initial content of the editor.</p>"
+                init={{
+                height: 500,
+                menubar: true,
+                plugins: [
+                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                    'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                ],
+                toolbar: 'undo redo | blocks | ' +
+                    'bold italic forecolor | alignleft aligncenter ' +
+                    'alignright alignjustify | bullist numlist outdent indent | ' +
+                    'removeformat | help',
+                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                }}
+            />
+            <button onClick={log}>Log editor content</button>
+        </>
     )
 })
 
