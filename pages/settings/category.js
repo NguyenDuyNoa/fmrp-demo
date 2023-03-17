@@ -255,7 +255,14 @@ const Popup_danhmuc = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
 
-    const [unit, sUnit] = useState(props.data?.unit ? props.data?.unit : "");
+    const [onSending, sOnSending] = useState(false);
+    const [unit, sUnit] = useState("");
+    const [required, sRequired] = useState(false);
+
+    useEffect(() => {
+      sUnit(props.data?.unit ? props.data?.unit : "")
+      sRequired(false)
+    }, [open]);
 
     const _HandleChangeInput = (type, value) => {
       if(type == "unit"){
@@ -263,11 +270,11 @@ const Popup_danhmuc = (props) => {
       }
     }
 
-    const handleSubmit = (event) => {
-      event.preventDefault();
+    const _ServerSending = () => {
       const id =props.data?.id;
       var data = new FormData();
-      data.append('unit', (tabPage === "units" && unit) );
+      data.append('unit', (tabPage === "units" && unit));
+
       Axios("POST", id ? 
           `${(tabPage === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true`)} `
         :
@@ -286,15 +293,34 @@ const Popup_danhmuc = (props) => {
             sUnit("")
             sOpen(false)
             props.onRefresh && props.onRefresh()
-        }else {
+          }else {
             Toast.fire({
               icon: 'error',
               title: props.dataLang[message]
             })  
           }
         }
+        sOnSending(false)
       }) 
     }
+
+    useEffect(() => {
+      onSending && _ServerSending()
+    }, [onSending]);
+
+    const _HandleSubmit = (e) => {
+      e.preventDefault()
+      if(unit.length == 0){
+        sRequired(true)
+      }else{
+        sRequired(false)
+      }
+      sOnSending(true)
+    }
+
+    useEffect(() => {
+      sRequired(false)
+    }, [unit.length > 0]);
 
     const Toast = Swal.mixin({
       toast: true,
@@ -313,22 +339,21 @@ const Popup_danhmuc = (props) => {
         classNameBtn={props.className}
       >
         <div className={`w-96 mt-4`}>
-          <form onSubmit={ handleSubmit}>
+          <form onSubmit={_HandleSubmit.bind(this)}>
             <div>
               {tabPage === "units" &&
-                <React.Fragment>
-                  <div className="flex flex-wrap justify-between">
-                    <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.category_unit_name} <span className="text-red-500">*</span></label>
+                  <div className="space-y-1">
+                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_unit_name} <span className="text-red-500">*</span></label>
                     <input
                       value={unit}
                       onChange={_HandleChangeInput.bind(this, "unit")}
                       name="fname"                       
                       type="text"
-                      className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
+                      placeholder="Nhập tên đơn vị"
+                      className={`${required ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
                     />
+                    {required && <label className="text-sm text-red-500">Vui lòng nhập tên đơn vị</label>}
                   </div>
-                      
-                </React.Fragment>
               }
 
               <div className="text-right mt-5 space-x-2">

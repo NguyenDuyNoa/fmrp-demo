@@ -7,11 +7,7 @@ import PopupEdit from "../../components/UI/popup";
 import {_ServerInstance as Axios} from '/services/axios';
 import Pagination from '/components/UI/pagination';
 
-import {
-  Edit as IconEdit,
-  Trash as IconDelete,
-  SearchNormal1 as IconSearch,
-} from "iconsax-react";
+import { Edit as IconEdit, Trash as IconDelete, SearchNormal1 as IconSearch, } from "iconsax-react";
 import Loading from "components/UI/loading";
 import Swal from "sweetalert2";
 
@@ -32,37 +28,35 @@ const Index = (props) => {
       })
   }, []);
   const [data, sData] = useState([]);
-  const [onFetching, sOnFetching] = useState(false);
-  
+  const [onFetching, sOnFetching] = useState(true);
   const [totalItems, sTotalItems] = useState([]);
   const [keySearch, sKeySearch] = useState("")
   const [limit, sLimit] = useState(15);
+const _ServerFetching = () => {
+  Axios("GET", `/api_web/${(router.query?.tab === "taxes" && "Api_tax/tax?csrf_protection=true") || (router.query?.tab === "currencies" && "Api_currency/currency?csrf_protection=true") || (router.query?.tab === "paymentmodes" && "Api_payment_method/payment_method?csrf_protection=true")}`, {
+      params: {
+          search: keySearch,
+          limit: limit,
+          page: router.query?.page || 1
+      }
+  }, (err, response) => {
+      if(!err){
+          var {rResult, output} = response.data
+          sData(rResult)
+          sTotalItems(output)
+      }
+      sOnFetching(false)
+  })
+}
 
-  const _ServerFetching = () => {
-    Axios("GET", `/api_web/${(router.query?.tab === "taxes" && "Api_tax/tax?csrf_protection=true") || (router.query?.tab === "currencies" && "Api_currency/currency?csrf_protection=true") || (router.query?.tab === "paymentmodes" && "Api_payment_method/payment_method?csrf_protection=true")}`, {
-        params: {
-            search: keySearch,
-            limit: limit,
-            page: router.query?.page || 1
-        }
-    }, (err, response) => {
-        if(!err){
-            var {rResult, output} = response.data
-            sData(rResult)
-            sTotalItems(output)
-        }
-        sOnFetching(false)
-    })
-  }
+useEffect(() => {
+  onFetching && _ServerFetching()
+}, [onFetching]);
 
-  useEffect(() => {
-    onFetching && _ServerFetching()
-  }, [onFetching]);
+useEffect(() => {
+   router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true))
 
-  useEffect(() => {
-    router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true))
-  }, [limit,router.query?.page, router.query?.tab]);
-
+}, [limit,router.query?.page, router.query?.tab]);
   const handleDelete = (event) => {
     Swal.fire({
       title: `${dataLang?.aler_ask}`,
@@ -92,7 +86,6 @@ const Index = (props) => {
     })
    
   }
-  
   const paginate = pageNumber => {
     router.push({
       pathname: '/settings/finance',
@@ -115,7 +108,7 @@ const Index = (props) => {
         sOnFetching(true)
       }
       sOnFetching(true)
-    }, 500);
+    }, 1500);
   };
   const Toast = Swal.mixin({
     toast: true,
@@ -128,7 +121,7 @@ const Index = (props) => {
   return (
   <React.Fragment>
     <Head>
-        <title>{dataLang?.list_btn_seting_finance}</title>
+        <title>{dataLang?.btn_seting_finance}</title>
     </Head>
     <div className='px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen'>
         <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
@@ -142,7 +135,7 @@ const Index = (props) => {
             </div>
             <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                 <div className='space-y-3 h-[96%] overflow-hidden'>
-                    <h2 className='text-2xl text-[#52575E]'>{dataLang?.list_btn_seting_finance}</h2>
+                    <h2 className='text-2xl text-[#52575E]'>{dataLang?.btn_seting_finance}</h2>
                     <div className="flex space-x-3 items-center justify-start">
                         <button onClick={_HandleSelectTab.bind(this, "taxes")} className={`${router.query?.tab === "taxes" ? "text-[#0F4F9E] bg-[#e2f0fe]" : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"} rounded-lg px-4 py-2 outline-none`}>{dataLang?.branch_popup_finance_exchange_rate}</button>
                         <button onClick={_HandleSelectTab.bind(this, "currencies")} className={`${router.query?.tab === "currencies" ? "text-[#0F4F9E] bg-[#e2f0fe]" : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"} rounded-lg px-4 py-2 outline-none`}>{dataLang?.branch_popup_finance_unittitle}</button>
@@ -163,18 +156,18 @@ const Index = (props) => {
                               placeholder={dataLang?.branch_search}
                           />
                         </form>
-                          <div className="flex space-x-2">
-                              <label className="font-[300] text-slate-400">Hiển thị :</label>
-                              <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
-                                  <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
-                                  <option value={15}>15</option>
-                                  <option value={20}>20</option>
-                                  <option value={40}>40</option>
-                                  <option value={60}>60</option>
-                                  <option value={-1}>Tất cả</option>
-                              </select>
-                          </div>
-                          </div>
+                                <div className="flex space-x-2">
+                                    <label className="font-[300] text-slate-400">Hiển thị :</label>
+                                    <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
+                                        <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
+                                        <option value={15}>15</option>
+                                        <option value={20}>20</option>
+                                        <option value={40}>40</option>
+                                        <option value={60}>60</option>
+                                        <option value={-1}>Tất cả</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div className="min:h-[200px] h-[100%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                             <div className={`${(router.query?.tab === "taxes") || (router.query?.tab === "currencies") ? "w-[100%]" : "w-[110%]" } 2xl:w-[100%] pr-2`}>
@@ -286,6 +279,8 @@ const Popup_TaiChinh = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
 
+    const [onSending, sOnSending] = useState(false);
+
     const [nameTax, sNameTax] = useState("");
     const [rateTax, sRateTax] = useState(null);
 
@@ -295,9 +290,18 @@ const Popup_TaiChinh = (props) => {
     const [nameMe, sNameMe] = useState("");
     const [methodMe, sMethodMe] = useState("0");
     const [balanceMe, sBalanceMe] = useState(null);
-    const [descriptionMe, sDescriptionMe] = useState("");
+    const [descriptionMe, sDescriptionMe] = useState("")
+    
+    const [errInput, sErrInput] = useState(false);
+    const [errInputCu, sErrInputCu] = useState(false);
+    const [errInputCusynm, sErrInputCusynm] = useState(false);
+    const [errInputMe, sErrInputMe] = useState(false);
 
     useEffect(() => {
+      sErrInput(false)
+      sErrInputMe(false)
+      sErrInputCu(false)
+      sErrInputCusynm(false)
       sNameTax(props.data?.name ? props.data?.name : "")
       sRateTax(props.data?.tax_rate ? props.data?.tax_rate : null)
       sCodeCu(props.data?.code ? props.data?.code : "")
@@ -310,7 +314,7 @@ const Popup_TaiChinh = (props) => {
 
     const _HandleChangeInput = (type, value) => {
       if(type == "nameTax"){
-        sNameTax(value.target?.value)
+          sNameTax(value.target?.value)
       }else if(type == "rateTax"){
         sRateTax(value.target?.value)
       }else if(type == "codeCu"){
@@ -328,8 +332,7 @@ const Popup_TaiChinh = (props) => {
       }
     }
 
-    const handleSubmit = (event) => {
-      event.preventDefault();
+    const _ServerSending = () => {
       const id =props.data?.id;
       var data = new FormData();
       data.append('name', (tabPage === "taxes" && nameTax) || (tabPage === "paymentmodes" && nameMe));
@@ -339,6 +342,7 @@ const Popup_TaiChinh = (props) => {
       data.append('cash_bank', methodMe);
       data.append('opening_balance', balanceMe);
       data.append('description', descriptionMe);
+
       Axios("POST", id ? 
           `${(tabPage === "taxes" && `/api_web/Api_tax/tax/${id}?csrf_protection=true`) || (tabPage === "currencies" && `/api_web/Api_currency/currency/${id}?csrf_protection=true`) || (tabPage === "paymentmodes" && `/api_web/Api_payment_method/payment_method/${id}?csrf_protection=true`)} `
         :
@@ -353,7 +357,12 @@ const Popup_TaiChinh = (props) => {
             Toast.fire({
               icon: 'success',
               title: props.dataLang[message]
-            })   
+            })  
+            sErrInputCu(false)
+            sErrInputCusynm(false)
+            sErrInput(false)
+            sErrInputMe(false)
+          
             sNameTax("")
             sRateTax(null)
             sCodeCu("")
@@ -362,19 +371,56 @@ const Popup_TaiChinh = (props) => {
             sMethodMe("0")
             sBalanceMe(null)
             sDescriptionMe("")
-
             sOpen(false)
             props.onRefresh && props.onRefresh()
-        }else {
+          }else {
             Toast.fire({
               icon: 'error',
               title: props.dataLang[message]
             })  
           }
         }
-      }) 
+        sOnSending(false)
+      })
     }
 
+    useEffect(() => {
+      onSending && _ServerSending()
+    }, [onSending])
+
+    const _HandleSubmit = (e) => {
+      e.preventDefault()
+      // || nameMe.length == 0  || balanceMe == 0
+      if(nameTax.length == 0   ){
+        sErrInput(true)
+      }else{
+        sErrInput(false)
+      }
+      if(codeCu.length == 0 )  {
+        sErrInputCu(true)
+      }else{
+        sErrInputCu(false)
+      }
+      if(symbolCu.length == 0 )  {
+      sErrInputCusynm(true)
+      }else{
+        sErrInputCusynm(false)
+      }
+      if(nameMe.length ==0){
+        sErrInputMe(true)
+      }else{
+        sErrInputMe(false)
+      }
+      sOnSending(true)
+    }
+
+    useEffect(() => {
+      sErrInput(false)
+      sErrInputCu(false)
+      sErrInputMe(false)
+      sErrInputCusynm(false)
+    }, [nameTax.length > 0,symbolCu.length > 0,codeCu.length > 0,nameMe.length >0])
+    
     const Toast = Swal.mixin({
       toast: true,
       position: 'top-end',
@@ -392,30 +438,33 @@ const Popup_TaiChinh = (props) => {
         classNameBtn={props.className}
       >
         <div className={`w-96 mt-4`}>
-          <form onSubmit={ handleSubmit}>
+          <form onSubmit={_HandleSubmit.bind(this)}>
             <div>
               {tabPage === "taxes" &&
                 <React.Fragment>
                   <div className="flex flex-wrap justify-between">
                     <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_finance_name} <span className="text-red-500">*</span></label>
                     <input
-                      value={nameTax}
+                      value={nameTax}                
                       onChange={_HandleChangeInput.bind(this, "nameTax")}
-                      name="fname"                       
+                      name="fname"                      
                       type="text"
-                      className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
+                      className={`${errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-1`}
                     />
+                    {errInput && <label className="mb-2 text-[14px] text-red-500">Vui lòng nhập tên loại thuế</label>}
+                   
+                   {/* {nameTax ==="" ?  <label className="mb-6 mt-2 text-[14px] text-red-500">Vui lòng nhập tên loại thuế</label> :"" } */}
                   </div>
                   <div className="flex flex-wrap justify-between">
                     <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_finance_rate} </label>
-                    <input
+                    <input       
                       value={rateTax}
                       onChange={_HandleChangeInput.bind(this, "rateTax")}
-                      name="tax_rate" 
+                      name="tax_rate"                       
                       type="number"
                       min={0}
                       max={100}
-                      step="0.01" 
+                      step="0.01"
                       className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
                     />     
                   </div>           
@@ -431,19 +480,21 @@ const Popup_TaiChinh = (props) => {
                       onChange={_HandleChangeInput.bind(this, "codeCu")}
                       name="fname"                       
                       type="text"
-                      className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
-                    />
+                      className={`${errInputCu ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-1`}
+                      />
+                      {errInputCu && <label className="mb-2 text-[14px] text-red-500">Vui lòng nhập mã tiền tệ</label>}
                   </div>
                   <div className="flex flex-wrap justify-between">
-                    <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_curency_symbol} </label>
+                    <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_curency_symbol} <span className="text-red-500">*</span></label>
                     <input
                       // required
                       value={symbolCu}
                       onChange={_HandleChangeInput.bind(this, "symbolCu")}
                       name="symbol"                       
                       type="text"
-                      className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
-                    />     
+                      className={`${errInputCusynm ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none`}
+                      />
+                      {errInputCusynm && <label className=" mt-2 text-[14px] text-red-500">Vui lòng nhập kí hiệu</label>} 
                   </div>         
                 </React.Fragment>
               }
@@ -457,8 +508,9 @@ const Popup_TaiChinh = (props) => {
                       onChange={_HandleChangeInput.bind(this, "nameMe")}
                       name="fname"                       
                       type="text"
-                      className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
-                    />
+                      className={`${errInputMe ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-1`}
+                      />
+                      {errInputMe && <label className="mb-2 text-[14px] text-red-500">Vui lòng nhập phương thức thanh toán</label>}
                   </div>
                   <div className="flex flex-wrap justify-between">
                     <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_payment_balance} </label>
@@ -469,23 +521,23 @@ const Popup_TaiChinh = (props) => {
                       onChange={_HandleChangeInput.bind(this, "balanceMe")}
                       name="opening_balance"                       
                       type="text"
-                      className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
-                    />     
+                      className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-6"
+                      />
+                     
+
                   </div>
                   <div className="flex flex-wrap ">
                     <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_payment_bank} </label>
-                  <textarea  value={descriptionMe}
-                      onChange={_HandleChangeInput.bind(this, "descriptionMe")}
-                      name="description" className="border border-gray-300 w-full min-h-[100px] outline-none p-2"/>
+                    <textarea  value={descriptionMe} rows={6} onChange={_HandleChangeInput.bind(this, "descriptionMe")} name="description" className="border border-gray-300 rounded-lg w-full outline-none p-2 resize-none"/>
                   </div>
                   <div className=" mt-2">
                     <div className="flex justify-between p-2">
                       <div className="flex items-center">
-                          <input type="radio" id="nganhang" value={"0"} onChange={_HandleChangeInput.bind(this, "methodMe")} checked={methodMe === "0" ? true : false} className="scale-150 outline-none"/>
+                          <input type="radio" id="nganhang" value={"0"} onChange={_HandleChangeInput.bind(this, "methodMe")} checked={methodMe === "0" ? true : false} className="scale-150 outline-none accent-blue-700"/>
                           <label htmlFor="nganhang" className="relative flex cursor-pointer items-center rounded-full p-3" data-ripple-dark="true">{props.dataLang?.branch_popup_payment_banking}</label>
                       </div>
                       <div className="flex items-center">
-                        <input type="radio" id="tienmat" value={"1"} onChange={_HandleChangeInput.bind(this, "methodMe")} checked={methodMe === "1" ? true : false} className="scale-150 outline-none"/>
+                        <input type="radio" id="tienmat" value={"1"} onChange={_HandleChangeInput.bind(this, "methodMe")} checked={methodMe === "1" ? true : false} className="scale-150 outline-none accent-blue-700"/>
                         <label htmlFor="tienmat" className="relative flex cursor-pointer items-center rounded-full p-3" data-ripple-dark="true">{props.dataLang?.branch_popup_payment_cash}</label>
                       </div>
                   </div>

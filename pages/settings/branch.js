@@ -218,9 +218,18 @@ const Popup_ChiNhanh = (props) => {
 
     const [onSending, sOnSending] = useState(false);
 
-    const [name, sName] = useState(props.name ? props.name : "");
-    const [address, sAddress] = useState(props.address ? props.address : "");
-    const [phone, sPhone] = useState(props.phone ? props.phone : "");
+    const [name, sName] = useState("");
+    const [address, sAddress] = useState("");
+    const [phone, sPhone] = useState("");
+    const [required, sRequired] = useState(false);
+
+    useEffect(() => {
+      sName(props.name ? props.name : "")
+      sAddress(props.address ? props.address : "")
+      sPhone(props.phone ? props.phone : "")
+      sRequired(false)
+    }, [open]);
+
     const id = props.id
 
     const _HandleChangeInput = (type, value) => {
@@ -250,9 +259,9 @@ const Popup_ChiNhanh = (props) => {
                     icon: 'success',
                     title: `${props.dataLang[message]}`
                 })
-                sName(props.name ? props.name : "")
-                sAddress(props.address ? props.address : "")
-                sPhone(props.phone ? props.phone : "")
+                sName("")
+                sAddress("")
+                sPhone("")
                 props.onRefresh && props.onRefresh()
                 sOpen(false)
             }else{
@@ -271,69 +280,75 @@ const Popup_ChiNhanh = (props) => {
     }, [onSending]);
 
     const _HandleSubmit = (e) => {
-        e.preventDefault()
-        sOnSending(true)
+      e.preventDefault()
+      if(name.length == 0){
+        sRequired(true)
+      }else{
+        sRequired(false)
+      }
+      sOnSending(true)
     }
+    
+    useEffect(() => {
+      sRequired(false)
+    }, [name.length > 0]);
 
   return(
     <PopupEdit  
       title={props.id ? `${props.dataLang?.branch_popup_edit}` : `${props.dataLang?.branch_popup_create_new_branch}`} 
       button={props.id ? <IconEdit/> : `${props.dataLang?.branch_popup_create_new}`} 
       onClickOpen={_ToggleModal.bind(this, true)} 
-      open={open} onClose={_ToggleModal.bind(this,false)}
+      open={open} 
+      onClose={_ToggleModal.bind(this,false)}
       classNameBtn={props.className}
     >
-      <div className="content mt-4">
-        <form onSubmit={_HandleSubmit.bind(this)}>
-          <div>
-            <div className="flex flex-wrap justify-between">
-              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_name}</label>
+      <div className="pt-5 w-96">
+        <form onSubmit={_HandleSubmit.bind(this)} className="space-y-5">
+            <div className="space-y-1">
+              <label className="text-[#344054] font-normal text-base">{props.dataLang?.branch_popup_name}<span className="text-red-500">*</span></label>
               <input
                 value={name}
                 onChange={_HandleChangeInput.bind(this, "name")}
                 name="fname"                       
                 type="text"
-                className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
+                className={`${required ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
               />
+              {required && <label className="text-sm text-red-500">Vui lòng nhập tên chi nhánh</label>}
             </div>
-            <div className="flex flex-wrap justify-between">
-              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_address} </label>
+            <div className="space-y-1">
+              <label className="text-[#344054] font-normal">{props.dataLang?.branch_popup_address} </label>
               <input
                 value={address}
                 onChange={_HandleChangeInput.bind(this, "address")}
                 name="adress"                       
                 type="text"
-                className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
+                className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none"
               />     
             </div>
-            <label className="text-[#344054] font-normal text-sm mb-1">{props.dataLang?.branch_popup_phone}</label>
-            <PhoneInput
-              country={"vn"}
-              value={phone}
-              onChange={(phone)=>sPhone(phone)}
-              inputProps={{
-                required: true,
-                autoFocus: true,
-              }}
-              inputStyle={{
-                width: "100%",
-                border: "1px solid #d0d5dd",
-                borderRadius: "8px",                 
-                paddingTop: "8px",
-                paddingBottom: "8px",
-                height: "auto",
-              }}
-            />
-       
-            <div className="text-right mt-5 space-x-2">
-              <button onClick={_ToggleModal.bind(this,false)} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-lg border border-solid border-[#D0D5DD]"
-              >{props.dataLang?.branch_popup_exit}</button>
-              <button 
-                type="submit"
-                className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-lg bg-[#0F4F9E]"
-              >{props.dataLang?.branch_popup_save}</button>
+            <div className="space-y-1">
+              <label className="text-[#344054] font-normal">{props.dataLang?.branch_popup_phone}</label>
+              <PhoneInput
+                country={"vn"}
+                value={phone}
+                onChange={(phone)=>sPhone(phone)}
+                inputProps={{
+                  required: true,
+                  autoFocus: true,
+                }}
+                inputStyle={{
+                  width: "100%",
+                  border: "1px solid #d0d5dd",
+                  borderRadius: "8px",                 
+                  paddingTop: "8px",
+                  paddingBottom: "8px",
+                  height: "auto",
+                }}
+              />
             </div>
-          </div>
+            <div className="text-right mt-5 space-x-2">
+              <button type="button" onClick={_ToggleModal.bind(this,false)} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-lg border border-solid border-[#D0D5DD]">{props.dataLang?.branch_popup_exit}</button>
+              <button type="submit" className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-lg bg-[#0F4F9E]">{props.dataLang?.branch_popup_save}</button>
+            </div>
         </form>
       </div>
     </PopupEdit>

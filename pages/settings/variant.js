@@ -99,7 +99,7 @@ const Index = (props) => {
               sOnFetching(true)
             }
             sOnFetching(true)
-        }, 500);
+        }, 1500);
     };
 
     return (
@@ -119,7 +119,7 @@ const Index = (props) => {
                     </div>
                     <div className='col-span-7 h-[100%] flex flex-col justify-between overflow-hidden'>
                         <div className='space-y-3 h-[96%] overflow-hidden'>
-                            <h2 className='text-2xl text-[#52575E]'>{dataLang?.list_btn_seting_variant}</h2>
+                            <h2 className='text-2xl text-[#52575E]'>{dataLang?.variant_title ? dataLang?.variant_title : "variant_title"}</h2>
                             <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
                                 <div className="flex justify-end">
                                     <Popup_ChiNhanh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
@@ -218,12 +218,16 @@ const Popup_ChiNhanh = (props) => {
 
     const [name, sName] = useState("");
     const [option, sOption] = useState([]);
+    const [required, sRequired] = useState(false);
+
     const [optionErr, sOptionErr] = useState(false);
     const [listOptErr, sListOptErr] = useState();
 
     useEffect(() => {
         sOption(props.option ? props.option : []) 
         sName(props.name ? props.name : "")
+        sRequired(false)
+        sOptionErr(false)
     }, [open]);
 
     const [optionName, sOptionName] = useState("");
@@ -264,7 +268,7 @@ const Popup_ChiNhanh = (props) => {
                 sListOptErr()
             }else{
                 Toast.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: `${props.dataLang[message]}`
                 })
                 // const res = option.filter(i => same_option.some(item => i.name === item));
@@ -281,8 +285,16 @@ const Popup_ChiNhanh = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault()
+        if(name.length == 0){
+            sRequired(true)
+        }else{
+            sRequired(false)
+        }
         sOnSending(true)
     }
+    useEffect(() => {
+        sRequired(false)
+    }, [name.length > 0]);
 
     const _HandleAddNew = () => {
         sOption([...option, {id: Date.now(), name: optionName}])
@@ -300,21 +312,22 @@ const Popup_ChiNhanh = (props) => {
       open={open} onClose={_ToggleModal.bind(this,false)}
       classNameBtn={props.className}
     >
-      <div className="mt-4 w-[400px]">
-        <form onSubmit={_HandleSubmit.bind(this)} className="space-y-6">
-            <div className="flex flex-wrap justify-between">
-              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.variant_name} <span className='text-red-500'>*</span></label>
-              <input
-                value={name}
-                name="nameVariant"
-                onChange={_HandleChangeInput.bind(this, "name")}
-                placeholder={props.dataLang?.variant_name}                       
-                type="text"
-                className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none"
-              />
+      <div className="pt-5 w-96">
+        <form onSubmit={_HandleSubmit.bind(this)} className="space-y-5">
+            <div className="space-y-1">
+                <label className="text-[#344054] font-normal text-base">{props.dataLang?.variant_name} <span className='text-red-500'>*</span></label>
+                <input
+                    value={name}
+                    name="nameVariant"
+                    onChange={_HandleChangeInput.bind(this, "name")}
+                    placeholder={props.dataLang?.variant_name}                       
+                    type="text"
+                    className={`${required ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
+                />
+              {required && <label className="text-sm text-red-500">Vui lòng nhập tên biến thể</label>}
             </div>
             <div className="space-y-1.5">
-              <h6 className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_variant_option}</h6>
+              <h6 className="text-[#344054] font-normal text-sm">{props.dataLang?.branch_popup_variant_option}</h6>
               <div className='pr-3 max-h-60 overflow-auto space-y-1.5 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
                 {option.map((e) => 
                     <div className='flex space-x-3 items-center' key={e.id?.toString()}>

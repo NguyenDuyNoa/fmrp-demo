@@ -144,25 +144,34 @@ const Index = (props) => {
                                 <div className='flex justify-center'>
                                     <div className=''>
                                         <input onChange={_HandleImg.bind(this)} ref={inputUpload} type="file" accept="image/png, image/jpeg, image/gif" hidden id="upload" />
-                                        <label htmlFor="upload" className="w-28 h-28 rounded overflow-hidden bg-[#000000]/50 flex flex-col justify-center items-center cursor-pointer">
-                                            {data?.company_logo  && 
-                                                <div className='relative h-full w-full'>
-                                                    {/* <img alt="logo" crossOrigin="anonymous" src={typeof(data?.company_logo)==="string" ? data?.company_logo : URL.createObjectURL(data?.company_logo)} className="w-full h-full object-cover"/> */}
-                                                    <Image alt="logo" width={120} height={120} onMouseEnter={_HoverImg.bind(this, true)} onMouseLeave={_HoverImg.bind(this, false)} src={typeof(data?.company_logo)==="string" ? data?.company_logo : URL.createObjectURL(data?.company_logo)} quality={100} className="object-contain w-full h-full" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
-                                                    {hoverImg ? 
-                                                        <div onMouseEnter={_HoverImg.bind(this, true)} onMouseLeave={_HoverImg.bind(this, false)} className='absolute top-0 right-0 w-full h-full bg-[#000000]/50 z-10 flex flex-col justify-center items-center backdrop-blur-sm'>
+                                        <label htmlFor="upload" className="w-28 h-28 rounded overflow-hidden bg-[#000000]/20 flex flex-col justify-center items-center cursor-pointer">
+                                            {onFetching ?
+                                                <div className='flex space-x-1'>
+                                                    <div className='w-3 h-3 rounded-full bg-blue-700 animate-[pulse_1.5s_linear_infinite]' />
+                                                    <div className='w-3 h-3 rounded-full bg-blue-700 animate-[pulse_1.6s_linear_infinite]' />
+                                                    <div className='w-3 h-3 rounded-full bg-blue-700 animate-[pulse_1.7s_linear_infinite]' />
+                                                </div>
+                                                :
+                                                <React.Fragment>
+                                                    {data?.company_logo  && 
+                                                        <div className='relative h-full w-full'>
+                                                            <Image alt="logo" width={120} height={120} onMouseEnter={_HoverImg.bind(this, true)} onMouseLeave={_HoverImg.bind(this, false)} src={typeof(data?.company_logo)==="string" ? data?.company_logo : URL.createObjectURL(data?.company_logo)} quality={100} className="object-contain w-full h-full" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" /> 
+                                                            {hoverImg ? 
+                                                                <div onMouseEnter={_HoverImg.bind(this, true)} onMouseLeave={_HoverImg.bind(this, false)} className='absolute top-0 right-0 w-full h-full bg-[#000000]/50 z-10 flex flex-col justify-center items-center backdrop-blur-sm'>
+                                                                    <IconCamera size="30" variant='Bold' className='text-white' />
+                                                                    <span className='text-white text-xs'>Upload logo</span>
+                                                                </div>
+                                                                : 
+                                                                null
+                                                            }
+                                                        </div>
+                                                    }
+                                                    {!data?.company_logo  && 
+                                                        <React.Fragment>
                                                             <IconCamera size="30" variant='Bold' className='text-white' />
                                                             <span className='text-white text-xs'>Upload logo</span>
-                                                        </div>
-                                                        : 
-                                                        null
+                                                        </React.Fragment>
                                                     }
-                                                </div>
-                                            }
-                                            {!data?.company_logo  && 
-                                                <React.Fragment>
-                                                    <IconCamera size="30" variant='Bold' className='text-white' />
-                                                    <span className='text-white text-xs'>Upload logo</span>
                                                 </React.Fragment>
                                             }
                                         </label>

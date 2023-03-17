@@ -9,7 +9,7 @@ const Index = (props) => {
         <button className={props.classNameBtn} onClick={props.onClickOpen}>{props.button}</button>
         <Popup 
             open={props.open}
-            closeOnDocumentClick
+            closeOnDocumentClick={false}
             onClose={props.onClose}
             className="popup-edit"
         >
