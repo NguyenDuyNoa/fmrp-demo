@@ -74,7 +74,7 @@ const Index = (props) => {
     }
     
     const _ServerSending = () => {
-        var formData = new  FormData()
+        var formData = new FormData()
 
         formData.append("company_name", data?.company_name)
         formData.append("company_email", data?.company_email)

@@ -39,21 +39,11 @@ const _ServerInstance = (method, url, dataObject, callback) => {
 	}).then(async function (response) {
       	callback && callback(null, response)
     }).catch(function (error){
-		// if(error.response && error.response?.status === 403){
-		// 	swal({
-		// 		title: "Hết Phiên Đăng Nhập",
-		// 		text: "Phiên đăng nhập của bạn đã hết hạn, vui lòng đăng nhập lại.",
-		// 		icon: "warning",
-		// 		timer: 3000,
-		// 		showConfirmButton: true,
-		// 		button: "Đăng Nhập Lại",
-		// 		timerProgressBar: true
-		// 	}).then((value) => {
-		// 		store.dispatch({type: "auth/update", payload: false})
-		// 	});
-		// }else{
-		// 	callback && callback(error, null)
-		// }
+		if(error.response && error.response?.status === 500){
+			store.dispatch({type: "auth/update", payload: false})
+		}else{
+			callback && callback(error, null)
+		}
     });
 }
 

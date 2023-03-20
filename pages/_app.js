@@ -20,6 +20,8 @@ const deca = Lexend_Deca({
   weight: ['300', '400', '500', '600', '700']
 })
 
+import axios from 'axios'
+
 const Default = (props) => {
   return(
     <React.Fragment>
@@ -75,7 +77,7 @@ function MainPage({ Component, pageProps }) {
       if(err){
         dispatch({type: "auth/update", payload: false})
       }else{
-        var isSuccess = response.data?.isSuccess;
+        var {isSuccess} = response.data;
         if(isSuccess){
           dispatch({type: "auth/update", payload: response.data?.info})
         }else{

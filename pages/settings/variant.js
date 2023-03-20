@@ -287,11 +287,15 @@ const Popup_ChiNhanh = (props) => {
         e.preventDefault()
         if(name.length == 0){
             sRequired(true)
+            Toast.fire({
+                icon: 'error',
+                title: `${props.dataLang?.required_field_null}`
+            })
         }else{
-            sRequired(false)
+            sOnSending(true)
         }
-        sOnSending(true)
     }
+    
     useEffect(() => {
         sRequired(false)
     }, [name.length > 0]);

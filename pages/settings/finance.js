@@ -241,7 +241,7 @@ useEffect(() => {
                                                     <div className="flex space-x-2 justify-center ">
                                                        <Popup_TaiChinh onRefresh={_ServerFetching.bind(this)} className="xl:text-base text-xs " dataLang={dataLang} data={e} />
                                                       <button className="xl:text-base text-xs  ">
-                                                      <IconDelete onClick={()=>handleDelete(e.id)}  color="red"/>
+                                                        <IconDelete onClick={()=>handleDelete(e.id)}  color="red"/>
                                                       </button>
                                                     </div>
                                               </div>
