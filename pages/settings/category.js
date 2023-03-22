@@ -140,7 +140,7 @@ useEffect(() => {
             </div>
             <div className='col-span-7 h-[100%] flex flex-col justify-between overflow-hidden'>
                 <div className='space-y-3 h-[96%] overflow-hidden'>
-                    <h2 className='text-2xl text-[#52575E]'>{dataLang?.category_unit}</h2>
+                    <h2 className='text-2xl text-[#52575E]'>{dataLang?.category_titel}</h2>
                     <div className="flex space-x-3 items-center justify-start">
                         <button onClick={_HandleSelectTab.bind(this, "units")} className={`${router.query?.tab === "units" ? "text-[#0F4F9E] bg-[#e2f0fe]" : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"} rounded-lg px-4 py-2 outline-none`}>{dataLang?.category_unit}</button>
                     </div>
@@ -255,14 +255,7 @@ const Popup_danhmuc = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
 
-    const [onSending, sOnSending] = useState(false);
-    const [unit, sUnit] = useState("");
-    const [required, sRequired] = useState(false);
-
-    useEffect(() => {
-      sUnit(props.data?.unit ? props.data?.unit : "")
-      sRequired(false)
-    }, [open]);
+    const [unit, sUnit] = useState(props.data?.unit ? props.data?.unit : "");
 
     const _HandleChangeInput = (type, value) => {
       if(type == "unit"){
@@ -270,11 +263,11 @@ const Popup_danhmuc = (props) => {
       }
     }
 
-    const _ServerSending = () => {
+    const handleSubmit = (event) => {
+      event.preventDefault();
       const id =props.data?.id;
       var data = new FormData();
-      data.append('unit', (tabPage === "units" && unit));
-
+      data.append('unit', (tabPage === "units" && unit) );
       Axios("POST", id ? 
           `${(tabPage === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true`)} `
         :
@@ -293,34 +286,15 @@ const Popup_danhmuc = (props) => {
             sUnit("")
             sOpen(false)
             props.onRefresh && props.onRefresh()
-          }else {
+        }else {
             Toast.fire({
               icon: 'error',
               title: props.dataLang[message]
             })  
           }
         }
-        sOnSending(false)
       }) 
     }
-
-    useEffect(() => {
-      onSending && _ServerSending()
-    }, [onSending]);
-
-    const _HandleSubmit = (e) => {
-      e.preventDefault()
-      if(unit.length == 0){
-        sRequired(true)
-      }else{
-        sRequired(false)
-      }
-      sOnSending(true)
-    }
-
-    useEffect(() => {
-      sRequired(false)
-    }, [unit.length > 0]);
 
     const Toast = Swal.mixin({
       toast: true,
@@ -339,21 +313,22 @@ const Popup_danhmuc = (props) => {
         classNameBtn={props.className}
       >
         <div className={`w-96 mt-4`}>
-          <form onSubmit={_HandleSubmit.bind(this)}>
+          <form onSubmit={ handleSubmit}>
             <div>
               {tabPage === "units" &&
-                  <div className="space-y-1">
-                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_unit_name} <span className="text-red-500">*</span></label>
+                <React.Fragment>
+                  <div className="flex flex-wrap justify-between">
+                    <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.category_unit_name} <span className="text-red-500">*</span></label>
                     <input
                       value={unit}
                       onChange={_HandleChangeInput.bind(this, "unit")}
                       name="fname"                       
                       type="text"
-                      placeholder="Nhập tên đơn vị"
-                      className={`${required ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
+                      className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
                     />
-                    {required && <label className="text-sm text-red-500">Vui lòng nhập tên đơn vị</label>}
                   </div>
+                      
+                </React.Fragment>
               }
 
               <div className="text-right mt-5 space-x-2">

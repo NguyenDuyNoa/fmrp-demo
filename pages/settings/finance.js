@@ -7,14 +7,19 @@ import PopupEdit from "../../components/UI/popup";
 import {_ServerInstance as Axios} from '/services/axios';
 import Pagination from '/components/UI/pagination';
 
-import { Edit as IconEdit, Trash as IconDelete, SearchNormal1 as IconSearch, } from "iconsax-react";
+
+
+import {
+  Edit as IconEdit,
+  Trash as IconDelete,
+  SearchNormal1 as IconSearch,
+} from "iconsax-react";
 import Loading from "components/UI/loading";
 import Swal from "sweetalert2";
 
 const Index = (props) => {
   const dataLang = props.dataLang;
   const router = useRouter();
-  
   const _HandleSelectTab = (e) => {
       router.push({
           pathname: '/settings/finance',    
@@ -108,7 +113,7 @@ useEffect(() => {
         sOnFetching(true)
       }
       sOnFetching(true)
-    }, 1500);
+    }, 500);
   };
   const Toast = Swal.mixin({
     toast: true,
@@ -234,14 +239,14 @@ useEffect(() => {
                                                               {router.query?.tab === "paymentmodes" && e?.name}                                                             
                                                             </h6>
                                                             <h6 className="xl:text-base text-xs px-2 col-span-1">{router.query?.tab === "paymentmodes" && e?.cash_bank == "1" ? dataLang?.paymethod_cash :  dataLang?.paymethod_bank  }</h6>
-                                                            <h6 className="xl:text-base text-xs px-2 col-span-2 text-center">{router.query?.tab === "paymentmodes" && e?.opening_balance}</h6>
+                                                            <h6 className="xl:text-base text-xs px-2 col-span-2 text-center">{router.query?.tab === "paymentmodes" && e?.opening_balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</h6>
                                                             <h6 className="xl:text-base text-xs px-2 col-span-2">{router.query?.tab === "paymentmodes" && e?.description}</h6>
                                                         </React.Fragment>
                                                     }
                                                     <div className="flex space-x-2 justify-center ">
                                                        <Popup_TaiChinh onRefresh={_ServerFetching.bind(this)} className="xl:text-base text-xs " dataLang={dataLang} data={e} />
                                                       <button className="xl:text-base text-xs  ">
-                                                        <IconDelete onClick={()=>handleDelete(e.id)}  color="red"/>
+                                                      <IconDelete onClick={()=>handleDelete(e.id)}  color="red"/>
                                                       </button>
                                                     </div>
                                               </div>
@@ -528,16 +533,18 @@ const Popup_TaiChinh = (props) => {
                   </div>
                   <div className="flex flex-wrap ">
                     <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_payment_bank} </label>
-                    <textarea  value={descriptionMe} rows={6} onChange={_HandleChangeInput.bind(this, "descriptionMe")} name="description" className="border border-gray-300 rounded-lg w-full outline-none p-2 resize-none"/>
+                  <textarea  value={descriptionMe}
+                      onChange={_HandleChangeInput.bind(this, "descriptionMe")}
+                      name="description" className="border border-gray-300 w-full min-h-[100px] outline-none p-2"/>
                   </div>
                   <div className=" mt-2">
                     <div className="flex justify-between p-2">
                       <div className="flex items-center">
-                          <input type="radio" id="nganhang" value={"0"} onChange={_HandleChangeInput.bind(this, "methodMe")} checked={methodMe === "0" ? true : false} className="scale-150 outline-none accent-blue-700"/>
+                          <input type="radio" id="nganhang" value={"0"} onChange={_HandleChangeInput.bind(this, "methodMe")} checked={methodMe === "0" ? true : false} className="scale-150 outline-none"/>
                           <label htmlFor="nganhang" className="relative flex cursor-pointer items-center rounded-full p-3" data-ripple-dark="true">{props.dataLang?.branch_popup_payment_banking}</label>
                       </div>
                       <div className="flex items-center">
-                        <input type="radio" id="tienmat" value={"1"} onChange={_HandleChangeInput.bind(this, "methodMe")} checked={methodMe === "1" ? true : false} className="scale-150 outline-none accent-blue-700"/>
+                        <input type="radio" id="tienmat" value={"1"} onChange={_HandleChangeInput.bind(this, "methodMe")} checked={methodMe === "1" ? true : false} className="scale-150 outline-none"/>
                         <label htmlFor="tienmat" className="relative flex cursor-pointer items-center rounded-full p-3" data-ripple-dark="true">{props.dataLang?.branch_popup_payment_cash}</label>
                       </div>
                   </div>

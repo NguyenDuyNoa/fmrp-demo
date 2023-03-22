@@ -20,9 +20,9 @@ const Header = () => {
                     title: "Khách hàng",
                     img: "/icon/header/danhmuc/kh.png",
                     items: [
-                        {name: "Danh sách khách hàng"},
+                        {name: "Danh sách khách hàng",link:"/clients/clients"},
                         {name: "Danh sách liên hệ"},
-                        {name: "Trạng thái khách hàng"},
+                        {name: "Trạng thái khách hàng", link:"/clients/statusClient"},
                         {name: "Nhóm khách hàng", link: "/clients/groups"}
                     ]
                 },

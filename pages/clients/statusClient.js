@@ -32,7 +32,7 @@ const Index = (props) => {
   const [totalItem, sTotalItem] = useState([]);
 
   const _ServerFetching =  () =>{
-    Axios("GET", `/api_web/Api_client/group?csrf_protection=true`, {
+    Axios("GET", `/api_web/api_client/status?csrf_protection=true`, {
       params: {
         search: keySearch,
         limit: limit,
@@ -68,9 +68,7 @@ const Index = (props) => {
     }).then((result) => {
       if (result.isConfirmed) {
         const id = event;
-       
-        
-        Axios("DELETE", `/api_web/Api_client/group/${id}?csrf_protection=true`, {
+        Axios("DELETE", `/api_web/api_client/status/${id}?csrf_protection=true`, {
         }, (err, response) => {
           if(!err){
             var isSuccess = response.data?.isSuccess;
@@ -89,14 +87,14 @@ const Index = (props) => {
 
   const paginate = pageNumber => {
     router.push({
-        pathname: '/clients/groups',
+        pathname: '/clients/statusClient',
         query: { page: pageNumber }
     })
   }
 
   const _HandleOnChangeKeySearch = ({target: {value}}) => {
     sKeySearch(value)
-    router.replace('/clients/groups');
+    router.replace('/clients/statusClient');
     setTimeout(() => {
       if(!value){
         sOnFetching(true)
@@ -107,21 +105,21 @@ const Index = (props) => {
   return (
     <React.Fragment>
       <Head>
-        <title>{dataLang?.client_groupuser_title}</title>
+        <title>{dataLang?.client_group_statusclient}</title>
       </Head>
       <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
         <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
           <h6 className="text-[#141522]/40">{dataLang?.client_group_client}</h6>
           <span className="text-[#141522]/40">/</span>
-          <h6>{dataLang?.client_groupuser_title}</h6>
+          <h6>{dataLang?.client_group_statusclient}</h6>
         </div>
         <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
           <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
             <div className="space-y-3 h-[96%] overflow-hidden">
-              <h2 className="text-2xl text-[#52575E]">{dataLang?.client_groupuser}</h2>
+              <h2 className="text-2xl text-[#52575E]">{dataLang?.client_group_statusctitle}</h2>
               <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
                 <div className="flex justify-end items-center">
-                  <Popup_groupKh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
+                  <Popup_status onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
                 </div>
                 <div className="xl:space-y-3 space-y-2">
                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
@@ -147,9 +145,10 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className="xl:w-[100%] w-[110%] pr-2">
+                <div className="min:h-[200px] h-[82%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                  <div className="xl:w-[100%] w-[110%] pr-2">
                     <div className="flex items-center sticky top-0 bg-white p-2 z-10">
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[50%] font-[300] text-left">{dataLang?.client_group_name}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[50%] font-[300] text-left">{dataLang?.client_group_statusclient}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.client_group_colorcode}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.client_group_color}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-center">{dataLang?.branch_popup_properties}</h4>
@@ -169,7 +168,7 @@ const Index = (props) => {
                                 backgroundColor:e.color
                               }} className="xl:text-base text-xs  px-2 py-3 w-[15%]  rounded-md "></h6>                 
                               <div className="space-x-2 w-[20%] text-center">
-                                <Popup_groupKh onRefresh={_ServerFetching.bind(this)} className="xl:text-base text-xs " dataLang={dataLang} name={e.name} color={e.color} id={e.id} />
+                                <Popup_status onRefresh={_ServerFetching.bind(this)} className="xl:text-base text-xs " dataLang={dataLang} name={e.name} color={e.color} id={e.id} />
                                 <button onClick={()=>handleDelete(e.id)} className="xl:text-base text-xs "><IconDelete color="red"/></button>
                               </div>
                             </div>
@@ -183,12 +182,13 @@ const Index = (props) => {
                             <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
                             <h1 className="textx-[#141522] text-base opacity-90 font-medium">Không tìm thấy các mục</h1>
                             <div className="flex items-center justify-around mt-6 ">
-                                <Popup_groupKh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />    
+                                <Popup_status onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />    
                             </div>
                           </div>
                         </div>
                       )}    
                   </div>
+                </div>
               </div>     
             </div>
             {data?.length != 0 &&
@@ -209,7 +209,7 @@ const Index = (props) => {
   );
 };
 
-const Popup_groupKh = (props) => {
+const Popup_status = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
 
@@ -217,9 +217,11 @@ const Popup_groupKh = (props) => {
     const [name, sName] = useState("");
     const [color, sColor] = useState("");
     const [errInput, sErrInput] = useState(false);
+    const [errInputColor, sErrInputColor] = useState(false);
     
     useEffect(() => {
       sErrInput(false)
+      sErrInputColor(false)
       sName(props.name ? props.name : "")
       sColor(props.color ? props.color : "")
     }, [open]);
@@ -227,7 +229,6 @@ const Popup_groupKh = (props) => {
     const _HandleChangeInput = (type, value) => {
         if(type == "name"){
             sName(value.target?.value)
-
         }else if(type == "color"){
             sColor(value.target?.value)
         }
@@ -235,15 +236,16 @@ const Popup_groupKh = (props) => {
 
     useEffect(() => {
         sErrInput(false) 
-      }, [name.length > 0])
+        sErrInputColor(false) 
+      }, [name.length > 0,color.length > 0])
       
   const _ServerSending = () => {
     const id =props.id;
-
+    console.log(id);
     var data = new FormData();
     data.append('name', name);
     data.append('color', color);
-    Axios("POST", `${props.id ? `/api_web/Api_client/group/${id}?csrf_protection=true` : "/api_web/Api_client/group?csrf_protection=true"}`, {
+    Axios("POST", `${props.id ? `/api_web/api_client/status/${id}?csrf_protection=true` : "/api_web/api_client/status?csrf_protection=true"}`, {
       data: data,
       headers: {"Content-Type": "multipart/form-data"} 
     }, (err, response) => {
@@ -255,6 +257,7 @@ const Popup_groupKh = (props) => {
                     title: `${props.dataLang[message]}`
                 })
                 sErrInput(false)
+                sErrInputColor(false)
                 sName("")
                 sColor("")
                 props.onRefresh && props.onRefresh()
@@ -276,20 +279,21 @@ const Popup_groupKh = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault()
-        if(name.length == 0){
+        if(name.length ==0){
             sErrInput(true)
-            Toast.fire({
-              icon: 'error',
-              title: `${props.dataLang?.required_field_null}`
-          })
         }else{
-            // sErrInput(false)
-            sOnSending(true)
+            sErrInput(false)
         }
+        if(color.length ==0){
+            sErrInputColor(true)
+        }else{
+            sErrInputColor(false)
+        }
+        sOnSending(true)
     }
   return(
     <PopupEdit  
-      title={props.id ? `${props.dataLang?.client_group_edit}` : `${props.dataLang?.client_group_add}`} 
+      title={props.id ? `${props.dataLang?.client_group_statusedit}` : `${props.dataLang?.client_group_statusadd}`} 
       button={props.id ? <IconEdit/> : `${props.dataLang?.branch_popup_create_new}`} 
       onClickOpen={_ToggleModal.bind(this, true)} 
       open={open} onClose={_ToggleModal.bind(this,false)}
@@ -299,7 +303,7 @@ const Popup_groupKh = (props) => {
         <form onSubmit={_HandleSubmit.bind(this)}>
           <div>
           <div className="flex flex-wrap justify-between">
-                    <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_group_name} <span className="text-red-500">*</span></label>
+                    <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_group_statusname} <span className="text-red-500">*</span></label>
                     <input
                       value={name}                
                       onChange={_HandleChangeInput.bind(this, "name")}
@@ -308,16 +312,17 @@ const Popup_groupKh = (props) => {
                       className={`${errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2`}
                     />
                     {errInput && <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.client_group_please_name}</label>}
-                                     </div>
+            </div>
             <div className="flex flex-wrap justify-between">
-              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_group_color}</label>
+              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_group_color} <span className="text-red-500">*</span></label>
               <input
                 value={color}
                 onChange={_HandleChangeInput.bind(this, "color")}
                 name="color"                       
                 type="color"
-                className="placeholder-[color:#667085] w-full min-h-[50px] bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
-              />     
+                className={`${errInputColor ? "border-red-500 min-h-[50px]" : "focus:border-[#92BFF7] min-h-[50px] rounded-lg border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2`}
+              />    
+              {errInputColor && <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.client_group_please_color}</label>} 
             </div>
             <div className="text-right mt-5 space-x-2">
               <button onClick={_ToggleModal.bind(this,false)} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-lg border border-solid border-[#D0D5DD]"
