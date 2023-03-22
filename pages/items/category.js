@@ -34,8 +34,7 @@ const CustomSelectOption = ({value, label, level, code}) => (
         {level == 1 && <span>--</span>}
         {level == 2 && <span>----</span>}
         {level == 3 && <span>------</span>}
-        <span dangerouslySetInnerHTML={{__html: label}} className="2xl:max-w-[250px] max-w-[150px] w-fit truncate"/>
-        <span className='opacity-30'>({code})</span>
+        <span className="2xl:max-w-[250px] max-w-[150px] w-fit truncate">{label}</span>
     </div>
 )
 
@@ -89,7 +88,7 @@ const Index = (props) => {
     }
 
     useEffect(() => {
-        sDataOption(option_NhomNVL != null && [...option_NhomNVL?.map(x => ({label: `<p><span>${x.name}</span><span style={{display: "none"}}><${x.code}/span></p>`, value: x.id, level: x.level, code: x.code, parent_id: x.parent_id}))])
+        sDataOption(option_NhomNVL != null && [...option_NhomNVL?.map(x => ({label: `${x.name + " " + "(" + x.code + ")"}`, value: x.id, level: x.level, code: x.code, parent_id: x.parent_id}))])
         sCheckFetching(false)
     }, [checkFetching]);
 
@@ -431,7 +430,7 @@ const Popup_NVL = React.memo((props) => {
         open && sErrCode(false);
         open && sErrName(false);
         open && sLoadingEditor(true)
-        open && sDataOption(option_NhomNVL != null && [...option_NhomNVL?.map(x => ({label: `<p><span>${x.name}</span><span style={{display: "none"}}><${x.code}/span></p>`, value: x.id, level: x.level, code: x.code, parent_id: x.parent_id}))])
+        open && sDataOption(option_NhomNVL != null && [...option_NhomNVL?.map(x => ({label: `${x.name + " " + "(" + x.code + ")"}`, value: x.id, level: x.level, code: x.code, parent_id: x.parent_id}))])
         setTimeout(() => {
             sLoadingEditor(false)
         }, 1000);
