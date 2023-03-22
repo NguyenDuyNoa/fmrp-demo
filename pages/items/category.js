@@ -287,6 +287,11 @@ const Items = React.memo((props) => {
                     icon: 'success',
                     title: props.dataLang[message]
                   })     
+                }else{
+                    Toast.fire({
+                        icon: 'error',
+                        title: props.dataLang[message]
+                    }) 
                 }
               }
               props.onRefresh && props.onRefresh()
