@@ -368,7 +368,7 @@ const Index = (props) => {
                                 <input type='checkbox' className='scale-125' />
                             </div>
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[12%]             text-left">{e.code}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[13%]  rounded-md text-left truncate">{e.name}
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[13%]  rounded-md text-left">{e.name}
                                {/* <span onClick={linktest}>xem</span> */}
                                </h6>                
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[12%]  rounded-md text-left">{e.representative}</h6>                
