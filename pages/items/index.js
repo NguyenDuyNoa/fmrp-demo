@@ -619,12 +619,12 @@ const Popup_NVL = React.memo((props) => {
                             </div>
                             <div className='space-y-1'>
                                 <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_list_code} <span className='text-red-500'>*</span></label>
-                                <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder={props.dataLang?.category_material_list_code} className={`${errGroup ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                                <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder={props.dataLang?.category_material_list_code} className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
                                 {errCode && <label className="text-sm text-red-500">{props.dataLang?.category_material_list_err_code}</label>}
                             </div>
                             <div className='space-y-1'>
                                 <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_list_name} <span className='text-red-500'>*</span></label>
-                                <input value={name} onChange={_HandleChangeInput.bind(this, "name")} type="text" placeholder={props.dataLang?.category_material_list_name} className={`${errGroup ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                                <input value={name} onChange={_HandleChangeInput.bind(this, "name")} type="text" placeholder={props.dataLang?.category_material_list_name} className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
                                 {errName && <label className="text-sm text-red-500">{props.dataLang?.category_material_list_err_name}</label>}
                             </div>
                             <div className='space-y-1'>
