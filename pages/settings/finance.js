@@ -6,9 +6,9 @@ import { ListBtn_Setting } from "./information";
 import PopupEdit from "../../components/UI/popup";
 import {_ServerInstance as Axios} from '/services/axios';
 import Pagination from '/components/UI/pagination';
+import { NumericFormat } from 'react-number-format';
 
-
-
+//daupdate
 import {
   Edit as IconEdit,
   Trash as IconDelete,
@@ -223,13 +223,11 @@ useEffect(() => {
                                                         <React.Fragment>
                                                             <h6 className="xl:text-base text-xs px-2 col-span-3">
                                                             {router.query?.tab === "taxes" && e?.name}
-                                                            {router.query?.tab === "currencies" && e?.code}
-                                                         
+                                                            {router.query?.tab === "currencies" && e?.code}                                                       
                                                             </h6>
                                                             <h6 className="xl:text-base text-xs px-2 col-span-2 text-center ">
                                                                 {router.query?.tab === "taxes" && e?.tax_rate}         
-                                                                {router.query?.tab === "currencies" && e?.symbol}
-                                                              
+                                                                {router.query?.tab === "currencies" && e?.symbol}    
                                                             </h6>
                                                         </React.Fragment>
                                                     }
@@ -315,6 +313,7 @@ const Popup_TaiChinh = (props) => {
       sMethodMe(props.data?.cash_bank ? props.data?.cash_bank : "0")
       sBalanceMe(props.data?.opening_balance ? props.data?.opening_balance : null)
       sDescriptionMe(props.data?.description ? props.data?.description : "")
+  
     }, [open]);
 
     const _HandleChangeInput = (type, value) => {
@@ -331,7 +330,9 @@ const Popup_TaiChinh = (props) => {
       }else if(type == "methodMe"){
         sMethodMe(value.target?.value)
       }else if(type == "balanceMe"){
-        sBalanceMe(value.target?.value)
+        // console.log(value.target.value);
+        sBalanceMe(Number(value.value))
+        
       }else if(type == "descriptionMe"){
         sDescriptionMe(value.target?.value)
       }
@@ -519,17 +520,21 @@ const Popup_TaiChinh = (props) => {
                   </div>
                   <div className="flex flex-wrap justify-between">
                     <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_payment_balance} </label>
-                    <input
+                    {/* <input
                       // required
                       pattern="[0-9]*"
                       value={balanceMe}
                       onChange={_HandleChangeInput.bind(this, "balanceMe")}
+                      id="#key"
                       name="opening_balance"                       
                       type="text"
                       className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-6"
-                      />
+                      /> */}
                      
-
+                     <NumericFormat thousandSeparator="," name="opening_balance"   value={balanceMe}
+                      //  onValueChange={_HandleChangeInput.bind(this, "balanceMe")}
+                       onValueChange={_HandleChangeInput.bind(this, "balanceMe")}
+                        className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none`} />
                   </div>
                   <div className="flex flex-wrap ">
                     <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.branch_popup_payment_bank} </label>
