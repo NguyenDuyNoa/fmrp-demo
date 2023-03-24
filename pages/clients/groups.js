@@ -118,11 +118,11 @@ const Index = (props) => {
         <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
           <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
             <div className="space-y-3 h-[96%] overflow-hidden">
-              <h2 className="text-2xl text-[#52575E]">{dataLang?.client_groupuser}</h2>
-              <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
-                <div className="flex justify-end items-center">
+              <div className="flex justify-between">
+                <h2 className="text-2xl text-[#52575E]">{dataLang?.client_groupuser}</h2>
                   <Popup_groupKh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
-                </div>
+              </div>
+              <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
                 <div className="xl:space-y-3 space-y-2">
                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
                         <form className="flex items-center relative">
@@ -147,7 +147,10 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className="xl:w-[100%] w-[110%] pr-2">
+                <div className="min:h-[200px] h-[82%] max:h-[600px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                  
+                
+                <div className="xl:w-[100%] w-[110%] pr-2 ">
                     <div className="flex items-center sticky top-0 bg-white p-2 z-10">
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[50%] font-[300] text-left">{dataLang?.client_group_name}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.client_group_colorcode}</h4>
@@ -160,7 +163,7 @@ const Index = (props) => {
                       data.length > 0 ? 
                       (
                         <>
-                          <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">                       
+                          <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px] ">                       
                           {(data.map((e) => 
                             <div className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
                               <h6 className="xl:text-base text-xs  px-2 py-3 w-[50%] text-left">{e.name}</h6>
@@ -188,6 +191,7 @@ const Index = (props) => {
                           </div>
                         </div>
                       )}    
+                  </div>
                   </div>
               </div>     
             </div>
@@ -269,7 +273,7 @@ const Popup_groupKh = (props) => {
         sOnSending(false)
     })
   }
-
+//da up date
     useEffect(() => {
         onSending && _ServerSending()
     }, [onSending]);

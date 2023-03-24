@@ -1,15 +1,12 @@
-import React, {useState, useEffect, useRef, useCallback } from 'react';
+import React, {useState, useEffect} from 'react';
 import Head from 'next/head';
 import {useRouter} from 'next/router';
-import { useSelector, useDispatch } from 'react-redux';
 
 import {_ServerInstance as Axios} from '/services/axios';
 import PopupEdit from "/components/UI/popup";
 import Pagination from '/components/UI/pagination';
 import Loading from "components/UI/loading";
 
-import { Editor } from '@tinymce/tinymce-react';
-import Popup from 'reactjs-popup';
 import { 
     Minus as IconMinus, SearchNormal1 as IconSearch, ArrowDown2 as IconDown, Trash as IconDelete, Edit as IconEdit,
     Grid6 as IconExcel
@@ -34,29 +31,26 @@ const CustomSelectOption = ({value, label, level, code}) => (
         {level == 1 && <span>--</span>}
         {level == 2 && <span>----</span>}
         {level == 3 && <span>------</span>}
-        <span className="2xl:max-w-[250px] max-w-[150px] w-fit truncate">{label}</span>
+        {level == 4 && <span>--------</span>}
+        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
     </div>
 )
 
 const Index = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
-    const dispatch = useDispatch();
-    const option_NhomNVL = useSelector(state => state.option_NhomNVL);
 
     const [dataOption, sDataOption] = useState([]);
     const [idCategory, sIdCategory] = useState(null);
     const _HandleFilterOpt = (e) => sIdCategory(e)
-    console.log(idCategory)
 
     const [onFetching, sOnFetching] = useState(false);
+    const [onFetchingOpt, sOnFetchingOpt] = useState(false);
     const [data, sData] = useState([]);
 
     const [totalItems, sTotalItems] = useState({});
     const [keySearch, sKeySearch] = useState("")
     const [limit, sLimit] = useState(15);
-
-    const [checkFetching, sCheckFetching] = useState(false);
 
     const _ServerFetching = () => {
         Axios("GET", "/api_web/api_material/category?csrf_protection=true", {
@@ -72,25 +66,27 @@ const Index = (props) => {
                 sData(rResult);
                 sTotalItems(output);
             }
+            sOnFetching(false)
         })
-        Axios("GET", "/api_web/api_material/category?csrf_protection=true", {
-            params: {
-                isOption: "1"
-            }
-        }, (err, response) => {
+    }
+
+    const _ServerFetchingOtp = () => {
+        Axios("GET", "/api_web/api_material/categoryOption?csrf_protection=true", {}, (err, response) => {
             if(!err){
                 var {rResult} = response.data;
-                dispatch({type: "option_NhomNVL/update", payload: rResult ? rResult : null})
+                sDataOption(rResult.map(x => ({label: `${x.name + " " + "(" + x.code + ")"}`, value: x.id, level: x.level, code: x.code, parent_id: x.parent_id})))
             }
-            sCheckFetching(true)
+            sOnFetchingOpt(false)
         })
-        sOnFetching(false)
     }
 
     useEffect(() => {
-        sDataOption(option_NhomNVL != null && [...option_NhomNVL?.map(x => ({label: `${x.name + " " + "(" + x.code + ")"}`, value: x.id, level: x.level, code: x.code, parent_id: x.parent_id}))])
-        sCheckFetching(false)
-    }, [checkFetching]);
+        onFetchingOpt && _ServerFetchingOtp()
+    }, [onFetchingOpt]);
+
+    useEffect(() => {
+        sOnFetchingOpt(true)
+    }, []);
 
     useEffect(() => {
         onFetching && _ServerFetching() 
@@ -102,14 +98,14 @@ const Index = (props) => {
 
     const paginate = pageNumber => {
         router.push({
-            pathname: '/items/category',
+            pathname: router.route,
             query: { page: pageNumber }
         })
     }
 
     const _HandleOnChangeKeySearch = ({target: {value}}) => {
         sKeySearch(value)
-        router.replace("/items/category")
+        router.replace(router.route)
         setTimeout(() => {
             if(!value){
               sOnFetching(true)
@@ -118,13 +114,14 @@ const Index = (props) => {
         }, 1500);
     };
 
+    //excel
     const multiDataSet = [
         {
             columns: [
                 {title: "ID", width: {wch: 4}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                {title: "Mã danh mục", width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                {title: "Tên danh mục", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                {title: "Ghi chú", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.category_material_group_code}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.category_material_group_name}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.client_popup_note}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
             ],
             data: data.map((e) => 
                 [
@@ -140,27 +137,26 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>Nhóm nguyên vật liệu</title>
+                <title>{dataLang?.header_category_material_group}</title>
             </Head>
             <div className='px-10 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between'>
                 <div className='h-[97%] space-y-3 overflow-hidden'>
                     <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
                         <h6 className='text-[#141522]/40'>{dataLang?.list_btn_seting_category}</h6>
                         <span className='text-[#141522]/40'>/</span>
-                        <h6 className='text-[#141522]/40'>NVL, thành phẩm, vật tư</h6>
+                        <h6 className='text-[#141522]/40'>{dataLang?.header_category_material}</h6>
                         <span className='text-[#141522]/40'>/</span>
-                        <h6>Nhóm nguyên vật liệu</h6>
+                        <h6>{dataLang?.header_category_material_group}</h6>
                     </div>
                     <div className='flex justify-between items-center'>
-                        <h2 className='xl:text-3xl text-xl font-medium '>Nhóm Nguyên Vật Liệu</h2>
+                        <h2 className='xl:text-3xl text-xl font-medium '>{dataLang?.category_material_group_title}</h2>
                         <div className='flex space-x-3 items-center'>
-                            <Popup_NVL onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} data={data} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105' />
-                            <BtnTacVu className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#e2e8f0] via-[#e2e8f0] via-[#cbd5e1] to-[#e2e8f0] rounded btn-animation hover:scale-105 " />
+                            <Popup_NVL onRefresh={_ServerFetching.bind(this)} onRefreshOpt={_ServerFetchingOtp.bind(this)} dataLang={dataLang} data={data} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105' />
                         </div>
                     </div>
-                    <div className='grid grid-cols-4 gap-8'>
+                    <div className='grid grid-cols-4 gap-8 px-0.5'>
                         <div className=''>
-                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>Tên danh mục</h6>
+                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.category_material_group_name}</h6>
                             <Select 
                                 options={dataOption}
                                 formatOptionLabel={CustomSelectOption}
@@ -197,10 +193,10 @@ const Index = (props) => {
                                 <ExcelFile filename="nhóm nvl" title="Hiii" element={
                                     <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
                                         <IconExcel size={18} />
-                                        <span>Xuất Excel</span>
+                                        <span>{dataLang?.client_list_exportexcel}</span>
                                     </button>
                                 }>
-                                    <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
+                                    <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Nhóm NVL" />
                                 </ExcelFile>
 
                                 <div className="flex space-x-2 items-center">
@@ -224,21 +220,18 @@ const Index = (props) => {
                                     <input type='checkbox' className='scale-125' />
                                 </div>
                                 <h4 className='w-[8%]'/>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300]'>mã danh mục</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[300]'>tên danh mục</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[300]'>ghi chú</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center'>tác vụ</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300]'>{dataLang?.category_material_group_code}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[300]'>{dataLang?.category_material_group_name}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[300]'>{dataLang?.client_popup_note}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center'>{dataLang?.branch_popup_properties}</h4>
                             </div>
                             <div className='divide-y divide-slate-200'>
-                                {data.map((e) => <Items onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} key={e.id} data={e}/>)}
+                                {data.map((e) => <Items onRefresh={_ServerFetching.bind(this)} onRefreshOpt={_ServerFetchingOtp.bind(this)} dataLang={dataLang} key={e.id} data={e}/>)}
                                 {(!onFetching && data?.length == 0) && 
                                     <div className=" max-w-[352px] mt-24 mx-auto" >
                                         <div className="text-center">
                                             <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
                                             <h1 className="textx-[#141522] text-base opacity-90 font-medium">Không tìm thấy các mục</h1>
-                                            <div className="flex items-center justify-around mt-6 ">
-                                                <Popup_NVL onRefresh={_ServerFetching.bind(this)} dataLang={dataLang}className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />    
-                                            </div>
                                         </div>
                                     </div>
                                 }
@@ -295,6 +288,7 @@ const Items = React.memo((props) => {
                 }
               }
               props.onRefresh && props.onRefresh()
+              props.onRefreshOpt && props.onRefreshOpt()
             })     
         }
         })
@@ -320,18 +314,18 @@ const Items = React.memo((props) => {
                 <h6 className='xl:text-base text-xs px-2 w-[30%]'>{props.data?.name}</h6>
                 <h6 dangerouslySetInnerHTML={{__html: props.data?.note}} className='px-2 w-[30%] truncate'/>
                 <div className='w-[10%] flex justify-center space-x-2'>
-                    <Popup_NVL onRefresh={props.onRefresh} dataLang={props.dataLang} data={props.data} dataOption={props.dataOption} />
+                    <Popup_NVL onRefresh={props.onRefresh} onRefreshOpt={props.onRefreshOpt} dataLang={props.dataLang} data={props.data} dataOption={props.dataOption} />
                     <button onClick={_HandleDelete.bind(this, props.data?.id)} className="xl:text-base text-xs outline-none"><IconDelete color="red"/></button>
                 </div>
             </div>
             {hasChild &&
                 <div className='bg-slate-50/50'>
                     {props.data?.children?.map((e) => 
-                        <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} dataLang={props.dataLang} key={e.id} data={e} grandchild="0"
+                        <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} onRefreshOpt={props.onRefreshOpt} dataLang={props.dataLang} key={e.id} data={e}  grandchild="0"
                             children={e?.children?.map((e => 
-                                <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} dataLang={props.dataLang} key={e.id} data={e} grandchild="1" 
+                                <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} onRefreshOpt={props.onRefreshOpt} dataLang={props.dataLang} key={e.id} data={e} grandchild="1"
                                     children={e?.children?.map((e => 
-                                        <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} dataLang={props.dataLang} key={e.id} data={e} grandchild="2" />
+                                        <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} onRefreshOpt={props.onRefreshOpt} dataLang={props.dataLang} key={e.id} data={e} grandchild="2" />
                                     ))}
                                 />
                             ))} 
@@ -347,19 +341,19 @@ const ItemsChild = React.memo((props) => {
     return(
         <React.Fragment key={props.data?.id}>
             <div className={`flex items-center py-2.5 px-2 hover:bg-slate-100/40 `}>
-                {props.grandchild == "2" && 
+                {props.data?.level == "3" && 
                     <div className='w-[10%] h-full flex justify-center items-center pl-24'>
                         <IconDown className='rotate-45' />
                     </div>
                 }
-                {props.grandchild == "1" && 
+                {props.data?.level == "2" && 
                     <div className='w-[10%] h-full flex justify-center items-center pl-12'>
                         <IconDown className='rotate-45' />
                         <IconMinus className='mt-1.5' />
                         <IconMinus className='mt-1.5' />
                     </div>
                 }
-                {props.grandchild == "0" && 
+                {props.data?.level == "1" && 
                     <div className='w-[10%] h-full flex justify-center items-center '>
                         <IconDown className='rotate-45' />
                         <IconMinus className='mt-1.5' />
@@ -372,7 +366,7 @@ const ItemsChild = React.memo((props) => {
                 <h6 className='xl:text-base text-xs px-2 w-[30%] truncate'>{props.data?.name}</h6>
                 <h6 dangerouslySetInnerHTML={{__html: props.data?.note}} className='px-2 w-[30%]' />
                 <div className='w-[10%] flex justify-center space-x-2'>
-                    <Popup_NVL onRefresh={props.onRefresh} dataLang={props.dataLang} data={props.data} />
+                    <Popup_NVL onRefresh={props.onRefresh} onRefreshOpt={props.onRefreshOpt} dataLang={props.dataLang} data={props.data} />
                     <button onClick={props.onClick} className="xl:text-base text-xs"><IconDelete color="red"/></button>
                 </div>
             </div>
@@ -381,42 +375,14 @@ const ItemsChild = React.memo((props) => {
     )
 })
 
-const BtnTacVu = React.memo((props) => {
-    return(
-        <div>
-            <Popup
-                trigger={
-                    <button className={`flex space-x-1 items-center ` + props.className } >
-                        <span>Tác vụ</span>
-                        <IconDown size={15} />
-                    </button>
-                }
-                closeOnDocumentClick
-                arrow={false}
-                position="bottom right"
-                className={`dropdown-edit `}
-            >
-                <div className="w-auto">
-                    <div className="bg-white p-0.5 rounded-t w-52">
-                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Export Excel</button>
-                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Import Excel</button>
-                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Xóa</button>
-                    </div>
-                </div>
-            </Popup>
-        </div>
-    )
-})
-
 const Popup_NVL = React.memo((props) => {
-    const option_NhomNVL = useSelector(state => state.option_NhomNVL);
 
     const [dataOption, sDataOption] = useState([]);
-    const [dataOptCheck, sDataOptCheck] = useState([]);
 
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
 
+    const [onFetching, sOnFetching] = useState(false);
     const [onSending, sOnSending] = useState(false);
     const [code, sCode] = useState("");
     const [name, sName] = useState("");
@@ -424,8 +390,6 @@ const Popup_NVL = React.memo((props) => {
 
     const [errCode, sErrCode] = useState(false);
     const [errName, sErrName] = useState(false);
-    const [loadingEditor, sLoadingEditor] = useState(false);
-    const [checkData, sCheckData] = useState(false);
 
     useEffect(() => {
         sCode(props.data?.code ? props.data?.code : "" )
@@ -434,23 +398,8 @@ const Popup_NVL = React.memo((props) => {
         sIdCategory(props.data?.parent_id ? props.data?.parent_id : null )
         open && sErrCode(false);
         open && sErrName(false);
-        open && sLoadingEditor(true)
-        open && sDataOption(option_NhomNVL != null && [...option_NhomNVL?.map(x => ({label: `${x.name + " " + "(" + x.code + ")"}`, value: x.id, level: x.level, code: x.code, parent_id: x.parent_id}))])
-        setTimeout(() => {
-            sLoadingEditor(false)
-        }, 1000);
-        sCheckData(true)
-        // dataOption != null && sDataOption(dataOption.filter(x => x.value !== props.data?.id))
+        open && sOnFetching(true);
     }, [open]);
-
-    useEffect(() => {
-        checkData && sDataOption(dataOption.filter(x =>  x.parent_id !== props.data?.id && x.value !== props.data?.id))
-        sCheckData(false)
-    }, [checkData]);
-    // console.log("data", props.data)
-
-    // console.log("dataOption", dataOption)
-    // console.log("check", dataOptCheck)
 
     const _HandleChangeInput = (type, value) => {
         if(type == "name"){
@@ -458,9 +407,33 @@ const Popup_NVL = React.memo((props) => {
         }else if(type == "code"){
             sCode(value.target?.value)
         }else if(type == "editor"){
-            sEditorValue(value)
+            sEditorValue(value.target?.value)
         }
     }
+
+    // const _ServerFetching = () => {
+    //     Axios("GET", "/api_web/api_material/categoryOption?csrf_protection=true&page=1&limit=0", {}, (err, response) => {
+    //         if(!err){
+    //             var {rResult} = response.data;
+    //             sDataOption(rResult.map(x => ({label: `${x.name + " " + "(" + x.code + ")"}`, value: x.id, level: x.level, code: x.code, parent_id: x.parent_id})))
+    //         }
+    //         sOnFetching(false)
+    //     })
+    // }
+    
+    const _ServerFetching = () => {
+        Axios("GET", `${props.data?.id ? `/api_web/api_material/categoryOption/${props.data?.id}?csrf_protection=true` : "api_web/api_material/categoryOption?csrf_protection=true"}`, {}, (err, response) => {
+            if(!err){
+                var {rResult} = response.data;
+                sDataOption(rResult.map(e => ({label: e.name + " " + "(" + e.code + ")", value: e.id, level: e.level})))
+            }
+            sOnFetching(false)
+        })
+    }
+
+    useEffect(() => {
+        onFetching && _ServerFetching()
+    }, [onFetching]);
 
     const _ServerSending = () => {
         var formData = new FormData()
@@ -486,6 +459,7 @@ const Popup_NVL = React.memo((props) => {
                     sEditorValue("")
                     sIdCategory([])
                     props.onRefresh && props.onRefresh()
+                    props.onRefreshOpt && props.onRefreshOpt()
                     sOpen(false)
                 }else{
                     Toast.fire({
@@ -529,7 +503,7 @@ const Popup_NVL = React.memo((props) => {
 
     return(
         <PopupEdit  
-            title={props.data?.id ? `Chỉnh sửa` : `Tạo mới`} 
+            title={props.data?.id ? `${props.dataLang?.category_material_group_edit}` : `${props.dataLang?.category_material_group_addnew}`} 
             button={props.data?.id ? <IconEdit/> : `${props.dataLang?.branch_popup_create_new}`} 
             onClickOpen={_ToggleModal.bind(this, true)} 
             open={open} 
@@ -538,42 +512,25 @@ const Popup_NVL = React.memo((props) => {
         >
             <div className='py-4 w-[600px] space-y-5'>
                 <div className='space-y-1'>
-                    <label className="text-[#344054] font-normal text-base">Mã danh mục <span className='text-red-500'>*</span></label>
-                    <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder='Nhập mã danh mục' className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
-                    {errCode && <label className="text-sm text-red-500">Vui lòng nhập mã danh mục</label>}
+                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_group_code} <span className='text-red-500'>*</span></label>
+                    <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder={props.dataLang?.category_material_group_code} className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                    {errCode && <label className="text-sm text-red-500">{props.dataLang?.category_material_group_err_code}</label>}
                 </div>
                 <div className='space-y-1'>
-                    <label className="text-[#344054] font-normal text-base">Tên danh mục <span className='text-red-500'>*</span></label>
-                    <input value={name} onChange={_HandleChangeInput.bind(this, "name")} type="text" placeholder='Nhập tên danh mục' className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
-                    {errName && <label className="text-sm text-red-500">Vui lòng nhập tên danh mục</label>}
+                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_group_name} <span className='text-red-500'>*</span></label>
+                    <input value={name} onChange={_HandleChangeInput.bind(this, "name")} type="text" placeholder={props.dataLang?.category_material_group_name} className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                    {errName && <label className="text-sm text-red-500">{props.dataLang?.category_material_group_err_name}</label>}
                 </div>
                 <div className='space-y-1'>
-                    <label className="text-[#344054] font-normal text-base">Nhóm cha</label>
-                    {/* <Select 
-                        options={dataMaChungTu} 
-                        value={idCategory}
-                        onChange={valueIdCategory.bind(this)}
-                        placeholder="Nhóm cha" 
-                        className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none z-10" 
-                        isSearchable={true}
-                        theme={(theme) => ({
-                            ...theme,
-                            colors: {
-                                ...theme.colors,
-                                primary25: '#EBF5FF',
-                                primary50: '#92BFF7',
-                                primary: '#0F4F9E',
-                            },
-                        })}
-                    /> */}
+                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_group_level}</label>
                     <Select 
                         options={dataOption}
                         formatOptionLabel={CustomSelectOption}
-                        defaultValue={(idCategory == "0" || !idCategory) ? {label: "Nhóm cha", code: "nhóm cha"} : {label: dataOption.find(x => x?.parent_id == idCategory)?.label, code:dataOption.find(x => x?.parent_id == idCategory)?.code, value: idCategory}}
+                        defaultValue={(idCategory == "0" || !idCategory) ? {label: `${props.dataLang?.category_material_group_level}`} : {label: dataOption.find(x => x?.parent_id == idCategory)?.label, code:dataOption.find(x => x?.parent_id == idCategory)?.code, value: idCategory}}
                         value={(idCategory == "0" || !idCategory) ? {label: "Nhóm cha", code: "nhóm cha"} : {label: dataOption.find(x => x?.value == idCategory)?.label, code:dataOption.find(x => x?.value == idCategory)?.code, value: idCategory}}
                         onChange={valueIdCategory.bind(this)}
                         isClearable={true}
-                        placeholder="Nhóm cha" 
+                        placeholder={props.dataLang?.category_material_group_level}
                         className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none z-10" 
                         isSearchable={true}
                         theme={(theme) => ({
@@ -588,34 +545,15 @@ const Popup_NVL = React.memo((props) => {
                     />
                 </div>
                 <div className='space-y-1'>
-                    <label className="text-[#344054] font-normal text-base">Ghi chú</label>
-                    {loadingEditor ? 
-                        <div className='h-[250px] bg-slate-50 rounded w-full animate-pulse' />
-                        : 
-                        <Editor
-                            apiKey='0l9ca7pyz0qyliy0v9mmkfl2cz69uodvc8l6md8o4cnf6rnc'
-                            // onInit={(evt, editor) => editorRef.current = editor}
-                            value={editorValue}
-                            onEditorChange={_HandleChangeInput.bind(this, "editor")}
-                            init={{
-                                height: 250,
-                                menubar: false,
-                                // plugins: [
-                                //     'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-                                //     'searchreplace', 'visualblocks', 'code',
-                                //     'media', 'table', 'code'
-                                // ],
-                                toolbar: 'undo redo | ' +
-                                    'bold italic underline |' +
-                                    'removeformat | help',
-                                // inline_styles: true,
-                                // verify_html: false,
-                                // fix_list_elements: true,
-                                // extended_valid_elements: '*[*]',
-                                // forced_root_block: false
-                            }}
-                        />
-                    }
+                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.client_popup_note}</label>
+                    <textarea 
+                        type="text"
+                        placeholder={props.dataLang?.client_popup_note}
+                        rows={6}
+                        value={editorValue}
+                        onChange={_HandleChangeInput.bind(this, "editor")}
+                        className='focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none resize-none'
+                    />
                 </div>
                 <div className='flex justify-end space-x-2'>
                     <button onClick={_ToggleModal.bind(this,false)} className="text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition">{props.dataLang?.branch_popup_exit}</button>
@@ -623,49 +561,6 @@ const Popup_NVL = React.memo((props) => {
                 </div>
             </div>
         </PopupEdit>
-    )
-})
-
-// const Popup_NVL = React.memo((props) => {
-//     console.log("render")
-//     return(
-//         <div></div>
-//     )
-// })
-
-const EditorForm = React.memo(() => {
-    const editorRef = useRef(null);
-    
-    const log = () => {
-        if (editorRef.current) {
-        console.log(editorRef.current.getContent());
-        }
-    };
-    return(
-        <>
-            <Editor
-                apiKey='0l9ca7pyz0qyliy0v9mmkfl2cz69uodvc8l6md8o4cnf6rnc'
-                // apiKey='nssrs338lqa6e6i3l75tb9xs4d8aqerp74if4rqgvopo74pe'
-                onInit={(evt, editor) => editorRef.current = editor}
-                initialValue="<p>This is the initial content of the editor.</p>"
-                init={{
-                    height: 500,
-                    menubar: true,
-                    // plugins: [
-                    //     'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-                    //     'searchreplace', 'visualblocks', 'code',
-                    //     'media', 'table', 'code'
-                    // ],
-                    toolbar: 'undo redo | ' +
-                        'fontfamily fontsize bold italic forecolor | alignleft aligncenter ' +
-                        'alignright alignjustify | bullist numlist outdent indent | ' +
-                        'removeformat | help',
-                    // content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-                }}
-            />
-            <button onClick={log}>Log editor content</button>
-            <p dangerouslySetInnerHTML={{__html: editorRef.current.getContent()}} className="w-full" />
-        </>
     )
 })
 

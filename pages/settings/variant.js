@@ -164,9 +164,6 @@ const Index = (props) => {
                                                         <div className="text-center">
                                                             <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
                                                             <h1 className="textx-[#141522] text-base opacity-90 font-medium">Không tìm thấy các mục</h1>
-                                                            <div className="flex items-center justify-around mt-6 ">
-                                                                <Popup_ChiNhanh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />    
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 }

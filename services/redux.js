@@ -7,7 +7,8 @@ const adminState = {
     {label: "Tiếng Việt", code: "vi"},
   ],
   lang: "vi",
-  option_NhomNVL: null
+  unit_NVL: null,
+  branch: null
 }
 
 function adminReducer(state = adminState, action) {
@@ -16,8 +17,10 @@ function adminReducer(state = adminState, action) {
       return { ...state, auth: action.payload }
     case 'lang/update':
       return { ...state, lang: action.payload }
-    case 'option_NhomNVL/update':
-      return { ...state, option_NhomNVL: action.payload }
+    case 'unit_NVL/update':
+      return { ...state, unit_NVL: action.payload }
+    case 'branch/update':
+      return { ...state, branch: action.payload }
     default:
       return state
   }

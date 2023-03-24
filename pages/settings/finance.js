@@ -239,7 +239,7 @@ useEffect(() => {
                                                               {router.query?.tab === "paymentmodes" && e?.name}                                                             
                                                             </h6>
                                                             <h6 className="xl:text-base text-xs px-2 col-span-1">{router.query?.tab === "paymentmodes" && e?.cash_bank == "1" ? dataLang?.paymethod_cash :  dataLang?.paymethod_bank  }</h6>
-                                                            <h6 className="xl:text-base text-xs px-2 col-span-2 text-center">{router.query?.tab === "paymentmodes" && e?.opening_balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</h6>
+                                                            <h6 className="xl:text-base text-xs px-2 col-span-2 text-center">{router.query?.tab === "paymentmodes" && e?.opening_balance?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</h6>
                                                             <h6 className="xl:text-base text-xs px-2 col-span-2">{router.query?.tab === "paymentmodes" && e?.description}</h6>
                                                         </React.Fragment>
                                                     }
