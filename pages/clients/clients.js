@@ -32,10 +32,14 @@ const Toast = Swal.mixin({
   timerProgressBar: true,
 })
 
+
+
 const Index = (props) => {
+
     const dataLang = props.dataLang
     const router = useRouter();
     const tabPage = router.query?.tab;
+
 
     const [keySearch, sKeySearch] = useState("")
     const [limit, sLimit] = useState(15);
@@ -83,12 +87,11 @@ const Index = (props) => {
         })
     }
     const [listBr, sListBr]= useState()
-
     const _ServerFetching_brand =  () =>{
       Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {
-        params:{
-          limit: 0
-        }
+       params:{
+        limit: 0
+       }
     }, (err, response) => {
       if(!err){
           var {rResult, output} =  response.data
@@ -101,7 +104,7 @@ const Index = (props) => {
     const _ServerFetching_group =  () =>{
       Axios("GET", `/api_web/api_client/group_count/?csrf_protection=true`, {
         params:{
-          limit: 5
+          limit: 0
         }
     }, (err, response) => {
       if(!err){
@@ -111,10 +114,11 @@ const Index = (props) => {
       sOnFetching(false)
     })
     }
-
     const _ServerFetching_selectgroup =  () =>{
-      Axios("GET", `/api_web/Api_client/group?csrf_protection=true`, {
-        limit: 0
+      Axios("GET", `/api_web/Api_client/group?csrf_protection=true`, {   
+        params:{
+          limit: 0
+        }
     }, (err, response) => {
       if(!err){
           var {rResult, output} =  response.data
@@ -123,7 +127,6 @@ const Index = (props) => {
       sOnFetching(false)
     })
     }
-
     const _ServerFetching_selectct =  () =>{
       Axios("GET", `/api_web/Api_address/province?limit=0`, {
         limit: 0
@@ -197,8 +200,6 @@ const Index = (props) => {
     }
 
     //excel
-    console.log(data_ex);
-  
     const multiDataSet = [
       {
           columns: [
@@ -329,17 +330,17 @@ const Index = (props) => {
                           {(data.map((e) => 
                             <div className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">{e.code}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left text-[#0F4F9E] hover:font-normal"><Popup_chitiet dataLang={dataLang} className="" name={e.name} id={e?.id}/></h6>           
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left text-[#0F4F9E] hover:font-normal"><Popup_chitiet dataLang={dataLang} className="text-left" name={e.name} id={e?.id}/></h6>           
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">{e.representative}</h6>                
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-center">{e.tax_code}</h6>                
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-center">{e.phone_number}</h6>                
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.address}</h6>                
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left flex object-cover cursor-pointer justify-start items-center flex-wrap gap-2">{e.staff_charge?.map(d => { return (
                                <>
-                                <Popup className='dropdown-avt' key={d.id}
-                                      trigger={open => (<img src={d.profile_image}  width={40} height={40} className="object-cover rounded-[100%]"></img>)}
+                                <Popup className='dropdown-avt ' key={d.id}
+                                      trigger={open => (<img src={d.profile_image}  width={40} height={40} className="object-cover rounded-[100%] text-left"></img>)}
                                       position="top center" on={['hover']} arrow={false}>
-                                    <span className='bg-[#0f4f9e] text-white rounded p-1.5'>{d.full_name} </span>
+                                    <span className='bg-[#0f4f9e] text-white rounded p-1.5 '>{d.full_name} </span>
                                 </Popup>      
                                </> 
                                )})}
@@ -414,6 +415,7 @@ const Popup_dskh = (props) => {
       const [onFetchingDis, sOnFetchingDis] = useState(false)
       const [onFetchingWar, sOnFetchingWar] = useState(false)
       const [onFetchingChar, sOnFetchingChar] = useState(false)
+      const [onFetchingBr, sOnFetchingBr] = useState(false);
 
       const [errInput, sErrInput] = useState(false);
       const [errInputBr, sErrInputBr] = useState(false);
@@ -441,10 +443,10 @@ const Popup_dskh = (props) => {
 
       const [valueBr, sValueBr] = useState([])
       const [valueGr, sValueGr] = useState([])
+      const branch = valueBr.map(e => e.value)
 
       const _HandleSelectTab = (e) => sTab(e)
       const [hidden, sHidden] = useState(false)
-
 
       useEffect(() => {
         sErrInputBr(false)
@@ -466,6 +468,11 @@ const Popup_dskh = (props) => {
          sListBrand(props.listSelectGr ? props.listBr && [...props.listBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
          sOption(props.option ? props.option : [])
          sValueBr([])
+         sValueCt()
+         sValueDis()
+         sValueWa()
+         sValueGr([])
+         sValueChar([])
       }, [open]);
       
       const _ServerFetching_detailUser =  () =>{
@@ -493,6 +500,7 @@ const Popup_dskh = (props) => {
             
           }
           sOnSending(false)
+          // sOnFetching(false)
         })
         }
         useEffect(() => {
@@ -523,7 +531,7 @@ const Popup_dskh = (props) => {
           sDebt_limit(value.target?.value)
         }else if(type == "debt_limit_day"){
           sDebt_limit_day(value.target?.value)
-        }else if(type == "valueBr", value){
+        }else if(type == "valueBr"){
           sValueBr(value)
           // if(value){
           //   _ServerFetching_Char(value.map(e=> e.value))
@@ -538,23 +546,31 @@ const Popup_dskh = (props) => {
           sOptionPhone(value.target?.value)
         }
       }
-
       // char..
+      console.log(valueBr);
       const [listChar, sListChar]= useState()
+      console.log(listChar);
       const _ServerFetching_Char =  () =>{
         Axios("GET", `/api_web/api_staff/GetstaffInBrard?csrf_protection=true`, {
           params: {
-            "brach_id[]": valueBr,
-            staffid: valueBr ? valueBr.value : -1
+            "brach_id[]": branch,
+            staffid: branch ? branch : -1,
           }
       }, (err, response) => {
         if(!err){
             var db =  response.data
             sListChar(db)
         }
-        sOnFetching(false)
+        // sOnFetching(false)
+        sOnFetchingBr(false)
       })
       }
+      useEffect(() => {
+        onFetchingBr && _ServerFetching_Char()
+    }, [onFetchingBr]);
+      useEffect(() => {
+        open && _ServerFetching_Char(true)
+    }, [valueBr]);
       const listCharP  = listChar?.map(e=> ({label: e.name, value:e.staffid}))
       const [valueChar, sValueChar] = useState([])
       const char =  valueChar?.map(e=> e.value)
@@ -565,7 +581,7 @@ const Popup_dskh = (props) => {
       // branh
       const [brandpOpt, sListBrand] = useState([])
       const branch_id = valueBr?.map(e =>{
-        return e.value
+        return e?.value
       })
 
       // group
@@ -773,13 +789,12 @@ const Popup_dskh = (props) => {
     const _HandleSubmit = (e) => {
       e.preventDefault()
       if(name?.length == 0 || branch_id?.length == 0){
-        name?.length == 0 && sErrInput(true) 
-        branch_id?.length == 0 && sErrInputBr(true) 
+        name?.length ==0 && sErrInput(true) 
+        branch_id?.length==0 && sErrInputBr(true) 
       }else{
         sOnSending(true)
       }
     }
-
 
     useEffect(() => {
       sErrInput(false)
@@ -810,7 +825,6 @@ const Popup_dskh = (props) => {
     useEffect(()=>{
       onFetchingChar && _ServerFetching_Char()
     },[onFetchingChar])
-
   return(
       <>
       <PopupEdit   
@@ -825,14 +839,11 @@ const Popup_dskh = (props) => {
           <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-semibold`}>{props.dataLang?.client_popup_contact}</button>
       </div>
               <div className="mt-4">
-              <form onSubmit={_HandleSubmit.bind(this)}>
+                  <form onSubmit={_HandleSubmit.bind(this)} className="">
                   {
                     tab === 0 &&(
-                      <ScrollArea     ref={scrollAreaRef}
-                  className="h-[555px] overflow-hidden" 
-                    speed={1} 
-                    smoothScrolling={true}>
-                  <div className='w-[50vw] p-2  '>         
+                      <ScrollArea   ref={scrollAreaRef} className="h-[555px] overflow-hidden"   speed={1}    smoothScrolling={true}>
+                  <div className='w-[50vw]  p-2  '>         
                       <div className="flex flex-wrap justify-between "> 
                       <div className='w-[48%]'>
                               <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_name}<span className="text-red-500">*</span></label>
@@ -848,7 +859,6 @@ const Popup_dskh = (props) => {
                           <div className='w-[48%]'>
                               <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_brand} <span className="text-red-500">*</span></label>
                               <Select   
-
                                  closeMenuOnSelect={false}
                                   placeholder={props.dataLang?.client_list_brand}
                                   options={brandpOpt}
@@ -858,17 +868,7 @@ const Popup_dskh = (props) => {
                                   isMulti
                                   value={valueBr}
                                   maxMenuHeight="200px"
-                                  isClearable={true}
-                                  theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                  
-                                        
-                                    }, 
-                                    
-                                    
-                                })}
+                                  isClearable={true} 
                                 menuPortalTarget={document.body}
                                 onMenuOpen={handleMenuOpen}
                                   styles={{
@@ -883,16 +883,24 @@ const Popup_dskh = (props) => {
                                         position: "absolute", 
                                       
                                     }), 
-                                    control: base => ({
-                                      ...base,
-                                      border: '1px solid #d0d5dd',
-                                      boxShadow: 'none',
+                                    // control: base => ({
+                                    //   ...base,
+                                    //   border: '1px solid #d0d5dd',
+                                    //   boxShadow: 'none',
                                      
-                                    })   
+                                    // })  ,
+                                    control: (provided) => ({
+                                      ...provided,
+                                      border: '1px solid #d0d5dd', 
+                                      "&:focus":{
+                                        outline:"none",
+                                        border:"none"
+                                      }
+                                    })
                                 }}
                                 className={`${errInputBr ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full  text-[#52575E] font-normal border outline-none rounded-lg bg-white border-none xl:text-base text-[14.5px]`}
                               />
-                              {errInputBr && <label className="mb-2  text-[14px] text-red-500">{"Vui lòng chọn chi nhánh"}</label>}
+                              {errInputBr && <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.client_list_bran}</label>}
                           </div>
                       </div>
                       <div className="flex flex-wrap justify-between "> 
@@ -1003,7 +1011,7 @@ const Popup_dskh = (props) => {
                                     }),
                                     
                                 }}
-                                className={`${errInputBr ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full  text-[#52575E] font-normal p-2 border outline-none mb-2 rounded-lg py-0.5 bg-white border-none xl:text-base text-[14.5px]`}
+                                className={`${errInputBr ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full  text-[#52575E] font-normal border outline-none mb-2 rounded-lg bg-white border-none xl:text-base text-[14.5px]`}
                               />
                 </div>
                 <div className='w-[48%]'>
@@ -1019,7 +1027,7 @@ const Popup_dskh = (props) => {
                     <div className='w-[48%]'>
                               <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_group}</label>
                               <Select 
-                                  placeholder="Nhóm"
+                                  placeholder={props.dataLang?.client_list_group}
                                   options={groupOpt} 
                                   value={valueGr}
                                   onChange={onChangeGroup}
@@ -1260,7 +1268,8 @@ const Popup_dskh = (props) => {
                       className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-lg bg-[#0F4F9E]"
                     >{props.dataLang?.branch_popup_save}</button>
                   </div>
-              </form>
+                  </form>
+
             </div>    
       </PopupEdit>
       </>
@@ -1302,16 +1311,17 @@ const Popup_chitiet =(props)=>{
       <div className='flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
           <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-semibold`}>{props.dataLang?.client_popup_detailUser}</button>
           <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-semibold`}>{props.dataLang?.client_popup_detailContact}</button>
-      </div>
-              <div className="mt-4 space-x-5 w-[930px] h-auto  ">    
+      </div>  
+              <div className="mt-4 space-x-5 w-[930px] h-auto  ">        
                   {
-                  
                     tab === 0 &&(
-                    <ScrollArea     ref={scrollAreaRef}
+                    <ScrollArea ref={scrollAreaRef}
                     className="h-[555px] overflow-hidden rounded-md shadow-[0px_0px_5px_0px_#0F4F9E]" 
                     speed={1} 
                     smoothScrolling={true}>
-                      <div className="flex p-2 ">
+                      {onFetching ?
+                      <Loading className="h-80"color="#0f4f9e" /> 
+                      : data !="" &&(<div className="flex p-2 ">
                         <div className='w-[48%]'>
                           <div className='mb-4'>{props.dataLang?.client_list_name}: <span className='font-medium capitalize'>{data?.name}</span></div>
                           <div className='mb-4'>{props.dataLang?.client_list_repre}: <span className='font-medium capitalize'>{data?.representative}</span></div>
@@ -1324,7 +1334,7 @@ const Popup_chitiet =(props)=>{
                          
                         </div>
                         <div className='w-[48%]'>
-                          <div className='mb-4 flex space-x-2 items-center flex-wrap'>{props.dataLang?.client_list_brand}: {data?.branch?.map(e=>{ return (<span className='last:ml-0 font-medium capitalize ml-1 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E]  py-0.5 border border-[#0F4F9E] rounded-lg'> {e.name}</span>)})}</div>
+                          <div className='mb-4 flex space-x-2 items-center flex-wrap'>{props.dataLang?.client_list_brand}: {data?.branch?.map(e=>{ return (<span  className='last:ml-0 font-medium capitalize ml-1 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E]  py-0.5 border border-[#0F4F9E] rounded-lg'> {e.name}</span>)})}</div>
                           <div className='mb-4'>{props.dataLang?.client_popup_date}: <span className='font-medium capitalize'>{moment(data?.date_create).format("DD-MM-YYYY")}</span></div>
                           <div className='mb-4'>{props.dataLang?.client_popup_mail}: <span className='font-medium capitalize'>{data?.email}</span></div>
                           <div className='mb-4 flex space-x-2 items-center flex-wrap'>{props.dataLang?.client_popup_char}: 
@@ -1342,7 +1352,8 @@ const Popup_chitiet =(props)=>{
                           <div className='mb-4'><span>{props.dataLang?.client_popup_district}: <span className='font-medium capitalize'>{data?.district != "" ?(data?.district.type+" "+data?.district.name):""}</span>, {props.dataLang?.client_popup_wards}: <span className='font-medium capitalize'>{data?.ward != "" ? (data?.ward.type+" "+data?.ward.name) :""}</span></span></div>
                           <div className='mb-4'>{props.dataLang?.client_popup_note}:  <span className='font-medium capitalize'>{data?.note}</span></div>
                         </div>
-                      </div>
+                      </div>)
+                      }
                     </ScrollArea>
                     )
                   }   

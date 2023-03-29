@@ -676,3 +676,46 @@ const BarChart_TopKhachhang = () => {
 };
 
 export default Index;
+
+// import React, {useState} from "react";
+// import InfiniteScroll from "react-infinite-scroll-component";
+
+// const style = {
+//   height: 30,
+//   border: "1px solid green",
+//   margin: 6,
+//   padding: 8
+// };
+// const App = () => {
+//   const [items, sItems] = useState(Array.from({ length: 20 }));
+
+//   const fetchMoreData = () => {
+//     setTimeout(() => {
+//         sItems(items?.concat(Array.from({ length: 20 })))
+//     }, 1500);
+//   };
+
+//     return (
+//       <div className="pt-40">
+//         <h1>demo: react-infinite-scroll-component</h1>
+//         <hr />
+//         <div id="scrollableDiv" style={{ height: 300, overflow: "auto" }}>
+//           <InfiniteScroll
+//             dataLength={items.length}
+//             next={fetchMoreData}
+//             hasMore={true}
+//             loader={<h4>Loading...</h4>}
+//             scrollableTarget="scrollableDiv"
+//           >
+//             {items.map((i, index) => (
+//               <div style={style} key={index}>
+//                 div - #{index}
+//               </div>
+//             ))}
+//           </InfiniteScroll>
+//         </div>
+//       </div>
+//     );
+// }
+
+// export default App;
