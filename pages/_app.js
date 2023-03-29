@@ -294,7 +294,9 @@ const LoginPage = React.memo((props) => {
               </div>
             </div>
             <div className='space-y-9'>
-              <Image alt="" src="/logo_1.png" width={200} height={70} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+              <div className='pointer-events-none select-none'>
+                <Image alt="" src="/logo_1.png" width={200} height={70} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+              </div>
               <div className='space-y-6'>
                 <h1 className="text-[#344054] font-medium text-xl">Trợ lý sản xuất</h1>
                 <div className='space-y-1'>
@@ -310,10 +312,12 @@ const LoginPage = React.memo((props) => {
                   </p>
                 </div>
               </div>
-              <Image alt="" src="/qr.png" width={120} height={120} quality={100} className="object-contain w-auto h-auto" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+              <div className='pointer-events-none select-none'>
+                <Image alt="" src="/qr.png" width={120} height={120} quality={100} className="object-contain w-auto h-auto " loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+              </div>
             </div>
           </div>
-          <div className='absolute bottom-0 right-0'>
+          <div className='absolute bottom-0 right-0 pointer-events-none select-none'>
             <Image src="/Illust.png" alt="" width={500} height={500} quality={100} className="object-contain w-[500px] h-auto" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
           </div>
         </div>

@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import Head from 'next/head';
 import {useRouter} from 'next/router';
+import { useDispatch, useSelector } from 'react-redux';
 
 import {_ServerInstance as Axios} from '/services/axios';
 import PopupEdit from "/components/UI/popup";
@@ -12,7 +13,7 @@ import {
     Grid6 as IconExcel
  } from "iconsax-react";
 import Swal from "sweetalert2";
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 import ReactExport from "react-data-export";
 
 const ExcelFile = ReactExport.ExcelFile;
@@ -39,13 +40,26 @@ const CustomSelectOption = ({value, label, level, code}) => (
 const Index = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
+    const dispatch = useDispatch()
 
+    //Bộ lọc Danh mục
     const [dataOption, sDataOption] = useState([]);
     const [idCategory, sIdCategory] = useState(null);
-    const _HandleFilterOpt = (e) => sIdCategory(e)
+    //Bộ lọc Chi nhánh
+    const [dataBranchOption, sDataBranchOption] = useState([]);
+    const [idBranch, sIdBranch] = useState(null);
+
+    const _HandleFilterOpt = (type, value) => {
+        if(type == "category"){
+            sIdCategory(value)
+        }else if(type == "branch"){
+            sIdBranch(value)
+        }
+    }
 
     const [onFetching, sOnFetching] = useState(false);
     const [onFetchingOpt, sOnFetchingOpt] = useState(false);
+
     const [data, sData] = useState([]);
 
     const [totalItems, sTotalItems] = useState({});
@@ -58,7 +72,8 @@ const Index = (props) => {
                 search: keySearch,
                 limit: limit,
                 page: router.query?.page || 1,
-                "filter[id]": idCategory?.value ? idCategory?.value : null
+                "filter[id]": idCategory?.value ? idCategory?.value : null,
+                "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map(e => e.value) : null
             }
         }, (err, response) => {
             if(!err){
@@ -76,8 +91,15 @@ const Index = (props) => {
                 var {rResult} = response.data;
                 sDataOption(rResult.map(x => ({label: `${x.name + " " + "(" + x.code + ")"}`, value: x.id, level: x.level, code: x.code, parent_id: x.parent_id})))
             }
-            sOnFetchingOpt(false)
         })
+        Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
+            if(!err){
+                var {rResult} = response.data;
+                sDataBranchOption(rResult.map(e => ({label: e.name, value: e.id})))
+                dispatch({type: "branch/update", payload: rResult.map(e => ({label: e.name, value: e.id}))})
+            }
+        })
+        sOnFetchingOpt(false)
     }
 
     useEffect(() => {
@@ -93,8 +115,8 @@ const Index = (props) => {
     }, [onFetching]);
 
     useEffect(() => {
-        sOnFetching(true) || (keySearch && sOnFetching(true)) || (idCategory && sOnFetching(true))
-    }, [limit,router.query?.page, idCategory]);
+        sOnFetching(true) || (keySearch && sOnFetching(true)) || (idCategory && sOnFetching(true)) || (idBranch?.length > 0 && sOnFetching(true))
+    }, [limit,router.query?.page, idCategory, idBranch]);
 
     const paginate = pageNumber => {
         router.push({
@@ -134,6 +156,10 @@ const Index = (props) => {
         }
     ];
 
+    //Set data cho bộ lọc chi nhánh
+    const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
+    const options = dataBranchOption.filter((x) => !hiddenOptions.includes(x.value));
+
     return (
         <React.Fragment>
             <Head>
@@ -160,7 +186,7 @@ const Index = (props) => {
                             <Select 
                                 options={dataOption}
                                 formatOptionLabel={CustomSelectOption}
-                                onChange={_HandleFilterOpt.bind(this)}
+                                onChange={_HandleFilterOpt.bind(this, "category")}
                                 value={idCategory}
                                 isClearable={true}
                                 placeholder="Chọn mã chứng từ" 
@@ -175,6 +201,37 @@ const Index = (props) => {
                                         primary: '#0F4F9E',
                                     },
                                 })}
+                            />
+                        </div>
+                        <div className='col-span-1'>
+                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>Chi nhánh</h6>
+                            <Select 
+                                options={options}
+                                onChange={_HandleFilterOpt.bind(this, "branch")}
+                                value={idBranch}
+                                isClearable={true}
+                                isMulti
+                                closeMenuOnSelect={false}
+                                hideSelectedOptions={false}
+                                placeholder="Chọn chi nhánh" 
+                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                                isSearchable={true}
+                                components={{ MultiValue }}
+                                theme={(theme) => ({
+                                    ...theme,
+                                    colors: {
+                                        ...theme.colors,
+                                        primary25: '#EBF5FF',
+                                        primary50: '#92BFF7',
+                                        primary: '#92BFF7',
+                                    },
+                                })}
+                                styles={{
+                                    placeholder: (base) => ({
+                                    ...base,
+                                    color: "#cbd5e1",
+                                    }),
+                                }}
                             />
                         </div>
                     </div>
@@ -220,9 +277,10 @@ const Index = (props) => {
                                     <input type='checkbox' className='scale-125' />
                                 </div>
                                 <h4 className='w-[8%]'/>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300]'>{dataLang?.category_material_group_code}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[300]'>{dataLang?.category_material_group_name}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[300]'>{dataLang?.client_popup_note}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[16%] font-[300]'>{dataLang?.category_material_group_code}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[25%] font-[300] truncate'>{dataLang?.category_material_group_name}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300]'>{dataLang?.client_popup_note}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[24%] font-[300]'>Chi nhánh</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center'>{dataLang?.branch_popup_properties}</h4>
                             </div>
                             <div className='divide-y divide-slate-200'>
@@ -310,9 +368,14 @@ const Items = React.memo((props) => {
                         <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
                     </button>
                 </div>
-                <h6 className='xl:text-base text-xs px-2 w-[20%]'>{props.data?.code}</h6>
-                <h6 className='xl:text-base text-xs px-2 w-[30%]'>{props.data?.name}</h6>
-                <h6 dangerouslySetInnerHTML={{__html: props.data?.note}} className='px-2 w-[30%] truncate'/>
+                <h6 className='xl:text-base text-xs px-2 w-[16%]'>{props.data?.code}</h6>
+                <h6 className='xl:text-base text-xs px-2 w-[25%] truncate'>{props.data?.name}</h6>
+                <h6 className='px-2 xl:text-base text-xs w-[15%] truncate'>{props.data?.note}</h6>
+                <div className='w-[24%] flex flex-wrap px-2'>
+                    {props.data?.branch.map(e => 
+                        <h6 key={e?.id.toString()} className='text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[500] rounded border border-[#0F4F9E] h-fit'>{e?.name}</h6>
+                    )}
+                </div>
                 <div className='w-[10%] flex justify-center space-x-2'>
                     <Popup_NVL onRefresh={props.onRefresh} onRefreshOpt={props.onRefreshOpt} dataLang={props.dataLang} data={props.data} dataOption={props.dataOption} />
                     <button onClick={_HandleDelete.bind(this, props.data?.id)} className="xl:text-base text-xs outline-none"><IconDelete color="red"/></button>
@@ -362,9 +425,15 @@ const ItemsChild = React.memo((props) => {
                         <IconMinus className='mt-1.5' />
                     </div>
                 }
-                <h6 className='xl:text-base text-xs px-2 w-[20%]'>{props.data?.code}</h6>
-                <h6 className='xl:text-base text-xs px-2 w-[30%] truncate'>{props.data?.name}</h6>
-                <h6 dangerouslySetInnerHTML={{__html: props.data?.note}} className='px-2 w-[30%]' />
+                <h6 className='xl:text-base text-xs px-2 w-[16%]'>{props.data?.code}</h6>
+                <h6 className='xl:text-base text-xs px-2 w-[25%] truncate'>{props.data?.name}</h6>
+                <h6 className='xl:text-base text-xs px-2 w-[15%]'>{props.data?.note}</h6>
+                {/* <h6 className='xl:text-base text-xs px-2 w-[24%]'>{props.data?.note}</h6> */}
+                <div className='w-[24%] flex flex-wrap px-2'>
+                    {props.data?.branch.map(e => 
+                        <h6 key={e?.id.toString()} className='text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[500] rounded border border-[#0F4F9E] h-fit'>{e?.name}</h6>
+                    )}
+                </div>
                 <div className='w-[10%] flex justify-center space-x-2'>
                     <Popup_NVL onRefresh={props.onRefresh} onRefreshOpt={props.onRefreshOpt} dataLang={props.dataLang} data={props.data} />
                     <button onClick={props.onClick} className="xl:text-base text-xs"><IconDelete color="red"/></button>
@@ -376,6 +445,7 @@ const ItemsChild = React.memo((props) => {
 })
 
 const Popup_NVL = React.memo((props) => {
+    const dataOptBranch = useSelector(state => state.branch);
 
     const [dataOption, sDataOption] = useState([]);
 
@@ -384,18 +454,24 @@ const Popup_NVL = React.memo((props) => {
 
     const [onFetching, sOnFetching] = useState(false);
     const [onSending, sOnSending] = useState(false);
+
+    const [branch, sBranch] = useState([]);
+    const branch_id = branch?.map(e => e.value)
+
     const [code, sCode] = useState("");
     const [name, sName] = useState("");
     const [editorValue, sEditorValue] = useState("");
 
+    const [errBranch, sErrBranch] = useState(false);
     const [errCode, sErrCode] = useState(false);
     const [errName, sErrName] = useState(false);
 
     useEffect(() => {
-        sCode(props.data?.code ? props.data?.code : "" )
-        sName(props.data?.name ? props.data?.name : "" )
-        sEditorValue(props.data?.note ? props.data?.note : "" )
-        sIdCategory(props.data?.parent_id ? props.data?.parent_id : null )
+        open && sCode(props.data?.code ? props.data?.code : "" )
+        open && sName(props.data?.name ? props.data?.name : "" )
+        open && sEditorValue(props.data?.note ? props.data?.note : "" )
+        open && sIdCategory(props.data?.parent_id ? props.data?.parent_id : null )
+        open && sBranch(props.data?.branch?.length > 0 ? props.data?.branch?.map(e => ({label: e.name, value: e.id})) : [] )
         open && sErrCode(false);
         open && sErrName(false);
         open && sOnFetching(true);
@@ -408,19 +484,13 @@ const Popup_NVL = React.memo((props) => {
             sCode(value.target?.value)
         }else if(type == "editor"){
             sEditorValue(value.target?.value)
+        }else if(type == "branch") {
+            sBranch(value)
         }
     }
-
-    // const _ServerFetching = () => {
-    //     Axios("GET", "/api_web/api_material/categoryOption?csrf_protection=true&page=1&limit=0", {}, (err, response) => {
-    //         if(!err){
-    //             var {rResult} = response.data;
-    //             sDataOption(rResult.map(x => ({label: `${x.name + " " + "(" + x.code + ")"}`, value: x.id, level: x.level, code: x.code, parent_id: x.parent_id})))
-    //         }
-    //         sOnFetching(false)
-    //     })
-    // }
     
+    console.log(props.data)
+
     const _ServerFetching = () => {
         Axios("GET", `${props.data?.id ? `/api_web/api_material/categoryOption/${props.data?.id}?csrf_protection=true` : "api_web/api_material/categoryOption?csrf_protection=true"}`, {}, (err, response) => {
             if(!err){
@@ -442,6 +512,7 @@ const Popup_NVL = React.memo((props) => {
         formData.append("name", name)
         formData.append("note", editorValue)
         formData.append("parent_id", idCategory ? idCategory : null)
+        branch_id.forEach(id => formData.append('branch_id[]', id));
 
         Axios("POST", `${props.data?.id ? `/api_web/api_material/category/${props.data?.id}?csrf_protection=true` : "/api_web/api_material/category?csrf_protection=true"}`, {
             data: formData,
@@ -478,9 +549,10 @@ const Popup_NVL = React.memo((props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if(name?.length == 0 || code?.length == 0){
-            name?.length == 0 && sErrName(true)
-            code?.length == 0 && sErrCode(true)
+        if(name?.length == 0 || code?.length == 0 || branch?.length == 0){
+            name?.length == 0 && sErrName(true);
+            code?.length == 0 && sErrCode(true);
+            branch?.length == 0 && sErrBranch(true);
             Toast.fire({
                 icon: 'error',
                 title: `${props.dataLang?.required_field_null}`
@@ -498,6 +570,10 @@ const Popup_NVL = React.memo((props) => {
         sErrCode(false)
     }, [code?.length > 0]);
 
+    useEffect(() => {
+        sErrBranch(false)
+    }, [branch?.length > 0]);
+
     const [idCategory, sIdCategory] = useState(null);
     const valueIdCategory = (e) => sIdCategory(e?.value)
 
@@ -511,6 +587,42 @@ const Popup_NVL = React.memo((props) => {
             classNameBtn={props.className}
         >
             <div className='py-4 w-[600px] space-y-5'>
+                <div className='space-y-1'>
+                    <label className="text-[#344054] font-normal text-base">Chi nhánh <span className='text-red-500'>*</span></label>
+                    <Select 
+                        options={dataOptBranch}
+                        formatOptionLabel={CustomSelectOption}
+                        value={branch}
+                        onChange={_HandleChangeInput.bind(this, "branch")}
+                        isClearable={true}
+                        placeholder={"Chi nhánh"}
+                        isMulti
+                        noOptionsMessage={() => "Không có dữ liệu"}
+                        closeMenuOnSelect={false}
+                        className={`${errBranch ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
+                        theme={(theme) => ({
+                            ...theme,
+                            colors: {
+                                ...theme.colors,
+                                primary25: '#EBF5FF',
+                                primary50: '#92BFF7',
+                                primary: '#0F4F9E',
+                            },
+                        })}
+                        styles={{
+                            placeholder: (base) => ({
+                            ...base,
+                            color: "#cbd5e1",
+                            }),
+                            menuPortal: (base) => ({
+                                ...base,
+                                zIndex: 9999,
+                                position: "absolute",
+                            }),
+                        }}
+                    />
+                    {errBranch && <label className="text-sm text-red-500">Vui lòng chọn chi nhánh</label>}
+                </div>
                 <div className='space-y-1'>
                     <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_group_code} <span className='text-red-500'>*</span></label>
                     <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder={props.dataLang?.category_material_group_code} className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
@@ -531,7 +643,7 @@ const Popup_NVL = React.memo((props) => {
                         onChange={valueIdCategory.bind(this)}
                         isClearable={true}
                         placeholder={props.dataLang?.category_material_group_level}
-                        className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none z-10" 
+                        className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none" 
                         isSearchable={true}
                         theme={(theme) => ({
                             ...theme,
@@ -563,5 +675,37 @@ const Popup_NVL = React.memo((props) => {
         </PopupEdit>
     )
 })
+
+const MoreSelectedBadge = ({ items }) => {
+    const style = {
+        marginLeft: "auto",
+        background: "#d4eefa",
+        borderRadius: "4px",
+        fontSize: "14px",
+        padding: "1px 3px",
+        order: 99
+    };
+  
+    const title = items.join(", ");
+    const length = items.length;
+    const label = `+ ${length}`;
+  
+    return (
+      <div style={style} title={title}>{label}</div>
+    );
+  };
+  
+const MultiValue = ({ index, getValue, ...props }) => {
+    const maxToShow = 3;
+    const overflow = getValue()
+      .slice(maxToShow)
+      .map((x) => x.label);
+  
+    return index < maxToShow ? (
+      <components.MultiValue {...props} />
+    ) : index === maxToShow ? (
+      <MoreSelectedBadge items={overflow} />
+    ) : null;
+};
 
 export default Index;

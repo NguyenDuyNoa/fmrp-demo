@@ -8,7 +8,8 @@ const adminState = {
   ],
   lang: "vi",
   unit_NVL: null,
-  branch: null
+  branch: null,
+  variant_NVL: null
 }
 
 function adminReducer(state = adminState, action) {
@@ -21,6 +22,8 @@ function adminReducer(state = adminState, action) {
       return { ...state, unit_NVL: action.payload }
     case 'branch/update':
       return { ...state, branch: action.payload }
+    case 'variant_NVL/update':
+      return { ...state, variant_NVL: action.payload }
     default:
       return state
   }

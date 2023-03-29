@@ -18,6 +18,8 @@ import Pagination from '/components/UI/pagination';
 import dynamic from 'next/dynamic';
 import moment from 'moment/moment';
 import Select from 'react-select';
+import Popup from 'reactjs-popup';
+import { data } from 'autoprefixer';
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet
@@ -30,10 +32,7 @@ const Toast = Swal.mixin({
   timerProgressBar: true,
 })
 
-
-
 const Index = (props) => {
-
     const dataLang = props.dataLang
     const router = useRouter();
     const tabPage = router.query?.tab;
@@ -64,27 +63,18 @@ const Index = (props) => {
           query: { tab: router.query?.tab ? router.query?.tab : 0  }
       })
     }, []);
-
-    const _ServerFetching = () => {
+    const _ServerFetching =  () => {
       const id = Number(tabPage)
-        // Axios("GET", `/api_web/${(tabPage === "all" && "api_client/client?csrf_protection=true") ||
-        // (router.query?.tab === "nogroup" && "api_client/client?csrf_protection=true") ||
-        // ("api_client/client/?csrf_protection=true")
-        // }`, {
-        // Axios("GET", `/api_web/${(tabPage === "all" || tabPage === "nogroup") ? "api_client/client?csrf_protection=true" : "api_client/group_count/?csrf_protection=true"}`, {
-        // Axios("GET", `/api_web/${(tabPage === "all" || tabPage === "nogroup") ? "api_client/client?csrf_protection=true" : "api_client/group_count/?csrf_protection=true"}`, {
         Axios("GET", `/api_web/${(tabPage === "0" || tabPage === "-1") ? "api_client/client?csrf_protection=true" : "api_client/client/?csrf_protection=true"}`, {
             params: {
                 customSearch: keySearch,
                 limit: limit,
                 page: router.query?.page || 1,
-                // "filter[client_group_id]": id ? (id ? id : -1) : ""
                 "filter[client_group_id]": tabPage !== "0" ? (tabPage !== "-1" ? id : -1) : null 
-                // "filter[client_group_id]": id == "" ? (router.query?.tab === "all" && 0) || (router.query?.tab === "nogroup" && -1): id
             }
         }, (err, response) => {
             if(!err){
-                var {rResult, output} = response.data
+                var {rResult, output} =  response.data
                 sData(rResult)
                 sTotalItems(output)
                 sData_ex(rResult)
@@ -92,42 +82,13 @@ const Index = (props) => {
             sOnFetching(false)
         })
     }
-
-    // const _ServerFetchingTotalAllNogroup = () => {
-    //     Axios("GET", `/api_web/${("api_client/client?csrf_protection=true") 
-    //     }`, {
-    //         params: {
-    //             limit: 1,
-    //             "filter[client_group_id]": -1,
-    //         }
-    //     }, (err, response) => {
-    //         if(!err){
-    //             var {rResult, output} = response.data
-    //             sTotalAllNo(output)   
-    //         }
-    //         sOnFetching(false)
-    //     })
-    // }
-    //truyen so
-    // const _ServerFetchingTotalAll = () => {
-    //     Axios("GET", `/api_web/${
-    //      ("api_client/client?csrf_protection=true") 
-    //     }`, {
-    //         params: {
-    //             limit: 1,
-    //         }
-    //     }, (err, response) => {
-    //         if(!err){
-    //             var {output} = response.data
-    //             sTotalAll(output)               
-    //         }
-    //         sOnFetching(false)
-    //     })
-    // }
     const [listBr, sListBr]= useState()
+
     const _ServerFetching_brand =  () =>{
-      Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true&`, {
-        limit: 0
+      Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {
+        params:{
+          limit: 0
+        }
     }, (err, response) => {
       if(!err){
           var {rResult, output} =  response.data
@@ -136,9 +97,12 @@ const Index = (props) => {
       sOnFetching(false)
     })
     }
+    
     const _ServerFetching_group =  () =>{
       Axios("GET", `/api_web/api_client/group_count/?csrf_protection=true`, {
-        limit: 0
+        params:{
+          limit: 5
+        }
     }, (err, response) => {
       if(!err){
           var {rResult, output} =  response.data
@@ -147,6 +111,7 @@ const Index = (props) => {
       sOnFetching(false)
     })
     }
+
     const _ServerFetching_selectgroup =  () =>{
       Axios("GET", `/api_web/Api_client/group?csrf_protection=true`, {
         limit: 0
@@ -158,6 +123,7 @@ const Index = (props) => {
       sOnFetching(false)
     })
     }
+
     const _ServerFetching_selectct =  () =>{
       Axios("GET", `/api_web/Api_address/province?limit=0`, {
         limit: 0
@@ -197,7 +163,7 @@ const Index = (props) => {
       };
     useEffect(() => {
         onFetching && _ServerFetching() || onFetching && _ServerFetching_group()  || onFetching && _ServerFetching_selectgroup()   || onFetching && _ServerFetching_selectct() || onFetching && _ServerFetching_brand()
-    }, [onFetching]);
+      }, [onFetching]);
     useEffect(() => {
         router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true))
      }, [limit,router.query?.page, router.query?.tab]);
@@ -213,7 +179,7 @@ const Index = (props) => {
       }).then((result) => {
         if (result.isConfirmed) {
           const id = event; 
-          Axios("DELETE",  `${(router.query.tab === "taxes" && `/api_web/api_client/client/${id}?csrf_protection=true`) || (router.query.tab === "currencies" && `/api_web/Api_currency/currency/${id}?csrf_protection=true`) || (router.query.tab === "paymentmodes" && `/api_web/Api_payment_method/payment_method/${id}?csrf_protection=true`)} `, {
+          Axios("DELETE",`/api_web/api_client/client/${id}?csrf_protection=true`, {
           }, (err, response) => {
             if(!err){
               var isSuccess = response.data?.isSuccess;
@@ -231,6 +197,8 @@ const Index = (props) => {
     }
 
     //excel
+    console.log(data_ex);
+  
     const multiDataSet = [
       {
           columns: [
@@ -243,9 +211,10 @@ const Index = (props) => {
               {title: "Địa chỉ", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
               {title: "Phụ trách khách hàng", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
               {title: "Nhóm", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: "Chi nhánh", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
               {title: "Ngày tạo", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
           ],
-          data: data_ex.map((e) =>
+          data: data_ex?.map((e) =>
               [
                   {value: `${e.id}`, style: {numFmt: "0"}},
                   {value: `${e.code}`},
@@ -254,16 +223,14 @@ const Index = (props) => {
                   {value: `${e.tax_code}`},
                   {value: `${e.phone_number}`},
                   {value: `${e.address}`},
-                  {value: `${"null"}`},
-                  {value: `${"null"}`}, 
+                  {value: `${e.staff_charge?.map(i => i.full_name)}`},
+                  {value: `${e.client_group?.map(i => i.name)}`},
+                  {value: `${e.branch?.map(i => i.name)}`},
                   {value: `${e.date_create}`},
               ]    
           ),
       }
     ];
-// const linktest = (e)=>{
-//   router.push("/clients/client")
-// }
     return (
         <React.Fragment>
       <Head>
@@ -282,7 +249,7 @@ const Index = (props) => {
                 <div className='flex justify-between'>
                     <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.client_list_title}</h2>
                     <div className="flex justify-end items-center">
-                  <Popup_dskh listBr={listBr} listSelectGr={listSelectGr} listSelectCt={listSelectCt}  onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
+                  <Popup_dskh  listBr={listBr} listSelectGr={listSelectGr} listSelectCt={listSelectCt}  onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
                 </div>
                 </div>
               
@@ -296,7 +263,7 @@ const Index = (props) => {
                                 style={{
                                  backgroundColor: e.color
                                }}
-                              key={e.id} onClick={_HandleSelectTab.bind(this, `${e.id}`)} total={e.count} active={e.name} >{e.name}</TabClient> 
+                              key={e.id} onClick={_HandleSelectTab.bind(this, `${e.id}`)} total={e.count} active={e.id} >{e.name}</TabClient> 
                             </div>
                           )
                       })
@@ -318,7 +285,7 @@ const Index = (props) => {
                         
                         <div className="flex space-x-2 items-center">
                      {
-                      data_ex.length > 0 &&(
+                      data_ex?.length > 0 &&(
                         <ExcelFile filename="Danh sách khách hàng" title="Dskh" element={
                           <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
                             <IconExcel size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
@@ -338,59 +305,51 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className="min:h-[200px] h-[72%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                  <div className=" w-[110%] pr-2 xl:w-[100vw]">
+                <div className="min:h-[200px] h-[72%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                  <div className="pr-2 w-[125%] lx:w-[115%] ">
                     <div className="flex items-center sticky top-0 bg-white p-2 z-10">
-                    <div className='w-[2%]'>
-                        <input type='checkbox' className='scale-125' />
-                    </div>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[12%] font-[300] text-left">{dataLang?.client_list_namecode}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[13%] font-[300] text-left">{dataLang?.client_list_name}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[12%] font-[300] text-left">{dataLang?.client_list_repre}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center">{dataLang?.client_list_taxtcode}</h4> 
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[9%] font-[300] text-center">{dataLang?.client_list_phone}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.client_list_adress}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.client_list_charge}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-left">{dataLang?.client_list_group}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.client_list_namecode}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.client_list_name}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.client_list_repre}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-center">{dataLang?.client_list_taxtcode}</h4> 
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-center">{dataLang?.client_list_phone}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.client_list_adress}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.client_list_charge}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[25%] font-[300] text-left">{dataLang?.client_list_group}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.client_list_brand}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[18%] font-[300] text-center">{dataLang?.client_list_datecre}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center">{dataLang?.branch_popup_properties}</h4>
                     </div>
                     {onFetching ?
                       <Loading className="h-80"color="#0f4f9e" /> 
                       : 
-                      data.length > 0 ? 
-                      (
-                        <>
+                      data?.length > 0 ? 
+                      (<>
                           <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">                       
                           {(data.map((e) => 
                             <div className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
-                                 <div className='w-[2%]'>
-                                <input type='checkbox' className='scale-125' />
-                            </div>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[12%]             text-left">{e.code}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[13%]  rounded-md text-left">{e.name}
-                               {/* <span onClick={linktest}>xem</span> */}
-                               </h6>                
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[12%]  rounded-md text-left">{e.representative}</h6>                
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[10%]  rounded-md text-center truncate">{e.tax_code}</h6>                
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[9%]   rounded-md text-center truncate">{e.phone_number}</h6>                
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">{e.address}</h6>                
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left flex object-cover justify-start items-center flex-wrap">
-                              <User size={30} color="gray"></User><User size={30} color="gray"></User><User size={30} color="gray"></User>
-                              <User size={30} color="gray"></User><User size={30} color="gray"></User><User size={30} color="gray"></User>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">{e.code}</h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left text-[#0F4F9E] hover:font-normal"><Popup_chitiet dataLang={dataLang} className="" name={e.name} id={e?.id}/></h6>           
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">{e.representative}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-center">{e.tax_code}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-center">{e.phone_number}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.address}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left flex object-cover cursor-pointer justify-start items-center flex-wrap gap-2">{e.staff_charge?.map(d => { return (
+                               <>
+                                <Popup className='dropdown-avt' key={d.id}
+                                      trigger={open => (<img src={d.profile_image}  width={40} height={40} className="object-cover rounded-[100%]"></img>)}
+                                      position="top center" on={['hover']} arrow={false}>
+                                    <span className='bg-[#0f4f9e] text-white rounded p-1.5'>{d.full_name} </span>
+                                </Popup>      
+                               </> 
+                               )})}
                               </h6>                
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[10%]  rounded-md text-left">{e.client_group?.map(h=>{
-                                 return (
-                                   <div className='flex items-center justify-between flex-wrap'>
-                                    <span className='truncate'>{h.name} 
-                                    </span>
-                                   </div>
-                                  )
-                              })}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[25%]  rounded-md text-left">{e.client_group?.map(h=>{return ( <div className='flex items-center justify-between flex-wrap'><span className='truncate'>{h.name}</span></div>)})}</h6> 
+                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%] rounded-md text-left flex justify-start flex-wrap gap-2">{e.branch?.map(i => (<span className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-lg">{i.name}</span>))}</h6>                  
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[18%]  rounded-md text-center">{moment(e.date_create).format('DD/MM/YYYY, h:mm:ss')}</h6>                
                               <div className="space-x-2 w-[10%] text-center">
-                                <Popup_dskh listBr={listBr} listSelectCt={listSelectCt}  onRefresh={_ServerFetching.bind(this)} className="xl:text-base text-xs " listDs={listDs} dataLang={dataLang} name={e.name} representative={e.representative} code={e.code} tax_code={e.tax_code} phone_number={e.phone_number} 
-                                address={e.address} date_incorporation={e.date_incorporation} note={e.note} email={e.email} website={e.website} debt_limit={e.debt_limit} debt_limit_day={e.debt_limit_day} debt_begin={e.debt_begin} city={e.city} district={e.district} ward={e.ward}   id={e.id}  />
+                                <Popup_dskh listBr={listBr} listSelectCt={listSelectCt} listSelectGr={listSelectGr}  onRefresh={_ServerFetching.bind(this)} className="xl:text-base text-xs " listDs={listDs} dataLang={dataLang} name={e.name} representative={e.representative} code={e.code} tax_code={e.tax_code} phone_number={e.phone_number} 
+                                address={e.address} date_incorporation={e.date_incorporation} note={e.note} email={e.email} website={e.website} debt_limit={e.debt_limit} debt_limit_day={e.debt_limit_day} debt_begin={e.debt_begin} city={e.city} district={e.district} ward={e.ward}   id={e?.id}  />
                                 <button onClick={()=>handleDelete(e.id)} className="xl:text-base text-xs "><IconDelete color="red"/></button>
                               </div>
                             </div>
@@ -430,7 +389,6 @@ const Index = (props) => {
     </React.Fragment>
     );
 }
-
 const TabClient = React.memo((props) => {
     const router = useRouter();
     return(
@@ -442,7 +400,6 @@ const TabClient = React.memo((props) => {
 
     )
   })
-
 const Popup_dskh = (props) => {
       const scrollAreaRef = useRef(null);
       const handleMenuOpen = () => {
@@ -453,13 +410,21 @@ const Popup_dskh = (props) => {
       const [open, sOpen] = useState(false);
       const _ToggleModal = (e) => sOpen(e);
       const [onSending, sOnSending] = useState(false);
+      const [onFetching, sOnFetching] = useState(false);
+      const [onFetchingDis, sOnFetchingDis] = useState(false)
+      const [onFetchingWar, sOnFetchingWar] = useState(false)
+      const [onFetchingChar, sOnFetchingChar] = useState(false)
 
       const [errInput, sErrInput] = useState(false);
       const [errInputBr, sErrInputBr] = useState(false);
 
       const [option, sOption] = useState([]);  
-      const [optionName, sOptionName] = useState("");
-
+      const [optionfull_name, sOptionFull_name] = useState("");
+      const [optionEmail, sOptionEmail] = useState("");
+      const [optionposition, sPosition] = useState("");
+      const [optionbirthday, sOptionBirthday] = useState("");
+      const [optionaddress, sOptionAddress] = useState("");
+      const [optionphone_number, sOptionPhone_number] = useState("");
       const [name, sName] = useState("")
       const [code, sCode] = useState(null)
       const [tax_code, sTaxcode] = useState(null)
@@ -469,7 +434,6 @@ const Popup_dskh = (props) => {
       const [date_incorporation, sDate_incorporation] = useState("")
       const [email, sEmail] = useState("")
       const [note, sNote] = useState("")
-      const [website, sWebsite] = useState("")
       const [debt_limit, sDebt_limit] = useState("")
       const [debt_limit_day, sDebt_limit_day] = useState("")
     
@@ -481,155 +445,208 @@ const Popup_dskh = (props) => {
       const _HandleSelectTab = (e) => sTab(e)
       const [hidden, sHidden] = useState(false)
 
+
       useEffect(() => {
         sErrInputBr(false)
         sErrInput(false)
-        sName(props?.name ? props?.name : "")
-        sCode(props?.code ? props?.code : null)
-        sTaxcode(props?.tax_code ? props?.tax_code : null)
-        sRepresentative(props?.representative ? props?.representative : null)
-        sDate_incorporation("")
-        sPhone(props?.phone_number ? props?.phone_number : null)
-        sEmail(props?.email ? props?.email : "")
-        sAdress(props?.address ? props?.address : "")
-        sNote(props?.note ? props?.note : "")
-        sWebsite(props?.website ? props?.website : "")
-        sDebt_limit(props?.debt_limit ? props?.debt_limit : "")
-        sDebt_limit_day(props?.debt_limit_day ? props?.debt_limit_day : "")
-        // sWard(props?.ward ? props?.ward : "")
-        sWard()
-        sGroupOpt(props.listSelectGr && [...props.listSelectGr?.map(e => ({label: e.name, value: Number(e.id)}))])
-        sCityOpt(props.listSelectCt && [...props.listSelectCt?.map(e => ({label: e.name, value: Number(e.provinceid)}))])
-        sDistricts()
-        sListBrand(props.listBr && [...props.listBr?.map(e => ({label: e.name, value: Number(e.id)}))])
-        sOption(props.option ? props.option : []) 
+         sName("")
+         sCode()
+         sTaxcode()
+         sRepresentative()
+         sPhone()
+         sAdress("")
+         sDate_incorporation("")
+         sEmail("")
+         sNote("")
+         sDebt_limit("")
+         sDebt_limit_day("")
+         props?.id && sOnFetching(true)
+         sGroupOpt(props.listSelectGr && [...props.listSelectGr?.map(e => ({label: e.name, value: Number(e.id)}))])
+         sCityOpt(props.listSelectCt && [...props.listSelectCt?.map(e => ({label: e.name, value: Number(e.provinceid)}))])
+         sListBrand(props.listSelectGr ? props.listBr && [...props.listBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
+         sOption(props.option ? props.option : [])
+         sValueBr([])
       }, [open]);
-
+      
+      const _ServerFetching_detailUser =  () =>{
+          Axios("GET", `/api_web/api_client/client/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+          if(!err){
+              var db =  response.data
+              sName(db?.name)
+              sCode(db?.code)
+              sTaxcode(db?.tax_code)
+              sRepresentative(db?.representative)
+              sPhone(db?.phone_number)
+              sAdress(db?.address)
+              sEmail(db?.email)
+              sDebt_limit(db?.debt_limit)
+              sDebt_limit_day(db?.debt_limit_day)
+              sDate_incorporation(db?.date_incorporation)
+              sValueDis(db?.district.districtid)
+              sValueCt(db?.city.provinceid)
+              sNote(db?.note)
+              sValueChar(db?.staff_charge.map(e=> ({label: e.full_name, value: Number(e.staffid)})))
+              sValueGr(db?.client_group.map(e=> ({label: e.name, value: Number(e.id)})))
+              sValueWa(db?.ward.wardid)
+              sValueBr(db?.branch?.map(e=> ({label: e.name, value: Number(e.id)})))
+              sOption(db?.contact ? db?.contact : [])
+            
+          }
+          sOnSending(false)
+        })
+        }
+        useEffect(() => {
+          onFetching && _ServerFetching_detailUser()
+        }, [open]);
+       
       //onchang input
       const _HandleChangeInput = (type, value) => {
         if(type == "name"){
           sName(value.target?.value)
-        }
-        else if(type == "code"){
+        }else if(type == "code"){
           sCode(value.target?.value)
-        }
-         else if(type == "tax_code"){
+        }else if(type == "tax_code"){
             sTaxcode(value.target?.value)
-        }
-        else if(type == "representative"){
+        }else if(type == "representative"){
           sRepresentative(value.target?.value)
-        }
-        else if(type == "phone_number"){
+        }else if(type == "phone_number"){
           sPhone(value.target?.value)
-        }
-        else if(type == "address"){
+        }else if(type == "address"){
           sAdress(value.target?.value)
-        }
-        else if(type == "date_incorporation"){
+        }else if(type == "date_incorporation"){
           sDate_incorporation(value.target?.value)
-        }
-        else if(type == "email"){
+        }else if(type == "email"){
           sEmail(value.target?.value)
-        }
-        else if(type == "note"){
+        }else if(type == "note"){
           sNote(value.target?.value)
-        }
-        else if(type == "website"){
-          sWebsite(value.target?.value)
-        }
-        else if(type == "debt_limit"){
+        }else if(type == "debt_limit"){
           sDebt_limit(value.target?.value)
-        }
-        else if(type == "debt_limit_day"){
+        }else if(type == "debt_limit_day"){
           sDebt_limit_day(value.target?.value)
-        }
-        else if(type == "optionName"){
-          sOptionName(value.target?.value)
-        }
-        else if(type == "valueBr"){
+        }else if(type == "valueBr", value){
           sValueBr(value)
-        }
-        else if(type == "valueGr"){
-          sValueGr(value)
+          // if(value){
+          //   _ServerFetching_Char(value.map(e=> e.value))
+          // } 
+        }else if(type == "optionName"){
+          sOptionName(value.target?.value)
+        }else if(type == "optionHapy"){
+          sOptionHapy(value.target?.value)
+        }else if(type == "optionNote"){
+          sOptionNote(value.target?.value)
+        }else if(type == "optionPhone"){
+          sOptionPhone(value.target?.value)
         }
       }
+
+      // char..
+      const [listChar, sListChar]= useState()
+      const _ServerFetching_Char =  () =>{
+        Axios("GET", `/api_web/api_staff/GetstaffInBrard?csrf_protection=true`, {
+          params: {
+            "brach_id[]": valueBr,
+            staffid: valueBr ? valueBr.value : -1
+          }
+      }, (err, response) => {
+        if(!err){
+            var db =  response.data
+            sListChar(db)
+        }
+        sOnFetching(false)
+      })
+      }
+      const listCharP  = listChar?.map(e=> ({label: e.name, value:e.staffid}))
+      const [valueChar, sValueChar] = useState([])
+      const char =  valueChar?.map(e=> e.value)
+      const handleChangeChar =  (e) => {
+        sValueChar(e) 
+      }
+
       // branh
       const [brandpOpt, sListBrand] = useState([])
-      const id_Brand = valueBr?.map(e =>{
+      const branch_id = valueBr?.map(e =>{
         return e.value
       })
 
       // group
       const [groupOpt, sGroupOpt] = useState([])
+      const onChangeGroup =(e)=>{
+        sValueGr(e)
+      }
       const client_group_id = valueGr?.map(e =>{
         return e.value
       })
 
       // on chang city
       const [cityOpt, sCityOpt] = useState()
-      const [valueCt ,sValueCt]= useState([])
+      const [valueCt ,sValueCt]= useState()
+
       const handleChangeCt =  (e) => {
-        sValueCt(e)
-        if(e?.value){
-          _ServerFetching_distric(e)
-        }
+        sValueCt(e?.value)
+        // if(e?.value){
+        //   _ServerFetching_distric(e)
+        // }
       };
-      const city = valueCt?.value
+
       // fecht distric
       const [ditrict, sDistricts] = useState()
-      const _ServerFetching_distric =  (e) =>{
-        let id = e.value
-          Axios("GET", `${id && `/api_web/Api_address/district?limit=0&provinceid=${id}`}`, {
-            limit: 0
+      const _ServerFetching_distric =  () =>{
+          Axios("GET", '/api_web/Api_address/district?limit=0', {
+            params: {
+              provinceid: valueCt ? valueCt : -1
+            }
+        }, (err, response) => {
+          if(!err){
+              var {rResult, output} =  response.data   
+              sDistricts(rResult?.map(e=> ({     
+                label: e.name,
+                value:e.districtid
+              })))
+           // sDistricts(rResult)
+          }
+          sOnSending(false)
+          sOnFetchingDis(false)
+        })
+      }
+
+      //on chang ditrict 
+      const [valueDis, sValueDis] = useState()
+      const handleChangeDtric =  (e) => {   
+        sValueDis(e?.value) 
+      }       
+
+      //fecth ward
+      const [ward_id, sWard] = useState()
+      const _ServerFetching_war =  () =>{
+        // let id = e.value
+          Axios("GET","/api_web/Api_address/ward?limit=0", {
+            params: {
+              districtid: valueDis ? valueDis : -1
+            }
         }, (err, response) => {
           if(!err){
               var {rResult, output} =  response.data
-              sDistricts(rResult)
+              sWard(rResult)
+              // sLiswar(rResult)
           }
           sOnSending(false)
+          sOnFetchingWar(false)
         })
-        }
-        const listDis  = ditrict?.map(e=> ({label: e.name, value:e.districtid}))
+      }
+      
+      const listWar = ward_id && [...ward_id?.map(e => ({label: e.name, value: Number(e.wardid)}))]
+      //onchang ward
+      const [valueWa, sValueWa] = useState()
 
-        //on chang ditrict 
-        const [valueDis, sValueDis] = useState()
-        const handleChangeDtric =  (e) => {
-          sValueDis(e) 
-          if(e?.value){
-            _ServerFetching_war(e)
-          }
-        }
-        const district = valueDis?.value
+      // const ward =  valueWa?.value
+      const handleChangeWar =  (e) => {
+        sValueWa(e?.value) 
+      };
 
-        //fecth ward
-        const [ward_id, sWard] = useState()
-        const _ServerFetching_war =  (e) =>{
-          let id = e.value
-            Axios("GET", `${id && `/api_web/Api_address/ward?limit=0&districtid=${id}`}`, {
-              limit: 0
-          }, (err, response) => {
-            if(!err){
-                var {rResult, output} =  response.data
-                sWard(rResult)
-                sLiswar(rResult)
-            }
-            sOnSending(false)
-          })
-        }
-        const listWar = ward_id && [...ward_id?.map(e => ({label: e.name, value: Number(e.wardid)}))]
-        //onchang ward
-        const [valueWa, sValueWa] = useState()
-        // const listWarDs  = listWar?.map(e=> ({label: e.name, value:e.wardid}))
-        // console.log(listWarDs);
 
-        const ward =  valueWa?.value
-        const handleChangeWar =  (e) => {
-          sValueWa(e) 
-        };
     //post db
-  const _ServerSending = () => {
-
-      const id =props.id;
+    const _ServerSending = () => {
+      let id = props?.id
       var data = new FormData();
       data.append('name', name);
       data.append('code', code);
@@ -640,15 +657,15 @@ const Popup_dskh = (props) => {
       data.append('date_incorporation', date_incorporation);
       data.append('note', note);
       data.append('email', email);
-      data.append('website', website);
       data.append('debt_limit', debt_limit);
       data.append('debt_limit_day', debt_limit_day);
-      data.append('city', city);
-      data.append('district', district);
-      data.append('ward', ward_id);
+      data.append('city', valueCt);
+      data.append('district', valueDis);
+      data.append('ward', valueWa);
       data.append('client_group_id', client_group_id);
-      data.append('id_Brand', id_Brand);
-      Axios("POST", `${props.id ? `/api_web/api_client/client/${id}?csrf_protection=true` : "/api_web/api_client/client?csrf_protection=true"}`, {
+      data.append('branch_id', branch_id);
+      data.append('staff_charge', char);
+      Axios("POST",`${id ? `/api_web/api_client/client/${id}?csrf_protection=true` : "/api_web/api_client/client?csrf_protection=true"}`, {
         data:{
           name: name,
           code:code,
@@ -659,26 +676,27 @@ const Popup_dskh = (props) => {
           date_incorporation:date_incorporation,
           note: note,
           email:email,
-          website:website,
           debt_limit:debt_limit,
           debt_limit_day:debt_limit_day,
-          city:city,
-          district:district,
-          ward:ward,
+          city:valueCt,
+          district:valueDis,
+          ward:valueWa,
           client_group_id: client_group_id,
-          id_Brand: id_Brand,
-          option: option,
+          branch_id: branch_id,
+          staff_charge:char,
+          contact: option,
         },
         headers: {"Content-Type": "multipart/form-data"} 
       }, (err, response) => {
         if(!err){
-              var {isSuccess, message} = response.data;
-              
+              var {isSuccess, message, branch_name} = response.data;   
               if(isSuccess){
                   Toast.fire({
                       icon: 'success',
-                      title: `${props.dataLang[message]}`
+                      title: `${props?.dataLang[message]}`
                   })
+                  props.onRefresh && props.onRefresh()
+                  sOpen(false)
                   sErrInput(false)
                   sErrInputBr(false)
                   sName("")   
@@ -692,31 +710,54 @@ const Popup_dskh = (props) => {
                   sEmail("")
                   sWebsite("")
                   sDebt_limit("")
-                  sDebt_limit_day("")
-                         
+                  sDebt_limit_day("")    
                   sWard("")
                   sOption([])
-                  props.onRefresh && props.onRefresh()
-                  sOpen(false)
+                  sValueBr([])
+                  sGroupOpt([]) 
+                  sValueChar([])   
               }else{
                 Toast.fire({
                   icon: 'error',
-                  title: `${props.dataLang[message]}`
+                  title: `${props.dataLang[message] +" "+branch_name} `
                 })
               }
           }
           sOnSending(false)
       })
     }
-    const _OnChangeOption = (id, value) => {
-      var index = option.findIndex(x=> x.id === id);
-      option[index].name = value.target?.value;
+
+    //onchang option form
+    const _OnChangeOption = (id, type, value) => {
+      var index = option.findIndex(x => x.id === id );
+        if(type == 'full_name'){
+          option[index].full_name = value.target?.value;
+        }else if(type == "email"){
+          option[index].email = value.target?.value;
+        }else if(type== "position"){
+          option[index].position = value.target?.value;
+        }else if(type === "birthday"){
+          option[index].birthday = value.target?.value;
+        }else if(type === "address"){
+          option[index].address = value.target?.value;
+        }else if(type === "phone_number"){
+          option[index].phone_number = value.target?.value;
+        }
       sOption([...option])
     }
+
+    // add option form
     const _HandleAddNew =  () => {
-      sOption([...option, {id: Date.now(), name: optionName}])
-      sOptionName("")
+      sOption([...option, {id: Date.now(), full_name: optionfull_name, email:optionEmail, position:optionposition, birthday:optionbirthday, address:optionaddress, phone_number:optionphone_number}])
+      sOptionFull_name("")
+      sOptionEmail("")
+      sPosition("")
+      sOptionBirthday("")
+      sOptionAddress("")
+      sOptionPhone_number("")
     }
+
+    // delete option form
     const _HandleDelete =  (id) => {
       sOption([...option.filter(x=> x.id !== id)])
     }
@@ -726,38 +767,54 @@ const Popup_dskh = (props) => {
     },[option.length])
     useEffect(() => {
       onSending && _ServerSending()  
-  }, [onSending]);
+    }, [onSending]);
 
-
-  const _HandleSubmit = (e) => {
-    e.preventDefault()
-    if(name.length == 0){
-        sErrInput(true) 
-    }else{
-      sErrInput(false) 
+    // save form
+    const _HandleSubmit = (e) => {
+      e.preventDefault()
+      if(name?.length == 0 || branch_id?.length == 0){
+        name?.length == 0 && sErrInput(true) 
+        branch_id?.length == 0 && sErrInputBr(true) 
+      }else{
+        sOnSending(true)
+      }
     }
-    if(id_Brand.length == 0 ){
-      sErrInputBr(true)  
-    }else{
+
+
+    useEffect(() => {
+      sErrInput(false)
+    }, [name?.length > 0 ] )
+    useEffect(() => {
       sErrInputBr(false)
-    }
-    sOnSending(true)
-  }
+    }, [branch_id?.length > 0]);
 
-  useEffect(() => {
-    sErrInput(false)
-  }, [name.length > 0 ] )
-  useEffect(() => {
-    sErrInputBr(false)
-  }, [id_Brand.length > 0]);
+
+    useEffect(()=>{
+      open && sOnFetchingDis(true)
+    },[valueCt])
+    useEffect(()=>{
+      open && sOnFetchingWar(true)
+    },[valueDis])
+    useEffect(()=>{
+      open && sOnFetchingChar(true)
+    },[valueBr])
+    // },[valueChar])
+
+
+    useEffect(()=>{
+      onFetchingDis && _ServerFetching_distric()
+    },[onFetchingDis])
+    useEffect(()=>{
+      onFetchingWar && _ServerFetching_war()
+    },[onFetchingWar])
+    useEffect(()=>{
+      onFetchingChar && _ServerFetching_Char()
+    },[onFetchingChar])
 
   return(
       <>
       <PopupEdit   
-        // title={props.id ? `${props.dataLang?.client_group_dskhedit}` : `${props.dataLang?.client_group_dskhadd}`} 
         title={props.id ? `${props.dataLang?.client_popup_edit}` : `${props.dataLang?.client_popup_add}`} 
-      // title={"Thêm khách hàng"}
-      //   title={btn} 
         button={props.id ? <IconEdit/> : `${props.dataLang?.branch_popup_create_new}`} 
         onClickOpen={_ToggleModal.bind(this, true)} 
         open={open} onClose={_ToggleModal.bind(this,false)}
@@ -767,344 +824,434 @@ const Popup_dskh = (props) => {
           <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-semibold`}>{props.dataLang?.client_popup_general}</button>
           <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-semibold`}>{props.dataLang?.client_popup_contact}</button>
       </div>
-      {
-          tab === 0 && (
               <div className="mt-4">
               <form onSubmit={_HandleSubmit.bind(this)}>
-              <ScrollArea     ref={scrollAreaRef}
-               className="h-[555px] overflow-hidden" 
-                speed={1} 
-                smoothScrolling={true}>
-              <div className='w-[50vw] p-2  '>         
-                  <div className="flex flex-wrap justify-between "> 
-                  <div className='w-[48%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_name}<span className="text-red-500">*</span></label>
-                          <input
-                            value={name}                
-                            onChange={_HandleChangeInput.bind(this, "name")}
-                            name="fname"                      
-                            type="text"
-                            className={`${errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2`}
-                          />
-                          {errInput && <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.client_list_nameuser}</label>}
-                      </div>
+                  {
+                    tab === 0 &&(
+                      <ScrollArea     ref={scrollAreaRef}
+                  className="h-[555px] overflow-hidden" 
+                    speed={1} 
+                    smoothScrolling={true}>
+                  <div className='w-[50vw] p-2  '>         
+                      <div className="flex flex-wrap justify-between "> 
                       <div className='w-[48%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">Chi nhánh <span className="text-red-500">*</span></label>
-                          <Select    
-                          closeMenuOnSelect={false}
-                              placeholder="Chi nhánh"
-                              options={brandpOpt}
-                              isSearchable={true}
-                              // onChange={handleChangeBr}
-                              onChange={_HandleChangeInput.bind(this, "valueBr")}
-                              LoadingIndicator
-                               isMulti
-                               value={valueBr}
-                               maxMenuHeight="200px"
-                              isClearable={true}
-                              theme={(theme) => ({
-                                ...theme,
-                                colors: {
-                                    ...theme.colors,
-                                    primary25: '#EBF5FF',
-                                    primary50: '#92BFF7',
-                                    primary: '#0F4F9E',
-                                },
-                            })}
-                            menuPortalTarget={document.body}
-                            onMenuOpen={handleMenuOpen}
-                              styles={{
-                                placeholder: (base) => ({
-                                ...base,
-                                color: "#cbd5e1",
-                                }),
-                                menuPortal: (base) => ({
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_name}<span className="text-red-500">*</span></label>
+                              <input
+                                value={name}                
+                                onChange={_HandleChangeInput.bind(this, "name")}
+                                name="fname"                      
+                                type="text"
+                                className={`${errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2`}
+                              />
+                              {errInput && <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.client_list_nameuser}</label>}
+                          </div>
+                          <div className='w-[48%]'>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_brand} <span className="text-red-500">*</span></label>
+                              <Select   
+
+                                 closeMenuOnSelect={false}
+                                  placeholder={props.dataLang?.client_list_brand}
+                                  options={brandpOpt}
+                                  isSearchable={true}
+                                  onChange={_HandleChangeInput.bind(this, "valueBr")}
+                                  LoadingIndicator
+                                  isMulti
+                                  value={valueBr}
+                                  maxMenuHeight="200px"
+                                  isClearable={true}
+                                  theme={(theme) => ({
+                                    ...theme,
+                                    colors: {
+                                        ...theme.colors,
+                                  
+                                        
+                                    }, 
+                                    
+                                    
+                                })}
+                                menuPortalTarget={document.body}
+                                onMenuOpen={handleMenuOpen}
+                                  styles={{
+                                    placeholder: (base) => ({
                                     ...base,
-                                    zIndex: 9999,
-                                    position: "absolute",
-                                }),
-                            }}
-                            className={`${errInputBr ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full  text-[#52575E] font-normal p-2 border outline-none mb-2 rounded-lg py-0.5 bg-white border-none xl:text-base text-[14.5px]`}
-                          />
-                          {errInputBr && <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.client_list_nameuser}</label>}
+                                    color: "#cbd5e1",
+                                   
+                                    }),
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        position: "absolute", 
+                                      
+                                    }), 
+                                    control: base => ({
+                                      ...base,
+                                      border: '1px solid #d0d5dd',
+                                      boxShadow: 'none',
+                                     
+                                    })   
+                                }}
+                                className={`${errInputBr ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full  text-[#52575E] font-normal border outline-none rounded-lg bg-white border-none xl:text-base text-[14.5px]`}
+                              />
+                              {errInputBr && <label className="mb-2  text-[14px] text-red-500">{"Vui lòng chọn chi nhánh"}</label>}
+                          </div>
                       </div>
-                  </div>
-                  <div className="flex flex-wrap justify-between "> 
-                     <div className='w-[48%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_namecode} </label>
-                          <input
-                            value={code}                
-                            onChange={_HandleChangeInput.bind(this, "code")}
-                            name="fname"                      
-                            type="text"
-                            className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                          />
-                      </div>
-                      <div className='w-[48%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_repre}</label>
-                          <input
-                            value={representative}                
-                            onChange={_HandleChangeInput.bind(this, "representative")}
-                            name="fname"                      
-                            type="text"
-                            className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                          />
-                      </div>          
-                      <div className='w-[48%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_taxtcode}</label>
-                          <input
-                            value={tax_code}                
-                            onChange={_HandleChangeInput.bind(this, "tax_code")}
-                            name="fname"                      
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                          />
-                      </div>
-                      <div className='w-[48%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_date}</label>
-                          <input
-                            value={date_incorporation}                
-                            onChange={_HandleChangeInput.bind(this, "date_incorporation")}
-                            name="fname"                      
-                            type="date"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                          />
-                      </div>
-                      <div className='w-[48%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_phone}</label>
-                          <input
-                            value={phone_number}                
-                            onChange={_HandleChangeInput.bind(this, "phone_number")}
-                            name="fname"                      
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                          />
-                      </div>
-                      <div className='w-[48%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">Email</label>
-                          <input
-                             value={email}                
-                             onChange={_HandleChangeInput.bind(this, "email")}
-                            name="fname"                      
-                            type="email"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                          />
-                      </div>
-                      <div className='w-[48%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">Địa chỉ</label>
-                          <textarea
-                            value={address}                
-                            onChange={_HandleChangeInput.bind(this, "address")}
-                            name="fname"                      
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[40px] max-h-[200px] bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                          />
-                      </div>  
-                      <div className='w-[48%]'>
-                    <label className="text-[#344054] font-normal text-sm mb-1 ">Website</label>
-                    <input
-                      value={website}                
-                      onChange={_HandleChangeInput.bind(this, "website")}
-                      name="fname"                      
-                      type="text"
-                      className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                    />
-            </div>
-            <div className='w-[48%]'>
-                    <label className="text-[#344054] font-normal text-sm mb-1 ">Hạn mức công nợ theo giá trị</label>
-                    <input
-                       value={debt_limit}                
-                       onChange={_HandleChangeInput.bind(this, "debt_limit")}
-                      name="fname"                      
-                      type="text"
-                      className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                    />
+                      <div className="flex flex-wrap justify-between "> 
+                        <div className='w-[48%]'>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_namecode} </label>
+                              <input
+                                value={code}                
+                                onChange={_HandleChangeInput.bind(this, "code")}
+                                name="fname"                      
+                                type="text"
+                                placeholder={props.dataLang?.client_popup_sytem}
+                                className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                              />
+                          </div>
+                          <div className='w-[48%]'>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_repre}</label>
+                              <input
+                                value={representative}                
+                                onChange={_HandleChangeInput.bind(this, "representative")}
+                                name="fname"                      
+                                type="text"
+                                className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                              />
+                          </div>          
+                          <div className='w-[48%]'>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_taxtcode}</label>
+                              <input
+                                value={tax_code}                
+                                onChange={_HandleChangeInput.bind(this, "tax_code")}
+                                name="fname"                      
+                                type="text"
+                                className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                              />
+                          </div>
+                          <div className='w-[48%]'>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_date}</label>
+                              <input
+                                value={date_incorporation}    
+                                onChange={_HandleChangeInput.bind(this, "date_incorporation")}
+                                name="fname"                      
+                                type="date"
+                                className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                              />
+                          </div>
+                          <div className='w-[48%]'>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_phone}</label>
+                              <input
+                                value={phone_number}                
+                                onChange={_HandleChangeInput.bind(this, "phone_number")}
+                                name="fname"                      
+                                type="text"
+                                className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                              />
+                          </div>
+                          <div className='w-[48%]'>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_mail}</label>
+                              <input
+                                value={email}                
+                                onChange={_HandleChangeInput.bind(this, "email")}
+                                name="fname"                      
+                                type="email"
+                                className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                              />
+                          </div>
+                          <div className='w-[48%]'>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_adress}</label>
+                              <textarea
+                                value={address}                
+                                onChange={_HandleChangeInput.bind(this, "address")}
+                                name="fname"                      
+                                type="text"
+                                className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[40px] max-h-[200px] bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                              />
+                          </div>  
+                          <div className='w-[48%]'>
+                        <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_char}</label>
+                         <Select    
+                                 closeMenuOnSelect={false}
+                                  placeholder={props.dataLang?.client_popup_char}
+                                  options={listCharP}
+                                  isSearchable={true}
+                                  onChange={handleChangeChar}
+                                  LoadingIndicator
+                                  isMulti
+                                  value={valueChar}
+                                  maxMenuHeight="200px"
+                                  isClearable={true}
+                                  theme={(theme) => ({
+                                    ...theme,
+                                    colors: {
+                                        ...theme.colors,
+                                        primary25: '#EBF5FF',
+                                        primary50: '#92BFF7',
+                                        primary: '#0F4F9E',
+                                    },
+                                })}
+                                menuPortalTarget={document.body}
+                                onMenuOpen={handleMenuOpen}
+                                  styles={{
+                                    placeholder: (base) => ({
+                                    ...base,
+                                    color: "#cbd5e1",
+                                    }),
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        position: "absolute",   
+                                    }),
+                                    
+                                }}
+                                className={`${errInputBr ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full  text-[#52575E] font-normal p-2 border outline-none mb-2 rounded-lg py-0.5 bg-white border-none xl:text-base text-[14.5px]`}
+                              />
                 </div>
                 <div className='w-[48%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_group}</label>
-                          <Select 
-                              placeholder="Nhóm"
-                              options={groupOpt} 
-                              value={valueGr}
-                              onChange={_HandleChangeInput.bind(this, "valueGr")}
-                              isSearchable={true}
-                              LoadingIndicator
-                              // value={props.listDs.filter(obj => selectedValue.includes(obj.value))}
-                              isMulti={true}
-                              maxMenuHeight="200px"
-                              isClearable={true}
-                              theme={(theme) => ({
-                                ...theme,
-                                colors: {
-                                    ...theme.colors,
-                                    primary25: '#EBF5FF',
-                                    primary50: '#92BFF7',
-                                    primary: '#0F4F9E',
-                                },
-                            })}
-                            menuPortalTarget={document.body}
-                            onMenuOpen={handleMenuOpen}
-                              styles={{
-                                placeholder: (base) => ({
-                                ...base,
-                                color: "#cbd5e1",
-                                }),
-                                menuPortal: (base) => ({
+                        <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_limit}</label>
+                        <input
+                          value={debt_limit}                
+                          onChange={_HandleChangeInput.bind(this, "debt_limit")}
+                          name="fname"                      
+                          type="text"
+                          className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                        />
+                    </div>
+                    <div className='w-[48%]'>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_group}</label>
+                              <Select 
+                                  placeholder="Nhóm"
+                                  options={groupOpt} 
+                                  value={valueGr}
+                                  onChange={onChangeGroup}
+                                  isSearchable={true}
+                                  LoadingIndicator
+                                  isMulti={true}
+                                  maxMenuHeight="200px"
+                                  isClearable={true}
+                                  theme={(theme) => ({
+                                    ...theme,
+                                    colors: {
+                                        ...theme.colors,
+                                        primary25: '#EBF5FF',
+                                        primary50: '#92BFF7',
+                                        primary: '#0F4F9E',
+                                    },
+                                })}
+                                menuPortalTarget={document.body}
+                                onMenuOpen={handleMenuOpen}
+                                  styles={{
+                                    placeholder: (base) => ({
                                     ...base,
-                                    zIndex: 9999,
-                                    position: "absolute",
-                                }),
-                            }}
-                              className="rounded-lg py-0.5 bg-white border-none xl:text-base text-[14.5px] " 
-                          />
-                      </div>
-                      <div className='w-[48%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_days}</label>
-                          <input
-                        value={debt_limit_day}                
-                        onChange={_HandleChangeInput.bind(this, "debt_limit_day")}
-                            name="fname"                      
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                          />
-                      </div>
-                      <div className='w-[48%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_city}</label>
-                          <Select 
-                              placeholder="Thành phố"
-                              options={cityOpt} 
-                              value={valueCt}
-                              onChange={handleChangeCt} 
-                              isSearchable={true}
-                              LoadingIndicator
-                              maxMenuHeight="200px"
-                              isClearable={true}
-                              theme={(theme) => ({
-                                ...theme,
-                                colors: {
-                                    ...theme.colors,
-                                    primary25: '#EBF5FF',
-                                    primary50: '#92BFF7',
-                                    primary: '#0F4F9E',
-                                },
-                            })}
-                            menuPortalTarget={document.body}
-                            onMenuOpen={handleMenuOpen}
-                              styles={{
-                                placeholder: (base) => ({
-                                ...base,
-                                color: "#cbd5e1",
-                                }),
-                                menuPortal: (base) => ({
+                                    color: "#cbd5e1",
+                                    }),
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        position: "absolute",
+                                    }),
+                                }}
+                                  className="rounded-lg py-0.5 bg-white border-none xl:text-base text-[14.5px] " 
+                              />
+                          </div>
+                          <div className='w-[48%]'>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_days}</label>
+                              <input
+                            value={debt_limit_day}                
+                            onChange={_HandleChangeInput.bind(this, "debt_limit_day")}
+                                name="fname"                      
+                                type="text"
+                                className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                              />
+                          </div>
+                          <div className='w-[48%]'>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_city}</label>
+                              <Select 
+                                  placeholder={props.dataLang?.client_popup_city}
+                                  options={cityOpt} 
+                                  value={valueCt ? {label: cityOpt?.find(x => x.value == valueCt)?.label, value: valueCt} : null}
+                                  onChange={handleChangeCt} 
+                                  isSearchable={true}
+                                  LoadingIndicator
+                                  maxMenuHeight="200px"
+                                  isClearable={true}
+                                  theme={(theme) => ({
+                                    ...theme,
+                                    colors: {
+                                        ...theme.colors,
+                                        primary25: '#EBF5FF',
+                                        primary50: '#92BFF7',
+                                        primary: '#0F4F9E',
+                                    },
+                                })}
+                                menuPortalTarget={document.body}
+                                onMenuOpen={handleMenuOpen}
+                                  styles={{
+                                    placeholder: (base) => ({
                                     ...base,
-                                    zIndex: 9999,
-                                    position: "absolute",
-                                }),
-                            }}
-                              className="rounded-lg py-0.5 bg-white border-none xl:text-base text-[14.5px] " 
-                          />
-                          {/* <input
-                             value={city}                
-                             onChange={_HandleChangeInput.bind(this, "city")}
-                            name="fname"                      
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                          /> */}
-                      </div>
-                      <div className='w-[48%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_district}</label>
-
-                          {/* <input
-                             value={district}                
-                             onChange={_HandleChangeInput.bind(this, "district")}
-                            name="fname"                      
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                          /> */}
-                          <Select 
-                              placeholder="Quận, huyện"
-                              options={listDis} 
-                              value={valueDis}
-                              onChange={handleChangeDtric} 
-                              isSearchable={true}
-                              LoadingIndicator
-                              maxMenuHeight="200px"
-                              isClearable={true}
-                              theme={(theme) => ({
-                                ...theme,
-                                colors: {
-                                    ...theme.colors,
-                                    primary25: '#EBF5FF',
-                                    primary50: '#92BFF7',
-                                    primary: '#0F4F9E',
-                                },
-                            })}
-                            menuPortalTarget={document.body}
-                            onMenuOpen={handleMenuOpen}
-                              styles={{
-                                placeholder: (base) => ({
-                                ...base,
-                                color: "#cbd5e1",
-                                }),
-                                menuPortal: (base) => ({
+                                    color: "#cbd5e1",
+                                    }),
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        position: "absolute",
+                                    }),
+                                }}
+                                  className="rounded-lg py-0.5 bg-white border-none xl:text-base text-[14.5px] " 
+                              />
+                             
+                          </div>
+                          <div className='w-[48%]'>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_district}</label>
+                              <Select 
+                                  placeholder={props.dataLang?.client_popup_district}
+                                  options={ditrict} 
+                                  value={valueDis ? {label: ditrict?.find(x => x.value == valueDis)?.label, value: valueDis} : null}
+                                  onChange={handleChangeDtric} 
+                                  isSearchable={true}
+                                  LoadingIndicator
+                                  maxMenuHeight="200px"
+                                  isClearable={true}
+                                  theme={(theme) => ({
+                                    ...theme,
+                                    colors: {
+                                        ...theme.colors,
+                                        primary25: '#EBF5FF',
+                                        primary50: '#92BFF7',
+                                        primary: '#0F4F9E',
+                                    },
+                                })}
+                                menuPortalTarget={document.body}
+                                onMenuOpen={handleMenuOpen}
+                                  styles={{
+                                    placeholder: (base) => ({
                                     ...base,
-                                    zIndex: 9999,
-                                    position: "absolute",
-                                }),
-                            }}
-                              className="rounded-lg py-0.5 bg-white border-none xl:text-base text-[14.5px] " 
-                          />
-                      </div>
-                      <div className='w-[48%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_wards}</label>
-                          <Select 
-                              placeholder="Phường xã"
-                              options={listWar} 
-                              value={valueWa}
-                              onChange={handleChangeWar} 
-                              isSearchable={true}
-                              LoadingIndicator
-                              maxMenuHeight="200px"
-                              isClearable={true}
-                              theme={(theme) => ({
-                                ...theme,
-                                colors: {
-                                    ...theme.colors,
-                                    primary25: '#EBF5FF',
-                                    primary50: '#92BFF7',
-                                    primary: '#0F4F9E',
-                                },
-                            })}
-                            menuPortalTarget={document.body}
-                            onMenuOpen={handleMenuOpen}
-                              styles={{
-                                placeholder: (base) => ({
-                                ...base,
-                                color: "#cbd5e1",
-                                }),
-                                menuPortal: (base) => ({
+                                    color: "#cbd5e1",
+                                    }),
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        position: "absolute",
+                                    }),
+                                }}
+                                  className="rounded-lg py-0.5 bg-white border-none xl:text-base text-[14.5px] " 
+                              />
+                          </div>
+                          <div className='w-[48%]'>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_wards}</label>
+                              <Select 
+                                  placeholder={props.dataLang?.client_popup_wards}
+                                  options={listWar} 
+                                  value={valueWa ? {label: listWar?.find(x => x.value == valueWa)?.label, value: valueWa} : null}
+                                  onChange={handleChangeWar} 
+                                  isSearchable={true}
+                                  LoadingIndicator
+                                  maxMenuHeight="200px"
+                                  isClearable={true}
+                                  theme={(theme) => ({
+                                    ...theme,
+                                    colors: {
+                                        ...theme.colors,
+                                        primary25: '#EBF5FF',
+                                        primary50: '#92BFF7',
+                                        primary: '#0F4F9E',
+                                    },
+                                })}
+                                menuPortalTarget={document.body}
+                                onMenuOpen={handleMenuOpen}
+                                  styles={{
+                                    placeholder: (base) => ({
                                     ...base,
-                                    zIndex: 9999,
-                                    position: "absolute",
-                                }),
-                            }}
-                              className="rounded-lg py-0.5 bg-white border-none xl:text-base text-[14.5px] " 
-                          />
+                                    color: "#cbd5e1",
+                                    }),
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        position: "absolute",
+                                    }),
+                                }}
+                                  className="rounded-lg py-0.5 bg-white border-none xl:text-base text-[14.5px] " 
+                              />
+                          </div>
+                          <div className='w-full'>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_note}</label>
+                              <textarea
+                                value={note}                
+                                onChange={_HandleChangeInput.bind(this, "note")}
+                                name="fname"                      
+                                type="text"
+                                className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[40px] max-h-[200px] bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                              />
+                          </div> 
                       </div>
-                      <div className='w-full'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_note}</label>
-                          <textarea
-                             value={note}                
-                             onChange={_HandleChangeInput.bind(this, "note")}
-                            name="fname"                      
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[40px] max-h-[200px] bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                          />
-                      </div> 
-                  </div>
-                </div>
-              </ScrollArea>
-                
+                    </div>
+                  </ScrollArea>
+                    )
+                  }   
+                  { tab === 1 && (
+                  <div>
+                    <ScrollArea     
+                    className="min-h-[0px] max-h-[550px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+                      <div className='w-[50vw] flex justify-between space-x-1  flex-wrap p-2'>     
+                      {option.map((e) => 
+                      <div className='w-[48%]'>
+                        <div className="" key={e.id?.toString()}>
+                                  <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_fiandlass}</label>
+                                  <input
+                                    value={e.full_name}                
+                                    onChange={_OnChangeOption.bind(this, e.id,"full_name")}
+                                    name="optionVariant"                      
+                                    type="text"
+                                    className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                                  />                         
+                                  <label className="text-[#344054] font-normal text-sm mb-1 ">Email</label>
+                                  <input
+                                    value={e.email}                
+                                    onChange={_OnChangeOption.bind(this, e.id, "email")}
+                                    name="optionEmail"                      
+                                    type="text"
+                                    className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                                  />                 
+                                  <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_position}</label>
+                                  <input
+                                    value={e.position}                
+                                    onChange={_OnChangeOption.bind(this, e.id,"position")}
+                                    name="fname"                      
+                                    type="text"
+                                    className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                                  />                     
+                                  <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_birthday}</label>
+                                  <input
+                                    value={e.birthday}                
+                                    onChange={_OnChangeOption.bind(this, e.id, "birthday")}
+                                    name="fname"                      
+                                    type="date"
+                                    className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                                  />                   
+                                  <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_adress}</label>
+                                  <textarea
+                                    value={e.address}                
+                                    onChange={_OnChangeOption.bind(this, e.id, "address")}
+                                    name="fname"                      
+                                    type="text"
+                                    className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[90px] max-h-[200px] bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                                  />         
+                                  <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_phone}</label>
+                                  <input
+                                    value={e.phone_number}                
+                                    onChange={_OnChangeOption.bind(this, e.id, "phone_number")}
+                                    name="fname"                      
+                                    type="number"
+                                    className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
+                                  />
+                            <button  type='button' title='Xóa' className='transition  w-full bg-slate-100 h-10 rounded-lg text-red-500 flex flex-col justify-center items-center'><IconDelete onClick={_HandleDelete.bind(this, e.id)}/></button>
+                          </div>         
+                        </div>
+                          )} 
+                    <button  type='button' onClick={_HandleAddNew.bind(this)} title='Thêm' className='transition w-[48%] mt-5   min-h-[160px] h-40 rounded-lg bg-slate-100 flex flex-col justify-center items-center'><IconAdd />{props.dataLang?.client_popup_addcontact}</button>         
+                    </div>  
+                    </ScrollArea>     
+                    </div>
+                  )}
                   <div className="text-right mt-5 space-x-2">
                     <button type='button' onClick={_ToggleModal.bind(this,false)} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-lg border border-solid border-[#D0D5DD]"
                     >{props.dataLang?.branch_popup_exit}</button>
@@ -1114,94 +1261,148 @@ const Popup_dskh = (props) => {
                     >{props.dataLang?.branch_popup_save}</button>
                   </div>
               </form>
-            </div>
-          )
-          }
-          { tab === 1 && (
-            
-                  <div className=" mt-4">
-                    <form onSubmit={_HandleSubmit.bind(this)} >   
-                        <ScrollArea     
-                          className="min-h-[0px] max-h-[550px] overflow-hidden"  speed={1}  smoothScrolling={true}>
-                            <div className='w-[65vw] flex justify-between space-x-1  flex-wrap p-2'>     
-                            {option.map((e) => 
-                            <div className='w-[48%]'>
-                              <div className="">
-                                        <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_fiandlass}</label>
-                                        <input
-                                          value={name}                
-                                          onChange={_HandleChangeInput.bind(this, "name")}
-                                          name="fname"                      
-                                          type="text"
-                                          className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                                        />                         
-                                        <label className="text-[#344054] font-normal text-sm mb-1 ">Email</label>
-                                        <input
-                                          value={name}                
-                                          onChange={_HandleChangeInput.bind(this, "name")}
-                                          name="fname"                      
-                                          type="text"
-                                          className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                                        />                 
-                                        <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_position}</label>
-                                        <input
-                                          value={name}                
-                                          onChange={_HandleChangeInput.bind(this, "name")}
-                                          name="fname"                      
-                                          type="text"
-                                          className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                                        />                     
-                                        <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_birthday}</label>
-                                        <input
-                                          value={name}                
-                                          onChange={_HandleChangeInput.bind(this, "name")}
-                                          name="fname"                      
-                                          type="date"
-                                          className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                                        />                   
-                                        <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_adress}</label>
-                                        <textarea
-                                          value={name}                
-                                          onChange={_HandleChangeInput.bind(this, "name")}
-                                          name="fname"                      
-                                          type="text"
-                                          className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[90px] max-h-[200px] bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                                        />         
-                                        <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_phone}</label>
-                                        <input
-                                          value={name}                
-                                          onChange={_HandleChangeInput.bind(this, "name")}
-                                          name="fname"                      
-                                          type="number"
-                                          className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
-                                        />
-                                  <button onClick={_HandleDelete.bind(this, e.id)} type='button' title='Xóa' className='transition  w-full bg-slate-100 h-10 rounded-lg text-red-500 flex flex-col justify-center items-center'><IconDelete /></button>
-                                </div>         
-                              </div>
-                                )} 
-                          <button  type='button' onClick={_HandleAddNew.bind(this)} title='Thêm' className='transition w-[48%] mt-5   min-h-[160px] h-40 rounded-lg bg-slate-100 flex flex-col justify-center items-center'><IconAdd />{props.dataLang?.client_popup_addcontact}</button>         
-                          </div>  
-                        </ScrollArea>            
-                   {
-                    hidden && (
-                      <div className="text-right mt-5 space-x-2">
-                      <button type='button' onClick={_ToggleModal.bind(this,false)} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-lg border border-solid border-[#D0D5DD]"
-                      >{props.dataLang?.branch_popup_exit}</button>
-                      <button 
-                        type="submit"
-                        className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-lg bg-[#0F4F9E]"
-                      >{props.dataLang?.branch_popup_save}</button>
-                    </div>
-                    )
-                   }
-                  </form>
-                  
-                </div>
-              )
-          
-          }
+            </div>    
       </PopupEdit>
       </>
     )
 }
+const Popup_chitiet =(props)=>{
+      const scrollAreaRef = useRef(null);
+      const [open, sOpen] = useState(false);
+      const _ToggleModal = (e) => sOpen(e);
+      const [tab, sTab] = useState(0)
+      const _HandleSelectTab = (e) => sTab(e)
+      const [data,sData] =useState()
+      const [onFetching, sOnFetching] = useState(false);
+      useEffect(() => {
+        props?.id && sOnFetching(true) 
+      }, [open]);
+      const _ServerFetching_detailUser = () =>{
+        Axios("GET", `/api_web/api_client/client/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+        if(!err){
+            var db =  response.data
+            sData(db)
+        }
+        sOnFetching(false)
+      })
+      }
+      useEffect(() => {
+        onFetching && _ServerFetching_detailUser()
+      }, [open]);
+
+  return (
+    <>
+     <PopupEdit   
+        title={props.dataLang?.client_popup_detail} 
+        button={props?.name} 
+        onClickOpen={_ToggleModal.bind(this, true)} 
+        open={open} onClose={_ToggleModal.bind(this,false)}
+        classNameBtn={props?.className} 
+      >
+      <div className='flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
+          <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-semibold`}>{props.dataLang?.client_popup_detailUser}</button>
+          <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-semibold`}>{props.dataLang?.client_popup_detailContact}</button>
+      </div>
+              <div className="mt-4 space-x-5 w-[930px] h-auto  ">    
+                  {
+                  
+                    tab === 0 &&(
+                    <ScrollArea     ref={scrollAreaRef}
+                    className="h-[555px] overflow-hidden rounded-md shadow-[0px_0px_5px_0px_#0F4F9E]" 
+                    speed={1} 
+                    smoothScrolling={true}>
+                      <div className="flex p-2 ">
+                        <div className='w-[48%]'>
+                          <div className='mb-4'>{props.dataLang?.client_list_name}: <span className='font-medium capitalize'>{data?.name}</span></div>
+                          <div className='mb-4'>{props.dataLang?.client_list_repre}: <span className='font-medium capitalize'>{data?.representative}</span></div>
+                          <div className='mb-4'>{props.dataLang?.client_list_namecode}: <span className='font-medium capitalize'>{data?.code}</span></div>
+                          <div className='mb-4'>{props.dataLang?.client_list_taxtcode}: <span className='font-medium capitalize'>{data?.tax_code}</span></div>
+                          <div className='mb-4'>{props.dataLang?.client_popup_phone}: <span className='font-medium capitalize'>{data?.phone_number}</span></div>
+                          <div className='mb-4'>{props.dataLang?.client_popup_adress}: <span className='font-medium capitalize'>{data?.address}</span></div>
+                          <div className='mb-4'>{props.dataLang?.client_popup_limit}: <span className='font-medium capitalize'>{data?.debt_limit}</span></div>
+                          <div className='mb-4'>{props.dataLang?.client_popup_days}: <span className='font-medium capitalize'>{data?.debt_limit_day}</span></div>
+                         
+                        </div>
+                        <div className='w-[48%]'>
+                          <div className='mb-4 flex space-x-2 items-center flex-wrap'>{props.dataLang?.client_list_brand}: {data?.branch?.map(e=>{ return (<span className='last:ml-0 font-medium capitalize ml-1 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E]  py-0.5 border border-[#0F4F9E] rounded-lg'> {e.name}</span>)})}</div>
+                          <div className='mb-4'>{props.dataLang?.client_popup_date}: <span className='font-medium capitalize'>{moment(data?.date_create).format("DD-MM-YYYY")}</span></div>
+                          <div className='mb-4'>{props.dataLang?.client_popup_mail}: <span className='font-medium capitalize'>{data?.email}</span></div>
+                          <div className='mb-4 flex space-x-2 items-center flex-wrap'>{props.dataLang?.client_popup_char}: 
+                          {data?.staff_charge?.map(e=>{ return (
+                            <span className='font-medium capitalize   ml-1'>
+                              <Popup className='dropdown-avt' key={e.id}
+                                      trigger={open => (<img src={e.profile_image}  width={40} height={40} className="object-cover rounded-[100%]"></img>)}
+                                      position="top center" on={['hover']} arrow={false}>
+                                <span className='bg-[#0f4f9e] text-white rounded p-1.5'>{e.full_name} </span>
+                              </Popup>  
+                            </span>)})}
+                          </div>
+                          <div className='mb-4 flex space-x-2'>{props.dataLang?.client_list_group}: {data?.client_group?.map(e=>{ return (<span className='font-medium capitalize ml-1'>{e.name}</span>)})}</div>
+                          <div className='mb-4'>{props.dataLang?.client_popup_city}: <span className='font-medium capitalize'>{data?.city != "" ?(data?.city.type+" "+data?.city.name) :""}</span></div>
+                          <div className='mb-4'><span>{props.dataLang?.client_popup_district}: <span className='font-medium capitalize'>{data?.district != "" ?(data?.district.type+" "+data?.district.name):""}</span>, {props.dataLang?.client_popup_wards}: <span className='font-medium capitalize'>{data?.ward != "" ? (data?.ward.type+" "+data?.ward.name) :""}</span></span></div>
+                          <div className='mb-4'>{props.dataLang?.client_popup_note}:  <span className='font-medium capitalize'>{data?.note}</span></div>
+                        </div>
+                      </div>
+                    </ScrollArea>
+                    )
+                  }   
+                  { tab === 1 && (
+                    <div>
+
+                      <div className='w-[930px]'>
+                      <div className="min:h-[200px] h-[72%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                  <div className="pr-2 w-[100%] lx:w-[110%] ">
+                    <div className="flex items-center sticky top-0 bg-white p-2 z-10">
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{props.dataLang?.client_popup_detailName}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{props.dataLang?.client_popup_mail}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-left">{props.dataLang?.client_popup_position}</h4> 
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{props.dataLang?.client_popup_birthday}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{props.dataLang?.client_popup_adress}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-center">{props.dataLang?.client_popup_phone}</h4>
+                    </div>
+                    {onFetching ?
+                      <Loading className="h-80"color="#0f4f9e" /> 
+                      : 
+                      data?.contact?.length > 0 ? 
+                      (<>
+                           <ScrollArea     
+                             className="min-h-[555px] max-h-[555px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">                       
+                          {(data?.contact?.map((e) => 
+                            <div className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.full_name}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">{e.email}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[10%]  rounded-md text-left">{e.position}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">{e.birthday != "0000-00-00" ? moment(e.birthday).format("DD-MM-YYYY") : ""}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.address}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-center">{e.phone_number}</h6>                
+                            </div>
+                          ))}              
+                        </div>   
+                          </ScrollArea>                       
+                        </>
+                      )  : 
+                      (
+                        <div className=" max-w-[352px] mt-24 mx-auto" >
+                          <div className="text-center">
+                            <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+                            <h1 className="textx-[#141522] text-base opacity-90 font-medium">Không tìm thấy các mục</h1>
+                            <div className="flex items-center justify-around mt-6 ">
+                                {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+                            </div>
+                          </div>
+                        </div>
+                      )}    
+                  </div>
+                </div>
+              </div>
+        
+         </div>
+        ) }
+        </div>    
+      </PopupEdit>
+    </>
+  )
+}
+
 export default Index;
