@@ -112,52 +112,22 @@ const Index = (props) => {
     const options = listBr_filter?.filter((x) => !hiddenOptions.includes(x.value));
 
 
-    const [limitGroup, sLimitGroup] = useState(10);
-    const [onFetchingGroup, sOnFetchingGroup] = useState(false);
-
     const _ServerFetching_group =  () =>{
       Axios("GET", `/api_web/api_client/group_count/?csrf_protection=true`, {
         params:{
-          limit: limitGroup
+          limit: 0,
+          search: keySearch,
+          "filter[branch_id]": idBranch?.length > 0 ? idBranch.map(e => e.value) : null
         }
     }, (err, response) => {
       if(!err){
-          var {rResult} =  response.data
+          var {rResult, output} =  response.data
           sListDs(rResult)
       }
-      sOnFetchingGroup(false)
+      sOnFetching(false)
     })
     }
 
-    useEffect(() => {
-      onFetchingGroup && _ServerFetching_group()
-    }, [onFetchingGroup]);
-
-    useEffect(() => {
-      sOnFetchingGroup(true)
-    }, [limitGroup]);
-
-    const _HandleScrollGroup = e => {
-      const { scrollLeft, clientWidth, scrollWidth } = e.currentTarget;
-      if (scrollWidth - scrollLeft === clientWidth) {
-        sLimitGroup(item => item + 2);
-      }
-    };
-
-    // const [listSelectGr, sListSelectGr] = useState()
-    // const _ServerFetching_selectgroup =  () =>{
-    //   Axios("GET", `/api_web/Api_client/group?csrf_protection=true`, {   
-    //     params:{
-    //       limit: 0
-    //     }
-    // }, (err, response) => {
-    //   if(!err){
-    //       var {rResult, output} =  response.data
-    //       sListSelectGr(rResult)
-    //   }
-    //   sOnFetching(false)
-    // })
-    // }
     
     const _ServerFetching_selectct =  () =>{
       Axios("GET", `/api_web/Api_address/province?limit=0`, {
@@ -313,26 +283,22 @@ const Index = (props) => {
                     })}
                    />
                     </div>
-                    {onFetchingGroup ? 
-                      <div className='h-[8vh] w-full bg-slate-100 flex flex-col items-center justify-center space-x-3'>
-                        <svg aria-hidden="true" className="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-                          <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-                        </svg>
-                      </div>
-                      :
-                      <div onScroll={_HandleScrollGroup.bind(this)} className="flex space-x-3 items-center h-[8vh] overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                        {listDs && listDs.map((e)=>
-                          <TabClient 
-                            style={{backgroundColor: e.color}}
-                            key={e.id} 
-                            onClick={_HandleSelectTab.bind(this, `${e.id}`)} 
-                            total={e.count} 
-                            active={e.id} 
-                          >{e.name}</TabClient> 
-                        )}
-                      </div>
-                    }
+              <div  className="flex space-x-3 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                    {/* <div><TabClient onClick={_HandleSelectTab.bind(this, "all")} active="all" total={totalItem.iTotalDisplayRecords}>{dataLang?.client_list_grroupall}</TabClient></div>
+                    <div><TabClient onClick={_HandleSelectTab.bind(this, "nogroup")} active="nogroup"  total={totalItem.iTotalDisplayRecords}>{dataLang?.client_list_nogroup}</TabClient></div> */}
+                     {listDs &&   listDs.map((e)=>{
+                          return (
+                           <div>
+                             <TabClient 
+                                style={{
+                                 backgroundColor: e.color
+                               }}
+                              key={e.id} onClick={_HandleSelectTab.bind(this, `${e.id}`)} total={e.count} active={e.id} >{e.name}</TabClient> 
+                            </div>
+                          )
+                      })
+                     }
+            </div>
            
               <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">    
                 <div className="xl:space-y-3 space-y-2">
@@ -369,7 +335,7 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className="min:h-[200px] h-[63%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <div className="min:h-[200px] h-[61%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[125%] lx:w-[115%] ">
                     <div className="flex items-center sticky top-0 bg-white p-2 z-10">
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.client_list_namecode}</h4>
@@ -467,7 +433,7 @@ const TabClient = React.memo((props) => {
     return(
       <button  style={props.style} onClick={props.onClick} className={`${router.query?.tab === `${props.active}` ? "text-[white] bg-[#0F4F9E] min-w-[220px] justify-center" : "bg-[#0F4F9E] justify-center text-white min-w-[180px]"} flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
         {router.query?.tab === `${props.active}` && <LocationTick   size="20" color="white" />}
-        <span className='truncate'>{props.children}</span>
+        {props.children}
         <span className={`${props?.total > 0 && "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"} `}>{props?.total > 0 && props?.total}</span>
       </button>
 
@@ -516,12 +482,12 @@ const Popup_dskh = (props) => {
       const [tab, sTab] = useState(0)
 
       const [valueBr, sValueBr] = useState([])
-      const [valueGr, sValueGr] = useState([])
       const branch = valueBr.map(e => e.value)
 
       const _HandleSelectTab = (e) => sTab(e)
       const [hidden, sHidden] = useState(false)
-
+   
+ 
       useEffect(() => {
         sErrInputBr(false)
         sErrInput(false)
@@ -537,7 +503,6 @@ const Popup_dskh = (props) => {
          sDebt_limit("")
          sDebt_limit_day("")
          props?.id && sOnFetching(true)
-        //  sGroupOpt(props.listSelectGr && [...props.listSelectGr?.map(e => ({label: e.name, value: Number(e.id)}))])
          sCityOpt(props.listSelectCt && [...props.listSelectCt?.map(e => ({label: e.name, value: Number(e.provinceid)}))])
          sListBrand(props.listBr ? props.listBr && [...props.listBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
          sOption(props.option ? props.option : [])
@@ -552,7 +517,6 @@ const Popup_dskh = (props) => {
           Axios("GET", `/api_web/api_client/client/${props?.id}?csrf_protection=true`, {}, (err, response) => {
           if(!err){
               var db =  response.data
-              console.log(db);
               sName(db?.name)
               sCode(db?.code)
               sTaxcode(db?.tax_code)
@@ -574,7 +538,6 @@ const Popup_dskh = (props) => {
             
           }
           sOnSending(false)
-          // sOnFetching(false)
         })
         }
         useEffect(() => {
@@ -607,9 +570,6 @@ const Popup_dskh = (props) => {
           sDebt_limit_day(value.target?.value)
         }else if(type == "valueBr"){
           sValueBr(value)
-          // if(value){
-          //   _ServerFetching_Char(value.map(e=> e.value))
-          // } 
         }else if(type == "optionName"){
           sOptionName(value.target?.value)
         }else if(type == "optionHapy"){
@@ -645,7 +605,6 @@ const Popup_dskh = (props) => {
         sValueChar(e) 
       }
 
-
       useEffect(() => {
           onFetchingBr && _ServerFetching_Char()
       }, [onFetchingBr]);
@@ -658,31 +617,38 @@ const Popup_dskh = (props) => {
       const branch_id = valueBr?.map(e =>{
         return e?.value
       })
+
       // group
 
-      const [groupOpt, sGroupOpt] = useState([])
-      const onChangeGroup =(e)=>{
-        sValueGr(e)
-      }
-    const [listSelectGr, sListSelectGr] = useState()
-    console.log("listSelectGr",listSelectGr);
-      const _ServerFetching_selectgroup =  () =>{
-        Axios("GET", `/api_web/Api_client/group?csrf_protection=true`, {   
-          params:{
-            limit: 0,
-            "brach_id[]": valueBr
-          },
+      const [listGr, sListGr]= useState()
+      const _ServerFetching_Gr =  () =>{
+        Axios("GET", `/api_web/Api_client/group?csrf_protection=true`, {
+          params: {
+            "filter[branch_id]": branch?.length > 0 ? branch : -1,
+          }
       }, (err, response) => {
         if(!err){
-            var {rResult} =  response.data
-            sListSelectGr(rResult.branch?.map(e=> ({     
-              label: e.name,
-              value:e.id
-            })))
+            var db =  response.data
+            sListGr(db.rResult)
         }
-        sOnFetchingGr(false)
+        // sOnFetching(false)
+        sOnFetchingBr(false)
       })
       }
+      const listGrp  = listGr?.map(e=> ({label: e.name, value:e.id}))
+      const [valueGr, sValueGr] = useState([])
+      const group =  valueGr?.map(e=> e.value)
+      const handleChangeGr =  (e) => {
+        sValueGr(e) 
+      }
+      
+    useEffect(() => {
+        onFetchingBr && _ServerFetching_Gr()
+    }, [onFetchingBr]);
+    useEffect(() => {
+        open && _ServerFetching_Gr(true)
+    }, [valueBr]);
+
       const client_group_id = valueGr?.map(e =>{
         return e.value
       })
@@ -695,9 +661,6 @@ const Popup_dskh = (props) => {
 
       const handleChangeCt =  (e) => {
         sValueCt(e?.value)
-        // if(e?.value){
-        //   _ServerFetching_distric(e)
-        // }
       };
 
       // fecht distric
@@ -730,7 +693,6 @@ const Popup_dskh = (props) => {
       //fecth ward
       const [ward_id, sWard] = useState()
       const _ServerFetching_war =  () =>{
-        // let id = e.value
           Axios("GET","/api_web/Api_address/ward?limit=0", {
             params: {
               districtid: valueDis ? valueDis : -1
@@ -739,7 +701,6 @@ const Popup_dskh = (props) => {
           if(!err){
               var {rResult, output} =  response.data
               sWard(rResult)
-              // sLiswar(rResult)
           }
           sOnSending(false)
           sOnFetchingWar(false)
@@ -774,7 +735,7 @@ const Popup_dskh = (props) => {
       data.append('city', valueCt);
       data.append('district', valueDis);
       data.append('ward', valueWa);
-      data.append('client_group_id', client_group_id);
+      data.append('client_group_id', group);
       data.append('branch_id', branch_id);
       data.append('staff_charge', char);
       Axios("POST",`${id ? `/api_web/api_client/client/${id}?csrf_protection=true` : "/api_web/api_client/client?csrf_protection=true"}`, {
@@ -793,7 +754,7 @@ const Popup_dskh = (props) => {
           city:valueCt,
           district:valueDis,
           ward:valueWa,
-          client_group_id: client_group_id,
+          client_group_id: group,
           branch_id: branch_id,
           staff_charge:char,
           contact: option,
@@ -917,23 +878,24 @@ const Popup_dskh = (props) => {
       open && sOnFetchingDis(true)
     },[valueCt])
     useEffect(()=>{
-      open && sOnFetchingGr(true)
-    },[valueGr])
-    useEffect(()=>{
       open && sOnFetchingWar(true)
     },[valueDis])
+    
     useEffect(()=>{
-      open && sOnFetchingChar(true)
+      open && sOnFetchingChar(true) 
+    },[valueBr])
+    useEffect(()=>{
+      open && sOnFetchingGr(true)
     },[valueBr])
     // },[valueChar])
-
+    
+    useEffect(()=>{
+      onFetchingGr && _ServerFetching_Gr()
+    },[onFetchingGr])
 
     useEffect(()=>{
       onFetchingDis && _ServerFetching_distric()
     },[onFetchingDis])
-    useEffect(()=>{
-      onFetchingGr && _ServerFetching_selectgroup()
-    },[onFetchingGr])
     useEffect(()=>{
       onFetchingWar && _ServerFetching_war()
     },[onFetchingWar])
@@ -1039,7 +1001,6 @@ const Popup_dskh = (props) => {
                               />   
                          </div>
                         <div className='w-[48%]'>
-                          
                            <div>
                            <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_brand} <span className="text-red-500">*</span></label>
                               <Select   
@@ -1130,9 +1091,9 @@ const Popup_dskh = (props) => {
                               <Select 
                                   placeholder={props.dataLang?.client_list_group}
                                   noOptionsMessage={() => "Không có dữ liệu"}
-                                  options={listSelectGr} 
-                                  value={valueGr ? {label: listSelectGr?.find(x => x.value == valueGr)?.label, value: valueGr} : null}
-                                  onChange={onChangeGroup}
+                                  options={listGrp} 
+                                  value={valueGr}
+                                  onChange={handleChangeGr}
                                   isSearchable={true}
                                   LoadingIndicator
                                   isMulti={true}
