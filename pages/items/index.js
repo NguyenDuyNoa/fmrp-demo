@@ -151,13 +151,13 @@ const Index = (props) => {
 
     const _HandleDelete = (id) => {
         Swal.fire({
-          title: `${props.dataLang?.aler_ask}`,
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#296dc1',
-          cancelButtonColor: '#d33',
-          confirmButtonText: `${props.dataLang?.aler_yes}`,
-          cancelButtonText:`${props.dataLang?.aler_cancel}`
+            title: `${props.dataLang?.aler_ask}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#296dc1',
+            cancelButtonColor: '#d33',
+            confirmButtonText: `${props.dataLang?.aler_yes}`,
+            cancelButtonText:`${props.dataLang?.aler_cancel}`
         }).then((result) => {
           if (result.isConfirmed) {
             Axios("DELETE", `/api_web/api_material/material/${id}?csrf_protection=true`, {
@@ -208,14 +208,14 @@ const Index = (props) => {
                     </div>
                     <div className='grid grid-cols-4 gap-8'>
                         <div className=''>
-                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.category_material_group_name}</h6>
+                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.category_material_group_name || "category_material_group_name"}</h6>
                             <Select 
                                 options={dataCateOption}
                                 formatOptionLabel={CustomSelectOption_GroupNVL}
                                 onChange={_HandleFilterOpt.bind(this, "category")}
                                 value={idCategory}
                                 isClearable={true}
-                                placeholder="Chọn tên danh mục" 
+                                placeholder={dataLang?.category_material_group_name || "category_material_group_name"}
                                 className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
                                 isSearchable={true}
                                 theme={(theme) => ({
@@ -235,8 +235,8 @@ const Index = (props) => {
                                 }}
                             />
                         </div>
-                        <div className='col-span-1'>
-                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>Chi nhánh</h6>
+                        <div className=''>
+                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand || "client_list_brand"}</h6>
                             <Select 
                                 options={options}
                                 onChange={_HandleFilterOpt.bind(this, "branch")}
@@ -245,7 +245,7 @@ const Index = (props) => {
                                 isMulti
                                 closeMenuOnSelect={false}
                                 hideSelectedOptions={false}
-                                placeholder="Chọn chi nhánh" 
+                                placeholder={dataLang?.client_list_brand || "client_list_brand"}
                                 className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
                                 isSearchable={true}
                                 components={{ MultiValue }}
@@ -308,17 +308,17 @@ const Index = (props) => {
                                 <div className='w-[2%] flex justify-center'>
                                     <input type='checkbox' className='scale-125' />
                                 </div>
-                                <h4 className='w-[8%] xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase text-center font-[300]'>Hình</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[12%] font-[300]'>tên danh mục</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300]'>mã nguyên vật liệu</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300]'>Tên nguyên vật liệu</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[7%] font-[300] text-center'>Đơn vị</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[6%] font-[300] text-center'>Tồn kho</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center'>Số lượng tối thiểu</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[11%] font-[300]'>Ghi chú</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[6%] font-[300] text-center'>Biến thể</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300]'>Chi nhánh</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[8%] font-[300] text-center'>{dataLang?.branch_popup_properties}</h4>
+                                <h4 className='w-[8%] xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase text-center font-[300]'>{dataLang?.image || "image"}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[11%] font-[300]'>{dataLang?.category_material_group_name || "category_material_group_name"}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[13%] font-[300]'>{dataLang?.category_material_list_code || "category_material_list_code"}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[13%] font-[300]'>{dataLang?.category_material_list_name || "category_material_list_name"}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[7%] font-[300] text-center'>{dataLang?.unit || "unit"}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[6%] font-[300] text-center'>{dataLang?.stock || "stock"}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center'>{dataLang?.minimum_amount || "minimum_amount"}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[11%] font-[300]'>{dataLang?.note || "note"}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[6%] font-[300] text-center truncate'>{dataLang?.category_material_list_variant || "category_material_list_variant"}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] truncate'>{dataLang?.client_list_brand || "client_list_brand"}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[8%] font-[300] text-center truncate'>{dataLang?.branch_popup_properties || "branch_popup_properties"}</h4>
                             </div>
                             {onFetching ?
                                 <Loading className="h-80"color="#0f4f9e" />
@@ -328,7 +328,7 @@ const Index = (props) => {
                                         <div className=" max-w-[352px] mt-24 mx-auto" >
                                             <div className="text-center">
                                                 <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
-                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">Không tìm thấy các mục</h1>
+                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">{dataLang?.no_data_found || "no_data_found"}</h1>
                                             </div>
                                         </div>
                                     }
@@ -345,21 +345,21 @@ const Index = (props) => {
                                                         <Image width={64} height={64} quality={100} src={e?.images} alt="thumb type" className="w-12 h-12 rounded object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/>
                                                     }
                                                 </div>
-                                                <h6 className='px-2 py-2.5 xl:text-base text-xs w-[12%] '>{e?.category_name}</h6>
-                                                <div className='px-2 py-2.5 xl:text-base text-xs w-[15%]'>
-                                                    <Popup_ThongTin id={e?.id}>
+                                                <h6 className='px-2 py-2.5 xl:text-base text-xs w-[11%] '>{e?.category_name}</h6>
+                                                <div className='px-2 py-2.5 xl:text-base text-xs w-[13%]'>
+                                                    <Popup_ThongTin id={e?.id} dataLang={dataLang} >
                                                         <button className=' text-[#0F4F9E] hover:opacity-70 w-fit outline-none'>{e?.code}</button>
                                                     </Popup_ThongTin>
                                                 </div>
-                                                <h6 className='px-2 py-2.5 xl:text-base text-xs w-[15%]'>{e?.name}</h6>
+                                                <h6 className='px-2 py-2.5 xl:text-base text-xs w-[13%]'>{e?.name}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-base text-xs w-[7%] text-center'>{e?.unit}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-base text-xs w-[6%] text-center'>{e?.stock_quantity}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-base text-xs w-[10%] text-center'>{e?.minimum_quantity}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-base text-xs w-[11%]'>{e?.note}</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-base text-xs w-[6%] text-center'>biển thể</h6>
-                                                <div className='px-2 py-2.5 w-[10%] flex flex-wrap'>
+                                                <h6 className='px-2 py-2.5 xl:text-base text-xs w-[6%] text-center'>{e?.variation?.length}</h6>
+                                                <div className='px-2 py-2.5 w-[15%] flex flex-wrap'>
                                                     {e?.branch.map(e => 
-                                                        <h6 key={e?.id.toString()} className='text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[500] rounded border border-[#0F4F9E] h-fit'>{e?.name}</h6>
+                                                        <h6 key={e?.id.toString()} className='text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] rounded border border-[#0F4F9E] h-fit font-[300]'>{e?.name}</h6>
                                                     )}
                                                 </div>
                                                 <div className='px-2 py-2.5 w-[8%] flex space-x-2 justify-center'>
@@ -474,10 +474,11 @@ const Popup_NVL = React.memo((props) => {
     const [optSelectedVariantSub, sOptSelectedVariantSub] = useState([]);
 
     const [dataTotalVariant, sDataTotalVariant] = useState([]);
+    const [dataVariantSending, sDataVariantSending] = useState([]);
 
     useEffect(() => {
         sOptVariantMain(dataOptVariant?.find(e => e.value == variantMain)?.option)
-        variantMain && sOptSelectedVariantMain([])
+        variantMain && optSelectedVariantMain?.length === 0 && sOptSelectedVariantMain([])
         !variantMain && sOptSelectedVariantMain([])
         if(variantMain === variantSub && variantSub != null && variantMain != null){
             sVariantSub(null)
@@ -490,7 +491,7 @@ const Popup_NVL = React.memo((props) => {
 
     useEffect(() => {
         sOptVariantSub(dataOptVariant?.find(e => e.value == variantSub)?.option)
-        variantSub && sOptSelectedVariantSub([])
+        variantSub && optSelectedVariantSub?.length === 0 && sOptSelectedVariantSub([])
         !variantSub && sOptSelectedVariantSub([])
         if(variantSub === variantMain && variantSub != null && variantMain != null){
             sVariantSub(null)
@@ -503,11 +504,11 @@ const Popup_NVL = React.memo((props) => {
 
     const _HandleSelectedVariant = (type, event) => {
         if(type == "main"){
-            const value = event?.target.value;
+            const name = event?.target.value;
             const id = event?.target.id;
             if (event?.target.checked) {
                 // Thêm giá trị và id vào mảng khi input được chọn
-                const updatedOptions = [...optSelectedVariantMain, { value, id }];
+                const updatedOptions = [...optSelectedVariantMain, { name, id }];
                 sOptSelectedVariantMain(updatedOptions);
             } else {
                 // Xóa giá trị và id khỏi mảng khi input được bỏ chọn
@@ -515,10 +516,10 @@ const Popup_NVL = React.memo((props) => {
                 sOptSelectedVariantMain(updatedOptions);
             }
         }else if(type == "sub"){
-            const value = event?.target.value;
+            const name = event?.target.value;
             const id = event?.target.id;
             if (event?.target.checked) {
-                const updatedOptions = [...optSelectedVariantSub, { value, id }];
+                const updatedOptions = [...optSelectedVariantSub, { name, id }];
                 sOptSelectedVariantSub(updatedOptions);
             } else {
                 const updatedOptions = optSelectedVariantSub.filter(option => option.id !== id);
@@ -548,8 +549,9 @@ const Popup_NVL = React.memo((props) => {
     const _HandleApplyVariant = () => {
         if(optSelectedVariantMain?.length > 0){
             sDataTotalVariant([
-                ...optSelectedVariantMain?.length > 0 ? optSelectedVariantMain?.map((item1) => ({...item1, image: null, sku: null, option: optSelectedVariantSub?.map((item2) => ({...item2, sku: null}))})) : optSelectedVariantSub?.map((item2) => ({...item2}))
+                ...optSelectedVariantMain?.length > 0 ? optSelectedVariantMain?.map((item1) => ({...item1, image: null, sku: "", variation_option_2: optSelectedVariantSub?.map((item2) => ({...item2, sku: ""}))})) : optSelectedVariantSub?.map((item2) => ({...item2}))
             ])
+            sDataVariantSending([{name: dataOptVariant.find(e => e.value == variantMain)?.label, option: optSelectedVariantMain.map(e => ({id: e.id}))}, {name: dataOptVariant.find(e => e.value == variantSub)?.label, option: optSelectedVariantSub.map(e => ({id: e.id}))}])
         }else {
             Toast.fire({
                 icon: 'error',
@@ -581,6 +583,7 @@ const Popup_NVL = React.memo((props) => {
         open && sBranch([])
         open && props?.id && sOnFetching(true)
         open && sDataTotalVariant([])
+        open && sDataVariantSending([])
         open && sVariantMain(null)
         open && sVariantSub(null)
     }, [open]);
@@ -654,19 +657,25 @@ const Popup_NVL = React.memo((props) => {
         branch_id.forEach(id => formData.append('branch_id[]', id));
 
         for (let i = 0; i < dataTotalVariant.length; i++) {
-            const item = dataTotalVariant[i];
+            var item = dataTotalVariant[i];
       
             formData.set(`variation_option_value[${i}][variation_option_1_id]`, item.id);
             formData.set(`variation_option_value[${i}][image]`, item.image || '');
       
-            if(item.option?.length > 0){
-                for (let j = 0; j < item.option?.length; j++) {
-                    const subItem = item.option[j];
+            if(item.variation_option_2?.length > 0){
+                for (let j = 0; j < item.variation_option_2?.length; j++) {
+                    var subItem = item.variation_option_2[j];
                     formData.set(`variation_option_value[${i}][variation_option_2][${j}][id]`, subItem.id);
-                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][sku]`, subItem.sku);
+                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][sku]`, subItem.sku || "");
                 }
             }else{
-                formData.set(`variation_option_value[${i}][sku]`, item.sku);
+                formData.set(`variation_option_value[${i}][sku]`, item.sku || "");
+            }
+        }
+
+        for (let i = 0; i < dataVariantSending.length; i++) {
+            for (let j = 0; j < dataVariantSending[i].option.length; j++) {
+                formData.append(`variation[${i}][option_id][${j}]`, dataVariantSending[i].option[j].id);
             }
         }
 
@@ -787,6 +796,12 @@ const Popup_NVL = React.memo((props) => {
                 sUnit(data?.unit_id)
                 sUnitChild(data?.unit_convert_id)
                 sBranch(data?.branch.map(e => ({label: e.name, value: e.id})))
+                sDataVariantSending(data?.variation)
+                sVariantMain(data?.variation[0]?.id)
+                sVariantSub(data?.variation[1]?.id)
+                sOptSelectedVariantMain(data?.variation[0]?.option)
+                sOptSelectedVariantSub(data?.variation[1]?.option)
+                sDataTotalVariant(data?.variation_option_value)
             }
             sOnFetching(false)
         })
@@ -809,14 +824,71 @@ const Popup_NVL = React.memo((props) => {
         }
     }
 
-    const _HandleChangeSku = (parentId, id, value) => {
-        var parentIndex = dataTotalVariant?.findIndex(x => x.id === parentId);
-        var index = dataTotalVariant[parentIndex].option.findIndex(x => x.id === id)
-        dataTotalVariant[parentIndex].option[index].sku = value.target?.value;
-        sDataTotalVariant([...dataTotalVariant])
+    // const _HandleChangeSku = (parentId, id, value) => {
+    //     var parentIndex = dataTotalVariant?.findIndex(x => x.id === parentId);
+    //     var index = dataTotalVariant[parentIndex].variation_option_2.findIndex(x => x.id === id)
+    //     dataTotalVariant[parentIndex].variation_option_2[index].sku = value.target?.value;
+    //     sDataTotalVariant([...dataTotalVariant])
+    // }
+
+    const _HandleDeleteVariant = (parentId, id) => {
+        Swal.fire({
+            title: `${props.dataLang?.aler_ask}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#296dc1',
+            cancelButtonColor: '#d33',
+            confirmButtonText: `${props.dataLang?.aler_yes}`,
+            cancelButtonText:`${props.dataLang?.aler_cancel}`
+        }).then((result) => {
+            if (result.isConfirmed){
+                const newData = dataTotalVariant.map(item => {
+                    if (item.id === parentId) {
+                        item.variation_option_2 = item.variation_option_2.filter(opt => opt.id !== id);
+                    }
+                    return item;
+                }).filter(item => item.variation_option_2.length > 0); 
+                sDataTotalVariant(newData);
+
+                // const idToRemove = parentId ? parentId : dataTotalVariant.find(item => item.variation_option_2.some(opt => opt.id === id))?.id;
+                // const newData2 = dataVariantSending.filter(item => {
+                //     return item.option.length > 0 || item.option.some(opt => opt.id === idToRemove);
+                // });
+                const newData2 = dataVariantSending.map(e => {
+                    if (e.option.find(opt => opt.id === id)) {
+                        const filteredOption = e.option.filter(opt => opt.id !== id);
+                        return { ...e, option: filteredOption };
+                    } else {
+                        return e;
+                    }
+                })
+                sDataVariantSending(newData2);
+            }
+        })
     }
 
-    console.log(dataTotalVariant)
+    const _HandleDeleteVariantItems = (id) => {
+        Swal.fire({
+            title: `${props.dataLang?.aler_ask}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#296dc1',
+            cancelButtonColor: '#d33',
+            confirmButtonText: `${props.dataLang?.aler_yes}`,
+            cancelButtonText:`${props.dataLang?.aler_cancel}`
+        }).then((result) => {
+            if (result.isConfirmed){
+                sDataTotalVariant([...dataTotalVariant.filter(x => x.id !== id)])
+                const filteredOption = dataVariantSending[0].option.filter(opt => opt.id !== id);
+                const updatedData = [...dataVariantSending];
+                updatedData[0] = { ...dataVariantSending[0], option: filteredOption };
+                sDataVariantSending(updatedData);
+
+            }
+        })
+    }
+    console.log("dataTotalVariant", dataTotalVariant)
+    console.log("dataVariantSending", dataVariantSending)
 
     return(
         <PopupEdit  
@@ -829,8 +901,8 @@ const Popup_NVL = React.memo((props) => {
         >
             <div className='py-4 w-[800px] space-y-5'>
                 <div className='flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
-                    <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-semibold`}>Thông tin</button>
-                    <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-semibold`}>Biến thể</button>
+                    <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>{props.dataLang?.information || "information"}</button>
+                    <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>{props.dataLang?.category_material_list_variant || "category_material_list_variant"}</button>
                 </div>
                 <ScrollArea className="max-h-[600px]" speed={1} smoothScrolling={true} ref={scrollAreaRef}>
                     {onFetching ? 
@@ -841,16 +913,16 @@ const Popup_NVL = React.memo((props) => {
                                 <div className='grid grid-cols-2 gap-5'>
                                     <div className='space-y-3'>
                                         <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">Chi nhánh <span className='text-red-500'>*</span></label>
+                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.client_list_brand || "client_list_brand"} <span className='text-red-500'>*</span></label>
                                             <Select 
                                                 options={dataOptBranch}
                                                 formatOptionLabel={CustomSelectOption_GroupNVL}
                                                 value={branch}
                                                 onChange={_HandleChangeInput.bind(this, "branch")}
                                                 isClearable={true}
-                                                placeholder={"Chi nhánh"}
+                                                placeholder={props.dataLang?.client_list_brand || "client_list_brand"}
                                                 isMulti
-                                                noOptionsMessage={() => "Không có dữ liệu"}
+                                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                 closeMenuOnSelect={false}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
@@ -876,7 +948,7 @@ const Popup_NVL = React.memo((props) => {
                                                     }),
                                                 }}
                                             />
-                                            {errBranch && <label className="text-sm text-red-500">Vui lòng chọn chi nhánh</label>}
+                                            {errBranch && <label className="text-sm text-red-500">{props.dataLang?.client_list_bran || "client_list_bran"}</label>}
                                         </div>
                                         <div className='space-y-1'>
                                             <label className="text-[#344054] font-normal text-base">{props.dataLang?.header_category_material_group} <span className='text-red-500'>*</span></label>
@@ -886,7 +958,7 @@ const Popup_NVL = React.memo((props) => {
                                                 value={groupId ? {label: dataOptGr?.find(x => x?.value == groupId)?.label, value: groupId} : null}
                                                 onChange={_HandleChangeInput.bind(this, "group")}
                                                 isClearable={true}
-                                                noOptionsMessage={() => "Không có dữ liệu"}
+                                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                 placeholder={props.dataLang?.header_category_material_group}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
@@ -912,44 +984,44 @@ const Popup_NVL = React.memo((props) => {
                                                     }),
                                                 }}
                                             />
-                                            {errGroup && <label className="text-sm text-red-500">{props.dataLang?.category_material_list_err_group}</label>}
+                                            {errGroup && <label className="text-sm text-red-500">{props.dataLang?.category_material_list_err_group || "category_material_list_err_group"}</label>}
                                         </div>
                                         <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_list_code} <span className='text-red-500'>*</span></label>
-                                            <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder={props.dataLang?.category_material_list_code} className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_list_code || "category_material_list_code"} <span className='text-red-500'>*</span></label>
+                                            <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder={props.dataLang?.category_material_list_code || "category_material_list_code"} className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
                                             {errCode && <label className="text-sm text-red-500">{props.dataLang?.category_material_list_err_code}</label>}
                                         </div>
                                         <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_list_name} <span className='text-red-500'>*</span></label>
-                                            <input value={name} onChange={_HandleChangeInput.bind(this, "name")} type="text" placeholder={props.dataLang?.category_material_list_name} className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_list_name || "category_material_list_name"} <span className='text-red-500'>*</span></label>
+                                            <input value={name} onChange={_HandleChangeInput.bind(this, "name")} type="text" placeholder={props.dataLang?.category_material_list_name || "category_material_list_name"} className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
                                             {errName && <label className="text-sm text-red-500">{props.dataLang?.category_material_list_err_name}</label>}
                                         </div>
                                         <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">Giá nhập</label>
-                                            <NumericFormat thousandSeparator="," value={price} onValueChange={_HandleChangeInput.bind(this, "price")} placeholder={"Giá nhập"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_list_cost_price || "category_material_list_cost_price"}</label>
+                                            <NumericFormat thousandSeparator="," value={price} onValueChange={_HandleChangeInput.bind(this, "price")} placeholder={props.dataLang?.category_material_list_cost_price || "category_material_list_cost_price"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
                                         </div>
                                         <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">Số lượng tối thiểu</label>
-                                            <NumericFormat thousandSeparator="," value={minimumAmount} onValueChange={_HandleChangeInput.bind(this, "minimumAmount")} placeholder={"Số lượng tối thiểu"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.minimum_amount || "minimum_amount"}</label>
+                                            <NumericFormat thousandSeparator="," value={minimumAmount} onValueChange={_HandleChangeInput.bind(this, "minimumAmount")} placeholder={props.dataLang?.minimum_amount || "minimum_amount"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
                                         </div>
                                         <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">Thời hạn sử dụng</label>
+                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}</label>
                                             <div className='relative flex flex-col justify-center items-center'>
-                                                <NumericFormat thousandSeparator="," value={expiry} onValueChange={_HandleChangeInput.bind(this, "expiry")} placeholder={"Thời hạn sử dụng"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 pr-14 border outline-none`} />
-                                                <span className='absolute right-2 text-slate-400 select-none'>Ngày</span>
+                                                <NumericFormat thousandSeparator="," value={expiry} onValueChange={_HandleChangeInput.bind(this, "expiry")} placeholder={props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 pr-14 border outline-none`} />
+                                                <span className='absolute right-2 text-slate-400 select-none'>{props.dataLang?.date || "date"}</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div className='space-y-4'>
                                         <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">Đơn vị mua <span className='text-red-500'>*</span></label>
+                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_list_purchase_unit || "category_material_list_purchase_unit"} <span className='text-red-500'>*</span></label>
                                             <Select 
                                                 options={dataOptUnit}
                                                 value={unit ? {label: dataOptUnit?.find(x => x?.value == unit)?.label, value: unit} : null}
                                                 onChange={_HandleChangeInput.bind(this, "unit")}
                                                 isClearable={true}
-                                                placeholder={"Đơn vị mua"}
-                                                noOptionsMessage={() => "Không có dữ liệu"}
+                                                placeholder={props.dataLang?.category_material_list_purchase_unit || "category_material_list_purchase_unit"}
+                                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
                                                 className={`${errUnit ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border`}
@@ -978,17 +1050,17 @@ const Popup_NVL = React.memo((props) => {
                                             {errUnit && <label className="text-sm text-red-500">{props.dataLang?.category_material_list_err_unit}</label>}
                                         </div>
                                         <div className='space-y-0.5'>
-                                            <h5 className="text-[#344054] font-medium text-base">Quy đổi đơn vị trong sản xuất</h5>
+                                            <h5 className="text-[#344054] font-medium text-base">{props.dataLang?.category_material_list_converting_unit || "category_material_list_converting_unit"}</h5>
                                             <div className='grid grid-cols-2 gap-5'>
                                                 <div className='space-y-1'>
-                                                    <label className="text-[#344054] font-normal text-sm">Đơn vị</label>
+                                                    <label className="text-[#344054] font-normal text-sm">{props.dataLang?.unit || "unit"}</label>
                                                     <Select 
                                                         options={dataOptUnit}
                                                         value={unitChild ? {label: dataOptUnit?.find(x => x?.value == unitChild)?.label, value: unitChild} : null}
                                                         onChange={_HandleChangeInput.bind(this, "unitChild")}
                                                         isClearable={true}
-                                                        placeholder={"Đơn vị"}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
+                                                        placeholder={props.dataLang?.unit || "unit"}
+                                                        noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                         menuPortalTarget={document.body}
                                                         onMenuOpen={handleMenuOpen}
                                                         className="w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none" 
@@ -1016,13 +1088,13 @@ const Popup_NVL = React.memo((props) => {
                                                     />
                                                 </div>
                                                 <div className='space-y-1'>
-                                                    <label className="text-[#344054] font-normal text-sm">Số lượng quy đổi</label>
-                                                    <NumericFormat thousandSeparator="," value={unitAmount} onValueChange={_HandleChangeInput.bind(this, "unitAmount")} placeholder={"Số lượng"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal px-2 py-1.5 border outline-none`} />
+                                                    <label className="text-[#344054] font-normal text-sm">{props.dataLang?.category_material_list_converting_amount || "category_material_list_converting_amount"}</label>
+                                                    <NumericFormat thousandSeparator="," value={unitAmount} onValueChange={_HandleChangeInput.bind(this, "unitAmount")} placeholder={props.dataLang?.amount || "amount"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal px-2 py-1.5 border outline-none`} />
                                                 </div>
                                             </div>
                                         </div>
                                         <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">Hình ảnh đại diện</label>
+                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.avatar || "avatar"}</label>
                                             <div className='flex justify-center'>
                                                 <div className='relative h-36 w-36 rounded bg-slate-200'>
                                                     {thumb && <Image width={120} height={120} quality={100} src={typeof(thumb)==="string" ? thumb : URL.createObjectURL(thumb)} alt="thumb type" className="w-36 h-36 rounded object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/>}
@@ -1036,11 +1108,11 @@ const Popup_NVL = React.memo((props) => {
                                             </div>
                                         </div>
                                         <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">Ghi chú</label>
+                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.note || "note"}</label>
                                             <textarea 
                                                 value={note}
                                                 type="text"
-                                                placeholder={props.dataLang?.client_popup_note}
+                                                placeholder={props.dataLang?.note || "note"}
                                                 rows={5}
                                                 onChange={_HandleChangeInput.bind(this, "note")}
                                                 className='focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none resize-none'
@@ -1054,14 +1126,14 @@ const Popup_NVL = React.memo((props) => {
                                     <div className='grid grid-cols-2 gap-5'>
                                         <div className='space-y-3'>
                                             <div className='space-y-1'>
-                                                <label>Biến thể chính</label>
+                                                <label>{props.dataLang?.category_material_list_variant_main || "category_material_list_variant_main"}</label>
                                                 <Select 
                                                     options={dataOptVariant}
                                                     value={variantMain ? {label: dataOptVariant.find(e => e.value == variantMain)?.label , value: variantMain} : null}
                                                     onChange={_HandleChangeInput.bind(this, "variantMain")}
                                                     isClearable={true}
-                                                    placeholder={"Biến thể chính"}
-                                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                                    placeholder={props.dataLang?.category_material_list_variant_main || "category_material_list_variant_main"}
+                                                    noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                     menuPortalTarget={document.body}
                                                     onMenuOpen={handleMenuOpen}
                                                     className={` placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
@@ -1088,7 +1160,7 @@ const Popup_NVL = React.memo((props) => {
                                                 />
                                             </div>
                                             <div className='flex justify-between items-center'>
-                                                <h5 className='text-slate-400 text-sm'>Các tùy chọn</h5>
+                                                <h5 className='text-slate-400 text-sm'>{props.dataLang?.branch_popup_variant_option || "branch_popup_variant_option"}</h5>
                                                 {optVariantMain && <button onClick={_HandleSelectedAllVariant.bind(this, "main")} className='text-sm font-medium'>Chọn tất cả</button>}
                                             </div>
                                             {!optVariantMain &&
@@ -1111,14 +1183,14 @@ const Popup_NVL = React.memo((props) => {
                                         </div>
                                         <div className='space-y-3'>
                                             <div className='space-y-1'>
-                                                <label>Biến thể phụ</label>
+                                                <label>{props.dataLang?.category_material_list_variant_sub || "category_material_list_variant_sub"}</label>
                                                 <Select 
                                                     options={dataOptVariant}
                                                     value={variantSub ? {label: dataOptVariant.find(e => e.value == variantSub)?.label , value: variantSub} : null}
                                                     onChange={_HandleChangeInput.bind(this, "variantSub")}
                                                     isClearable={true}
-                                                    placeholder={"Biến thể phụ"}
-                                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                                    placeholder={props.dataLang?.category_material_list_variant_sub || "category_material_list_variant_sub"}
+                                                    noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                     menuPortalTarget={document.body}
                                                     onMenuOpen={handleMenuOpen}
                                                     className={` placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
@@ -1140,12 +1212,12 @@ const Popup_NVL = React.memo((props) => {
                                                             ...base,
                                                             zIndex: 9999,
                                                             position: "absolute",
-                                                        }),
+                                                        })
                                                     }}
                                                 />
                                             </div>
                                             <div className='flex justify-between items-center'>
-                                                <h5 className='text-slate-400 text-sm'>Các tùy chọn</h5>
+                                                <h5 className='text-slate-400 text-sm'>{props.dataLang?.branch_popup_variant_option || "branch_popup_variant_option"}</h5>
                                                 {optVariantSub && <button onClick={_HandleSelectedAllVariant.bind(this, "sub")} className='text-sm font-medium'>Chọn tất cả</button>}
                                             </div>
                                             {!optVariantSub &&
@@ -1168,21 +1240,21 @@ const Popup_NVL = React.memo((props) => {
                                         </div>
                                     </div>
                                     <div className='flex justify-end'>
-                                        <button onClick={_HandleApplyVariant.bind(this)} disabled={(optSelectedVariantMain?.length == 0 && optSelectedVariantSub?.length == 0) ? true : false} className='disabled:grayscale outline-none px-4 py-2 rounded-lg bg-[#E2F0FE] text-sm font-medium hover:scale-105 disabled:hover:scale-100 disabled:opacity-50 transition'>Áp dụng</button>
+                                        <button onClick={_HandleApplyVariant.bind(this)} disabled={(optSelectedVariantMain?.length == 0 && optSelectedVariantSub?.length == 0) ? true : false} className='disabled:grayscale outline-none px-4 py-2 rounded-lg bg-[#E2F0FE] text-sm font-medium hover:scale-105 disabled:hover:scale-100 disabled:opacity-50 transition'>{props.dataLang?.apply || "apply"}</button>
                                     </div>
                                     {Object.keys(dataTotalVariant).length !== 0 &&
                                         <div className='space-y-1'>
-                                            <h4 className='text-[#344054] font-medium'>Danh sách biến thể</h4>
-                                            <div className={`${dataTotalVariant?.option?.length > 0 ? "grid-cols-4" : "grid-cols-3" } grid gap-5 p-1`}>
-                                                <h4 className='text-[15px] text-center'>Hình đại diện</h4>
-                                                <h4 className='text-[15px]'>Biến thể chính</h4>
-                                                {dataTotalVariant?.option?.length > 0 && <h4 className='text-[15px]'>Biến thể phụ</h4>}
-                                                <h4 className='text-[15px] text-center'>SKU</h4>
+                                            <h4 className='text-[#344054] font-medium'>{props.dataLang?.list_variant || "list_variant"}</h4>
+                                            <div className={`${dataTotalVariant[0]?.variation_option_2?.length > 0 ? "grid-cols-4" : "grid-cols-3" } grid gap-5 p-1`}>
+                                                <h4 className='text-[15px] text-center font-[300] text-slate-400'>{props.dataLang?.avatar}</h4>
+                                                <h4 className='text-[15px] font-[300] text-slate-400'>{dataVariantSending[0]?.name}</h4>
+                                                {dataTotalVariant[0]?.variation_option_2?.length > 0 && <h4 className='text-[15px] font-[300] text-slate-400'>{dataVariantSending[1]?.name}</h4>}
+                                                <h4 className='text-[15px] text-center font-[300] text-slate-400'>{props.dataLang?.branch_popup_properties || "branch_popup_properties"}</h4>
                                             </div>
                                             <ScrollArea className="max-h-[250px]" speed={1} smoothScrolling={true}>
                                                 <div className='space-y-0.5'>
                                                     {dataTotalVariant?.map(e => 
-                                                        <div className={`${e?.option?.length > 0 ? "grid-cols-4" : "grid-cols-3"} grid gap-5 items-center bg-slate-50 hover:bg-slate-100 p-1`} key={e?.id.toString()}>
+                                                        <div className={`${e?.variation_option_2?.length > 0 ? "grid-cols-4" : "grid-cols-3"} grid gap-5 items-center bg-slate-50 hover:bg-slate-100 p-1`} key={e?.id.toString()}>
                                                             <div className='w-full h-full flex flex-col justify-center items-center'>
                                                                 <input onChange={_HandleChangeVariant.bind(this, e?.id, "image")} type="file" id={`uploadImg+${e?.id}`} accept="image/png, image/jpeg" hidden />
                                                                 <label htmlFor={`uploadImg+${e?.id}`} className='h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 cursor-pointer rounded'>
@@ -1196,17 +1268,23 @@ const Popup_NVL = React.memo((props) => {
                                                                 </label>
                                                             </div>
                                                             <div className=''>{e.name}</div>
-                                                            {e?.option?.length > 0 ?
+                                                            {e?.variation_option_2?.length > 0 ?
                                                                 <div className='col-span-2 grid grid-cols-2 gap-1 items-center'>
-                                                                    {e?.option?.map(ce => 
-                                                                        <React.Fragment>
-                                                                            <div key={ce.id?.toString()}>{ce.name}</div>
-                                                                            <input value={ce.sku} onChange={_HandleChangeSku.bind(this, e.id, ce.id)} placeholder='Mã SKU' className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full h-fit bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                                                    {e?.variation_option_2?.map(ce => 
+                                                                        <React.Fragment key={ce.id?.toString()}>
+                                                                            <div>{ce.name}</div>
+                                                                            <div className='flex justify-center'>
+                                                                                <button onClick={_HandleDeleteVariant.bind(this, e.id, ce.id)} className='p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600'><IconDelete size="22" /></button>
+                                                                            </div>
+                                                                            {/* <input value={ce.sku} onChange={_HandleChangeSku.bind(this, e.id, ce.id)} placeholder='Mã SKU' className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full h-fit bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} /> */}
                                                                         </React.Fragment>
                                                                     )}
                                                                 </div>
                                                                 :
-                                                                <input value={e?.sku} onChange={_HandleChangeVariant.bind(this, e.id, "sku")} placeholder='Mã SKU' className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full h-fit bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                                                <div className='flex justify-center'>
+                                                                    <button onClick={_HandleDeleteVariantItems.bind(this, e.id)} className='p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600'><IconDelete size="22" /></button>
+                                                                </div>
+                                                                // <input value={e?.sku} onChange={_HandleChangeVariant.bind(this, e.id, "sku")} placeholder='Mã SKU' className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full h-fit bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
                                                             }
                                                         </div>
                                                     )}
@@ -1258,7 +1336,7 @@ const Popup_ThongTin = React.memo((props) => {
 
     return(
         <PopupEdit  
-            title={`Xem nguyên vật liệu`} 
+            title={props.dataLang?.category_material_list_detail || "category_material_list_detail"} 
             button={props.children} 
             onClickOpen={_ToggleModal.bind(this, true)} 
             open={open} 
@@ -1266,8 +1344,8 @@ const Popup_ThongTin = React.memo((props) => {
         >
             <div className='py-4 w-[800px] space-y-5'>
                 <div className='flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
-                    <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-semibold`}>Thông tin</button>
-                    <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-semibold`}>Biến thể</button>
+                    <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>{props.dataLang?.information || "information"}</button>
+                    <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>{props.dataLang?.category_material_list_variant || "category_material_list_variant"}</button>
                 </div>
                 {onFetching ? 
                     <Loading className="h-96"color="#0f4f9e" />
@@ -1277,7 +1355,7 @@ const Popup_ThongTin = React.memo((props) => {
                             <div className='grid grid-cols-2 gap-5'>
                                 <div className='space-y-3 bg-slate-100/40 p-2 rounded-md'>
                                     <div className='flex justify-between'>
-                                        <h5 className='text-slate-400 text-sm w-[40%]'>Chi nhánh:</h5>
+                                        <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.client_list_brand || "client_list_brand"}:</h5>
                                         <div className='w-[55%] flex flex-col items-end'>
                                             {list?.branch?.map(e => 
                                                 <h6 key={e.id.toString()} className='w-[55%] text-right'>{e.name}</h6>
@@ -1285,46 +1363,46 @@ const Popup_ThongTin = React.memo((props) => {
                                         </div>
                                     </div>
                                     <div className='flex justify-between'>
-                                        <h5 className='text-slate-400 text-sm w-[40%]'>Danh mục:</h5>
+                                        <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.category_titel || "category_titel"}:</h5>
                                         <h6 className='w-[55%] text-right'>{list?.category_name}</h6>
                                     </div>
                                     <div className='flex justify-between'>
-                                        <h5 className='text-slate-400 text-sm w-[40%]'>Mã nguyên vật liệu:</h5>
+                                        <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.category_material_list_code || "category_material_list_code"}:</h5>
                                         <h6 className='w-[55%] text-right'>{list?.code}</h6>
                                     </div>
                                     <div className='flex justify-between'>
-                                        <h5 className='text-slate-400 text-sm w-[40%]'>Tên nguyên vật liệu:</h5>
+                                        <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.category_material_list_name || "category_material_list_name"}:</h5>
                                         <h6 className='w-[55%] text-right'>{list?.name}</h6>
                                     </div>
                                     <div className='flex justify-between'>
-                                        <h5 className='text-slate-400 text-sm w-[40%]'>Giá nhập:</h5>
+                                        <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.category_material_list_cost_price || "category_material_list_cost_price"}:</h5>
                                         <h6 className='w-[55%] text-right'>{Number(list?.import_price).toLocaleString()}</h6>
                                     </div>
                                     <div className='flex justify-between'>
-                                        <h5 className='text-slate-400 text-sm w-[40%]'>Số lượng tối thiểu:</h5>
+                                        <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.minimum_amount || "minimum_amount"}:</h5>
                                         <h6 className='w-[55%] text-right'>{Number(list?.minimum_quantity).toLocaleString()}</h6>
                                     </div>
                                     <div className='flex justify-between'>
-                                        <h5 className='text-slate-400 text-sm w-[40%]'>Thời hạn sử dụng:</h5>
-                                        <h6 className='w-[55%] text-right'>{Number(list?.expiry).toLocaleString()} ngày</h6>
+                                        <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}:</h5>
+                                        <h6 className='w-[55%] text-right'>{Number(list?.expiry).toLocaleString()} {props.dataLang?.date || "date"}</h6>
                                     </div>
                                     <div className='flex justify-between'>
-                                        <h5 className='text-slate-400 text-sm w-[40%]'>Đơn vị mua:</h5>
+                                        <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.category_material_list_purchase_unit || "category_material_list_purchase_unit"}:</h5>
                                         <h6 className='w-[55%] text-right'>{list?.unit}</h6>
                                     </div>
-                                    <h5 className='text-slate-400 text-[15px] font-medium'>Quy đổi đơn vị trong sản xuất</h5>
+                                    <h5 className='text-slate-400 text-[15px] font-medium'>{props.dataLang?.category_material_list_converting_unit || "category_material_list_converting_unit"}</h5>
                                     <div className='flex justify-between'>
-                                        <h5 className='text-slate-400 text-sm w-[40%]'>Đơn vị:</h5>
+                                        <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.unit || "unit"}:</h5>
                                         <h6 className='w-[55%] text-right'>{list?.unit_convert}</h6>
                                     </div>
                                     <div className='flex justify-between'>
-                                        <h5 className='text-slate-400 text-sm w-[40%]'>Số lượng quy đổi:</h5>
+                                        <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.category_material_list_converting_amount || "category_material_list_converting_amount"}:</h5>
                                         <h6 className='w-[55%] text-right'>{list?.coefficient}</h6>
                                     </div>
                                 </div>
                                 <div className='space-y-3 flex flex-col justify-between'>
                                     <div className='flex bg-slate-100/40 p-2 rounded-md'>
-                                        <h5 className='text-slate-400 text-sm w-[40%]'>Hình ảnh đại diện:</h5>
+                                        <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.avatar || "avatar"}:</h5>
                                         {list?.images == null ?
                                             <img src="/no_image.png" className='w-48 h-48 rounded object-contain select-none pointer-events-none' />
                                             :
@@ -1334,11 +1412,11 @@ const Popup_ThongTin = React.memo((props) => {
                                     <div className='bg-slate-100/40 p-2 rounded-md space-y-3'>
                                         <h4 className='flex space-x-2'><IconUserEdit size={20} /><span className='text-[15px] font-medium'>Người lập phiếu</span></h4>
                                         <div className='flex justify-between'>
-                                            <h5 className='text-slate-400 text-sm w-[30%]'>Người tạo:</h5>
+                                            <h5 className='text-slate-400 text-sm w-[30%]'>{props.dataLang?.creator || "creator"}:</h5>
                                             <h6 className='w-[65%] text-right'>ABC</h6>
                                         </div>
                                         <div className='flex justify-between'>
-                                            <h5 className='text-slate-400 text-sm w-[30%]'>Ngày tạo:</h5>
+                                            <h5 className='text-slate-400 text-sm w-[30%]'>{props.dataLang?.date_created || "date_created"}:</h5>
                                             <h6 className='w-[65%] text-right'>dasd</h6>
                                         </div>
                                     </div>
@@ -1346,14 +1424,47 @@ const Popup_ThongTin = React.memo((props) => {
                             </div>
                             :
                             <React.Fragment>
-                                {list?.variant ?
-                                    <div className='space-y-5'>
-                                        <h4 className='text-[#344054] font-medium'>Danh sách biến thể</h4>
+                                {list?.variation?.length > 0 ?
+                                    <div className='space-y-2 min-h-[384px]'>
+                                        <div className={`${list?.variation[1] ? "grid-cols-4" : "grid-cols-3" } grid gap-2 px-2 py-1 `}>
+                                            <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center'>Hình đại diện</h5>
+                                            <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]'>{list?.variation[0]?.name}</h5>
+                                            {list?.variation[1] && <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]'>{list?.variation[1]?.name}</h5>}
+                                            <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]'>SKU</h5>
+                                        </div>
+                                        <ScrollArea className="min-h-[400px] max-h-[450px]" speed={1} smoothScrolling={true}>
+                                            <div className='divide-y divide-slate-200'>
+                                                {list?.variation_option_value?.map(e => 
+                                                    <div key={e?.id.toString()} className={`${e?.variation_option_2?.length > 0 ? "grid-cols-4" : "grid-cols-3" } grid gap-2 px-2 py-2.5 hover:bg-slate-50`}>
+                                                        <div className='flex justify-center self-center'>
+                                                            {e?.image == null ?
+                                                                <img src="/no_image.png" className='w-auto h-20 rounded object-contain select-none pointer-events-none' />
+                                                                :
+                                                                <Image width={200} height={200} quality={100} src={e?.image} alt="thumb type" className="w-auto h-20 rounded object-contain select-none pointer-events-none" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/>
+                                                            }
+                                                        </div>
+                                                        <h6 className='px-2 xl:text-base text-xs self-center'>{e?.name}</h6>
+                                                        {e?.variation_option_2?.length > 0 ?
+                                                            <div className='col-span-2 grid grid-cols-2 gap-1 items-center'>
+                                                                {e?.variation_option_2?.map(ce => 
+                                                                    <React.Fragment key={ce.id?.toString()}>
+                                                                        <h6 className='px-2 xl:text-base text-xs'>{ce.name}</h6>
+                                                                        <h6 className='px-2 xl:text-base text-xs'>{ce.sku}</h6>
+                                                                    </React.Fragment>
+                                                                )}
+                                                            </div>
+                                                            :
+                                                            <h6 className='px-2 xl:text-base text-xs self-center'>{ce.sku}</h6>
+                                                        }
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </ScrollArea>
                                     </div>
                                     :
                                     <div className="w-full h-96 flex flex-col justify-center items-center" >
                                         <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
-                                        <h1 className="text-[#141522] text-base opacity-90 font-medium">Không tìm thấy biến thể</h1>
+                                        <h1 className="text-[#141522] text-base opacity-90 font-medium">{props.dataLang?.no_data_found}</h1>
                                     </div>
                                 }
                             </React.Fragment>

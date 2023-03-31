@@ -10,7 +10,6 @@ import ReactExport from "react-data-export";
 
 import Swal from 'sweetalert2'
 
-
 import { Edit as IconEdit,  Grid6 as IconExcel, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User  } from "iconsax-react";
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
@@ -19,7 +18,6 @@ import dynamic from 'next/dynamic';
 import moment from 'moment/moment';
 import Select from 'react-select';
 import Popup from 'reactjs-popup';
-import { data } from 'autoprefixer';
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet
@@ -39,7 +37,6 @@ const Index = (props) => {
     const dataLang = props.dataLang
     const router = useRouter();
     const tabPage = router.query?.tab;
-
 
     const [keySearch, sKeySearch] = useState("")
     const [limit, sLimit] = useState(15);
@@ -101,19 +98,38 @@ const Index = (props) => {
     })
     }
     
+    const [limitGroup, sLimitGroup] = useState(10);
+    const [onFetchingGroup, sOnFetchingGroup] = useState(false);
+
     const _ServerFetching_group =  () =>{
       Axios("GET", `/api_web/api_client/group_count/?csrf_protection=true`, {
         params:{
-          limit: 0
+          limit: limitGroup
         }
     }, (err, response) => {
       if(!err){
-          var {rResult, output} =  response.data
+          var {rResult} =  response.data
           sListDs(rResult)
       }
-      sOnFetching(false)
+      sOnFetchingGroup(false)
     })
     }
+
+    useEffect(() => {
+      onFetchingGroup && _ServerFetching_group()
+    }, [onFetchingGroup]);
+
+    useEffect(() => {
+      sOnFetchingGroup(true)
+    }, [limitGroup]);
+
+    const _HandleScrollGroup = e => {
+      const { scrollLeft, clientWidth, scrollWidth } = e.currentTarget;
+      if (scrollWidth - scrollLeft === clientWidth) {
+        sLimitGroup(item => item + 2);
+      }
+    };
+
     const _ServerFetching_selectgroup =  () =>{
       Axios("GET", `/api_web/Api_client/group?csrf_protection=true`, {   
         params:{
@@ -165,7 +181,7 @@ const Index = (props) => {
         }, 500);
       };
     useEffect(() => {
-        onFetching && _ServerFetching() || onFetching && _ServerFetching_group()  || onFetching && _ServerFetching_selectgroup()   || onFetching && _ServerFetching_selectct() || onFetching && _ServerFetching_brand()
+        onFetching && _ServerFetching()  || onFetching && _ServerFetching_selectgroup()   || onFetching && _ServerFetching_selectct() || onFetching && _ServerFetching_brand()
       }, [onFetching]);
     useEffect(() => {
         router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true))
@@ -253,23 +269,27 @@ const Index = (props) => {
                   <Popup_dskh  listBr={listBr} listSelectGr={listSelectGr} listSelectCt={listSelectCt}  onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
                 </div>
                 </div>
-              
-              <div  className="flex space-x-3 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                    {/* <div><TabClient onClick={_HandleSelectTab.bind(this, "all")} active="all" total={totalItem.iTotalDisplayRecords}>{dataLang?.client_list_grroupall}</TabClient></div>
-                    <div><TabClient onClick={_HandleSelectTab.bind(this, "nogroup")} active="nogroup"  total={totalItem.iTotalDisplayRecords}>{dataLang?.client_list_nogroup}</TabClient></div> */}
-                     {listDs &&   listDs.map((e)=>{
-                          return (
-                           <div>
-                             <TabClient 
-                                style={{
-                                 backgroundColor: e.color
-                               }}
-                              key={e.id} onClick={_HandleSelectTab.bind(this, `${e.id}`)} total={e.count} active={e.id} >{e.name}</TabClient> 
-                            </div>
-                          )
-                      })
-                     }
-            </div>
+
+                {onFetchingGroup ? 
+                  <div className='h-[8vh] w-full bg-slate-100 flex flex-col items-center justify-center space-x-3'>
+                    <svg aria-hidden="true" className="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                      <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                    </svg>
+                  </div>
+                  :
+                  <div onScroll={_HandleScrollGroup.bind(this)} className="flex space-x-3 items-center h-[8vh] overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                    {listDs && listDs.map((e)=>
+                      <TabClient 
+                        style={{backgroundColor: e.color}}
+                        key={e.id} 
+                        onClick={_HandleSelectTab.bind(this, `${e.id}`)} 
+                        total={e.count} 
+                        active={e.id} 
+                      >{e.name}</TabClient> 
+                    )}
+                  </div>
+                }
           
               <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">    
                 <div className="xl:space-y-3 space-y-2">
@@ -393,9 +413,9 @@ const Index = (props) => {
 const TabClient = React.memo((props) => {
     const router = useRouter();
     return(
-      <button  style={props.style} onClick={props.onClick} className={`${router.query?.tab === `${props.active}` ? "text-[white] bg-[#0F4F9E] min-w-[220px] justify-center" : "bg-[#0F4F9E] justify-center text-white min-w-[180px]"} flex gap-2 items-center rounded-lg px-4 py-2 outline-none relative `}>
+      <button style={props.style} onClick={props.onClick} className={`text-white bg-[#0F4F9E] relative w-fit px-4 py-2 rounded outline-none flex justify-center space-x-2 min-w-[180px] `}>
         {router.query?.tab === `${props.active}` && <LocationTick   size="20" color="white" />}
-        {props.children}
+        <span className='truncate'>{props.children}</span>
         <span className={`${props?.total > 0 && "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"} `}>{props?.total > 0 && props?.total}</span>
       </button>
 

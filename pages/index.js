@@ -28,7 +28,7 @@ const Index = () => {
       <Head>
         <title>Tổng quan</title>
       </Head>
-      <div className='px-10 py-8 space-y-5 pt-24'>
+      <div className='px-10 py-8 space-y-5 pt-24 overflow-x-auto'>
         <div className='flex space-x-5'>
           <h3 className="text-[#11315B] text-lg font-medium not-italic	leading-6">Lệnh sản xuất</h3>
         </div>
@@ -677,45 +677,67 @@ const BarChart_TopKhachhang = () => {
 
 export default Index;
 
-// import React, {useState} from "react";
-// import InfiniteScroll from "react-infinite-scroll-component";
+// import React,{ useState, useEffect } from "react";
 
-// const style = {
-//   height: 30,
-//   border: "1px solid green",
-//   margin: 6,
-//   padding: 8
-// };
-// const App = () => {
-//   const [items, sItems] = useState(Array.from({ length: 20 }));
+// import {_ServerInstance as Axios} from '/services/axios';
 
-//   const fetchMoreData = () => {
-//     setTimeout(() => {
-//         sItems(items?.concat(Array.from({ length: 20 })))
-//     }, 1500);
+// const HorizontalInfiniteScroll = () => {
+//   const [items, setItems] = useState([]);
+//   const [limit, sLimit] = useState(5);
+//   const [onFetching, sOnFetching] = useState(false);
+
+//   useEffect(() => {
+//     onFetching && _ServerFetching_group()
+//   }, [onFetching]);
+
+//   useEffect(() => {
+//     sOnFetching(true)
+//   }, [limit]);
+
+//   const _ServerFetching_group =  () =>{
+//     Axios("GET", `/api_web/api_client/group_count/?csrf_protection=true`, {
+//       params:{
+//         limit: limit
+//       }
+//     }, (err, response) => {
+//       if(!err){
+//         var {rResult} =  response.data;
+//         setItems([...rResult])
+//       }
+//       sOnFetching(false)
+//     })
+//   }
+
+//   //ngang
+//   const handleScroll = e => {
+//     const { scrollLeft, clientWidth, scrollWidth } = e.currentTarget;
+//     if (scrollWidth - scrollLeft === clientWidth) {
+//       sLimit(limit + 2);
+//     }
 //   };
 
-//     return (
-//       <div className="pt-40">
-//         <h1>demo: react-infinite-scroll-component</h1>
-//         <hr />
-//         <div id="scrollableDiv" style={{ height: 300, overflow: "auto" }}>
-//           <InfiniteScroll
-//             dataLength={items.length}
-//             next={fetchMoreData}
-//             hasMore={true}
-//             loader={<h4>Loading...</h4>}
-//             scrollableTarget="scrollableDiv"
-//           >
-//             {items.map((i, index) => (
-//               <div style={style} key={index}>
-//                 div - #{index}
-//               </div>
-//             ))}
-//           </InfiniteScroll>
-//         </div>
-//       </div>
-//     );
-// }
+//   //dọc
+//   // const handleScroll = e => {
+//   //   const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+//   //   if (scrollHeight - scrollTop === clientHeight) {
+//   //     setPage(prevPage => prevPage + 1);
+//   //   }
+//   // };
 
-// export default App;
+//   return (
+//     <div className="pt-40">
+//       <h1>Hiii</h1>
+//       <div onScroll={handleScroll} style={{overflowX: 'scroll'}} className="flex space-x-2 w-80">
+//         {items.map(item => (
+//           <div key={item.id} className="min-w-fit">
+//             <h2>{item.name}</h2>
+//             <p>{item.description}</p>
+//           </div>
+//         ))}
+//         {onFetching && <p>Loading...</p>}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default HorizontalInfiniteScroll;

@@ -20,8 +20,6 @@ const deca = Lexend_Deca({
   weight: ['300', '400', '500', '600', '700']
 })
 
-import axios from 'axios'
-
 const Default = (props) => {
   return(
     <React.Fragment>

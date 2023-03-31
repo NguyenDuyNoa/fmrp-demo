@@ -201,6 +201,12 @@ const Index = (props) => {
                                         primary: '#0F4F9E',
                                     },
                                 })}
+                                styles={{
+                                    placeholder: (base) => ({
+                                    ...base,
+                                    color: "#cbd5e1",
+                                    }),
+                                }}
                             />
                         </div>
                         <div className='col-span-1'>
@@ -373,7 +379,7 @@ const Items = React.memo((props) => {
                 <h6 className='px-2 xl:text-base text-xs w-[15%] truncate'>{props.data?.note}</h6>
                 <div className='w-[24%] flex flex-wrap px-2'>
                     {props.data?.branch.map(e => 
-                        <h6 key={e?.id.toString()} className='text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[500] rounded border border-[#0F4F9E] h-fit'>{e?.name}</h6>
+                        <h6 key={e?.id.toString()} className='text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[300] rounded border border-[#0F4F9E] h-fit'>{e?.name}</h6>
                     )}
                 </div>
                 <div className='w-[10%] flex justify-center space-x-2'>
@@ -488,8 +494,6 @@ const Popup_NVL = React.memo((props) => {
             sBranch(value)
         }
     }
-    
-    console.log(props.data)
 
     const _ServerFetching = () => {
         Axios("GET", `${props.data?.id ? `/api_web/api_material/categoryOption/${props.data?.id}?csrf_protection=true` : "api_web/api_material/categoryOption?csrf_protection=true"}`, {}, (err, response) => {
