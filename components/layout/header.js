@@ -21,7 +21,7 @@ const Header = () => {
                     img: "/icon/header/danhmuc/kh.png",
                     items: [
                         {name: "Danh sách khách hàng",link:"/clients/clients"},
-                        {name: "Danh sách liên hệ"},
+                        {name: "Danh sách liên hệ", link:"/clients/contact"},
                         {name: "Trạng thái khách hàng", link:"/clients/statusClient"},
                         {name: "Nhóm khách hàng", link: "/clients/groups"}
                     ]
