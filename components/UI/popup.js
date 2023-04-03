@@ -7,10 +7,9 @@ import {Add as IconClose} from "iconsax-react"
 const Index = (props) => {
   return (
     <React.Fragment>
-        {/* <Head>
-            <link rel="preconnect" href="https://fonts.gstatic.com"/>
+        <Head>
             <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca&display=swap" rel="stylesheet"/>
-        </Head> */}
+        </Head>
         <React.Fragment>
             <button className={props.classNameBtn} onClick={props.onClickOpen}>{props.button}</button>
             <Popup 
@@ -18,9 +17,9 @@ const Index = (props) => {
                 closeOnDocumentClick={false}
                 onClose={props.onClose}
                 className="popup-edit"
-                // contentStyle={{
-                //     fontFamily: 'Lexend Deca, sans-serif'
-                // }}
+                contentStyle={{
+                    fontFamily: 'Lexend Deca, sans-serif'
+                }}
             >
                 <div className=" bg-[#ffffff] p-4 shadow-xl rounded-xl 2xl:mt-28 mt-36">
                     <div className="text-[#101828] font-medium text-xl flex justify-between items-center">
