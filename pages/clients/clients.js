@@ -338,14 +338,14 @@ const Index = (props) => {
                 <div className="min:h-[200px] h-[55%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[125%] lx:w-[115%] ">
                     <div className="flex items-center sticky top-0 bg-white p-2 z-10">
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.client_list_namecode}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.client_list_namecode}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.client_list_name}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.client_list_repre}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.client_list_repre}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-center">{dataLang?.client_list_taxtcode}</h4> 
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-center">{dataLang?.client_list_phone}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.client_list_adress}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.client_group_statusclient}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.client_list_charge}</h4>
+                      {/* <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.client_group_statusclient}</h4> */}
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[28%] font-[300] text-left">{dataLang?.client_list_charge}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[300] text-left">{dataLang?.client_list_group}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.client_list_brand}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[18%] font-[300] text-center">{dataLang?.client_list_datecre}</h4>
@@ -359,14 +359,14 @@ const Index = (props) => {
                           <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">                       
                           {(data?.map((e) => 
                             <div className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">{e.code}</h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.code}</h6>
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left text-[#0F4F9E] hover:font-normal"><Popup_chitiet dataLang={dataLang} className="text-left" name={e.name} id={e?.id}/></h6>           
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">{e.representative}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.representative}</h6>                
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-center">{e.tax_code}</h6>                
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-center">{e.phone_number}</h6>                
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.address}</h6>                
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{"Vip"}</h6>                
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left flex object-cover cursor-pointer justify-start items-center flex-wrap gap-2">{e.staff_charge?.map(d => { return (
+                              {/* <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{"Vip"}</h6>                 */}
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[28%]  rounded-md text-left flex object-cover cursor-pointer justify-start items-center flex-wrap gap-2">{e.staff_charge?.map(d => { return (
                                <>
                                 <Popup className='dropdown-avt ' key={d.id}
                                       trigger={open => (<img src={d.profile_image}  width={40} height={40} className="object-cover rounded-[100%] text-left"></img>)}
