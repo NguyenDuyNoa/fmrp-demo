@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 //input eye password
 input::-ms-reveal,
 	input::-ms-clear {
@@ -9,9 +11,9 @@ input::-ms-reveal,
 }
 
 //Popup
-// .popup-content{
-// 	font-family: '__Lexend_Deca_0c54b2', '__Lexend_Deca_Fallback_0c54b2';
-// }
+.popup-content{
+	font-family: 'Lexend Deca' !important;
+}
 .popup-edit-overlay {
 	.popup-content {
 		width: inherit;

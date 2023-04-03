@@ -467,7 +467,9 @@ const Popup_NVL = React.memo((props) => {
 
     ///Biến thể
     const [variantMain, sVariantMain] = useState(null);
+    const [prevVariantMain, sPrevVariantMain] = useState(null);
     const [variantSub, sVariantSub] = useState(null);
+    const [prevVariantSub, sPrevVariantSub] = useState(null);
     const [optVariantMain, sOptVariantMain] = useState([]);
     const [optVariantSub, sOptVariantSub] = useState([]);
     const [optSelectedVariantMain, sOptSelectedVariantMain] = useState([]);
@@ -478,7 +480,8 @@ const Popup_NVL = React.memo((props) => {
 
     useEffect(() => {
         sOptVariantMain(dataOptVariant?.find(e => e.value == variantMain)?.option)
-        variantMain && optSelectedVariantMain?.length === 0 && sOptSelectedVariantMain([])
+        // variantMain && optSelectedVariantMain?.length === 0 && sOptSelectedVariantMain([])
+        prevVariantMain === undefined && sOptSelectedVariantMain([])
         !variantMain && sOptSelectedVariantMain([])
         if(variantMain === variantSub && variantSub != null && variantMain != null){
             sVariantSub(null)
@@ -491,7 +494,8 @@ const Popup_NVL = React.memo((props) => {
 
     useEffect(() => {
         sOptVariantSub(dataOptVariant?.find(e => e.value == variantSub)?.option)
-        variantSub && optSelectedVariantSub?.length === 0 && sOptSelectedVariantSub([])
+        // variantSub && optSelectedVariantSub?.length === 0 && sOptSelectedVariantSub([])
+        prevVariantSub === undefined && sOptSelectedVariantSub([])
         !variantSub && sOptSelectedVariantSub([])
         if(variantSub === variantMain && variantSub != null && variantMain != null){
             sVariantSub(null)
@@ -501,6 +505,8 @@ const Popup_NVL = React.memo((props) => {
             })
         }
     }, [variantSub]);
+
+    const checkEqual = (prevValue, nextValue) => prevValue && nextValue && prevValue === nextValue;
 
     const _HandleSelectedVariant = (type, event) => {
         if(type == "main"){
@@ -586,6 +592,8 @@ const Popup_NVL = React.memo((props) => {
         open && sDataVariantSending([])
         open && sVariantMain(null)
         open && sVariantSub(null)
+        open && sPrevVariantMain(null)
+        open && sPrevVariantSub(null)
     }, [open]);
 
     const _HandleChangeInput = (type, value) => {
@@ -612,9 +620,15 @@ const Popup_NVL = React.memo((props) => {
         }else if(type == "branch") {
             sBranch(value)
         }else if(type == "variantMain") {
-            sVariantMain(value?.value)
+            if (!checkEqual(variantMain, value)) {
+                sPrevVariantMain(variantMain?.value);
+                sVariantMain(value?.value);
+            }
         }else if(type == "variantSub") {
-            sVariantSub(value?.value)
+            if (!checkEqual(variantSub, value)) {
+                sPrevVariantSub(variantSub?.value);
+                sVariantSub(value?.value);
+            }
         }
     }
 
@@ -849,20 +863,34 @@ const Popup_NVL = React.memo((props) => {
                     return item;
                 }).filter(item => item.variation_option_2.length > 0); 
                 sDataTotalVariant(newData);
-
-                // const idToRemove = parentId ? parentId : dataTotalVariant.find(item => item.variation_option_2.some(opt => opt.id === id))?.id;
-                // const newData2 = dataVariantSending.filter(item => {
-                //     return item.option.length > 0 || item.option.some(opt => opt.id === idToRemove);
-                // });
-                const newData2 = dataVariantSending.map(e => {
-                    if (e.option.find(opt => opt.id === id)) {
-                        const filteredOption = e.option.filter(opt => opt.id !== id);
-                        return { ...e, option: filteredOption };
-                    } else {
-                        return e;
+                
+                const foundParent = newData.some((item) => item.id === parentId)
+                if(foundParent === false){
+                    const newData2 = dataVariantSending.map((item) => {
+                        return {
+                          ...item,
+                          option: item.option.filter((opt) => opt.id !== parentId),
+                        };
+                    })
+                    if(newData2[0].option?.length === 0){
+                        sDataVariantSending(newData2.map(item => ({name: item.name})))
+                    }else{
+                        sDataVariantSending(newData2);
                     }
-                })
-                sDataVariantSending(newData2);
+                }else{
+                    const found = dataTotalVariant.some((item) => {
+                        return item.variation_option_2.some((opt) => opt.id === id);
+                    });
+                    if(found === false){
+                        const newData2 = dataVariantSending.map((item) => {
+                            return {
+                              ...item,
+                              option: item.option.filter((opt) => opt.id !== id),
+                            };
+                        })
+                        sDataVariantSending(newData2);
+                    }
+                }
             }
         })
     }
@@ -887,8 +915,6 @@ const Popup_NVL = React.memo((props) => {
             }
         })
     }
-    console.log("dataTotalVariant", dataTotalVariant)
-    console.log("dataVariantSending", dataVariantSending)
 
     return(
         <PopupEdit  
