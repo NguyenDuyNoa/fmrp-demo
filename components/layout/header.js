@@ -42,7 +42,7 @@ const Header = () => {
                 },
             ]
         },{
-            title: "NVL, thành phẩm, vật tư",
+            title: "NVL, thành phẩm",
             sub: [
                 {
                     title: "Nguyên vật liệu",
@@ -68,7 +68,7 @@ const Header = () => {
                     title: "Phòng ban",
                     img: "/icon/header/danhmuc/nv.png",
                     items: [
-                        {name: "Danh sách nhân viên", link: "/personnel/staff"},
+                        {name: "Danh sách người dùng", link: "/personnel/staff"},
                         {name: "Phòng ban", link: "/personnel/departments"},
                         {name: "Chức vụ", link: "/personnel/roles"}
                     ]
