@@ -57,7 +57,7 @@ const Header = () => {
                     img: "/icon/header/danhmuc/tp.png",
                     items: [
                         {name: "Nhóm thành phẩm", link: "/products/category"},
-                        {name: "Danh sách thành phẩm"}
+                        {name: "Danh sách thành phẩm", link: "/products"}
                     ]
                 }
             ]
@@ -355,7 +355,7 @@ const Header = () => {
           <div className="flex justify-between items-center">
             <div className='flex space-x-7 items-center'>
                 <Link href="/">
-                    <Image src="/logo.png" width={100} height={45} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                    <Image alt="" src="/logo.png" width={100} height={45} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                 </Link>
                 <Dropdown data={ListDanhMuc} position={"bottom left"} className="popover-bottom-left arrow-danhmuc">Danh mục</Dropdown>
                 <Dropdown data={ListBanXuatHang} position={"bottom left"} className="popover-bottom-left arrow-banxuathang">Bán & Xuất hàng</Dropdown>
@@ -368,11 +368,11 @@ const Header = () => {
             </div>
             <div className='flex space-x-5 items-center'>
                 <a href="#" title='Thông báo' className='hover:scale-105 transition'>
-                    <Image src="/icon/header/tb.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                    <Image alt="" src="/icon/header/tb.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                 </a>
                 <form className="flex items-center relative">
                     <div className='w-[18px] absolute left-3'>
-                        <Image src="/icon/header/timkiem.png" width={24} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                        <Image alt="" src="/icon/header/timkiem.png" width={24} height={18} quality={100} className="w-auto h-auto object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                     </div>
                     <input
                         className="placeholder:text-white/50 text-[#ffffff] relative bg-[#ffffff1a] hover:bg-[#ffffff25] focus:bg-[#ffffff25] outline-none pl-10 pr-5 py-2 rounded-md"
@@ -381,14 +381,14 @@ const Header = () => {
                     />
                 </form>
                 <Link href="/settings" title='Cài đặt' className='hover:scale-105 transition'>
-                    <Image src="/icon/header/extent.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                    <Image alt="" src="/icon/header/extent.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                 </Link>
                 <a href="#" title='Thông báo' className='hover:scale-105 transition relative'>
-                    <Image src="/icon/header/tb2.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                    <Image alt="" src="/icon/header/tb2.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                     <div className='text-[10px] bg-red-500 h-4 w-4 rounded-full absolute -top-[7px] -right-[7px] flex flex-col items-center justify-center text-white font-medium'>2</div>
                 </a>
                 <a href="#" title='Trợ giúp' className='hover:scale-105 transition'>
-                    <Image src="/icon/header/ques.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                    <Image alt="" src="/icon/header/ques.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                 </a>
                 <DropdownAvatar />
             </div>

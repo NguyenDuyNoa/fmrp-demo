@@ -325,7 +325,7 @@ const Index = (props) => {
                         }
                     </div>
                     <div className='min:h-[500px] h-[81%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
-                        <div className='xl:w-[100%] w-[110%] pr-2'>
+                        <div className='pr-2'>
                             <div className='flex items-center sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]'>
                                 <h4 className='w-[10%]'/>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300]'>{dataLang?.category_material_group_code || "category_material_group_code"}</h4>
