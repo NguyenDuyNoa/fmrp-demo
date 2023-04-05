@@ -3,6 +3,11 @@ import Link from 'next/link';
 import Image from "next/image";
 
 import Popup from 'reactjs-popup';
+import { Lexend_Deca } from "@next/font/google";
+const deca = Lexend_Deca({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700']
+})
 
 const Dropdown = (props) => {
     return (
@@ -15,7 +20,7 @@ const Dropdown = (props) => {
                 position={props.position}
                 className={`popover-edit ` + props.className}
             >
-                <div className="w-auto">
+                <div className={`w-auto ${deca.className}`}>
                     <div className="bg-white py-2 px-0.5 rounded-t justify-between flex divide-x divide-[#DDDDE2]">
                         {props.data?.map((e, i) => 
                             <div className={`${e.title ? "px-7 py-3" : "px-1"} space-y-2 min-w-[200px]`} key={i}>
