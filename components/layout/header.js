@@ -25,15 +25,7 @@ const Header = () => {
                         {name: "Trạng thái khách hàng", link:"/clients/statusClient"},
                         {name: "Nhóm khách hàng", link: "/clients/groups"}
                     ]
-                },
-                {
-                    title: "Chăm sóc",
-                    img: "/icon/header/danhmuc/cs.png",
-                    items: [
-                        {name: "Sinh nhật hôm nay"},
-                        {name: "Phiếu chăm sóc"}
-                    ]
-                },
+                }
             ]
         },{
             title: "Nhà cung cấp",
@@ -45,15 +37,6 @@ const Header = () => {
                         {name: "Nhóm nhà cung cấp"},
                         {name: "Danh sách NCC"},
                         {name: "Danh sách liên hệ NCC"},
-                        {name: "Mặt hàng chủ đạo theo NCC"}
-                    ]
-                },
-                {
-                    title: "Đánh giá NCC",
-                    img: "/icon/header/danhmuc/ncc.png",
-                    items: [
-                        {name: "Nhóm nhà cung cấp"},
-                        {name: "Danh sách NCC"},
                         {name: "Mặt hàng chủ đạo theo NCC"}
                     ]
                 },
@@ -73,15 +56,8 @@ const Header = () => {
                     title: "thành phẩm",
                     img: "/icon/header/danhmuc/tp.png",
                     items: [
-                        {name: "Nhóm thành phẩm"},
+                        {name: "Nhóm thành phẩm", link: "/products/category"},
                         {name: "Danh sách thành phẩm"}
-                    ]
-                },{
-                    title: "vật tư",
-                    img: "/icon/header/danhmuc/vat.png",
-                    items: [
-                        {name: "Nhóm nguyên vật liệu"},
-                        {name: "Danh sách nguyên vật liệu"}
                     ]
                 }
             ]
@@ -94,8 +70,7 @@ const Header = () => {
                     items: [
                         {name: "Danh sách nhân viên"},
                         {name: "Phòng ban"},
-                        {name: "Chức vụ"},
-                        {name: "Lương sản lượng"}
+                        {name: "Chức vụ"}
                     ]
                 }
             ]
@@ -108,29 +83,23 @@ const Header = () => {
             sub: [
                 {
                     title: "Báo giá",
-                    img: "/icon/header/banxuat/bh.png",
-                    items: [
-                        {name: "Đơn hàng bán"},
-                        {name: "Trả lại hàng bán"},
-                        {name: "Hợp đồng bán"}
-                    ]
-                }
-            ]
-        },{
-            title: "Kế hoạch nội bộ",
-            sub: [
-                {
-                    title: "Kế hoạch nội bộ",
-                    img: "/icon/header/banxuat/kh.png",
+                    // img: "/icon/header/banxuat/bh.png",
                     link: "#"
-                }
+                },{
+                    title: "Đơn hàng bán",
+                    // img: "/icon/header/banxuat/bh.png",
+                    link: "#"
+                },{
+                    title: "Trả lại hàng bán",
+                    // img: "/icon/header/banxuat/bh.png",
+                    link: "#"
+                },
             ]
         },{
             title: "Giao hàng",
             sub: [
                 {
-                    title: "Giao hàng",
-                    img: "/icon/header/banxuat/giao.png",
+                    title: "Phiếu xuất kho",
                     link: "#"
                 }
             ]
@@ -144,7 +113,7 @@ const Header = () => {
                         {name: "Hóa đơn bán hàng"},
                         {name: "Phiếu thu bán hàng"},
                         {name: "Công nợ khách hàng"},
-                        {name: "Phiếu thu khách hàng"}
+                        {name: "Phiếu thu khác"}
                     ]
                 }
             ]
@@ -161,7 +130,7 @@ const Header = () => {
                     items: [
                         {name: "Yêu cầu mua hàng"},
                         {name: "Đơn đặt hàng", link: '/purchase_order'},
-                        {name: "Hợp đồng bán"}
+                        {name: "Phiếu dịch vụ"}
                     ]
                 }
             ]
@@ -178,17 +147,6 @@ const Header = () => {
                 }
             ]
         },{
-            title: "Dịch vụ khác",
-            sub: [
-                {
-                    title: "Dịch vụ khác",
-                    img: "/icon/header/muanhap/dvk.png",
-                    items: [
-                        {name: "Phiếu dịch vụ"}
-                    ]
-                }
-            ]
-        },{
             title: "Công nợ mua",
             sub: [
                 {
@@ -197,7 +155,7 @@ const Header = () => {
                     items: [
                         {name: "Hóa đơn mua hàng"},
                         {name: "Phiếu chi mua hàng"},
-                        {name: "Công nợ nhà nước cung cấp"},
+                        {name: "Công nợ nhà cung cấp"},
                         {name: "Phiếu chi khác"}
                     ]
                 }
@@ -241,13 +199,7 @@ const Header = () => {
                     title: "Xuất kho khác",
                     img: "/icon/header/kho/xuatkho.png",
                     link: "#"
-                },
-
-            ]
-        },{
-            title: "Kiểm kê",
-            sub: [
-                {
+                },{
                     title: "Kiểm kê kho",
                     img: "/icon/header/kho/kk.png",
                     link: "#"
@@ -256,11 +208,16 @@ const Header = () => {
                     img: "/icon/header/kho/kho.png",
                     link: "#"
                 }
+
             ]
         },{
             title: "Sản xuất",
             sub: [
                 {
+                    title: "Kế hoạch nội bộ",
+                    img: "/icon/header/banxuat/kh.png",
+                    link: "#"
+                },{
                     title: "Kế hoạch sản xuất",
                     img: "/icon/header/kho/kehoach.png",
                     link: "#"
@@ -294,6 +251,18 @@ const Header = () => {
                 },
             ]
         },{
+            title: "Xuất gia công",
+            sub: [
+                {
+                    title: "Xuất gia công",
+                    img: "/icon/header/khac/xgc.png",
+                    items: [
+                        {name: "Xuất gia công"},
+                        {name: "Nhập gia công"}
+                    ]
+                }
+            ]
+        },{
             title: "QC",
             sub: [
                 {
@@ -319,18 +288,6 @@ const Header = () => {
 
     const ListKhac = [
         {
-            title: "Xuất gia công",
-            sub: [
-                {
-                    title: "Xuất gia công",
-                    img: "/icon/header/khac/xgc.png",
-                    items: [
-                        {name: "Xuất gia công"},
-                        {name: "Nhập gia công"}
-                    ]
-                }
-            ]
-        },{
             title: "Tiện ích",
             sub: [
                 {

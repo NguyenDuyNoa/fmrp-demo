@@ -20,6 +20,10 @@ import Swal from "sweetalert2";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
+import ReactExport from "react-data-export";
+
+const ExcelFile = ReactExport.ExcelFile;
+const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const Toast = Swal.mixin({
     toast: true,
@@ -186,12 +190,44 @@ const Index = (props) => {
     const hiddenOptions = idBranch?.length > 2 ? idBranch?.slice(0, 2) : [];
     const options = dataBranchOption.filter((x) => !hiddenOptions.includes(x.value));
 
+    //excel
+    const multiDataSet = [
+        {
+            columns: [
+                {title: "ID", width: {wch: 4}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.category_material_group_name}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.category_material_list_code}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.category_material_list_name}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.unit}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.stock}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.minimum_amount}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.note}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.category_material_list_variant}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.client_list_brand}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            ],
+            data: data.map((e) => 
+                [
+                    {value: `${e.id}`, style: {numFmt: "0"}},
+                    {value: `${e.category_name}`},
+                    {value: `${e.code}`},
+                    {value: `${e.name}`},
+                    {value: `${e.unit}`},
+                    {value: `${e.stock_quantity}`},
+                    {value: `${e.minimum_quantity}`},
+                    {value: `${e.note}`},
+                    {value: `${e.variation?.length}`},
+                    {value: `${JSON.stringify(e.branch)}`},
+                ]
+            ),
+        }
+    ];
+
     return (
         <React.Fragment>
             <Head>
                 <title>{dataLang?.header_category_material_list}</title>
             </Head>
-            <div className='px-10 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between'>
+            <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between'>
                 <div className='h-[97%] space-y-3 overflow-hidden'>
                     <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
                         <h6 className='text-[#141522]/40'>{dataLang?.list_btn_seting_category}</h6>
@@ -279,15 +315,14 @@ const Index = (props) => {
                         </form>
                         {data.length != 0 &&
                             <div className='flex space-x-6'>
-                                {/* <ExcelFile filename="nhóm nvl" title="Hiii" element={
+                                <ExcelFile filename="danh sách nvl"  element={
                                     <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
                                         <IconExcel size={18} />
                                         <span>{dataLang?.client_list_exportexcel}</span>
                                     </button>
                                 }>
-                                    <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Nhóm NVL" />
-                                </ExcelFile> */}
-
+                                    <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Danh sách Nguyên Vật Liệu" />
+                                </ExcelFile>
                                 <div className="flex space-x-2 items-center">
                                     <label className="font-[300] text-slate-400">{dataLang?.display} :</label>
                                     <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
@@ -302,23 +337,19 @@ const Index = (props) => {
                             </div>
                         }
                     </div>
-                    <div className='min:h-[500px] h-[72%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
-                        <div className='2xl:w-[110%] w-[120%] pr-2'>
+                    <div className='min:h-[500px] 2xl:h-[72%] xl:h-[69%] h-[72%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+                        <div className='pr-2'>
                             <div className='flex items-center sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]'>
-                                <div className='w-[2%] flex justify-center'>
-                                    <input type='checkbox' className='scale-125' />
-                                </div>
-                                <h4 className='w-[8%] xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase text-center font-[300]'>{dataLang?.image || "image"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[11%] font-[300]'>{dataLang?.category_material_group_name || "category_material_group_name"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[13%] font-[300]'>{dataLang?.category_material_list_code || "category_material_list_code"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[13%] font-[300]'>{dataLang?.category_material_list_name || "category_material_list_name"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[7%] font-[300] text-center'>{dataLang?.unit || "unit"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[6%] font-[300] text-center'>{dataLang?.stock || "stock"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center'>{dataLang?.minimum_amount || "minimum_amount"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[11%] font-[300]'>{dataLang?.note || "note"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[6%] font-[300] text-center truncate'>{dataLang?.category_material_list_variant || "category_material_list_variant"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] truncate'>{dataLang?.client_list_brand || "client_list_brand"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[8%] font-[300] text-center truncate'>{dataLang?.branch_popup_properties || "branch_popup_properties"}</h4>
+                                <h4 className='xl:w-[10%] w-[6%] 2xl:text-[14px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-center font-[300]'>{dataLang?.image || "image"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase xl:w-[11%] w-[12%] font-[300]'>{dataLang?.category_material_group_name || "category_material_group_name"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase xl:w-[13%] w-[14%] truncate font-[300]'>{dataLang?.category_material_list_code || "category_material_list_code"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase xl:w-[13%] w-[14%] truncate font-[300]'>{dataLang?.category_material_list_name || "category_material_list_name"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[7%] font-[300] text-center'>{dataLang?.unit || "unit"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase xl:w-[6%] w-[8%] font-[300] text-center'>{dataLang?.stock || "stock"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[11%] font-[300]'>{dataLang?.note || "note"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase xl:w-[6%] w-[7%] font-[300] text-center truncate'>{dataLang?.category_material_list_variant || "category_material_list_variant"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] truncate'>{dataLang?.client_list_brand || "client_list_brand"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase xl:w-[8%] w-[6%] font-[300] text-center truncate'>{dataLang?.branch_popup_properties || "branch_popup_properties"}</h4>
                             </div>
                             {onFetching ?
                                 <Loading className="h-80"color="#0f4f9e" />
@@ -335,36 +366,32 @@ const Index = (props) => {
                                     <div className="divide-y divide-slate-200"> 
                                         {data.map((e) => 
                                             <div key={e?.id.toString()} className='flex p-2 hover:bg-slate-50 relative'>
-                                                <div className='w-[2%] flex justify-start flex-col items-center mt-3.5'>
-                                                    <input type='checkbox' className='scale-125' />
-                                                </div>
-                                                <div className='w-[8%] pointer-events-none select-none justify-center flex'>
+                                                <div className='xl:w-[10%] w-[6%] pointer-events-none select-none justify-center flex'>
                                                     {e?.images == null ?
                                                         <img src="/no_image.png" className='w-full h-12 rounded object-contain' />
                                                     :
                                                         <Image width={64} height={64} quality={100} src={e?.images} alt="thumb type" className="w-12 h-12 rounded object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/>
                                                     }
                                                 </div>
-                                                <h6 className='px-2 py-2.5 xl:text-base text-xs w-[11%] '>{e?.category_name}</h6>
-                                                <div className='px-2 py-2.5 xl:text-base text-xs w-[13%]'>
+                                                <h6 className='px-2 py-2.5 xl:text-base text-xs xl:w-[11%] w-[12%]'>{e?.category_name}</h6>
+                                                <div className='px-2 py-2.5 xl:text-base text-xs xl:w-[13%] w-[14%]'>
                                                     <Popup_ThongTin id={e?.id} dataLang={dataLang} >
                                                         <button className=' text-[#0F4F9E] hover:opacity-70 w-fit outline-none'>{e?.code}</button>
                                                     </Popup_ThongTin>
                                                 </div>
-                                                <h6 className='px-2 py-2.5 xl:text-base text-xs w-[13%]'>{e?.name}</h6>
+                                                <h6 className='px-2 py-2.5 xl:text-base text-xs xl:w-[13%] w-[14%]'>{e?.name}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-base text-xs w-[7%] text-center'>{e?.unit}</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-base text-xs w-[6%] text-center'>{e?.stock_quantity}</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-base text-xs w-[10%] text-center'>{e?.minimum_quantity}</h6>
+                                                <h6 className='px-2 py-2.5 xl:text-base text-xs xl:w-[6%] w-[8%] text-center'>{e?.stock_quantity}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-base text-xs w-[11%]'>{e?.note}</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-base text-xs w-[6%] text-center'>{e?.variation?.length}</h6>
+                                                <h6 className='px-2 py-2.5 xl:text-base text-xs xl:w-[6%] w-[7%] text-center'>{e?.variation?.length}</h6>
                                                 <div className='px-2 py-2.5 w-[15%] flex flex-wrap'>
                                                     {e?.branch.map(e => 
-                                                        <h6 key={e?.id.toString()} className='text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] rounded border border-[#0F4F9E] h-fit font-[300]'>{e?.name}</h6>
+                                                        <h6 key={e?.id.toString()} className='xl:text-[15px] text-xs mr-1 mb-1 xl:py-[1px] xl:px-1.5 px-0.5 text-[#0F4F9E] rounded border border-[#0F4F9E] h-fit font-[300]'>{e?.name}</h6>
                                                     )}
                                                 </div>
-                                                <div className='px-2 py-2.5 w-[8%] flex space-x-2 justify-center'>
-                                                    <Popup_NVL onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} id={e?.id} className=" outline-none" />
-                                                    <button onClick={_HandleDelete.bind(this, e?.id)} className="xl:text-base text-xs outline-none"><IconDelete color="red"/></button>
+                                                <div className='px-2 py-2.5 xl:w-[8%] w-[6%] flex space-x-2 justify-center'>
+                                                    <Popup_NVL onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} id={e?.id} className="xl:scale-100 scale-[0.8] outline-none" />
+                                                    <button onClick={_HandleDelete.bind(this, e?.id)} className="xl:scale-100 scale-[0.8] outline-none"><IconDelete color="red"/></button>
                                                 </div>
                                             </div>
                                         )}
@@ -651,7 +678,7 @@ const Popup_NVL = React.memo((props) => {
 
     useEffect(() => {
         sThumb(thumb)
-     },[thumb])
+    },[thumb])
 
     const _ServerSending = () => {
         var formData = new FormData();
@@ -925,10 +952,10 @@ const Popup_NVL = React.memo((props) => {
             onClose={_ToggleModal.bind(this,false)}
             classNameBtn={props.className}
         >
-            <div className='py-4 w-[800px] space-y-5'>
+            <div className='py-4 w-[800px] 2xl:space-y-5 space-y-4'>
                 <div className='flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
-                    <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>{props.dataLang?.information || "information"}</button>
-                    <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>{props.dataLang?.category_material_list_variant || "category_material_list_variant"}</button>
+                    <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "} 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}>{props.dataLang?.information || "information"}</button>
+                    <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "} 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}>{props.dataLang?.category_material_list_variant || "category_material_list_variant"}</button>
                 </div>
                 <ScrollArea className="max-h-[600px]" speed={1} smoothScrolling={true} ref={scrollAreaRef}>
                     {onFetching ? 
@@ -937,9 +964,9 @@ const Popup_NVL = React.memo((props) => {
                         <React.Fragment>
                             {tab === 0 &&
                                 <div className='grid grid-cols-2 gap-5'>
-                                    <div className='space-y-3'>
-                                        <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.client_list_brand || "client_list_brand"} <span className='text-red-500'>*</span></label>
+                                    <div className='2xl:space-y-3 space-y-2'>
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.client_list_brand || "client_list_brand"} <span className='text-red-500'>*</span></label>
                                             <Select 
                                                 options={dataOptBranch}
                                                 formatOptionLabel={CustomSelectOption_GroupNVL}
@@ -976,8 +1003,8 @@ const Popup_NVL = React.memo((props) => {
                                             />
                                             {errBranch && <label className="text-sm text-red-500">{props.dataLang?.client_list_bran || "client_list_bran"}</label>}
                                         </div>
-                                        <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.header_category_material_group} <span className='text-red-500'>*</span></label>
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.header_category_material_group} <span className='text-red-500'>*</span></label>
                                             <Select 
                                                 options={dataOptGr}
                                                 formatOptionLabel={CustomSelectOption_GroupNVL}
@@ -1012,35 +1039,35 @@ const Popup_NVL = React.memo((props) => {
                                             />
                                             {errGroup && <label className="text-sm text-red-500">{props.dataLang?.category_material_list_err_group || "category_material_list_err_group"}</label>}
                                         </div>
-                                        <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_list_code || "category_material_list_code"} <span className='text-red-500'>*</span></label>
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.category_material_list_code || "category_material_list_code"} <span className='text-red-500'>*</span></label>
                                             <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder={props.dataLang?.category_material_list_code || "category_material_list_code"} className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
                                             {errCode && <label className="text-sm text-red-500">{props.dataLang?.category_material_list_err_code}</label>}
                                         </div>
-                                        <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_list_name || "category_material_list_name"} <span className='text-red-500'>*</span></label>
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.category_material_list_name || "category_material_list_name"} <span className='text-red-500'>*</span></label>
                                             <input value={name} onChange={_HandleChangeInput.bind(this, "name")} type="text" placeholder={props.dataLang?.category_material_list_name || "category_material_list_name"} className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
                                             {errName && <label className="text-sm text-red-500">{props.dataLang?.category_material_list_err_name}</label>}
                                         </div>
-                                        <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_list_cost_price || "category_material_list_cost_price"}</label>
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.category_material_list_cost_price || "category_material_list_cost_price"}</label>
                                             <NumericFormat thousandSeparator="," value={price} onValueChange={_HandleChangeInput.bind(this, "price")} placeholder={props.dataLang?.category_material_list_cost_price || "category_material_list_cost_price"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
                                         </div>
-                                        <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.minimum_amount || "minimum_amount"}</label>
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.minimum_amount || "minimum_amount"}</label>
                                             <NumericFormat thousandSeparator="," value={minimumAmount} onValueChange={_HandleChangeInput.bind(this, "minimumAmount")} placeholder={props.dataLang?.minimum_amount || "minimum_amount"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
                                         </div>
-                                        <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}</label>
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}</label>
                                             <div className='relative flex flex-col justify-center items-center'>
                                                 <NumericFormat thousandSeparator="," value={expiry} onValueChange={_HandleChangeInput.bind(this, "expiry")} placeholder={props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 pr-14 border outline-none`} />
                                                 <span className='absolute right-2 text-slate-400 select-none'>{props.dataLang?.date || "date"}</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className='space-y-4'>
-                                        <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_list_purchase_unit || "category_material_list_purchase_unit"} <span className='text-red-500'>*</span></label>
+                                    <div className='2xl:space-y-3 space-y-2'>
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.category_material_list_purchase_unit || "category_material_list_purchase_unit"} <span className='text-red-500'>*</span></label>
                                             <Select 
                                                 options={dataOptUnit}
                                                 value={unit ? {label: dataOptUnit?.find(x => x?.value == unit)?.label, value: unit} : null}
@@ -1075,10 +1102,10 @@ const Popup_NVL = React.memo((props) => {
                                             />
                                             {errUnit && <label className="text-sm text-red-500">{props.dataLang?.category_material_list_err_unit}</label>}
                                         </div>
-                                        <div className='space-y-0.5'>
-                                            <h5 className="text-[#344054] font-medium text-base">{props.dataLang?.category_material_list_converting_unit || "category_material_list_converting_unit"}</h5>
+                                        <div className='2xl:space-y-0.5'>
+                                            <h5 className="text-[#344054] font-medium 2xl:text-base text-[15px]">{props.dataLang?.category_material_list_converting_unit || "category_material_list_converting_unit"}</h5>
                                             <div className='grid grid-cols-2 gap-5'>
-                                                <div className='space-y-1'>
+                                                <div className='2xl:space-y-1'>
                                                     <label className="text-[#344054] font-normal text-sm">{props.dataLang?.unit || "unit"}</label>
                                                     <Select 
                                                         options={dataOptUnit}
@@ -1113,14 +1140,14 @@ const Popup_NVL = React.memo((props) => {
                                                         }}
                                                     />
                                                 </div>
-                                                <div className='space-y-1'>
+                                                <div className='2xl:space-y-1'>
                                                     <label className="text-[#344054] font-normal text-sm">{props.dataLang?.category_material_list_converting_amount || "category_material_list_converting_amount"}</label>
                                                     <NumericFormat thousandSeparator="," value={unitAmount} onValueChange={_HandleChangeInput.bind(this, "unitAmount")} placeholder={props.dataLang?.amount || "amount"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal px-2 py-1.5 border outline-none`} />
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.avatar || "avatar"}</label>
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.avatar || "avatar"}</label>
                                             <div className='flex justify-center'>
                                                 <div className='relative h-36 w-36 rounded bg-slate-200'>
                                                     {thumb && <Image width={120} height={120} quality={100} src={typeof(thumb)==="string" ? thumb : URL.createObjectURL(thumb)} alt="thumb type" className="w-36 h-36 rounded object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/>}
@@ -1133,8 +1160,8 @@ const Popup_NVL = React.memo((props) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className='space-y-1'>
-                                            <label className="text-[#344054] font-normal text-base">{props.dataLang?.note || "note"}</label>
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.note || "note"}</label>
                                             <textarea 
                                                 value={note}
                                                 type="text"
@@ -1265,7 +1292,7 @@ const Popup_NVL = React.memo((props) => {
                                             </ScrollArea>
                                         </div>
                                     </div>
-                                    <div className='flex justify-end'>
+                                    <div className='flex justify-end py-2'>
                                         <button onClick={_HandleApplyVariant.bind(this)} disabled={(optSelectedVariantMain?.length == 0 && optSelectedVariantSub?.length == 0) ? true : false} className='disabled:grayscale outline-none px-4 py-2 rounded-lg bg-[#E2F0FE] text-sm font-medium hover:scale-105 disabled:hover:scale-100 disabled:opacity-50 transition'>{props.dataLang?.apply || "apply"}</button>
                                     </div>
                                     {Object.keys(dataTotalVariant).length !== 0 &&
@@ -1384,7 +1411,7 @@ const Popup_ThongTin = React.memo((props) => {
                                         <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.client_list_brand || "client_list_brand"}:</h5>
                                         <div className='w-[55%] flex flex-col items-end'>
                                             {list?.branch?.map(e => 
-                                                <h6 key={e.id.toString()} className='w-[55%] text-right'>{e.name}</h6>
+                                                <h6 key={e.id.toString()} className='w-fit text-right'>{e.name}</h6>
                                             )}
                                         </div>
                                     </div>
@@ -1452,16 +1479,16 @@ const Popup_ThongTin = React.memo((props) => {
                             <React.Fragment>
                                 {list?.variation?.length > 0 ?
                                     <div className='space-y-2 min-h-[384px]'>
-                                        <div className={`${list?.variation[1] ? "grid-cols-4" : "grid-cols-3" } grid gap-2 px-2 py-1 `}>
+                                        <div className={`${list?.variation[1] ? "grid-cols-3" : "grid-cols-2" } grid gap-2 px-2 py-1 `}>
                                             <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center'>Hình đại diện</h5>
                                             <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]'>{list?.variation[0]?.name}</h5>
                                             {list?.variation[1] && <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]'>{list?.variation[1]?.name}</h5>}
-                                            <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]'>SKU</h5>
+                                            {/* <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]'>SKU</h5> */}
                                         </div>
                                         <ScrollArea className="min-h-[400px] max-h-[450px]" speed={1} smoothScrolling={true}>
                                             <div className='divide-y divide-slate-200'>
                                                 {list?.variation_option_value?.map(e => 
-                                                    <div key={e?.id.toString()} className={`${e?.variation_option_2?.length > 0 ? "grid-cols-4" : "grid-cols-3" } grid gap-2 px-2 py-2.5 hover:bg-slate-50`}>
+                                                    <div key={e?.id.toString()} className={`${e?.variation_option_2?.length > 0 ? "grid-cols-3" : "grid-cols-2" } grid gap-2 px-2 py-2.5 hover:bg-slate-50`}>
                                                         <div className='flex justify-center self-center'>
                                                             {e?.image == null ?
                                                                 <img src="/no_image.png" className='w-auto h-20 rounded object-contain select-none pointer-events-none' />
@@ -1470,17 +1497,14 @@ const Popup_ThongTin = React.memo((props) => {
                                                             }
                                                         </div>
                                                         <h6 className='px-2 xl:text-base text-xs self-center'>{e?.name}</h6>
-                                                        {e?.variation_option_2?.length > 0 ?
-                                                            <div className='col-span-2 grid grid-cols-2 gap-1 items-center'>
+                                                        {e?.variation_option_2?.length > 0 &&
+                                                            <div className='self-center space-y-0.5'>
                                                                 {e?.variation_option_2?.map(ce => 
                                                                     <React.Fragment key={ce.id?.toString()}>
                                                                         <h6 className='px-2 xl:text-base text-xs'>{ce.name}</h6>
-                                                                        <h6 className='px-2 xl:text-base text-xs'>{ce.sku}</h6>
                                                                     </React.Fragment>
                                                                 )}
                                                             </div>
-                                                            :
-                                                            <h6 className='px-2 xl:text-base text-xs self-center'>{ce.sku}</h6>
                                                         }
                                                     </div>
                                                 )}

@@ -400,7 +400,6 @@ const Popup_groupKh = (props) => {
                                   options={brandpOpt}
                                   isSearchable={true}
                                   onChange={_HandleChangeInput.bind(this, "valueBr")}
-                                  LoadingIndicator
                                   isMulti
                                   noOptionsMessage={() => "Không có dữ liệu"}
                                   value={valueBr}
