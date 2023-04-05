@@ -70,7 +70,7 @@ const Header = () => {
                     items: [
                         {name: "Danh sách nhân viên"},
                         {name: "Phòng ban"},
-                        {name: "Chức vụ"}
+                        {name: "Chức vụ", link: "/personnel/roles"}
                     ]
                 }
             ]

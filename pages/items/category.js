@@ -618,12 +618,7 @@ const Popup_NVL = React.memo((props) => {
                             placeholder: (base) => ({
                             ...base,
                             color: "#cbd5e1",
-                            }),
-                            menuPortal: (base) => ({
-                                ...base,
-                                zIndex: 9999,
-                                position: "absolute",
-                            }),
+                            })
                         }}
                     />
                     {errBranch && <label className="text-sm text-red-500">{props.dataLang?.client_list_bran || "client_list_bran"}</label>}
