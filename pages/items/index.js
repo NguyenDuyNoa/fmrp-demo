@@ -1224,12 +1224,42 @@ const Popup_NVL = React.memo((props) => {
                                                 </div>
                                             }
                                             <ScrollArea className="max-h-[115px] w-full " speed={1} smoothScrolling={true}>
-                                                <div className='flex flex-col space-y-0.5'>
+                                                <div className='flex flex-col'>
                                                     {optVariantMain?.map(e => 
-                                                        <label key={e?.id.toString()} htmlFor={e.id} className='w-full space-x-2 py-1.5 px-3 bg-slate-50 hover:bg-slate-100 rounded cursor-pointer'>
-                                                            <input type="checkbox" id={e.id} value={e.name} checked={optSelectedVariantMain.some((selectedOpt) => selectedOpt.id === e.id)} onChange={_HandleSelectedVariant.bind(this, "main")} className="accent-lime-500" />
-                                                            <span>{e.name}</span>
-                                                        </label>
+                                                        // <label key={e?.id.toString()} htmlFor={e.id} className='w-full space-x-2 py-1.5 px-3 bg-slate-50 hover:bg-slate-100 rounded cursor-pointer'>
+                                                        //     <input type="checkbox" id={e.id} value={e.name} checked={optSelectedVariantMain.some((selectedOpt) => selectedOpt.id === e.id)} onChange={_HandleSelectedVariant.bind(this, "main")} className="accent-lime-500" />
+                                                        //     <span>{e.name}</span>
+                                                        // </label>
+                                                        <div key={e?.id.toString()} className='flex items-center '>
+                                                            <label className="relative flex cursor-pointer items-center rounded-full p-2" htmlFor={e.id} data-ripple-dark="true" > 
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
+                                                                    id={e.id}
+                                                                    value={e.name}
+                                                                    checked={optSelectedVariantMain.some((selectedOpt) => selectedOpt.id === e.id)}
+                                                                    onChange={_HandleSelectedVariant.bind(this, "main")}
+                                                                />
+                                                                <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                    <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    className="h-3.5 w-3.5"
+                                                                    viewBox="0 0 20 20"
+                                                                    fill="currentColor"
+                                                                    stroke="currentColor"
+                                                                    stroke-width="1"
+                                                                    >
+                                                                    <path
+                                                                        fill-rule="evenodd"
+                                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                        clip-rule="evenodd"
+                                                                    ></path>
+                                                                    </svg>
+                                                                </div>
+                                                                
+                                                            </label>
+                                                            <span className='text-[#344054] font-normal text-sm '>{e.name}</span>
+                                                        </div>
                                                     )}
                                                 </div>
                                             </ScrollArea>
@@ -1283,10 +1313,40 @@ const Popup_NVL = React.memo((props) => {
                                             <ScrollArea className="max-h-[115px] w-full " speed={1} smoothScrolling={true}>
                                                 <div className='flex flex-col space-y-0.5'>
                                                     {optVariantSub?.map(e => 
-                                                        <label key={e?.id.toString()} htmlFor={e.id} className='w-full space-x-2 py-1.5 px-3 bg-slate-50 hover:bg-slate-100 rounded cursor-pointer'>
-                                                            <input type="checkbox" id={e.id} value={e.name} checked={optSelectedVariantSub.some((selectedOpt) => selectedOpt.id === e.id)} onChange={_HandleSelectedVariant.bind(this, "sub")} className="accent-lime-500" />
-                                                            <span>{e.name}</span>
-                                                        </label>
+                                                        // <label key={e?.id.toString()} htmlFor={e.id} className='w-full space-x-2 py-1.5 px-3 bg-slate-50 hover:bg-slate-100 rounded cursor-pointer'>
+                                                        //     <input type="checkbox" id={e.id} value={e.name} checked={optSelectedVariantSub.some((selectedOpt) => selectedOpt.id === e.id)} onChange={_HandleSelectedVariant.bind(this, "sub")} className="accent-lime-500" />
+                                                        //     <span>{e.name}</span>
+                                                        // </label>
+                                                        <div key={e?.id.toString()} className='flex items-center '>
+                                                            <label className="relative flex cursor-pointer items-center rounded-full p-2" htmlFor={e.id} data-ripple-dark="true" > 
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
+                                                                    id={e.id}
+                                                                    value={e.name}
+                                                                    checked={optSelectedVariantSub.some((selectedOpt) => selectedOpt.id === e.id)}
+                                                                    onChange={_HandleSelectedVariant.bind(this, "sub")}
+                                                                />
+                                                                <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                    <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    className="h-3.5 w-3.5"
+                                                                    viewBox="0 0 20 20"
+                                                                    fill="currentColor"
+                                                                    stroke="currentColor"
+                                                                    stroke-width="1"
+                                                                    >
+                                                                    <path
+                                                                        fill-rule="evenodd"
+                                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                        clip-rule="evenodd"
+                                                                    ></path>
+                                                                    </svg>
+                                                                </div>
+                                                                
+                                                            </label>
+                                                            <span className='text-[#344054] font-normal text-sm '>{e.name}</span>
+                                                        </div>
                                                     )}
                                                 </div>
                                             </ScrollArea>

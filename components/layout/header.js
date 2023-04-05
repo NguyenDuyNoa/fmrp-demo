@@ -68,8 +68,8 @@ const Header = () => {
                     title: "Phòng ban",
                     img: "/icon/header/danhmuc/nv.png",
                     items: [
-                        {name: "Danh sách nhân viên"},
-                        {name: "Phòng ban"},
+                        {name: "Danh sách nhân viên", link: "/personnel/staff"},
+                        {name: "Phòng ban", link: "/personnel/departments"},
                         {name: "Chức vụ", link: "/personnel/roles"}
                     ]
                 }

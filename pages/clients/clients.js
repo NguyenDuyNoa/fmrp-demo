@@ -647,11 +647,7 @@ const Popup_dskh = (props) => {
 
     useEffect(() => {
         open && _ServerFetching_Gr()
-        console.log("Here 2")
-        console.log(branch)
-        // console.log("valueGr", valueGr)
-        // console.log("listGr", listGr)
-      }, [valueBr]);
+    }, [valueBr]);
 
     // useEffect(() => {
     //   sOnFetchingBr(true)
