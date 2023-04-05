@@ -449,6 +449,7 @@ const Popup_dskh = (props) => {
       
       const [open, sOpen] = useState(false);
       const _ToggleModal = (e) => sOpen(e);
+      
       const [onSending, sOnSending] = useState(false);
       const [onFetching, sOnFetching] = useState(false);
       const [onFetchingDis, sOnFetchingDis] = useState(false)
@@ -538,11 +539,11 @@ const Popup_dskh = (props) => {
               sOption(db?.contact ? db?.contact : [])
             
           }
-          sOnSending(false)
+          sOnFetching(false)
         })
         }
         useEffect(() => {
-          onFetching && _ServerFetching_detailUser()
+          onFetching && props?.id && _ServerFetching_detailUser()
         }, [open]);
        
       //onchang input
@@ -594,7 +595,11 @@ const Popup_dskh = (props) => {
       }, (err, response) => {
         if(!err){
             var db =  response.data
-            sListChar(db?.map(e=> ({label: e.name, value: Number(e.staffid)}))?.filter(e => valueChar.some(x => e.value !== x.value)))
+            if(valueChar?.length == 0){
+              sListChar(db?.map(e=> ({label: e.name, value: Number(e.id)})))
+            }else if(props?.id){
+              sListChar(db?.map(e=> ({label: e.name, value: Number(e.staffid)}))?.filter(e => valueChar.some(x => e.value !== x.value)))
+            }
         }
         // sOnFetching(false)
         sOnFetchingBr(false)
@@ -631,7 +636,11 @@ const Popup_dskh = (props) => {
       }, (err, response) => {
         if(!err){
             var {rResult} =  response.data
-            sListGr(rResult?.map(x => ({label: x.name, value: Number(x.id)}))?.filter(e => valueGr.some(x => e.value !== x.value)))
+            if(valueGr?.length == 0){
+              sListGr(rResult?.map(e=> ({label: e.name, value: Number(e.id)})))
+            }else if(props?.id){
+              sListGr(rResult?.map(x => ({label: x.name, value: Number(x.id)}))?.filter(e => valueGr.some(x => e.value !== x.value)))
+            }
         }
         sOnFetchingGr(false)
       })
@@ -1094,6 +1103,7 @@ const Popup_dskh = (props) => {
                                   placeholder={props.dataLang?.client_list_group}
                                   noOptionsMessage={() => "Không có dữ liệu"}
                                   options={listGr} 
+                                  //hihi
                                   value={valueGr}
                                   onChange={handleChangeGr}
                                   isSearchable={true}
