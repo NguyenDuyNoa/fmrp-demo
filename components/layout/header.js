@@ -34,10 +34,10 @@ const Header = () => {
                     title: "Nhà cung cấp",
                     img: "/icon/header/danhmuc/ncc.png",
                     items: [
-                        {name: "Nhóm nhà cung cấp"},
                         {name: "Danh sách NCC"},
                         {name: "Danh sách liên hệ NCC"},
-                        {name: "Mặt hàng chủ đạo theo NCC"}
+                        {name: "Mặt hàng chủ đạo theo NCC"},
+                        {name: "Nhóm nhà cung cấp"},
                     ]
                 },
             ]
