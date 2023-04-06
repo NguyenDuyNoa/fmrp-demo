@@ -7,11 +7,14 @@ const adminState = {
     {label: "Tiếng Việt", code: "vi"},
   ],
   lang: "vi",
+  information: null,
   unit_NVL: null,
   branch: null,
   variant_NVL: null,
   department_staff: null,
-  position_staff: null
+  position_staff: null,
+  categoty_finishedProduct: null,
+  type_finishedProduct: null
 }
 
 function adminReducer(state = adminState, action) {
@@ -30,6 +33,10 @@ function adminReducer(state = adminState, action) {
       return { ...state, department_staff: action.payload }
     case 'position_staff/update':
       return { ...state, position_staff: action.payload }
+    case 'categoty_finishedProduct/update':
+      return { ...state, categoty_finishedProduct: action.payload }
+    case 'type_finishedProduct/update':
+      return { ...state, type_finishedProduct: action.payload }
     default:
       return state
   }

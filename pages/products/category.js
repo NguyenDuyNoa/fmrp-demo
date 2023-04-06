@@ -63,7 +63,7 @@ const CustomSelectOption = ({value, label, level}) => (
         {level == 2 && <span>----</span>}
         {level == 3 && <span>------</span>}
         {level == 4 && <span>--------</span>}
-        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
+        <span className="2xl:max-w-[300px] max-w-[200px] w-fit truncate">{label}</span>
     </div>
 )
 
@@ -81,20 +81,20 @@ const Index = (props) => {
     const [dataBranchOption, sDataBranchOption] = useState([]);
     const [idBranch, sIdBranch] = useState(null);
     //Bộ lọc Chức vụ
-    const [dataPositionOption, sDataPositionOption] = useState([]);
-    const [idPosition, sIdPosition] = useState(null);
+    const [dataCategoryOption, sDataCategoryOption] = useState([]);
+    const [idCategory, sIdCategory] = useState(null);
 
     const [totalItems, sTotalItems] = useState({});
     const [keySearch, sKeySearch] = useState("")
     const [limit, sLimit] = useState(15);
 
     const _ServerFetching = () => {
-        Axios("GET", "/api_web/api_staff/position/?csrf_protection=true", {
+        Axios("GET", "/api_web/api_product/category/?csrf_protection=true", {
             params: {
                 search: keySearch,
                 limit: limit,
                 page: router.query?.page || 1,
-                "filter[id]": idPosition?.value ? idPosition?.value : null,
+                "filter[id]": idCategory?.value ? idCategory?.value : null,
                 "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map(e => e.value) : null
             }
         }, (err, response) => {
@@ -113,7 +113,7 @@ const Index = (props) => {
 
     useEffect(() => {
         sOnFetching(true)
-    }, [limit,router.query?.page, idPosition, idBranch]);
+    }, [limit,router.query?.page, idCategory, idBranch]);
 
     const paginate = pageNumber => {
         router.push({
@@ -123,8 +123,8 @@ const Index = (props) => {
     }
 
     const _HandleFilterOpt = (type, value) => {
-        if(type == "position"){
-            sIdPosition(value)
+        if(type == "category"){
+            sIdCategory(value)
         }else if(type == "branch"){
             sIdBranch(value)
         }
@@ -142,11 +142,11 @@ const Index = (props) => {
     };
 
     const _ServerFetchingSub = () => {
-        Axios("GET", "/api_web/api_staff/positionOption?csrf_protection=true", {}, (err, response) => {
+        Axios("GET", "/api_web/api_product/categoryOption/?csrf_protection=true", {}, (err, response) => {
             if(!err){
                 var {rResult} = response.data;
-                sDataPositionOption(rResult.map(e => ({label: e.name, value: e.id, level: e.level})))
-                dispatch({type: "position_staff/update", payload: rResult.map(e => ({label: e.name, value: e.id, level: e.level}))})
+                sDataCategoryOption(rResult.map(e => ({label: `${e.name + " " + "(" + e.code + ")"}`, value: e.id, level: e.level, code: e.code, parent_id: e.parent_id})))
+                dispatch({type: "categoty_finishedProduct/update", payload: rResult.map(e => ({label: `${e.name + " " + "(" + e.code + ")"}`, value: e.id, level: e.level, code: e.code, parent_id: e.parent_id}))})
             }
             sOnFetchingSub(false)
         })
@@ -162,12 +162,6 @@ const Index = (props) => {
                 var {rResult} = response.data;
                 sDataBranchOption(rResult.map(e => ({label: e.name, value: e.id})))
                 dispatch({type: "branch/update", payload: rResult.map(e => ({label: e.name, value: e.id}))})
-            }
-        })
-        Axios("GET", "/api_web/api_staff/department/?csrf_protection=true", {}, (err, response) => {
-            if(!err){
-                var {rResult} = response.data;
-                dispatch({type: "department_staff/update", payload: rResult.map(e => ({label: e.name, value: e.id}))})
             }
         })
     }
@@ -197,10 +191,10 @@ const Index = (props) => {
             data: data.map((e) => 
                 [
                     {value: `${e.id}`, style: {numFmt: "0"}},
+                    {value: `${e.code}`},
                     {value: `${e.name}`},
-                    {value: `${e.name}`},
-                    {value: `${e.department_name}`},
-                    {value: `${JSON.stringify(e.branch.map(e => e.name))}`},
+                    {value: `${e.note}`},
+                    {value: `${JSON.stringify(e.branch?.map(e => e.name))}`},
                 ]
             ),
         }
@@ -223,17 +217,17 @@ const Index = (props) => {
                     <div className='flex justify-between items-center'>
                         <h2 className='xl:text-3xl text-xl font-medium '>{dataLang?.catagory_finishedProduct_group_title || "catagory_finishedProduct_group_title"}</h2>
                         <div className='flex space-x-3 items-center'>
-                            <Popup_ThanhPham dataLang={dataLang} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105' />
+                            <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} onRefreshSub={_ServerFetchingSub.bind(this)} dataLang={dataLang} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105' />
                         </div>
                     </div>
                     <div className='grid grid-cols-4 gap-8 px-0.5'>
                         <div className=''>
                             <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.category_material_group_name || "category_material_group_name"}</h6>
                             <Select 
-                                options={dataPositionOption}
+                                options={dataCategoryOption}
                                 formatOptionLabel={CustomSelectOption}
-                                onChange={_HandleFilterOpt.bind(this, "position")}
-                                value={idPosition}
+                                onChange={_HandleFilterOpt.bind(this, "category")}
+                                value={idCategory}
                                 noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                 isClearable={true}
                                 placeholder={dataLang?.category_material_group_name || "category_material_group_name"}
@@ -335,7 +329,7 @@ const Index = (props) => {
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center'>{dataLang?.branch_popup_properties || "branch_popup_properties"}</h4>
                             </div>
                             <div className='divide-y divide-slate-200'>
-                                {/* {data.map((e) => <Item onRefresh={_ServerFetching.bind(this)} onRefreshSub={_ServerFetchingSub.bind(this)} dataLang={dataLang} key={e.id} data={e}/>)}
+                                {data.map((e) => <Item onRefresh={_ServerFetching.bind(this)} onRefreshSub={_ServerFetchingSub.bind(this)} dataLang={dataLang} key={e.id} data={e}/>)}
                                 {(!onFetching && data?.length == 0) && 
                                     <div className=" max-w-[352px] mt-24 mx-auto" >
                                         <div className="text-center">
@@ -344,7 +338,7 @@ const Index = (props) => {
                                         </div>
                                     </div>
                                 }
-                                {onFetching && <Loading/>} */}
+                                {onFetching && <Loading/>}
                             </div>
                         </div>
                     </div>
@@ -380,7 +374,7 @@ const Item = React.memo((props) => {
             cancelButtonText:`${props.dataLang?.aler_cancel}`
         }).then((result) => {
           if (result.isConfirmed) {
-            Axios("DELETE", `/api_web/api_staff/position/${id}?csrf_protection=true`, {
+            Axios("DELETE", `/api_web/api_product/category/${id}?csrf_protection=true`, {
             }, (err, response) => {
               if(!err){
                 var {isSuccess, message} = response.data;
@@ -416,27 +410,27 @@ const Item = React.memo((props) => {
                         <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
                     </button>
                 </div>
+                <h6 className='xl:text-base text-xs px-2 w-[20%]'>{props.data?.code}</h6>
                 <h6 className='xl:text-base text-xs px-2 w-[20%]'>{props.data?.name}</h6>
-                <h6 className='xl:text-base text-xs px-2 w-[15%] text-center'>Thành viên</h6>
-                <h6 className='xl:text-base text-xs px-2 w-[20%]'>{props.data?.department_name}</h6>
+                <h6 className='xl:text-base text-xs px-2 w-[15%]'>{props.data?.note}</h6>
                 <div className='flex flex-wrap px-2 w-[25%]'>
                     {props.data?.branch.map(e => 
                         <h6 key={e?.id.toString()} className='text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[300] rounded border border-[#0F4F9E] h-fit'>{e?.name}</h6>
                     )}
                 </div>
                 <div className='flex justify-center space-x-2 w-[10%] px-2'>
-                    <Popup_ChucVu onRefresh={props.onRefresh} onRefreshSub={props.onRefreshSub} dataLang={props.dataLang} id={props.data?.id} />
+                    <Popup_ThanhPham onRefresh={props.onRefresh} onRefreshSub={props.onRefreshSub} dataLang={props.dataLang} id={props.data?.id} />
                     <button onClick={_HandleDelete.bind(this, props.data?.id)} className="xl:text-base text-xs outline-none"><IconDelete color="red"/></button>
                 </div>
             </div>
             {hasChild &&
                 <div className='bg-slate-50/50'>
                     {props.data?.children?.map((e) => 
-                        <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} dataLang={props.dataLang} key={e.id} data={e}  grandchild="0"
+                        <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} onRefreshSub={props.onRefreshSub} dataLang={props.dataLang} key={e.id} data={e} grandchild="0"
                             children={e?.children?.map((e => 
-                                <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} dataLang={props.dataLang} key={e.id} data={e} grandchild="1"
+                                <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} onRefreshSub={props.onRefreshSub} dataLang={props.dataLang} key={e.id} data={e} grandchild="1"
                                     children={e?.children?.map((e => 
-                                        <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} dataLang={props.dataLang} key={e.id} data={e} grandchild="2" />
+                                        <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} onRefreshSub={props.onRefreshSub} dataLang={props.dataLang} key={e.id} data={e} grandchild="2" />
                                     ))}
                                 />
                             ))} 
@@ -473,16 +467,16 @@ const ItemsChild = React.memo((props) => {
                         <IconMinus className='mt-1.5' />
                     </div>
                 }
+                <h6 className='xl:text-base text-xs px-2 w-[20%]'>{props.data?.code}</h6>
                 <h6 className='xl:text-base text-xs px-2 w-[20%]'>{props.data?.name}</h6>
-                <h6 className='xl:text-base text-xs px-2 w-[15%] text-center'>0</h6>
-                <h6 className='xl:text-base text-xs px-2 w-[20%]'>{props.data?.department_name}</h6>
+                <h6 className='xl:text-base text-xs px-2 w-[15%]'>{props.data?.note}</h6>
                 <div className='w-[25%] flex flex-wrap px-2'>
                     {props.data?.branch.map(e => 
                         <h6 key={e?.id.toString()} className='text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[300] rounded border border-[#0F4F9E] h-fit'>{e?.name}</h6>
                     )}
                 </div>
                 <div className='w-[10%] flex justify-center space-x-2'>
-                    {/* <Popup_NVL onRefresh={props.onRefresh} dataLang={props.dataLang} data={props.data} /> */}
+                    <Popup_ThanhPham onRefresh={props.onRefresh} onRefreshSub={props.onRefreshSub} dataLang={props.dataLang} data={props.data} id={props.data?.id} />
                     <button onClick={props.onClick} className="xl:text-base text-xs"><IconDelete color="red"/></button>
                 </div>
             </div>
@@ -493,8 +487,7 @@ const ItemsChild = React.memo((props) => {
 
 const Popup_ThanhPham = React.memo((props) => {
     const dataOptBranch = useSelector(state => state.branch);
-    const dataOptDepartment = useSelector(state => state.department_staff);
-    const dataOptPosition = useSelector(state => state.position_staff);
+    const dataOptGroup = useSelector(state => state.categoty_finishedProduct);
 
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
@@ -503,12 +496,15 @@ const Popup_ThanhPham = React.memo((props) => {
 
     const [onSending, sOnSending] = useState(false);
     const [onFetching, sOnFetching] = useState(false);
+    const [onFetchingSubId, sOnFetchingSubId] = useState(false);
+    const [onFetchingSub, sOnFetchingSub] = useState(false);
 
     const [name, sName] = useState("");
     const [code, sCode] = useState("");
     const [note, sNote] = useState("");
     const [branch, sBranch] = useState([]);
-    const branch_id = branch?.map(e => e.value)
+
+    const [group, sGroup] = useState(null);
 
     const [errBranch, sErrBranch] = useState(false);
     const [errName, sErrName] = useState(false);
@@ -523,30 +519,37 @@ const Popup_ThanhPham = React.memo((props) => {
         open && sNote("");
         open && sBranch([]);
         open && sDataOption([]);
+        open && sGroup(null)
         open && props?.id && sOnFetching(true)
+        setTimeout(() => {
+            open && props?.id && sOnFetchingSubId(true)
+        }, 500);
     }, [open]);
 
     const _HandleChangeInput = (type, value) => {
         if(type == "name"){
             sName(value?.target.value)
         }else if(type == "code"){
-            sPosition(value?.value)
+            sCode(value?.target.value)
         }else if(type == "note"){
-            sDepartment(value?.value)
+            sNote(value?.target.value)
         }else if(type == "branch"){
             sBranch(value)
+        }else if(type == "group"){
+            sGroup(value?.value)
         }
     }
 
     const _ServerSending = () => {
         var formData = new FormData()
 
+        formData.append("code", code)
         formData.append("name", name)
-        formData.append("position_parent_id", position)
-        formData.append("department_id", department)
-        branch_id.forEach(id => formData.append('branch_id[]', id));
+        formData.append("note", note)
+        formData.append("parent_id", group)
+        branch.forEach(id => formData.append('branch_id[]', id.value));
 
-        Axios("POST", `${props?.id ? `/api_web/api_staff/position/${props?.id}?csrf_protection=true` : "/api_web/api_staff/position?csrf_protection=true"}`, {
+        Axios("POST", `${props?.id ? `/api_web/api_product/category/${props?.id}?csrf_protection=true` : "/api_web/api_product/category?csrf_protection=true"}`, {
             data: formData,
             headers: {'Content-Type': 'multipart/form-data'}
         }, (err, response) => {
@@ -559,8 +562,9 @@ const Popup_ThanhPham = React.memo((props) => {
                     })
                     sOpen(false)
                     sName("")
-                    sPosition(null)
-                    sDepartment(null)
+                    sCode("")
+                    sNote("")
+                    sGroup(null)
                     sBranch([])
                     props.onRefresh && props.onRefresh()
                     props.onRefreshSub && props.onRefreshSub()
@@ -607,27 +611,67 @@ const Popup_ThanhPham = React.memo((props) => {
     }, [branch?.length > 0]);
 
     const _ServerFetching = () => {
-        Axios("GET", `/api_web/api_staff/position/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+        Axios("GET", `/api_web/api_product/category/${props?.id}?csrf_protection=true`, {}, (err, response) => {
             if(!err){
                 var list = response.data;
                 sName(list?.name)
-                sDepartment(list?.department_id)
-                sPosition(list?.position_parent_id)
+                sCode(list?.code)
+                sNote(list?.note)
+                sGroup(list?.parent_id)
                 sBranch(list?.branch.map(e => ({label: e.name, value: e.id})))
             }
+            sOnFetching(false)
         })
-        Axios("GET", `/api_web/api_staff/positionOption/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            if(!err){
-                var {rResult} = response.data;
-                sDataOption(rResult.map(x => ({label: x.name, value: x.id, level: x.level})))
-            }
-        })
-        sOnFetching(false)
     }
 
     useEffect(() => {
         onFetching && _ServerFetching()
     }, [onFetching]);
+
+    const _ServerFetchingSubId = () => {
+        Axios("GET", `/api_web/api_product/categoryOption/${props.id}?csrf_protection=true`, {
+            params: {
+                "filter[branch_id][]": branch?.length > 0 ? branch.map(e => e.value) : 0
+            }
+        }, (err, response) => {
+            if(!err){
+                console.log("Here 3")
+                var {rResult} = response.data;
+                sDataOption(rResult.map(x => ({label: x.name, value: x.id, level: x.level})))
+            }
+            sOnFetchingSubId(false)
+        })
+    }
+
+    useEffect(() => {
+        onFetchingSubId && _ServerFetchingSubId()
+    }, [onFetchingSubId]);
+
+    const _ServerFetchingSub = () => {
+        Axios("GET", `/api_web/api_product/categoryOption/?csrf_protection=true`, {
+            params: {
+                "filter[branch_id][]": branch?.length > 0 ? branch.map(e => e.value) : 0
+            }
+        }, (err, response) => {
+            console.log(branch)
+            if(!err){
+                var {rResult} = response.data;
+                sDataOption(rResult.map(x => ({label: x.name, value: x.id, level: x.level})))
+            }
+            sOnFetchingSub(false)
+        })
+    }
+
+    useEffect(() => {
+        onFetchingSub && _ServerFetchingSub()
+    }, [onFetchingSub]);
+
+    useEffect(() => {
+        setTimeout(() => {
+            open && branch && props.id && sOnFetchingSubId(true)
+            open && branch && !props.id && sOnFetchingSub(true)
+        }, 800);
+    }, [branch]);
 
     return(
         <PopupEdit  
@@ -682,14 +726,14 @@ const Popup_ThanhPham = React.memo((props) => {
                 </div>
                 <div className='space-y-1'>
                     <label className="text-[#344054] font-normal text-base">{props.dataLang?.category_material_group_level}</label>
-                    {/* <Select 
-                        options={dataOption}
+                    <Select 
+                        options={branch?.length != 0 ? dataOption : dataOptGroup}
                         formatOptionLabel={CustomSelectOption}
-                        defaultValue={(idCategory == "0" || !idCategory) ? {label: `${props.dataLang?.category_material_group_level}`} : {label: dataOption.find(x => x?.parent_id == idCategory)?.label, code:dataOption.find(x => x?.parent_id == idCategory)?.code, value: idCategory}}
-                        value={(idCategory == "0" || !idCategory) ? {label: "Nhóm cha", code: "nhóm cha"} : {label: dataOption.find(x => x?.value == idCategory)?.label, code:dataOption.find(x => x?.value == idCategory)?.code, value: idCategory}}
-                        onChange={valueIdCategory.bind(this)}
+                        value={(group == "0" || !group) ? null : {label: dataOptGroup.find(x => x?.value == group)?.label, code:dataOptGroup.find(x => x?.value == group)?.code, value: group}}
+                        onChange={_HandleChangeInput.bind(this, "group")}
                         isClearable={true}
                         placeholder={props.dataLang?.category_material_group_level}
+                        noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                         className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none" 
                         isSearchable={true}
                         theme={(theme) => ({
@@ -701,7 +745,13 @@ const Popup_ThanhPham = React.memo((props) => {
                                 primary: '#0F4F9E',
                             },
                         })}
-                    /> */}
+                        styles={{
+                            placeholder: (base) => ({
+                            ...base,
+                            color: "#cbd5e1",
+                            })
+                        }}
+                    />
                 </div>
                 <div className='space-y-1'>
                     <label className="text-[#344054] font-normal text-base">{props.dataLang?.client_popup_note}</label>

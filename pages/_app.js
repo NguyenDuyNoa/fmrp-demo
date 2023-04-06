@@ -20,6 +20,14 @@ const deca = Lexend_Deca({
   weight: ['300', '400', '500', '600', '700']
 })
 
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: true,
+})
+
 const Default = (props) => {
   return(
     <React.Fragment>
@@ -75,9 +83,9 @@ function MainPage({ Component, pageProps }) {
       if(err){
         dispatch({type: "auth/update", payload: false})
       }else{
-        var {isSuccess} = response.data;
+        var {isSuccess, info} = response.data;
         if(isSuccess){
-          dispatch({type: "auth/update", payload: response.data?.info})
+          dispatch({type: "auth/update", payload: info})
         }else{
           dispatch({type: "auth/update", payload: false})
         }
@@ -88,7 +96,7 @@ function MainPage({ Component, pageProps }) {
 
   useEffect(() => {
     onChecking && ServerFetching()
- }, [onChecking])
+  }, [onChecking])
 
   useEffect(() => {
     auth === null && sOnChecking(true)
@@ -124,7 +132,7 @@ const LoginPage = React.memo((props) => {
   const [code, sCode] = useState(localStorage?.getItem('usercodeFMRP') ? localStorage?.getItem('usercodeFMRP') : "");
   const [name, sName] = useState(localStorage?.getItem('usernameFMRP') ? localStorage?.getItem('usernameFMRP') : "");
   const [password, sPassword] = useState("");
-  const [onSending, sOnSending] = useState(false)
+  const [onSending, sOnSending] = useState(false);
 
   const _HandleInputChange = (type, value) => {
     if(type === "code"){
@@ -144,14 +152,14 @@ const LoginPage = React.memo((props) => {
       }
     }, (err, response) => {
       if(response !== null){
-        var isSuccess = response.data?.isSuccess;
+        var {isSuccess, message, token, database_app} = response.data;
         if(isSuccess){
           dispatch({type: "auth/update", payload: response.data?.data})
-          localStorage.setItem("tokenFMRP", response.data?.token)
-          localStorage.setItem("databaseappFMRP", response.data?.database_app)
+          localStorage.setItem("tokenFMRP", token)
+          localStorage.setItem("databaseappFMRP", database_app)
           Toast.fire({
             icon: 'success',
-            title: 'Đăng nhập thành công'
+            title: message
           })
           if(rememberMe){
             localStorage.setItem("usernameFMRP", name)
@@ -163,16 +171,10 @@ const LoginPage = React.memo((props) => {
             localStorage.removeItem("remembermeFMRP");
           }
         }else{
-          Swal.fire({
-            title: "Lỗi",
-            text: "Thông tin của bạn chưa đúng",
-            icon: "error",
-            background: "#ffffff",
-            color: "#141522",
-            showConfirmButton: false,
-            timer: 1000,
-            width: "400px"
-          });
+          Toast.fire({
+            icon: 'error',
+            title: `${message}`
+          })     
         }
       }else {
         console.log("Lỗi")
@@ -180,13 +182,6 @@ const LoginPage = React.memo((props) => {
       sOnSending(false)
     })
   }
-  const Toast = Swal.mixin({
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-  })
 
   useEffect(() => {
     onSending && _ServerSending()
@@ -195,16 +190,10 @@ const LoginPage = React.memo((props) => {
   const _HandleSubmit = (e) => {
     e.preventDefault()
     if((name.length && code.length && password.length) === 0 ){
-      Swal.fire({
-        title: "Cảnh báo",
-        text: "Vui lòng điền đầy đủ thông tin",
-        icon: "warning",
-        background: "#ffffff",
-        color: "#141522",
-        showConfirmButton: false,
-        timer: 800,
-        width: "400px"
-      });
+      Toast.fire({
+        icon: 'error',
+        title: "Vui lòng điền đầy đủ thông tin"
+      })     
     }else{
         sOnSending(true)
     }
@@ -213,7 +202,7 @@ const LoginPage = React.memo((props) => {
   return(
     <React.Fragment>
       <Head>
-        <title>{dataLang?.auth_login}</title>
+        <title>{dataLang?.auth_login || "auth_login"}</title>
       </Head>
       <div className="bg-[#EEF1F8]">
         <div className="bg-[url('/Logo-BG.png')] relative bg-repeat-round h-screen w-screen flex flex-col justify-center items-center overflow-hidden">
@@ -221,10 +210,10 @@ const LoginPage = React.memo((props) => {
             <div className='space-y-8'>
               <div className='bg-white px-16 pt-20 pb-12 rounded-lg space-y-10 w-[600px]'>
                 <div className='space-y-3'>
-                  <h1 className="text-[#11315B] font-medium text-3xl text-center">{dataLang?.auth_login}</h1>
+                  <h1 className="text-[#11315B] font-medium text-3xl text-center">{dataLang?.auth_login || "auth_login"}</h1>
                   <div className='flex space-x-5 w-full'>
-                    <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ? "bg-[#E2F0FE] border-transparent text-[#11315B]" : "bg-white border-[#cccccc]"} px-5 py-3 rounded-md transition hover:scale-105 border w-full`}>{dataLang?.auth_version_official}</button>
-                    <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ? "bg-[#E2F0FE] border-transparent text-[#11315B]" : "bg-white border-[#cccccc]"} px-5 py-3 rounded-md transition hover:scale-105 border w-full`}>{dataLang?.auth_version_test}</button>
+                    <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ? "bg-[#E2F0FE] border-transparent text-[#11315B]" : "bg-white border-[#cccccc]"} px-5 py-3 rounded-md transition hover:scale-105 border w-full`}>{dataLang?.auth_version_official || "auth_version_official"}</button>
+                    <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ? "bg-[#E2F0FE] border-transparent text-[#11315B]" : "bg-white border-[#cccccc]"} px-5 py-3 rounded-md transition hover:scale-105 border w-full`}>{dataLang?.auth_version_test || "auth_version_test"}</button>
                   </div>
                 </div>
                 <div className='space-y-3'>
@@ -237,7 +226,7 @@ const LoginPage = React.memo((props) => {
                   />
                   <input
                     type="text"
-                    placeholder={dataLang?.auth_user_name}
+                    placeholder={dataLang?.auth_user_name || "auth_user_name"}
                     value={name}
                     id="username"
                     onChange={_HandleInputChange.bind(this, "name")}
@@ -246,7 +235,7 @@ const LoginPage = React.memo((props) => {
                   <div className='relative flex flex-col justify-center'>
                     <input
                       type={typePassword ? "text" : "password"}
-                      placeholder={dataLang?.auth_password}
+                      placeholder={dataLang?.auth_password || "auth_password"}
                       value={password}
                       id="userpwd"
                       onChange={_HandleInputChange.bind(this, "password")}
@@ -257,12 +246,12 @@ const LoginPage = React.memo((props) => {
                   <div className='flex w-full justify-between'>
                     <div className='flex items-center space-x-1.5'>
                       <input type="checkbox" id="rememberMe" value={rememberMe} checked={rememberMe ? true : false} onChange={_ToggleRememberMe.bind(this)} />
-                      <label htmlFor="rememberMe">{dataLang?.auth_remember_login}</label>
+                      <label htmlFor="rememberMe">{dataLang?.auth_remember_login || "auth_remember_login"}</label>
                     </div>
-                    <button className='text-[#3276FA] text-sm'>{dataLang?.auth_forgot_password}</button>
+                    <button className='text-[#3276FA] text-sm'>{dataLang?.auth_forgot_password || "auth_forgot_password"}</button>
                   </div>
                 </div>
-                <button onClick={_HandleSubmit.bind(this)} className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] btn-animation hover:scale-105">{dataLang?.auth_login}</button>
+                <button onClick={_HandleSubmit.bind(this)} className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] btn-animation hover:scale-105">{dataLang?.auth_login || "auth_login"}</button>
                 <h4 className="text-center text-[#667085] text-sm font-light">FOSOSOFT © 2021</h4>
               </div>
               <div className='flex items-center space-x-6 justify-center'>

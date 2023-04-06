@@ -56,7 +56,7 @@ const Index = (props) => {
     const [data, sData] = useState({});
     const [data_ex, sData_ex] = useState([]);
     const [listDs, sListDs] = useState()
-
+    const [onSending, sOnSending] = useState(false);
     const [dataOption, sDataOption] = useState([]);
     const [idPos, sIdPos] = useState(null);
     const [onFetchingOpt, sOnFetchingOpt] = useState(false);
@@ -207,41 +207,74 @@ const Index = (props) => {
         }
       })
     }
-    const [status, sStatus] = useState(false)
-    const _HandleChangeInput = (type, value) => {
-        if(type == "status"){
-            sStatus(value.target?.checked)
-          }
+    const [status, sStatus] = useState("")
+    const [active,sActive] = useState(0)
+    const _ToggleStatus = (id) => {
+      var index = data.findIndex(x => x.id === id);
+      if (index !== -1 && data[index].active === "0") {
+        data[index].active = "1";
+      }else if (index !== -1 && data[index].active === "1") {
+        data[index].active = "0";
+      }
+      sData([...data])
     }
+    const _ServerSending = () => {
+      let id = status
+      var data = new FormData();
+      data.append('active', active);   
+      Axios("POST",`${id && `/api_web/api_staff/change_status_staff/${id}?csrf_protection=true`}`, {
+          data:{
+            active:active
+          },
+          headers: {"Content-Type": "multipart/form-data"} 
+      }, (err, response) => {
+          if(!err){
+              var {isSuccess, message, } = response.data;  
+              if(isSuccess){
+                  Toast.fire({
+                      icon: 'success',
+                      title: `${dataLang[message]}`
+                  })
+                }
+          }
+          sOnSending(false)
+      })
+      }
+  useEffect(() => {
+    onSending && _ServerSending()  
+  }, [onSending]);
+  useEffect(()=>{
+     sOnSending(true)
+  },[active])
     //excel
     const multiDataSet = [
       {
           columns: [
               {title: "ID", width: {wch: 4}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Mã khách hàng", width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Tên khách hàng", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Người đại diện", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Mã số thuế", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Điện thoại", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Địa chỉ", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Phụ trách khách hàng", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Nhóm", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Chi nhánh", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Ngày tạo", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.personnels_staff_table_fullname}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.personnels_staff_table_code}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.personnels_staff_table_email}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.personnels_staff_table_depart}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.personnels_staff_position}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.personnels_staff_table_logged}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.personnels_staff_table_active}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.personnels_staff_popup_manager}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.personnels_staff_position}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title:`${dataLang?.client_list_brand}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
           ],
           data: data_ex?.map((e) =>
               [
                   {value: `${e.id}`, style: {numFmt: "0"}},
-                  {value: `${e.code}`},
-                  {value: `${e.name}`},
-                  {value: `${e.representative}`},
-                  {value: `${e.tax_code}`},
-                  {value: `${e.phone_number}`},
-                  {value: `${e.address}`},
-                  {value: `${e.staff_charge?.map(i => i.full_name)}`},
-                  {value: `${e.client_group?.map(i => i.name)}`},
-                  {value: `${e.branch?.map(i => i.name)}`},
-                  {value: `${e.date_create}`},
+                  {value: `${e.full_name ? e.full_name : ""}`},
+                  {value: `${e.code ? e.code : ""}`},
+                  {value: `${e.email ? e.email : ""}`},
+                  {value: `${e.department ? e.department?.map(e=> e.name) : ""}`},
+                  {value: `${e.position_name ? e.position_name : ""}`},
+                  {value: `${e.last_login ? e.last_login :""}`},
+                  {value: `${e.active ? e.active == "1" && "Đang hoạt động" :e.active == "0" && "Không hoạt động"}`},
+                  {value: `${e.admin ?  e.admin == "1" && "Có" : e.admin == "0" && "Không"}`},
+                  {value: `${e.position_name ? e.position_name : ""}`},
+                  {value: `${e.branch ? e.branch?.map(i => i.name) : ""}`},
               ]    
           ),
       }
@@ -411,9 +444,14 @@ const Index = (props) => {
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-center">{e.position_name}</h6>                
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[28%]  rounded-md text-left">{e.last_login}</h6>                              
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-center">
-                                <label className="relative inline-flex items-center cursor-pointer">
-                                  <input type="checkbox"  className="sr-only peer" value={status}  id={e.id}     
-                                    onChange={_HandleChangeInput.bind(this, "status")}/>
+                                <label htmlFor={e.id} className="relative inline-flex items-center cursor-pointer">
+                                  <input type="checkbox"  className="sr-only peer" value={e.active}  id={e.id}
+                                  // defaultChecked
+                                   checked={e.active === "0" ? false : true}
+     
+                                    
+                                    onChange={_ToggleStatus.bind(this, e.id)}/>
+                                    
                                   <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                                 </label>
                             </h6>                              
@@ -563,7 +601,8 @@ const Popup_dsnd = (props) => {
               sThumb(db?.profile_image)
               sIdPos(db?.position_id)
           }
-          sOnSending(false)
+          // sOnSending(false)
+          sOnFetching(false)
          })
         
         }

@@ -123,6 +123,7 @@ const Index = (props) => {
                                             {err && e.prefix === "" && <label className="text-sm text-red-500">Vui lòng nhập {dataLang[e.type] || e.type}</label>}
                                         </div>
                                     )}
+                                    <div className='h-8 w-8 rounded-r-full border border-l-transparent' />
                                 </div>
                             </ScrollArea>
                         </div>

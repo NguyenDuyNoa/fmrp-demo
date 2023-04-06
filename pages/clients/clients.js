@@ -284,16 +284,19 @@ const Index = (props) => {
                    />
                     </div>
               <div  className="flex space-x-3 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                    {/* <div><TabClient onClick={_HandleSelectTab.bind(this, "all")} active="all" total={totalItem.iTotalDisplayRecords}>{dataLang?.client_list_grroupall}</TabClient></div>
-                    <div><TabClient onClick={_HandleSelectTab.bind(this, "nogroup")} active="nogroup"  total={totalItem.iTotalDisplayRecords}>{dataLang?.client_list_nogroup}</TabClient></div> */}
                      {listDs &&   listDs.map((e)=>{
                           return (
                            <div>
-                             <TabClient 
+                              <TabClient 
                                 style={{
-                                 backgroundColor: e.color
-                               }}
-                              key={e.id} onClick={_HandleSelectTab.bind(this, `${e.id}`)} total={e.count} active={e.id} >{e.name}</TabClient> 
+                                  backgroundColor: e.color
+                                }}
+                                key={e.id} 
+                                onClick={_HandleSelectTab.bind(this, `${e.id}`)} 
+                                total={e.count} 
+                                active={e.id} 
+                                className={`${e.color ? "text-white" : "text-[#0F4F9E] bg-[#e2f0fe] "}`}
+                              >{e.name}</TabClient> 
                             </div>
                           )
                       })
@@ -378,9 +381,9 @@ const Index = (props) => {
                               </h6>                
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left flex justify-start flex-wrap ">
                                
-                                  {e.client_group?.map(h=>{
+                                    {e.client_group?.map(h=>{
                                     return ( 
-                                      <span key={h} style={{ backgroundColor: `${h.color == "" ? "#0F4F9E" : h.color}`}} className={`text-[white]  mr-2 mb-1 w-fit xl:text-base text-xs px-2 rounded-md font-[300] py-0.5`}>{h.name}</span>
+                                      <span key={h.id} style={{ backgroundColor: `${h.color == "" ? "#e2f0fe" : h.color}`, color: `${h.color == "" ? "#0F4F9E" : "white"}`}} className={`  mr-2 mb-1 w-fit xl:text-base text-xs px-2 rounded-md font-[300] py-0.5`}>{h.name}</span>
                                       )})}
                               
                               </h6> 
@@ -431,7 +434,7 @@ const Index = (props) => {
 const TabClient = React.memo((props) => {
     const router = useRouter();
     return(
-      <button  style={props.style} onClick={props.onClick} className={`${router.query?.tab === `${props.active}` ? "text-[white] bg-[#0F4F9E] min-w-[220px] justify-center" : "bg-[#0F4F9E] justify-center text-white min-w-[180px]"} flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
+      <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[220px] flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
         {router.query?.tab === `${props.active}` && <LocationTick   size="20" color="white" />}
         {props.children}
         <span className={`${props?.total > 0 && "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"} `}>{props?.total > 0 && props?.total}</span>

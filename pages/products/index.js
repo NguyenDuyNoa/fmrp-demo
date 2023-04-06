@@ -99,6 +99,12 @@ const Index = (props) => {
                 dispatch({type: "branch/update", payload: rResult.map(e => ({label: e.name, value: e.id}))})
             }
         })
+        Axios("GET", "/api_web/api_product/productType/?csrf_protection=true", {}, (err, response) => {
+            if(!err){
+                var data = response.data;
+                dispatch({type: "type_finishedProduct/update", payload: data.map(e => ({label: dataLang[e.name], value: e.code}))})
+            }
+        })
     }
 
     useEffect(() => {
@@ -303,6 +309,7 @@ const Index = (props) => {
 
 const Popup_ThanhPham = React.memo((props) => {
     const dataOptBranch = useSelector(state => state.branch);
+    const dataOptType = useSelector(state => state.type_finishedProduct);
 
     const scrollAreaRef = useRef(null);
     const handleMenuOpen = () => {
@@ -317,19 +324,20 @@ const Popup_ThanhPham = React.memo((props) => {
     const _HandleSelectTab = (e) => sTab(e)
 
     const [onFetching, sOnFetching] = useState(false);
+    const [onFetchingCategory, sOnFetchingCategory] = useState(false);
 
     const [name, sName] = useState("");
     const [code, sCode] = useState("");
     const [price, sPrice] = useState();
     const [minimumAmount, sMinimumAmount] = useState();
     const [note, sNote] = useState("");
+    const [branch, sBranch] = useState([]);
+    const [type, sType] = useState(null);
+    const [dataCategory, sDataCategory] = useState([]);
 
     const [thumb, sThumb] = useState(null);
     const [thumbFile, sThumbFile] = useState(null);
     const [isDeleteThumb, sIsDeleteThumb] = useState(false);
-
-    const [branch, sBranch] = useState([]);
-    const branch_id = branch.map(e => e.value)
 
     const [errGroup, sErrGroup] = useState(false);
     const [errName, sErrName] = useState(false);
@@ -347,6 +355,7 @@ const Popup_ThanhPham = React.memo((props) => {
         open && sThumb(null)
         open && sThumbFile(null)
         open && sBranch([])
+        open && sDataCategory([])
     }, [open]);
 
     const _HandleChangeInput = (type, value) => {
@@ -385,6 +394,24 @@ const Popup_ThanhPham = React.memo((props) => {
     useEffect(() => {
         sThumb(thumb)
     },[thumb])
+
+    const _ServerFetchingCategory = () => {
+        Axios("GET", "api_web/api_product/categoryOption/?csrf_protection=true", {
+            params: {
+                "filter[branch_id][]": branch?.length > 0 ? branch.map(e => e.value) : 0
+            }
+        }, (err, response) => {
+            if(!err){}
+        })
+    }
+
+    useEffect(() => {
+        onFetchingCategory && _ServerFetchingCategory()
+    }, [onFetchingCategory]);
+
+    useEffect(() => {
+        open && branch && sOnFetchingCategory(true)
+    }, [branch]);
 
     return(
         <PopupEdit  
@@ -483,6 +510,37 @@ const Popup_ThanhPham = React.memo((props) => {
                                         </div>
                                         <div className='2xl:space-y-1'>
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Loại thành phẩm <span className='text-red-500'>*</span></label>
+                                            <Select 
+                                                options={dataOptType}
+                                                // value={branch}
+                                                onChange={_HandleChangeInput.bind(this, "type")}
+                                                isClearable={true}
+                                                placeholder={"Loại thành phẩm"}
+                                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                menuPortalTarget={document.body}
+                                                onMenuOpen={handleMenuOpen}
+                                                className={`${errBranch ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
+                                                theme={(theme) => ({
+                                                    ...theme,
+                                                    colors: {
+                                                        ...theme.colors,
+                                                        primary25: '#EBF5FF',
+                                                        primary50: '#92BFF7',
+                                                        primary: '#0F4F9E',
+                                                    },
+                                                })}
+                                                styles={{
+                                                    placeholder: (base) => ({
+                                                    ...base,
+                                                    color: "#cbd5e1",
+                                                    }),
+                                                    menuPortal: (base) => ({
+                                                        ...base,
+                                                        zIndex: 9999,
+                                                        position: "absolute",
+                                                    }),
+                                                }}
+                                            />
                                             {errType && <label className="text-sm text-red-500">Vui lòng chọn loại thành phẩm</label>}
                                         </div>
                                         <div className='2xl:space-y-1'>

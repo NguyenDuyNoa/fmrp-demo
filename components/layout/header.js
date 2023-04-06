@@ -399,6 +399,8 @@ const Header = () => {
   };
 
 const DropdownAvatar = React.memo(() => {
+    const auth = useSelector(state => state.auth);
+    
     const router = useRouter()
     const dispatch = useDispatch();
 
@@ -442,7 +444,7 @@ const DropdownAvatar = React.memo(() => {
                 trigger={
                     <button className={`hover:drop-shadow-[0_0_5px_#eabd7a99]`} >
                         <div className='flex items-center self-center space-x-1'>
-                            <Image alt="" src="/avt.png" width={35.5} height={35.5} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                            <Image alt="" src={auth?.user_avatar} width={35.5} height={35.5} quality={100} className="object-cover rounded-full" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                             <Image alt="" src="/icon/header/dropdown.png" width={10} height={10} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                         </div>
                     </button>
@@ -457,12 +459,12 @@ const DropdownAvatar = React.memo(() => {
                     <div className="bg-white rounded justify-between">
                         <div className='flex space-x-3 px-3 py-3.5 border-b border-[#F2F4F7]'>
                             <div className='h-fit min-w-[40px] relative'>
-                                <Image alt="" src="/avt.png" width={40} height={40} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                <Image alt="" src={auth?.user_avatar} width={40} height={40} quality={100} className="object-cover rounded-full" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                 <div className='bg-green-500 w-2.5 h-2.5 rounded-full absolute bottom-0 right-1' />
                             </div>
                             <div>
-                                <h5 className='font-semibold text-sm text-[#141522]'>Công Ty TNHH Giải pháp phần mềm FOSO</h5>
-                                <h6 className="text-[#9295A4] font-normal text-sm ">info@fososoft.com</h6>
+                                <h5 className='font-semibold text-sm text-[#141522]'>{auth?.user_full_name}</h5>
+                                <h6 className="text-[#9295A4] font-normal text-sm ">{auth?.user_email}</h6>
                             </div>
                         </div>
                         <div className=''>

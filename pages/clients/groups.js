@@ -400,6 +400,7 @@ const Popup_groupKh = (props) => {
                                   options={brandpOpt}
                                   isSearchable={true}
                                   onChange={_HandleChangeInput.bind(this, "valueBr")}
+                                  LoadingIndicator
                                   isMulti
                                   noOptionsMessage={() => "Không có dữ liệu"}
                                   value={valueBr}
@@ -449,7 +450,7 @@ const Popup_groupKh = (props) => {
               />     
             </div>
             <div className="text-right mt-5 space-x-2">
-              <button onClick={_ToggleModal.bind(this,false)} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-lg border border-solid border-[#D0D5DD]"
+              <button  type="button" onClick={_ToggleModal.bind(this,false)} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-lg border border-solid border-[#D0D5DD]"
               >{props.dataLang?.branch_popup_exit}</button>
               <button 
                 type="submit"
