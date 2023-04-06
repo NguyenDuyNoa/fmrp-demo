@@ -208,17 +208,50 @@ const Index = (props) => {
       })
     }
     const [status, sStatus] = useState("")
-    const [active,sActive] = useState(0)
+    const [active,sActive] = useState("")
+    // const [fecthActive,sFecthActive] = useState(false)
+    // const _ToggleStatus = (id, value) => {
+    //   var index = data.findIndex(x => {
+    //     if(x.id === id){
+    //       return x.id === id
+    //     }
+    //   });
+    //   var db =  data[index].active = value.target.checked
+    //   // sActive()
+    //   sStatus(id)
+    //   sData([...data])
+    //   // console.log(data[index] = !active);
+    //   // data[index]?.active = !active
+    //   // sData([...data])
+    // }
     const _ToggleStatus = (id) => {
-      var index = data.findIndex(x => x.id === id);
-      if (index !== -1 && data[index].active === "0") {
-        data[index].active = "1";
-      }else if (index !== -1 && data[index].active === "1") {
-        data[index].active = "0";
-      }
-      sData([...data])
+     Swal.fire({
+        title: `${"Thay đổi trạng thái"}`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#296dc1',
+        cancelButtonColor: '#d33',
+        confirmButtonText: `${dataLang?.aler_yes}`,
+        cancelButtonText:`${dataLang?.aler_cancel}`
+      }).then((result) => {
+        if (result.isConfirmed) {
+          sStatus(id)
+          var index = data.findIndex(x => x.id === id);
+          if (index !== -1 && data[index].active === "0") {
+           sActive(data[index].active = "1")
+          
+          }else if (index !== -1 && data[index].active === "1") {
+          
+            sActive(data[index].active = "0")
+           
+          }
+          sData([...data])
+        }
+       
+      })
+     
     }
-    const _ServerSending = () => {
+    const _ServerSending =  () => {
       let id = status
       var data = new FormData();
       data.append('active', active);   
@@ -243,10 +276,15 @@ const Index = (props) => {
   useEffect(() => {
     onSending && _ServerSending()  
   }, [onSending]);
+  
   useEffect(()=>{
      sOnSending(true)
   },[active])
+  useEffect(()=>{
+     sOnSending(true)
+  },[status])
     //excel
+
     const multiDataSet = [
       {
           columns: [
@@ -263,6 +301,7 @@ const Index = (props) => {
               {title:`${dataLang?.client_list_brand}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
           ],
           data: data_ex?.map((e) =>
+         
               [
                   {value: `${e.id}`, style: {numFmt: "0"}},
                   {value: `${e.full_name ? e.full_name : ""}`},
@@ -271,7 +310,7 @@ const Index = (props) => {
                   {value: `${e.department ? e.department?.map(e=> e.name) : ""}`},
                   {value: `${e.position_name ? e.position_name : ""}`},
                   {value: `${e.last_login ? e.last_login :""}`},
-                  {value: `${e.active ? e.active == "1" && "Đang hoạt động" :e.active == "0" && "Không hoạt động"}`},
+                  {value: `${e.active ? ( e.active == "1" ? "Đang hoạt động" : "Không hoạt động"):""}`},
                   {value: `${e.admin ?  e.admin == "1" && "Có" : e.admin == "0" && "Không"}`},
                   {value: `${e.position_name ? e.position_name : ""}`},
                   {value: `${e.branch ? e.branch?.map(i => i.name) : ""}`},
@@ -279,7 +318,6 @@ const Index = (props) => {
           ),
       }
     ];
-    
     return (
         <React.Fragment>
       <Head>
@@ -407,7 +445,7 @@ const Index = (props) => {
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[18%] font-[300] text-left">{dataLang?.personnels_staff_table_avtar}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.personnels_staff_table_fullname}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.personnels_staff_table_code}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.personnels_staff_table_email}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[22%] font-[300] text-left">{dataLang?.personnels_staff_table_email}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.personnels_staff_table_depart}</h4> 
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-center">{dataLang?.personnels_staff_position}</h4>
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[28%] font-[300] text-left">{dataLang?.personnels_staff_table_logged}</h4>
@@ -422,7 +460,7 @@ const Index = (props) => {
                       (<>
                           <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">                       
                           {(data?.map((e) => 
-                            <div className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
+                            <div className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e?.id.toString()}>
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[18%]  rounded-md text-left"><div className='w-[60px] h-[60px]'>
                                 {e?.profile_image == null ?
                                                         <img src="/no_image.png" className='w-full h-full rounded object-contain' />
@@ -435,27 +473,27 @@ const Index = (props) => {
                                 <Popup_chitiet dataLang={dataLang} className="text-left" name={e.full_name} id={e?.id}/>
                               </h6>           
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.code}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.email}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[22%]  rounded-md text-left">{e.email}</h6>                
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left"><div className='flex flex-wrap gap-2'>{e.department?.map(e =>{
                                 return (
-                                 <span>{e.name}</span>
+                                 <span key={e.id}>{e.name}</span>
                                 )
                               })}</div></h6>                
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-center">{e.position_name}</h6>                
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[28%]  rounded-md text-left">{e.last_login}</h6>                              
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[28%]  rounded-md text-left">{e.last_login != null ? moment(e.last_login).format("DD/MM/YYYY, h:mm:ss") : ""}</h6>                              
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-center">
                                 <label htmlFor={e.id} className="relative inline-flex items-center cursor-pointer">
                                   <input type="checkbox"  className="sr-only peer" value={e.active}  id={e.id}
                                   // defaultChecked
-                                   checked={e.active === "0" ? false : true}
+                                   checked={e.active == "0" ? false : true}
      
-                                    
+                                 
                                     onChange={_ToggleStatus.bind(this, e.id)}/>
                                     
                                   <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                                 </label>
                             </h6>                              
-                            <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%] rounded-md text-left flex justify-start flex-wrap ">{e.branch?.map(i => (<span key={i} className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{i.name}</span>))}</h6>                  
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%] rounded-md text-left flex justify-start flex-wrap ">{e.branch?.map(i => (<span key={i.id} className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{i.name}</span>))}</h6>                  
                               <div className="space-x-2 w-[10%] text-center">
                                 <Popup_dsnd room={room}  listBr={listBr} dataOption={dataOption}  onRefresh={_ServerFetching.bind(this)} className="xl:text-base text-xs " listDs={listDs} dataLang={dataLang} name={e.name}code={e.code} phone_number={e.phone_number} 
                                   email={e.email}   id={e?.id} department={e.department} position_name={e.position_name} last_login={e.last_login}/>
@@ -577,6 +615,14 @@ const Popup_dsnd = (props) => {
         sValueBr([])
         sDataDepar([])
         // sValuePosi() 
+        // if(valueBr?.length == 0)
+        //   {
+        //     sListBrand(props.listBr ? props.listBr && [...props.listBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
+        //   }
+        //  else if(props?.id){
+        //     sListBrand((props.listBr?.map(e=> ({label: e.name, value: Number(e.id)}))?.filter(e => valueBr.some(x => e.value !== x.value))))
+        //   }
+        
         sListBrand(props.listBr ? props.listBr && [...props.listBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
         sRoom(props?.room ? props.room : [])
         sDataOption(props?.dataOption ? props?.dataOption : [])
@@ -585,7 +631,7 @@ const Popup_dsnd = (props) => {
         sCode()
         // sManage([])
       }, [open]);
-
+      
       const _ServerFetching_detailUser =  () =>{
           Axios("GET", `/api_web/api_staff/staff/${props?.id}?csrf_protection=true`, {}, (err, response) => {
           if(!err){
@@ -594,6 +640,7 @@ const Popup_dsnd = (props) => {
               sCode(db?.code)
               sPhone(db?.phonenumber)
               sEmail(db?.email)
+              // sValueBr(db?.branch?.map(e=> ({label: e.name, value: Number(e.id)})))
               sValueBr(db?.branch?.map(e=> ({label: e.name, value: Number(e.id)})))
               sValueManage(db?.manage?.map(x => ({label: x.full_name, value: Number(x.id)})))
               sAdmin(db?.admin)
@@ -1146,7 +1193,8 @@ const Popup_chitiet =(props)=>{
     }
     sOnFetching(false)
   })
-  }
+ 
+  } 
   useEffect(() => {
     onFetching && _ServerFetching_detailUser()
   }, [open]);
@@ -1183,11 +1231,11 @@ return (
                       <div className='mb-4 flex justify-between flex-wrap p-2'><span className='text-slate-400 text-sm      w-[25%]'>{props.dataLang?.personnels_staff_table_depart}:</span> <span className='font-normal capitalize'><div className='flex gap-2 flex-wrap'>{data?.department?.map(e =>  { return (<span key={e.id}>{e.name}</span>)})}</div></span></div>
                       <div className='mb-4 flex justify-between flex-wrap p-2'><span className='text-slate-400 text-sm      w-[25%]'>{props.dataLang?.personnels_staff_popup_manager}:</span> <span className='font-normal capitalize'>{data?.admin === "1" ? "Có" : data?.admin === "0" && "Không"}</span></div>                
                       <div className='mb-4 flex justify-between flex-wrap p-2'><span className='text-slate-400 text-sm      w-[34%]'>{props.dataLang?.personnels_staff_table_logged}:</span> <span className='font-normal capitalize'>{data?.last_login}</span></div>
-                      <div className='mb-4 flex justify-between flex-wrap p-2'><span className='text-slate-400 text-sm      w-[34%]'>{props.dataLang?.personnels_staff_table_active}:</span> <span className='font-normal capitalize'>{"Trạng thái"}</span></div>
+                      <div className='mb-4 flex justify-between flex-wrap p-2'><span className='text-slate-400 text-sm      w-[34%]'>{props.dataLang?.personnels_staff_table_active}:</span> <span className='font-normal capitalize'>{data?.active === "1" ? "Đang hoạt động" : data?.active === "0" && "Không hoạt động"}</span></div>
 
                      
                     </div>
-                    <div className='w-[50%] bg-slate-100/40'>
+                    <div className='w-[50%] bg-slate-100/40 rounded-md'>
                       <h6>
                       <div className='mb-4 flex justify-between flex-wrap p-2'><span className='text-slate-400 text-sm  w-[25%]'>{props.dataLang?.personnels_staff_table_avtar} </span></div>
                         <div className='flex justify-center'>
@@ -1208,21 +1256,21 @@ return (
               }   
        { tab === 1 && (
         <div>
-           <div className='w-[930px]'>
+           <div className='w-[930px] '>
              <div className="min:h-[200px] h-[72%] max:h-[400px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
               <div className="pr-2 w-[100%] lx:w-[110%] ">
                 
-                  <ScrollArea className="min-h-[455px] max-h-[455px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+                  <ScrollArea className="min-h-[455px] max-h-[455px] overflow-hidden bg-slate-100/40 rounded-md"  speed={1}  smoothScrolling={true}>
                     <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px]">                       
                         <div className="" >
                           <div className='mb-4 flex flex-wrap p-2 items-center'><span className='text-slate-400 text-sm w-[15%]'>{props.dataLang?.personnels_staff_position}:</span> <span className='font-normal capitalize'>{data?.position_name}</span></div>
-                          <div className='mb-4 flex flex-wrap p-2 items-center'><span className='text-slate-400 text-sm w-[15%]'>{props.dataLang?.personnels_staff_popup_mana}:</span> <span className='flex  gap-1 items-center flex-wrap mt-2'>{data?.manage?.map(e=>{ return (<span key={e.id} className='last:ml-0 font-normal capitalize  w-fit xl:text-base text-xs   gap-2 mb-2'> {e.full_name}</span>)})}</span></div> 
-                          <div className='mb-4 flex flex-wrap p-2 items-center'><span className='text-slate-400 text-sm w-[15%]'>{props.dataLang?.personnels_staff_table_depart}:</span> <span className='flex  gap-1 items-center flex-wrap mt-2'>{data?.department?.map(e=>{ return (
-                          <div className='inline-flex items-center w-[50%]' key={e.id}>               
-                            <label className="relative flex cursor-pointer items-center rounded-full p-3" htmlFor={e?.id} data-ripple-dark="true" > 
+                          <div className='mb-2 flex flex-wrap p-2 items-center'><span className='text-slate-400 text-sm w-[15%] '>{props.dataLang?.personnels_staff_popup_mana}:</span> <span className='flex  gap-1 items-center flex-wrap mt-2'>{data?.manage?.map(e=>{ return (<span key={e.id} className='last:ml-0 font-normal capitalize  w-fit xl:text-base text-xs   gap-2 mb-2'> {e.full_name}</span>)})}</span></div> 
+                          <div className='mb-4 flex flex-wrap p-2 '><span className='text-slate-400 text-sm w-[15%] '>{props.dataLang?.personnels_staff_table_depart}:</span> <span className='flex  gap-1 w-[85%] justify-between  flex-wrap '>{data?.department?.map(e=>{ return (
+                          <div className='inline-flex items-center w-[27%]' key={e.id}>               
+                            <label className="relative flex cursor-pointer items-center rounded-full p-1" htmlFor={e?.id} data-ripple-dark="true" > 
                                         <input
                                             type="checkbox"
-                                            className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
+                                            className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 "
                                             id={e?.id}
                                             defaultChecked
                                             checked
@@ -1235,6 +1283,7 @@ return (
                                             fill="currentColor"
                                             stroke="currentColor"
                                             stroke-width="1"
+
                                             >
                                             <path
                                                 fill-rule="evenodd"
