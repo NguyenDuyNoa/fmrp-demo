@@ -444,7 +444,12 @@ const DropdownAvatar = React.memo(() => {
                 trigger={
                     <button className={`hover:drop-shadow-[0_0_5px_#eabd7a99]`} >
                         <div className='flex items-center self-center space-x-1'>
-                            <Image alt="" src={auth?.user_avatar} width={35.5} height={35.5} quality={100} className="object-cover rounded-full" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                            {auth?.user_avatar !== null ?
+                                <Image alt="" src={auth?.user_avatar} width={35.5} height={35.5} quality={100} className="object-cover rounded-full" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                :
+                                <Image alt="" src={"/avatar_null.png"} width={35.5} height={35.5} quality={100} className="object-cover rounded-full" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+
+                            }
                             <Image alt="" src="/icon/header/dropdown.png" width={10} height={10} quality={100} className="object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                         </div>
                     </button>
@@ -459,7 +464,11 @@ const DropdownAvatar = React.memo(() => {
                     <div className="bg-white rounded justify-between">
                         <div className='flex space-x-3 px-3 py-3.5 border-b border-[#F2F4F7]'>
                             <div className='h-fit min-w-[40px] relative'>
-                                <Image alt="" src={auth?.user_avatar} width={40} height={40} quality={100} className="object-cover rounded-full" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                {auth?.user_avatar !== null ?
+                                    <Image alt="" src={auth?.user_avatar} width={40} height={40} quality={100} className="object-cover rounded-full" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                    :
+                                    <Image alt="" src={"/avatar_null.png"} width={35.5} height={35.5} quality={100} className="object-cover rounded-full" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                }
                                 <div className='bg-green-500 w-2.5 h-2.5 rounded-full absolute bottom-0 right-1' />
                             </div>
                             <div>
