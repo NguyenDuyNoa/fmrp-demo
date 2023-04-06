@@ -37,7 +37,7 @@ const Header = () => {
                         {name: "Danh sách NCC"},
                         {name: "Danh sách liên hệ NCC"},
                         {name: "Mặt hàng chủ đạo theo NCC"},
-                        {name: "Nhóm nhà cung cấp"},
+                        {name: "Nhóm nhà cung cấp", link: "/suppliers/groups"},
                     ]
                 },
             ]
@@ -400,6 +400,7 @@ const Header = () => {
 
 const DropdownAvatar = React.memo(() => {
     const auth = useSelector(state => state.auth);
+    console.log(auth)
     
     const router = useRouter()
     const dispatch = useDispatch();
