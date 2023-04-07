@@ -175,23 +175,28 @@ const Index = (props) => {
       {
           columns: [
               {title: "ID", width: {wch: 4}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Họ và tên", width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Tên khách hàng", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Điện thoại", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Chức vụ", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Chi nhánh", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: "Địa chỉ", width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              
+              {title: `${dataLang?.client_contact_table_fulname}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.client_contact_table_name}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.client_contact_table_phone}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.client_contact_table_mail}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.client_contact_table_pos}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.client_contact_table_hapy}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.client_contact_table_address}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title:`${dataLang?.client_list_brand}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+             
           ],
           data: data_ex?.map((e) =>
+         
               [
-                  {value: `${e.id}`, style: {numFmt: "0"}},
-                  {value: `${e.code}`},
-                  {value: `${e.name}`},
-                  {value: `${e.representative}`},
-                  {value: `${e.tax_code}`},
-                  {value: `${e.phone_number}`},
-                  {value: `${e.address}`},
+                  {value: `${e.client_contact_id}`, style: {numFmt: "0"}},
+                  {value: `${e.client_name ? e.client_name : ""}`},
+                  {value: `${e.contact_name ? e.contact_name : ""}`},
+                  {value: `${e.phone_number ? e.phone_number : ""}`},
+                  {value: `${e.position ? e.position : ""}`},
+                  {value: `${e.email ? e.email : ""}`},
+                  {value: `${e.birthday ? e.birthday != "0000-00-00" ? moment(e.birthday).format("DD-MM-YYYY") : "" : ""}`},
+                  {value: `${e.address ? e.address : ""}`},
+                  {value: `${e.branch ? e.branch?.map(i => i.name) : ""}`},
               ]    
           ),
       }
@@ -287,7 +292,7 @@ const Index = (props) => {
                         <div className="flex space-x-2 items-center">
                      {
                       data_ex?.length > 0 &&(
-                        <ExcelFile filename="Danh sách khách hàng" title="Dskh" element={
+                        <ExcelFile filename="Danh sách liên hệ" title="Dslh" element={
                           <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
                             <IconExcel size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
                           <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />

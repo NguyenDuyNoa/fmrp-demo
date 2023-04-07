@@ -34,7 +34,7 @@ const Header = () => {
                     title: "Nhà cung cấp",
                     img: "/icon/header/danhmuc/ncc.png",
                     items: [
-                        {name: "Danh sách NCC"},
+                        {name: "Danh sách NCC", link: "/suppliers/supplier"},
                         {name: "Danh sách liên hệ NCC"},
                         {name: "Mặt hàng chủ đạo theo NCC"},
                         {name: "Nhóm nhà cung cấp", link: "/suppliers/groups"},
@@ -313,7 +313,11 @@ const Header = () => {
                     ]
                 }
             ]
-        },{
+        }
+    ]
+
+    const ListBaoCao = [
+        {
             title: "Báo cáo",
             sub: [
                 {
@@ -361,7 +365,8 @@ const Header = () => {
                 <Dropdown data={ListBanXuatHang} position={"bottom left"} className="popover-bottom-left arrow-banxuathang">Bán & Xuất hàng</Dropdown>
                 <Dropdown data={ListMuaNhapHang} position={"bottom left"} className="popover-bottom-left-muanhaphang arrow-muanhaphang">Mua & Nhập hàng</Dropdown>
                 <Dropdown data={ListKhoSanXuat} className="popover-khosanxuat">Kho & Sản xuất</Dropdown>
-                <Dropdown data={ListKhac} className="popover-khac">Khác</Dropdown>
+                <Dropdown data={ListBaoCao} className="">Báo cáo & Thống kê</Dropdown>
+                <Dropdown data={ListKhac} className="popover-khac">Tiệc ích</Dropdown>
                 <Dropdown data={ListAdd} position={"bottom center"}>
                     <div>+ Thêm</div>
                 </Dropdown>
@@ -400,7 +405,6 @@ const Header = () => {
 
 const DropdownAvatar = React.memo(() => {
     const auth = useSelector(state => state.auth);
-    console.log(auth)
     
     const router = useRouter()
     const dispatch = useDispatch();

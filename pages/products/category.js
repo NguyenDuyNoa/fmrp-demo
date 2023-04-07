@@ -635,7 +635,6 @@ const Popup_ThanhPham = React.memo((props) => {
             }
         }, (err, response) => {
             if(!err){
-                console.log("Here 3")
                 var {rResult} = response.data;
                 sDataOption(rResult.map(x => ({label: x.name, value: x.id, level: x.level})))
             }
@@ -653,7 +652,6 @@ const Popup_ThanhPham = React.memo((props) => {
                 "filter[branch_id][]": branch?.length > 0 ? branch.map(e => e.value) : 0
             }
         }, (err, response) => {
-            console.log(branch)
             if(!err){
                 var {rResult} = response.data;
                 sDataOption(rResult.map(x => ({label: x.name, value: x.id, level: x.level})))

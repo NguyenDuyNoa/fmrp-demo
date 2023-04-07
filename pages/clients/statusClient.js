@@ -9,10 +9,15 @@ import Pagination from '/components/UI/pagination';
 import Select,{components} from "react-select"
 
 
-import { Edit as IconEdit, Trash as IconDelete, SearchNormal1 as IconSearch } from "iconsax-react";
+import { Edit as IconEdit, Trash as IconDelete, SearchNormal1 as IconSearch,Grid6 as IconExcel } from "iconsax-react";
 import Swal from "sweetalert2";
 import 'react-phone-input-2/lib/style.css'
- 
+import ReactExport from "react-data-export";
+
+
+const ExcelFile = ReactExport.ExcelFile;
+const ExcelSheet = ReactExport.ExcelFile.ExcelSheet
+
 const Toast = Swal.mixin({
   toast: true,
   position: 'top-end',
@@ -31,6 +36,7 @@ const Index = (props) => {
   const [keySearch, sKeySearch] = useState("")
   const [limit, sLimit] = useState(15);
   const [totalItem, sTotalItem] = useState([]);
+  const [data_ex, sData_ex] = useState([]);
 
   const _ServerFetching =  () =>{
     Axios("GET", `/api_web/api_client/status?csrf_protection=true`, {
@@ -45,6 +51,7 @@ const Index = (props) => {
           var {rResult, output} = response.data
           sData(rResult)
           sTotalItem(output)
+          sData_ex(rResult)
       }
       sOnFetching(false)
     })
@@ -126,6 +133,28 @@ const Index = (props) => {
       sOnFetching(true)
     }, 500);
   };
+
+  const multiDataSet = [
+    {
+        columns: [
+            {title: "ID", width: {wch: 4}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            {title: `${dataLang?.client_group_statusclient}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            {title: `${dataLang?.client_group_colorcode}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            {title:`${dataLang?.client_list_brand}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+           
+        ],
+        data: data_ex?.map((e) =>
+       
+            [
+                {value: `${e.id}`, style: {numFmt: "0"}},
+                {value: `${e.name ? e.name : ""}`},
+                {value: `${e.color ? e.color : ""}`},
+                {value: `${e.branch ? e.branch?.map(i => i.name) : ""}`},
+            ]    
+        ),
+    }
+  ];
+
   return (
     <React.Fragment>
       <Head>
@@ -184,7 +213,16 @@ const Index = (props) => {
                               placeholder={dataLang?.branch_search}
                           />
                         </form>
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-2 items-center">
+                        {
+                          data_ex?.length > 0 &&(
+                            <ExcelFile filename="Trạng thái khách hàng" title="Ttkh" element={
+                              <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
+                                <IconExcel size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
+                              <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
+                          </ExcelFile>
+                          )
+                        }
                           <label className="font-[300] text-slate-400">{dataLang?.display}</label>
                           <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
                             <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
@@ -402,6 +440,7 @@ const Popup_status = (props) => {
                                   options={brandpOpt}
                                   isSearchable={true}
                                   onChange={_HandleChangeInput.bind(this, "valueBr")}
+                                  LoadingIndicator
                                   isMulti
                                   noOptionsMessage={() => "Không có dữ liệu"}
                                   value={valueBr}
