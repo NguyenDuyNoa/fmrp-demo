@@ -522,7 +522,8 @@ const Popup_dskh = (props) => {
       const _ServerFetching_detailUser =  () =>{
           Axios("GET", `/api_web/api_client/client/${props?.id}?csrf_protection=true`, {}, (err, response) => {
           if(!err){
-              var db =  response.data
+              var db =  response.data;
+             
               sName(db?.name)
               sCode(db?.code)
               sTaxcode(db?.tax_code)
@@ -536,12 +537,12 @@ const Popup_dskh = (props) => {
               sValueDis(db?.district.districtid)
               sValueCt(db?.city.provinceid)
               sNote(db?.note)
+              sValueBr(db?.branch?.map(e=> ({label: e.name, value: Number(e.id)})))
               sValueChar(db?.staff_charge.map(e=> ({label: e.full_name, value: Number(e.staffid)})))
               sValueGr(db?.client_group.map(e=> ({label: e.name, value: Number(e.id)})))
               sValueWa(db?.ward.wardid)
-              sValueBr(db?.branch?.map(e=> ({label: e.name, value: Number(e.id)})))
               sOption(db?.contact ? db?.contact : [])
-            
+           
           }
           sOnFetching(false)
         })

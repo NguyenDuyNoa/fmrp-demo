@@ -90,6 +90,7 @@ const Index = (props) => {
       Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {
        params:{
         limit: 0,
+        
        }
     }, (err, response) => {
       if(!err){
@@ -183,7 +184,7 @@ const Index = (props) => {
       }).then((result) => {
         if (result.isConfirmed) {
           const id = event; 
-          Axios("DELETE",`/api_web/api_supplier/supplier/${props.id}?csrf_protection=true`, {
+          Axios("DELETE",`/api_web/api_supplier/supplier/${id}?csrf_protection=true`, {
           }, (err, response) => {
             if(!err){
               var isSuccess = response.data?.isSuccess;
@@ -474,7 +475,7 @@ const Popup_dsncc = (props) => {
 
       const [valueBr, sValueBr] = useState([])
       const branch = valueBr.map(e => e.value)
-
+  
       const _HandleSelectTab = (e) => sTab(e)
       const [hidden, sHidden] = useState(false)
    
@@ -502,11 +503,13 @@ const Popup_dsncc = (props) => {
          sValueGr([])
        
       }, [open]);
+
       const _ServerFetching_detailUser =  () =>{
-          Axios("GET", `/api_web/api_supplier/supplier/${props.id}?csrf_protection=true`, {}, (err, response) => {
+          Axios("GET", `/api_web/api_supplier/supplier/${props?.id}?csrf_protection=true`, {}, (err, response) => {
           if(!err){
-              var db =  response.data
             
+              var db =  response.data
+            console.log(db);
               sName(db?.name)
               sCode(db?.code)
               sTaxcode(db?.tax_code)
@@ -519,20 +522,20 @@ const Popup_dsncc = (props) => {
               sValueDis(db?.district.districtid)
               sValueCt(db?.city.provinceid)
               sNote(db?.note)
-              sValueGr(db?.client_group.map(e=> ({label: e.name, value: Number(e.id)})))
-              sValueWa(db?.ward.wardid)
               sValueBr(db?.branch?.map(e=> ({label: e.name, value: Number(e.id)})))
+              sValueWa(db?.ward.wardid)
+              sValueGr(db?.supplier_group.map(e=> ({label: e.name, value: Number(e.id)})))
               sOption(db?.contact ? db?.contact : [])
-             
           }
-          // sOnSending(false)
           sOnFetching(false)
         })
         }
+
         useEffect(() => {
-          onFetching && _ServerFetching_detailUser()
+          onFetching && props?.id && _ServerFetching_detailUser()
         }, [open]);
-       console.log(valueBr);
+
+
       //onchang input
       const _HandleChangeInput = (type, value) => {
         if(type == "name"){
@@ -559,15 +562,15 @@ const Popup_dsncc = (props) => {
           sValueBr(value)
         }
         
-        else if(type == "optionName"){
-          sOptionName(value.target?.value)
-        }else if(type == "optionHapy"){
-          sOptionHapy(value.target?.value)
-        }else if(type == "optionNote"){
-          sOptionNote(value.target?.value)
-        }else if(type == "optionPhone"){
-          sOptionPhone(value.target?.value)
-        }
+        // else if(type == "optionName"){
+        //   sOptionName(value.target?.value)
+        // }else if(type == "optionHapy"){
+        //   sOptionHapy(value.target?.value)
+        // }else if(type == "optionNote"){
+        //   sOptionNote(value.target?.value)
+        // }else if(type == "optionPhone"){
+        //   sOptionPhone(value.target?.value)
+        // }
       }
 
 
@@ -590,11 +593,13 @@ const Popup_dsncc = (props) => {
       }, (err, response) => {
         if(!err){
             var {rResult} =  response.data
+           
             if(valueGr?.length == 0){
               sListGr(rResult?.map(e=> ({label: e.name, value: Number(e.id)})))
             }else if(props?.id){
               sListGr(rResult?.map(x => ({label: x.name, value: Number(x.id)}))?.filter(e => valueGr.some(x => e.value !== x.value)))
             }
+
         }
         // sOnFetching(false)
         sOnFetchingBr(false)
@@ -606,7 +611,6 @@ const Popup_dsncc = (props) => {
       const handleChangeGr =  (e) => {
         sValueGr(e) 
       }
-      
     useEffect(() => {
         onFetchingBr && _ServerFetching_Gr()
     }, [onFetchingBr]);
@@ -701,7 +705,6 @@ const Popup_dsncc = (props) => {
       data.append('ward', valueWa);
       data.append('supplier_group_id', group);
       data.append('branch_id', branch_id);
-      data.append('staff_charge', char);
       
       Axios("POST",`${id ? `/api_web/api_supplier/supplier/${id}?csrf_protection=true` : "/api_web/api_supplier/supplier/?csrf_protection=true"}`, {
         data:{
@@ -720,7 +723,6 @@ const Popup_dsncc = (props) => {
           ward:valueWa,
           supplier_group_id: group,
           branch_id: branch_id,
-          staff_charge:char,
           contact: option,
         },
         headers: {"Content-Type": "multipart/form-data"} 
@@ -751,7 +753,6 @@ const Popup_dsncc = (props) => {
                   sOption([])
                   sValueBr([])
                   sGroupOpt([]) 
-                  sValueChar([])   
               }else{
                 Toast.fire({
                   icon: 'error',
@@ -1307,7 +1308,7 @@ const Popup_chitiet =(props)=>{
                         </div>
                         <div className='w-[50%] bg-slate-100/40'>
                           <div className='mb-4 flex justify-between  p-2 items-center flex-wrap'><span className='text-slate-400 text-sm'>{props.dataLang?.client_list_brand}:</span> <span className='flex flex-wrap justify-between gap-1'>{data?.branch?.map(e=>{ return (<span key={e.id}  className='last:ml-0 font-normal capitalize mb-1  w-fit xl:text-base text-xs px-2 text-[#0F4F9E] border border-[#0F4F9E] rounded-[5.5px]'> {e.name}</span>)})}</span></div>
-                          <div className='mb-4 justify-between  p-2 flex flex-wrap  '><span className='text-slate-400 text-sm '>{"Nhóm nhà cung cấp"}:</span> <span className=' flex flex-wrap  justify-start gap-1'>{data?.client_group?.map(h=>{ return (  <span key={h.id} style={{ backgroundColor: "#e2f0fe"}} className={`text-[#0F4F9E] mb-1   w-fit xl:text-base text-xs px-2 rounded-md font-[300] py-0.5`}>{h.name}</span>)})}</span></div>
+                          <div className='mb-4 justify-between  p-2 flex flex-wrap  '><span className='text-slate-400 text-sm '>{"Nhóm nhà cung cấp"}:</span> <span className=' flex flex-wrap  justify-start gap-1'>{data?.supplier_group?.map(h=>{ return (  <span key={h.id} style={{ backgroundColor: "#e2f0fe"}} className={`text-[#0F4F9E] mb-1   w-fit xl:text-base text-xs px-2 rounded-md font-[300] py-0.5`}>{h.name}</span>)})}</span></div>
                           
                           <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.suppliers_supplier_debt}:</span> <span className='font-normal capitalize'>{data?.debt_limit}</span></div>
                           {/* <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_date}:</span> <span className='font-normal capitalize'>{moment(data?.date_create).format("DD/MM/YYYY")}</span></div> */}
@@ -1327,9 +1328,9 @@ const Popup_chitiet =(props)=>{
                   <div className="pr-2 w-[100%] lx:w-[110%] ">
                     <div className="flex items-center sticky top-0 bg-slate-100 p-2 z-10">
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-left">{props.dataLang?.suppliers_supplier_fullname}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-center">{props.dataLang?.suppliers_supplier_phone}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[400] text-left">{props.dataLang?.suppliers_supplier_email}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[400] text-left">{props.dataLang?.suppliers_supplier_pos}</h4> 
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[25%] font-[400] text-center">{props.dataLang?.suppliers_supplier_phone}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-left">{props.dataLang?.suppliers_supplier_email}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[400] text-left">{props.dataLang?.suppliers_supplier_pos}</h4> 
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-left">{props.dataLang?.suppliers_supplier_adress}</h4>
                     </div>
                     {onFetching ?
@@ -1343,9 +1344,9 @@ const Popup_chitiet =(props)=>{
                           {(data?.contact?.map((e) => 
                             <div className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.full_name}</h6>                
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-center">{e.phone_number}</h6>                
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">{e.email}</h6>                
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[10%]  rounded-md text-left">{e.position}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[25%]  rounded-md text-center">{e.phone_number}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.email}</h6>                
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">{e.position}</h6>                
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.address}</h6>                
                             </div>
                           ))}              

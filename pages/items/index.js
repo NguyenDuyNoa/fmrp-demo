@@ -621,6 +621,11 @@ const Popup_NVL = React.memo((props) => {
         open && sVariantSub(null)
         open && sPrevVariantMain(null)
         open && sPrevVariantSub(null)
+        open && sErrGroup(false)
+        open && sErrName(false)
+        open && sErrCode(false)
+        open && sErrUnit(false)
+        open && sErrBranch(false)
     }, [open]);
 
     const _HandleChangeInput = (type, value) => {
@@ -762,9 +767,9 @@ const Popup_NVL = React.memo((props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if(name?.length == 0 || code?.length == 0 || groupId == null || unit == null || branch.length == 0){
+        if(name?.length == 0 || props.id && code?.length == 0 || groupId == null || unit == null || branch.length == 0){
             name?.length == 0 && sErrName(true);
-            code?.length == 0 && sErrCode(true);
+            props.id && code?.length == 0 && sErrCode(true);
             groupId == null && sErrGroup(true);
             unit == null && sErrUnit(true);
             branch.length == 0 && sErrBranch(true);
@@ -1040,8 +1045,8 @@ const Popup_NVL = React.memo((props) => {
                                             {errGroup && <label className="text-sm text-red-500">{props.dataLang?.category_material_list_err_group || "category_material_list_err_group"}</label>}
                                         </div>
                                         <div className='2xl:space-y-1'>
-                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.category_material_list_code || "category_material_list_code"} <span className='text-red-500'>*</span></label>
-                                            <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder={props.dataLang?.category_material_list_code || "category_material_list_code"} className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.category_material_list_code || "category_material_list_code"} {props.id && <span className='text-red-500'>*</span>}</label>
+                                            <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder={props.dataLang?.client_popup_sytem} className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
                                             {errCode && <label className="text-sm text-red-500">{props.dataLang?.category_material_list_err_code}</label>}
                                         </div>
                                         <div className='2xl:space-y-1'>

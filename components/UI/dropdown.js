@@ -13,7 +13,7 @@ const Dropdown = (props) => {
     return (
         <div className="">
             <Popup
-                trigger={<button className={`text-slate-200 hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99]`} >{props.children}</button>}
+                trigger={<button className={`text-slate-200 2xl:text-base text-sm hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99]`} >{props.children}</button>}
                 closeOnDocumentClick
                 arrow={props.position}
                 on={['hover']}

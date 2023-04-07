@@ -117,13 +117,12 @@ const Index = (props) => {
                                     {data.map(e =>
                                         <div>
                                             <div key={e.id?.toString()} className='flex items-center space-x-3 pr-10'>
-                                                <label className=''>{dataLang[e.type] || e.type} <span className='text-red-500'>*</span></label>
+                                                <label className='w-40'>{dataLang[e.type] || e.type} <span className='text-red-500'>*</span></label>
                                                 <input value={e.prefix} onChange={_HandleChangeInput.bind(this, e.id)} type="text" placeholder={`Nhập ${dataLang[e.type] || (e.type)}`} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-60 bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
                                             </div>
                                             {err && e.prefix === "" && <label className="text-sm text-red-500">Vui lòng nhập {dataLang[e.type] || e.type}</label>}
                                         </div>
                                     )}
-                                    <div className='h-8 w-8 rounded-r-full border border-l-transparent' />
                                 </div>
                             </ScrollArea>
                         </div>

@@ -35,7 +35,7 @@ const Header = () => {
                     img: "/icon/header/danhmuc/ncc.png",
                     items: [
                         {name: "Danh sách NCC", link: "/suppliers/supplier"},
-                        {name: "Danh sách liên hệ NCC"},
+                        {name: "Danh sách liên hệ NCC", link: "/suppliers/contacts"},
                         {name: "Mặt hàng chủ đạo theo NCC"},
                         {name: "Nhóm nhà cung cấp", link: "/suppliers/groups"},
                     ]
@@ -352,21 +352,39 @@ const Header = () => {
             ]
         }
     ]
+
+    const ListQuyTrinh = [
+        {
+            title: "Quy trình",
+            sub: [
+                {
+                    title: "Quy trình",
+                    img: "/icon/header/quytrinh/process.svg",
+                    items: [
+                        {name: "Quy trình sử dụng phần mềm FMRP", link: "/process"},
+                        {name: "Quy trình quản lý sản xuất"},
+                        {name: "Quy trình bán hàng"},
+                        {name: "Quy trình mua hàng - nhập kho"}
+                    ]
+                }
+            ]
+        }
+    ]
   
     return (
       <header className="z-[999] w-full bg-[#0f4f9e] fixed top-0">
-        <div className="mx-10 py-4">
+        <div className="2xl:mx-10 mx-5 py-4">
           <div className="flex justify-between items-center">
-            <div className='flex space-x-7 items-center'>
+            <div className='flex 2xl:space-x-7 space-x-4 items-center'>
                 <Link href="/">
-                    <Image alt="" src="/logo.png" width={100} height={45} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                    <Image alt="" src="/logo.png" width={100} height={45} quality={100} className="2xl:w-[100px] w-[70px] h-auto object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                 </Link>
                 <Dropdown data={ListDanhMuc} position={"bottom left"} className="popover-bottom-left arrow-danhmuc">Danh mục</Dropdown>
                 <Dropdown data={ListBanXuatHang} position={"bottom left"} className="popover-bottom-left arrow-banxuathang">Bán & Xuất hàng</Dropdown>
                 <Dropdown data={ListMuaNhapHang} position={"bottom left"} className="popover-bottom-left-muanhaphang arrow-muanhaphang">Mua & Nhập hàng</Dropdown>
                 <Dropdown data={ListKhoSanXuat} className="popover-khosanxuat">Kho & Sản xuất</Dropdown>
                 <Dropdown data={ListBaoCao} className="">Báo cáo & Thống kê</Dropdown>
-                <Dropdown data={ListKhac} className="popover-khac">Tiệc ích</Dropdown>
+                <Dropdown data={ListKhac} className="popover-khac">Tiện ích</Dropdown>
                 <Dropdown data={ListAdd} position={"bottom center"}>
                     <div>+ Thêm</div>
                 </Dropdown>
@@ -392,9 +410,9 @@ const Header = () => {
                     <Image alt="" src="/icon/header/tb2.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                     <div className='text-[10px] bg-red-500 h-4 w-4 rounded-full absolute -top-[7px] -right-[7px] flex flex-col items-center justify-center text-white font-medium'>2</div>
                 </a>
-                <a href="#" title='Trợ giúp' className='hover:scale-105 transition'>
-                    <Image alt="" src="/icon/header/ques.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
-                </a>
+                <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"}>
+                    <Image alt="" src="/icon/header/ques.png" width={18} height={18} quality={100} className="object-contain hover:scale-105 transition" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                </Dropdown>
                 <DropdownAvatar />
             </div>
           </div>

@@ -95,6 +95,7 @@ const Index = (props) => {
     }
 
     const [data, sData] = useState([]);
+    const [dataExcel, sDataExcel] = useState([]);
     const [onFetching, sOnFetching] = useState(false);
     const [onFetchingAnother, sOnFetchingAnother] = useState(false);
     //Bộ lọc Chi nhánh
@@ -192,6 +193,7 @@ const Index = (props) => {
             if(!err){
                 var {rResult} = response.data;
                 sDataFinishedPro(rResult.map(e => ({label: `${e.code} (${e.name})`, value: e.id})))
+                sDataExcel(rResult)
             }
         })
         sOnFetchingAnother(false)
@@ -251,6 +253,38 @@ const Index = (props) => {
     //Set data cho bộ lọc chi nhánh
     const hiddenOptions = idBranch?.length > 2 ? idBranch?.slice(0, 2) : [];
     const options = dataBranchOption.filter((x) => !hiddenOptions.includes(x.value));
+
+    //excel
+    const multiDataSet = [
+        {
+            columns: [
+                {title: "ID", width: {wch: 4}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `Danh mục `, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `Mã thành phẩm`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `Tên thành phẩm`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `Loại thành phẩm`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `Đơn vị`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `Biến thể`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `Tồn kho`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `Ghi chú`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `Chi nhánh`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            ],
+            data: dataExcel?.map((e) =>
+                [
+                    {value: `${e.id}`, style: {numFmt: "0"}},
+                    {value: `${e.category_name ? e.category_name : ""}`},
+                    {value: `${e.code ? e.code : ""}`},
+                    {value: `${e.name ? e.name : ""}`},
+                    {value: `${e?.type_products?.name ? e?.type_products?.name : ""}`},
+                    {value: `${e.unit ? e.unit :""}`},
+                    {value: `${e.variation ? e.variation?.length : 0}`},
+                    {value: `${e.stock_quantity ? Number(e?.stock_quantity).toLocaleString() : ""}`},
+                    {value: `${e.note ? e.note : ""}`},
+                    {value: `${e.branch ? e.branch?.map(i => i.name)  : ""}`},
+                ]    
+            ),
+        }
+      ];
 
     return (
         <React.Fragment>
@@ -384,14 +418,14 @@ const Index = (props) => {
                         </form>
                         {data.length != 0 &&
                             <div className='flex space-x-6'>
-                                {/* <ExcelFile filename={dataLang?.header_category_finishedProduct_group || "header_category_finishedProduct_group"} element={
+                                <ExcelFile filename="Thành phẩm" element={
                                     <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
                                         <IconExcel size={18} />
                                         <span>{dataLang?.client_list_exportexcel}</span>
                                     </button>
                                 }>
-                                    <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name={dataLang?.header_category_finishedProduct_group || "header_category_finishedProduct_group"} />
-                                </ExcelFile> */}
+                                    <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Thành phẩm" />
+                                </ExcelFile>
 
                                 <div className="flex space-x-2 items-center">
                                     <label className="font-[300] text-slate-400">{dataLang?.display} :</label>
@@ -459,8 +493,8 @@ const Index = (props) => {
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[5%] text-center'>{e?.unit}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[6%] text-center'>{e?.variation?.length}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[6%] text-center'>{Number(e?.stock_quantity).toLocaleString()}</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[9%]'>định mức bom</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[10%]'>Phiên bản - Công đoạn</h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[9%]'></h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[10%]'></h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[7%]'>{e?.note}</h6>
                                                 <div className='px-2 py-2.5 w-[8%] flex flex-wrap'>
                                                     {e?.branch.map(e => 
@@ -730,7 +764,7 @@ const Popup_ThanhPham = React.memo((props) => {
                 var list = response.data
                 sBranch(list?.branch?.map(e => ({label: e.name, value: e.id})))
                 sCategory({label: list?.category_name, value: list?.category_id})
-                sType({label: list?.type_products?.name, value: list?.type_products?.code})
+                sType({label: props.dataLang[list?.type_products?.name], value: list?.type_products?.code})
                 sCode(list?.code)
                 sName(list?.name)
                 sPrice(Number(list?.price_sell))
@@ -843,11 +877,11 @@ const Popup_ThanhPham = React.memo((props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if(branch?.length == 0 || category?.value == null || type?.value == null || code == "" || unit?.value == null || name == ""){
+        if(branch?.length == 0 || category?.value == null || type?.value == null || props?.id && code == "" || unit?.value == null || name == ""){
             branch?.length == 0 && sErrBranch(true)
             category?.value == null && sErrGroup(true)
             type?.value == null && sErrType(true)
-            code == "" && sErrCode(true)
+            props?.id && code == "" && sErrCode(true)
             unit?.value == null && sErrUnit(true)
             name == "" && sErrName(true)
             Toast.fire({
@@ -1079,8 +1113,8 @@ const Popup_ThanhPham = React.memo((props) => {
                                             {errType && type?.value == null && <label className="text-sm text-red-500">Vui lòng chọn loại thành phẩm</label>}
                                         </div>
                                         <div className='2xl:space-y-1'>
-                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Mã thành phẩm <span className='text-red-500'>*</span></label>
-                                            <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder="Mã thành phẩm" className={`${errCode && code == "" ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Mã thành phẩm {props?.id && <span className='text-red-500'>*</span>}</label>
+                                            <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder={props.dataLang?.client_popup_sytem} className={`${errCode && code == "" ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
                                             {errCode && code == "" && <label className="text-sm text-red-500">Vui lòng nhập mã thành phẩm</label>}
                                         </div>
                                         <div className='2xl:space-y-1'>
