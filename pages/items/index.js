@@ -1263,7 +1263,7 @@ const Popup_NVL = React.memo((props) => {
                                                                 </div>
                                                                 
                                                             </label>
-                                                            <span className='text-[#344054] font-normal text-sm '>{e.name}</span>
+                                                            <label htmlFor={e.id} className='text-[#344054] font-normal text-sm '>{e.name}</label>
                                                         </div>
                                                     )}
                                                 </div>
@@ -1350,7 +1350,7 @@ const Popup_NVL = React.memo((props) => {
                                                                 </div>
                                                                 
                                                             </label>
-                                                            <span className='text-[#344054] font-normal text-sm '>{e.name}</span>
+                                                            <label htmlFor={e.id} className='text-[#344054] font-normal text-sm '>{e.name}</label>
                                                         </div>
                                                     )}
                                                 </div>

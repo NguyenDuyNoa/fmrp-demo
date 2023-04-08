@@ -1275,7 +1275,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                 </div>
                                                                 
                                                             </label>
-                                                            <span className='text-[#344054] font-normal text-sm '>{e.name}</span>
+                                                            <label htmlFor={e.id} className='text-[#344054] font-normal text-sm cursor-pointer'>{e.name}</label>
                                                         </div>
                                                     )}
                                                 </div>
@@ -1358,7 +1358,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                 </div>
                                                                 
                                                             </label>
-                                                            <span className='text-[#344054] font-normal text-sm '>{e.name}</span>
+                                                            <label htmlFor={e.id} className='text-[#344054] font-normal text-sm '>{e.name}</label>
                                                         </div>
                                                     )}
                                                 </div>
