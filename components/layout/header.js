@@ -171,7 +171,6 @@ const Header = () => {
                     title: "Kho hàng",
                     img: "/icon/header/kho/kho.png",
                     items: [
-                        {name: "Nhóm kho hàng"},
                         {name: "Kho"},
                         {name: "Vị trí kho"}
                     ]

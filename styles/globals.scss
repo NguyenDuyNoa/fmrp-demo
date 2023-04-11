@@ -147,3 +147,8 @@ input::-ms-reveal,
 		margin: 0em 1em !important
 	} 
 }
+
+.tooltip-container {
+	position: absolute !important;
+	overflow: visible !important;
+  }

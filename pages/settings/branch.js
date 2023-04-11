@@ -72,12 +72,17 @@ const Index = (props) => {
         Axios("DELETE", `/api_web/Api_Branch/branch/${id}?csrf_protection=true`, {
         }, (err, response) => {
           if(!err){
-            var isSuccess = response.data?.isSuccess;
+            var {isSuccess, message} = response.data;
             if(isSuccess){
               Toast.fire({
                 icon: 'success',
-                title: dataLang?.aler_success_delete
+                title: `${dataLang[message]}`
               })     
+            }else {
+              Toast.fire({
+                icon: 'error',
+                title: `${dataLang[message]}`
+              })  
             }
           }
           _ServerFetching()

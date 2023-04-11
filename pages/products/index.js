@@ -10,13 +10,15 @@ import PopupEdit from "/components/UI/popup";
 import Pagination from '/components/UI/pagination';
 import Loading from "components/UI/loading";
 
+import Popup from 'reactjs-popup';
 import { 
     SearchNormal1 as IconSearch, Trash as IconDelete, Edit as IconEdit, UserEdit as IconUserEdit,
-    Grid6 as IconExcel, Image as IconImage, GalleryEdit as IconEditImg
+    Grid6 as IconExcel, Image as IconImage, GalleryEdit as IconEditImg, ArrowDown2 as IconDown
 } from "iconsax-react";
 import { NumericFormat } from 'react-number-format';
 import Select, { components } from 'react-select';
 import Swal from "sweetalert2";
+import ModalImage from "react-modal-image";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
@@ -347,7 +349,7 @@ const Index = (props) => {
                                 isMulti
                                 closeMenuOnSelect={false}
                                 hideSelectedOptions={false}
-                                placeholder={dataLang?.client_list_brand || "client_list_brand"}
+                                placeholder={"Thành phẩm"}
                                 className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
                                 isSearchable={true}
                                 components={{ MultiValue }}
@@ -441,7 +443,7 @@ const Index = (props) => {
                             </div>
                         }
                     </div>
-                    <div className='min:h-[500px] h-[66%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+                    <div className='min:h-[500px] 2xl:h-[66%] h-[60%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 tooltipBoundary'>
                         <div className='pr-2'>
                             <div className='flex items-center sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]'>
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[5%] font-[300] text-center'>{dataLang?.image || "image"}</h4>
@@ -473,11 +475,13 @@ const Index = (props) => {
                                     <div className="divide-y divide-slate-200"> 
                                         {data.map((e) => 
                                             <div key={e?.id.toString()} className='flex p-2 hover:bg-slate-50 relative'>
-                                                <div className='w-[5%] pointer-events-none select-none justify-center flex self-center'>
+                                                <div className='w-[5%]  justify-center flex self-center'>
                                                     {e?.images == null ?
-                                                        <img src="/no_image.png" className='w-full h-12 rounded object-contain' />
+                                                        // <img src="/no_image.png" className='w-full h-12 rounded object-contain' />
+                                                        <ModalImage small="/no_image.png" large="/no_image.png" className="w-full h-12 rounded object-cover"/> 
                                                     :
-                                                        <Image width={64} height={64} quality={100} src={e?.images} alt="thumb type" className="w-auto h-12 rounded object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/>
+                                                        // <Image width={64} height={64} quality={100} src={e?.images} alt="thumb type" className="w-auto h-12 rounded object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/>
+                                                        <ModalImage small={e?.images} large={e?.images} className="w-full h-12 rounded object-contain"/> 
                                                     }
                                                 </div>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[7%]'>{e?.category_name}</h6>
@@ -501,9 +505,12 @@ const Index = (props) => {
                                                         <h6 key={e?.id.toString()} className='xl:text-[14px] text-xs mr-1 mb-1 xl:py-[1px] xl:px-1.5 px-0.5 text-[#0F4F9E] rounded border border-[#0F4F9E] h-fit font-[300] break-words'>{e?.name}</h6>
                                                     )}
                                                 </div>
-                                                <div className='px-2 py-2.5 w-[7%] flex space-x-2 justify-center'>
-                                                    <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} id={e?.id} className="xl:scale-100 scale-[0.8] outline-none" />
-                                                    <button onClick={_HandleDelete.bind(this, e.id)} className="xl:scale-100 scale-[0.8] outline-none"><IconDelete color="red"/></button>
+                                                <div className='pl-2 py-2.5 w-[7%] flex space-x-2 justify-center'>
+                                                    {/* <button className='w-[98%] bg-slate-200 text-sm rounded'>Tác vụ <IconDown /></button> */}
+                                                    {/* <BtnTacVu keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" /> */}
+                                                    <MyComponent />
+                                                    {/* <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} id={e?.id} className="xl:scale-100 scale-[0.8] outline-none" />
+                                                    <button onClick={_HandleDelete.bind(this, e.id)} className="xl:scale-100 scale-[0.8] outline-none"><IconDelete color="red"/></button> */}
                                                 </div>
                                             </div>
                                         )}
@@ -528,6 +535,77 @@ const Index = (props) => {
         </React.Fragment>
     );
 }
+
+// const BtnTacVu = React.memo((props) => {
+//     return(
+//         <div>
+//             <Popup
+//                 trigger={
+//                     <button className={`flex space-x-1 items-center relative ` + props.className } >
+//                         <span>Tác vụ</span>
+//                         <IconDown size={12} />
+//                     </button>
+//                 }
+//                 closeOnDocumentClick
+//                 arrow={false}
+//                 position="bottom right"
+//                 className={`dropdown-edit `}
+//                 keepTooltipInside={props.keepTooltipInside}
+//             >
+//                 <div className="w-auto">
+//                     <div className="bg-white p-0.5 rounded-t w-52">
+//                         <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Thiết kế công đoạn</button>
+//                         <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Thiết kế BOM</button>
+//                         <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Sửa</button>
+//                         <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Xoá</button>
+//                     </div>
+//                 </div>
+//             </Popup>
+//         </div>
+//     )
+// })
+
+const MyComponent = () => {
+    const parentRef = useRef(null);
+    const [isOpen, setIsOpen] = useState(false);
+  
+    const handleClick = () => {
+      const parentPos = parentRef.current.getBoundingClientRect();
+      const posX = parentPos.x;
+      const posY = parentPos.y + parentPos.height;
+      setIsOpen(true);
+      const popupEl = document.querySelector(".tooltip-container");
+    if (popupEl) {
+        popupEl.style.position = "absolute";
+        popupEl.style.top = posY + "px";
+        popupEl.style.left = posX + "px";
+    }
+    };
+  
+    const MyPopup = React.forwardRef((props, ref) => {
+      return (
+        <Popup ref={ref} {...props}>
+          Popup contents here
+        </Popup>
+      );
+    });
+  
+    return (
+      <div className="parent-container" ref={parentRef}>
+        <button onClick={handleClick}>Open Popup</button>
+        <MyPopup
+          trigger={<div className="tooltip-trigger">i</div>}
+          position="bottom center"
+          arrow={true}
+          onOpen={() => setIsOpen(true)}
+          onClose={() => setIsOpen(false)}
+          open={isOpen}
+          keepTooltipInside
+        />
+      </div>
+    );
+  };
+  
 
 const Popup_ThanhPham = React.memo((props) => {
     const dataOptBranch = useSelector(state => state.branch);
@@ -561,6 +639,7 @@ const Popup_ThanhPham = React.memo((props) => {
     const [dataCategory, sDataCategory] = useState([]);
     const [category, sCategory] = useState(null);
     const [unit, sUnit] = useState(null);
+    const [expiry, sExpiry] = useState();
 
     const [thumb, sThumb] = useState(null);
     const [thumbFile, sThumbFile] = useState(null);
@@ -681,6 +760,7 @@ const Popup_ThanhPham = React.memo((props) => {
         open && sCode("")
         open && sNote("")
         open && sPrice(null)
+        open && sExpiry()
         open && sMinimumAmount(null)
         open && sThumb(null)
         open && sThumbFile(null)
@@ -734,6 +814,8 @@ const Popup_ThanhPham = React.memo((props) => {
                 sPrevVariantSub(variantSub?.value);
                 sVariantSub(value?.value);
             }
+        }else if(type == "expiry") {
+            sExpiry(Number(value.value))
         }
     }
 
@@ -762,15 +844,17 @@ const Popup_ThanhPham = React.memo((props) => {
         Axios("GET", `/api_web/api_product/product/${props?.id}?csrf_protection=true`, {}, (err, response) => {
             if(!err){
                 var list = response.data
+                sUnit({label: list?.unit, value: list?.unit_id})
+                sMinimumAmount(Number(list?.quantity_minimum))
+                sExpiry(Number(list?.expiry))
+                sThumb(list?.images)
                 sBranch(list?.branch?.map(e => ({label: e.name, value: e.id})))
                 sCategory({label: list?.category_name, value: list?.category_id})
                 sType({label: props.dataLang[list?.type_products?.name], value: list?.type_products?.code})
                 sCode(list?.code)
                 sName(list?.name)
                 sPrice(Number(list?.price_sell))
-                sMinimumAmount(Number(list?.quantity_minimum))
-                sUnit({label: list?.unit, value: list?.unit_id})
-                sThumb(list?.images)
+                sExpiry(Number(data?.expiry))
                 sNote(list?.note)
                 sDataVariantSending(list?.variation)
                 sVariantMain(list?.variation[0]?.id)
@@ -820,6 +904,7 @@ const Popup_ThanhPham = React.memo((props) => {
         formData.append("type_products", type.value)
         formData.append("category_id", category.value)
         formData.append("unit_id", unit.value)
+        formData.append("expiry", expiry)
         formData.append("note", note)
         branch.forEach(e => formData.append("branch_id[]", e.value))
         formData.append("images", thumbFile)
@@ -1077,6 +1162,34 @@ const Popup_ThanhPham = React.memo((props) => {
                                             />
                                             {errGroup && category?.value == null && <label className="text-sm text-red-500">Vui lòng chọn danh mục</label>}
                                         </div>
+                                        
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Mã thành phẩm {props?.id && <span className='text-red-500'>*</span>}</label>
+                                            <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder={props.dataLang?.client_popup_sytem} className={`${errCode && code == "" ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                                            {errCode && code == "" && <label className="text-sm text-red-500">Vui lòng nhập mã thành phẩm</label>}
+                                        </div>
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Tên thành phẩm <span className='text-red-500'>*</span></label>
+                                            <input value={name} onChange={_HandleChangeInput.bind(this, "name")} type="text" placeholder="Tên thành phẩm" className={`${errName && name == "" ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                                            {errName && name == "" && <label className="text-sm text-red-500">Vui lòng nhập tên thành phẩm</label>}
+                                        </div>
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Giá bán</label>
+                                            <NumericFormat thousandSeparator="," value={price} onValueChange={_HandleChangeInput.bind(this, "price")} placeholder="Giá bán" className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                        </div>
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.minimum_amount || "minimum_amount"}</label>
+                                            <NumericFormat thousandSeparator="," value={minimumAmount} onValueChange={_HandleChangeInput.bind(this, "minimumAmount")} placeholder={props.dataLang?.minimum_amount || "minimum_amount"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                        </div>
+                                        <div className='2xl:space-y-1'>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}</label>
+                                            <div className='relative flex flex-col justify-center items-center'>
+                                                <NumericFormat thousandSeparator="," value={expiry} onValueChange={_HandleChangeInput.bind(this, "expiry")} placeholder={props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 pr-14 border outline-none`} />
+                                                <span className='absolute right-2 text-slate-400 select-none'>{props.dataLang?.date || "date"}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className='2xl:space-y-3 space-y-2'>
                                         <div className='2xl:space-y-1'>
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Loại thành phẩm <span className='text-red-500'>*</span></label>
                                             <Select 
@@ -1112,26 +1225,6 @@ const Popup_ThanhPham = React.memo((props) => {
                                             />
                                             {errType && type?.value == null && <label className="text-sm text-red-500">Vui lòng chọn loại thành phẩm</label>}
                                         </div>
-                                        <div className='2xl:space-y-1'>
-                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Mã thành phẩm {props?.id && <span className='text-red-500'>*</span>}</label>
-                                            <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder={props.dataLang?.client_popup_sytem} className={`${errCode && code == "" ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
-                                            {errCode && code == "" && <label className="text-sm text-red-500">Vui lòng nhập mã thành phẩm</label>}
-                                        </div>
-                                        <div className='2xl:space-y-1'>
-                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Tên thành phẩm <span className='text-red-500'>*</span></label>
-                                            <input value={name} onChange={_HandleChangeInput.bind(this, "name")} type="text" placeholder="Tên thành phẩm" className={`${errName && name == "" ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
-                                            {errName && name == "" && <label className="text-sm text-red-500">Vui lòng nhập tên thành phẩm</label>}
-                                        </div>
-                                        <div className='2xl:space-y-1'>
-                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Giá bán</label>
-                                            <NumericFormat thousandSeparator="," value={price} onValueChange={_HandleChangeInput.bind(this, "price")} placeholder="Giá bán" className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
-                                        </div>
-                                        <div className='2xl:space-y-1'>
-                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.minimum_amount || "minimum_amount"}</label>
-                                            <NumericFormat thousandSeparator="," value={minimumAmount} onValueChange={_HandleChangeInput.bind(this, "minimumAmount")} placeholder={props.dataLang?.minimum_amount || "minimum_amount"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
-                                        </div>
-                                    </div>
-                                    <div className='2xl:space-y-3 space-y-2'>
                                         <div className='2xl:space-y-1'>
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Đơn vị <span className='text-red-500'>*</span></label>
                                             <Select 

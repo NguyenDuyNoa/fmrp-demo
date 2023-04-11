@@ -17,6 +17,7 @@ import {
 import { NumericFormat } from 'react-number-format';
 import Select, { components } from 'react-select';
 import Swal from "sweetalert2";
+import ModalImage from "react-modal-image";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
@@ -368,9 +369,10 @@ const Index = (props) => {
                                             <div key={e?.id.toString()} className='flex p-2 hover:bg-slate-50 relative'>
                                                 <div className='xl:w-[10%] w-[6%] pointer-events-none select-none justify-center flex'>
                                                     {e?.images == null ?
-                                                        <img src="/no_image.png" className='w-full h-12 rounded object-contain' />
+                                                        <ModalImage small="/no_image.png" large="/no_image.png" className="w-full h-12 rounded object-cover"/> 
                                                     :
-                                                        <Image width={64} height={64} quality={100} src={e?.images} alt="thumb type" className="w-12 h-12 rounded object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/>
+                                                        // <Image width={64} height={64} quality={100} src={e?.images} alt="thumb type" className="w-12 h-12 rounded object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/>
+                                                        <ModalImage small={e?.images} large={e?.images} className="w-full h-12 rounded object-contain"/> 
                                                     }
                                                 </div>
                                                 <h6 className='px-2 py-2.5 xl:text-base text-xs xl:w-[11%] w-[12%]'>{e?.category_name}</h6>
