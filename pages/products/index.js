@@ -13,12 +13,15 @@ import Loading from "components/UI/loading";
 import Popup from 'reactjs-popup';
 import { 
     SearchNormal1 as IconSearch, Trash as IconDelete, Edit as IconEdit, UserEdit as IconUserEdit,
-    Grid6 as IconExcel, Image as IconImage, GalleryEdit as IconEditImg, ArrowDown2 as IconDown
+    Grid6 as IconExcel, Image as IconImage, GalleryEdit as IconEditImg, ArrowDown2 as IconDown,
+    Add as IconAdd, Maximize4 as IconMax
 } from "iconsax-react";
 import { NumericFormat } from 'react-number-format';
 import Select, { components } from 'react-select';
 import Swal from "sweetalert2";
 import ModalImage from "react-modal-image";
+import {SortableContainer, SortableElement, sortableHandle} from 'react-sortable-hoc';
+import {arrayMoveImmutable} from 'array-move';
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
@@ -286,7 +289,7 @@ const Index = (props) => {
                 ]    
             ),
         }
-      ];
+    ];
 
     return (
         <React.Fragment>
@@ -304,8 +307,11 @@ const Index = (props) => {
                     </div>
                     <div className='flex justify-between items-center'>
                         <h2 className='xl:text-3xl text-xl font-medium '>Danh Sách Thành Phẩm</h2>
-                        <div className='flex space-x-3 items-center'>
-                            <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105 outline-none' />
+                        <div className='flex space-x-3'>
+                            <div className='flex space-x-3 items-center'>
+                                <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105 outline-none' />
+                            </div>
+                            <Popup_GiaiDoan dataLang={dataLang} />
                         </div>
                     </div>
                     <div className='grid grid-cols-4 gap-8 px-0.5'>
@@ -507,8 +513,7 @@ const Index = (props) => {
                                                 </div>
                                                 <div className='pl-2 py-2.5 w-[7%] flex space-x-2 justify-center'>
                                                     {/* <button className='w-[98%] bg-slate-200 text-sm rounded'>Tác vụ <IconDown /></button> */}
-                                                    {/* <BtnTacVu keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" /> */}
-                                                    <MyComponent />
+                                                    <BtnTacVu keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
                                                     {/* <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} id={e?.id} className="xl:scale-100 scale-[0.8] outline-none" />
                                                     <button onClick={_HandleDelete.bind(this, e.id)} className="xl:scale-100 scale-[0.8] outline-none"><IconDelete color="red"/></button> */}
                                                 </div>
@@ -536,76 +541,39 @@ const Index = (props) => {
     );
 }
 
-// const BtnTacVu = React.memo((props) => {
-//     return(
-//         <div>
-//             <Popup
-//                 trigger={
-//                     <button className={`flex space-x-1 items-center relative ` + props.className } >
-//                         <span>Tác vụ</span>
-//                         <IconDown size={12} />
-//                     </button>
-//                 }
-//                 closeOnDocumentClick
-//                 arrow={false}
-//                 position="bottom right"
-//                 className={`dropdown-edit `}
-//                 keepTooltipInside={props.keepTooltipInside}
-//             >
-//                 <div className="w-auto">
-//                     <div className="bg-white p-0.5 rounded-t w-52">
-//                         <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Thiết kế công đoạn</button>
-//                         <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Thiết kế BOM</button>
-//                         <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Sửa</button>
-//                         <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Xoá</button>
-//                     </div>
-//                 </div>
-//             </Popup>
-//         </div>
-//     )
-// })
+const BtnTacVu = React.memo((props) => {
 
-const MyComponent = () => {
-    const parentRef = useRef(null);
-    const [isOpen, setIsOpen] = useState(false);
-  
-    const handleClick = () => {
-      const parentPos = parentRef.current.getBoundingClientRect();
-      const posX = parentPos.x;
-      const posY = parentPos.y + parentPos.height;
-      setIsOpen(true);
-      const popupEl = document.querySelector(".tooltip-container");
-    if (popupEl) {
-        popupEl.style.position = "absolute";
-        popupEl.style.top = posY + "px";
-        popupEl.style.left = posX + "px";
-    }
-    };
-  
-    const MyPopup = React.forwardRef((props, ref) => {
-      return (
-        <Popup ref={ref} {...props}>
-          Popup contents here
-        </Popup>
-      );
-    });
-  
-    return (
-      <div className="parent-container" ref={parentRef}>
-        <button onClick={handleClick}>Open Popup</button>
-        <MyPopup
-          trigger={<div className="tooltip-trigger">i</div>}
-          position="bottom center"
-          arrow={true}
-          onOpen={() => setIsOpen(true)}
-          onClose={() => setIsOpen(false)}
-          open={isOpen}
-          keepTooltipInside
-        />
-      </div>
-    );
-  };
-  
+    return(
+        <div>
+            <Head>
+                <div id="popup-wrapper"></div>
+            </Head>
+            <Popup
+                trigger={
+                    <button className={`flex space-x-1 items-center ` + props.className } >
+                        <span>Tác vụ</span>
+                        <IconDown size={12} />
+                    </button>
+                }
+                arrow={false}
+                on={['hover']}
+                position="bottom right"
+                className={`dropdown-edit `}
+                keepTooltipInside={props.keepTooltipInside}
+                closeOnDocumentClick
+            >
+                <div className="w-auto rounded">
+                    <div className="bg-white rounded-t flex flex-col overflow-hidden">
+                        <button className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Thiết kế công đoạn</button>
+                        <button className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Thiết kế BOM</button>
+                        <button className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Sửa</button>
+                        <button className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Xoá</button>
+                    </div>
+                </div>
+            </Popup>
+        </div>
+    )
+})
 
 const Popup_ThanhPham = React.memo((props) => {
     const dataOptBranch = useSelector(state => state.branch);
@@ -1700,5 +1668,181 @@ const Popup_ThongTin = React.memo((props) => {
         </PopupEdit>
     )
 })
+
+const Popup_GiaiDoan = React.memo((props) => {
+    const [open, sOpen] = useState(false);
+    const _ToggleModal = (e) => sOpen(e);
+
+    const scrollAreaRef = useRef(null);
+
+    const [onFetchingCd, sOnFetchingCd] = useState(false);
+    
+    const [listCd, sListCd] = useState([])
+    const [option, sOption] = useState([]);  
+
+    const [name, sName] = useState(null);
+    const [radio1, sRadio1] = useState(0);
+    const [radio2, sRadio2] = useState(0);
+    
+    useEffect(() => {
+        open && sOnFetchingCd(true)
+        open && sOption([])
+    }, [open]);
+
+    const _ServerFetching_selectCd =  () =>{
+        Axios("GET", `/api_web/api_product/stage/?csrf_protection=true"`, {
+            limit: 0
+        }, (err, response) => {
+            if(!err){
+                var {rResult} =  response.data
+                sListCd(rResult?.map(e => ({label: e.name, value: e.id})))
+            }
+            sOnFetchingCd(false)
+        })
+    }
+
+    useEffect(() => {
+        onFetchingCd && _ServerFetching_selectCd()
+      }, [onFetchingCd]);
+
+    const _HandleAddNew =  () => {
+        sOption([...option, {id: Date.now(), name: name, radio1: radio1, radio2: radio2}])
+        sName(null)
+        sRadio1(0)
+        sRadio2(0)
+    }
+    
+    const onSortEnd = ({oldIndex, newIndex}) => {
+        var newItems = arrayMoveImmutable([...option], oldIndex, newIndex);
+        sOption(newItems)
+    }
+    console.log(option)
+
+    const handleDelete = (updatedData) => {
+        Swal.fire({
+            title: `${props.dataLang?.aler_ask}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#296dc1',
+            cancelButtonColor: '#d33',
+            confirmButtonText: `${props.dataLang?.aler_yes}`,
+            cancelButtonText:`${props.dataLang?.aler_cancel}`
+        }).then((result) => {
+            if (result.isConfirmed) {
+                sOption(updatedData);
+            }
+        })
+    }
+
+    return(
+        <PopupEdit  
+            title={"Thêm công đoạn"} 
+            button={"Công đoạn"} 
+            onClickOpen={_ToggleModal.bind(this, true)} 
+            open={open} 
+            onClose={_ToggleModal.bind(this,false)}
+        >
+            <form className="py-4 w-[800px]">
+                <div>
+                    <div className="flex w-full items-center py-2">
+                        <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[5%] font-[400] text-center">STT</h4>
+                        <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[400] text-left">{"Tên công đoạn"}</h4>
+                        <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[400] text-left">{"Đánh dấu công đoạn bắt đầu TP chưa hoàn thiện"}</h4>
+                        <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-center">{"Công đoạn cuối"}</h4>
+                        <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[400] text-center">{"Thao tác"}</h4>
+                    </div> 
+                    <ScrollArea className="min-h-[0px] max-h-[500px] overflow-hidden" speed={1} smoothScrolling={true} ref={scrollAreaRef}>
+                        <SortableList useDragHandle lockAxis={"y"} items={option} dataCd={listCd} onSortEnd={onSortEnd.bind(this)} onClickDelete={handleDelete} />
+                        <button type='button' onClick={_HandleAddNew.bind(this)} title='Thêm' className='transition  mt-5 w-full  hover:text-[#0F4F9E]  min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center hover:bg-[#e2f0fe]'><IconAdd />{"Thêm thành phần BOM"}</button> 
+                    </ScrollArea>     
+                </div>
+                <div className="text-right mt-5 space-x-2">
+                  <button type='button' onClick={_ToggleModal.bind(this,false)} className="text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
+                  >{props.dataLang?.branch_popup_exit}</button>
+                  <button type="submit" className="text-[#FFFFFF] font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]" >{props.dataLang?.branch_popup_save}</button>
+                </div>
+            </form> 
+        </PopupEdit>
+    )
+})
+
+const SortableList = SortableContainer(({items, dataCd, onClickDelete}) => {
+    const handleDelete = (id) => {
+        const updatedItems = items.filter(item => item.id !== id);
+        onClickDelete(updatedItems);
+    }
+    return (
+        <div className='divide-y divide-slate-100'>
+            {items.map((e, index) => (
+                <SortableItem key={`item-${e.value}`} index={index} indexItem={index} value={e} dataCd={dataCd} onClickDelete={handleDelete} />
+            ))}
+        </div>
+    );
+});
+
+const ItemDragHandle = sortableHandle(() => {
+    return(
+        <button type='button' className='text-blue-500 relative flex flex-col justify-center items-center'>
+            <IconMax size="18" className='-rotate-45' />
+            <IconMax size="18" className='rotate-45 absolute' />
+        </button>
+    )
+})
+
+const SortableItem = SortableElement(React.forwardRef(({value, dataCd, indexItem, onClickDelete}, ref) => {
+    const handleMenuOpen = () => {
+        const menuPortalTarget = ref != null ? ref.current : ref;
+        return { menuPortalTarget };
+    };
+
+    const handleDeleteClick = () => {
+        onClickDelete(value.id);
+    }
+    
+    return(
+        <div className='flex items-center z-[999] py-1 hover:bg-slate-50 bg-white'>
+            <h6 className='w-[5%] text-center px-2'>{indexItem + 1}</h6>
+            <div className='w-[30%] px-2'>
+                <Select   
+                    closeMenuOnSelect={true}
+                    placeholder={"Tên công đoạn"}
+                    options={dataCd}
+                    isSearchable={true}
+                    noOptionsMessage={() => "Không có dữ liệu"}
+                    maxMenuHeight="200px"
+                    isClearable={true} 
+                    menuPortalTarget={document.body}
+                    onMenuOpen={handleMenuOpen}
+                    styles={{
+                        placeholder: (base) => ({
+                        ...base,
+                        color: "#cbd5e1",
+                    
+                        }),
+                        menuPortal: (base) => ({
+                            ...base,
+                            zIndex: 9999,
+                            position: "absolute", 
+                        
+                        }), 
+                    }}
+                    className={` placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
+                />
+            </div>
+            <div className="w-[30%] flex items-center justify-center">
+                <input type="radio" id={`radio1 + ${value.id}`} name='radio1' className="scale-150 outline-none accent-blue-500"/>
+                <label htmlFor={`radio1 + ${value.id}`} className="relative flex cursor-pointer items-center rounded-full p-3" data-ripple-dark="true">{"Chọn"}</label>
+            </div>
+            <div className="w-[20%] flex items-center justify-center">
+                <input type="radio" id={`radio2 + ${value.id}`} name='radio2' className="scale-150 outline-none accent-blue-500"/>
+                <label htmlFor={`radio2 + ${value.id}`} className="relative flex cursor-pointer items-center rounded-full p-3" data-ripple-dark="true">{"Chọn"}</label>
+            </div>
+            <div className='w-[15%] flex items-center justify-center space-x-4'>
+                <ItemDragHandle />
+                <button onClick={handleDeleteClick.bind(this)} type='button' className='text-red-500'><IconDelete /></button>
+            </div>
+        </div>
+    )
+}));
 
 export default Index;
