@@ -405,6 +405,10 @@ const Popup_status = (props) => {
           name.length ==0 &&  sErrInput(true)
           branch_id?.length==0 && sErrInputBr(true)
           color.length == 0 && sErrInputColor(true)
+          Toast.fire({
+            icon: 'error',
+            title: `${props.dataLang?.required_field_null}`
+        })
         }else{
           sOnSending(true)
         }
@@ -476,7 +480,8 @@ const Popup_status = (props) => {
                                       }
                                     })
                                 }}
-                                className={`${errInputBr ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full  text-[#52575E] font-normal border outline-none rounded-lg bg-white border-none xl:text-base text-[14.5px]`}
+                           className={`${errInputBr ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
+
                               />
                               {errInputBr && <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.client_list_bran}</label>}
             <div className="flex flex-wrap justify-between">

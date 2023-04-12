@@ -11,9 +11,13 @@ import {
   Edit as IconEdit,
   Trash as IconDelete,
   SearchNormal1 as IconSearch,
+  ArrowCircleDown,
+  CloseCircle,
+  TickCircle,
 } from "iconsax-react";
 import Loading from "components/UI/loading";
 import Swal from "sweetalert2";
+import { FALSE } from "sass";
 
 const Index = (props) => {
   const dataLang = props.dataLang;
@@ -32,12 +36,13 @@ const Index = (props) => {
       })
   }, []);
   const [data, sData] = useState([]);
+  console.log(data);
   const [onFetching, sOnFetching] = useState(false);
   const [totalItems, sTotalItems] = useState([]);
   const [keySearch, sKeySearch] = useState("")
   const [limit, sLimit] = useState(15);
 const _ServerFetching = () => {
-  Axios("GET", `${(router.query?.tab === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`) } `, {
+  Axios("GET", `${(router.query?.tab === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`) || (router.query?.tab === "stages" && "/api_web/api_product/stage/?csrf_protection=true")} `, {
       params: {
           search: keySearch,
           limit: limit,
@@ -74,16 +79,21 @@ useEffect(() => {
     }).then((result) => {
       if (result.isConfirmed) {
         const id = event; 
-        Axios("DELETE",  `${(router.query.tab === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true`) } `, {
+        Axios("DELETE",  `${(router.query.tab === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true`) || (router.query.tab === "stages" && `/api_web/api_product/stage/${id}?csrf_protection=true`) } `, {
         }, (err, response) => {
           if(!err){
-            var isSuccess = response.data?.isSuccess;
+            var {isSuccess,message} = response.data
             if(isSuccess){
               Toast.fire({
                 icon: 'success',
-                title: dataLang?.aler_success_delete
+                title: dataLang[message]
               })     
-            }
+            }else{
+              Toast.fire({
+                  icon: 'error',
+                  title: dataLang[message]
+              }) 
+          }
           }
           _ServerFetching()
         })     
@@ -122,17 +132,16 @@ useEffect(() => {
     timer: 2000,
     timerProgressBar: true,
   })
-
   return (
   <React.Fragment>
     <Head>
-        <title>{dataLang?.category_unit}</title>
+        <title>{ router.query.tab === "units" && dataLang?.category_unit || router.query.tab === "stages" && dataLang?.settings_category_stages_title}</title>
     </Head>
     <div className='px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen'>
         <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
             <h6 className='text-[#141522]/40'>{dataLang?.branch_seting}</h6>
             <span className='text-[#141522]/40'>/</span>
-            <h6>{dataLang?.category_unit}</h6>
+            <h6>{ router.query.tab === "units" && dataLang?.category_unit || router.query.tab === "stages" && dataLang?.settings_category_stages_title}</h6>
         </div>
         <div className='grid grid-cols-9 gap-5 h-[99%]'>
             <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
@@ -143,6 +152,7 @@ useEffect(() => {
                     <h2 className='text-2xl text-[#52575E]'>{dataLang?.category_titel}</h2>
                     <div className="flex space-x-3 items-center justify-start">
                         <button onClick={_HandleSelectTab.bind(this, "units")} className={`${router.query?.tab === "units" ? "text-[#0F4F9E] bg-[#e2f0fe]" : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"} rounded-lg px-4 py-2 outline-none`}>{dataLang?.category_unit}</button>
+                        <button onClick={_HandleSelectTab.bind(this, "stages")} className={`${router.query?.tab === "stages" ? "text-[#0F4F9E] bg-[#e2f0fe]" : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"} rounded-lg px-4 py-2 outline-none`}>{dataLang?.settings_category_stages_title}</button>
                     </div>
                     <div className="3xl:h-[65%] 2xl:h-[60%] xl:h-[55%] h-[57%] space-y-2">
                         <div className="flex justify-end">
@@ -184,6 +194,14 @@ useEffect(() => {
                                         
                                         </React.Fragment>
                                     }
+                                      {router.query?.tab === "stages" && 
+                                        <React.Fragment>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">{dataLang?.settings_category_stages_code}</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">{dataLang?.settings_category_stages_name}</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">{dataLang?.settings_category_stages_status}</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">{dataLang?.settings_category_stages_note}</h4>
+                                        </React.Fragment>
+                                    }
                                     <h4 className="xl:text-[14px] px-2 text-[12px] col-span-1 text-[#667085] uppercase font-[300] text-center">
                                         {dataLang?.branch_popup_properties}
                                     </h4>
@@ -211,6 +229,15 @@ useEffect(() => {
                                                             <h6 className="xl:text-base text-xs px-2 col-span-5">
                                                             {router.query?.tab === "units" && e?.unit}                
                                                             </h6>                                                          
+                                                        </React.Fragment>
+                                                    }
+                                                    {router.query?.tab === "stages" && 
+                                                        <React.Fragment>
+                                                            <h6 className="xl:text-base text-xs px-2 col-span-2">{router.query?.tab === "stages" && e?.code}</h6>
+                                                            <h6 className="xl:text-base text-xs px-2 col-span-2">{router.query?.tab === "stages" && e?.name}</h6>
+                                                            <h6 className="xl:text-base text-xs px-2 col-span-2 mx-auto">{router.query?.tab === "stages" && e?.status_qc === "1" ? <TickCircle size={32} color="#0BAA2E"/> :  <CloseCircle size={32} color="#EE1E1E"/>}</h6>
+                                                            <h6 className="xl:text-base text-xs px-2 col-span-2">{router.query?.tab === "stages" && e?.note}</h6>
+                                                          
                                                         </React.Fragment>
                                                     }
                                                 
@@ -254,48 +281,135 @@ const Popup_danhmuc = (props) => {
 
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
+    const [onSending, sOnSending] = useState(false);
 
-    const [unit, sUnit] = useState(props.data?.unit ? props.data?.unit : "");
+    const [unit, sUnit] = useState("");
+    
+    const [stages_code ,sTagesCode] = useState("")
+    const [stages_name ,sTagesName] = useState("")
+    const [stages_status, sTagesStatus] = useState("0")
+    const [stages_note, sTagesNote] = useState("")
 
+    const [errInput, sErrInput] = useState(false);
+    const [errInputcode, sErrInputcode] = useState(false);
+    const [errInputName, sErrInputName] = useState(false);
+
+    useEffect(() => {
+      sErrInput(false)
+      sErrInputcode(false)
+      sErrInputName(false)
+      sTagesName(props.data?.name ? props.data?.name : "")
+      sTagesCode(props.data?.code ? props.data?.code : "")
+      sTagesStatus((props.data?.status_qc ? props.data?.status_qc : ""))
+      sTagesNote(props.data?.note ? props.data?.note : "")
+      sUnit(props.data?.unit ? props.data?.unit : "")
+  
+    }, [open]);
+
+   
+    const _ServerSending = () => {
+      const id =props.data?.id;
+      var data = new FormData();
+      data.append('unit', (tabPage === "units" && unit) );
+      if(tabPage === "stages"){
+        data.append('code',  stages_code );
+        data.append('name',  stages_name );
+        data.append('status_qc',  stages_status);
+        data.append('note',  stages_note );
+
+      }
+      Axios("POST", id ? 
+      `${(tabPage === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true ` || (tabPage === "stages" && `/api_web/api_product/stage/${id}?csrf_protection=true`))} `
+    :
+      `${(tabPage === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`)  || (tabPage === "stages" && `/api_web/api_product/stage/?csrf_protection=true`)} `
+    , {
+    data: data,
+    headers: {"Content-Type": "multipart/form-data"} 
+  }, (err, response) => {
+    if(!err){
+      var {isSuccess, message} = response.data;
+      if(isSuccess){
+        Toast.fire({
+          icon: 'success',
+          title: props.dataLang[message]
+        })   
+        sUnit("")
+        sTagesCode("")
+        sTagesName("")
+        sTagesNote("")
+        sTagesStatus("")
+        sErrInput(false)
+        sErrInputcode(false)
+        sErrInputName(false)
+        sOpen(false)
+        props.onRefresh && props.onRefresh()
+    }else {
+        Toast.fire({
+          icon: 'error',
+          title: props.dataLang[message]
+        })  
+      }
+    } sOnSending(false)
+  })
+    }
+    useEffect(() => {
+      onSending && _ServerSending()
+    }, [onSending])
+    // const handleSubmit = (event) => {
+    //   event.preventDefault();
+    //   const id =props.data?.id;
+    //   var data = new FormData();
+    //   data.append('unit', (tabPage === "units" && unit) );
+    //   Axios("POST", id ? 
+    //       `${(tabPage === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true ` || (tabPage === "stages" && `/api_web/Api_payment_method/payment_method/${id}?csrf_protection=true`))} `
+    //     :
+    //       `${(tabPage === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`)  || (tabPage === "stages" && `/api_web/Api_payment_method/payment_method?csrf_protection=true`)} `
+    //     , {
+    //     data: data,
+    //     headers: {"Content-Type": "multipart/form-data"} 
+    //   }, (err, response) => {
+    //     if(!err){
+    //       var {isSuccess, message} = response.data;
+    //       if(isSuccess){
+    //         Toast.fire({
+    //           icon: 'success',
+    //           title: props.dataLang[message]
+    //         })   
+    //         sUnit("")
+    //         sErrInput(false)
+    //         sOpen(false)
+    //         props.onRefresh && props.onRefresh()
+    //     }else {
+    //         Toast.fire({
+    //           icon: 'error',
+    //           title: props.dataLang[message]
+    //         })  
+    //       }
+    //     }
+    //   }) 
+    // }
     const _HandleChangeInput = (type, value) => {
       if(type == "unit"){
         sUnit(value.target?.value)
       }
+       else if(type == "code"){
+        sTagesCode(value.target?.value)
+      }
+       else if(type == "name"){
+        sTagesName(value.target?.value)
+      }
+      else if(type === "status"){
+        if(value.target?.checked === false){
+          sTagesStatus("0")
+        }else if(value.target?.checked === true){
+        sTagesStatus("1")
+      }
     }
-
-    const handleSubmit = (event) => {
-      event.preventDefault();
-      const id =props.data?.id;
-      var data = new FormData();
-      data.append('unit', (tabPage === "units" && unit) );
-      Axios("POST", id ? 
-          `${(tabPage === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true`)} `
-        :
-          `${(tabPage === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`) } `
-        , {
-        data: data,
-        headers: {"Content-Type": "multipart/form-data"} 
-      }, (err, response) => {
-        if(!err){
-          var {isSuccess, message} = response.data;
-          if(isSuccess){
-            Toast.fire({
-              icon: 'success',
-              title: props.dataLang[message]
-            })   
-            sUnit("")
-            sOpen(false)
-            props.onRefresh && props.onRefresh()
-        }else {
-            Toast.fire({
-              icon: 'error',
-              title: props.dataLang[message]
-            })  
-          }
-        }
-      }) 
+      else if(type == "note"){
+        sTagesNote(value.target?.value)
+      }
+       
     }
-
     const Toast = Swal.mixin({
       toast: true,
       position: 'top-end',
@@ -303,17 +417,64 @@ const Popup_danhmuc = (props) => {
       timer: 2000,
       timerProgressBar: true,
     })
+    const _HandleSubmit = (e) => {
+      e.preventDefault()
+      if(tabPage === "units"){
+        if(unit?.length == 0){
+          unit?.length ==0 && sErrInput(true) 
+             Toast.fire({
+          icon: 'error',
+          title: `${props.dataLang?.required_field_null}`
+      })
+        }
+        else{
+          sOnSending(true)
+        }
+      }
+      else if(tabPage === "stages"){
+        if(stages_name?.length == 0 || stages_code?.length == 0){
+          stages_name?.length == 0 && sErrInputName(true) 
+          stages_code?.length == 0 && sErrInputcode(true) 
+             Toast.fire({
+          icon: 'error',
+          title: `${props.dataLang?.required_field_null}`
+      })
+        }
+        else{
+          sOnSending(true)
+        }
+      }
 
+
+      // if(unit?.length == 0 || stages_name?.length == 0 || stages_code?.length == 0 ){
+      //   unit?.length ==0 && sErrInput(true) 
+      //   stages_name?.length == 0 && sErrInputName(true) 
+      //   stages_code?.length == 0 && sErrInputcode(true) 
+      //   Toast.fire({
+      //     icon: 'error',
+      //     title: `${props.dataLang?.required_field_null}`
+      // })
+      // }else{
+      //   sOnSending(true)
+      // }
+    }
+    useEffect(() => {
+      sErrInput(false)
+    }, [unit.length > 0])
+    useEffect(() => {
+      sErrInputName(false) 
+      sErrInputcode(false)
+    }, [stages_code.length > 0, stages_name?.length > 0])
     return(
       <PopupEdit  
-        title={props.data?.id ? `${(tabPage === "units" && props.dataLang?.category_unit_edit) }` : `${(tabPage === "units" && props.dataLang?.category_unit_add) }`} 
+        title={props.data?.id ? `${(tabPage === "units" && props.dataLang?.category_unit_edit) || (tabPage === "stages" && props.dataLang?.settings_category_stages_edit) }` : `${(tabPage === "units" && props.dataLang?.category_unit_add) || (tabPage === "stages" && props.dataLang?.settings_category_stages_add)}`} 
         button={props.data?.id ? <IconEdit/> : `${props.dataLang?.branch_popup_create_new}`} 
         onClickOpen={_ToggleModal.bind(this, true)} 
         open={open} onClose={_ToggleModal.bind(this,false)}
         classNameBtn={props.className}
       >
-        <div className={`w-96 mt-4`}>
-          <form onSubmit={ handleSubmit}>
+        <div className={`w-[33vw] mt-4`}>
+          <form onSubmit={_HandleSubmit.bind(this)}>
             <div>
               {tabPage === "units" &&
                 <React.Fragment>
@@ -324,10 +485,103 @@ const Popup_danhmuc = (props) => {
                       onChange={_HandleChangeInput.bind(this, "unit")}
                       name="fname"                       
                       type="text"
-                      className="placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
+                      className={`${errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+
                     />
+                              {errInput && <label className="mb-4  text-[14px] text-red-500">{"Vui lòng nhập tên đơn vị"}</label>}
+
                   </div>
                       
+                </React.Fragment>
+              }
+              {tabPage === "stages" &&
+                <React.Fragment>
+                  <div className="flex flex-wrap justify-between">
+                    <div className="w-full">
+                      <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.settings_category_stages_code}<span className="text-red-500">*</span></label>
+                      <div>
+                        <input
+                          value={stages_code}                
+                          onChange={_HandleChangeInput.bind(this, "code")}
+                          placeholder={props.dataLang?.settings_category_stages_code}
+                          name="fname"                      
+                          type="text"
+                          className={`${errInputcode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                        />
+                        {errInputcode && <label className="mb-4  text-[14px] text-red-500">{props.dataLang?.settings_category_stages_errCode}</label>}
+                      </div>
+                    </div>
+                    <div className="w-full">
+                   <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.settings_category_stages_name}<span className="text-red-500">*</span></label>
+                    <div>
+                      <input
+                         value={stages_name}                
+                        onChange={_HandleChangeInput.bind(this, "name")}
+                        placeholder={props.dataLang?.settings_category_stages_name}
+                        name="fname"                      
+                        type="text"
+                        className={`${errInputName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                      />
+                      {errInputName && <label className="mb-4  text-[14px] text-red-500">{props.dataLang?.settings_category_stages_errName}</label>}
+                     </div>
+                   </div>
+                  
+                  <div className="w-full flex justify-between flex-wrap">
+                          <div className='inline-flex items-center w-[50%] gap-3.5' >               
+                            <label className="relative flex cursor-pointer items-center rounded-full p-1" htmlFor="1" data-ripple-dark="true" > 
+                                        <input
+                                            type="checkbox"
+                                            className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 "
+                                            id="1"
+                                          
+                                                 value={stages_status}
+                                       checked={stages_status === "0" ? false : stages_status === "1" && true}
+                                        onChange={_HandleChangeInput.bind(this, "status")}
+                                        />
+                                        <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                            <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-3.5 w-3.5"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                            stroke="currentColor"
+                                            stroke-width="1"
+
+                                            >
+                                            <path
+                                                fill-rule="evenodd"
+                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                clip-rule="evenodd"
+                                            ></path>
+                                            </svg>
+                                        </div>
+                                        
+                                    </label>
+                              <label htmlFor="1" className='text-[#344054] font-medium text-base  cursor-pointer '>{props.dataLang?.settings_category_stages_status}</label>
+                            
+                          </div>
+                          
+                          
+                         
+                    </div>
+                    
+                  <div className="w-full flex justify-between flex-wrap">
+                          <div className='w-full ' >               
+                          <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.settings_category_stages_note}</label>
+                              <textarea
+                                value={stages_note}  
+                                placeholder={props.dataLang?.settings_category_stages_note}             
+                                onChange={_HandleChangeInput.bind(this, "note")}
+                                name="fname"                      
+                                type="text"
+                                className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[140px] h-[40px] max-h-[240px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"
+                              />                          
+                          </div>
+                          
+                          
+                         
+                    </div>
+                  </div>  
                 </React.Fragment>
               }
 

@@ -8,6 +8,8 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 import Image from 'next/image';
 
 import ReactExport from "react-data-export";
+import ModalImage from "react-modal-image";
+
 
 import Swal from 'sweetalert2'
 
@@ -463,9 +465,11 @@ const Index = (props) => {
                             <div className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e?.id.toString()}>
                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[18%]  rounded-md text-left"><div className='w-[60px] h-[60px]'>
                                 {e?.profile_image == null ?
-                                                        <img src="/no_image.png" className='w-full h-full rounded object-contain' />
-                                                    :
-                                                        <Image width={60} height={60} quality={100} src={e?.profile_image} alt="thumb type" className="w-[60px] h-[60px] rounded-[100%] object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/>
+                                                    <ModalImage small="/no_image.png" large="/no_image.png" className='w-full h-full rounded object-contain' /> 
+                                                    : <>
+                                                    <ModalImage small={e?.profile_image} large={e?.profile_image} className="w-[60px] h-[60px]  rounded-[100%] object-cover"/> 
+                                                     {/* <Image width={60} height={60} quality={100} src={e?.profile_image} alt="thumb type" className="w-[60px] h-[60px] rounded-[100%] object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/> */}
+                                                    </>
                                                     }
                                      </div>
                                 </h6>           
@@ -629,6 +633,7 @@ const Popup_dsnd = (props) => {
         sIdPos()
         sValueManage([])
         sCode()
+        
         // sManage([])
       }, [open]);
       
@@ -818,7 +823,10 @@ const Popup_dsnd = (props) => {
         name?.length == 0  && sErrInput(true) 
         branch_id?.length == 0 && sErrInputBr(true) 
         password?.length == 0 && sErrInputPas(true) 
-
+        Toast.fire({
+          icon: 'error',
+          title: `${props.dataLang?.required_field_null}`
+      })
       }else{
         sOnSending(true)
       }
@@ -951,7 +959,7 @@ const Popup_dsnd = (props) => {
                               </div>
                               <div className='flex items-center '>
                                      <label
-                                        className="relative flex cursor-pointer items-center rounded-full p-3"
+                                        className="relative flex cursor-pointer items-center rounded-full p-3 gap-3.5"
                                         for="checkbox-6"
                                         data-ripple-dark="true"
                                         > 
@@ -964,7 +972,7 @@ const Popup_dsnd = (props) => {
                                        checked={admin === "0" ? false : admin === "1" && true}
                                         onChange={_HandleChangeInput.bind(this, "admin")}
                                         />
-                                        <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                        <div className="pointer-events-none absolute top-2/4 left-[10%]   -translate-y-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
                                             <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             className="h-3.5 w-3.5"
@@ -980,9 +988,10 @@ const Popup_dsnd = (props) => {
                                             ></path>
                                             </svg>
                                         </div>
-                                        
+                                        <div>
+                                          <span className='text-[#344054] font-normal text-sm '>{props.dataLang?.personnels_staff_popup_manager}</span>   
+                                        </div>
                                     </label>
-                                    <span className='text-[#344054] font-normal text-sm '>{props.dataLang?.personnels_staff_popup_manager}</span>
 
                               </div>
                              <div className='relative flex flex-col mt-3'>
@@ -1144,7 +1153,7 @@ const Popup_dsnd = (props) => {
                                                       </div>
                                                       </label>
                                                   </div>
-                                                  <span className='text-[#344054] font-medium text-base '>{e.name}</span>
+                                                  <label htmlFor={e.id} className='text-[#344054] font-medium text-base cursor-pointer'>{e.name}</label>
 
                                               </div>
                                           </div>
@@ -1230,7 +1239,7 @@ return (
                       <div className='mb-4 flex justify-between flex-wrap p-2'><span className='text-slate-400 text-sm      w-[25%]'>{props.dataLang?.personnels_staff_popup_phone}:</span> <span className='font-normal capitalize'>{data?.phonenumber}</span></div>
                       <div className='mb-4 flex justify-between flex-wrap p-2'><span className='text-slate-400 text-sm      w-[25%]'>{props.dataLang?.personnels_staff_table_depart}:</span> <span className='font-normal capitalize'><div className='flex gap-2 flex-wrap'>{data?.department?.map(e =>  { return (<span key={e.id}>{e.name}</span>)})}</div></span></div>
                       <div className='mb-4 flex justify-between flex-wrap p-2'><span className='text-slate-400 text-sm      w-[25%]'>{props.dataLang?.personnels_staff_popup_manager}:</span> <span className='font-normal capitalize'>{data?.admin === "1" ? "Có" : data?.admin === "0" && "Không"}</span></div>                
-                      <div className='mb-4 flex justify-between flex-wrap p-2'><span className='text-slate-400 text-sm      w-[34%]'>{props.dataLang?.personnels_staff_table_logged}:</span> <span className='font-normal capitalize'>{data?.last_login}</span></div>
+                      <div className='mb-4 flex justify-between flex-wrap p-2'><span className='text-slate-400 text-sm      w-[40%]'>{props.dataLang?.personnels_staff_table_logged}:</span> <span className='font-normal capitalize'>{data?.last_login != null ? moment(data?.last_login).format("DD/MM/YYYY, h:mm:ss") : ""}</span></div>
                       <div className='mb-4 flex justify-between flex-wrap p-2'><span className='text-slate-400 text-sm      w-[34%]'>{props.dataLang?.personnels_staff_table_active}:</span> <span className='font-normal capitalize'>{data?.active === "1" ? "Đang hoạt động" : data?.active === "0" && "Không hoạt động"}</span></div>
 
                      

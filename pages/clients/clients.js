@@ -187,7 +187,7 @@ const Index = (props) => {
           Axios("DELETE",`/api_web/api_client/client/${id}?csrf_protection=true`, {
           }, (err, response) => {
             if(!err){
-              var isSuccess = response.data?.isSuccess;
+              var isSuccess = response.data
               if(isSuccess){
                 Toast.fire({
                   icon: 'success',
@@ -524,6 +524,9 @@ const Popup_dskh = (props) => {
           if(!err){
               var db =  response.data;
              
+              sValueBr(db?.branch?.map(e=> ({label: e.name, value: Number(e.id)})))
+              sValueChar(db?.staff_charge.map(e=> ({label: e.full_name, value: Number(e.staffid)})))
+              sValueGr(db?.client_group.map(e=> ({label: e.name, value: Number(e.id)})))
               sName(db?.name)
               sCode(db?.code)
               sTaxcode(db?.tax_code)
@@ -537,9 +540,6 @@ const Popup_dskh = (props) => {
               sValueDis(db?.district.districtid)
               sValueCt(db?.city.provinceid)
               sNote(db?.note)
-              sValueBr(db?.branch?.map(e=> ({label: e.name, value: Number(e.id)})))
-              sValueChar(db?.staff_charge.map(e=> ({label: e.full_name, value: Number(e.staffid)})))
-              sValueGr(db?.client_group.map(e=> ({label: e.name, value: Number(e.id)})))
               sValueWa(db?.ward.wardid)
               sOption(db?.contact ? db?.contact : [])
            
@@ -590,6 +590,7 @@ const Popup_dskh = (props) => {
 
       // char..
       const [valueChar, sValueChar] = useState([])
+
       const [listChar, sListChar]= useState([])
       const _ServerFetching_Char =  () =>{
         Axios("GET", `/api_web/api_staff/GetstaffInBrard?csrf_protection=true`, {
@@ -601,7 +602,7 @@ const Popup_dskh = (props) => {
         if(!err){
             var db =  response.data
             if(valueChar?.length == 0){
-              sListChar(db?.map(e=> ({label: e.name, value: Number(e.id)})))
+              sListChar(db?.map(e=> ({label: e.name, value: Number(e.staffid)})))
             }else if(props?.id){
               sListChar(db?.map(e=> ({label: e.name, value: Number(e.staffid)}))?.filter(e => valueChar.some(x => e.value !== x.value)))
             }
@@ -772,9 +773,9 @@ const Popup_dskh = (props) => {
           city:valueCt,
           district:valueDis,
           ward:valueWa,
-          client_group_id: group,
           branch_id: branch_id,
           staff_charge:char,
+          client_group_id: group,
           contact: option,
         },
         headers: {"Content-Type": "multipart/form-data"} 
@@ -879,6 +880,10 @@ const Popup_dskh = (props) => {
       if(name?.length == 0 || branch_id?.length == 0){
         name?.length ==0 && sErrInput(true) 
         branch_id?.length==0 && sErrInputBr(true) 
+        Toast.fire({
+          icon: 'error',
+          title: `${props.dataLang?.required_field_null}`
+      })
       }else{
         sOnSending(true)
       }
@@ -1378,6 +1383,7 @@ const Popup_chitiet =(props)=>{
     Axios("GET", `/api_web/api_client/client/${props?.id}?csrf_protection=true`, {}, (err, response) => {
     if(!err){
         var db =  response.data
+
         sData(db)
     }
     sOnFetching(false)
@@ -1386,7 +1392,6 @@ const Popup_chitiet =(props)=>{
   useEffect(() => {
     onFetching && _ServerFetching_detailUser()
   }, [open]);
-
 return (
 <>
  <PopupEdit   
@@ -1425,7 +1430,7 @@ return (
                     <div className='w-[50%] bg-slate-100/40'>
                       
                       <div className='mb-4 min-h-[50px] max-h-[auto] flex  p-2 justify-between  items-center flex-wrap'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_char}:</span> 
-                      <span className='flex'>{data?.staff_charge?.map(e=>{ return (
+                      <span className='flex flex-wrap'>{data?.staff_charge?.map(e=>{ return (
                         <span className='font-normal capitalize   ml-1'>
                           <Popup className='dropdown-avt' key={e.id}
                                   trigger={open => (<img src={e.profile_image}  width={40} height={40} className="object-cover rounded-[100%]"></img>)}
@@ -1436,7 +1441,7 @@ return (
                       </span>
                       </div>
                       <div className='mb-4 flex justify-between  p-2 items-center flex-wrap'><span className='text-slate-400 text-sm'>{props.dataLang?.client_list_brand}:</span> <span className='flex justify-between space-x-1'>{data?.branch?.map(e=>{ return (<span  className='last:ml-0 font-normal capitalize  w-fit xl:text-base text-xs px-2 text-[#0F4F9E] border border-[#0F4F9E] rounded-[5.5px]'> {e.name}</span>)})}</span></div>
-                      <div className='mb-4 justify-between items-center p-2 flex space-x-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_list_group}:</span> {data?.client_group?.map(e=>{ return (<span className='font-normal capitalize ml-1'>{e.name}</span>)})}</div>
+                      <div className='mb-4 justify-between  items-center p-2 flex space-x-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_list_group}:</span> <span className='flex justify-between space-x-1'>{data?.client_group?.map(e=>{ return (<span style={{ backgroundColor: `${e.color == "" ? "#e2f0fe" : e.color}`, color: `${e.color == "" ? "#0F4F9E" : "white"}`}} className="last:ml-0 font-normal capitalize  w-fit xl:text-base text-xs px-2   rounded-[5.5px]">{e.name} </span>)})}</span></div>
                       <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_limit}:</span> <span className='font-normal capitalize'>{data?.debt_limit}</span></div>
                       <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_days}:</span> <span className='font-normal capitalize'>{data?.debt_limit_day}</span></div>
                       {/* <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_date}:</span> <span className='font-normal capitalize'>{moment(data?.date_create).format("DD/MM/YYYY")}</span></div> */}

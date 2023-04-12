@@ -18,9 +18,6 @@ const Index = (props) => {
             closeOnDocumentClick={false}
             onClose={props.onClose}
             className={`popup-edit`}
-            // contentStyle={{
-            //     fontFamily: 'Lexend Deca, sans-serif'
-            // }}
         >
             <div className={`${deca.className} bg-[#ffffff] p-4 shadow-xl rounded-xl 2xl:mt-28 mt-36`}>
                 <div className="flex justify-between items-center">

@@ -104,13 +104,18 @@ const Index = (props) => {
         Axios("DELETE", `/api_web/Api_client/group/${id}?csrf_protection=true`, {
         }, (err, response) => {
           if(!err){
-            var isSuccess = response.data?.isSuccess;
+            var {isSuccess,message} = response.data
             if(isSuccess){
               Toast.fire({
                 icon: 'success',
-                title: dataLang?.aler_success_delete
+                title: dataLang[message]
               })     
-            }
+            }else{
+              Toast.fire({
+                  icon: 'error',
+                  title: dataLang[message]
+              }) 
+          }
           }
           _ServerFetching()
         })     
@@ -262,7 +267,7 @@ const Index = (props) => {
                               <h6 style={{
                                 backgroundColor:e.color
                               }} className="xl:text-base text-xs  px-2 py-3 w-[15%]  rounded-md "></h6> 
-                              <h6 className="xl:text-base text-xs  px-2 py-3 w-[15%]  rounded-md  "><span className="flex flex-wrap justify-between ">{e?.branch?.map(e => (<span className="mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-lg">{e.name}</span>))}</span></h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-3 w-[15%]  rounded-md  "><span className="flex flex-wrap justify-start gap-2 ">{e?.branch?.map(e => (<span className="mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-lg">{e.name}</span>))}</span></h6>
 
                               <div className="space-x-2 w-[20%] text-center">
                                 <Popup_groupKh onRefresh={_ServerFetching.bind(this)} className="xl:text-base text-xs " listBr={listBr} sValueBr={e.branch}  dataLang={dataLang} name={e.name} color={e.color} id={e.id} />
@@ -426,7 +431,8 @@ const Popup_groupKh = (props) => {
                       onChange={_HandleChangeInput.bind(this, "name")}
                       name="fname"                      
                       type="text"
-                      className={`${errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2`}
+
+                      className={`${errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-md text-[#52575E] font-normal p-2 border outline-none mb-2`}
                     />
                     {errInput && <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.client_group_please_name}</label>}
               </div>
@@ -473,7 +479,8 @@ const Popup_groupKh = (props) => {
                                       }
                                     })
                                 }}
-                                className={`${errInputBr ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full  text-[#52575E] font-normal border outline-none rounded-lg bg-white border-none xl:text-base text-[14.5px]`}
+                                  className={`${errInputBr ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
+
                               />
                               {errInputBr && <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.client_list_bran}</label>}
             <div className="flex flex-wrap justify-between mt-2">

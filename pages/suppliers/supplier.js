@@ -822,6 +822,10 @@ const Popup_dsncc = (props) => {
       if(name?.length == 0 || branch_id?.length == 0){
         name?.length ==0 && sErrInput(true) 
         branch_id?.length==0 && sErrInputBr(true) 
+        Toast.fire({
+          icon: 'error',
+          title: `${props.dataLang?.required_field_null}`
+      })
       }else{
         sOnSending(true)
       }

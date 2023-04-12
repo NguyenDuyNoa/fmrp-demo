@@ -201,6 +201,12 @@ const Index = (props) => {
                 sDataExcel(rResult)
             }
         })
+        Axios("GET", `/api_web/api_product/stage/?csrf_protection=true"`, {}, (err, response) => {
+            if(!err){
+                var {rResult} =  response.data
+                dispatch({type: "congdoan_finishedProduct/update", payload: rResult?.map(e => ({label: e.name, value: e.id}))})
+            }
+        })
         sOnFetchingAnother(false)
     }
 
@@ -307,11 +313,8 @@ const Index = (props) => {
                     </div>
                     <div className='flex justify-between items-center'>
                         <h2 className='xl:text-3xl text-xl font-medium '>Danh Sách Thành Phẩm</h2>
-                        <div className='flex space-x-3'>
-                            <div className='flex space-x-3 items-center'>
-                                <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105 outline-none' />
-                            </div>
-                            <Popup_GiaiDoan dataLang={dataLang} />
+                        <div className='flex space-x-3 items-center'>
+                            <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105 outline-none' />
                         </div>
                     </div>
                     <div className='grid grid-cols-4 gap-8 px-0.5'>
@@ -513,7 +516,7 @@ const Index = (props) => {
                                                 </div>
                                                 <div className='pl-2 py-2.5 w-[7%] flex space-x-2 justify-center'>
                                                     {/* <button className='w-[98%] bg-slate-200 text-sm rounded'>Tác vụ <IconDown /></button> */}
-                                                    <BtnTacVu keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
+                                                    <BtnTacVu dataLang={dataLang} id={e.id} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
                                                     {/* <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} id={e?.id} className="xl:scale-100 scale-[0.8] outline-none" />
                                                     <button onClick={_HandleDelete.bind(this, e.id)} className="xl:scale-100 scale-[0.8] outline-none"><IconDelete color="red"/></button> */}
                                                 </div>
@@ -542,29 +545,32 @@ const Index = (props) => {
 }
 
 const BtnTacVu = React.memo((props) => {
+    const [open, sOpen] = useState(false);
+    const _ToggleModal = (e) => sOpen(e);
 
+    const _HandleGiaiDoan = () => {
+        sOpen(false)
+        props.onClick
+    }
     return(
         <div>
-            <Head>
-                <div id="popup-wrapper"></div>
-            </Head>
             <Popup
-                trigger={
-                    <button className={`flex space-x-1 items-center ` + props.className } >
-                        <span>Tác vụ</span>
-                        <IconDown size={12} />
-                    </button>
-                }
+                trigger={<button className={`flex space-x-1 items-center ` + props.className } ><span>Tác vụ</span><IconDown size={12} /></button>}
                 arrow={false}
-                on={['hover']}
                 position="bottom right"
                 className={`dropdown-edit `}
                 keepTooltipInside={props.keepTooltipInside}
                 closeOnDocumentClick
+                nested
+                onOpen={_ToggleModal.bind(this, true)}
+                onClose={_ToggleModal.bind(this, false)}
+                open={open}
             >
                 <div className="w-auto rounded">
                     <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                        <button className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Thiết kế công đoạn</button>
+                            <Popup_GiaiDoan onClick={_HandleGiaiDoan.bind(this)} dataLang={props.dataLang} id={props.id} classNameBtn='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
+                        {/* <button onClick={_ToggleModal.bind(this, false)} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
+                        </button> */}
                         <button className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Thiết kế BOM</button>
                         <button className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Sửa</button>
                         <button className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Xoá</button>
@@ -1670,14 +1676,23 @@ const Popup_ThongTin = React.memo((props) => {
 })
 
 const Popup_GiaiDoan = React.memo((props) => {
+    const listCd = useSelector(state => state.congdoan_finishedProduct);
+
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
 
     const scrollAreaRef = useRef(null);
+    const handleMenuOpen = () => {
+        const menuPortalTarget = scrollAreaRef != null ? scrollAreaRef.current : scrollAreaRef;
+        return { menuPortalTarget };
+    };
 
-    const [onFetchingCd, sOnFetchingCd] = useState(false);
+    const [onSending, sOnSending] = useState(false);
+
+    const [statusBtnAdd, sStatusBtnAdd] = useState(false);
+    const [errName, sErrName] = useState(false);
     
-    const [listCd, sListCd] = useState([])
+    const [listCdChosen, sListCdChosen] = useState([]);
     const [option, sOption] = useState([]);  
 
     const [name, sName] = useState(null);
@@ -1685,25 +1700,70 @@ const Popup_GiaiDoan = React.memo((props) => {
     const [radio2, sRadio2] = useState(0);
     
     useEffect(() => {
-        open && sOnFetchingCd(true)
         open && sOption([])
+        open && sListCdChosen([])
+        open && sStatusBtnAdd(false)
+        open && sErrName(false)
     }, [open]);
 
-    const _ServerFetching_selectCd =  () =>{
-        Axios("GET", `/api_web/api_product/stage/?csrf_protection=true"`, {
-            limit: 0
+    useEffect(() => {
+        if(listCd?.length == option?.length){
+            sStatusBtnAdd(true)
+        }else{
+            sStatusBtnAdd(false)
+        }
+
+    }, [option]);
+
+    const _ServerSending = () => {
+        var formData = new FormData();
+
+        formData.append("product_id", props.id)
+        option.forEach((item, index) => {
+            formData.append(`data[${index}][stages]`, item?.name?.value);
+            formData.append(`data[${index}][type]`, item.radio1);
+            formData.append(`data[${index}][final_stage]`, item.radio2);
+        });
+        Axios("POST", "/api_web/api_product/designStages?csrf_protection=true", {
+            data: formData,
+            headers: {"Content-Type": "multipart/form-data"} 
         }, (err, response) => {
             if(!err){
-                var {rResult} =  response.data
-                sListCd(rResult?.map(e => ({label: e.name, value: e.id})))
+                console.log("hii")
+                var {isSuccess, message} = response.data;
+                if(isSuccess){
+                    Toast.fire({
+                        icon: 'success',
+                        title: props.dataLang[message]
+                    })
+                }else {
+                    Toast.fire({
+                        icon: 'error',
+                        title: props.dataLang[message]
+                    })
+                }
             }
-            sOnFetchingCd(false)
+            sOnSending(false)
         })
     }
+    console.log(option)
 
     useEffect(() => {
-        onFetchingCd && _ServerFetching_selectCd()
-      }, [onFetchingCd]);
+        onSending && _ServerSending()
+    }, [onSending]);
+
+    const _HandleSubmit = (e) => {
+        e.preventDefault();
+        const hasNullLabel = option.some(item => item.name === null);
+        if(hasNullLabel){
+            sErrName(true)
+        }else{
+            sErrName(false)
+            sOnSending(true)
+        }
+    }
+
+    //Draggable
 
     const _HandleAddNew =  () => {
         sOption([...option, {id: Date.now(), name: name, radio1: radio1, radio2: radio2}])
@@ -1716,7 +1776,8 @@ const Popup_GiaiDoan = React.memo((props) => {
         var newItems = arrayMoveImmutable([...option], oldIndex, newIndex);
         sOption(newItems)
     }
-    console.log(option)
+
+    const listCdRest = listCd?.filter(item1 => !listCdChosen.some(item2 => item1.label === item2?.label && item1.value === item2?.value));
 
     const handleDelete = (updatedData) => {
         Swal.fire({
@@ -1734,15 +1795,119 @@ const Popup_GiaiDoan = React.memo((props) => {
         })
     }
 
+    const handleRatioChange = (id, type) => {
+        const updatedData = option.map(item => {
+          if (item.id === id) {
+            if(type == "radio1"){
+                return {...item, radio1: 1};
+            }else if(type == "radio2"){
+                return {...item, radio2: 1};
+            }
+          } else {
+            if(type == "radio1"){
+                return {...item, radio1: 0};
+            }else if(type == "radio2"){
+                return {...item, radio2: 0};
+            }
+          }
+        });
+        sOption(updatedData);
+    };
+
+    const handleSelectChange = (id, value) => {
+        const index = option.findIndex(x => x.id === id);
+        option[index].name = value;
+        sOption([...option])
+        sListCdChosen(option.map(e => e.name))
+    }
+
+    const ItemDragHandle = sortableHandle(() => {
+        return(
+            <button type='button' className='text-blue-500 relative flex flex-col justify-center items-center'>
+                <IconMax size="18" className='-rotate-45' />
+                <IconMax size="18" className='rotate-45 absolute' />
+            </button>
+        )
+    })
+
+    const SortableList = SortableContainer(({items, onClickDelete}) => {
+        const handleDelete = (id) => {
+            const updatedItems = items.filter(item => item.id !== id);
+            onClickDelete(updatedItems);
+        }
+        return (
+            <div className='divide-y divide-slate-100'>
+                {items.map((e, index) => (
+                    <SortableItem key={`item-${e.value}`} index={index} indexItem={index} value={e} onClickDelete={handleDelete} />
+                ))}
+            </div>
+        );
+    });
+
+    const SortableItem = SortableElement(({value, indexItem, onClickDelete}) => {
+        const handleDeleteClick = () => {
+            onClickDelete(value.id);
+        }
+        
+        return(
+            <div className='flex items-center z-[999] py-1 hover:bg-slate-50 bg-white'>
+                <h6 className='w-[5%] text-center px-2'>{indexItem + 1}</h6>
+                <div className='w-[30%] px-2'>
+                    <Select   
+                        closeMenuOnSelect={true}
+                        placeholder={"Tên công đoạn"}
+                        options={listCdRest}
+                        value={value.name}
+                        onChange={handleSelectChange.bind(this, value.id)}
+                        isSearchable={true}
+                        noOptionsMessage={() => "Không có dữ liệu"}
+                        maxMenuHeight="200px"
+                        isClearable={true} 
+                        menuPortalTarget={document.body}
+                        onMenuOpen={handleMenuOpen}
+                        styles={{
+                            placeholder: (base) => ({
+                            ...base,
+                            color: "#cbd5e1",
+                        
+                            }),
+                            menuPortal: (base) => ({
+                                ...base,
+                                zIndex: 9999,
+                                position: "absolute", 
+                            
+                            }), 
+                        }}
+                        className={`${errName && value.name == null ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
+                    />
+                </div>
+                <div className="w-[30%] flex items-center justify-center">
+                    <input type="radio" id={`radio1 + ${value.id}`} onChange={handleRatioChange.bind(this, value.id, "radio1")} checked={value.radio1 === 0 ? false : true} name='radio1' className="scale-150 outline-none accent-blue-500"/>
+                    <label htmlFor={`radio1 + ${value.id}`} className="relative flex cursor-pointer items-center rounded-full p-3" data-ripple-dark="true">{"Chọn"}</label>
+                </div>
+                <div className="w-[20%] flex items-center justify-center">
+                    <input type="radio" id={`radio2 + ${value.id}`} onChange={handleRatioChange.bind(this, value.id, "radio2")} checked={value.radio2 === 0 ? false : true} name='radio2' className="scale-150 outline-none accent-blue-500"/>
+                    <label htmlFor={`radio2 + ${value.id}`} className="relative flex cursor-pointer items-center rounded-full p-3" data-ripple-dark="true">{"Chọn"}</label>
+                </div>
+                <div className='w-[15%] flex items-center justify-center space-x-4'>
+                    <ItemDragHandle />
+                    <button onClick={handleDeleteClick.bind(this)} type='button' className='text-red-500'><IconDelete /></button>
+                </div>
+            </div>
+        )
+    });
+
     return(
         <PopupEdit  
             title={"Thêm công đoạn"} 
-            button={"Công đoạn"} 
+            button={"Thiết kế công đoạn"} 
             onClickOpen={_ToggleModal.bind(this, true)} 
             open={open} 
             onClose={_ToggleModal.bind(this,false)}
+            classNameBtn={props.classNameBtn}
+            onClick={_ToggleModal.bind(this, true)}
         >
-            <form className="py-4 w-[800px]">
+            <div className="py-4 w-[800px]">
                 <div>
                     <div className="flex w-full items-center py-2">
                         <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[5%] font-[400] text-center">STT</h4>
@@ -1752,97 +1917,18 @@ const Popup_GiaiDoan = React.memo((props) => {
                         <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[400] text-center">{"Thao tác"}</h4>
                     </div> 
                     <ScrollArea className="min-h-[0px] max-h-[500px] overflow-hidden" speed={1} smoothScrolling={true} ref={scrollAreaRef}>
-                        <SortableList useDragHandle lockAxis={"y"} items={option} dataCd={listCd} onSortEnd={onSortEnd.bind(this)} onClickDelete={handleDelete} />
-                        <button type='button' onClick={_HandleAddNew.bind(this)} title='Thêm' className='transition  mt-5 w-full  hover:text-[#0F4F9E]  min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center hover:bg-[#e2f0fe]'><IconAdd />{"Thêm thành phần BOM"}</button> 
+                        <SortableList useDragHandle lockAxis={"y"} items={option} onSortEnd={onSortEnd.bind(this)} onClickDelete={handleDelete} />
+                        <button type='button' onClick={_HandleAddNew.bind(this)} disabled={statusBtnAdd} title='Thêm' className={`${statusBtnAdd ? "opacity-50" : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]" } transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}><IconAdd />{"Thêm thành phần BOM"}</button> 
                     </ScrollArea>     
                 </div>
                 <div className="text-right mt-5 space-x-2">
-                  <button type='button' onClick={_ToggleModal.bind(this,false)} className="text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
+                  <button type='button' onClick={_ToggleModal.bind(this,false)} className={`text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]`}
                   >{props.dataLang?.branch_popup_exit}</button>
-                  <button type="submit" className="text-[#FFFFFF] font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]" >{props.dataLang?.branch_popup_save}</button>
+                  <button onClick={_HandleSubmit.bind(this)} className="text-[#FFFFFF] font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]" >{props.dataLang?.branch_popup_save}</button>
                 </div>
-            </form> 
+            </div> 
         </PopupEdit>
     )
 })
-
-const SortableList = SortableContainer(({items, dataCd, onClickDelete}) => {
-    const handleDelete = (id) => {
-        const updatedItems = items.filter(item => item.id !== id);
-        onClickDelete(updatedItems);
-    }
-    return (
-        <div className='divide-y divide-slate-100'>
-            {items.map((e, index) => (
-                <SortableItem key={`item-${e.value}`} index={index} indexItem={index} value={e} dataCd={dataCd} onClickDelete={handleDelete} />
-            ))}
-        </div>
-    );
-});
-
-const ItemDragHandle = sortableHandle(() => {
-    return(
-        <button type='button' className='text-blue-500 relative flex flex-col justify-center items-center'>
-            <IconMax size="18" className='-rotate-45' />
-            <IconMax size="18" className='rotate-45 absolute' />
-        </button>
-    )
-})
-
-const SortableItem = SortableElement(React.forwardRef(({value, dataCd, indexItem, onClickDelete}, ref) => {
-    const handleMenuOpen = () => {
-        const menuPortalTarget = ref != null ? ref.current : ref;
-        return { menuPortalTarget };
-    };
-
-    const handleDeleteClick = () => {
-        onClickDelete(value.id);
-    }
-    
-    return(
-        <div className='flex items-center z-[999] py-1 hover:bg-slate-50 bg-white'>
-            <h6 className='w-[5%] text-center px-2'>{indexItem + 1}</h6>
-            <div className='w-[30%] px-2'>
-                <Select   
-                    closeMenuOnSelect={true}
-                    placeholder={"Tên công đoạn"}
-                    options={dataCd}
-                    isSearchable={true}
-                    noOptionsMessage={() => "Không có dữ liệu"}
-                    maxMenuHeight="200px"
-                    isClearable={true} 
-                    menuPortalTarget={document.body}
-                    onMenuOpen={handleMenuOpen}
-                    styles={{
-                        placeholder: (base) => ({
-                        ...base,
-                        color: "#cbd5e1",
-                    
-                        }),
-                        menuPortal: (base) => ({
-                            ...base,
-                            zIndex: 9999,
-                            position: "absolute", 
-                        
-                        }), 
-                    }}
-                    className={` placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
-                />
-            </div>
-            <div className="w-[30%] flex items-center justify-center">
-                <input type="radio" id={`radio1 + ${value.id}`} name='radio1' className="scale-150 outline-none accent-blue-500"/>
-                <label htmlFor={`radio1 + ${value.id}`} className="relative flex cursor-pointer items-center rounded-full p-3" data-ripple-dark="true">{"Chọn"}</label>
-            </div>
-            <div className="w-[20%] flex items-center justify-center">
-                <input type="radio" id={`radio2 + ${value.id}`} name='radio2' className="scale-150 outline-none accent-blue-500"/>
-                <label htmlFor={`radio2 + ${value.id}`} className="relative flex cursor-pointer items-center rounded-full p-3" data-ripple-dark="true">{"Chọn"}</label>
-            </div>
-            <div className='w-[15%] flex items-center justify-center space-x-4'>
-                <ItemDragHandle />
-                <button onClick={handleDeleteClick.bind(this)} type='button' className='text-red-500'><IconDelete /></button>
-            </div>
-        </div>
-    )
-}));
 
 export default Index;
