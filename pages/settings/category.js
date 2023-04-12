@@ -577,9 +577,6 @@ const Popup_danhmuc = (props) => {
                                 className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[140px] h-[40px] max-h-[240px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"
                               />                          
                           </div>
-                          
-                          
-                         
                     </div>
                   </div>  
                 </React.Fragment>
