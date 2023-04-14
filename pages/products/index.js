@@ -12,9 +12,9 @@ import Loading from "components/UI/loading";
 
 import Popup from 'reactjs-popup';
 import { 
-    SearchNormal1 as IconSearch, Trash as IconDelete, Edit as IconEdit, UserEdit as IconUserEdit,
+    SearchNormal1 as IconSearch, Trash as IconDelete, UserEdit as IconUserEdit,
     Grid6 as IconExcel, Image as IconImage, GalleryEdit as IconEditImg, ArrowDown2 as IconDown,
-    Add as IconAdd, Maximize4 as IconMax
+    Add as IconAdd, Maximize4 as IconMax, CloseCircle as IconClose, TickCircle as IconTick
 } from "iconsax-react";
 import { NumericFormat } from 'react-number-format';
 import Select, { components } from 'react-select';
@@ -98,6 +98,8 @@ const Index = (props) => {
             query: { tab: e }
         })
     }
+
+    const [openDetail, sOpenDetail] = useState(false);
 
     const [data, sData] = useState([]);
     const [dataExcel, sDataExcel] = useState([]);
@@ -201,7 +203,7 @@ const Index = (props) => {
                 sDataExcel(rResult)
             }
         })
-        Axios("GET", `/api_web/api_product/stage/?csrf_protection=true"`, {}, (err, response) => {
+        Axios("GET", `/api_web/api_product/stage/?csrf_protection=true`, {}, (err, response) => {
             if(!err){
                 var {rResult} =  response.data
                 dispatch({type: "congdoan_finishedProduct/update", payload: rResult?.map(e => ({label: e.name, value: e.id}))})
@@ -226,39 +228,6 @@ const Index = (props) => {
         }else if(type == "finishedPro"){
             sValueFinishedPro(value)
         }
-    }
-
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#296dc1',
-            cancelButtonColor: '#d33',
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText:`${props.dataLang?.aler_cancel}`
-        }).then((result) => {
-          if (result.isConfirmed) {
-            Axios("DELETE", `/api_web/api_product/product/${id}?csrf_protection=true`, {
-            }, (err, response) => {
-              if(!err){
-                var {isSuccess, message} = response.data;
-                if(isSuccess){
-                  Toast.fire({
-                    icon: 'success',
-                    title: props.dataLang[message]
-                  })     
-                  _ServerFetching()
-                }else{
-                    Toast.fire({
-                        icon: 'error',
-                        title: props.dataLang[message]
-                    }) 
-                }
-              }
-            })     
-        }
-        })
     }
 
     //Set data cho bộ lọc chi nhánh
@@ -314,7 +283,7 @@ const Index = (props) => {
                     <div className='flex justify-between items-center'>
                         <h2 className='xl:text-3xl text-xl font-medium '>Danh Sách Thành Phẩm</h2>
                         <div className='flex space-x-3 items-center'>
-                            <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105 outline-none' />
+                            <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} setOpen={sOpenDetail} isOpen={openDetail} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105 outline-none' />
                         </div>
                     </div>
                     <div className='grid grid-cols-4 gap-8 px-0.5'>
@@ -516,7 +485,7 @@ const Index = (props) => {
                                                 </div>
                                                 <div className='pl-2 py-2.5 w-[7%] flex space-x-2 justify-center'>
                                                     {/* <button className='w-[98%] bg-slate-200 text-sm rounded'>Tác vụ <IconDown /></button> */}
-                                                    <BtnTacVu dataLang={dataLang} id={e.id} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
+                                                    <BtnTacVu dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
                                                     {/* <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} id={e?.id} className="xl:scale-100 scale-[0.8] outline-none" />
                                                     <button onClick={_HandleDelete.bind(this, e.id)} className="xl:scale-100 scale-[0.8] outline-none"><IconDelete color="red"/></button> */}
                                                 </div>
@@ -545,13 +514,47 @@ const Index = (props) => {
 }
 
 const BtnTacVu = React.memo((props) => {
-    const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
+    const [openTacvu, sOpenTacvu] = useState(false);
+    const _ToggleModal = (e) => sOpenTacvu(e);
 
-    const _HandleGiaiDoan = () => {
-        sOpen(false)
-        props.onClick
+    const [open, sOpen] = useState(false);
+    const [openDetail, sOpenDetail] = useState(false);
+    const [openBom, sOpenBom] = useState(false);
+
+    ////
+    const _HandleDelete = (id) => {
+        Swal.fire({
+            title: `${props.dataLang?.aler_ask}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#296dc1',
+            cancelButtonColor: '#d33',
+            confirmButtonText: `${props.dataLang?.aler_yes}`,
+            cancelButtonText:`${props.dataLang?.aler_cancel}`
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Axios("DELETE", `/api_web/api_product/product/${id}?csrf_protection=true`, {
+            }, (err, response) => {
+              if(!err){
+                var {isSuccess, message} = response.data;
+                if(isSuccess){
+                  Toast.fire({
+                    icon: 'success',
+                    title: props.dataLang[message]
+                  })     
+                  props.onRefresh && props.onRefresh()
+                }else{
+                    Toast.fire({
+                        icon: 'error',
+                        title: props.dataLang[message]
+                    }) 
+                }
+              }
+            })     
+        }
+        })
     }
+    
     return(
         <div>
             <Popup
@@ -564,16 +567,14 @@ const BtnTacVu = React.memo((props) => {
                 nested
                 onOpen={_ToggleModal.bind(this, true)}
                 onClose={_ToggleModal.bind(this, false)}
-                open={open}
+                open={open || openDetail || openBom}
             >
                 <div className="w-auto rounded">
                     <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                            <Popup_GiaiDoan onClick={_HandleGiaiDoan.bind(this)} dataLang={props.dataLang} id={props.id} classNameBtn='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
-                        {/* <button onClick={_ToggleModal.bind(this, false)} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
-                        </button> */}
-                        <button className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Thiết kế BOM</button>
-                        <button className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Sửa</button>
-                        <button className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Xoá</button>
+                        <Popup_GiaiDoan setOpen={sOpen} isOpen={open} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
+                        <Popup_Bom setOpen={sOpenBom} isOpen={openBom} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
+                        <Popup_ThanhPham onRefresh={props.onRefresh} dataLang={props.dataLang} id={props?.id} setOpen={sOpenDetail} isOpen={openDetail} className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full" />
+                        <button onClick={_HandleDelete.bind(this, props.id)} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Xoá</button>
                     </div>
                 </div>
             </Popup>
@@ -593,8 +594,7 @@ const Popup_ThanhPham = React.memo((props) => {
         return { menuPortalTarget };
     };
 
-    const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
+    const _ToggleModal = (e) => props.setOpen(e);
 
     const [tab, sTab] = useState(0)
     const _HandleSelectTab = (e) => sTab(e)
@@ -729,35 +729,35 @@ const Popup_ThanhPham = React.memo((props) => {
     const [errType, sErrType] = useState(false);
 
     useEffect(() => {
-        open && sTab(0)
-        open && sName("")
-        open && sCode("")
-        open && sNote("")
-        open && sPrice(null)
-        open && sExpiry()
-        open && sMinimumAmount(null)
-        open && sThumb(null)
-        open && sThumbFile(null)
-        open && sType(null)
-        open && sCategory(null)
-        open && sBranch([])
-        open && sDataCategory([])
-        open && sUnit(null)
-        open && sOnFetchingCategory(false)
-        open && sErrGroup(false)
-        open && sErrName(false)
-        open && sErrCode(false)
-        open && sErrUnit(false)
-        open && sErrBranch(false)
-        open && sErrType(false)
-        open && sDataTotalVariant([])
-        open && sDataVariantSending([])
-        open && sVariantMain(null)
-        open && sVariantSub(null)
-        open && sPrevVariantMain(null)
-        open && sPrevVariantSub(null)
-        open && props?.id && sOnFetching(true)
-    }, [open]);
+        props.isOpen && sTab(0)
+        props.isOpen && sName("")
+        props.isOpen && sCode("")
+        props.isOpen && sNote("")
+        props.isOpen && sPrice(null)
+        props.isOpen && sExpiry()
+        props.isOpen && sMinimumAmount(null)
+        props.isOpen && sThumb(null)
+        props.isOpen && sThumbFile(null)
+        props.isOpen && sType(null)
+        props.isOpen && sCategory(null)
+        props.isOpen && sBranch([])
+        props.isOpen && sDataCategory([])
+        props.isOpen && sUnit(null)
+        props.isOpen && sOnFetchingCategory(false)
+        props.isOpen && sErrGroup(false)
+        props.isOpen && sErrName(false)
+        props.isOpen && sErrCode(false)
+        props.isOpen && sErrUnit(false)
+        props.isOpen && sErrBranch(false)
+        props.isOpen && sErrType(false)
+        props.isOpen && sDataTotalVariant([])
+        props.isOpen && sDataVariantSending([])
+        props.isOpen && sVariantMain(null)
+        props.isOpen && sVariantSub(null)
+        props.isOpen && sPrevVariantMain(null)
+        props.isOpen && sPrevVariantSub(null)
+        props.isOpen && props?.id && sOnFetching(true)
+    }, [props.isOpen]);
 
     const _HandleChangeInput = (type, value) => {
         if(type === "code"){
@@ -865,7 +865,7 @@ const Popup_ThanhPham = React.memo((props) => {
 
     useEffect(() => {
         setTimeout(() => {
-            open && branch && sOnFetchingCategory(true)
+            props.isOpen && branch && sOnFetchingCategory(true)
         }, 500);
     }, [branch]);
 
@@ -917,7 +917,7 @@ const Popup_ThanhPham = React.memo((props) => {
                         icon: 'success',
                         title: `${props.dataLang[message]}`
                     })
-                    sOpen(false)
+                    props.setOpen(false)
                     props.onRefresh && props.onRefresh()
                 }else{
                     Toast.fire({
@@ -1044,9 +1044,9 @@ const Popup_ThanhPham = React.memo((props) => {
     return(
         <PopupEdit  
             title={props?.id ? `Sửa thành phẩm` : `Tạo mới thành phẩm`} 
-            button={props?.id ? <IconEdit/> : `${props.dataLang?.branch_popup_create_new}`} 
+            button={props?.id ? "Sửa" : `${props.dataLang?.branch_popup_create_new}`} 
             onClickOpen={_ToggleModal.bind(this, true)} 
-            open={open} 
+            open={props.isOpen} 
             onClose={_ToggleModal.bind(this,false)}
             classNameBtn={props.className}
         >
@@ -1506,11 +1506,15 @@ const Popup_ThongTin = React.memo((props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
 
+    const [openStage, sOpenStage] = useState(false);
+
     const [tab, sTab] = useState(0)
     const _HandleSelectTab = (e) => sTab(e)
 
     const [onFetching, sOnFetching] = useState(false);
+    const [onFetchingAnother, sOnFetchingAnother] = useState(false);
     const [list, sList] = useState({});
+    const [dataStage, sDataStage] = useState(false);
 
     const _ServerFetching = () => {
         Axios("GET", `/api_web/api_product/product/${props.id}?csrf_protection=true`, {}, (err, response) => {
@@ -1525,10 +1529,29 @@ const Popup_ThongTin = React.memo((props) => {
         onFetching && _ServerFetching()
     }, [onFetching]);
 
+    const _ServerFetchingAnother = () => {
+        Axios("GET", `/api_web/api_product/getDesignStages/${props.id}?csrf_protection=true`, {}, (err, response) => {
+            if(!err){
+                var data = response.data;
+                sDataStage(data)
+            }
+            sOnFetchingAnother(false)
+        })
+    }
+
+    useEffect(() => {
+        onFetchingAnother && _ServerFetchingAnother()
+    }, [onFetchingAnother]);
+
     useEffect(() => {
         open && sTab(0)
         open && sOnFetching(true)
+        open && sOnFetchingAnother(true)
     }, [open]);
+
+    useEffect(() => {
+        open && openStage == false && sOnFetchingAnother(true) && console.log("Here")
+    }, [openStage == false]);
 
     return(
         <PopupEdit  
@@ -1537,17 +1560,20 @@ const Popup_ThongTin = React.memo((props) => {
             onClickOpen={_ToggleModal.bind(this, true)} 
             open={open} 
             onClose={_ToggleModal.bind(this,false)}
+            nested
         >
             <div className='py-4 w-[800px] space-y-5'>
                 <div className='flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
                     <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>{props.dataLang?.information || "information"}</button>
                     <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>{props.dataLang?.category_material_list_variant || "category_material_list_variant"}</button>
+                    <button onClick={_HandleSelectTab.bind(this, 2)} className={`${tab === 2 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>Định mức BOM</button>
+                    <button onClick={_HandleSelectTab.bind(this, 3)} className={`${tab === 3 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>Giai đoạn</button>
                 </div>
                 {onFetching ? 
                     <Loading className="h-96"color="#0f4f9e" />
                     :
                     <React.Fragment>
-                        {tab === 0 ?
+                        {tab === 0 &&
                             <div className='grid grid-cols-2 gap-5'>
                                 <div className='space-y-5'>
                                     <div className='space-y-3 bg-slate-100/40 p-2 rounded-md'>
@@ -1621,11 +1647,12 @@ const Popup_ThongTin = React.memo((props) => {
                                     </div>
                                 </div>
                             </div>
-                            :
+                        }
+                        {tab === 1 &&
                             <React.Fragment>
                                 {list?.variation?.length > 0 ?
-                                    <div className='space-y-2 min-h-[384px]'>
-                                        <div className={`${list?.variation[1] ? "grid-cols-4" : "grid-cols-3" } grid gap-2 px-2 py-1 `}>
+                                    <div className='space-y-0.5 min-h-[384px]'>
+                                        <div className={`${list?.variation[1] ? "grid-cols-4" : "grid-cols-3" } grid gap-2 px-2 py-1.5 bg-slate-100/40 rounded`}>
                                             <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center'>Hình đại diện</h5>
                                             <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]'>{list?.variation[0]?.name}</h5>
                                             {list?.variation[1] && <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]'>{list?.variation[1]?.name}</h5>}
@@ -1668,6 +1695,49 @@ const Popup_ThongTin = React.memo((props) => {
                                 }
                             </React.Fragment>
                         }
+                        {tab === 2 &&
+                            <div>BOM</div>
+                        }
+                        {tab === 3 &&
+                            <>
+                                {onFetchingAnother ?
+                                    <Loading className="h-96"color="#0f4f9e" />
+                                    :
+                                    <React.Fragment>
+                                        {dataStage?.length > 0 ?
+                                            <div className='space-y-0.5 min-h-[384px]'>
+                                                <div className={`grid-cols-8 grid gap-2 px-2 py-1.5 bg-slate-100/40 rounded`}>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center'>STT</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] col-span-2'>Giai đoạn</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] col-span-3'>Đánh dấu công đoạn bắt đầu TP chưa hoàn thiện</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2'>Giai đoạn cuối</h5>
+                                                </div>
+                                                <ScrollArea className="min-h-[400px] max-h-[450px]" speed={1} smoothScrolling={true}>
+                                                    <div className='divide-y divide-slate-200'>
+                                                        {dataStage?.map((e, index) => 
+                                                            <div key={e?.id.toString()} className={`grid-cols-8 grid gap-2 px-2 py-2.5 hover:bg-slate-50 items-center`}>
+                                                                <h6 className='text-center px-2 xl:text-base text-xs'>{index + 1}</h6>
+                                                                <h6 className='px-2 xl:text-base text-xs col-span-2'>{e?.stage_name}</h6>
+                                                                <h6 className='px-2 xl:text-base text-xs col-span-3 flex justify-center text-green-600'>{e?.type !== "0" && <IconTick />}</h6>
+                                                                <h6 className='px-2 xl:text-base text-xs col-span-2 flex justify-center text-green-600'>{e?.final_stage !== "0" && <IconTick />}</h6>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </ScrollArea>
+                                                <div className="flex items-center space-x-3 justify-end">
+                                                    <Popup_GiaiDoan setOpen={sOpenStage} isOpen={openStage} dataLang={props.dataLang} id={props.id} name={list?.name} code={list?.code} type="edit" className='text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition' />
+                                                </div>
+                                            </div>
+                                            :
+                                            <div className="w-full h-96 flex flex-col justify-center items-center" >
+                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+                                                <h1 className="text-[#141522] text-base opacity-90 font-medium">{props.dataLang?.no_data_found}</h1>
+                                            </div>
+                                        }
+                                    </React.Fragment>
+                                }
+                            </>
+                        }
                     </React.Fragment>
                 }
             </div>
@@ -1678,8 +1748,7 @@ const Popup_ThongTin = React.memo((props) => {
 const Popup_GiaiDoan = React.memo((props) => {
     const listCd = useSelector(state => state.congdoan_finishedProduct);
 
-    const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
+    const _ToggleModal = (e) => props.setOpen(e);
 
     const scrollAreaRef = useRef(null);
     const handleMenuOpen = () => {
@@ -1688,23 +1757,27 @@ const Popup_GiaiDoan = React.memo((props) => {
     };
 
     const [onSending, sOnSending] = useState(false);
+    const [onFetching, sOnFetching] = useState(false);
 
     const [statusBtnAdd, sStatusBtnAdd] = useState(false);
     const [errName, sErrName] = useState(false);
     
     const [listCdChosen, sListCdChosen] = useState([]);
     const [option, sOption] = useState([]);  
+    const [listCdRest, sListCdRest] = useState([]);
 
     const [name, sName] = useState(null);
     const [radio1, sRadio1] = useState(0);
     const [radio2, sRadio2] = useState(0);
+
     
     useEffect(() => {
-        open && sOption([])
-        open && sListCdChosen([])
-        open && sStatusBtnAdd(false)
-        open && sErrName(false)
-    }, [open]);
+        props.isOpen && sOption([])
+        props.isOpen && sListCdChosen([])
+        props.isOpen && sStatusBtnAdd(false)
+        props.isOpen && sErrName(false)
+        props.isOpen && sOnFetching(true)
+    }, [props.isOpen]);
 
     useEffect(() => {
         if(listCd?.length == option?.length){
@@ -1712,8 +1785,22 @@ const Popup_GiaiDoan = React.memo((props) => {
         }else{
             sStatusBtnAdd(false)
         }
-
     }, [option]);
+
+    const _ServerFetching = () => {
+        Axios("GET", `/api_web/api_product/getDesignStages/${props.id}?csrf_protection=true`, {}, (err, response) => {
+            if(!err){
+                var data = response.data;
+                sOption(data.map(e => ({id: Number(e.id), name: {label: e.stage_name, value: e.stage_id}, radio1: e.type !== "0" ? 1 : 0, radio2: e.final_stage !== "0" ? 1 : 0})))
+                sListCdChosen(data.map(e => ({label: e.stage_name, value: e.stage_id})))
+            }
+            sOnFetching(false)
+        })
+    }
+
+    useEffect(() => {
+        onFetching && _ServerFetching()
+    }, [onFetching]);
 
     const _ServerSending = () => {
         var formData = new FormData();
@@ -1729,13 +1816,13 @@ const Popup_GiaiDoan = React.memo((props) => {
             headers: {"Content-Type": "multipart/form-data"} 
         }, (err, response) => {
             if(!err){
-                console.log("hii")
                 var {isSuccess, message} = response.data;
                 if(isSuccess){
                     Toast.fire({
                         icon: 'success',
                         title: props.dataLang[message]
                     })
+                    props.setOpen(false)
                 }else {
                     Toast.fire({
                         icon: 'error',
@@ -1746,7 +1833,6 @@ const Popup_GiaiDoan = React.memo((props) => {
             sOnSending(false)
         })
     }
-    console.log(option)
 
     useEffect(() => {
         onSending && _ServerSending()
@@ -1757,6 +1843,10 @@ const Popup_GiaiDoan = React.memo((props) => {
         const hasNullLabel = option.some(item => item.name === null);
         if(hasNullLabel){
             sErrName(true)
+            Toast.fire({
+                icon: 'error',
+                title: `${props.dataLang?.required_field_null}`
+            })
         }else{
             sErrName(false)
             sOnSending(true)
@@ -1777,7 +1867,9 @@ const Popup_GiaiDoan = React.memo((props) => {
         sOption(newItems)
     }
 
-    const listCdRest = listCd?.filter(item1 => !listCdChosen.some(item2 => item1.label === item2?.label && item1.value === item2?.value));
+    useEffect(() => {
+        props.isOpen && listCdChosen && sListCdRest(listCd?.filter(item1 => !listCdChosen.some(item2 => item1.label === item2?.label && item1.value === item2?.value)))
+    }, [listCdChosen]);
 
     const handleDelete = (updatedData) => {
         Swal.fire({
@@ -1899,34 +1991,373 @@ const Popup_GiaiDoan = React.memo((props) => {
 
     return(
         <PopupEdit  
-            title={"Thêm công đoạn"} 
-            button={"Thiết kế công đoạn"} 
+            title={`Công đoạn (${props.code} - ${props.name})`} 
+            button={props.type == "add" ? "Thiết kế công đoạn" : "Sửa"} 
             onClickOpen={_ToggleModal.bind(this, true)} 
-            open={open} 
+            open={props.isOpen} 
             onClose={_ToggleModal.bind(this,false)}
-            classNameBtn={props.classNameBtn}
-            onClick={_ToggleModal.bind(this, true)}
+            classNameBtn={props.className}
         >
             <div className="py-4 w-[800px]">
-                <div>
-                    <div className="flex w-full items-center py-2">
-                        <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[5%] font-[400] text-center">STT</h4>
-                        <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[400] text-left">{"Tên công đoạn"}</h4>
-                        <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[400] text-left">{"Đánh dấu công đoạn bắt đầu TP chưa hoàn thiện"}</h4>
-                        <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-center">{"Công đoạn cuối"}</h4>
-                        <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[400] text-center">{"Thao tác"}</h4>
-                    </div> 
-                    <ScrollArea className="min-h-[0px] max-h-[500px] overflow-hidden" speed={1} smoothScrolling={true} ref={scrollAreaRef}>
-                        <SortableList useDragHandle lockAxis={"y"} items={option} onSortEnd={onSortEnd.bind(this)} onClickDelete={handleDelete} />
-                        <button type='button' onClick={_HandleAddNew.bind(this)} disabled={statusBtnAdd} title='Thêm' className={`${statusBtnAdd ? "opacity-50" : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]" } transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}><IconAdd />{"Thêm thành phần BOM"}</button> 
-                    </ScrollArea>     
+                <div className="flex w-full items-center py-2">
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[5%] font-[400] text-center">STT</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[400] text-left">{"Tên công đoạn"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[400] text-left">{"Đánh dấu công đoạn bắt đầu TP chưa hoàn thiện"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-center">{"Công đoạn cuối"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[400] text-center">{"Thao tác"}</h4>
+                </div> 
+                {onFetching ? 
+                    <Loading className="h-96"color="#0f4f9e" />
+                    :
+                    <>
+                        <ScrollArea className="min-h-[0px] max-h-[500px] overflow-hidden" speed={1} smoothScrolling={true} ref={scrollAreaRef}>
+                            <SortableList useDragHandle lockAxis={"y"} items={option} onSortEnd={onSortEnd.bind(this)} onClickDelete={handleDelete} />
+                            <button type='button' onClick={_HandleAddNew.bind(this)} disabled={statusBtnAdd} title='Thêm' className={`${statusBtnAdd ? "opacity-50" : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]" } transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}><IconAdd />{"Thêm giai đoạn"}</button> 
+                        </ScrollArea> 
+                        <div className="text-right mt-5 space-x-2">
+                        <button type='button' onClick={_ToggleModal.bind(this,false)} className={`text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]`}
+                        >{props.dataLang?.branch_popup_exit}</button>
+                        <button onClick={_HandleSubmit.bind(this)} className="text-[#FFFFFF] font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]" >{props.dataLang?.branch_popup_save}</button>
+                        </div>
+                    </>
+                }
+            </div> 
+        </PopupEdit>
+    )
+})
+
+const Popup_Bom = React.memo((props) => {
+    const scrollAreaRef = useRef(null);
+    const handleMenuOpen = () => {
+        const menuPortalTarget = scrollAreaRef.current;
+        return { menuPortalTarget };
+    };
+
+    const dataOptType = useSelector(state => state.type_finishedProduct);
+
+    const [onFetching, sOnFetching] = useState(false);
+    const [onFetchingCd, sOnFetchingCd] = useState(false);
+    const _ToggleModal = (e) => props.setOpen(e);
+
+    const [dataVariant, sDataVariant] = useState([]);
+    const [valueVariant, sValueVariant] = useState(null);
+
+    const [tab, sTab] = useState(null);
+    const [selectedList, sSelectedList] = useState(null);
+
+    const [dataTypeCd, sDataTypeCd] = useState([]);
+
+    const _HandleSelectTab = (e) => sTab(e);
+
+    const [dataSelectedVariant, sDataSelectedVariant] = useState([]);
+    const dataRestVariant = dataVariant?.filter(item1 => !dataSelectedVariant.some(item2 => item1.label === item2?.label && item1.value === item2?.value));
+
+    useEffect(() => {
+        props.isOpen && sOnFetching(true)
+        props.isOpen && props?.id && sOnFetching(true)
+        props.isOpen && props?.id && sOnFetchingCd(true)
+        props.isOpen && sTab(null)
+    }, [props.isOpen]);
+
+    const _ServerFetching = () => {
+        Axios("GET", `/api_web/api_product/productVariationOption/${props.id}?csrf_protection=true`, {}, (err,response) => {
+            if(!err){
+                var {rResult} = response.data;
+                sDataVariant(rResult.map(e => ({label: e.product_variation, value: e.id, child: []})))
+            }
+            sOnFetching(false)
+        })
+    }
+
+    useEffect(() => {
+        onFetching && _ServerFetching()
+    }, [onFetching]);
+
+    const _ServerFetchingCd = () => {
+        Axios("GET", "/api_web/api_product/getDataDesignBom?csrf_protection=true", {}, (err, response) => {
+            if(!err){
+                var {data} = response.data;
+                sDataTypeCd(Object.entries(data.typeDesignBom).map(([key, value]) => ({ label: value, value: key })))
+            }
+        })
+    }
+
+    useEffect(() => {
+        onFetchingCd && _ServerFetchingCd()
+    }, [onFetchingCd]);
+
+    const hiddenOptions = valueVariant?.length > 2 ? valueVariant?.slice(0, 2) : [];
+    const options = dataRestVariant.filter((x) => !hiddenOptions.includes(x.value));
+
+    const _HandleChangeSelect = (value) => {
+        sValueVariant(value)
+    }
+
+    const _HandleApplyVariant = () => {
+        dataSelectedVariant.push(...valueVariant)
+        sTab(dataSelectedVariant[0]?.value)
+        sValueVariant([])
+    }
+    
+    useEffect(() => {
+        props.isOpen && sTab(dataSelectedVariant[0]?.value)
+    }, [dataSelectedVariant.length > 0]);
+
+    
+    const _HandleAddNew =  (id) => {
+        const index = dataSelectedVariant.findIndex(obj => obj.value === id);
+        const newData = [...dataSelectedVariant]
+        newData[index] = {...newData[index], child: [...newData[index].child, { id: Date.now(), type: null, name: null, unit: null, norm: 0, loss: 0, stage: null }]};
+        sDataSelectedVariant(newData)
+    }
+
+    const _HandleDeleteItemBOM = (parentId, id) => {
+        Swal.fire({
+            title: `${props.dataLang?.aler_ask}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#296dc1',
+            cancelButtonColor: '#d33',
+            confirmButtonText: `${props.dataLang?.aler_yes}`,
+            cancelButtonText:`${props.dataLang?.aler_cancel}`
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const index = dataSelectedVariant.findIndex(obj => obj.value === parentId);
+                const newData = [...dataSelectedVariant]
+                const newChild = newData[index].child.filter(item => item.id !== id);
+                newData[index] = {...newData[index], child: newChild};
+                sDataSelectedVariant(newData);
+            }
+        })
+    }
+
+    const _HandleChangeItemBOM = (parentId, id, value, type) => {
+        const index = dataSelectedVariant.findIndex(obj => obj.value === parentId);
+        const newData = [...dataSelectedVariant]
+        const newChild = newData[index].child.filter(item => item.id !== id);
+    }
+
+    const _HandleDeleteBOM = (id) => {
+        Swal.fire({
+            title: `${props.dataLang?.aler_ask}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#296dc1',
+            cancelButtonColor: '#d33',
+            confirmButtonText: `${props.dataLang?.aler_yes}`,
+            cancelButtonText:`${props.dataLang?.aler_cancel}`
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const newData = [...dataSelectedVariant.filter(item => item.value !== id)];
+                sDataSelectedVariant(newData);
+                sTab(newData[0]?.value)
+            }
+        })
+    }
+
+    useEffect(() => {
+        props.isOpen && (tab || dataSelectedVariant) && sSelectedList(dataSelectedVariant.find(item => item.value === tab))
+    }, [tab, dataSelectedVariant]);
+
+    return(
+        <PopupEdit   
+            title={`Thiết kế BOM (${props.code} - ${props.name})`} 
+            button={"Thiết kế BOM"} 
+            onClickOpen={_ToggleModal.bind(this, true)} 
+            open={props.isOpen} 
+            onClose={_ToggleModal.bind(this,false)}
+            classNameBtn={props.className} 
+        >
+            <div className="py-4 w-[900px] space-y-2">
+                <div className='flex justify-between items-end pb-2'>
+                    <div className='w-2/3'>
+                        <label className="text-[#344054] font-normal text-sm mb-1 ">{"Chọn biến thể"} <span className="text-red-500">*</span></label>
+                        <Select   
+                            closeMenuOnSelect={false}
+                            placeholder={"Biến thể"}
+                            options={options}
+                            isSearchable={true}
+                            onChange={_HandleChangeSelect.bind(this)}
+                            noOptionsMessage={() => "Không có dữ liệu"}
+                            value={valueVariant}
+                            maxMenuHeight="200px"
+                            isClearable={true} 
+                            isMulti
+                            menuPortalTarget={document.body}
+                            onMenuOpen={handleMenuOpen}
+                            components={{ MultiValue }}
+                            styles={{
+                                placeholder: (base) => ({
+                                ...base,
+                                color: "#cbd5e1",
+                            
+                                }),
+                                menuPortal: (base) => ({
+                                    ...base,
+                                    zIndex: 9999,
+                                    position: "absolute", 
+                                
+                                }), 
+                                control: (provided) => ({
+                                ...provided,
+                                border: '1px solid #d0d5dd', 
+                                "&:focus":{
+                                    outline:"none",
+                                    border:"none"
+                                }
+                                })
+                            }}
+                        />
+                    </div>
+                    <button onClick={_HandleApplyVariant.bind(this)} className='disabled:grayscale outline-none px-4 py-2 rounded-lg bg-[#E2F0FE] text-sm font-medium hover:scale-105 disabled:hover:scale-100 disabled:opacity-50 transition'>{props.dataLang?.apply || "apply"}</button>
+                </div>
+                {dataSelectedVariant?.length > 0 &&
+                    <div className='pb-2 flex space-x-3 items-center justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+                        {dataSelectedVariant.map(e => 
+                            <button key={e.value} onClick={_HandleSelectTab.bind(this, e.value)} className={`${tab == e.value ? "text-[#0F4F9E] bg-[#0F4F9E10]" : "hover:text-[#0F4F9E] bg-slate-50/50" } outline-none min-w-fit pl-3 pr-10 py-1.5 rounded relative flex items-center`}>
+                                <span>{e.label}</span>
+                                <button type='button' onClick={_HandleDeleteBOM.bind(this, e.value)} className='text-red-500 absolute right-0 px-2'><IconDelete /></button>
+                            </button>
+                        )}
+                    </div>
+                }
+                <div className='space-y-1 -pt-5'>
+                    <div className="flex w-full items-center bg-slate-100 p-2 z-10">
+                        <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[5%] font-[400] text-center">{"Stt"}</h4>
+                        <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[37%] font-[400]">{"Tên thành phần BOM"}</h4>
+                        <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[11%] font-[400] text-center">{"Đơn vị"}</h4>
+                        <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[12%] font-[400] text-left">{"Định mức"}</h4>
+                        <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[12%] font-[400] text-left">{"% Hao hụt"}</h4>
+                        <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[23%] font-[400] text-left">{"Công đoạn sử dụng"}</h4>
+                        <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[10%] font-[400] text-center">{"Thao tác"}</h4>
+                    </div>
+                    <ScrollArea className="min-h-[0px] max-h-[550px] overflow-hidden" speed={1} smoothScrolling={true}>
+                        <div className='divide-y divide-slate-100'>
+                            {selectedList?.child.map((e, index) =>
+                                <div key={e.id} className='py-1 px-2 flex w-full hover:bg-slate1-100 items-center'>
+                                    <h6 className='w-[5%] px-1 text-center'>{index + 1}</h6>
+                                    <div className='w-[37%] flex space-x-2 px-1'>
+                                        <Select 
+                                            options={dataTypeCd}
+                                            // value={type}
+                                            // onChange={_HandleChangeInput.bind(this, "type")}
+                                            isClearable={true}
+                                            placeholder={"Loại"}
+                                            noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                            menuPortalTarget={document.body}
+                                            onMenuOpen={handleMenuOpen}
+                                            classNamePrefix="Select"
+                                            className={`Select__custom border-transparent placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `} 
+                                            theme={(theme) => ({
+                                                ...theme,
+                                                colors: {
+                                                    ...theme.colors,
+                                                    primary25: '#EBF5FF',
+                                                    primary50: '#92BFF7',
+                                                    primary: '#0F4F9E',
+                                                },
+                                            })}
+                                            styles={{
+                                                placeholder: (base) => ({
+                                                ...base,
+                                                color: "#cbd5e1",
+                                                }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
+                                                    position: "absolute",
+                                                }),
+                                            }}
+                                        />
+                                        <Select 
+                                            // options={dataOptType}
+                                            // value={type}
+                                            // onChange={_HandleChangeInput.bind(this, "type")}
+                                            isClearable={true}
+                                            placeholder={"Tên"}
+                                            noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                            menuPortalTarget={document.body}
+                                            onMenuOpen={handleMenuOpen}
+                                            className={`border-transparent placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
+                                            theme={(theme) => ({
+                                                ...theme,
+                                                colors: {
+                                                    ...theme.colors,
+                                                    primary25: '#EBF5FF',
+                                                    primary50: '#92BFF7',
+                                                    primary: '#0F4F9E',
+                                                },
+                                            })}
+                                            styles={{
+                                                placeholder: (base) => ({
+                                                ...base,
+                                                color: "#cbd5e1",
+                                                }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
+                                                    position: "absolute",
+                                                }),
+                                            }}
+                                        />
+                                    </div>
+                                    <h6 className="w-[11%] px-1 text-center">Đơn vị</h6>
+                                    <div className="w-[12%] px-1">
+                                        <NumericFormat thousandSeparator="," placeholder={"Định mức"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                    </div>
+                                    <div className="w-[12%] px-1">
+                                        <NumericFormat thousandSeparator="," placeholder={"% Hao hụt"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                    </div>
+                                    <div className="w-[23%] px-1">
+                                        <Select 
+                                            // options={dataOptType}
+                                            // value={type}
+                                            // onChange={_HandleChangeInput.bind(this, "type")}
+                                            isClearable={true}
+                                            placeholder={"Công đoạn sử dụng"}
+                                            noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                            menuPortalTarget={document.body}
+                                            onMenuOpen={handleMenuOpen}
+                                            className={`border-transparent placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`} 
+                                            theme={(theme) => ({
+                                                ...theme,
+                                                colors: {
+                                                    ...theme.colors,
+                                                    primary25: '#EBF5FF',
+                                                    primary50: '#92BFF7',
+                                                    primary: '#0F4F9E',
+                                                },
+                                            })}
+                                            styles={{
+                                                placeholder: (base) => ({
+                                                ...base,
+                                                color: "#cbd5e1",
+                                                }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
+                                                    position: "absolute",
+                                                }),
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="w-[10%] px-1 text-center">
+                                        <button onClick={_HandleDeleteItemBOM.bind(this, selectedList?.value, e.id)} type='button' className='text-red-500'><IconDelete /></button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </ScrollArea>
+                    {dataSelectedVariant?.length > 0 &&
+                        <button onClick={_HandleAddNew.bind(this, selectedList?.value)} type='button' title='Thêm' className={`hover:text-[#0F4F9E] hover:bg-[#e2f0fe] transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}><IconAdd />{"Thêm thiết kế BOM"}</button> 
+                    }
                 </div>
                 <div className="text-right mt-5 space-x-2">
-                  <button type='button' onClick={_ToggleModal.bind(this,false)} className={`text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]`}
-                  >{props.dataLang?.branch_popup_exit}</button>
-                  <button onClick={_HandleSubmit.bind(this)} className="text-[#FFFFFF] font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]" >{props.dataLang?.branch_popup_save}</button>
+                    <button type='button' onClick={_ToggleModal.bind(this,false)} className="button text-[#344054]  font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
+                    >{props.dataLang?.branch_popup_exit}</button>
+                    <button type="submit" className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]">{props.dataLang?.branch_popup_save}</button>
                 </div>
-            </div> 
+          </div>    
         </PopupEdit>
     )
 })

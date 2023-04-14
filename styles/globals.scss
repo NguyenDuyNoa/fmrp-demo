@@ -147,3 +147,11 @@ input::-ms-reveal,
 		margin: 0em 1em !important
 	} 
 }
+
+/// .Select__single-value,
+.Select__custom .Select__single-value {
+	white-space: initial !important;
+	overflow: visible !important;
+	text-overflow: ellipsis !important;
+	display: block;
+}
