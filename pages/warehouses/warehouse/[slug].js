@@ -283,13 +283,13 @@ const newResult = data_ex.map(item => {
                                             </div>
                                             {dataProductSerial.is_enable === "1" ? (
                                                 <div className=" col-span-1 border-r">
-                                                  <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-left border-b">{e.serial == null ? "-" : e.serial}</h6>                              
+                                                  <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-left border-b">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
                                                 </div>
                                               ):""}
                                            {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
                                              <>
                                                 <div className=" col-span-1 border-r ">
-                                                    <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-left border-b">{e.lot == null ? "-" : e.lot}</h6>                              
+                                                    <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-left border-b">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
                                                 </div>
                                                 <div className=" col-span-1 border-r ">
                                                     <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-center border-b">{e.expiration_date ? moment(e.expiration_date).format("DD-MM-YYYY")   : "-"}</h6>                              
