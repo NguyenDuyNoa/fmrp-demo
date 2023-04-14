@@ -2194,7 +2194,9 @@ const Popup_Bom = React.memo((props) => {
                 if (c.id !== id) {
                     return c;
                 }
+                console.log("here 1")
                 if(type == "norm"){
+                    console.log("here norm")
                     return {...c, norm: Number(value.value)};
                 }else if(type == "type"){
                     return {

@@ -110,20 +110,46 @@ const Index = (props) => {
     }, 500);
   };
 
+const newResult = data_ex.map(item => {
+  const detail = item.detail || [];
+  return detail.map(detailItem => ({
+    ...item,
+    detail: detailItem
+  }));
+}).flat();
   const multiDataSet = [
     {
         columns: [
             {title: "ID", width: {wch: 4}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-            {title: `${dataLang?.suppliers_groups_name}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-            {title:`${dataLang?.client_list_brand}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            {title: `${dataLang?.warehouses_detail_type || "warehouses_detail_type"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            {title: `${dataLang?.warehouses_detail_plu || "warehouses_detail_plu"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            {title: `${dataLang?.warehouses_detail_productname || "warehouses_detail_productname"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            {title: `${dataLang?.warehouses_detail_wareLoca || "warehouses_detail_wareLoca"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            {title: `${dataLang?.warehouses_detail_mainVar || "warehouses_detail_mainVar"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            {title: `${dataLang?.warehouses_detail_subVar || "warehouses_detail_subVar"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            {title: `${"Serial"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            {title: `${"Lot"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            {title: `${dataLang?.warehouses_detail_date || "warehouses_detail_date"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            {title: `${dataLang?.warehouses_detail_quantity || "warehouses_detail_quantity"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            {title: `${dataLang?.warehouses_detail_value || "warehouses_detail_value"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
         ],
-        data: data_ex?.map((e) =>
-       
+        data: newResult?.map((e) =>
+            
             [
-                {value: `${e.id}`, style: {numFmt: "0"}},
-                {value: `${e.name ? e.name : ""}`},
-                {value: `${e.branch ? e.branch?.map(i => i.name) : ""}`},
-            ]    
+                {value: `${e.item_id}`, style: {numFmt: "0"}},
+                {value: `${e.item_type ? dataLang?.product : ""}`},
+                {value: `${e.item_code ? e.item_code : ""}`},
+                {value: `${e.item_name ? e.item_name : ""}`},
+                {value: `${e?.detail.location_name ? e?.detail.location_name : ""}`},
+                {value: `${e?.detail.option_name_1 ? e?.detail.option_name_1 : ""}`},
+                {value: `${e?.detail.option_name_2 ? e?.detail.option_name_2 : ""}`},
+                {value: `${e?.detail.serial != null ? e?.detail.serial : ""}`},
+                {value: `${e?.detail.lot != null ? e?.detail.lot : ""}`},
+                {value: `${e?.detail.expiration_date != null ? e?.detail.expiration_date : ""}`},
+                {value: `${e?.detail.quantity != null ? e?.detail.quantity : ""}`},
+                {value: `${e?.detail.amount != null ? e?.detail.amount : ""}`},
+            ]
+            
         ),
     }
   ];
@@ -167,15 +193,15 @@ const Index = (props) => {
                           </form>                      
                         </div>
                         <div className="flex space-x-2 items-center">
-                            {/* {
+                            {
                           data_ex?.length > 0 &&(
-                            <ExcelFile filename="Chi tiết kho" title="Ctkh" element={
+                            <ExcelFile filename={title} title="Ctkh" element={
                               <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
                                 <IconExcel size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
                               <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
                           </ExcelFile>
                           )
-                        } */}
+                        }
                           <label className="font-[300] text-slate-400">{dataLang?.display}</label>
                           <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
                             <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
@@ -347,5 +373,4 @@ const MultiValue = ({ index, getValue, ...props }) => {
     <MoreSelectedBadge items={overflow} />
   ) : null;
 };
-
 export default Index;
