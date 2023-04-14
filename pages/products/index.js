@@ -115,6 +115,8 @@ const Index = (props) => {
     const [dataFinishedPro, sDataFinishedPro] = useState([]);
     const [valueFinishedPro, sValueFinishedPro] = useState(null);
 
+    const [dataProductExpiry, sDataProductExpiry] = useState({});
+
     const [totalItems, sTotalItems] = useState({});
     const [keySearch, sKeySearch] = useState("")
     const [limit, sLimit] = useState(15);
@@ -209,6 +211,12 @@ const Index = (props) => {
                 dispatch({type: "congdoan_finishedProduct/update", payload: rResult?.map(e => ({label: e.name, value: e.id}))})
             }
         })
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if(!err){
+                var data = response.data;
+                sDataProductExpiry(data.find(x => x.code == "product_expiry"));
+            }
+        })
         sOnFetchingAnother(false)
     }
 
@@ -283,101 +291,7 @@ const Index = (props) => {
                     <div className='flex justify-between items-center'>
                         <h2 className='xl:text-3xl text-xl font-medium '>Danh Sách Thành Phẩm</h2>
                         <div className='flex space-x-3 items-center'>
-                            <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} setOpen={sOpenDetail} isOpen={openDetail} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105 outline-none' />
-                        </div>
-                    </div>
-                    <div className='grid grid-cols-4 gap-8 px-0.5'>
-                        <div className=''>
-                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.category_material_group_name || "category_material_group_name"}</h6>
-                            <Select 
-                                options={dataCategory}
-                                formatOptionLabel={CustomSelectOption}
-                                onChange={_HandleFilterOpt.bind(this, "category")}
-                                value={valueCategory}
-                                noOptionsMessage={() => `${dataLang?.no_data_found}`}
-                                isClearable={true}
-                                placeholder={dataLang?.category_material_group_name || "category_material_group_name"}
-                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                                isSearchable={true}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: '#EBF5FF',
-                                        primary50: '#92BFF7',
-                                        primary: '#0F4F9E',
-                                    },
-                                })}
-                                styles={{
-                                    placeholder: (base) => ({
-                                    ...base,
-                                    color: "#cbd5e1",
-                                    }),
-                                }}
-                            />
-                        </div>
-                        <div>
-                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>Thành phẩm</h6>
-                            <Select 
-                                options={dataFinishedPro}
-                                onChange={_HandleFilterOpt.bind(this, "finishedPro")}
-                                value={valueFinishedPro}
-                                noOptionsMessage={() => `${dataLang?.no_data_found}`}
-                                isClearable={true}
-                                isMulti
-                                closeMenuOnSelect={false}
-                                hideSelectedOptions={false}
-                                placeholder={"Thành phẩm"}
-                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                                isSearchable={true}
-                                components={{ MultiValue }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: '#EBF5FF',
-                                        primary50: '#92BFF7',
-                                        primary: '#92BFF7',
-                                    },
-                                })}
-                                styles={{
-                                    placeholder: (base) => ({
-                                    ...base,
-                                    color: "#cbd5e1",
-                                    }),
-                                }}
-                            />
-                        </div>
-                        <div className=''>
-                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand || "client_list_brand"}</h6>
-                            <Select 
-                                options={options}
-                                onChange={_HandleFilterOpt.bind(this, "branch")}
-                                value={idBranch}
-                                isClearable={true}
-                                isMulti
-                                closeMenuOnSelect={false}
-                                hideSelectedOptions={false}
-                                placeholder={dataLang?.client_list_brand || "client_list_brand"}
-                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                                isSearchable={true}
-                                components={{ MultiValue }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: '#EBF5FF',
-                                        primary50: '#92BFF7',
-                                        primary: '#92BFF7',
-                                    },
-                                })}
-                                styles={{
-                                    placeholder: (base) => ({
-                                    ...base,
-                                    color: "#cbd5e1",
-                                    }),
-                                }}
-                            />
+                            <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataProductExpiry={dataProductExpiry} dataLang={dataLang} setOpen={sOpenDetail} isOpen={openDetail} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105 outline-none' />
                         </div>
                     </div>
                     <div className='flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
@@ -387,15 +301,136 @@ const Index = (props) => {
                         <button onClick={_HandleSelectTab.bind(this, "semi_products_outside")} className={`${router.query?.tab === "semi_products_outside" ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "} 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}>Bán thành phẩm (MN)</button>
                     </div>
                     <div className='bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2'>
-                        <form className="flex items-center relative">
-                            <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
-                            <input
-                                className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
-                                type="text"  
-                                onChange={_HandleOnChangeKeySearch.bind(this)} 
-                                placeholder={dataLang?.branch_search}
-                            />
-                        </form>
+                        <div className='flex gap-2'>
+                            <form className="flex items-center relative">
+                                <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
+                                <input
+                                    className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md 2xl:w-[400px] w-[250px]"
+                                    type="text"  
+                                    onChange={_HandleOnChangeKeySearch.bind(this)} 
+                                    placeholder={dataLang?.branch_search}
+                                />
+                            </form>
+                            <div className='w-[17vw]'>
+                                <Select 
+                                    options={[{ value: '', label: 'Chọn chi nhánh', isDisabled: true }, ...options]}
+                                    onChange={_HandleFilterOpt.bind(this, "branch")}
+                                    value={idBranch}
+                                    isClearable={true}
+                                    isMulti
+                                    closeMenuOnSelect={false}
+                                    hideSelectedOptions={false}
+                                    placeholder={dataLang?.client_list_brand || "client_list_brand"}
+                                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                                    isSearchable={true}
+                                    components={{ MultiValue }}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                    styles={{
+                                        placeholder: (base) => ({
+                                        ...base,
+                                        color: "#cbd5e1",
+                                    }),
+                                    control: (base,state) => ({
+                                        ...base,
+                                        border: 'none',
+                                        outline: 'none',
+                                        boxShadow: 'none',
+                                        ...(state.isFocused && {
+                                            boxShadow: '0 0 0 1.5px #0F4F9E',
+                                        }),
+                                    })
+                                }}
+                                />
+                            </div>
+                            <div className='w-[17vw]'>
+                                <Select 
+                                    options={[{ value: '', label: 'Chọn tên danh mục', isDisabled: true }, ...dataCategory]}
+                                    formatOptionLabel={CustomSelectOption}
+                                    onChange={_HandleFilterOpt.bind(this, "category")}
+                                    value={valueCategory}
+                                    noOptionsMessage={() => `${dataLang?.no_data_found}`}
+                                    isClearable={true}
+                                    placeholder={dataLang?.category_material_group_name || "category_material_group_name"}
+                                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                                    isSearchable={true}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                    styles={{
+                                    placeholder: (base) => ({
+                                        ...base,
+                                        color: "#cbd5e1",
+                                    }),
+                                    control: (base,state) => ({
+                                        ...base,
+                                        border: 'none',
+                                        outline: 'none',
+                                        boxShadow: 'none',
+                                        ...(state.isFocused && {
+                                            boxShadow: '0 0 0 1.5px #0F4F9E',
+                                        }),
+                                    })
+                                }}
+                                />
+                            </div>
+                            <div className='w-[17vw]'>
+                                <Select 
+                                    options={[{ value: '', label: 'Chọn thành phẩm', isDisabled: true }, ...dataFinishedPro]}
+                                    onChange={_HandleFilterOpt.bind(this, "finishedPro")}
+                                    value={valueFinishedPro}
+                                    noOptionsMessage={() => `${dataLang?.no_data_found}`}
+                                    isClearable={true}
+                                    isMulti
+                                    closeMenuOnSelect={false}
+                                    hideSelectedOptions={false}
+                                    placeholder={"Thành phẩm"}
+                                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                                    isSearchable={true}
+                                    components={{ MultiValue }}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                    styles={{
+                                    placeholder: (base) => ({
+                                        ...base,
+                                        color: "#cbd5e1",
+                                    }),
+                                    control: (base,state) => ({
+                                        ...base,
+                                        border: 'none',
+                                        outline: 'none',
+                                        boxShadow: 'none',
+                                        ...(state.isFocused && {
+                                            boxShadow: '0 0 0 1.5px #0F4F9E',
+                                        }),
+                                    })
+                                }}
+                                />
+                            </div>
+                        </div>
                         {data.length != 0 &&
                             <div className='flex space-x-6'>
                                 <ExcelFile filename="Thành phẩm" element={
@@ -421,7 +456,7 @@ const Index = (props) => {
                             </div>
                         }
                     </div>
-                    <div className='min:h-[500px] 2xl:h-[66%] h-[60%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 tooltipBoundary'>
+                    <div className='min:h-[500px] 2xl:h-[76%] h-[70%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 tooltipBoundary'>
                         <div className='pr-2'>
                             <div className='flex items-center sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]'>
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[5%] font-[300] text-center'>{dataLang?.image || "image"}</h4>
@@ -464,7 +499,7 @@ const Index = (props) => {
                                                 </div>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[7%]'>{e?.category_name}</h6>
                                                 <div className='px-2 py-2.5 xl:text-[14px] text-xs w-[10%]'>
-                                                    <Popup_ThongTin id={e?.id} dataLang={dataLang} >
+                                                    <Popup_ThongTin id={e?.id} dataProductExpiry={dataProductExpiry} dataLang={dataLang} >
                                                         <button className=' text-[#0F4F9E] hover:opacity-70 w-fit outline-none'>{e?.code}</button>
                                                     </Popup_ThongTin>
                                                 </div>
@@ -484,10 +519,7 @@ const Index = (props) => {
                                                     )}
                                                 </div>
                                                 <div className='pl-2 py-2.5 w-[7%] flex space-x-2 justify-center'>
-                                                    {/* <button className='w-[98%] bg-slate-200 text-sm rounded'>Tác vụ <IconDown /></button> */}
-                                                    <BtnTacVu dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
-                                                    {/* <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} id={e?.id} className="xl:scale-100 scale-[0.8] outline-none" />
-                                                    <button onClick={_HandleDelete.bind(this, e.id)} className="xl:scale-100 scale-[0.8] outline-none"><IconDelete color="red"/></button> */}
+                                                    <BtnTacVu dataProductExpiry={dataProductExpiry} dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
                                                 </div>
                                             </div>
                                         )}
@@ -573,7 +605,7 @@ const BtnTacVu = React.memo((props) => {
                     <div className="bg-white rounded-t flex flex-col overflow-hidden">
                         <Popup_GiaiDoan setOpen={sOpen} isOpen={open} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
                         <Popup_Bom setOpen={sOpenBom} isOpen={openBom} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
-                        <Popup_ThanhPham onRefresh={props.onRefresh} dataLang={props.dataLang} id={props?.id} setOpen={sOpenDetail} isOpen={openDetail} className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full" />
+                        <Popup_ThanhPham onRefresh={props.onRefresh} dataProductExpiry={props.dataProductExpiry} dataLang={props.dataLang} id={props?.id} setOpen={sOpenDetail} isOpen={openDetail} className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full" />
                         <button onClick={_HandleDelete.bind(this, props.id)} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Xoá</button>
                     </div>
                 </div>
@@ -1155,13 +1187,15 @@ const Popup_ThanhPham = React.memo((props) => {
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.minimum_amount || "minimum_amount"}</label>
                                             <NumericFormat thousandSeparator="," value={minimumAmount} onValueChange={_HandleChangeInput.bind(this, "minimumAmount")} placeholder={props.dataLang?.minimum_amount || "minimum_amount"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
                                         </div>
-                                        <div className='2xl:space-y-1'>
-                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}</label>
-                                            <div className='relative flex flex-col justify-center items-center'>
-                                                <NumericFormat thousandSeparator="," value={expiry} onValueChange={_HandleChangeInput.bind(this, "expiry")} placeholder={props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 pr-14 border outline-none`} />
-                                                <span className='absolute right-2 text-slate-400 select-none'>{props.dataLang?.date || "date"}</span>
+                                        {props.dataProductExpiry?.is_enable === "1" &&
+                                            <div className='2xl:space-y-1'>
+                                                <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}</label>
+                                                <div className='relative flex flex-col justify-center items-center'>
+                                                    <NumericFormat thousandSeparator="," value={expiry} onValueChange={_HandleChangeInput.bind(this, "expiry")} placeholder={props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 pr-14 border outline-none`} />
+                                                    <span className='absolute right-2 text-slate-400 select-none'>{props.dataLang?.date || "date"}</span>
+                                                </div>
                                             </div>
-                                        </div>
+                                        }
                                     </div>
                                     <div className='2xl:space-y-3 space-y-2'>
                                         <div className='2xl:space-y-1'>
@@ -1609,6 +1643,12 @@ const Popup_ThongTin = React.memo((props) => {
                                             <h5 className='text-slate-400 text-sm w-[40%]'>Tồn kho:</h5>
                                             <h6 className='w-[55%] text-right'>{Number(list?.stock_quantity).toLocaleString()}</h6>
                                         </div>
+                                        {props.dataProductExpiry?.is_enable === "1" &&
+                                            <div className='flex justify-between'>
+                                                <h5 className='text-slate-400 text-sm w-[40%]'>Thời hạn sử dụng:</h5>
+                                                <h6 className='w-[55%] text-right'>{list?.expiry}</h6>
+                                            </div>
+                                        }
                                         <div className='flex justify-between'>
                                             <h5 className='text-slate-400 text-sm w-[40%]'>Ghi chú:</h5>
                                             <h6 className='w-[55%] text-right'>{list?.note}</h6>
