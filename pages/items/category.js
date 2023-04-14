@@ -180,77 +180,99 @@ const Index = (props) => {
                             <Popup_NVL onRefresh={_ServerFetching.bind(this)} onRefreshOpt={_ServerFetchingOtp.bind(this)} dataLang={dataLang} data={data} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105' />
                         </div>
                     </div>
-                    <div className='grid grid-cols-4 gap-8 px-0.5'>
-                        <div className=''>
-                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.category_material_group_name}</h6>
-                            <Select 
-                                options={dataOption}
-                                formatOptionLabel={CustomSelectOption}
-                                onChange={_HandleFilterOpt.bind(this, "category")}
-                                value={idCategory}
-                                isClearable={true}
-                                placeholder="Chọn mã chứng từ" 
-                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                                isSearchable={true}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: '#EBF5FF',
-                                        primary50: '#92BFF7',
-                                        primary: '#0F4F9E',
-                                    },
-                                })}
-                                styles={{
-                                    placeholder: (base) => ({
-                                    ...base,
-                                    color: "#cbd5e1",
-                                    }),
-                                }}
-                            />
-                        </div>
-                        <div className='col-span-1'>
-                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>Chi nhánh</h6>
-                            <Select 
-                                options={options}
-                                onChange={_HandleFilterOpt.bind(this, "branch")}
-                                value={idBranch}
-                                isClearable={true}
-                                isMulti
-                                closeMenuOnSelect={false}
-                                hideSelectedOptions={false}
-                                placeholder="Chọn chi nhánh" 
-                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                                isSearchable={true}
-                                components={{ MultiValue }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: '#EBF5FF',
-                                        primary50: '#92BFF7',
-                                        primary: '#92BFF7',
-                                    },
-                                })}
-                                styles={{
-                                    placeholder: (base) => ({
-                                    ...base,
-                                    color: "#cbd5e1",
-                                    }),
-                                }}
-                            />
-                        </div>
-                    </div>
+                   
                     <div className='bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2'>
-                        <form className="flex items-center relative">
-                            <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
-                            <input
-                                className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
-                                type="text"  
-                                onChange={_HandleOnChangeKeySearch.bind(this)} 
-                                placeholder={dataLang?.branch_search}
-                            />
-                        </form>
+                        <div className='flex gap-2'>
+                            <form className="flex items-center relative">
+                                <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
+                                <input
+                                    className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
+                                    type="text"  
+                                    onChange={_HandleOnChangeKeySearch.bind(this)} 
+                                    placeholder={dataLang?.branch_search}
+                                />
+                            </form>
+                           
+                            <div className=' w-[23vw]'>
+                                <Select 
+                                    // options={options}
+                                    options={[{ value: '', label: 'Chọn chi nhánh', isDisabled: true }, ...options]}
+                                    onChange={_HandleFilterOpt.bind(this, "branch")}
+                                    value={idBranch}
+                                    isClearable={true}
+                                    isMulti
+                                    closeMenuOnSelect={false}
+                                    hideSelectedOptions={false}
+                                    placeholder="Chọn chi nhánh" 
+                                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                                    isSearchable={true}
+                                    components={{ MultiValue }}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                    styles={{
+                                    placeholder: (base) => ({
+                                    ...base,
+                                    color: "#cbd5e1",
+                                    }),
+                                    control: (base,state) => ({
+                                        ...base,
+                                        border: 'none',
+                                        outline: 'none',
+                                        boxShadow: 'none',
+                                    ...(state.isFocused && {
+                                        boxShadow: '0 0 0 1.5px #0F4F9E',
+                                    }),
+                                    })
+                                }}
+                                />
+                            </div>
+                            <div className='w-[23vw]'>
+                                <Select 
+                                    // options={dataOption}
+                                    options={[{ value: '', label: 'Chọn mã chứng từ', isDisabled: true }, ...dataOption]}
+                                    formatOptionLabel={CustomSelectOption}
+                                    onChange={_HandleFilterOpt.bind(this, "category")}
+                                    value={idCategory}
+                                    isClearable={true}
+                                    placeholder="Chọn mã chứng từ" 
+                                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                                    isSearchable={true}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                    styles={{
+                                    placeholder: (base) => ({
+                                    ...base,
+                                    color: "#cbd5e1",
+                                    }),
+                                    control: (base,state) => ({
+                                        ...base,
+                                        border: 'none',
+                                        outline: 'none',
+                                        boxShadow: 'none',
+                                    ...(state.isFocused && {
+                                        boxShadow: '0 0 0 1.5px #0F4F9E',
+                                    }),
+                                    })
+                                }}
+                                />
+                            </div>       
+                        </div>
                         {data.length != 0 &&
                             <div className='flex space-x-6'>
                                 <ExcelFile filename="nhóm nvl" title="Hiii" element={
@@ -276,7 +298,7 @@ const Index = (props) => {
                             </div>
                         }
                     </div>
-                    <div className='min:h-[500px] h-[81%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+                    <div className='min:h-[500px] h-[91%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
                         <div className='xl:w-[100%] w-[110%] pr-2'>
                             <div className='flex items-center sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]'>
                                 <div className='w-[2%] flex justify-center'>

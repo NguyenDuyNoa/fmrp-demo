@@ -101,7 +101,7 @@ const Index = (props) => {
     })
     }
 
-    const listBr_filter = listBr?.map(e =>({label: e.name, value: e.id}))
+    const listBr_filter = listBr ? listBr?.map(e =>({label: e.name, value: e.id})) : []
     const [idBranch, sIdBranch] = useState(null);
     const onchang_filterBr = (type, value) => {
       if(type == "branch"){
@@ -255,32 +255,7 @@ const Index = (props) => {
                   </div>
                 </div>
                 
-                <div className='ml-1 w-[20%]'>
-                <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand}</h6>
-                <Select 
-                    options={options}
-                    onChange={onchang_filterBr.bind(this, "branch")}
-                    value={idBranch}
-                    hideSelectedOptions={false}
-                    isMulti
-                    isClearable={true}
-                    placeholder={dataLang?.client_list_filterbrand} 
-                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                    isSearchable={true}
-                    noOptionsMessage={() => "Không có dữ liệu"}
-                    components={{ MultiValue }}
-                    closeMenuOnSelect={false}
-                    theme={(theme) => ({
-                        ...theme,
-                        colors: {
-                            ...theme.colors,
-                            primary25: '#EBF5FF',
-                            primary50: '#92BFF7',
-                            primary: '#0F4F9E',
-                        },
-                    })}
-                   />
-                    </div>
+                
               <div  className="flex space-x-3 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                     {/* <div><TabClient onClick={_HandleSelectTab.bind(this, "all")} active="all" total={totalItem.iTotalDisplayRecords}>{dataLang?.client_list_grroupall}</TabClient></div>
                     <div><TabClient onClick={_HandleSelectTab.bind(this, "nogroup")} active="nogroup"  total={totalItem.iTotalDisplayRecords}>{dataLang?.client_list_nogroup}</TabClient></div> */}
@@ -307,15 +282,60 @@ const Index = (props) => {
               <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">    
                 <div className="xl:space-y-3 space-y-2">
                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
-                        <form className="flex items-center relative">
-                          <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
-                          <input
-                              className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
-                              type="text" 
-                              onChange={_HandleOnChangeKeySearch.bind(this)} 
-                              placeholder={dataLang?.branch_search}
-                          />
-                        </form>
+                    <div className='flex gap-2'>
+                          <form className="flex items-center relative">
+                            <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
+                            <input
+                                className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-1.5 rounded-md w-[400px]"
+                                type="text" 
+                                onChange={_HandleOnChangeKeySearch.bind(this)} 
+                                placeholder={dataLang?.branch_search}
+                            />
+                          </form>
+                        <div className='ml-1 w-[23vw]'>
+                            <Select 
+                                //  options={listBr_filter}
+                                 options={[{ value: '', label: 'Chọn chi nhánh', isDisabled: true }, ...listBr_filter]}
+                                 onChange={onchang_filterBr.bind(this, "branch")}
+                                 value={idBranch}
+                                 placeholder={dataLang?.client_list_filterbrand} 
+                                hideSelectedOptions={false}
+                                isMulti
+                                isClearable={true}
+                               
+                                className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
+                                isSearchable={true}
+                                noOptionsMessage={() => "Không có dữ liệu"}
+                                components={{ MultiValue }}
+                                closeMenuOnSelect={false}
+                                style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                theme={(theme) => ({
+                                    ...theme,
+                                    colors: {
+                                        ...theme.colors,
+                                        primary25: '#EBF5FF',
+                                        primary50: '#92BFF7',
+                                        primary: '#0F4F9E',
+                                    },
+                                })}
+                                styles={{
+                                  placeholder: (base) => ({
+                                  ...base,
+                                  color: "#cbd5e1",
+                                  }),
+                                  control: (base,state) => ({
+                                    ...base,
+                                    border: 'none',
+                                    outline: 'none',
+                                    boxShadow: 'none',
+                                   ...(state.isFocused && {
+                                    boxShadow: '0 0 0 1.5px #0F4F9E',
+                                  }),
+                                 })
+                              }}
+                              />
+                        </div>
+                        </div>
                         
                         <div className="flex space-x-2 items-center">
                      {

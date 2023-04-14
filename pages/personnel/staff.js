@@ -140,7 +140,7 @@ const Index = (props) => {
 
 
     const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
-    const options = listBr_filter?.filter((x) => !hiddenOptions.includes(x.value));
+    const options = listBr_filter? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value)) : [];
     const paginate = pageNumber => {
         router.push({
           pathname: router.route,
@@ -312,6 +312,7 @@ const Index = (props) => {
                   {value: `${e.department ? e.department?.map(e=> e.name) : ""}`},
                   {value: `${e.position_name ? e.position_name : ""}`},
                   {value: `${e.last_login ? e.last_login :""}`},
+                 
                   {value: `${e.active ? ( e.active == "1" ? "Đang hoạt động" : "Không hoạt động"):""}`},
                   {value: `${e.admin ?  e.admin == "1" && "Có" : e.admin == "0" && "Không"}`},
                   {value: `${e.position_name ? e.position_name : ""}`},
@@ -343,73 +344,12 @@ const Index = (props) => {
                   
                 </div>
                 
-                <div className='flex space-x-1 items-center'>
-                <div className='ml-1 w-[20%]'>
-                <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand}</h6>
-                    <Select 
-                        options={options}
-                    onChange={onchang_filterBr.bind(this, "branch")}
-                    value={idBranch}
-                    hideSelectedOptions={false}
-                    isMulti
-                    isClearable={true}
-                    placeholder={dataLang?.client_list_filterbrand} 
-                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                    isSearchable={true}
-                    noOptionsMessage={() => "Không có dữ liệu"}
-                    components={{ MultiValue }}
-                    closeMenuOnSelect={false}
-                    theme={(theme) => ({
-                        ...theme,
-                        colors: {
-                            ...theme.colors,
-                            primary25: '#EBF5FF',
-                            primary50: '#92BFF7',
-                            primary: '#0F4F9E',
-                        },
-                        
-                    })}
-                    styles={{
-                      placeholder: (base) => ({
-                      ...base,
-                      color: "#cbd5e1",
-                      }),
-                  }}
-                   />
-                </div>
-                  <div className='w-[20%]'>
-                  <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.personnels_staff_position}</h6>
-                  <Select 
-                    options={dataOption}
-                    formatOptionLabel={CustomSelectOption}
-                    onChange={_HandleFilterOpt.bind(this, "pos")}
-                    value={idPos}
-                    isClearable={true}
-                    placeholder={dataLang?.personnels_staff_position_click} 
-                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                    isSearchable={true}
-                    theme={(theme) => ({
-                        ...theme,
-                        colors: {
-                            ...theme.colors,
-                            primary25: '#EBF5FF',
-                            primary50: '#92BFF7',
-                            primary: '#0F4F9E',
-                        },
-                    })}
-                    styles={{
-                        placeholder: (base) => ({
-                        ...base,
-                        color: "#cbd5e1",
-                        }),
-                    }}
-                />
-                  </div>
-                </div>
+               
               <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">    
                 <div className="xl:space-y-3 space-y-2">
                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
-                        <form className="flex items-center relative">
+                       <div className='flex gap-2'>
+                       <form className="flex items-center relative">
                           <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
                           <input
                               className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
@@ -418,7 +358,91 @@ const Index = (props) => {
                               placeholder={dataLang?.branch_search}
                           />
                         </form>
-                        
+                        <div className='flex space-x-1 items-center'>
+                          <div className='ml-1 w-[23vw]'>
+                          {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand}</h6> */}
+                              <Select 
+                                  // options={options}
+                              options={[{ value: '', label: 'Chọn chi nhánh', isDisabled: true }, ...options]}
+                              onChange={onchang_filterBr.bind(this, "branch")}
+                              value={idBranch}
+                              hideSelectedOptions={false}
+                              isMulti
+                              isClearable={true}
+                              placeholder={dataLang?.client_list_filterbrand} 
+                              className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                              isSearchable={true}
+                              noOptionsMessage={() => "Không có dữ liệu"}
+                              components={{ MultiValue }}
+                              closeMenuOnSelect={false}
+                              style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                          theme={(theme) => ({
+                                              ...theme,
+                                              colors: {
+                                                  ...theme.colors,
+                                                  primary25: '#EBF5FF',
+                                                  primary50: '#92BFF7',
+                                                  primary: '#0F4F9E',
+                                              },
+                                          })}
+                                          styles={{
+                                            placeholder: (base) => ({
+                                            ...base,
+                                            color: "#cbd5e1",
+                                            }),
+                                            control: (base,state) => ({
+                                              ...base,
+                                              border: 'none',
+                                              outline: 'none',
+                                              boxShadow: 'none',
+                                            ...(state.isFocused && {
+                                              boxShadow: '0 0 0 1.5px #0F4F9E',
+                                            }),
+                                          })
+                                        }}
+                            />
+                          </div>
+                          <div className='w-[23vw]'>
+                          {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.personnels_staff_position}</h6> */}
+                          <Select 
+                            // options={dataOption}
+                            options={[{ value: '', label: 'Chọn chức vụ', isDisabled: true }, ...dataOption]}
+                            formatOptionLabel={CustomSelectOption}
+                            onChange={_HandleFilterOpt.bind(this, "pos")}
+                            value={idPos}
+                            isClearable={true}
+                            placeholder={dataLang?.personnels_staff_position_click} 
+                            className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                            isSearchable={true}
+                            style={{ border: "none", boxShadow: "none", outline: "none" }}
+                            theme={(theme) => ({
+                                ...theme,
+                                colors: {
+                                    ...theme.colors,
+                                    primary25: '#EBF5FF',
+                                    primary50: '#92BFF7',
+                                    primary: '#0F4F9E',
+                                },
+                            })}
+                            styles={{
+                              placeholder: (base) => ({
+                              ...base,
+                              color: "#cbd5e1",
+                              }),
+                              control: (base,state) => ({
+                                ...base,
+                                border: 'none',
+                                outline: 'none',
+                                boxShadow: 'none',
+                              ...(state.isFocused && {
+                                boxShadow: '0 0 0 1.5px #0F4F9E',
+                              }),
+                            })
+                          }}
+                        />
+                          </div>
+                        </div>
+                       </div>
                         <div className="flex space-x-2 items-center">
                      {
                       data_ex?.length > 0 &&(
@@ -441,7 +465,7 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className="min:h-[200px] h-[72%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <div className="min:h-[500px] 2xl:h-[92%] xl:h-[69%] h-[72%] max:h-[800px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%] lx:w-[115%] ">
                     <div className="flex items-center sticky top-0 bg-white p-2 z-10">
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[18%] font-[300] text-left">{dataLang?.personnels_staff_table_avtar}</h4>

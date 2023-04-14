@@ -340,6 +340,7 @@ const ListBtn_Setting = React.memo((props) => {
                 <Btn_Setting url={`/settings/finance?tab=taxes`} isActive="/settings/finance">{props.dataLang?.list_btn_seting_finance}</Btn_Setting>
                 <Btn_Setting>{props.dataLang?.list_btn_seting_qt}</Btn_Setting>
                 <Btn_Setting>{props.dataLang?.list_btn_seting_order}</Btn_Setting>
+                <Btn_Setting>{props.dataLang?.list_btn_seting_stage}</Btn_Setting>
                 <Btn_Setting url={`/settings/category?tab=units`} isActive="/settings/category">{props.dataLang?.list_btn_seting_category}</Btn_Setting>
                 <Btn_Setting url="/settings/variant" isActive="/settings/variant">{props.dataLang?.list_btn_seting_variant}</Btn_Setting>
                 <Btn_Setting url="/settings/prefixes" isActive="/settings/prefixes">Thiết lập tiếp đầu ngữ</Btn_Setting>

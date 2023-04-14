@@ -172,7 +172,7 @@ const Header = () => {
                     img: "/icon/header/kho/kho.png",
                     items: [
                         {name: "Kho", link:"/warehouses/warehouse"},
-                        {name: "Vị trí kho"}
+                        {name: "Vị trí kho", link:"/warehouses/location"}
                     ]
                 },{
                     title: "Cảnh báo tồn kho",

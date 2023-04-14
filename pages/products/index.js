@@ -2132,10 +2132,45 @@ const Popup_Bom = React.memo((props) => {
     }
 
     const _HandleChangeItemBOM = (parentId, id, value, type) => {
-        const index = dataSelectedVariant.findIndex(obj => obj.value === parentId);
-        const newData = [...dataSelectedVariant]
-        const newChild = newData[index].child.filter(item => item.id !== id);
+        // const index = dataSelectedVariant.findIndex(obj => obj.value === parentId);
+        // if(index > -1){
+        //     const newData = [...dataSelectedVariant]
+        //     const newChild = newData[index]?.child.map(e => {
+        //         if(e == id){
+        //             if(type == "norm"){
+        //                 return {...e, norm: Number(value.value)}
+        //             }
+        //         }
+        //     })
+        //     newData[index] = {...newData[index], child: newChild};
+        //     sDataSelectedVariant(newData);
+        // }
+
+        const newData = dataSelectedVariant.map((item) => {
+            if (item.value !== parentId) {
+              return item;
+            }
+            const newChild = item.child.map((c) => {
+                if (c.id !== id) {
+                    return c;
+                }
+                if(type == "norm"){
+                    return {...c, norm: Number(value.value)};
+                }else if(type == "type"){
+                    return {
+                        ...c,
+                        [type]: value,
+                    };
+                }
+            });
+            return {
+                ...item,
+                child: newChild,
+            };
+        });
+        sDataSelectedVariant(newData);
     }
+    console.log(dataSelectedVariant)
 
     const _HandleDeleteBOM = (id) => {
         Swal.fire({
@@ -2239,8 +2274,8 @@ const Popup_Bom = React.memo((props) => {
                                     <div className='w-[37%] flex space-x-2 px-1'>
                                         <Select 
                                             options={dataTypeCd}
-                                            // value={type}
-                                            // onChange={_HandleChangeInput.bind(this, "type")}
+                                            value={e.type}
+                                            onChange={_HandleChangeItemBOM.bind(this, e.id, "type")}
                                             isClearable={true}
                                             placeholder={"Loại"}
                                             noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
@@ -2303,10 +2338,10 @@ const Popup_Bom = React.memo((props) => {
                                     </div>
                                     <h6 className="w-[11%] px-1 text-center">Đơn vị</h6>
                                     <div className="w-[12%] px-1">
-                                        <NumericFormat thousandSeparator="," placeholder={"Định mức"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                        <NumericFormat value={e?.norm} onValueChange={_HandleChangeItemBOM.bind(this, e.id, "norm")} thousandSeparator="," placeholder={"Định mức"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
                                     </div>
                                     <div className="w-[12%] px-1">
-                                        <NumericFormat thousandSeparator="," placeholder={"% Hao hụt"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                        <NumericFormat isAllowed={(values) => { const {floatValue} = values; return floatValue >= 0 &&  floatValue <= 100; }} value={e?.loss} onValueChange={_HandleChangeItemBOM.bind(this, e.id, "loss")} suffix="%" thousandSeparator="," placeholder={"% Hao hụt"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
                                     </div>
                                     <div className="w-[23%] px-1">
                                         <Select 

@@ -43,14 +43,15 @@ const Index = (props) => {
     const [onFetching, sOnFetching] = useState(false);
     const [data, sData] = useState({});
     const [data_ex, sData_ex] = useState([]);
-    
+    const [idKho, sIdKho] = useState(null);
+    const [onSending, sOnSending] = useState(false);
     const _ServerFetching =  () => {
-        Axios("GET", `/api_web/api_warehouse/warehouse/?csrf_protection=true`, {
+        Axios("GET", `/api_web/api_warehouse/location/?csrf_protection=true`, {
             params: {
                 search: keySearch,
                 limit: limit,
                 page: router.query?.page || 1,
-                "filter[branch_id]": idBranch?.length > 0 ? idBranch.map(e => e.value) : null
+                "filter[warehouse_id]": idKho ? idKho?.value : null
             }
         }, (err, response) => {
             if(!err){
@@ -62,53 +63,34 @@ const Index = (props) => {
             sOnFetching(false)
         })
     }
-    const [listBr, sListBr]= useState()
-    const _ServerFetching_brand =  () =>{
-      Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {
+    const [listKho, sListKho]= useState()
+    const _ServerFetching_kho =  () =>{
+      Axios("GET", `/api_web/api_warehouse/warehouse/?csrf_protection=true`, {
        params:{
         limit: 0,   
        }
     }, (err, response) => {
       if(!err){
           var {rResult, output} =  response.data
-          sListBr(rResult)
+          sListKho(rResult)
       }
       sOnFetching(false)
     })
     }
 
-    const listBr_filter = listBr?.map(e =>({label: e.name, value: e.id}))
-    const [idBranch, sIdBranch] = useState(null);
-    const onchang_filterBr = (type, value) => {
-      if(type == "branch"){
-        sIdBranch(value)
+    const listKho_filter = listKho ? listKho?.map(e =>({label: e.name, value: e.id})) : []
+    const onchang_filterKho = (type, value) => {
+      if(type == "kho"){
+        sIdKho(value)
       }
     }
-    const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
-    const options = listBr_filter?.filter((x) => !hiddenOptions.includes(x.value));
-
-    const paginate = pageNumber => {
-        router.push({
-            pathname: '/warehouses/warehouse',
-            query: { page: pageNumber }
-        })
-      }
-      const _HandleOnChangeKeySearch = ({target: {value}}) => {
-        sKeySearch(value)
-        router.replace('/warehouses/warehouse');
-        setTimeout(() => {
-          if(!value){
-            sOnFetching(true)
-          }
-          sOnFetching(true)
-        }, 500);
-      };
+    
     useEffect(() => {
-        onFetching && _ServerFetching()    || onFetching && _ServerFetching_brand() 
+        onFetching && _ServerFetching() || onFetching && _ServerFetching_kho() 
       }, [onFetching]);
     useEffect(() => {
-        sOnFetching(true) || (keySearch && sOnFetching(true)) || (idBranch?.length > 0 && sOnFetching(true))
-     }, [limit,router.query?.page,idBranch]);
+        sOnFetching(true) || (keySearch && sOnFetching(true)) || (idKho && sOnFetching(true))
+     }, [limit,router.query?.page,idKho]);
     const handleDelete = (event) => {
       Swal.fire({
         title: `${dataLang?.aler_ask}`,
@@ -121,7 +103,7 @@ const Index = (props) => {
       }).then((result) => {
         if (result.isConfirmed) {
           const id = event; 
-          Axios("DELETE",`/api_web/api_warehouse/warehouse/${id}?csrf_protection=true`, {
+          Axios("DELETE",`/api_web/api_warehouse/location/${id}?csrf_protection=true`, {
           }, (err, response) => {
             if(!err){
               var isSuccess = response.data
@@ -137,73 +119,148 @@ const Index = (props) => {
         }
       })
     }
+
+    const [status, sStatus] = useState("")
+    const [active,sActive] = useState("")
+    const _ToggleStatus = (id) => {
+     Swal.fire({
+        title: `${"Thay đổi trạng thái"}`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#296dc1',
+        cancelButtonColor: '#d33',
+        confirmButtonText: `${dataLang?.aler_yes}`,
+        cancelButtonText:`${dataLang?.aler_cancel}`
+      }).then((result) => {
+        if (result.isConfirmed) {
+          sActive(id)
+          var index = data.findIndex(x => x.id === id);
+          if (index !== -1 && data[index].status === "0") {
+           sStatus(data[index].status = "1")
+          
+          }else if (index !== -1 && data[index].status === "1") {
+          
+            sStatus(data[index].status = "0")
+           
+          }
+          sData([...data])
+        }
+       
+      })
+     
+    }
+    const _ServerSending =  () => {
+      let id = active
+      var data = new FormData();
+      data.append('status', status);   
+      Axios("POST",`${id && `/api_web/api_warehouse/locationStatus/${id}?csrf_protection=true`}`, {
+          data:{
+            status:status
+          },
+          headers: {"Content-Type": "multipart/form-data"} 
+      }, (err, response) => {
+          if(!err){
+              var {isSuccess, message, } = response.data;  
+              if(isSuccess){
+                  Toast.fire({
+                      icon: 'success',
+                      title: `${dataLang[message]}`
+                  })
+                }
+          }
+          sOnSending(false)
+      })
+      }
+  useEffect(() => {
+    onSending && _ServerSending()  
+  }, [onSending]);
+  
+  useEffect(()=>{
+     sOnSending(true)
+  },[status])
+  useEffect(()=>{
+     sOnSending(true)
+  },[active])
+
+
+    const paginate = pageNumber => {
+      router.push({
+          pathname: '/warehouses/localtion',
+          query: { page: pageNumber }
+      })
+    }
+    const _HandleOnChangeKeySearch = ({target: {value}}) => {
+      sKeySearch(value)
+      router.replace('/warehouses/localtion');
+      setTimeout(() => {
+        if(!value){
+          sOnFetching(true)
+        }
+        sOnFetching(true)
+      }, 500);
+    };
     //excel
     const multiDataSet = [
       {
           columns: [
               {title: "ID", width: {wch: 4}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${dataLang?.Warehouse_code || "Warehouse_code"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${dataLang?.Warehouse_poppup_name || "Warehouse_poppup_name"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${dataLang?.Warehouse_total || "Warehouse_total"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${dataLang?.Warehouse_inventory || "Warehouse_inventory"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${dataLang?.Warehouse_poppup_address || "Warehouse_poppup_address"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${dataLang?.client_popup_note || "client_popup_note"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${dataLang?.Warehouse_factory || "Warehouse_factory"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.warehouses_localtion_ware || "warehouses_localtion_ware"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.warehouses_localtion_code || "warehouses_localtion_code"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.warehouses_localtion_NAME || "warehouses_localtion_NAME"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.warehouses_localtion_status || "warehouses_localtion_status"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.warehouses_localtion_date || "warehouses_localtion_date"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
               
              
           ],
           data: data_ex?.map((e) =>
               [
                   {value: `${e.id}`, style: {numFmt: "0"}},
+                  {value: `${e.warehouse_name ? e.warehouse_name : ""}`},
                   {value: `${e.code ? e.code : ""}`},
                   {value: `${e.name ? e.name : ""}`},
-                  {value: `${"Tổng mặt hàng "}`},
-                  {value: `${"Tổng tồn kho"}`},
-                  {value: `${e.address ? e.address : ""}`},   
-                  {value: `${e.note ? e.note : ""}`},   
-                  {value: `${e.branch ? e.branch?.map(i => i.name) : ""}`},
+                  {value: `${e.status ? ( e.status == "1" ? "Đang sử dụng" : "Không sử dụng"):""}`},
+                  {value: `${e.date_create ? e.date_create :""}`}
               ]    
           ),
       }
     ];
- 
     return (
         <React.Fragment>
       <Head>
-        <title>{dataLang?.Warehouse_title}</title>
+        <title>{dataLang?.warehouses_localtion_title}</title>
       </Head>
       <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
         <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-          <h6 className="text-[#141522]/40">{dataLang?.Warehouse_title}</h6>
+          <h6 className="text-[#141522]/40">{dataLang?.warehouses_localtion_title}</h6>
           <span className="text-[#141522]/40">/</span>
-          <h6>{dataLang?.Warehouse_title}</h6>
+          <h6>{dataLang?.warehouses_localtion_title}</h6>
         </div>
 
         <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
           <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
             <div className="space-y-3 h-[96%] overflow-hidden">
                 <div className='flex justify-between'>
-                    <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.Warehouse_title}</h2>
+                    <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.warehouses_localtion_title}</h2>
                     <div className="flex justify-end items-center">
-                    <Popup_kho  listBr={listBr}   onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
+                    <Popup_Vitrikho  listKho={listKho}   onRefresh={_ServerFetching.bind(this)}  dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
                   </div>
                 </div>
                 
-                <div className='ml-1 w-[20%]'>
-                <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand}</h6>
+                {/* <div className='ml-1 w-[20%]'>
+                <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{"Kho"}</h6>
                 <Select 
-                    options={options}
-                    onChange={onchang_filterBr.bind(this, "branch")}
-                    value={idBranch}
+                    options={listKho_filter}
+                    onChange={onchang_filterKho.bind(this, "kho")}
+                    value={idKho}
                     hideSelectedOptions={false}
-                    isMulti
                     isClearable={true}
-                    placeholder={dataLang?.client_list_filterbrand} 
+                    placeholder={"Chọn kho"} 
                     className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
                     isSearchable={true}
                     noOptionsMessage={() => "Không có dữ liệu"}
                     components={{ MultiValue }}
                     closeMenuOnSelect={false}
+                    isMulti
                     theme={(theme) => ({
                         ...theme,
                         colors: {
@@ -214,24 +271,78 @@ const Index = (props) => {
                         },
                     })}
                    />
-                </div>
+                </div> */}
               <div className="space-y-2 2xl:h-[100%] h-[75%] overflow-hidden">    
                 <div className="xl:space-y-3 space-y-2">
                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
-                        <form className="flex items-center relative">
-                          <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
-                          <input
-                              className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
-                              type="text" 
-                              onChange={_HandleOnChangeKeySearch.bind(this)} 
-                              placeholder={dataLang?.branch_search}
-                          />
-                        </form>
+                    <div className='flex gap-2'>
+                          <form className="flex items-center relative">
+                            <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
+                            <input
+                                className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-1.5 rounded-md w-[400px]"
+                                type="text" 
+                                onChange={_HandleOnChangeKeySearch.bind(this)} 
+                                placeholder={dataLang?.branch_search}
+                            />
+                          </form>
+                        <div className='ml-1 w-[23vw]'>
+                            
+                              <Select 
+                                 placeholder={
+                                   "Chọn kho"
+                                  }
+                                  menuPlacement="auto"
+                                  aria-label={"Chọn kho"}
+                                  options={[{ value: '', label: 'Chọn kho', isDisabled: true }, ...listKho_filter]}
+                                  onChange={onchang_filterKho.bind(this, "kho")}
+                                  value={idKho}
+                                  hideSelectedOptions={false}
+                                  // isMulti
+                                  isClearable={true}
+                                  className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
+                                  isSearchable={true}
+                                  noOptionsMessage={() => "Không có dữ liệu"}
+                                  components={{ MultiValue }}
+                                  // closeMenuOnSelect={false}
+                                  menuPosition="fixed"
+                                  style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                  theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                          ...theme.colors,
+                                          primary25: '#EBF5FF',
+                                          primary50: '#92BFF7',
+                                          primary: '#0F4F9E',
+                                      },
+                                  })}
+                                  styles={{
+                                    placeholder: (base,state) => ({
+                                    ...base,
+                                    color: "#cbd5e1",
+                                    
+                                    }), menu: (base) => ({
+                                      ...base,
+                                      marginTop: "8px", // Khoảng cách giữa placeholder và option
+                                    }),
+                                    control: (base,state) => ({
+                                      ...base,
+                                      border: 'none',
+                                      outline: 'none',
+                                      boxShadow: 'none',
+                                    ...(state.isFocused && {
+                                      boxShadow: '0 0 0 1.5px #0F4F9E',
+                                    }),
+                                  })
+                                }}
+                                >
+                              </Select>
+                        </div>
+                        </div>
                         
                         <div className="flex space-x-2 items-center">
                      {
                       data_ex?.length > 0 &&(
-                        <ExcelFile filename="Danh sách kho" title="Dsk" element={
+                        <ExcelFile filename="Vị trí kho" title="Vtk" element={
                           <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
                             <IconExcel size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
                           <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
@@ -250,62 +361,51 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className="min:h-[200px] h-[72%] max:h-[1200px]   overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                  <div className="pr-2">
-                    
+                <div className="min:h-[500px] 2xl:h-[85%] xl:h-[69%] h-[100%] max:h-[800px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                  <div className="pr-2 w-[100%] lx:w-[115%] ">
+                    <div className="flex items-center sticky top-0 bg-white p-2 z-10">
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.warehouses_localtion_ware}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.warehouses_localtion_code}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.warehouses_localtion_NAME}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center">{dataLang?.warehouses_localtion_status}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.warehouses_localtion_date}</h4>
+                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center">{dataLang?.branch_popup_properties}</h4>
+                    </div>
                     {onFetching ?
                       <Loading className="h-80"color="#0f4f9e" /> 
                       : 
                       data?.length > 0 ? 
                       (<>
-                          <div className="divide-y divide-slate-200 min:h-[400px] max:h-[1000px] h-[100%] ">                       
-                          <div className='grid grid-cols-4 gap-5  p-1'>
-                            {(data?.map((e) => 
-                            // shadow-[0_0px_0px_0.1px_#0F4F9E] 
-                                    <div key={e?.id} className='bg-white flex flex-col justify-between   min-h-[250px] h-auto border-[0.5px] border-[#0F4F9E] hover:shadow-[0_0px_2px_0.5px_#0F4F9E]    rounded-2xl  overflow-hidden'>
-                                       <div className=''>
-                                            <div className='flex items-center justify-between gap-2 p-2'>
-                                            <div className='flex items-center gap-2 '>
-                                                    <House2 size="32" color="#0F4F9E"
-                                                    />
-                                                    <h3 className='text-[#0F4F9E] font-medium capitalize'>{e?.name}</h3>
-                                            </div>
-                                            <div>
-                                            {e?.is_system === "1" && ( <h3 className='bg-[#EBFEF2] text-[#0BAA2E] rounded-lg font-normal p-1.5'>{dataLang?.Warehouse_system}</h3>)}
-                                            </div>
-                                            </div>
-                                            <div className=''>
-                                                <h3 className='font-normal mt-2.5 ml-2.5'>{dataLang?.Warehouse_code}: <span className=' text-[#0F4F9E] font-medium capitalize'>{e?.code}</span></h3>
-                                                <h3 className='font-normal mt-2.5 ml-2.5'>{dataLang?.Warehouse_total}: <span className=' text-[#0F4F9E] font-medium capitalize'>{e?.code}</span></h3>
-                                                <h3 className='font-normal mt-2.5 ml-2.5'>{dataLang?.Warehouse_inventory}: <span className=' text-[#0F4F9E] font-medium capitalize'>{e?.code}</span></h3>
-                                                <h3 className='font-normal mt-2.5 ml-2.5'>{dataLang?.Warehouse_factory} <span className='flex flex-wrap pt-2'>{e?.branch?.map(e => {return (<span key={e?.id} className='mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px] capitalize'>{e.name}</span>)})}</span></h3>
-                                            </div>
-                                       </div>
-                                            <div className='flex justify-between items-center p-2  mt-auto'>
-                                                    <div className={`rounded-lg w-[80%]  p-2  cursor-pointer bg-[#e2f0fe] hover:bg-[#C7DFFB] text-center`}><button>{dataLang?.Warehouse_detail}</button></div>
-                                                 <div>
-                                                 {
-                                                    e?.is_system === "0" && (<div className='flex  gap-2 w-[20%]'>
-                                                    <div className=''>
-                                                        <Popup_kho
-                                                        listBr={listBr} sValueBr={e.branch}  onRefresh={_ServerFetching.bind(this)} 
-                                                        className="xl:text-base text-xs " 
-                                                        dataLang={dataLang} name={e.name} code={e.code}
-                                                        address={e.address} note={e.note} id={e?.id}  />
-                                                    </div>
-                                                    <div>
-                                                    <button 
-                                                    onClick={()=>handleDelete(e.id)} 
-                                                    className="xl:text-base text-xs "><IconDelete color="red"/></button>
-                                                    </div>
-                                                    </div>)
-                                                }
-                                                 </div>
-                                            </div>
-                                    </div>
-                            ))}      
-                         </div>        
-                        </div>                    
+                          <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">                       
+                          {(data?.map((e) => 
+                            <div className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e?.id.toString()}>  
+                      
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.warehouse_name}</h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.code}</h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.name}</h6>  
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[10%]  rounded-md text-center">
+                                <label htmlFor={e.id} className="relative inline-flex items-center cursor-pointer">
+                                  <input type="checkbox"  className="sr-only peer" value={e.status}  id={e.id}
+                                  // defaultChecked
+                                   checked={e.status == "0" ? false : true}
+                                 
+                                    onChange={_ToggleStatus.bind(this, e.id)}
+                                    />
+                                    
+                                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                </label>
+                            </h6>                      
+                              {/* <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.email}</h6>                 */}
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e?.date_create != null ? moment(e.date_create).format("DD/MM/YYYY, h:mm:ss") : ""}</h6>                              
+                                                   
+                              <div className="space-x-2 w-[10%] text-center">
+                                <Popup_Vitrikho   onRefresh={_ServerFetching.bind(this)}   valuekho={e} warehouse_name={e.warehouse_name} warehouse_id={e.warehouse_id}   listKho={listKho}  className="xl:text-base text-xs "  dataLang={dataLang} name={e.name} code={e.code}  
+                                id={e?.id}  />
+                                <button onClick={()=>handleDelete(e.id)} className="xl:text-base text-xs "><IconDelete color="red"/></button>
+                              </div>
+                            </div>
+                          ))}              
+                        </div>                     
                         </>
                       )  : 
                       (
@@ -314,7 +414,6 @@ const Index = (props) => {
                             <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
                             <h1 className="textx-[#141522] text-base opacity-90 font-medium">Không tìm thấy các mục</h1>
                             <div className="flex items-center justify-around mt-6 ">
-                                {/* <Popup_kho onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
                             </div>
                           </div>
                         </div>
@@ -340,7 +439,7 @@ const Index = (props) => {
     </React.Fragment>
     );
 }
-const Popup_kho = (props) => {
+const Popup_Vitrikho = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
     const scrollAreaRef = useRef(null);
@@ -350,57 +449,41 @@ const Popup_kho = (props) => {
       };
 
     const [onSending, sOnSending] = useState(false);
-    const [brandpOpt, sListBrand] = useState([])
+    const [khoOpt, sListkho] = useState([])
     const [name, sName] = useState("");
     const [code, sCode] = useState("");
-    const [address, sAddress] = useState("");
-    const [note, sNote] = useState("");
 
     const [errInputCode, sErrInputCode] = useState(false);
     const [errInputName, sErrInputName] = useState(false);
-    const [errInputAddress, sErrInputAddress] = useState(false);
-    const [errInputBr, sErrInputBr] = useState(false);
-    const [valueBr, sValueBr] = useState([])
-    // const branch = valueBr.map(e => e.value)
-
+    const [errInputKho, sErrInputKho] = useState(false);
+    const [valuekho, sValuekho] = useState([])
     useEffect(() => {
-      sErrInputBr(false)
+      sErrInputKho(false)
       sErrInputCode(false)
       sErrInputName(false)
-      sErrInputAddress(false)
       sName(props.name ? props.name : "")
       sCode(props.code ? props.code : "")
-      sAddress(props.address ? props.address : "")
-      sNote(props.note ? props.note : "")
-      sListBrand(props.listBr ? props.listBr && [...props.listBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
-      sValueBr(props.sValueBr ? props.listBr && [...props.sValueBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
+      sListkho(props.listKho ? props.listKho && [...props.listKho?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
+      sValuekho(props?.valuekho ? props.valuekho && [{label: props.warehouse_name, value: props.warehouse_id}]: [])
     }, [open]);
-    const branch_id = valueBr?.map(e =>{
-      return e?.value
-    })
+ 
+    const kho_id = valuekho?.value || valuekho?.map(e => e.value)
     const _HandleChangeInput = (type, value) => {
         if(type == "name"){
           sName(value.target?.value)
-        }else if(type == "valueBr"){
-          sValueBr(value)
+        }else if(type == "valuekho"){
+          sValuekho(value)
         }else if(type == "code"){
           sCode(value.target?.value)
-        }else if(type == "address"){
-          sAddress(value.target?.value)
-        }else if(type == "note"){
-          sNote(value.target?.value)
         }
     }
-
   const _ServerSending = () => {
     const id =props.id;
     var data = new FormData();
     data.append('name', name);
     data.append('code', code);
-    data.append('address', address);
-    data.append('note', note);
-    branch_id.forEach(id => data.append('branch_id[]', id));
-    Axios("POST", `${props.id ? `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true` : "/api_web/api_warehouse/warehouse/?csrf_protection=true"}`, {
+    data.append("warehouse_id", kho_id)
+    Axios("POST", `${props.id ? `/api_web/api_warehouse/location/${id}?csrf_protection=true` : "/api_web/api_warehouse/location/?csrf_protection=true"}`, {
         data:data,
       headers: {"Content-Type": "multipart/form-data"} 
     }, (err, response) => {
@@ -410,18 +493,15 @@ const Popup_kho = (props) => {
                 Toast.fire({
                     icon: 'success',
                     title: `${props.dataLang[message]}`
-                })
+                  })
+                  props.onRefresh && props.onRefresh()
+                sOpen(false)
                 sErrInputCode(false)
                 sErrInputName(false)
-                sErrInputAddress(false)
+                sErrInputKho(false)
                 sName("")
                 sCode("")
-                sAddress("")
-                sNote("")
-                sErrInputBr(false)
-                sValueBr([])
-                props.onRefresh && props.onRefresh()
-                sOpen(false)
+                sValuekho([])
             }else{
               Toast.fire({
                 icon: 'error',
@@ -432,17 +512,18 @@ const Popup_kho = (props) => {
         sOnSending(false)
     })
   }
+
 //da up date
     useEffect(() => {
-        onSending && _ServerSending()
+     onSending && _ServerSending()
     }, [onSending]);
     const _HandleSubmit = (e) => {
         e.preventDefault()
-        if(code.length == 0 || branch_id?.length==0 || name.length == 0 || address.length ==0 ){
+        if(code.length == 0 || valuekho?.length == 0 || name.length == 0 || valuekho == null ){
             code?.length ==0 &&  sErrInputCode(true)
             name?.length ==0 &&  sErrInputName(true)
-            address?.length ==0 &&  sErrInputAddress(true)
-          branch_id?.length==0 && sErrInputBr(true) 
+             valuekho?.length == 0 && sErrInputKho(true) 
+             valuekho == null && sErrInputKho(true) 
             Toast.fire({
               icon: 'error',
               title: `${props.dataLang?.required_field_null}`
@@ -453,21 +534,19 @@ const Popup_kho = (props) => {
         }
     }
     useEffect(() => {
-        sErrInputCode(false) 
-    }, [code.length > 0])
+      sErrInputCode(false) 
+    }, [code?.length > 0])
     useEffect(() => {
         sErrInputName(false) 
-    }, [name.length > 0])
+    }, [name?.length > 0])
+
     useEffect(() => {
-        sErrInputAddress(false) 
-    }, [address.length > 0])
-    useEffect(() => {
-        sErrInputBr(false)
-    }, [branch_id?.length > 0]);
+      sErrInputKho(false)
+    }, [valuekho?.length > 0,valuekho !=null]);
   return(
       <>
       <PopupEdit   
-        title={props.id ? `${props.dataLang?.Warehouse_poppup_edit}` : `${props.dataLang?.Warehouse_poppup_add}`} 
+        title={props.id ? `${props.dataLang?.warehouses_localtion_edit}` : `${props.dataLang?.warehouses_localtion_add}`} 
         button={props.id ? <IconEdit/> : `${props.dataLang?.branch_popup_create_new}`} 
         onClickOpen={_ToggleModal.bind(this, true)} 
         open={open} onClose={_ToggleModal.bind(this,false)}
@@ -476,57 +555,44 @@ const Popup_kho = (props) => {
 
               <div className="mt-4">
                   <form onSubmit={_HandleSubmit.bind(this)} className="">
-                      <ScrollArea ref={scrollAreaRef} className="h-[420px] overflow-hidden" speed={1} smoothScrolling={true}>
+                      <ScrollArea ref={scrollAreaRef} className="h-[280px] overflow-hidden" speed={1} smoothScrolling={true}>
                   <div className='w-[30vw] '>         
                       <div className="flex flex-wrap justify-between "> 
                         <div className='w-full'>
                             <div>
-                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.Warehouse_poppup_code}<span className="text-red-500">*</span></label>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.warehouses_localtion_code}<span className="text-red-500">*</span></label>
                              <input
                                 value={code}                
                                 onChange={_HandleChangeInput.bind(this, "code")}
-                                placeholder={props.dataLang?.Warehouse_poppup_code}
+                                placeholder={props.dataLang?.warehouses_localtion_code}
                                 name="fname"                      
                                 type="text"
                                 className={`${errInputCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                               />
-                              {errInputCode && <label className="mb-4  text-[14px] text-red-500">{props.dataLang?.Warehouse_poppup_errcode}</label>}
+                              {errInputCode && <label className="mb-4  text-[14px] text-red-500">{props.dataLang?.warehouses_localtion_errCode}</label>}
                              </div>
                              <div>
-                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.Warehouse_poppup_name}<span className="text-red-500">*</span></label>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.warehouses_localtion_NAME}<span className="text-red-500">*</span></label>
                              <input
                                 value={name}                
                                 onChange={_HandleChangeInput.bind(this, "name")}
-                                placeholder={props.dataLang?.Warehouse_poppup_name}
+                                placeholder={props.dataLang?.warehouses_localtion_NAME}
                                 name="fname"                      
                                 type="text"
                                 className={`${errInputName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                               />
-                              {errInputName && <label className="mb-4  text-[14px] text-red-500">{props.dataLang?.Warehouse_poppup_errname}</label>}
+                              {errInputName && <label className="mb-4  text-[14px] text-red-500">{props.dataLang?.warehouses_localtion_errName}</label>}
                              </div>
-                             <div>
-                              <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.Warehouse_poppup_address}<span className="text-red-500">*</span></label>
-                             <input
-                                value={address}                
-                                onChange={_HandleChangeInput.bind(this, "address")}
-                                placeholder={props.dataLang?.Warehouse_poppup_address}
-                                name="fname"                      
-                                type="text"
-                                className={`${errInputAddress ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
-                              />
-                              {errInputAddress && <label className="mb-4  text-[14px] text-red-500">{props.dataLang?.Warehouse_poppup_erraddress}</label>}
-                             </div>  
+                               
                          <div>
-                           <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_brand} <span className="text-red-500">*</span></label>
+                           <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.warehouses_localtion_ware} <span className="text-red-500">*</span></label>
                               <Select   
-                                 closeMenuOnSelect={false}
-                                  placeholder={props.dataLang?.client_list_brand}
-                                  options={brandpOpt}
+                                  placeholder={props.dataLang?.warehouses_localtion_ware}
+                                  options={khoOpt}
                                   isSearchable={true}
-                                  onChange={_HandleChangeInput.bind(this, "valueBr")}
-                                  isMulti
+                                  onChange={_HandleChangeInput.bind(this, "valuekho")}
                                   noOptionsMessage={() => "Không có dữ liệu"}
-                                  value={valueBr}
+                                  value={valuekho}
                                   maxMenuHeight="200px"
                                   isClearable={true} 
                                  menuPortalTarget={document.body}
@@ -558,20 +624,12 @@ const Popup_kho = (props) => {
                                       }
                                     })
                                 }}
-                                className={`${errInputBr ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
+                                className={`${errInputKho ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
                               />
-                              {errInputBr && <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.client_list_bran}</label>}
+                              {errInputKho && <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.warehouses_localtion_errWare}</label>}
                            </div>
                            </div>
-                            <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_popup_note}</label>
-                                <textarea
-                                value={note}       
-                                placeholder={props.dataLang?.client_popup_note}         
-                                onChange={_HandleChangeInput.bind(this, "note")}
-                                name="fname"                      
-                                type="text"
-                                className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[80px] max-h-[150px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"
-                                />
+                            
                           </div>
                     </div>
                   </ScrollArea>
@@ -718,7 +776,7 @@ const Popup_kho = (props) => {
 //                         <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
 //                         <h1 className="textx-[#141522] text-base opacity-90 font-medium">Không tìm thấy các mục</h1>
 //                         <div className="flex items-center justify-around mt-6 ">
-//                             {/* <Popup_kho onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+//                             {/* <Popup_Vitrikho  onRefresh={_ServerFetching.bind(this)}  dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
 //                         </div>
 //                       </div>
 //                     </div>

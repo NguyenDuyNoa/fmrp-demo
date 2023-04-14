@@ -79,7 +79,7 @@ const Index = (props) => {
     const listBr_filter = listBr?.map(e =>({label: e.name, value: e.id}))
     const [idBranch, sIdBranch] = useState(null);
     const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
-    const options = listBr_filter?.filter((x) => !hiddenOptions.includes(x.value));
+    const options = listBr_filter ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value)) : []
 
     const [listSupplier, sListSupplier]= useState()
     const _ServerFetching_Supplier =  () =>{
@@ -95,7 +95,7 @@ const Index = (props) => {
       sOnFetching(false)
     })
     }
-    const listSupplier_filter = listSupplier?.map(e =>({label: e.code, value: e.id}))
+    const listSupplier_filter = listSupplier ?  listSupplier?.map(e =>({label: e.code, value: e.id})) : []
     const [idSpplier, sIdSpplier] = useState(null);
 
    
@@ -213,73 +213,106 @@ const Index = (props) => {
                 <div className='flex justify-between'>
                     <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.suppliers_contacts_title}</h2>
                 </div>
-                
-                <div className='flex space-x-2'>
-                <div className='ml-1 w-[20%]'>
-                <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand}</h6>
-                <Select 
-                    options={options}
-                    onChange={onchang_filter.bind(this, "branch")}
-                    value={idBranch}
-                    hideSelectedOptions={false}
-                    isMulti
-                    isClearable={true}
-                    placeholder={dataLang?.client_list_filterbrand}  
-                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                    isSearchable={true}
-                    noOptionsMessage={() => "Không có dữ liệu"}
-                    components={{ MultiValue }}
-                    closeMenuOnSelect={false}
-                    theme={(theme) => ({
-                        ...theme,
-                        colors: {
-                            ...theme.colors,
-                            primary25: '#EBF5FF',
-                            primary50: '#92BFF7',
-                            primary: '#0F4F9E',
-                        },
-                    })}
-                   />
-                </div>
-                <div className='ml-1 w-[20%]'>
-                <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.suppliers_supplier_code}</h6>
-                <Select 
-                    options={listSupplier_filter}
-                    onChange={onchang_filter.bind(this, "listSupplier")}
-                    value={idSpplier}
-                    hideSelectedOptions={false}
-                    isClearable={true}
-                    placeholder={dataLang?.suppliers_contacts_clickCode} 
-                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                    isSearchable={true}
-                    noOptionsMessage={() => "Không có dữ liệu"}
-                    components={{ MultiValue }}
-                    closeMenuOnSelect={false}
-                    theme={(theme) => ({
-                        ...theme,
-                        colors: {
-                            ...theme.colors,
-                            primary25: '#EBF5FF',
-                            primary50: '#92BFF7',
-                            primary: '#0F4F9E',
-                        },
-                    })}
-                   />
-                </div>
-                    
-                </div>
               <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">    
                 <div className="xl:space-y-3 space-y-2">
                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
-                        <form className="flex items-center relative">
-                          <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
-                          <input
-                              className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
-                              type="text" 
-                              onChange={_HandleOnChangeKeySearch.bind(this)} 
-                              placeholder={dataLang?.branch_search}
-                          />
-                        </form>
+                    <div className='flex gap-2'>
+                          <form className="flex items-center relative">
+                            <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
+                            <input
+                                className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-1.5 rounded-md w-[400px]"
+                                type="text" 
+                                onChange={_HandleOnChangeKeySearch.bind(this)} 
+                                placeholder={dataLang?.branch_search}
+                            />
+                          </form>
+                          <div className='ml-1 w-[23vw]'>
+                            <Select 
+                                  //  options={options}
+                                   options={[{ value: '', label: 'Chọn chi nhánh', isDisabled: true }, ...options]}
+                                   onChange={onchang_filter.bind(this, "branch")}
+                                   value={idBranch}
+                                   hideSelectedOptions={false}
+                                   isMulti
+                                   isClearable={true}
+                                   placeholder={dataLang?.client_list_filterbrand}  
+                                   className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                                   isSearchable={true}
+                                   noOptionsMessage={() => "Không có dữ liệu"}
+                                   components={{ MultiValue }}
+                                   closeMenuOnSelect={false}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                 styles={{
+                                  placeholder: (base) => ({
+                                  ...base,
+                                  color: "#cbd5e1",
+                                  }),
+                                  control: (base,state) => ({
+                                    ...base,
+                                    border: 'none',
+                                    outline: 'none',
+                                    boxShadow: 'none',
+                                   ...(state.isFocused && {
+                                    boxShadow: '0 0 0 1.5px #0F4F9E',
+                                  }),
+                                 })
+                              }}
+                              />
+                        </div>
+                          <div className='ml-1 w-[23vw]'>
+                            <Select 
+                                    // options={listSupplier_filter}
+                                 options={[{ value: '', label: 'Chọn mã nhà cung cấp', isDisabled: true }, ...listSupplier_filter]}
+
+                                    onChange={onchang_filter.bind(this, "listSupplier")}
+                                    value={idSpplier}
+                                    hideSelectedOptions={false}
+                                    isClearable={true}
+                                    placeholder={dataLang?.suppliers_contacts_clickCode} 
+                                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                                    isSearchable={true}
+                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                    components={{ MultiValue }}
+                                    closeMenuOnSelect={false}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                 styles={{
+                                  placeholder: (base) => ({
+                                  ...base,
+                                  color: "#cbd5e1",
+                                  }),
+                                  control: (base,state) => ({
+                                    ...base,
+                                    border: 'none',
+                                    outline: 'none',
+                                    boxShadow: 'none',
+                                   ...(state.isFocused && {
+                                    boxShadow: '0 0 0 1.5px #0F4F9E',
+                                  }),
+                                 })
+                              }}
+                              />
+                        </div>
+                       
+                        
+                        </div>
                         
                         <div className="flex space-x-2 items-center">
                      {
@@ -303,7 +336,7 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className="min:h-[200px] h-[76.5%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <div className="min:h-[500px] 2xl:h-[90%] xl:h-[69%] h-[100%] max:h-[800px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%] lx:w-[110%] ">
                     <div className="flex items-center sticky top-0 bg-white p-2 z-10">
                       <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.suppliers_contacts_name}</h4>

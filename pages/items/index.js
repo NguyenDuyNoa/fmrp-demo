@@ -17,7 +17,6 @@ import {
 import { NumericFormat } from 'react-number-format';
 import Select, { components } from 'react-select';
 import Swal from "sweetalert2";
-import ModalImage from "react-modal-image";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
@@ -71,6 +70,7 @@ const Index = (props) => {
     const [totalItems, sTotalItems] = useState({});
     const [keySearch, sKeySearch] = useState("")
     const [limit, sLimit] = useState(15);
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
 
     const _ServerFetching = () => {
         Axios("GET", "/api_web/api_material/material?csrf_protection=true", {
@@ -89,6 +89,13 @@ const Index = (props) => {
             }
             sOnFetching(false)
         })
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if(!err){
+                var data = response.data;
+                sDataMaterialExpiry(data.find(x => x.code == "material_expiry"));
+               
+            }
+          })
     }
 
     useEffect(() => {
@@ -240,21 +247,37 @@ const Index = (props) => {
                     <div className='flex justify-between items-center'>
                         <h2 className='xl:text-3xl text-xl font-medium '>{dataLang?.category_material_list_title}</h2>
                         <div className='flex space-x-3 items-center'>
-                            <Popup_NVL onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105 outline-none' />
+                            <Popup_NVL dataMaterialExpiry={dataMaterialExpiry}  onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105 outline-none' />
                         </div>
                     </div>
-                    <div className='grid grid-cols-4 gap-8'>
-                        <div className=''>
-                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.category_material_group_name || "category_material_group_name"}</h6>
-                            <Select 
-                                options={dataCateOption}
-                                formatOptionLabel={CustomSelectOption_GroupNVL}
-                                onChange={_HandleFilterOpt.bind(this, "category")}
-                                value={idCategory}
-                                isClearable={true}
-                                placeholder={dataLang?.category_material_group_name || "category_material_group_name"}
-                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                                isSearchable={true}
+                   
+                    <div className='bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2'>
+                       <div className='flex gap-2'>
+                            <form className="flex items-center relative">
+                                    <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
+                                    <input
+                                        className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
+                                        type="text"  
+                                        onChange={_HandleOnChangeKeySearch.bind(this)} 
+                                        placeholder={dataLang?.branch_search}
+                                    />
+                            </form>
+                            <div className='w-[23vw]'>
+                                {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand || "client_list_brand"}</h6> */}
+                                <Select 
+                                    // options={options}
+                                    options={[{ value: '', label: 'Chọn chi nhánh', isDisabled: true }, ...options]}
+                                    onChange={_HandleFilterOpt.bind(this, "branch")}
+                                    value={idBranch}
+                                    isClearable={true}
+                                    isMulti
+                                    closeMenuOnSelect={false}
+                                    hideSelectedOptions={false}
+                                    placeholder={dataLang?.client_list_brand || "client_list_brand"}
+                                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                                    isSearchable={true}
+                                    components={{ MultiValue }}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
                                 theme={(theme) => ({
                                     ...theme,
                                     colors: {
@@ -265,55 +288,65 @@ const Index = (props) => {
                                     },
                                 })}
                                 styles={{
-                                    placeholder: (base) => ({
+                                  placeholder: (base) => ({
+                                  ...base,
+                                  color: "#cbd5e1",
+                                  }),
+                                  control: (base,state) => ({
                                     ...base,
-                                    color: "#cbd5e1",
-                                    }),
-                                }}
-                            />
-                        </div>
-                        <div className=''>
-                            <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand || "client_list_brand"}</h6>
-                            <Select 
-                                options={options}
-                                onChange={_HandleFilterOpt.bind(this, "branch")}
-                                value={idBranch}
-                                isClearable={true}
-                                isMulti
-                                closeMenuOnSelect={false}
-                                hideSelectedOptions={false}
-                                placeholder={dataLang?.client_list_brand || "client_list_brand"}
-                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                                isSearchable={true}
-                                components={{ MultiValue }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: '#EBF5FF',
-                                        primary50: '#92BFF7',
-                                        primary: '#92BFF7',
-                                    },
-                                })}
-                                styles={{
-                                    placeholder: (base) => ({
-                                    ...base,
-                                    color: "#cbd5e1",
-                                    }),
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <div className='bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2'>
-                        <form className="flex items-center relative">
-                            <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
-                            <input
-                                className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
-                                type="text"  
-                                onChange={_HandleOnChangeKeySearch.bind(this)} 
-                                placeholder={dataLang?.branch_search}
-                            />
-                        </form>
+                                    border: 'none',
+                                    outline: 'none',
+                                    boxShadow: 'none',
+                                   ...(state.isFocused && {
+                                    boxShadow: '0 0 0 1.5px #0F4F9E',
+                                  }),
+                                 })
+                              }}
+                                />
+                            </div>
+                            <div className='w-[23vw]'>
+                                {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.category_material_group_name || "category_material_group_name"}</h6> */}
+                                <Select 
+                                    // options={dataCateOption}
+                                    options={[{ value: '', label: 'Chọn tên danh mục', isDisabled: true }, ...dataCateOption]}
+
+                                    formatOptionLabel={CustomSelectOption_GroupNVL}
+                                    onChange={_HandleFilterOpt.bind(this, "category")}
+                                    value={idCategory}
+                                    isClearable={true}
+                                    placeholder={dataLang?.category_material_group_name || "category_material_group_name"}
+                                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                                    isSearchable={true}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                    styles={{
+                                      placeholder: (base) => ({
+                                      ...base,
+                                      color: "#cbd5e1",
+                                      }),
+                                      control: (base,state) => ({
+                                        ...base,
+                                        border: 'none',
+                                        outline: 'none',
+                                        boxShadow: 'none',
+                                       ...(state.isFocused && {
+                                        boxShadow: '0 0 0 1.5px #0F4F9E',
+                                      }),
+                                     })
+                                  }}
+                                />
+                            </div>
+                            
+                       </div>
+                  
                         {data.length != 0 &&
                             <div className='flex space-x-6'>
                                 <ExcelFile filename="danh sách nvl"  element={
@@ -338,7 +371,7 @@ const Index = (props) => {
                             </div>
                         }
                     </div>
-                    <div className='min:h-[500px] 2xl:h-[72%] xl:h-[69%] h-[72%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+                    <div className='min:h-[500px] 2xl:h-[90%] xl:h-[69%] h-[72%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
                         <div className='pr-2'>
                             <div className='flex items-center sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]'>
                                 <h4 className='xl:w-[10%] w-[6%] 2xl:text-[14px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-center font-[300]'>{dataLang?.image || "image"}</h4>
@@ -369,15 +402,14 @@ const Index = (props) => {
                                             <div key={e?.id.toString()} className='flex p-2 hover:bg-slate-50 relative'>
                                                 <div className='xl:w-[10%] w-[6%] pointer-events-none select-none justify-center flex'>
                                                     {e?.images == null ?
-                                                        <ModalImage small="/no_image.png" large="/no_image.png" className="w-full h-12 rounded object-cover"/> 
+                                                        <img src="/no_image.png" className='w-full h-12 rounded object-contain' />
                                                     :
-                                                        // <Image width={64} height={64} quality={100} src={e?.images} alt="thumb type" className="w-12 h-12 rounded object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/>
-                                                        <ModalImage small={e?.images} large={e?.images} className="w-full h-12 rounded object-contain"/> 
+                                                        <Image width={64} height={64} quality={100} src={e?.images} alt="thumb type" className="w-12 h-12 rounded object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/>
                                                     }
                                                 </div>
                                                 <h6 className='px-2 py-2.5 xl:text-base text-xs xl:w-[11%] w-[12%]'>{e?.category_name}</h6>
                                                 <div className='px-2 py-2.5 xl:text-base text-xs xl:w-[13%] w-[14%]'>
-                                                    <Popup_ThongTin id={e?.id} dataLang={dataLang} >
+                                                    <Popup_ThongTin dataMaterialExpiry={dataMaterialExpiry} id={e?.id} dataLang={dataLang} >
                                                         <button className=' text-[#0F4F9E] hover:opacity-70 w-fit outline-none'>{e?.code}</button>
                                                     </Popup_ThongTin>
                                                 </div>
@@ -392,7 +424,7 @@ const Index = (props) => {
                                                     )}
                                                 </div>
                                                 <div className='px-2 py-2.5 xl:w-[8%] w-[6%] flex space-x-2 justify-center'>
-                                                    <Popup_NVL onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} id={e?.id} className="xl:scale-100 scale-[0.8] outline-none" />
+                                                    <Popup_NVL dataMaterialExpiry={dataMaterialExpiry} onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} id={e?.id} className="xl:scale-100 scale-[0.8] outline-none" />
                                                     <button onClick={_HandleDelete.bind(this, e?.id)} className="xl:scale-100 scale-[0.8] outline-none"><IconDelete color="red"/></button>
                                                 </div>
                                             </div>
@@ -1064,13 +1096,15 @@ const Popup_NVL = React.memo((props) => {
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.minimum_amount || "minimum_amount"}</label>
                                             <NumericFormat thousandSeparator="," value={minimumAmount} onValueChange={_HandleChangeInput.bind(this, "minimumAmount")} placeholder={props.dataLang?.minimum_amount || "minimum_amount"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
                                         </div>
-                                        <div className='2xl:space-y-1'>
-                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}</label>
-                                            <div className='relative flex flex-col justify-center items-center'>
-                                                <NumericFormat thousandSeparator="," value={expiry} onValueChange={_HandleChangeInput.bind(this, "expiry")} placeholder={props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 pr-14 border outline-none`} />
-                                                <span className='absolute right-2 text-slate-400 select-none'>{props.dataLang?.date || "date"}</span>
+                                        {props.dataMaterialExpiry?.is_enable === "1" ? (
+                                                <div className='2xl:space-y-1'>
+                                                <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}</label>
+                                                <div className='relative flex flex-col justify-center items-center'>
+                                                    <NumericFormat thousandSeparator="," value={expiry} onValueChange={_HandleChangeInput.bind(this, "expiry")} placeholder={props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 pr-14 border outline-none`} />
+                                                    <span className='absolute right-2 text-slate-400 select-none'>{props.dataLang?.date || "date"}</span>
+                                                </div>
                                             </div>
-                                        </div>
+                                            ):""}
                                     </div>
                                     <div className='2xl:space-y-3 space-y-2'>
                                         <div className='2xl:space-y-1'>
@@ -1502,10 +1536,12 @@ const Popup_ThongTin = React.memo((props) => {
                                         <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.minimum_amount || "minimum_amount"}:</h5>
                                         <h6 className='w-[55%] text-right'>{Number(list?.minimum_quantity).toLocaleString()}</h6>
                                     </div>
-                                    <div className='flex justify-between'>
-                                        <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}:</h5>
-                                        <h6 className='w-[55%] text-right'>{Number(list?.expiry).toLocaleString()} {props.dataLang?.date || "date"}</h6>
-                                    </div>
+                                    {props.dataMaterialExpiry?.is_enable === "1" ?(
+                                        <div className='flex justify-between'>
+                                            <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.category_material_list_expiry_date || "category_material_list_expiry_date"}:</h5>
+                                            <h6 className='w-[55%] text-right'>{Number(list?.expiry).toLocaleString()} {props.dataLang?.date || "date"}</h6>
+                                        </div>
+                                    ):""}
                                     <div className='flex justify-between'>
                                         <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.category_material_list_purchase_unit || "category_material_list_purchase_unit"}:</h5>
                                         <h6 className='w-[55%] text-right'>{list?.unit}</h6>
