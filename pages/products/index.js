@@ -505,7 +505,7 @@ const Index = (props) => {
                                                 </div>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[10%]'>{e?.name}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[13px] text-xs w-[10%]'>
-                                                    <span className={`w-fit p-0.5 border rounded ${(e?.type_products?.id === 0 && "text-lime-500 border-lime-500") || (e?.type_products?.id === 1 && "text-orange-500 border-orange-500") || (e?.type_products?.id === 2 && "text-sky-500 border-sky-500")}`}>{dataLang[e?.type_products?.name]}</span>
+                                                    <span className={`w-fit p-0.5 border rounded ${(e?.type_products?.id === 0 && "text-lime-500 border-lime-500") || (e?.type_products?.id === 1 && "text-orange-500 border-orange-500") || (e?.type_products?.id === 2 && "text-sky-500 border-sky-500")}`}>{dataLang[e?.type_products?.name] || ""}</span>
                                                 </h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[5%] text-center'>{e?.unit}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[6%] text-center'>{e?.variation?.length}</h6>
@@ -2077,6 +2077,7 @@ const Popup_Bom = React.memo((props) => {
 
     const [onFetching, sOnFetching] = useState(false);
     const [onFetchingCd, sOnFetchingCd] = useState(false);
+    const [onFetchingName, sOnFetchingName] = useState(false);
     const _ToggleModal = (e) => props.setOpen(e);
 
     const [dataVariant, sDataVariant] = useState([]);
@@ -2096,6 +2097,7 @@ const Popup_Bom = React.memo((props) => {
         props.isOpen && sOnFetching(true)
         props.isOpen && props?.id && sOnFetching(true)
         props.isOpen && props?.id && sOnFetchingCd(true)
+        props.isOpen && props?.id && sOnFetchingName(true)
         props.isOpen && sTab(null)
     }, [props.isOpen]);
 
@@ -2119,12 +2121,30 @@ const Popup_Bom = React.memo((props) => {
                 var {data} = response.data;
                 sDataTypeCd(Object.entries(data.typeDesignBom).map(([key, value]) => ({ label: value, value: key })))
             }
+            sOnFetchingCd(false)
         })
     }
 
     useEffect(() => {
         onFetchingCd && _ServerFetchingCd()
     }, [onFetchingCd]);
+
+    const _ServerFetchingName = () => {
+        Axios("POST", "/api_web/api_product/searchItems?csrf_protection=true", {
+            data: {
+                type: "material"
+            }
+        }, (err, response) => {
+            if(!err){
+
+            }
+            sOnFetchingName(false)
+        })
+    }
+
+    useEffect(() => {
+        onFetchingName && _ServerFetchingName()
+    }, [onFetchingName]);
 
     const hiddenOptions = valueVariant?.length > 2 ? valueVariant?.slice(0, 2) : [];
     const options = dataRestVariant.filter((x) => !hiddenOptions.includes(x.value));
@@ -2147,7 +2167,7 @@ const Popup_Bom = React.memo((props) => {
     const _HandleAddNew =  (id) => {
         const index = dataSelectedVariant.findIndex(obj => obj.value === id);
         const newData = [...dataSelectedVariant]
-        newData[index] = {...newData[index], child: [...newData[index].child, { id: Date.now(), type: null, name: null, unit: null, norm: 0, loss: 0, stage: null }]};
+        newData[index] = {...newData[index], child: [...newData[index].child, { id: Date.now(), type: null, name: null, dataName: [], unit: null, norm: 0, loss: 0, stage: null }]};
         sDataSelectedVariant(newData)
     }
 
@@ -2171,48 +2191,36 @@ const Popup_Bom = React.memo((props) => {
         })
     }
 
-    const _HandleChangeItemBOM = (parentId, id, value, type) => {
-        // const index = dataSelectedVariant.findIndex(obj => obj.value === parentId);
-        // if(index > -1){
-        //     const newData = [...dataSelectedVariant]
-        //     const newChild = newData[index]?.child.map(e => {
-        //         if(e == id){
-        //             if(type == "norm"){
-        //                 return {...e, norm: Number(value.value)}
-        //             }
-        //         }
-        //     })
-        //     newData[index] = {...newData[index], child: newChild};
-        //     sDataSelectedVariant(newData);
-        // }
-
-        const newData = dataSelectedVariant.map((item) => {
-            if (item.value !== parentId) {
-              return item;
+    const _HandleChangeItemBOM = (parentId, childId, type, value) => {
+        const newData = dataSelectedVariant.map((parent) => {
+            if (parent.value === parentId) {
+                const newChild = parent.child.map((child) => {
+                    if (child.id === childId) {
+                        if(type === "type"){
+                            sOnFetchingName(true);
+                            return {
+                                ...child,
+                                "type": value,
+                                "dataName": []
+                            };
+                        }else{
+                            return {
+                                ...child,
+                                [type]: (type === "norm" || type === "loss" ? Number(value.value) : value),
+                            };
+                        }
+                    }
+                    return child;
+                });
+                return {
+                    ...parent,
+                    child: newChild,
+                };
             }
-            const newChild = item.child.map((c) => {
-                if (c.id !== id) {
-                    return c;
-                }
-                console.log("here 1")
-                if(type == "norm"){
-                    console.log("here norm")
-                    return {...c, norm: Number(value.value)};
-                }else if(type == "type"){
-                    return {
-                        ...c,
-                        [type]: value,
-                    };
-                }
-            });
-            return {
-                ...item,
-                child: newChild,
-            };
+            return parent;
         });
         sDataSelectedVariant(newData);
     }
-    console.log(dataSelectedVariant)
 
     const _HandleDeleteBOM = (id) => {
         Swal.fire({
@@ -2311,13 +2319,13 @@ const Popup_Bom = React.memo((props) => {
                     <ScrollArea className="min-h-[0px] max-h-[550px] overflow-hidden" speed={1} smoothScrolling={true}>
                         <div className='divide-y divide-slate-100'>
                             {selectedList?.child.map((e, index) =>
-                                <div key={e.id} className='py-1 px-2 flex w-full hover:bg-slate1-100 items-center'>
+                                <div key={e.id} className='py-1 px-2 flex w-full hover:bg-slate-100 items-center'>
                                     <h6 className='w-[5%] px-1 text-center'>{index + 1}</h6>
                                     <div className='w-[37%] flex space-x-2 px-1'>
                                         <Select 
                                             options={dataTypeCd}
                                             value={e.type}
-                                            onChange={_HandleChangeItemBOM.bind(this, e.id, "type")}
+                                            onChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "type")}
                                             isClearable={true}
                                             placeholder={"Loại"}
                                             noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
@@ -2347,9 +2355,9 @@ const Popup_Bom = React.memo((props) => {
                                             }}
                                         />
                                         <Select 
-                                            // options={dataOptType}
-                                            // value={type}
-                                            // onChange={_HandleChangeInput.bind(this, "type")}
+                                            options={e.type && dataOptType}
+                                            value={e.name}
+                                            onChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "name")}
                                             isClearable={true}
                                             placeholder={"Tên"}
                                             noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
@@ -2380,10 +2388,10 @@ const Popup_Bom = React.memo((props) => {
                                     </div>
                                     <h6 className="w-[11%] px-1 text-center">Đơn vị</h6>
                                     <div className="w-[12%] px-1">
-                                        <NumericFormat value={e?.norm} onValueChange={_HandleChangeItemBOM.bind(this, e.id, "norm")} thousandSeparator="," placeholder={"Định mức"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                        <NumericFormat value={e?.norm} onValueChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "norm")} thousandSeparator="," placeholder={"Định mức"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
                                     </div>
                                     <div className="w-[12%] px-1">
-                                        <NumericFormat isAllowed={(values) => { const {floatValue} = values; return floatValue >= 0 &&  floatValue <= 100; }} value={e?.loss} onValueChange={_HandleChangeItemBOM.bind(this, e.id, "loss")} suffix="%" thousandSeparator="," placeholder={"% Hao hụt"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                        <NumericFormat isAllowed={(values) => { const {floatValue} = values; return floatValue >= 0 &&  floatValue <= 100; }} value={e?.loss} onValueChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "loss")} suffix="%" thousandSeparator="," placeholder={"% Hao hụt"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
                                     </div>
                                     <div className="w-[23%] px-1">
                                         <Select 
