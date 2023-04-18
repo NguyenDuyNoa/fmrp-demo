@@ -224,7 +224,7 @@ const Index = (props) => {
                     {value: `${e.minimum_quantity}`},
                     {value: `${e.note}`},
                     {value: `${e.variation?.length}`},
-                    {value: `${JSON.stringify(e.branch)}`},
+                    {value: `${JSON.stringify(e.branch?.map(e => e.name))}`},
                 ]
             ),
         }

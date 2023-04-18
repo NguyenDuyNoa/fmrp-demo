@@ -467,8 +467,8 @@ const Index = (props) => {
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[5%] font-[300] text-center'>{dataLang?.unit || "unit"}</h4>
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[6%] font-[300] text-center'>{dataLang?.category_material_list_variant || "category_material_list_variant"}</h4>
                                 <h4 className='2xl:text-[13px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[6%] font-[300] text-center'>{dataLang?.stock || "stock"}</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[9%] font-[300]'>Định mức BOM</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300]'>Phiên bản - Công đoạn</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[9%] font-[300] text-center'>Định mức BOM</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center'>Công đoạn sản xuất</h4>
                                 <h4 className='2xl:text-[13px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[7%] font-[300]'>{dataLang?.note || "note"}</h4>
                                 <h4 className='2xl:text-[13px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[8%] font-[300]'>{dataLang?.client_list_brand || "client_list_brand"}</h4>
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[7%] font-[300] text-center'>{dataLang?.branch_popup_properties || "branch_popup_properties"}</h4>
@@ -505,13 +505,19 @@ const Index = (props) => {
                                                 </div>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[10%]'>{e?.name}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[13px] text-xs w-[10%]'>
-                                                    <span className={`w-fit p-0.5 border rounded ${(e?.type_products?.id === 0 && "text-lime-500 border-lime-500") || (e?.type_products?.id === 1 && "text-orange-500 border-orange-500") || (e?.type_products?.id === 2 && "text-sky-500 border-sky-500")}`}>{dataLang[e?.type_products?.name] || ""}</span>
+                                                    <span className={`xl:py-[1px] xl:px-1.5 px-0.5 rounded border h-fit font-[300] break-words ${(e?.type_products?.id === 0 && "text-lime-500 border-lime-500") || (e?.type_products?.id === 1 && "text-orange-500 border-orange-500") || (e?.type_products?.id === 2 && "text-sky-500 border-sky-500")}`}>{dataLang[e?.type_products?.name] || ""}</span>
                                                 </h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[5%] text-center'>{e?.unit}</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[6%] text-center'>{e?.variation?.length}</h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[6%] text-center'>{Number(e?.variation_count)}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[6%] text-center'>{Number(e?.stock_quantity).toLocaleString()}</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[9%]'></h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[10%]'></h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[9%] flex justify-center'>
+                                                    {Number(e?.variation_count) == 0 ?
+                                                        Number(e?.ct_versions) != 0 && <IconTick className="text-green-500" />
+                                                        :
+                                                        (Number(e?.variation_count) > Number(e?.ct_versions)) ? (Number(e?.ct_versions) == 0 ? "" : Number(e?.ct_versions)) : <IconTick className="text-green-500" />
+                                                    }
+                                                </h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[10%] flex justify-center'>{Number(e?.ct_versions_stage) == 0 ? "" : <IconTick className="text-green-500" />}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[7%]'>{e?.note}</h6>
                                                 <div className='px-2 py-2.5 w-[8%] flex flex-wrap'>
                                                     {e?.branch.map(e => 
@@ -519,7 +525,7 @@ const Index = (props) => {
                                                     )}
                                                 </div>
                                                 <div className='pl-2 py-2.5 w-[7%] flex space-x-2 justify-center'>
-                                                    <BtnTacVu dataProductExpiry={dataProductExpiry} dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
+                                                    <BtnTacVu dataProductExpiry={dataProductExpiry} dataLang={dataLang} id={e.id} name={e.name} code={e.code} variant={Number(e?.variation_count)} bom={Number(e?.ct_versions)} stage={Number(e?.ct_versions_stage)} onRefresh={_ServerFetching.bind(this)} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
                                                 </div>
                                             </div>
                                         )}
@@ -586,7 +592,6 @@ const BtnTacVu = React.memo((props) => {
         }
         })
     }
-    
     return(
         <div>
             <Popup
@@ -603,8 +608,19 @@ const BtnTacVu = React.memo((props) => {
             >
                 <div className="w-auto rounded">
                     <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                        <Popup_GiaiDoan setOpen={sOpen} isOpen={open} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
-                        <Popup_Bom setOpen={sOpenBom} isOpen={openBom} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
+                        {props.stage == 0 ?
+                            <Popup_GiaiDoan setOpen={sOpen} isOpen={open} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
+                            :
+                            <button disabled className='disabled:opacity-30 text-sm hover:bg-slate-50 text-left disabled:cursor-auto cursor-pointer px-5 rounded py-2.5 w-full'>Thiết kế công đoạn</button>
+                        }
+                        {props.variant == 0 ?
+                            props.bom != 0 && <button disabled className='disabled:opacity-30 text-sm hover:bg-slate-50 text-left disabled:cursor-auto cursor-pointer px-5 rounded py-2.5 w-full'>Thiết kế BOM</button>
+                            :
+                            (props.variant > props.bom) ? 
+                                <Popup_Bom setOpen={sOpenBom} isOpen={openBom} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
+                                :
+                                <button disabled className='disabled:opacity-30 text-sm hover:bg-slate-50 text-left disabled:cursor-auto cursor-pointer px-5 rounded py-2.5 w-full'>Thiết kế BOM</button>
+                        }
                         <Popup_ThanhPham onRefresh={props.onRefresh} dataProductExpiry={props.dataProductExpiry} dataLang={props.dataLang} id={props?.id} setOpen={sOpenDetail} isOpen={openDetail} className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full" />
                         <button onClick={_HandleDelete.bind(this, props.id)} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Xoá</button>
                     </div>
@@ -1168,7 +1184,6 @@ const Popup_ThanhPham = React.memo((props) => {
                                             />
                                             {errGroup && category?.value == null && <label className="text-sm text-red-500">Vui lòng chọn danh mục</label>}
                                         </div>
-                                        
                                         <div className='2xl:space-y-1'>
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Mã thành phẩm {props?.id && <span className='text-red-500'>*</span>}</label>
                                             <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder={props.dataLang?.client_popup_sytem} className={`${errCode && code == "" ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
@@ -1541,14 +1556,23 @@ const Popup_ThongTin = React.memo((props) => {
     const _ToggleModal = (e) => sOpen(e);
 
     const [openStage, sOpenStage] = useState(false);
+    const [openBom, sOpenBom] = useState(false);
 
     const [tab, sTab] = useState(0)
     const _HandleSelectTab = (e) => sTab(e)
 
+    const [tabBom, sTabBom] = useState(0);
+    const _HandleSelectTabBom = (e) => sTabBom(e)
+
     const [onFetching, sOnFetching] = useState(false);
-    const [onFetchingAnother, sOnFetchingAnother] = useState(false);
+    const [onFetchingStage, sOnFetchingStage] = useState(false);
+    const [onFetchingBom, sOnFetchingBom] = useState(false);
+
     const [list, sList] = useState({});
-    const [dataStage, sDataStage] = useState(false);
+    const [dataStage, sDataStage] = useState([]);
+
+    const [dataBom, sDataBom] = useState([]);
+    const [selectedListBom, sSelectedListBom] = useState([]);
 
     const _ServerFetching = () => {
         Axios("GET", `/api_web/api_product/product/${props.id}?csrf_protection=true`, {}, (err, response) => {
@@ -1563,29 +1587,53 @@ const Popup_ThongTin = React.memo((props) => {
         onFetching && _ServerFetching()
     }, [onFetching]);
 
-    const _ServerFetchingAnother = () => {
+    const _ServerFetchingStage = () => {
         Axios("GET", `/api_web/api_product/getDesignStages/${props.id}?csrf_protection=true`, {}, (err, response) => {
             if(!err){
                 var data = response.data;
                 sDataStage(data)
             }
-            sOnFetchingAnother(false)
+            sOnFetchingStage(false)
         })
     }
 
     useEffect(() => {
-        onFetchingAnother && _ServerFetchingAnother()
-    }, [onFetchingAnother]);
+        onFetchingStage && _ServerFetchingStage()
+    }, [onFetchingStage]);
+
+    const _ServerFetchingBom = () => {
+        Axios("GET", `/api_web/Api_product/getDesignBOM?csrf_protection=true`, {
+            params: {
+                id: props.id
+            }
+        }, (err, response) => {
+            if(!err){
+                var {data} = response.data;
+                sDataBom(data?.variations || [])
+                sTabBom(data?.variations[0]?.product_variation_option_value_id)
+            }
+            sOnFetchingBom(false)
+        })
+    }
+
+    useEffect(() => {
+        onFetchingBom && _ServerFetchingBom()
+    }, [onFetchingBom]);
 
     useEffect(() => {
         open && sTab(0)
         open && sOnFetching(true)
-        open && sOnFetchingAnother(true)
+        open && sOnFetchingStage(true)
+        open && sOnFetchingBom(true)
     }, [open]);
 
     useEffect(() => {
-        open && openStage == false && sOnFetchingAnother(true) && console.log("Here")
+        open && openStage == false && sOnFetchingStage(true)
     }, [openStage == false]);
+
+    useEffect(() => {
+        open && tabBom && sSelectedListBom(dataBom.find(item => item.product_variation_option_value_id === tabBom))
+    }, [tabBom]);
 
     return(
         <PopupEdit  
@@ -1671,7 +1719,7 @@ const Popup_ThongTin = React.memo((props) => {
                                         {list?.images == null ?
                                             <img src="/no_image.png" className='w-48 h-48 rounded object-contain select-none pointer-events-none' />
                                             :
-                                            <Image width={200} height={200} quality={100} src={list?.images} alt="thumb type" className="w-48 h-48 rounded object-contain select-none pointer-events-none" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/>
+                                            <Image width={200} height={200} quality={100} src={list?.images} alt="thumb type" className="w-48 h-48 rounded object-contain select-none pointer-events-none" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                         }
                                     </div>
                                     <div className='bg-slate-100/40 p-2 rounded-md space-y-3'>
@@ -1736,11 +1784,61 @@ const Popup_ThongTin = React.memo((props) => {
                             </React.Fragment>
                         }
                         {tab === 2 &&
-                            <div>BOM</div>
+                            <>
+                                {onFetchingStage ?
+                                    <Loading className="h-96"color="#0f4f9e" />
+                                    :
+                                    <>
+                                        {dataBom?.length > 0 ?
+                                            <div className='space-y-0.5 min-h-[384px]'>
+                                                <div className='pb-3 flex space-x-3 items-center justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+                                                    {dataBom?.map(e => 
+                                                        <button key={e.product_variation_option_value_id.toString()} onClick={_HandleSelectTabBom.bind(this, e.product_variation_option_value_id)} className={`${tabBom === e.product_variation_option_value_id ? "text-[#0F4F9E] bg-[#0F4F9E10]" : "hover:text-[#0F4F9E] bg-slate-50/50" } outline-none min-w-fit px-3 py-1.5 rounded relative flex items-center`}>
+                                                            <span>{e.name_variation}</span>
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                <div className={`flex px-2 py-1.5 bg-slate-100/40 rounded items-center text-[14px]`}>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center w-[5%]'>STT</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[18%]'>Loại</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[18%]'>Tên</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center w-[10%]'>Đơn vị</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[12%]'>Định mức</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[14%]'>% Hao hụt</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[23%]'>Công đoạn sử dụng</h5>
+                                                </div>
+                                                <ScrollArea className="min-h-[400px] max-h-[450px]" speed={1} smoothScrolling={true}>
+                                                    <div className='divide-y divide-slate-200'>
+                                                        {selectedListBom?.items?.map((e, index) => 
+                                                            <div key={e?.id.toString()} className={`flex px-2 py-2.5 hover:bg-slate-50 items-center`}>
+                                                                <h6 className='px-2 xl:text-base text-xs text-center w-[5%]'>{index + 1}</h6>
+                                                                <h6 className='px-2 xl:text-[15px] text-xs w-[18%]'>{e?.str_type_item}</h6>
+                                                                <h6 className='px-2 xl:text-base text-xs w-[18%]'>{e?.item_name}</h6>
+                                                                <h6 className='px-2 xl:text-base text-xs w-[10%] text-center'>{e?.unit_name}</h6>
+                                                                <h6 className='px-2 xl:text-base text-xs w-[12%]'>{Number(e?.quota).toLocaleString()}</h6>
+                                                                <h6 className='px-2 xl:text-base text-xs w-[14%]'>{Number(e?.loss).toLocaleString()}%</h6>
+                                                                <h6 className='px-2 xl:text-base text-xs w-[23%]'>{e?.stage_name}</h6>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </ScrollArea>
+                                                <div className="flex items-center space-x-3 justify-end">
+                                                    <Popup_Bom setOpen={sOpenBom} isOpen={openBom} dataLang={props.dataLang} id={props.id} name={list?.name} code={list?.code} type="edit" className='text-base py-2 px-4 rounded-lg bg-slate-200 hover:opacity-90 hover:scale-105 transition' />
+                                                </div>
+                                            </div>
+                                            :
+                                            <div className="w-full h-96 flex flex-col justify-center items-center" >
+                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+                                                <h1 className="text-[#141522] text-base opacity-90 font-medium">{props.dataLang?.no_data_found}</h1>
+                                            </div>
+                                        }
+                                    </>
+                                }
+                            </>
                         }
                         {tab === 3 &&
                             <>
-                                {onFetchingAnother ?
+                                {onFetchingStage ?
                                     <Loading className="h-96"color="#0f4f9e" />
                                     :
                                     <React.Fragment>
@@ -1912,19 +2010,7 @@ const Popup_GiaiDoan = React.memo((props) => {
     }, [listCdChosen]);
 
     const handleDelete = (updatedData) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#296dc1',
-            cancelButtonColor: '#d33',
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText:`${props.dataLang?.aler_cancel}`
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sOption(updatedData);
-            }
-        })
+        sOption(updatedData);
     }
 
     const handleRatioChange = (id, type) => {
@@ -2073,12 +2159,13 @@ const Popup_Bom = React.memo((props) => {
         return { menuPortalTarget };
     };
 
-    const dataOptType = useSelector(state => state.type_finishedProduct);
-
     const [onFetching, sOnFetching] = useState(false);
+    const [loadingData, sLoadingData] = useState(false);
+
     const [onFetchingCd, sOnFetchingCd] = useState(false);
-    const [onFetchingName, sOnFetchingName] = useState(false);
     const _ToggleModal = (e) => props.setOpen(e);
+
+    const [onSending, sOnSending] = useState(false);
 
     const [dataVariant, sDataVariant] = useState([]);
     const [valueVariant, sValueVariant] = useState(null);
@@ -2087,27 +2174,40 @@ const Popup_Bom = React.memo((props) => {
     const [selectedList, sSelectedList] = useState(null);
 
     const [dataTypeCd, sDataTypeCd] = useState([]);
+    const [dataCd, sDataCd] = useState([]);
 
     const _HandleSelectTab = (e) => sTab(e);
 
     const [dataSelectedVariant, sDataSelectedVariant] = useState([]);
-    const dataRestVariant = dataVariant?.filter(item1 => !dataSelectedVariant.some(item2 => item1.label === item2?.label && item1.value === item2?.value));
+    const dataRestVariant = dataVariant?.filter(item1 => !dataSelectedVariant?.some(item2 => item1.label === item2?.label && item1.value === item2?.value));
+
+    const [currentData, sCurrentData] = useState([]);
+
+    const [errType, sErrType] = useState(false);
+    const [errName, sErrName] = useState(false);
 
     useEffect(() => {
-        props.isOpen && sOnFetching(true)
-        props.isOpen && props?.id && sOnFetching(true)
+        props.isOpen && props.type == "edit" && sOnFetching(true)
         props.isOpen && props?.id && sOnFetchingCd(true)
-        props.isOpen && props?.id && sOnFetchingName(true)
+        props.isOpen && sLoadingData(false)
         props.isOpen && sTab(null)
+        props.isOpen && sErrType(false)
+        props.isOpen && sErrName(false)
     }, [props.isOpen]);
 
     const _ServerFetching = () => {
-        Axios("GET", `/api_web/api_product/productVariationOption/${props.id}?csrf_protection=true`, {}, (err,response) => {
+        Axios("GET", `/api_web/Api_product/getDesignBOM?csrf_protection=true`, {
+            params: {
+                id: props.id
+            }
+        }, (err, response) => {
             if(!err){
-                var {rResult} = response.data;
-                sDataVariant(rResult.map(e => ({label: e.product_variation, value: e.id, child: []})))
+                var {data} = response.data;
+                sDataSelectedVariant(data?.variations?.map(e => ({label: e.name_variation, value: e.product_variation_option_value_id, child: e.items?.map(ce => ({type: {label: ce.str_type_item, value: ce.type_item}, name: {label: ce.item_name, value: ce.item_id}, unit: {label: ce.unit_name, value: ce.unit_id}, norm: Number(ce.quota), loss: Number(ce.loss), stage: {label: ce.stage_name, value: ce.stage_id}}))})))
+                sCurrentData(data?.variations?.map(e => ({label: e.name_variation, value: e.product_variation_option_value_id, child: e.items?.map(ce => ({type: {label: ce.str_type_item, value: ce.type_item}, name: {label: ce.item_name, value: ce.item_id}, unit: {label: ce.unit_name, value: ce.unit_id}, norm: Number(ce.quota), loss: Number(ce.loss), stage: {label: ce.stage_name, value: ce.stage_id}}))})))
             }
             sOnFetching(false)
+            sLoadingData(true)
         })
     }
 
@@ -2120,31 +2220,21 @@ const Popup_Bom = React.memo((props) => {
             if(!err){
                 var {data} = response.data;
                 sDataTypeCd(Object.entries(data.typeDesignBom).map(([key, value]) => ({ label: value, value: key })))
+                sDataCd(data.stages.map(e => ({label: e.name, value: e.id})))
             }
-            sOnFetchingCd(false)
         })
+        Axios("GET", `/api_web/api_product/productVariationOption/${props.id}?csrf_protection=true`, {}, (err,response) => {
+            if(!err){
+                var {rResult} = response.data;
+                sDataVariant(rResult[0]?.product_variation.includes("NONE") ? [{label: "Mặc định", value: rResult[0]?.id, child: []}] : rResult.map(e => ({label: e.product_variation, value: e.id, child: []})))
+            }
+        })
+        sOnFetchingCd(false)
     }
 
     useEffect(() => {
         onFetchingCd && _ServerFetchingCd()
     }, [onFetchingCd]);
-
-    const _ServerFetchingName = () => {
-        Axios("POST", "/api_web/api_product/searchItems?csrf_protection=true", {
-            data: {
-                type: "material"
-            }
-        }, (err, response) => {
-            if(!err){
-
-            }
-            sOnFetchingName(false)
-        })
-    }
-
-    useEffect(() => {
-        onFetchingName && _ServerFetchingName()
-    }, [onFetchingName]);
 
     const hiddenOptions = valueVariant?.length > 2 ? valueVariant?.slice(0, 2) : [];
     const options = dataRestVariant.filter((x) => !hiddenOptions.includes(x.value));
@@ -2154,41 +2244,28 @@ const Popup_Bom = React.memo((props) => {
     }
 
     const _HandleApplyVariant = () => {
-        dataSelectedVariant.push(...valueVariant)
+        dataSelectedVariant?.push(...valueVariant)
         sTab(dataSelectedVariant[0]?.value)
         sValueVariant([])
     }
     
-    useEffect(() => {
-        props.isOpen && sTab(dataSelectedVariant[0]?.value)
-    }, [dataSelectedVariant.length > 0]);
-
+    // useEffect(() => {
+    //     props.isOpen && sTab(dataSelectedVariant[0]?.value)
+    // }, [dataSelectedVariant?.length > 0]);
     
     const _HandleAddNew =  (id) => {
         const index = dataSelectedVariant.findIndex(obj => obj.value === id);
         const newData = [...dataSelectedVariant]
-        newData[index] = {...newData[index], child: [...newData[index].child, { id: Date.now(), type: null, name: null, dataName: [], unit: null, norm: 0, loss: 0, stage: null }]};
+        newData[index] = {...newData[index], child: [...newData[index].child, { id: Date.now(), type: null, name: null, dataName: [], unit: null, dataUnit: [], norm: 0, loss: 0, stage: null }]};
         sDataSelectedVariant(newData)
     }
 
     const _HandleDeleteItemBOM = (parentId, id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#296dc1',
-            cancelButtonColor: '#d33',
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText:`${props.dataLang?.aler_cancel}`
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const index = dataSelectedVariant.findIndex(obj => obj.value === parentId);
-                const newData = [...dataSelectedVariant]
-                const newChild = newData[index].child.filter(item => item.id !== id);
-                newData[index] = {...newData[index], child: newChild};
-                sDataSelectedVariant(newData);
-            }
-        })
+        const index = dataSelectedVariant.findIndex(obj => obj.value === parentId);
+        const newData = [...dataSelectedVariant]
+        const newChild = newData[index].child.filter(item => item.id !== id);
+        newData[index] = {...newData[index], child: newChild};
+        sDataSelectedVariant(newData);
     }
 
     const _HandleChangeItemBOM = (parentId, childId, type, value) => {
@@ -2196,19 +2273,10 @@ const Popup_Bom = React.memo((props) => {
             if (parent.value === parentId) {
                 const newChild = parent.child.map((child) => {
                     if (child.id === childId) {
-                        if(type === "type"){
-                            sOnFetchingName(true);
-                            return {
-                                ...child,
-                                "type": value,
-                                "dataName": []
-                            };
-                        }else{
-                            return {
-                                ...child,
-                                [type]: (type === "norm" || type === "loss" ? Number(value.value) : value),
-                            };
-                        }
+                        return {
+                            ...child,
+                            [type]: (type === "norm" || type === "loss" ? Number(value.value) : value),
+                        };
                     }
                     return child;
                 });
@@ -2220,228 +2288,428 @@ const Popup_Bom = React.memo((props) => {
             return parent;
         });
         sDataSelectedVariant(newData);
+        if(type === "type"){
+            const found = newData.find(parent => parent.value === parentId);
+            if (found) {
+                const child = found.child.find(child => child.id === childId);
+                if (child) {
+                    const type = child.type?.value;
+                    Axios("POST", "/api_web/api_product/searchItems?csrf_protection=true", {
+                        data: {
+                            type: type
+                        }
+                    }, (err, response) => {
+                        if(!err){
+                            const {data} = response.data;
+                            const updatedData = newData.map((parent) => {
+                                if (parent.value === parentId) {
+                                    const newChild = parent.child.map((child) => {
+                                        if (child.id === childId) {
+                                            return {...child, dataName: data?.items ? data?.items.map(e => ({label: e.name, value: e.id})) : []};
+                                        }
+                                        return child;
+                                    });
+                                    return {...parent, child: newChild};
+                                }
+                                return parent;
+                            });
+                            sDataSelectedVariant(updatedData);
+                        }
+                    })
+                }
+            }
+        }
+        if(type === "name"){
+            const found = newData.find(parent => parent.value === parentId);
+            if (found) {
+                const child = found.child.find(child => child.id === childId);
+                if (child) {
+                    const name = child.name?.value;
+                    const type = child.type?.value;
+                    Axios("POST", "/api_web/api_product/rowItem?csrf_protection=true", {
+                        data: {
+                            item_id: name,
+                            type: type
+                        }
+                    }, (err, response) => {
+                        if(!err){
+                            const {data} = response.data;
+                            const updatedData = newData.map((parent) => {
+                                if (parent.value === parentId) {
+                                    const newChild = parent.child.map((child) => {
+                                        if (child.id === childId) {
+                                            return {...child, dataUnit: data?.units ? data?.units.map(e => ({label: e.unit, value: e.unitid})) : []};
+                                        }
+                                        return child;
+                                    });
+                                    return {...parent, child: newChild};
+                                }
+                                return parent;
+                            });
+                            sDataSelectedVariant(updatedData);
+                        }
+                    })
+                }
+            }
+        }
     }
 
     const _HandleDeleteBOM = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask}`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#296dc1',
-            cancelButtonColor: '#d33',
-            confirmButtonText: `${props.dataLang?.aler_yes}`,
-            cancelButtonText:`${props.dataLang?.aler_cancel}`
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const newData = [...dataSelectedVariant.filter(item => item.value !== id)];
-                sDataSelectedVariant(newData);
-                sTab(newData[0]?.value)
-            }
-        })
+        const newData = [...dataSelectedVariant.filter(item => item.value !== id)];
+        sDataSelectedVariant(newData);
+        sTab(newData[0]?.value)
     }
 
     useEffect(() => {
         props.isOpen && (tab || dataSelectedVariant) && sSelectedList(dataSelectedVariant.find(item => item.value === tab))
     }, [tab, dataSelectedVariant]);
 
+    const checkEqual = (prevValue, nextValue) => prevValue && nextValue && JSON.stringify(prevValue) === JSON.stringify(nextValue);
+
+    useEffect(() => {
+        props.isOpen && sTab(dataSelectedVariant[0]?.value)
+        props.isOpen && props.type == "edit" && dataSelectedVariant.length == 0 && _ServerFetching();
+
+        if (checkEqual(currentData, dataSelectedVariant)) {
+            dataSelectedVariant.forEach(e => {
+                e.child.forEach(ce => {
+                    if (ce.name !== null) {
+                        Axios("POST", "/api_web/api_product/searchItems?csrf_protection=true", {
+                            data: {
+                                type: ce.type.value
+                            }
+                        }, (err, response) => {
+                            if(!err){
+                                const {data} = response.data;
+                                ce.dataName = data?.items.map(item => ({label: item.name, value: item.id}))
+                            }
+                        })
+                    }
+                    if (ce.unit !== null) {
+                        Axios("POST", "/api_web/api_product/rowItem?csrf_protection=true", {
+                            data: {
+                                item_id: ce.name.value,
+                                type: ce.type.value
+                            }
+                        }, (err, response) => {
+                            if(!err){
+                                const {data} = response.data;
+                                ce.dataUnit = data?.units.map(e => ({label: e.unit, value: e.unitid}))
+                            }
+                        })
+                    }
+                });
+            });
+        }
+    }, [dataSelectedVariant]);
+
+    const _ServerSending = () => {
+        var formData = new FormData();
+
+        formData.append("product_id", props?.id)
+
+        dataSelectedVariant.forEach((item, i) => {
+            formData.append(`items[${i}][product_variation_option_value_id]`, item.value);
+            
+            item?.child.forEach((child, j) => {
+                formData.append(`items[${i}][child][${j}][type_item]`, child.type?.value);
+                formData.append(`items[${i}][child][${j}][item_id]`, child.name?.value);
+                formData.append(`items[${i}][child][${j}][unit_id]`, child.unit?.value);
+                formData.append(`items[${i}][child][${j}][quota]`, child.norm);
+                formData.append(`items[${i}][child][${j}][loss]`, child.loss);
+                formData.append(`items[${i}][child][${j}][stage_id]`, child.stage?.value || null);
+            })
+        })
+
+        Axios("POST", "/api_web/api_product/designBOM?csrf_protection=true", {
+            data: formData,
+            headers: {"Content-Type": "multipart/form-data"} 
+        }, (err, response) => {
+            if(!err){
+                var {isSuccess, message} = response.data;
+                if(isSuccess){
+                    Toast.fire({
+                        icon: 'success',
+                        title: props.dataLang[message]
+                    })
+                    props.setOpen(false)
+                }else{
+                    Toast.fire({
+                        icon: 'error',
+                        title: props.dataLang[message]
+                    })
+                }
+            }
+            sOnSending(false)
+        })
+    }
+
+    useEffect(() => {
+        onSending && _ServerSending()
+    }, [onSending]);
+
+    const _HandleSubmit = (e) => {
+        e.preventDefault();
+        const errNullType = dataSelectedVariant.map(item => item.child.some(itemChild => itemChild.type === null));
+        const errNullName = dataSelectedVariant.map(item => item.child.some(itemChild => itemChild.name === null));
+        if(errType || errName){
+            errNullType && sErrType(true);
+            errNullName && sErrName(true);
+            Toast.fire({
+                icon: 'error',
+                title: `${props.dataLang?.required_field_null}`
+            })
+        }else{
+            sErrType(false)
+            sErrName(false)
+            sOnSending(true)
+        }
+    }
+
+    useEffect(() => {
+        setTimeout(() => {
+            sLoadingData(false)
+        }, 2000);
+    }, [loadingData]);
+
     return(
         <PopupEdit   
             title={`Thiết kế BOM (${props.code} - ${props.name})`} 
-            button={"Thiết kế BOM"} 
+            button={props.type == "add" ? "Thiết kế BOM" : "Sửa"} 
             onClickOpen={_ToggleModal.bind(this, true)} 
             open={props.isOpen} 
             onClose={_ToggleModal.bind(this,false)}
             classNameBtn={props.className} 
         >
-            <div className="py-4 w-[900px] space-y-2">
-                <div className='flex justify-between items-end pb-2'>
-                    <div className='w-2/3'>
-                        <label className="text-[#344054] font-normal text-sm mb-1 ">{"Chọn biến thể"} <span className="text-red-500">*</span></label>
-                        <Select   
-                            closeMenuOnSelect={false}
-                            placeholder={"Biến thể"}
-                            options={options}
-                            isSearchable={true}
-                            onChange={_HandleChangeSelect.bind(this)}
-                            noOptionsMessage={() => "Không có dữ liệu"}
-                            value={valueVariant}
-                            maxMenuHeight="200px"
-                            isClearable={true} 
-                            isMulti
-                            menuPortalTarget={document.body}
-                            onMenuOpen={handleMenuOpen}
-                            components={{ MultiValue }}
-                            styles={{
-                                placeholder: (base) => ({
-                                ...base,
-                                color: "#cbd5e1",
-                            
-                                }),
-                                menuPortal: (base) => ({
-                                    ...base,
-                                    zIndex: 9999,
-                                    position: "absolute", 
-                                
-                                }), 
-                                control: (provided) => ({
-                                ...provided,
-                                border: '1px solid #d0d5dd', 
-                                "&:focus":{
-                                    outline:"none",
-                                    border:"none"
-                                }
-                                })
-                            }}
-                        />
-                    </div>
-                    <button onClick={_HandleApplyVariant.bind(this)} className='disabled:grayscale outline-none px-4 py-2 rounded-lg bg-[#E2F0FE] text-sm font-medium hover:scale-105 disabled:hover:scale-100 disabled:opacity-50 transition'>{props.dataLang?.apply || "apply"}</button>
-                </div>
-                {dataSelectedVariant?.length > 0 &&
-                    <div className='pb-2 flex space-x-3 items-center justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
-                        {dataSelectedVariant.map(e => 
-                            <button key={e.value} onClick={_HandleSelectTab.bind(this, e.value)} className={`${tab == e.value ? "text-[#0F4F9E] bg-[#0F4F9E10]" : "hover:text-[#0F4F9E] bg-slate-50/50" } outline-none min-w-fit pl-3 pr-10 py-1.5 rounded relative flex items-center`}>
-                                <span>{e.label}</span>
-                                <button type='button' onClick={_HandleDeleteBOM.bind(this, e.value)} className='text-red-500 absolute right-0 px-2'><IconDelete /></button>
-                            </button>
-                        )}
-                    </div>
-                }
-                <div className='space-y-1 -pt-5'>
-                    <div className="flex w-full items-center bg-slate-100 p-2 z-10">
-                        <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[5%] font-[400] text-center">{"Stt"}</h4>
-                        <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[37%] font-[400]">{"Tên thành phần BOM"}</h4>
-                        <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[11%] font-[400] text-center">{"Đơn vị"}</h4>
-                        <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[12%] font-[400] text-left">{"Định mức"}</h4>
-                        <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[12%] font-[400] text-left">{"% Hao hụt"}</h4>
-                        <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[23%] font-[400] text-left">{"Công đoạn sử dụng"}</h4>
-                        <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[10%] font-[400] text-center">{"Thao tác"}</h4>
-                    </div>
-                    <ScrollArea className="min-h-[0px] max-h-[550px] overflow-hidden" speed={1} smoothScrolling={true}>
-                        <div className='divide-y divide-slate-100'>
-                            {selectedList?.child.map((e, index) =>
-                                <div key={e.id} className='py-1 px-2 flex w-full hover:bg-slate-100 items-center'>
-                                    <h6 className='w-[5%] px-1 text-center'>{index + 1}</h6>
-                                    <div className='w-[37%] flex space-x-2 px-1'>
-                                        <Select 
-                                            options={dataTypeCd}
-                                            value={e.type}
-                                            onChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "type")}
-                                            isClearable={true}
-                                            placeholder={"Loại"}
-                                            noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
-                                            menuPortalTarget={document.body}
-                                            onMenuOpen={handleMenuOpen}
-                                            classNamePrefix="Select"
-                                            className={`Select__custom border-transparent placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `} 
-                                            theme={(theme) => ({
-                                                ...theme,
-                                                colors: {
-                                                    ...theme.colors,
-                                                    primary25: '#EBF5FF',
-                                                    primary50: '#92BFF7',
-                                                    primary: '#0F4F9E',
-                                                },
-                                            })}
-                                            styles={{
-                                                placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                                }),
-                                                menuPortal: (base) => ({
-                                                    ...base,
-                                                    zIndex: 9999,
-                                                    position: "absolute",
-                                                }),
-                                            }}
-                                        />
-                                        <Select 
-                                            options={e.type && dataOptType}
-                                            value={e.name}
-                                            onChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "name")}
-                                            isClearable={true}
-                                            placeholder={"Tên"}
-                                            noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
-                                            menuPortalTarget={document.body}
-                                            onMenuOpen={handleMenuOpen}
-                                            className={`border-transparent placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
-                                            theme={(theme) => ({
-                                                ...theme,
-                                                colors: {
-                                                    ...theme.colors,
-                                                    primary25: '#EBF5FF',
-                                                    primary50: '#92BFF7',
-                                                    primary: '#0F4F9E',
-                                                },
-                                            })}
-                                            styles={{
-                                                placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                                }),
-                                                menuPortal: (base) => ({
-                                                    ...base,
-                                                    zIndex: 9999,
-                                                    position: "absolute",
-                                                }),
-                                            }}
-                                        />
-                                    </div>
-                                    <h6 className="w-[11%] px-1 text-center">Đơn vị</h6>
-                                    <div className="w-[12%] px-1">
-                                        <NumericFormat value={e?.norm} onValueChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "norm")} thousandSeparator="," placeholder={"Định mức"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
-                                    </div>
-                                    <div className="w-[12%] px-1">
-                                        <NumericFormat isAllowed={(values) => { const {floatValue} = values; return floatValue >= 0 &&  floatValue <= 100; }} value={e?.loss} onValueChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "loss")} suffix="%" thousandSeparator="," placeholder={"% Hao hụt"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
-                                    </div>
-                                    <div className="w-[23%] px-1">
-                                        <Select 
-                                            // options={dataOptType}
-                                            // value={type}
-                                            // onChange={_HandleChangeInput.bind(this, "type")}
-                                            isClearable={true}
-                                            placeholder={"Công đoạn sử dụng"}
-                                            noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
-                                            menuPortalTarget={document.body}
-                                            onMenuOpen={handleMenuOpen}
-                                            className={`border-transparent placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`} 
-                                            theme={(theme) => ({
-                                                ...theme,
-                                                colors: {
-                                                    ...theme.colors,
-                                                    primary25: '#EBF5FF',
-                                                    primary50: '#92BFF7',
-                                                    primary: '#0F4F9E',
-                                                },
-                                            })}
-                                            styles={{
-                                                placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                                }),
-                                                menuPortal: (base) => ({
-                                                    ...base,
-                                                    zIndex: 9999,
-                                                    position: "absolute",
-                                                }),
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="w-[10%] px-1 text-center">
-                                        <button onClick={_HandleDeleteItemBOM.bind(this, selectedList?.value, e.id)} type='button' className='text-red-500'><IconDelete /></button>
-                                    </div>
-                                </div>
-                            )}
+            <div className="py-4 w-[1000px] space-y-2">
+                {onFetching ? 
+                    <Loading className="h-96"color="#0f4f9e" />
+                    :
+                    <>
+                        <div className='flex justify-between items-end pb-2'>
+                            <div className='w-2/3'>
+                                <label className="text-[#344054] font-normal text-sm mb-1 ">{"Chọn biến thể"} <span className="text-red-500">*</span></label>
+                                <Select   
+                                    closeMenuOnSelect={false}
+                                    placeholder={"Biến thể"}
+                                    options={options}
+                                    isSearchable={true}
+                                    onChange={_HandleChangeSelect.bind(this)}
+                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                    value={valueVariant}
+                                    maxMenuHeight="200px"
+                                    isClearable={true} 
+                                    isMulti
+                                    menuPortalTarget={document.body}
+                                    onMenuOpen={handleMenuOpen}
+                                    components={{ MultiValue }}
+                                    styles={{
+                                        placeholder: (base) => ({
+                                        ...base,
+                                        color: "#cbd5e1",
+                                    
+                                        }),
+                                        menuPortal: (base) => ({
+                                            ...base,
+                                            zIndex: 9999,
+                                            position: "absolute", 
+                                        
+                                        }), 
+                                        control: (provided) => ({
+                                        ...provided,
+                                        border: '1px solid #d0d5dd', 
+                                        "&:focus":{
+                                            outline:"none",
+                                            border:"none"
+                                        }
+                                        })
+                                    }}
+                                />
+                            </div>
+                            <button onClick={_HandleApplyVariant.bind(this)} disabled={valueVariant?.length > 0 ? false : true} className='disabled:grayscale outline-none px-4 py-2 rounded-lg bg-[#E2F0FE] text-sm font-medium hover:scale-105 disabled:hover:scale-100 disabled:opacity-50 transition'>{props.dataLang?.apply || "apply"}</button>
                         </div>
-                    </ScrollArea>
-                    {dataSelectedVariant?.length > 0 &&
-                        <button onClick={_HandleAddNew.bind(this, selectedList?.value)} type='button' title='Thêm' className={`hover:text-[#0F4F9E] hover:bg-[#e2f0fe] transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}><IconAdd />{"Thêm thiết kế BOM"}</button> 
-                    }
-                </div>
-                <div className="text-right mt-5 space-x-2">
-                    <button type='button' onClick={_ToggleModal.bind(this,false)} className="button text-[#344054]  font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
-                    >{props.dataLang?.branch_popup_exit}</button>
-                    <button type="submit" className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]">{props.dataLang?.branch_popup_save}</button>
-                </div>
+                        {dataSelectedVariant?.length > 0 &&
+                            <div className='pb-2 flex space-x-3 items-center justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+                                {dataSelectedVariant.map(e => 
+                                    <button key={e.value} onClick={_HandleSelectTab.bind(this, e.value)} className={`${tab == e.value ? "text-[#0F4F9E] bg-[#0F4F9E10]" : "hover:text-[#0F4F9E] bg-slate-50/50" } outline-none min-w-fit pl-3 pr-10 py-1.5 rounded relative flex items-center`}>
+                                        <span>{e.label}</span>
+                                        <button type='button' onClick={_HandleDeleteBOM.bind(this, e.value)} className='text-red-500 absolute right-0 px-2'><IconDelete /></button>
+                                    </button>
+                                )}
+                            </div>
+                        }
+                        <div className='space-y-1 -pt-5'>
+                            <div className="flex w-full items-center bg-slate-100 p-2 z-10">
+                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[5%] font-[400] text-center">{"Stt"}</h4>
+                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[37%] font-[400]">{"Tên thành phần BOM"}</h4>
+                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[15%] font-[400] text-center">{"Đơn vị"}</h4>
+                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[10%] font-[400] text-left">{"Định mức"}</h4>
+                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[10%] font-[400] text-left">{"% Hao hụt"}</h4>
+                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[23%] font-[400] text-left">{"Công đoạn sử dụng"}</h4>
+                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[10%] font-[400] text-center">{"Thao tác"}</h4>
+                            </div>
+                            <ScrollArea className="min-h-[0px] max-h-[550px] overflow-hidden" speed={1} smoothScrolling={true}>
+                                <div className='divide-y divide-slate-100'>
+                                    {loadingData ?
+                                        <Loading className="h-40"color="#0f4f9e" />
+                                        :
+                                        <>
+                                            {selectedList?.child?.map((e, index) =>
+                                                <div key={e.id} className='py-1 px-2 flex w-full hover:bg-slate-100 items-center'>
+                                                    <h6 className='w-[5%] px-1 text-center'>{index + 1}</h6>
+                                                    <div className='w-[37%] flex space-x-2 px-1 items-center'>
+                                                        <Select 
+                                                            options={dataTypeCd}
+                                                            value={e.type}
+                                                            onChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "type")}
+                                                            placeholder={"Loại"}
+                                                            noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                            menuPortalTarget={document.body}
+                                                            onMenuOpen={handleMenuOpen}
+                                                            classNamePrefix="Select"
+                                                            className={`${errType && e.type == null ? "border-red-500" : "border-transparent"} Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `} 
+                                                            theme={(theme) => ({
+                                                                ...theme,
+                                                                colors: {
+                                                                    ...theme.colors,
+                                                                    primary25: '#EBF5FF',
+                                                                    primary50: '#92BFF7',
+                                                                    primary: '#0F4F9E',
+                                                                },
+                                                            })}
+                                                            styles={{
+                                                                placeholder: (base) => ({
+                                                                ...base,
+                                                                color: "#cbd5e1",
+                                                                }),
+                                                                menuPortal: (base) => ({
+                                                                    ...base,
+                                                                    zIndex: 9999,
+                                                                    position: "absolute",
+                                                                }),
+                                                            }}
+                                                        />
+                                                        <Select 
+                                                            options={e.dataName}
+                                                            value={e.name}
+                                                            onChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "name")}
+                                                            placeholder={"Tên"}
+                                                            noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                            menuPortalTarget={document.body}
+                                                            onMenuOpen={handleMenuOpen}
+                                                            classNamePrefix="Select"
+                                                            className={`${errName && e.name == null ? "border-red-500" : "border-transparent"} Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `} 
+                                                            theme={(theme) => ({
+                                                                ...theme,
+                                                                colors: {
+                                                                    ...theme.colors,
+                                                                    primary25: '#EBF5FF',
+                                                                    primary50: '#92BFF7',
+                                                                    primary: '#0F4F9E',
+                                                                },
+                                                            })}
+                                                            styles={{
+                                                                placeholder: (base) => ({
+                                                                ...base,
+                                                                color: "#cbd5e1",
+                                                                }),
+                                                                menuPortal: (base) => ({
+                                                                    ...base,
+                                                                    zIndex: 9999,
+                                                                    position: "absolute",
+                                                                }),
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <Select 
+                                                        options={e.dataUnit}
+                                                        value={e.unit}
+                                                        onChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "unit")}
+                                                        placeholder={"Đơn vị"}
+                                                        noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                        menuPortalTarget={document.body}
+                                                        onMenuOpen={handleMenuOpen}
+                                                        classNamePrefix="Select"
+                                                        className={`${errName && e.name == null ? "border-red-500" : "border-transparent"} Select__custom placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] w-[15%]`} 
+                                                        theme={(theme) => ({
+                                                            ...theme,
+                                                            colors: {
+                                                                ...theme.colors,
+                                                                primary25: '#EBF5FF',
+                                                                primary50: '#92BFF7',
+                                                                primary: '#0F4F9E',
+                                                            },
+                                                        })}
+                                                        styles={{
+                                                            placeholder: (base) => ({
+                                                            ...base,
+                                                            color: "#cbd5e1",
+                                                            }),
+                                                            menuPortal: (base) => ({
+                                                                ...base,
+                                                                zIndex: 9999,
+                                                                position: "absolute",
+                                                            }),
+                                                        }}
+                                                    />
+                                                    <div className="w-[10%] px-1">
+                                                        <NumericFormat value={e?.norm} onValueChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "norm")} thousandSeparator="," placeholder={"Định mức"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                                    </div>
+                                                    <div className="w-[10%] px-1">
+                                                        <NumericFormat isAllowed={(values) => { const {floatValue} = values; return floatValue >= 0 &&  floatValue <= 100; }} value={e?.loss} onValueChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "loss")} suffix="%" thousandSeparator="," placeholder={"% Hao hụt"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                                    </div>
+                                                    <div className="w-[23%] px-1">
+                                                        <Select 
+                                                            options={dataCd}
+                                                            value={e.stage}
+                                                            onChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "stage")}
+                                                            placeholder={"Công đoạn sử dụng"}
+                                                            noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                            menuPortalTarget={document.body}
+                                                            onMenuOpen={handleMenuOpen}
+                                                            className={`border-transparent placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`} 
+                                                            theme={(theme) => ({
+                                                                ...theme,
+                                                                colors: {
+                                                                    ...theme.colors,
+                                                                    primary25: '#EBF5FF',
+                                                                    primary50: '#92BFF7',
+                                                                    primary: '#0F4F9E',
+                                                                },
+                                                            })}
+                                                            styles={{
+                                                                placeholder: (base) => ({
+                                                                ...base,
+                                                                color: "#cbd5e1",
+                                                                }),
+                                                                menuPortal: (base) => ({
+                                                                    ...base,
+                                                                    zIndex: 9999,
+                                                                    position: "absolute",
+                                                                }),
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div className="w-[10%] px-1 text-center">
+                                                        <button onClick={_HandleDeleteItemBOM.bind(this, selectedList?.value, e.id)} type='button' className='text-red-500'><IconDelete /></button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    }
+                                </div>
+                            </ScrollArea>
+                            {dataSelectedVariant?.length > 0 &&
+                                <button onClick={_HandleAddNew.bind(this, selectedList?.value)} type='button' title='Thêm' className={`hover:text-[#0F4F9E] hover:bg-[#e2f0fe] transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}><IconAdd />{"Thêm thiết kế BOM"}</button> 
+                            }
+                        </div>
+                        <div className="text-right mt-5 space-x-2">
+                            <button type='button' onClick={_ToggleModal.bind(this,false)} className="button text-[#344054]  font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
+                            >{props.dataLang?.branch_popup_exit}</button>
+                            <button type="submit" onClick={_HandleSubmit.bind(this)} className="button text-[#FFFFFF] font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]">{props.dataLang?.branch_popup_save}</button>
+                        </div>
+                    </>
+                }
           </div>    
         </PopupEdit>
     )

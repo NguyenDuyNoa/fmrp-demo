@@ -776,7 +776,7 @@ const Popup_dsncc = (props) => {
               }else{
                 Toast.fire({
                   icon: 'error',
-                  title: `${props.dataLang[message] +" "+branch_name} `
+                  title: `${props.dataLang[message]}`
                 })
               }
           }
