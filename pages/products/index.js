@@ -525,7 +525,7 @@ const Index = (props) => {
                                                     )}
                                                 </div>
                                                 <div className='pl-2 py-2.5 w-[7%] flex space-x-2 justify-center'>
-                                                    <BtnTacVu dataProductExpiry={dataProductExpiry} dataLang={dataLang} id={e.id} name={e.name} code={e.code} variant={Number(e?.variation_count)} bom={Number(e?.ct_versions)} stage={Number(e?.ct_versions_stage)} onRefresh={_ServerFetching.bind(this)} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
+                                                    <BtnTacVu dataProductExpiry={dataProductExpiry} dataLang={dataLang} id={e.id} name={e.name} code={e.code} bom={Number(e?.ct_versions)} stage={Number(e?.ct_versions_stage)} onRefresh={_ServerFetching.bind(this)} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
                                                 </div>
                                             </div>
                                         )}
@@ -609,17 +609,14 @@ const BtnTacVu = React.memo((props) => {
                 <div className="w-auto rounded">
                     <div className="bg-white rounded-t flex flex-col overflow-hidden">
                         {props.stage == 0 ?
-                            <Popup_GiaiDoan setOpen={sOpen} isOpen={open} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
+                            <Popup_GiaiDoan onRefresh={props.onRefresh} setOpen={sOpen} isOpen={open} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
                             :
                             <button disabled className='disabled:opacity-30 text-sm hover:bg-slate-50 text-left disabled:cursor-auto cursor-pointer px-5 rounded py-2.5 w-full'>Thiết kế công đoạn</button>
                         }
-                        {props.variant == 0 ?
-                            props.bom != 0 && <button disabled className='disabled:opacity-30 text-sm hover:bg-slate-50 text-left disabled:cursor-auto cursor-pointer px-5 rounded py-2.5 w-full'>Thiết kế BOM</button>
+                        {props.bom == 0 ?
+                            <Popup_Bom onRefresh={props.onRefresh} setOpen={sOpenBom} isOpen={openBom} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
                             :
-                            (props.variant > props.bom) ? 
-                                <Popup_Bom setOpen={sOpenBom} isOpen={openBom} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
-                                :
-                                <button disabled className='disabled:opacity-30 text-sm hover:bg-slate-50 text-left disabled:cursor-auto cursor-pointer px-5 rounded py-2.5 w-full'>Thiết kế BOM</button>
+                            <button disabled className='disabled:opacity-30 text-sm hover:bg-slate-50 text-left disabled:cursor-auto cursor-pointer px-5 rounded py-2.5 w-full'>Thiết kế BOM</button>
                         }
                         <Popup_ThanhPham onRefresh={props.onRefresh} dataProductExpiry={props.dataProductExpiry} dataLang={props.dataLang} id={props?.id} setOpen={sOpenDetail} isOpen={openDetail} className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full" />
                         <button onClick={_HandleDelete.bind(this, props.id)} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Xoá</button>
@@ -1632,6 +1629,10 @@ const Popup_ThongTin = React.memo((props) => {
     }, [openStage == false]);
 
     useEffect(() => {
+        open && openBom == false && sOnFetchingBom(true)
+    }, [openBom == false]);
+
+    useEffect(() => {
         open && tabBom && sSelectedListBom(dataBom.find(item => item.product_variation_option_value_id === tabBom))
     }, [tabBom]);
 
@@ -1785,7 +1786,7 @@ const Popup_ThongTin = React.memo((props) => {
                         }
                         {tab === 2 &&
                             <>
-                                {onFetchingStage ?
+                                {onFetchingBom ?
                                     <Loading className="h-96"color="#0f4f9e" />
                                     :
                                     <>
@@ -1961,6 +1962,7 @@ const Popup_GiaiDoan = React.memo((props) => {
                         title: props.dataLang[message]
                     })
                     props.setOpen(false)
+                    props.onRefresh && props.onRefresh()
                 }else {
                     Toast.fire({
                         icon: 'error',
@@ -2433,6 +2435,7 @@ const Popup_Bom = React.memo((props) => {
                         title: props.dataLang[message]
                     })
                     props.setOpen(false)
+                    props.onRefresh && props.onRefresh()
                 }else{
                     Toast.fire({
                         icon: 'error',
