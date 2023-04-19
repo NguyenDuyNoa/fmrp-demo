@@ -31,11 +31,11 @@ const Dropdown = (props) => {
                                             <Link title={ce.title} href={ce.link} className="flex items-center space-x-2 mb-2 px-3 py-2 rounded hover:bg-[#ececee87] text-[#344054]">
                                                 {ce?.img ?
                                                     <React.Fragment>
-                                                        <Image alt={ce.title} src={ce?.img} width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                                        <Image alt={ce.title} src={ce?.img} width={24} height={24} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                                         <h5 className="uppercase text-[14px]">{ce.title}</h5>
                                                     </React.Fragment>
                                                     :
-                                                    <li className="text-[14px] text-[#344054] marker:text-[#9295A4]">
+                                                    <li className="text-[14px] text-[#344054] marker:text-[#9295A4] outline-none">
                                                         {ce.title}
                                                     </li>
                                                 }
@@ -44,7 +44,7 @@ const Dropdown = (props) => {
                                             <React.Fragment>
                                                 {ce.title &&
                                                     <div className="flex items-center space-x-2 mb-2 px-3">
-                                                        <Image alt={ce.title} src={ce?.img} width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                                        <Image alt={ce.title} src={ce?.img} width={24} height={24} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                                         <h5 className="uppercase text-[#141522] text-[14px]">{ce.title}</h5>
                                                     </div>
                                                 }
