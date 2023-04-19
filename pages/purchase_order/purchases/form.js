@@ -348,10 +348,11 @@ const Index = (props) => {
                             placeholder={dataLang?.client_list_filterbrand} 
                             hideSelectedOptions={false}
                             isClearable={true}
-                            className={`${errBranch ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
+                            className={`${errBranch ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
                             // components={{ MultiValue }}
+                            menuPortalTarget={document.body}
                             closeMenuOnSelect={true}
                             style={{ border: "none", boxShadow: "none", outline: "none" }}
                             theme={(theme) => ({
@@ -368,6 +369,10 @@ const Index = (props) => {
                               ...base,
                               color: "#cbd5e1",
                               }),
+                              menuPortal: (base) => ({
+                                ...base,
+                                zIndex: 9999
+                              }), 
                               control: (base,state) => ({
                                 ...base,
                                 // border: 'none',
