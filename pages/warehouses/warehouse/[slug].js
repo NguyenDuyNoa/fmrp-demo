@@ -47,12 +47,22 @@ const Index = (props) => {
   const [dataProductSerial, sDataProductSerial] = useState({});
 
 
+  const [location, sListLocation] = useState([])
+  const [idLocation, sIdLocation] = useState(null);
+  const [variant, sListVariant] = useState([])
+  const [idVariantMain, sIdVariantMain] = useState(null);
+  const [idVariantSub, sIdVariantSub] = useState(null);
+
+
   const _ServerFetching =  () =>{
     Axios("GET", `/api_web/api_warehouse/warehouse_detail/${id}?csrf_protection=true`, {
       params: {
         search: keySearch,
         limit: limit,
         page: router.query?.page || 1,
+        "filter[location_id]": idLocation?.value ? idLocation?.value : null,
+        "filter[variation_option_id_1]":idVariantMain?.value ? idVariantMain?.value : null,
+        "filter[variation_option_id_2]":idVariantSub?.value ? idVariantSub?.value : null,
       }
     }, (err, response) => {
       if(!err){
@@ -78,13 +88,46 @@ const Index = (props) => {
       }
     })
   }
+
+
+  const _ServerFetching_localtion =  () =>{
+    Axios("GET", `/api_web/api_warehouse/location/?csrf_protection=true&filter[warehouse_id]=${id}`, {
+  }, (err, response) => {
+    if(!err){
+        var {rResult} =  response.data
+        sListLocation(rResult.map(e => ({label: e.name, value:e.id})))
+    }
+    sOnFetching(false)
+  })
+  }
+  const _ServerFetching_Variation =  () =>{
+    Axios("GET", `/api_web/Api_variation/variation?csrf_protection=true`, {
+  }, (err, response) => {
+    if(!err){
+      const { rResult } = response.data ?? {};
+      const options = rResult?.flatMap(({ option }) => option) ?? [];
+      sListVariant(options?.map(({ id, name }) => ({ label: name, value: id })));
+    }
+    sOnFetching(false)
+  })
+  }
+
+  const onchang_filter = (type, value) => {
+    if(type == "location"){
+      sIdLocation(value)
+    }else if(type == "MainVariation"){
+      sIdVariantMain(value)
+    }else if(type == "SubVariation"){
+      sIdVariantSub(value)
+    }
+  }
+
   useEffect(() => {
-   id && onFetching && _ServerFetching() 
+  onFetching && _ServerFetching()   || onFetching && _ServerFetching_localtion() || onFetching && _ServerFetching_Variation()
   }, [onFetching])
-  
   useEffect(() => {
-    sOnFetching(true) || (keySearch && sOnFetching(true))
-  }, [limit,router.query?.page])
+    sOnFetching(true) || (keySearch && sOnFetching(true))  || (idLocation?.length > 0 && sOnFetching(true)) || (idVariantMain?.length > 0 && sOnFetching(true))  || (idVariantSub?.length > 0 && sOnFetching(true)) 
+  }, [limit,router.query?.page,idLocation,idVariantMain,idVariantSub])
 
   const paginate = pageNumber => {
     router.push({
@@ -143,9 +186,9 @@ const newResult = data_ex.map(item => {
                 {value: `${e?.detail.location_name ? e?.detail.location_name : ""}`},
                 {value: `${e?.detail.option_name_1 ? e?.detail.option_name_1 : ""}`},
                 {value: `${e?.detail.option_name_2 ? e?.detail.option_name_2 : ""}`},
-                {value: `${e?.detail.serial != null ? e?.detail.serial : ""}`},
-                {value: `${e?.detail.lot != null ? e?.detail.lot : ""}`},
-                {value: `${e?.detail.expiration_date != null ? e?.detail.expiration_date : ""}`},
+                {value: `${dataProductSerial.is_enable === "1" ? (e?.detail.serial != null ? e?.detail.serial : ""):""}`},
+                {value: `${dataMaterialExpiry.is_enable === "1" ? (e?.detail.lot != null ? e?.detail.lot : ""):""}`},
+                {value: `${dataProductExpiry.is_enable === "1" ? (e?.detail.expiration_date != null ? e?.detail.expiration_date : ""):""}`},
                 {value: `${e?.detail.quantity != null ? e?.detail.quantity : ""}`},
                 {value: `${e?.detail.amount != null ? e?.detail.amount : ""}`},
             ]
@@ -182,7 +225,7 @@ const newResult = data_ex.map(item => {
                 <div className="xl:space-y-3 space-y-2">
                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
                     <div className='flex gap-2'>
-                          <form className="flex items-center relative">
+                          <form className="flex items-center relative w-[18vw]">
                             <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
                             <input
                                 className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-1.5 rounded-md w-[400px]"
@@ -190,7 +233,134 @@ const newResult = data_ex.map(item => {
                                 onChange={_HandleOnChangeKeySearch.bind(this)} 
                                 placeholder={dataLang?.branch_search}
                             />
-                          </form>                      
+                          </form> 
+                          <div className='ml-1 w-[18vw]'>
+                              {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand}</h6> */}
+                              <Select 
+                                  // options={options}
+                                  options={[{ value: '', label: dataLang?.warehouses_detail_filterWare || "warehouses_detail_filterWare", isDisabled: true }, ...location]}
+                                  onChange={onchang_filter.bind(this, "location")}
+                                  value={idLocation}
+                                  hideSelectedOptions={false}
+                                  isClearable={true}
+                                  placeholder={dataLang?.warehouses_detail_filterWare || "warehouses_detail_filterWare"} 
+                                  className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
+                                  isSearchable={true}
+                                  noOptionsMessage={() => "Không có dữ liệu"}
+                                  components={{ MultiValue }}
+                                  // closeMenuOnSelect={false}
+                                  style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                  theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                          ...theme.colors,
+                                          primary25: '#EBF5FF',
+                                          primary50: '#92BFF7',
+                                          primary: '#0F4F9E',
+                                      },
+                                  })}
+                                  styles={{
+                                    placeholder: (base) => ({
+                                    ...base,
+                                    color: "#cbd5e1",
+                                    }),
+                                    control: (base,state) => ({
+                                      ...base,
+                                      border: 'none',
+                                      outline: 'none',
+                                      boxShadow: 'none',
+                                    ...(state.isFocused && {
+                                      boxShadow: '0 0 0 1.5px #0F4F9E',
+                                    }),
+                                  })
+                                }}
+                                />
+                          </div>
+                          <div className='ml-1 w-[18vw]'>
+                              {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand}</h6> */}
+                              <Select 
+                                  // options={options}
+                                  options={[{ value: '', label: dataLang?.warehouses_detail_filterMain || "warehouses_detail_filterMain", isDisabled: true }, ...variant]}
+                                  onChange={onchang_filter.bind(this, "MainVariation")}
+                                  value={idVariantMain}
+                                  hideSelectedOptions={false}
+                                  isClearable={true}
+                                  placeholder={dataLang?.warehouses_detail_filterMain || "warehouses_detail_filterMain"} 
+                                  className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
+                                  isSearchable={true}
+                                  noOptionsMessage={() => "Không có dữ liệu"}
+                                  components={{ MultiValue }}
+                                  // closeMenuOnSelect={false}
+                                  style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                  theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                          ...theme.colors,
+                                          primary25: '#EBF5FF',
+                                          primary50: '#92BFF7',
+                                          primary: '#0F4F9E',
+                                      },
+                                  })}
+                                  styles={{
+                                    placeholder: (base) => ({
+                                    ...base,
+                                    color: "#cbd5e1",
+                                    }),
+                                    control: (base,state) => ({
+                                      ...base,
+                                      border: 'none',
+                                      outline: 'none',
+                                      boxShadow: 'none',
+                                    ...(state.isFocused && {
+                                      boxShadow: '0 0 0 1.5px #0F4F9E',
+                                    }),
+                                  })
+                                }}
+                                />
+                          </div> 
+                          <div className='ml-1 w-[18vw]'>
+                              {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand}</h6> */}
+                              <Select 
+                                  // options={options}
+                                  options={[{ value: '', label: dataLang?.warehouses_detail_filterSub ||"warehouses_detail_filterSub", isDisabled: true }, ...variant]}
+                                  onChange={onchang_filter.bind(this, "SubVariation")}
+                                  value={idVariantSub}
+                                  hideSelectedOptions={false}
+                                  isClearable={true}
+                                  placeholder={dataLang?.warehouses_detail_filterSub || "warehouses_detail_filterSub"} 
+                                  className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
+                                  isSearchable={true}
+                                  noOptionsMessage={() => "Không có dữ liệu"}
+                                  components={{ MultiValue }}
+                                  closeMenuOnSelect={false}
+                                  style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                  theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                          ...theme.colors,
+                                          primary25: '#EBF5FF',
+                                          primary50: '#92BFF7',
+                                          primary: '#0F4F9E',
+                                      },
+                                  })}
+                                  styles={{
+                                    placeholder: (base) => ({
+                                    ...base,
+                                    color: "#cbd5e1",
+                                    }),
+                                    control: (base,state) => ({
+                                      ...base,
+                                      border: 'none',
+                                      outline: 'none',
+                                      boxShadow: 'none',
+                                    ...(state.isFocused && {
+                                      boxShadow: '0 0 0 1.5px #0F4F9E',
+                                    }),
+                                  })
+                                }}
+                                />
+                          </div>                         
+                                                 
                         </div>
                         <div className="flex space-x-2 items-center">
                             {

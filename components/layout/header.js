@@ -128,7 +128,7 @@ const Header = () => {
                     title: "Mua hàng",
                     img: "/icon/header/muanhap/mua.png",
                     items: [
-                        {name: "Yêu cầu mua hàng"},
+                        {name: "Yêu cầu mua hàng", link:'/purchase_order/purchases'},
                         {name: "Đơn đặt hàng", link: '/purchase_order'},
                         {name: "Phiếu dịch vụ"}
                     ]
@@ -139,7 +139,7 @@ const Header = () => {
             sub: [
                 {
                     title: "Nhập hàng & trả hàng",
-                    img: "/icon/header/muanhap/nhap.png",
+                    img: "/icon/header/kho/Vector-9.png",
                     items: [
                         {name: "Nhập hàng"},
                         {name: "Trả hàng"}
@@ -202,10 +202,6 @@ const Header = () => {
                     title: "Kiểm kê kho",
                     img: "/icon/header/kho/kk.png",
                     link: "#"
-                },{
-                    title: "Điều chỉnh kho",
-                    img: "/icon/header/kho/kho.png",
-                    link: "#"
                 }
 
             ]
@@ -214,7 +210,7 @@ const Header = () => {
             sub: [
                 {
                     title: "Kế hoạch nội bộ",
-                    img: "/icon/header/banxuat/kh.png",
+                    img: "/icon/header/kho/kehoach.png",
                     link: "#"
                 },{
                     title: "Kế hoạch sản xuất",
