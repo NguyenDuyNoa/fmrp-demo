@@ -1796,7 +1796,7 @@ const Popup_ThongTin = React.memo((props) => {
                                                 <div className='pb-3 flex space-x-3 items-center justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
                                                     {dataBom?.map(e => 
                                                         <button key={e.product_variation_option_value_id.toString()} onClick={_HandleSelectTabBom.bind(this, e.product_variation_option_value_id)} className={`${tabBom === e.product_variation_option_value_id ? "text-[#0F4F9E] bg-[#0F4F9E10]" : "hover:text-[#0F4F9E] bg-slate-50/50" } outline-none min-w-fit px-3 py-1.5 rounded relative flex items-center`}>
-                                                            <span>{e.name_variation}</span>
+                                                            <span>{e.name_variation?.includes("NONE") ? "Mặc định" : e.name_variation}</span>
                                                         </button>
                                                     )}
                                                 </div>
@@ -2229,7 +2229,7 @@ const Popup_Bom = React.memo((props) => {
         Axios("GET", `/api_web/api_product/productVariationOption/${props.id}?csrf_protection=true`, {}, (err,response) => {
             if(!err){
                 var {rResult} = response.data;
-                sDataVariant(rResult[0]?.product_variation.includes("NONE") ? [{label: "Mặc định", value: rResult[0]?.id, child: []}] : rResult.map(e => ({label: e.product_variation, value: e.id, child: []})))
+                sDataVariant(rResult[0]?.product_variation?.includes("NONE") ? [{label: "Mặc định", value: rResult[0]?.id, child: []}] : rResult.map(e => ({label: e.product_variation, value: e.id, child: []})))
             }
         })
         sOnFetchingCd(false)
@@ -2537,7 +2537,7 @@ const Popup_Bom = React.memo((props) => {
                             <div className='pb-2 flex space-x-3 items-center justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
                                 {dataSelectedVariant.map(e => 
                                     <button key={e.value} onClick={_HandleSelectTab.bind(this, e.value)} className={`${tab == e.value ? "text-[#0F4F9E] bg-[#0F4F9E10]" : "hover:text-[#0F4F9E] bg-slate-50/50" } outline-none min-w-fit pl-3 pr-10 py-1.5 rounded relative flex items-center`}>
-                                        <span>{e.label}</span>
+                                        <span>{e.label?.includes("NONE") ? "Mặc định" : e.label}</span>
                                         <button type='button' onClick={_HandleDeleteBOM.bind(this, e.value)} className='text-red-500 absolute right-0 px-2'><IconDelete /></button>
                                     </button>
                                 )}
