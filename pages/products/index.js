@@ -247,15 +247,15 @@ const Index = (props) => {
         {
             columns: [
                 {title: "ID", width: {wch: 4}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                {title: `Danh mục `, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                {title: `Mã thành phẩm`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                {title: `Tên thành phẩm`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                {title: `Loại thành phẩm`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                {title: `Đơn vị`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                {title: `Biến thể`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                {title: `Tồn kho`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                {title: `Ghi chú`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                {title: `Chi nhánh`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.category_titel} `, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.code_finishedProduct}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.name_finishedProduct}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.type_finishedProduct}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.unit}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.category_material_list_variant}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.stock}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.note}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.client_list_brand}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
             ],
             data: dataExcel?.map((e) =>
                 [
@@ -277,7 +277,7 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>Danh sách thành phẩm</title>
+                <title>{dataLang?.header_category_finishedProduct_list}</title>
             </Head>
             <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between'>
                 <div className='h-[97%] space-y-3 overflow-hidden'>
@@ -286,19 +286,19 @@ const Index = (props) => {
                         <span className='text-[#141522]/40'>/</span>
                         <h6 className='text-[#141522]/40'>{dataLang?.header_category_material}</h6>
                         <span className='text-[#141522]/40'>/</span>
-                        <h6>Danh sách thành phẩm</h6>
+                        <h6>{dataLang?.header_category_finishedProduct_list}</h6>
                     </div>
                     <div className='flex justify-between items-center'>
-                        <h2 className='xl:text-3xl text-xl font-medium '>Danh Sách Thành Phẩm</h2>
+                        <h2 className='xl:text-3xl text-xl font-medium '>{dataLang?.list_finishedProduct_title}</h2>
                         <div className='flex space-x-3 items-center'>
                             <Popup_ThanhPham onRefresh={_ServerFetching.bind(this)} dataProductExpiry={dataProductExpiry} dataLang={dataLang} setOpen={sOpenDetail} isOpen={openDetail} className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105 outline-none' />
                         </div>
                     </div>
                     <div className='flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
-                        <button onClick={_HandleSelectTab.bind(this, "all")} className={`${router.query?.tab === "all" ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "} 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}>Tất cả</button>
-                        <button onClick={_HandleSelectTab.bind(this, "products")} className={`${router.query?.tab === "products" ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "} 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}>Thành phẩm</button>
-                        <button onClick={_HandleSelectTab.bind(this, "semi_products")} className={`${router.query?.tab === "semi_products" ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "} 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}>Bán thành phẩm (SX)</button>
-                        <button onClick={_HandleSelectTab.bind(this, "semi_products_outside")} className={`${router.query?.tab === "semi_products_outside" ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "} 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}>Bán thành phẩm (MN)</button>
+                        <button onClick={_HandleSelectTab.bind(this, "all")} className={`${router.query?.tab === "all" ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "} 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}>{props.dataLang?.all_group}</button>
+                        <button onClick={_HandleSelectTab.bind(this, "products")} className={`${router.query?.tab === "products" ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "} 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}>{dataLang?.product}</button>
+                        <button onClick={_HandleSelectTab.bind(this, "semi_products")} className={`${router.query?.tab === "semi_products" ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "} 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}>{dataLang?.catagory_finishedProduct_type_semi_products}</button>
+                        <button onClick={_HandleSelectTab.bind(this, "semi_products_outside")} className={`${router.query?.tab === "semi_products_outside" ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "} 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}>{dataLang?.catagory_finishedProduct_type_semi_products_outside}</button>
                     </div>
                     <div className='bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2'>
                         <div className='flex gap-2'>
@@ -313,7 +313,7 @@ const Index = (props) => {
                             </form>
                             <div className='w-[17vw]'>
                                 <Select 
-                                    options={[{ value: '', label: 'Chọn chi nhánh', isDisabled: true }, ...options]}
+                                    options={[{ value: '', label: `${dataLang?.client_list_brand}`, isDisabled: true }, ...options]}
                                     onChange={_HandleFilterOpt.bind(this, "branch")}
                                     value={idBranch}
                                     isClearable={true}
@@ -353,7 +353,7 @@ const Index = (props) => {
                             </div>
                             <div className='w-[17vw]'>
                                 <Select 
-                                    options={[{ value: '', label: 'Chọn tên danh mục', isDisabled: true }, ...dataCategory]}
+                                    options={[{ value: '', label: `${dataLang?.category_titel}`, isDisabled: true }, ...dataCategory]}
                                     formatOptionLabel={CustomSelectOption}
                                     onChange={_HandleFilterOpt.bind(this, "category")}
                                     value={valueCategory}
@@ -391,7 +391,7 @@ const Index = (props) => {
                             </div>
                             <div className='w-[17vw]'>
                                 <Select 
-                                    options={[{ value: '', label: 'Chọn thành phẩm', isDisabled: true }, ...dataFinishedPro]}
+                                    options={[{ value: '', label: `${dataLang?.product}`, isDisabled: true }, ...dataFinishedPro]}
                                     onChange={_HandleFilterOpt.bind(this, "finishedPro")}
                                     value={valueFinishedPro}
                                     noOptionsMessage={() => `${dataLang?.no_data_found}`}
@@ -399,7 +399,7 @@ const Index = (props) => {
                                     isMulti
                                     closeMenuOnSelect={false}
                                     hideSelectedOptions={false}
-                                    placeholder={"Thành phẩm"}
+                                    placeholder={dataLang?.product}
                                     className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
                                     isSearchable={true}
                                     components={{ MultiValue }}
@@ -433,13 +433,13 @@ const Index = (props) => {
                         </div>
                         {data.length != 0 &&
                             <div className='flex space-x-6'>
-                                <ExcelFile filename="Thành phẩm" element={
+                                <ExcelFile filename={dataLang?.product} element={
                                     <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
                                         <IconExcel size={18} />
                                         <span>{dataLang?.client_list_exportexcel}</span>
                                     </button>
                                 }>
-                                    <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Thành phẩm" />
+                                    <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name={dataLang?.product} />
                                 </ExcelFile>
 
                                 <div className="flex space-x-2 items-center">
@@ -460,15 +460,15 @@ const Index = (props) => {
                         <div className='pr-2'>
                             <div className='flex items-center sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]'>
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[5%] font-[300] text-center'>{dataLang?.image || "image"}</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[7%] font-[300]'>Danh mục</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300]'>Mã thành phẩm</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300]'>Tên thành phẩm</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300]'>Loại thành phẩm</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[7%] font-[300]'>{dataLang?.category_titel}</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300]'>{dataLang?.code_finishedProduct}</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300]'>{dataLang?.name_finishedProduct}</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300]'>{dataLang?.type_finishedProduct}</h4>
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[5%] font-[300] text-center'>{dataLang?.unit || "unit"}</h4>
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[6%] font-[300] text-center'>{dataLang?.category_material_list_variant || "category_material_list_variant"}</h4>
                                 <h4 className='2xl:text-[13px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[6%] font-[300] text-center'>{dataLang?.stock || "stock"}</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[9%] font-[300] text-center'>Định mức BOM</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center'>Công đoạn sản xuất</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[9%] font-[300] text-center'>{dataLang?.bom_finishedProduct}</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center'>{dataLang?.settings_category_stages_title || "settings_category_stages_title"}</h4>
                                 <h4 className='2xl:text-[13px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[7%] font-[300]'>{dataLang?.note || "note"}</h4>
                                 <h4 className='2xl:text-[13px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[8%] font-[300]'>{dataLang?.client_list_brand || "client_list_brand"}</h4>
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase w-[7%] font-[300] text-center'>{dataLang?.branch_popup_properties || "branch_popup_properties"}</h4>
@@ -505,7 +505,7 @@ const Index = (props) => {
                                                 </div>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[10%]'>{e?.name}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[13px] text-xs w-[10%]'>
-                                                    <span className={`xl:py-[1px] xl:px-1.5 px-0.5 rounded border h-fit font-[300] break-words ${(e?.type_products?.id === 0 && "text-lime-500 border-lime-500") || (e?.type_products?.id === 1 && "text-orange-500 border-orange-500") || (e?.type_products?.id === 2 && "text-sky-500 border-sky-500")}`}>{dataLang[e?.type_products?.name] || ""}</span>
+                                                    <span className={`xl:py-[1px] xl:px-1.5 px-0.5 rounded border h-fit font-[300] break-words leading-relaxed ${(e?.type_products?.id === 0 && "text-lime-500 border-lime-500") || (e?.type_products?.id === 1 && "text-orange-500 border-orange-500") || (e?.type_products?.id === 2 && "text-sky-500 border-sky-500")}`}>{dataLang[e?.type_products?.name] || ""}</span>
                                                 </h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[5%] text-center'>{e?.unit}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs w-[6%] text-center'>{Number(e?.variation_count)}</h6>
@@ -611,12 +611,12 @@ const BtnTacVu = React.memo((props) => {
                         {props.stage == 0 ?
                             <Popup_GiaiDoan onRefresh={props.onRefresh} setOpen={sOpen} isOpen={open} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
                             :
-                            <button disabled className='disabled:opacity-30 text-sm hover:bg-slate-50 text-left disabled:cursor-auto cursor-pointer px-5 rounded py-2.5 w-full'>Thiết kế công đoạn</button>
+                            <button disabled className='disabled:opacity-30 text-sm hover:bg-slate-50 text-left disabled:cursor-auto cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.stage_design_finishedProduct}</button>
                         }
                         {props.bom == 0 ?
                             <Popup_Bom onRefresh={props.onRefresh} setOpen={sOpenBom} isOpen={openBom} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
                             :
-                            <button disabled className='disabled:opacity-30 text-sm hover:bg-slate-50 text-left disabled:cursor-auto cursor-pointer px-5 rounded py-2.5 w-full'>Thiết kế BOM</button>
+                            <button disabled className='disabled:opacity-30 text-sm hover:bg-slate-50 text-left disabled:cursor-auto cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.bom_design_finishedProduct}</button>
                         }
                         <Popup_ThanhPham onRefresh={props.onRefresh} dataProductExpiry={props.dataProductExpiry} dataLang={props.dataLang} id={props?.id} setOpen={sOpenDetail} isOpen={openDetail} className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full" />
                         <button onClick={_HandleDelete.bind(this, props.id)} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Xoá</button>
@@ -1088,8 +1088,8 @@ const Popup_ThanhPham = React.memo((props) => {
 
     return(
         <PopupEdit  
-            title={props?.id ? `Sửa thành phẩm` : `Tạo mới thành phẩm`} 
-            button={props?.id ? "Sửa" : `${props.dataLang?.branch_popup_create_new}`} 
+            title={props?.id ? `${props.dataLang?.edit_finishedProduct || "edit_finishedProduct"}` : `${props.dataLang?.addNew_finishedProduct || "addNew_finishedProduct"}`} 
+            button={props?.id ? `${props.dataLang?.edit || "edit"}` : `${props.dataLang?.branch_popup_create_new}`} 
             onClickOpen={_ToggleModal.bind(this, true)} 
             open={props.isOpen} 
             onClose={_ToggleModal.bind(this,false)}
@@ -1146,7 +1146,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                             {errBranch && branch?.length == 0 && <label className="text-sm text-red-500">{props.dataLang?.client_list_bran || "client_list_bran"}</label>}
                                         </div>
                                         <div className='2xl:space-y-1'>
-                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Danh mục <span className='text-red-500'>*</span></label>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.category_titel} <span className='text-red-500'>*</span></label>
                                             <Select 
                                                 options={dataCategory}
                                                 formatOptionLabel={CustomSelectOption}
@@ -1154,7 +1154,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 onChange={_HandleChangeInput.bind(this, "category")}
                                                 isClearable={true}
                                                 noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
-                                                placeholder={"Danh mục"}
+                                                placeholder={props.dataLang?.category_titel}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
                                                 className={`${errGroup && category?.value == null ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
@@ -1179,17 +1179,17 @@ const Popup_ThanhPham = React.memo((props) => {
                                                     }),
                                                 }}
                                             />
-                                            {errGroup && category?.value == null && <label className="text-sm text-red-500">Vui lòng chọn danh mục</label>}
+                                            {errGroup && category?.value == null && <label className="text-sm text-red-500">{props.dataLang?.category_material_group_err_name}</label>}
                                         </div>
                                         <div className='2xl:space-y-1'>
-                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Mã thành phẩm {props?.id && <span className='text-red-500'>*</span>}</label>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.code_finishedProduct} {props?.id && <span className='text-red-500'>*</span>}</label>
                                             <input value={code} onChange={_HandleChangeInput.bind(this, "code")} type="text" placeholder={props.dataLang?.client_popup_sytem} className={`${errCode && code == "" ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
-                                            {errCode && code == "" && <label className="text-sm text-red-500">Vui lòng nhập mã thành phẩm</label>}
+                                            {errCode && code == "" && <label className="text-sm text-red-500">{props.dataLang?.please_fill_code_finishedProduct}</label>}
                                         </div>
                                         <div className='2xl:space-y-1'>
-                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Tên thành phẩm <span className='text-red-500'>*</span></label>
-                                            <input value={name} onChange={_HandleChangeInput.bind(this, "name")} type="text" placeholder="Tên thành phẩm" className={`${errName && name == "" ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
-                                            {errName && name == "" && <label className="text-sm text-red-500">Vui lòng nhập tên thành phẩm</label>}
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.name_finishedProduct} <span className='text-red-500'>*</span></label>
+                                            <input value={name} onChange={_HandleChangeInput.bind(this, "name")} type="text" placeholder={props.dataLang?.name_finishedProduct} className={`${errName && name == "" ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                                            {errName && name == "" && <label className="text-sm text-red-500">{props.dataLang?.please_fill_name_finishedProduct}</label>}
                                         </div>
                                         <div className='2xl:space-y-1'>
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Giá bán</label>
@@ -1211,13 +1211,13 @@ const Popup_ThanhPham = React.memo((props) => {
                                     </div>
                                     <div className='2xl:space-y-3 space-y-2'>
                                         <div className='2xl:space-y-1'>
-                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Loại thành phẩm <span className='text-red-500'>*</span></label>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.type_finishedProduct} <span className='text-red-500'>*</span></label>
                                             <Select 
                                                 options={dataOptType}
                                                 value={type}
                                                 onChange={_HandleChangeInput.bind(this, "type")}
                                                 isClearable={true}
-                                                placeholder={"Loại thành phẩm"}
+                                                placeholder={props.dataLang?.type_finishedProduct}
                                                 noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
@@ -1243,17 +1243,17 @@ const Popup_ThanhPham = React.memo((props) => {
                                                     }),
                                                 }}
                                             />
-                                            {errType && type?.value == null && <label className="text-sm text-red-500">Vui lòng chọn loại thành phẩm</label>}
+                                            {errType && type?.value == null && <label className="text-sm text-red-500">{props.dataLang?.please_choose_type_finishedProduct}</label>}
                                         </div>
                                         <div className='2xl:space-y-1'>
-                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Đơn vị <span className='text-red-500'>*</span></label>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.unit} <span className='text-red-500'>*</span></label>
                                             <Select 
                                                 options={dataOptUnit}
                                                 value={unit}
                                                 onChange={_HandleChangeInput.bind(this, "unit")}
                                                 isClearable={true}
                                                 noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
-                                                placeholder={"Đơn vị"}
+                                                placeholder={props.dataLang?.unit}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
                                                 className={`${errUnit && unit?.value == null ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
@@ -1278,7 +1278,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                     }),
                                                 }}
                                             />
-                                            {errUnit && unit?.value == null && <label className="text-sm text-red-500">Vui lòng chọn đơn vị</label>}
+                                            {errUnit && unit?.value == null && <label className="text-sm text-red-500">{props.dataLang?.please_fill_unit}</label>}
                                         </div>
                                         <div className='2xl:space-y-1'>
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.avatar || "avatar"}</label>
@@ -1288,14 +1288,14 @@ const Popup_ThanhPham = React.memo((props) => {
                                                     {!thumb && <div className='h-full w-full flex flex-col justify-center items-center'><IconImage /></div>}
                                                     <div className='absolute bottom-0 -right-12 flex flex-col space-y-2'>
                                                         <input onChange={_HandleChangeFileThumb.bind(this)} type="file" id={`upload`} accept="image/png, image/jpeg" hidden />
-                                                        <label htmlFor={`upload`} title='Sửa hình' className='cursor-pointer w-8 h-8 rounded-full bg-slate-100 flex flex-col justify-center items-center'><IconEditImg size="17" /></label>
-                                                        <button disabled={!thumb ? true : false} onClick={_DeleteThumb.bind(this)} title='Xóa hình' className='w-8 h-8 rounded-full bg-red-500 disabled:opacity-30 flex flex-col justify-center items-center text-white'><IconDelete size="17" /></button>
+                                                        <label htmlFor={`upload`} title={props.dataLang?.edit || "edit"} className='cursor-pointer w-8 h-8 rounded-full bg-slate-100 flex flex-col justify-center items-center'><IconEditImg size="17" /></label>
+                                                        <button disabled={!thumb ? true : false} onClick={_DeleteThumb.bind(this)} title={props.dataLang?.delete || "delete"} className='w-8 h-8 rounded-full bg-red-500 disabled:opacity-30 flex flex-col justify-center items-center text-white'><IconDelete size="17" /></button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div className='2xl:space-y-1'>
-                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">Ghi chú</label>
+                                            <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">{props.dataLang?.note}</label>
                                             <textarea 
                                                 value={note}
                                                 type="text"
@@ -1634,7 +1634,8 @@ const Popup_ThongTin = React.memo((props) => {
 
     useEffect(() => {
         open && tabBom && sSelectedListBom(dataBom.find(item => item.product_variation_option_value_id === tabBom))
-    }, [tabBom]);
+        open && dataBom && sSelectedListBom(dataBom.find(item => item.product_variation_option_value_id === tabBom))
+    }, [tabBom, dataBom]);
 
     return(
         <PopupEdit  
@@ -1649,8 +1650,8 @@ const Popup_ThongTin = React.memo((props) => {
                 <div className='flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
                     <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>{props.dataLang?.information || "information"}</button>
                     <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>{props.dataLang?.category_material_list_variant || "category_material_list_variant"}</button>
-                    <button onClick={_HandleSelectTab.bind(this, 2)} className={`${tab === 2 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>Định mức BOM</button>
-                    <button onClick={_HandleSelectTab.bind(this, 3)} className={`${tab === 3 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>Giai đoạn</button>
+                    <button onClick={_HandleSelectTab.bind(this, 2)} className={`${tab === 2 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>{props.dataLang?.bom_finishedProduct || "bom_finishedProduct"}</button>
+                    <button onClick={_HandleSelectTab.bind(this, 3)} className={`${tab === 3 ?  "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "}  px-4 py-2 outline-none font-medium`}>{props.dataLang?.stage_finishedProduct || "stage_finishedProduct"}</button>
                 </div>
                 {onFetching ? 
                     <Loading className="h-96"color="#0f4f9e" />
@@ -1669,37 +1670,37 @@ const Popup_ThongTin = React.memo((props) => {
                                             </div>
                                         </div>
                                         <div className='flex justify-between'>
-                                            <h5 className='text-slate-400 text-sm w-[40%]'>Danh mục:</h5>
+                                            <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.category_titel}:</h5>
                                             <h6 className='w-[55%] text-right'>{list?.category_name}</h6>
                                         </div>
                                         <div className='flex justify-between'>
-                                            <h5 className='text-slate-400 text-sm w-[40%]'>Mã thành phẩm:</h5>
+                                            <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.code_finishedProduct}:</h5>
                                             <h6 className='w-[55%] text-right'>{list?.code}</h6>
                                         </div>
                                         <div className='flex justify-between'>
-                                            <h5 className='text-slate-400 text-sm w-[40%]'>Tên thành phẩm:</h5>
+                                            <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.name_finishedProduct}:</h5>
                                             <h6 className='w-[55%] text-right'>{list?.name}</h6>
                                         </div>
                                         <div className='flex justify-between'>
-                                            <h5 className='text-slate-400 text-sm w-[40%]'>Loại thành phẩm:</h5>
+                                            <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.type_finishedProduct}:</h5>
                                             <h6 className='w-[55%] text-right'>{props.dataLang[list?.type_products?.name]}</h6>
                                         </div>
                                         <div className='flex justify-between'>
-                                            <h5 className='text-slate-400 text-sm w-[40%]'>Đơn vị:</h5>
+                                            <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.unit}:</h5>
                                             <h6 className='w-[55%] text-right'>{list?.unit}</h6>
                                         </div>
                                         <div className='flex justify-between'>
-                                            <h5 className='text-slate-400 text-sm w-[40%]'>Tồn kho:</h5>
+                                            <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.stock}:</h5>
                                             <h6 className='w-[55%] text-right'>{Number(list?.stock_quantity).toLocaleString()}</h6>
                                         </div>
                                         {props.dataProductExpiry?.is_enable === "1" &&
                                             <div className='flex justify-between'>
-                                                <h5 className='text-slate-400 text-sm w-[40%]'>Thời hạn sử dụng:</h5>
+                                                <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.category_material_list_expiry_date}:</h5>
                                                 <h6 className='w-[55%] text-right'>{list?.expiry}</h6>
                                             </div>
                                         }
                                         <div className='flex justify-between'>
-                                            <h5 className='text-slate-400 text-sm w-[40%]'>Ghi chú:</h5>
+                                            <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.note}:</h5>
                                             <h6 className='w-[55%] text-right'>{list?.note}</h6>
                                         </div>
                                     </div>
@@ -1709,7 +1710,7 @@ const Popup_ThongTin = React.memo((props) => {
                                             <h6 className='w-[55%] text-right'>{Number(list?.price_sell).toLocaleString()}</h6>
                                         </div>
                                         <div className='flex justify-between'>
-                                            <h5 className='text-slate-400 text-sm w-[40%]'>Số lượng tối thiểu:</h5>
+                                            <h5 className='text-slate-400 text-sm w-[40%]'>{props.dataLang?.minimum_amount}:</h5>
                                             <h6 className='w-[55%] text-right'>{Number(list?.quantity_minimum).toLocaleString()}</h6>
                                         </div>
                                     </div>
@@ -1742,10 +1743,10 @@ const Popup_ThongTin = React.memo((props) => {
                                 {list?.variation?.length > 0 ?
                                     <div className='space-y-0.5 min-h-[384px]'>
                                         <div className={`${list?.variation[1] ? "grid-cols-4" : "grid-cols-3" } grid gap-2 px-2 py-1.5 bg-slate-100/40 rounded`}>
-                                            <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center'>Hình đại diện</h5>
+                                            <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center'>{props.dataLang?.avatar}</h5>
                                             <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]'>{list?.variation[0]?.name}</h5>
                                             {list?.variation[1] && <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300]'>{list?.variation[1]?.name}</h5>}
-                                            <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-right'>Giá</h5>
+                                            <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-right'>{props.dataLang?.price || "price"}</h5>
                                         </div>
                                         <ScrollArea className="min-h-[400px] max-h-[450px]" speed={1} smoothScrolling={true}>
                                             <div className='divide-y divide-slate-200'>
@@ -1800,13 +1801,13 @@ const Popup_ThongTin = React.memo((props) => {
                                                     )}
                                                 </div>
                                                 <div className={`flex px-2 py-1.5 bg-slate-100/40 rounded items-center text-[14px]`}>
-                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center w-[5%]'>STT</h5>
-                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[18%]'>Loại</h5>
-                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[18%]'>Tên</h5>
-                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center w-[10%]'>Đơn vị</h5>
-                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[12%]'>Định mức</h5>
-                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[14%]'>% Hao hụt</h5>
-                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[23%]'>Công đoạn sử dụng</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center w-[5%]'>{props.dataLang?.no || "no"}</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[18%]'>{props.dataLang?.warehouses_detail_type || "warehouses_detail_type"}</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[18%]'>{props.dataLang?.name || "name"}</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center w-[10%]'>{props.dataLang?.unit}</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[12%]'>{props.dataLang?.norm_finishedProduct || "norm_finishedProduct"}</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[14%]'>%{props.dataLang?.loss_finishedProduct || "loss_finishedProduct"}</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[23%]'>{props.dataLang?.stage_usage_finishedProduct}</h5>
                                                 </div>
                                                 <ScrollArea className="min-h-[400px] max-h-[450px]" speed={1} smoothScrolling={true}>
                                                     <div className='divide-y divide-slate-200'>
@@ -1846,10 +1847,10 @@ const Popup_ThongTin = React.memo((props) => {
                                         {dataStage?.length > 0 ?
                                             <div className='space-y-0.5 min-h-[384px]'>
                                                 <div className={`grid-cols-8 grid gap-2 px-2 py-1.5 bg-slate-100/40 rounded`}>
-                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center'>STT</h5>
-                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] col-span-2'>Giai đoạn</h5>
-                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] col-span-3'>Đánh dấu công đoạn bắt đầu TP chưa hoàn thiện</h5>
-                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2'>Giai đoạn cuối</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center'>{props.dataLang?.no || "no"}</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] col-span-2'>{props.dataLang?.stage_finishedProduct}</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] col-span-3'>{props.dataLang?.check_first_stage_finishedProduct}</h5>
+                                                    <h5 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2'>{props.dataLang?.stage_last_finishedProduct}</h5>
                                                 </div>
                                                 <ScrollArea className="min-h-[400px] max-h-[450px]" speed={1} smoothScrolling={true}>
                                                     <div className='divide-y divide-slate-200'>
@@ -2075,7 +2076,7 @@ const Popup_GiaiDoan = React.memo((props) => {
                 <div className='w-[30%] px-2'>
                     <Select   
                         closeMenuOnSelect={true}
-                        placeholder={"Tên công đoạn"}
+                        placeholder={props.dataLang?.stage_finishedProduct}
                         options={listCdRest}
                         value={value.name}
                         onChange={handleSelectChange.bind(this, value.id)}
@@ -2119,8 +2120,8 @@ const Popup_GiaiDoan = React.memo((props) => {
 
     return(
         <PopupEdit  
-            title={`Công đoạn (${props.code} - ${props.name})`} 
-            button={props.type == "add" ? "Thiết kế công đoạn" : "Sửa"} 
+            title={`${props.dataLang?.stage_finishedProduct || "stage_finishedProduct"} (${props.code} - ${props.name})`} 
+            button={props.type == "add" ? `${props.dataLang?.stage_design_finishedProduct || "stage_design_finishedProduct"}` : `${props.dataLang?.edit || "edit"}`} 
             onClickOpen={_ToggleModal.bind(this, true)} 
             open={props.isOpen} 
             onClose={_ToggleModal.bind(this,false)}
@@ -2128,11 +2129,11 @@ const Popup_GiaiDoan = React.memo((props) => {
         >
             <div className="py-4 w-[800px]">
                 <div className="flex w-full items-center py-2">
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[5%] font-[400] text-center">STT</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[400] text-left">{"Tên công đoạn"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[400] text-left">{"Đánh dấu công đoạn bắt đầu TP chưa hoàn thiện"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-center">{"Công đoạn cuối"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[400] text-center">{"Thao tác"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[5%] font-[400] text-center">{props.dataLang?.no || "no"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[400] text-left">{props.dataLang?.stage_name_finishedProduct}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[400] text-left">{props.dataLang?.check_first_stage_finishedProduct || "check_first_stage_finishedProduct"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-center">{props.dataLang?.stage_last_finishedProduct}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[400] text-center">{props.dataLang?.branch_popup_properties}</h4>
                 </div> 
                 {onFetching ? 
                     <Loading className="h-96"color="#0f4f9e" />
@@ -2140,7 +2141,7 @@ const Popup_GiaiDoan = React.memo((props) => {
                     <>
                         <ScrollArea className="min-h-[0px] max-h-[500px] overflow-hidden" speed={1} smoothScrolling={true} ref={scrollAreaRef}>
                             <SortableList useDragHandle lockAxis={"y"} items={option} onSortEnd={onSortEnd.bind(this)} onClickDelete={handleDelete} />
-                            <button type='button' onClick={_HandleAddNew.bind(this)} disabled={statusBtnAdd} title='Thêm' className={`${statusBtnAdd ? "opacity-50" : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]" } transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}><IconAdd />{"Thêm giai đoạn"}</button> 
+                            <button type='button' onClick={_HandleAddNew.bind(this)} disabled={statusBtnAdd} title='Thêm' className={`${statusBtnAdd ? "opacity-50" : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]" } transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}><IconAdd />{props.dataLang?.stage_add_finishedProduct}</button> 
                         </ScrollArea> 
                         <div className="text-right mt-5 space-x-2">
                         <button type='button' onClick={_ToggleModal.bind(this,false)} className={`text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]`}
@@ -2205,8 +2206,8 @@ const Popup_Bom = React.memo((props) => {
         }, (err, response) => {
             if(!err){
                 var {data} = response.data;
-                sDataSelectedVariant(data?.variations?.map(e => ({label: e.name_variation, value: e.product_variation_option_value_id, child: e.items?.map(ce => ({type: {label: ce.str_type_item, value: ce.type_item}, name: {label: ce.item_name, value: ce.item_id}, unit: {label: ce.unit_name, value: ce.unit_id}, norm: Number(ce.quota), loss: Number(ce.loss), stage: {label: ce.stage_name, value: ce.stage_id}}))})))
-                sCurrentData(data?.variations?.map(e => ({label: e.name_variation, value: e.product_variation_option_value_id, child: e.items?.map(ce => ({type: {label: ce.str_type_item, value: ce.type_item}, name: {label: ce.item_name, value: ce.item_id}, unit: {label: ce.unit_name, value: ce.unit_id}, norm: Number(ce.quota), loss: Number(ce.loss), stage: {label: ce.stage_name, value: ce.stage_id}}))})))
+                sDataSelectedVariant(data?.variations?.map(e => ({label: e.name_variation, value: e.product_variation_option_value_id, child: e.items?.map(ce => ({id: ce.id, type: {label: ce.str_type_item, value: ce.type_item}, name: {label: ce.item_name, value: ce.item_id}, unit: {label: ce.unit_name, value: ce.unit_id}, norm: Number(ce.quota), loss: Number(ce.loss), stage: {label: ce.stage_name, value: ce.stage_id}}))})))
+                sCurrentData(data?.variations?.map(e => ({label: e.name_variation, value: e.product_variation_option_value_id, child: e.items?.map(ce => ({id: ce.id, type: {label: ce.str_type_item, value: ce.type_item}, name: {label: ce.item_name, value: ce.item_id}, unit: {label: ce.unit_name, value: ce.unit_id}, norm: Number(ce.quota), loss: Number(ce.loss), stage: {label: ce.stage_name, value: ce.stage_id}}))})))
             }
             sOnFetching(false)
             sLoadingData(true)
@@ -2268,6 +2269,7 @@ const Popup_Bom = React.memo((props) => {
         const newChild = newData[index].child.filter(item => item.id !== id);
         newData[index] = {...newData[index], child: newChild};
         sDataSelectedVariant(newData);
+        console.log(parentId, id)
     }
 
     const _HandleChangeItemBOM = (parentId, childId, type, value) => {
@@ -2477,8 +2479,8 @@ const Popup_Bom = React.memo((props) => {
 
     return(
         <PopupEdit   
-            title={`Thiết kế BOM (${props.code} - ${props.name})`} 
-            button={props.type == "add" ? "Thiết kế BOM" : "Sửa"} 
+            title={`${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"} (${props.code} - ${props.name})`} 
+            button={props.type == "add" ? `${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"}` : `${props.dataLang?.edit}`} 
             onClickOpen={_ToggleModal.bind(this, true)} 
             open={props.isOpen} 
             onClose={_ToggleModal.bind(this,false)}
@@ -2491,10 +2493,10 @@ const Popup_Bom = React.memo((props) => {
                     <>
                         <div className='flex justify-between items-end pb-2'>
                             <div className='w-2/3'>
-                                <label className="text-[#344054] font-normal text-sm mb-1 ">{"Chọn biến thể"} <span className="text-red-500">*</span></label>
+                                <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.category_material_list_variant} <span className="text-red-500">*</span></label>
                                 <Select   
                                     closeMenuOnSelect={false}
-                                    placeholder={"Biến thể"}
+                                    placeholder={props.dataLang?.category_material_list_variant}
                                     options={options}
                                     isSearchable={true}
                                     onChange={_HandleChangeSelect.bind(this)}
@@ -2543,13 +2545,13 @@ const Popup_Bom = React.memo((props) => {
                         }
                         <div className='space-y-1 -pt-5'>
                             <div className="flex w-full items-center bg-slate-100 p-2 z-10">
-                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[5%] font-[400] text-center">{"Stt"}</h4>
-                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[37%] font-[400]">{"Tên thành phần BOM"}</h4>
-                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[15%] font-[400] text-center">{"Đơn vị"}</h4>
-                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[10%] font-[400] text-left">{"Định mức"}</h4>
-                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[10%] font-[400] text-left">{"% Hao hụt"}</h4>
-                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[23%] font-[400] text-left">{"Công đoạn sử dụng"}</h4>
-                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[10%] font-[400] text-center">{"Thao tác"}</h4>
+                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[5%] font-[400] text-center">{props.dataLang?.no || "no"}</h4>
+                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[37%] font-[400]">{props.dataLang?.bom_name_finishedProduct}</h4>
+                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[15%] font-[400] text-center">{props.dataLang?.unit}</h4>
+                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[10%] font-[400] text-left">{props.dataLang?.norm_finishedProduct || "norm_finishedProduct"}</h4>
+                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[10%] font-[400] text-left">%{props.dataLang?.loss_finishedProduct || "loss_finishedProduct"}</h4>
+                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[23%] font-[400] text-left">{props.dataLang?.stage_usage_finishedProduct || "stage_usage_finishedProduct"}</h4>
+                                <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase w-[10%] font-[400] text-center">{props.dataLang?.branch_popup_properties || "branch_popup_properties"}</h4>
                             </div>
                             <ScrollArea className="min-h-[0px] max-h-[550px] overflow-hidden" speed={1} smoothScrolling={true}>
                                 <div className='divide-y divide-slate-100'>
@@ -2565,7 +2567,7 @@ const Popup_Bom = React.memo((props) => {
                                                             options={dataTypeCd}
                                                             value={e.type}
                                                             onChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "type")}
-                                                            placeholder={"Loại"}
+                                                            placeholder={props.dataLang?.warehouses_detail_type || "warehouses_detail_type"}
                                                             noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                             menuPortalTarget={document.body}
                                                             onMenuOpen={handleMenuOpen}
@@ -2596,7 +2598,7 @@ const Popup_Bom = React.memo((props) => {
                                                             options={e.dataName}
                                                             value={e.name}
                                                             onChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "name")}
-                                                            placeholder={"Tên"}
+                                                            placeholder={props.dataLang?.name || "name"}
                                                             noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                             menuPortalTarget={document.body}
                                                             onMenuOpen={handleMenuOpen}
@@ -2628,7 +2630,7 @@ const Popup_Bom = React.memo((props) => {
                                                         options={e.dataUnit}
                                                         value={e.unit}
                                                         onChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "unit")}
-                                                        placeholder={"Đơn vị"}
+                                                        placeholder={props.dataLang?.unit}
                                                         noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                         menuPortalTarget={document.body}
                                                         onMenuOpen={handleMenuOpen}
@@ -2656,17 +2658,17 @@ const Popup_Bom = React.memo((props) => {
                                                         }}
                                                     />
                                                     <div className="w-[10%] px-1">
-                                                        <NumericFormat value={e?.norm} onValueChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "norm")} thousandSeparator="," placeholder={"Định mức"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                                        <NumericFormat value={e?.norm} onValueChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "norm")} thousandSeparator="," placeholder={props.dataLang?.norm_finishedProduct || "norm_finishedProduct"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
                                                     </div>
                                                     <div className="w-[10%] px-1">
-                                                        <NumericFormat isAllowed={(values) => { const {floatValue} = values; return floatValue >= 0 &&  floatValue <= 100; }} value={e?.loss} onValueChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "loss")} suffix="%" thousandSeparator="," placeholder={"% Hao hụt"} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
+                                                        <NumericFormat isAllowed={(values) => { const {floatValue} = values; return floatValue >= 0 &&  floatValue <= 100; }} value={e?.loss} onValueChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "loss")} suffix="%" thousandSeparator="," placeholder={`%${props.dataLang?.loss_finishedProduct || "loss_finishedProduct"}`} className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`} />
                                                     </div>
                                                     <div className="w-[23%] px-1">
                                                         <Select 
                                                             options={dataCd}
                                                             value={e.stage}
                                                             onChange={_HandleChangeItemBOM.bind(this, selectedList?.value, e.id, "stage")}
-                                                            placeholder={"Công đoạn sử dụng"}
+                                                            placeholder={props.dataLang?.stage_usage_finishedProduct || "stage_usage_finishedProduct"}
                                                             noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                             menuPortalTarget={document.body}
                                                             onMenuOpen={handleMenuOpen}
@@ -2703,7 +2705,7 @@ const Popup_Bom = React.memo((props) => {
                                 </div>
                             </ScrollArea>
                             {dataSelectedVariant?.length > 0 &&
-                                <button onClick={_HandleAddNew.bind(this, selectedList?.value)} type='button' title='Thêm' className={`hover:text-[#0F4F9E] hover:bg-[#e2f0fe] transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}><IconAdd />{"Thêm thiết kế BOM"}</button> 
+                                <button onClick={_HandleAddNew.bind(this, selectedList?.value)} type='button' title='Thêm' className={`hover:text-[#0F4F9E] hover:bg-[#e2f0fe] transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}><IconAdd />{props.dataLang?.bom_design_add_finishedProduct || "bom_design_add_finishedProduct"}</button> 
                             }
                         </div>
                         <div className="text-right mt-5 space-x-2">
