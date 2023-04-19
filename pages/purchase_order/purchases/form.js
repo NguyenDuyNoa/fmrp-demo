@@ -241,6 +241,8 @@ const Index = (props) => {
                     sErrCode(false)
                     sErrBranch(false)
                     sOption([{id: Date.now(), mathang: null, donvitinh:"", soluong:0, ghichu:""}])
+                    setTotalSoluong(0); // cập nhật lại tổng số lượng
+                     setTotalQty(0)
                     
                 }else{
                     Toast.fire({
