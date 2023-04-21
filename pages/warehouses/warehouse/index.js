@@ -396,9 +396,7 @@ const Popup_kho = (props) => {
       sListBrand(props.listBr ? props.listBr && [...props.listBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
       sValueBr(props.sValueBr ? props.listBr && [...props.sValueBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
     }, [open]);
-    const branch_id = valueBr?.map(e =>{
-      return e?.value
-    })
+    const branch_id = valueBr?.value
     const _HandleChangeInput = (type, value) => {
         if(type == "name"){
           sName(value.target?.value)
@@ -420,7 +418,7 @@ const Popup_kho = (props) => {
     data.append('code', code);
     data.append('address', address);
     data.append('note', note);
-    branch_id.forEach(id => data.append('branch_id[]', id));
+    data.append('branch_id[]', branch_id);
     Axios("POST", `${props.id ? `/api_web/api_warehouse/warehouse/${id}?csrf_protection=true` : "/api_web/api_warehouse/warehouse/?csrf_protection=true"}`, {
         data:data,
       headers: {"Content-Type": "multipart/form-data"} 
@@ -459,11 +457,11 @@ const Popup_kho = (props) => {
     }, [onSending]);
     const _HandleSubmit = (e) => {
         e.preventDefault()
-        if(code.length == 0 || branch_id?.length==0 || name.length == 0 || address.length ==0 ){
+        if(code.length == 0 || branch_id == null || name.length == 0 || address.length ==0 ){
             code?.length ==0 &&  sErrInputCode(true)
             name?.length ==0 &&  sErrInputName(true)
             address?.length ==0 &&  sErrInputAddress(true)
-          branch_id?.length==0 && sErrInputBr(true) 
+          branch_id == null && sErrInputBr(true) 
             Toast.fire({
               icon: 'error',
               title: `${props.dataLang?.required_field_null}`
@@ -484,7 +482,7 @@ const Popup_kho = (props) => {
     }, [address.length > 0])
     useEffect(() => {
         sErrInputBr(false)
-    }, [branch_id?.length > 0]);
+    }, [branch_id != null]);
   return(
       <>
       <PopupEdit   
@@ -540,16 +538,16 @@ const Popup_kho = (props) => {
                          <div>
                            <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_brand} <span className="text-red-500">*</span></label>
                               <Select   
-                                 closeMenuOnSelect={false}
+                                //  closeMenuOnSelect={false}
                                   placeholder={props.dataLang?.client_list_brand}
                                   options={brandpOpt}
                                   isSearchable={true}
                                   onChange={_HandleChangeInput.bind(this, "valueBr")}
-                                  isMulti
+                                  // isMulti
                                   noOptionsMessage={() => "Không có dữ liệu"}
                                   value={valueBr}
                                   maxMenuHeight="200px"
-                                  isClearable={true} 
+                                  // isClearable={true} 
                                  menuPortalTarget={document.body}
                                 onMenuOpen={handleMenuOpen}
                                   styles={{

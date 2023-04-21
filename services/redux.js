@@ -16,7 +16,8 @@ const adminState = {
   categoty_finishedProduct: null,
   type_finishedProduct: null,
   unit_finishedProduct: null,
-  congdoan_finishedProduct: null
+  congdoan_finishedProduct: null,
+  vitrikho_kiemke: null
 }
 
 function adminReducer(state = adminState, action) {
@@ -43,6 +44,8 @@ function adminReducer(state = adminState, action) {
       return { ...state, unit_finishedProduct: action.payload }
     case 'congdoan_finishedProduct/update':
       return { ...state, congdoan_finishedProduct: action.payload }
+    case 'vitrikho_kiemke/update':
+      return { ...state, vitrikho_kiemke: action.payload }
     default:
       return state
   }

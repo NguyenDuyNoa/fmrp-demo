@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head';
 import {_ServerInstance as Axios} from '/services/axios';
 
+
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
@@ -12,6 +13,8 @@ import { Edit as IconEdit,  Grid6 as IconExcel, Trash as IconDelete, SearchNorma
 import Swal from 'sweetalert2';
 import { useEffect } from 'react';
 import {NumericFormat} from "react-number-format";
+import Link from 'next/link';
+import moment from 'moment/moment';
 
 
 
@@ -24,8 +27,8 @@ const Toast = Swal.mixin({
 })
 const Index = (props) => {
     const router = useRouter();
-    // console.log(router)
     const id = router.query?.id
+
     const dataLang = props.dataLang
     const scrollAreaRef = useRef(null);
     const handleMenuOpen = () => {
@@ -33,6 +36,9 @@ const Index = (props) => {
         return { menuPortalTarget };
     };
     const [onFetching, sOnFetching] = useState(false);
+    const [onFetchingDetail, sOnFetchingDetail] = useState(false);
+    const [fetchingSuccess, sFetchingSuccess] = useState(false);
+
     const [data, sData] = useState([]);
     const [listBr, sListBr]= useState()
     const [idBranch, sIdBranch] = useState(null);
@@ -48,21 +54,20 @@ const Index = (props) => {
     const [errCode, sErrCode] = useState(false);
     const [errDate, sErrDate] = useState(false);
     const [errBranch, sErrBranch] = useState(false);
-    
+   
     const [onSending, sOnSending] = useState(false);
-
     useEffect(() => {
-       sErrDate(false)
-       sErrName(false)
-       sErrCode(false)
-       sErrBranch(false)
-       sCode("")
-       sNamePromis('Yêu cầu mua hàng (PR)')
-       setSelectedDate(new Date().toISOString().slice(0, 10))
-       sNote("")
-  }, []);
-
-
+      router.query && sErrDate(false)
+      router.query && sErrName(false)
+      router.query && sErrCode(false)
+      router.query && sErrBranch(false)
+      router.query && sCode( "")
+      router.query && sNamePromis('Yêu cầu mua hàng (PR)')
+      router.query && setSelectedDate(new Date().toISOString().slice(0, 10))
+      router.query && sNote("")
+  }, [router.query]);
+  const options = data?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e}))
+  const [option, sOption] = useState([{id: Date.now(), mathang: null, donvitinh:"", soluong:0, ghichu:""}]);
     const _ServerFetching =  () => {
         Axios("GET", "/api_web/api_product/searchItemsVariant?csrf_protection=true", { 
         }, (err, response) => {
@@ -84,14 +89,35 @@ const Index = (props) => {
          sOnFetching(false)
        })
     }
-
-
-    const options = data?.map(e => ({label: e.name, value:e.id,code:e.code,e}))
-    const [option, sOption] = useState([{id: Date.now(), mathang: null, donvitinh:"", soluong:0, ghichu:""}]);
-    const listBr_filter = listBr?.map(e =>({label: e.name, value: e.id}))
-
-
-    const _HandleDelete =  (id) => {
+    const _ServerFetchingDetail =  () => {
+      Axios("GET", `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`, {
+    }, (err, response) => {
+        if(!err){
+            var rResult = response.data;
+          sCode(rResult?.code )
+          sNamePromis(rResult?.name)
+          setSelectedDate(moment(rResult?.date).format("YYYY-MM-DD"))
+          sNote(rResult?.note)
+          sIdBranch(({label: rResult?.branch_name, value:rResult?.branch_id}))
+          const itemlast =  [{mathang: null}]
+          const item = itemlast?.concat(rResult?.items?.map(e => ({id: e.item.id, data: e.item.id, ghichu: e.note, donvitinh: e.item.unit_name, soluong: Number(e.quantity), mathang: {e: e.item,label: `${e.item.name} <span style={{display: none}}>${e.item.code}</span><span style={{display: none}}>${e.item.product_variation} </span><span style={{display: none}}>${e.item.text_type} ${e.item.unit_name} </span>`,value:e.item.id}})))
+          sOption(item) 
+          let listQty = rResult?.items
+          let totalQuantity = 0;
+          for (let i = 0; i < listQty.length; i++) {
+            totalQuantity += parseInt(listQty[i].quantity);
+          }
+          setTotalSoluong(totalQuantity)
+          setTotalQty(rResult?.items?.length);
+        
+        }
+        sOnFetchingDetail(false)
+    })
+  }
+    
+      const listBr_filter = listBr?.map(e =>({label: e.name, value: e.id}))
+      const branch_id = idBranch?.value
+      const _HandleDelete =  (id) => {
       if (id === option[0].id) {
         return Toast.fire({
           title: `${"Mặc định hệ thống, không xóa"}`,
@@ -107,7 +133,6 @@ const Index = (props) => {
         setTotalSoluong(newTotal); // cập nhật lại tổng số lượng
         setTotalQty(newOption.slice(1).length); // cập nhật lại độ dài của mảng từ phần tử thứ 2 trở đi
       }
-
       const _HandleChangeInput = (type, value) => {
         if(type == "branch"){
           sIdBranch(value)
@@ -134,25 +159,32 @@ const Index = (props) => {
               confirmButtonText: `${dataLang?.aler_yes}`,
               })
             }else {
-            if(option[index].mathang){
-              option[index].mathang = value
-              option[index].donvitinh =  value?.e?.unit_name
-              // option[index].ghichu = value.ghichu
-            }else{
-              const newData = {id: Date.now(), mathang: value, donvitinh: value?.e?.unit_name, soluong: 1, ghichu:""}
-              option.push(newData)
-              const newOption = option.slice(1); // Tạo một mảng mới bắt đầu từ phần tử thứ hai của option
-              setTotalQty(newOption.length)
-              const newTotal = newOption.reduce((total, item) => total + item.soluong, 0); // Tính tổng số lượng trong mảng mới
-              setTotalSoluong(newTotal);
+              if(option[index].mathang){
+                option[index].mathang = value
+                option[index].donvitinh =  value?.e?.unit_name
+                // option[index].ghichu = value.ghichu
+              }else{
+                const newData = {id: Date.now(), mathang: value, donvitinh: value?.e?.unit_name, soluong: 1, ghichu:""}
+                option.push(newData)
+                const newOption = option.slice(1); // Tạo một mảng mới bắt đầu từ phần tử thứ hai của option
+                setTotalQty(newOption.length)
+                const newTotal = newOption.reduce((total, item) => total + item.soluong, 0); // Tính tổng số lượng trong mảng mới
+                setTotalSoluong(newTotal);
+              }
             }
-          }
         }else if(type == "donvitinh"){
           option[index].donvitinh = value.target?.value;
         }else if (type === "soluong") {
           option[index].soluong = Number(value?.target.value);
           sOption([...option]);
-          const newTotal = option.reduce((total, item) => total + item.soluong, 0);
+          const newTotal = option.reduce((total, item) => {
+            if (!isNaN(item.soluong)) {
+              return total + parseInt(item.soluong);
+            } else {
+              // console.log(`Value of item.soluong is not a number: ${item.soluong}`);
+              return total;
+            }
+          }, 0);
           setTotalSoluong(newTotal);
         }else if(type == "ghichu"){
           option[index].ghichu = value?.target?.value;
@@ -166,7 +198,6 @@ const Index = (props) => {
         setTotalSoluong(totalSoluong + 1);
         sOption([...option]);
       };
-      
       const handleDecrease = (id) => {
         const index = option.findIndex((x) => x.id === id);
         const newQuantity = option[index].soluong - 1;
@@ -184,15 +215,12 @@ const Index = (props) => {
             })
         }
       };
-      const branch_id = idBranch?.value
       const _HandleSubmit = (e) => {
         e.preventDefault();
-        if(namePromis?.length == 0 || selectedDate?.length == 0 || code?.length == 0 || branch_id == null){
+        if(namePromis?.length == 0 || selectedDate?.length == 0 || branch_id == null){
           namePromis?.length == 0 && sErrName(true);
           selectedDate?.length == 0 && sErrDate(true)
-          code?.length == 0 && sErrCode(true)
           branch_id == null && sErrBranch(true)
-           
             Toast.fire({
                 icon: 'error',
                 title: `${props.dataLang?.required_field_null}`
@@ -201,12 +229,10 @@ const Index = (props) => {
             sOnSending(true)
         }
       }
-      // console.log(option.map(e));
-      const dataOption = option?.map(e => {
-        return {data: e?.mathang?.value, soluong: e.soluong, ghichu:e.ghichu}
-      })
-   
+
+      const dataOption = option?.map(e => { return {data: e?.mathang?.value, soluong: e.soluong, ghichu:e.ghichu}})
       const newDataOption = dataOption?.filter(e => e?.data !== undefined);
+      const readOnlyFirst = true;
 
       const _ServerSending = () => {
         var formData = new FormData();
@@ -219,7 +245,7 @@ const Index = (props) => {
           formData.append(`items[${index}][item]`, item?.data);
           formData.append(`items[${index}][quantity]`, item?.soluong);
           formData.append(`items[${index}][note]`, item?.ghichu);
-      });
+      });  
         Axios("POST", `/api_web/Api_purchases/purchases/?csrf_protection=true`, {
             data: formData,
             headers: {'Content-Type': 'multipart/form-data'}
@@ -242,18 +268,40 @@ const Index = (props) => {
                     sErrBranch(false)
                     sOption([{id: Date.now(), mathang: null, donvitinh:"", soluong:0, ghichu:""}])
                     setTotalSoluong(0); // cập nhật lại tổng số lượng
-                     setTotalQty(0)
-                    
-                }else{
+                    setTotalQty(0)
+                    router.back()
+                }else {
+                  if(totalQty == 0){
                     Toast.fire({
-                        icon: 'error',
-                        title: `${props.dataLang[message]}`
+                      icon: 'error',
+                      title: `Chưa nhập thông tin mặt hàng`
+                  })
+                  }
+                  else{
+                    Toast.fire({
+                      icon: 'error',
+                      title: `${props.dataLang[message]}`
                     })
+                  }
+                   
                 }
             }
             sOnSending(false)
         })
     }
+    const _HandleSeachApi = (inputValue) => {
+     Axios("POST",`/api_web/api_product/searchItemsVariant?csrf_protection=true`, {
+          data: {
+            term: inputValue,
+          },
+        }, (err, response) => {
+              if(!err){
+                var {result} = response?.data.data
+                sData(result)
+            }
+          }
+      )};
+    
 
       useEffect(() => {
           onSending && _ServerSending()
@@ -263,9 +311,9 @@ const Index = (props) => {
         sErrName(false)
       }, [namePromis?.length > 0]);
 
-      useEffect(() => {
-        sErrCode(false)
-      }, [code?.length > 0]);
+      // useEffect(() => {
+      //   sErrCode(false)
+      // }, [code?.length > 0]);
 
       useEffect(() => {
         sErrDate(false)
@@ -276,19 +324,29 @@ const Index = (props) => {
       }, [branch_id != null]);
 
 
-
       useEffect(() => {
         onFetching && _ServerFetching() 
       }, [onFetching]);
+
       useEffect(() => {
           router.query && sOnFetching(true) 
       }, [router.query]);
-      const readOnlyFirst = true;
 
+      useEffect(() => {
+        onFetchingDetail && _ServerFetchingDetail()
+      }, [onFetchingDetail]);
+      useEffect(() => {
+        id && sOnFetchingDetail(true) 
+      }, []);
+
+      // useEffect(() => {
+       
+      //   sFetchingSuccess(false)
+      // }, [fetchingSuccess]);
   return (
     <React.Fragment>
     <Head>
-        <title>{"Tạo phiếu yêu cầu mua hàng"}</title>
+        <title>{id ? "Sửa phiếu yêu cầu mua hàng" : "Tạo phiếu yêu cầu mua hàng"}</title>
     </Head>
     {/* <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between'> */}
     <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between'>
@@ -296,102 +354,106 @@ const Index = (props) => {
             <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
                 <h6 className='text-[#141522]/40'>{"Mua hàng"}</h6>
                 <span className='text-[#141522]/40'>/</span>
-                <h6>{"Tạo phiếu yêu cầu mua hàng"}</h6>
+                <h6>{id ? "Sửa phiếu yêu cầu mua hàng" : "Tạo phiếu yêu cầu mua hàng"}</h6>
             </div>
             <div className='flex justify-between items-center'>
-                <h2 className='xl:text-2xl text-xl '>{"Tạo phiếu yêu cầu mua hàng"}</h2>
+                <h2 className='xl:text-2xl text-xl '>{id ? "Sửa phiếu yêu cầu mua hàng" : "Tạo phiếu yêu cầu mua hàng"}</h2>
+                <div className="flex justify-end items-center">
+                    <button   onClick={() => router.back()} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105">{dataLang?.warehouses_detail_back}</button>
+                  </div>
             </div>    
             <div className=' w-full rounded'>
               <div className=''>  
                   <h2 className='font-normal bg-[#ECF0F4] p-2'>Thông tin chung</h2>       
-                  <div className="flex flex-wrap justify-between items-center mt-2"> 
-                    <div className='w-[24.5%]'>
-                        <label className="text-[#344054] font-normal text-sm mb-1 ">{"Mã chứng từ"} <span className="text-red-500">*</span></label>
-                        <input
-                          value={code}                
-                          onChange={_HandleChangeInput.bind(this, "code")}
-                          name="fname"                      
-                          type="text"
-                          placeholder={"Mặc định theo hệ thống"}
-                          className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
-                         {errCode && <label className="text-sm text-red-500">{"Vui lòng nhập mã chứng từ" || ""}</label>}
-                    </div>
-                    <div className='w-[24.5%]'>
-                            <label className="text-[#344054] font-normal text-sm mb-1 ">{"Ngày chứng từ"} <span className="text-red-500">*</span></label>
-                            <input
-                              value={selectedDate}              
-                              onChange={_HandleChangeInput.bind(this, "date")}
-                              name="fname"                      
-                              type="date"
-                              placeholder={"Mặc định theo hệ thống"}
-                              className={`${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
-                              {errDate && <label className="text-sm text-red-500">{"Vui lòng nhập ngày chứng từ" || ""}</label>}
-                          
-                        </div>
-                    <div className='w-[24.5%]'>
-                        <label className="text-[#344054] font-normal text-sm mb-1 ">{"Tên phiếu yêu cầu"}</label>
+                  
+                    <div className="flex flex-wrap justify-between items-center mt-2"> 
+                      <div className='w-[24.5%]'>
+                          <label className="text-[#344054] font-normal text-sm mb-1 ">{"Mã chứng từ"} </label>
                           <input
-                          value={namePromis}                
-                          onChange={_HandleChangeInput.bind(this, "namePromis")}
-                          name="fname"                      
-                          type="text"
-                          placeholder={"Tên phiếu yêu cầu"}
-                          className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
-                          {errName && <label className="text-sm text-red-500">{"Vui lòng nhập tên phiếu" || ""}</label>}
-                      
-                      {/* <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_name}<span className="text-red-500">*</span></label> */}
+                            value={code}                
+                            onChange={_HandleChangeInput.bind(this, "code")}
+                            name="fname"                      
+                            type="text"
+                            placeholder={"Mặc định theo hệ thống"}
+                            className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                       </div>
                       <div className='w-[24.5%]'>
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">{"Chi nhánh"} <span className="text-red-500">*</span></label>
-                        <Select 
-                            options={listBr_filter}
-                            onChange={_HandleChangeInput.bind(this, "branch")}
-                            value={idBranch}
-                            placeholder={dataLang?.client_list_filterbrand} 
-                            hideSelectedOptions={false}
-                            isClearable={true}
-                            className={`${errBranch ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
-                            isSearchable={true}
-                            noOptionsMessage={() => "Không có dữ liệu"}
-                            // components={{ MultiValue }}
-                            menuPortalTarget={document.body}
-                            closeMenuOnSelect={true}
-                            style={{ border: "none", boxShadow: "none", outline: "none" }}
-                            theme={(theme) => ({
-                                ...theme,
-                                colors: {
-                                    ...theme.colors,
-                                    primary25: '#EBF5FF',
-                                    primary50: '#92BFF7',
-                                    primary: '#0F4F9E',
-                                },
-                            })}
-                            styles={{
-                              placeholder: (base) => ({
-                              ...base,
-                              color: "#cbd5e1",
-                              }),
-                              menuPortal: (base) => ({
-                                ...base,
-                                zIndex: 9999
-                              }), 
-                              control: (base,state) => ({
-                                ...base,
-                                // border: 'none',
-                                // outline: 'none',
-                                boxShadow: 'none',
-                              ...(state.isFocused && {
-                                border: '0 0 0 1px #92BFF7',
-                              }),
-                            })
-                          }}
-                          />
-                          
-                          {errBranch && <label className="text-sm text-red-500">{"Vui lòng chọn chi nhánh" || ""}</label>}
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{"Ngày chứng từ"} <span className="text-red-500">*</span></label>
+                              <input
+                                value={selectedDate}              
+                                onChange={_HandleChangeInput.bind(this, "date")}
+                                name="fname"                      
+                                type="date"
+                                placeholder={"Mặc định theo hệ thống"}
+                                className={`${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
+                                {errDate && <label className="text-sm text-red-500">{"Vui lòng nhập ngày chứng từ" || ""}</label>}
+                            
+                          </div>
+                      <div className='w-[24.5%]'>
+                          <label className="text-[#344054] font-normal text-sm mb-1 ">{"Tên phiếu yêu cầu"}</label>
+                            <input
+                            value={namePromis}                
+                            onChange={_HandleChangeInput.bind(this, "namePromis")}
+                            name="fname"                      
+                            type="text"
+                            placeholder={"Tên phiếu yêu cầu"}
+                            className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
+                            {errName && <label className="text-sm text-red-500">{"Vui lòng nhập tên phiếu" || ""}</label>}
+                        
+                        {/* <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_name}<span className="text-red-500">*</span></label> */}
                         </div>
-                     
+                        <div className='w-[24.5%]'>
+                        <label className="text-[#344054] font-normal text-sm mb-1 ">{"Chi nhánh"} <span className="text-red-500">*</span></label>
+                          <Select 
+                              options={listBr_filter}
+                              onChange={_HandleChangeInput.bind(this, "branch")}
+                              value={idBranch}
+                              placeholder={dataLang?.client_list_filterbrand} 
+                              hideSelectedOptions={false}
+                              isClearable={true}
+                              className={`${errBranch ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
+                              isSearchable={true}
+                              noOptionsMessage={() => "Không có dữ liệu"}
+                              // components={{ MultiValue }}
+                              menuPortalTarget={document.body}
+                              closeMenuOnSelect={true}
+                              style={{ border: "none", boxShadow: "none", outline: "none" }}
+                              theme={(theme) => ({
+                                  ...theme,
+                                  colors: {
+                                      ...theme.colors,
+                                      primary25: '#EBF5FF',
+                                      primary50: '#92BFF7',
+                                      primary: '#0F4F9E',
+                                  },
+                              })}
+                              styles={{
+                                placeholder: (base) => ({
+                                ...base,
+                                color: "#cbd5e1",
+                                }),
+                                menuPortal: (base) => ({
+                                  ...base,
+                                  zIndex: 20
+                                }), 
+                                control: (base,state) => ({
+                                  ...base,
+                                  // border: 'none',
+                                  // outline: 'none',
+                                  boxShadow: 'none',
+                                ...(state.isFocused && {
+                                  border: '0 0 0 1px #92BFF7',
+                                }),
+                              })
+                            }}
+                            />
+                            
+                            {errBranch && <label className="text-sm text-red-500">{"Vui lòng chọn chi nhánh" || ""}</label>}
+                          </div>
                       
-                </div>
+                        
+                    </div>
+                 
               </div>
             </div>
             <h2 className='font-normal bg-[#ECF0F4] p-2  '>Thông tin mặt hàng</h2>  
@@ -414,11 +476,13 @@ const Index = (props) => {
                       {/* <ScrollArea className=" h-[400px] overflow-hidden" speed={1}  smoothScrolling={true}> */}
                           {option.map((e,index) => 
                            <div className='grid grid-cols-12 gap-1 py-1 ' key={e.id}>
-                           <div className='col-span-1 '>
-                             <h3 className="text-[#344054] font-normal text-center text-sm mb-1 ml-2">{index + 1}</h3>
+                           <div className='col-span-1 flex items-center justify-center'>
+                             <h3 className="text-[#344054] font-normal text-center text-sm mb-1 ml-2 ">{index + 1}</h3>
                            </div>
-                           <div className='col-span-4  z-[100]'>
+                           <div className='col-span-4  z-[100] my-auto'>
                            <Select 
+                          onInputChange={_HandleSeachApi.bind(this)}
+                          dangerouslySetInnerHTML={{__html: option.label}}
                            options={options}
                            onChange={_HandleChangeInputOption.bind(this, e?.id, "mathang",index)}
                            value={e?.mathang}
@@ -426,26 +490,26 @@ const Index = (props) => {
                             <div className='flex items-center  justify-between py-2'>
                               <div className='flex items-center gap-2'>
                                 <div>
-                                  {option.e.images != null ? (<img src={option.e.images} alt="Product Image" style={{ width: "50px", height: "60px" }} className='object-cover rounded' />):
+                                  {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image" style={{ width: "50px", height: "60px" }} className='object-cover rounded' />):
                                     <div className='w-[50px] h-[60px] object-cover bg-gray-200 flex items-center justify-center rounded'>
                                       <IconImage/>
                                     </div>
                                   }
                                 </div>
                                 <div>
-                                  <h3 className='font-medium'>{option.e.name}</h3>
+                                  <h3 className='font-medium'>{option.e?.name}</h3>
                                   <div className='flex gap-2'>
-                                    <h5 className='text-gray-400 font-normal'>{option.e.code}</h5>
-                                    <h5 className='text-[#0F4F9E] font-medium'>{option.e.product_variation}</h5>
+                                    <h5 className='text-gray-400 font-normal'>{option.e?.code}</h5>
+                                    <h5 className='text-[#0F4F9E] font-medium'>{option.e?.product_variation}</h5>
                                   </div>
-                                  <h5 className='text-gray-400 font-medium text-xs'>{option.e.text_type === "product" ? dataLang?.product : option.e.text_type === "material" ? dataLang?.material : ""}</h5>
+                                  <h5 className='text-gray-400 font-medium text-xs'>{option.e?.text_type === "product" ? dataLang?.product : option.e?.text_type === "material" ? dataLang?.material : ""}</h5>
                                 </div>
                               </div>
                               <div className=''>
                                  <div className='text-right opacity-0'>{"0"}</div>
                                  <div className='flex gap-2'>
                                    <div className='flex items-center gap-2'>
-                                     <h5 className='text-gray-400 font-normal'>Tồn:</h5><h5 className='text-[#0F4F9E] font-medium'>{option.e.qty_warehouse ?? 0}</h5>
+                                     <h5 className='text-gray-400 font-normal'>Tồn:</h5><h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse ?? 0}</h5>
                                    </div>
                                   
                                   </div>
@@ -487,12 +551,12 @@ const Index = (props) => {
                          }}
                          />
                          </div>
-                         <div className='col-span-1 text-center'>
+                         <div className='col-span-1 text-center flex items-center justify-center'>
                            <h3 className=''>{e.donvitinh}</h3>
                         </div>
-                         <div className='col-span-1 '>
+                         <div className='col-span-1 flex items-center justify-center'>
                            <div className="flex items-center justify-center">
-                               <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center w-[25px] h-[25px]  bg-slate-200 rounded-full"
+                               <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                               onClick={() => handleDecrease(e.id)}  disabled={index === 0} ><Minus size="16"/></button>
                               <NumericFormat
                                 className="appearance-none text-center py-2 px-4 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
@@ -505,11 +569,11 @@ const Index = (props) => {
                                 // isNumericString={true}   
                                 isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
                                 />
-                                <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center w-[25px] h-[25px]  bg-slate-200 rounded-full"
+                                <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                 onClick={() => handleIncrease(e.id)} disabled={index === 0}><Add size="16"/></button>
                               </div>
                             </div>
-                         <div className='col-span-4'>
+                         <div className='col-span-4 flex items-center justify-center'>
                              <input
                                  value={e.ghichu}                
                                  onChange={_HandleChangeInputOption.bind(this, e.id, "ghichu",index)}
@@ -519,7 +583,7 @@ const Index = (props) => {
                                  className= "focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
                                /> 
                          </div>
-                         <div className='col-span-1'>
+                         <div className='col-span-1 flex items-center justify-center'>
                            <button onClick={_HandleDelete.bind(this, e.id)}
                              type='button' title='Xóa' className='transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2'><IconDelete /></button>
                          </div>
@@ -555,9 +619,7 @@ const Index = (props) => {
                   <div className='font-normal'><h3 className='text-blue-600'>{totalQty}</h3></div>
                 </div>
                 <div className='space-x-2'>
-                <button type='button'
-                    // onClick={_ToggleModal.bind(this,false)}
-                   className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]">{"Quay lại"}</button>
+                <button onClick={() => router.back()} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]">{"Quay lại"}</button>
                   <button onClick={_HandleSubmit.bind(this)}  type="submit"className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]">{"Lưu"}</button>
                 </div>
             </div>

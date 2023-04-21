@@ -201,7 +201,7 @@ const Header = () => {
                 },{
                     title: "Kiểm kê kho",
                     img: "/icon/header/kho/kk.png",
-                    link: "#"
+                    link: "/inventory"
                 }
 
             ]

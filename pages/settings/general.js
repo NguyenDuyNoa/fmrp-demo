@@ -57,13 +57,23 @@ const Index = (props) => {
             }
         }else if(code == "product_expiry"){
             if(dataProductExpiry?.is_enable == "0"){
-                sDataProductExpiry({...dataProductExpiry, is_enable: "1"})
+                if(dataProductSerial?.is_enable == "0"){
+                    sDataProductExpiry({...dataProductExpiry, is_enable: "1"})
+                }else{
+                    sDataProductExpiry({...dataProductExpiry, is_enable: "1"})
+                    sDataProductSerial({...dataProductSerial, is_enable: "0"})
+                }
             }else if(dataProductExpiry?.is_enable == "1"){
                 sDataProductExpiry({...dataProductExpiry, is_enable: "0"})
             }
         }else if(code == "product_serial"){
             if(dataProductSerial?.is_enable == "0"){
-                sDataProductSerial({...dataProductSerial, is_enable: "1"})
+                if(dataProductExpiry?.is_enable == "0"){
+                    sDataProductSerial({...dataProductSerial, is_enable: "1"})
+                }else{
+                    sDataProductSerial({...dataProductSerial, is_enable: "1"})
+                    sDataProductExpiry({...dataProductExpiry, is_enable: "0"})
+                }
             }else if(dataProductSerial?.is_enable == "1"){
                 sDataProductSerial({...dataProductSerial, is_enable: "0"})
             }

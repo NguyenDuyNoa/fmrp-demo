@@ -67,7 +67,8 @@ const Index = (props) => {
     const _ServerFetching_kho =  () =>{
       Axios("GET", `/api_web/api_warehouse/warehouse/?csrf_protection=true`, {
        params:{
-        limit: 0,   
+        limit: 0,  
+        "filter[is_system]":2 
        }
     }, (err, response) => {
       if(!err){

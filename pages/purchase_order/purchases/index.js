@@ -1,277 +1,758 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import moment from 'moment/moment';
 
 import {
     Grid6 as IconExcel, Filter as IconFilter, Calendar as IconCalendar, SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,Add as IconAdd
+    ArrowDown2 as IconDown,Add as IconAdd, TickCircle, ArrowCircleDown,Image as IconImage
 } from "iconsax-react";
 // import { Edit as IconEdit,  Grid6 as IconExcel, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User  } from "iconsax-react";
 
 import Select from 'react-select';
-import DatePicker from "react-datepicker";
+// import Datepicker from "react-tailwindcss-datepicker"; 
 import Popup from 'reactjs-popup';
 import { useRef } from 'react';
 import PopupEdit from "/components/UI/popup";
+import { useRouter } from 'next/router';
+import Loading from "components/UI/loading";
+import {_ServerInstance as Axios} from '/services/axios';
+import Pagination from '/components/UI/pagination';
+import 'react-datepicker/dist/react-datepicker.css';
+import Datepicker from 'react-tailwindcss-datepicker'
+import dayjs from 'dayjs';
+import 'dayjs/locale/vi';
+import { format } from "date-fns";
 
+dayjs.locale('vi');
+
+import Swal from "sweetalert2";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 2000,
+    timerProgressBar: true,
+})
 
-const Index = () => {
-    const dataMaChungTu = [
-        { value: 'chocolate', label: 'Chocolate' },
-        { value: 'strawberry', label: 'Strawberry' },
-        { value: 'vanilla', label: 'Vanilla' }
-    ]
+import ReactExport from "react-data-export";
+const ExcelFile = ReactExport.ExcelFile;
+const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-    const [dateRange, setDateRange] = useState([null, null]);
-    const [startDate, endDate] = dateRange;
+
+const Index = (props) => {
+    const dataLang = props.dataLang;
+    const router = useRouter();
+    const [data, sData] = useState([]);
+    const [dataExcel, sDataExcel] = useState([]);
+    const [onFetching, sOnFetching] = useState(true);
+    const [totalItems, sTotalItems] = useState([]);
+    const [keySearch, sKeySearch] = useState("")
+    const [limit, sLimit] = useState(15);
+    const [listDs, sListDs] = useState()
+    const tabPage = router.query?.tab;
+
+    const [listBr, sListBr]= useState()
+    const [listCode, sListCode]= useState()
+    const [listUser, sListUser]= useState()
+    const [idBranch, sIdBranch] = useState(null);
+    const [idCode, sIdCode] = useState(null);
+    const [idUser, sIdUser] = useState(null);
+    const [valueDate, sDate] = useState({startDate: null, endDate: null});
+    const [status, sStatus] = useState("")
+    const [active,sActive] = useState("")
+    const [onSending, sOnSending] = useState(false);
+
+
+    const _ServerFetching = () => {
+      const id = Number(tabPage)
+        Axios("GET", "/api_web/Api_purchases/purchases/?csrf_protection=true", {
+            params: {
+                search: keySearch,
+                limit: limit,
+                page: router.query?.page || 1,
+                "filter[branch_id]": idBranch?.length > 0 ? idBranch.map(e => e.value) : null,
+                "filter[status]": tabPage !== "" ? (tabPage !== "1" ? id : 1) : null ,
+                "filter[id]": idCode?.value,
+                "filter[staff_id]" : idUser?.value,
+                "filter[start_date]": valueDate?.startDate,
+                "filter[end_date]":valueDate?.endDate,
+
+            }
+        }, (err, response) => {
+            if(!err){
+                var {output, rResult} = response.data;
+                sData(rResult)
+                sDataExcel(rResult)
+                sTotalItems(output)
+            }
+            sOnFetching(false)
+        })
+    }
+    const _ServerFetching_filter =  () =>{
+      Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
+      if(!err){
+          var {rResult} =  response.data
+          sListBr(rResult)
+      }
+    })
+    Axios("GET", `/api_web/Api_purchases/purchases/?csrf_protection=true`, {}, (err, response) => {
+       if(!err){
+           var {rResult} =  response.data
+           sListCode(rResult)
+       }
+    })
+    Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {}, (err, response) => {
+       if(!err){
+           var {rResult} =  response.data
+           sListUser(rResult)
+       }
+    })
+    sOnFetching(false)
+    }
+    const listBr_filter = listBr ? listBr?.map(e =>({label: e.name, value: e.id})) : []
+    const listCode_filter = listCode ? listCode?.map(e => ({label: e.code, value : e.id})): []
+    const listUser_filter = listUser ? listUser?.map(e => ({label: e.name, value : e.staffid})): []
+    const onchang_filter= (type, value) => {
+      if(type == "branch"){
+        sIdBranch(value)
+      }else if(type == "code"){
+        sIdCode(value)
+      }else if(type == "user"){
+        sIdUser(value)
+      }else if(type == "date"){
+        sDate(value)
+      }
+    }
+    const _ServerFetching_group =  () =>{
+        Axios("GET", `/api_web/Api_purchases/purchasesFilterBar/?csrf_protection=true`, {
+          params:{
+            limit: 0,
+            search: keySearch,
+          }
+      }, (err, response) => {
+        if(!err){
+            var data =  response.data
+            sListDs(data)
+        }
+        sOnFetching(false)
+      })
+      }
+      const paginate = pageNumber => {
+        router.push({
+          pathname: router.route,
+          query: { 
+            tab: router.query?.tab,
+            page: pageNumber 
+          }
+        })
+      }
+
+      const _HandleSelectTab = (e) => {
+        router.push({
+            pathname: router.route,    
+            query: { tab: e }
+        })
+      }
+      useEffect(() => {
+        router.push({
+            pathname: router.route,    
+            query: { tab: router.query?.tab ? router.query?.tab : ""  }
+        })
+      }, []);
+    const _HandleOnChangeKeySearch = ({target: {value}}) => {
+        sKeySearch(value)
+        router.replace({
+          pathname: router.route,
+          query: { 
+            tab: router.query?.tab,
+          }
+        });
+        setTimeout(() => {
+          if(!value){
+            sOnFetching(true)
+          }
+          sOnFetching(true)
+        }, 500);
+      };
+      useEffect(() => {
+        onFetching && _ServerFetching() || onFetching && _ServerFetching_group()   || onFetching && _ServerFetching_filter()   
+      }, [onFetching]);
+      useEffect(() => {
+        router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || tabPage == "" && sOnFetching(true) || (idBranch?.length > 0 && sOnFetching(true)) || (idCode?.length > 0 && sOnFetching(true)) || (idUser?.length > 0 && sOnFetching(true)) || (valueDate?.length > 0 && sOnFetching(true))
+      }, [limit,router.query?.page, router.query?.tab,tabPage,idBranch,idCode,idUser,valueDate]);
+
+        const _ToggleStatus = (id) => {
+            Swal.fire({
+               title: `${"Thay đổi trạng thái"}`,
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonColor: '#296dc1',
+               cancelButtonColor: '#d33',
+               confirmButtonText: `${dataLang?.aler_yes}`,
+               cancelButtonText:`${dataLang?.aler_cancel}`
+             }).then((result) => {
+               if (result.isConfirmed) {
+                 sStatus(id)
+                 var index = data.findIndex(x => x.id === id);
+                 if (index !== -1 && data[index].status === "0") {
+                  sActive(data[index].status = "1")
+                 }else if (index !== -1 && data[index].status === "1") {
+                    sActive(data[index].status = "0")
+                  }
+                 sData([...data])
+               }
+             })
+           }
+        const _ServerSending =  () => {
+            let id = status
+            Axios("POST",`${id && `/api_web/Api_purchases/updateStatus/${id}/${active}}?csrf_protection=true`}`, {
+               
+                headers: {"Content-Type": "multipart/form-data"} 
+            }, (err, response) => {
+                if(!err){
+                    var {isSuccess, message } = response.data;  
+                    if(isSuccess){
+                        Toast.fire({
+                            icon: 'success',
+                            title: `${dataLang[message]}`
+                        })
+                      }
+                }
+                sOnSending(false)
+            })
+        }
+        useEffect(() => {
+        onSending && _ServerSending() 
+        }, [onSending]);
+        useEffect(()=>{
+           sOnSending(true)
+        },[active])
+        useEffect(()=>{
+           sOnSending(true)
+        },[status])
+        const multiDataSet = [
+            {
+                columns: [
+                    {title: "ID", width: {wch: 4}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `Ngày chứng từ `, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `Mã chứng từ`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `Số kế hoạc SX`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `Người đề nghị`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `Trạng thái`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `Tổng mặt hàng`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `Chưa đặt hàng`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `Đặt 1 phần`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `Đặt đủ đơn`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `Ghi chú`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `Chi nhánh`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                ],
+                data: dataExcel?.map((e) =>
+                    [
+                        {value: `${e?.id ? e.id : ""}`, style: {numFmt: "0"}},
+                        {value: `${e?.date ? e?.date : ""}`},
+                        {value: `${e?.code ? e?.code : ""}`},
+                        {value: `${e?.reference_no ? e?.reference_no : ""}`},
+                        {value: `${e?.staff_create_name ? e?.staff_create_name : ""}`},
+                        {value: `${e?.status ? (e?.status === "1" ? "Đã duyệt" : "Chưa duyệt") : ""}`},
+                        {value: `${e?.total_item ? e?.total_item  : ""}`},
+                        {value: `${"Chưa đặt hàng"}`},
+                        {value: `${"Đặt 1 phần"}`},
+                        {value: `${"Đặt đủ đơn"}`},
+                        {value: `${e?.note ? e?.note :""}`},
+                        {value: `${e?.branch_name ? e?.branch_name :""}`},
+                       
+                    ]    
+                ),
+            }
+        ];
+        
+       
     return (
         <React.Fragment>
             <Head>
                 <title>Yêu cầu mua hàng</title>
             </Head>
-            <div className='px-10 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen flex flex-col justify-between'>
-                <div className='3xl:h-[65%] 2xl:h-[60%] xl:h-[55%] h-[57%] space-y-2'>
+            <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between'>
+                <div className='h-[97%] space-y-3 overflow-hidden'>
                     <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
-                        <h6 className='text-[#141522]/40'>Mua & Nhập hàng</h6>
+                        <h6 className='text-[#141522]/40'>{"Yêu cầu mua hàng"}</h6>
                         <span className='text-[#141522]/40'>/</span>
-                        <h6>Yêu cầu mua hàng</h6>
+                        <h6 className='text-[#141522]/40'>{"Yêu cầu mua hàng"}</h6>
+                       
                     </div>
                     <div className='flex justify-between items-center'>
                         <h2 className='xl:text-3xl text-xl font-medium '>Yêu cầu mua hàng</h2>
                         <div className='flex space-x-3 items-center'>
-                            <Link href="/purchase_order/purchases/form" className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>Tao moi</Link>
+                        <Link href="/purchase_order/purchases/form" className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>Tạo mới</Link>
                         </div>
                     </div>
-                    
+                    <div className='flex items-center space-x-4 '>
+                         {listDs &&   listDs.map((e)=>{
+                          return (
+                           <div>
+                              <TabStatus
+                                key={e.id} 
+                                onClick={_HandleSelectTab.bind(this, `${e.id}`)} 
+                                total={e.count} 
+                                active={e.id} 
+                                className={`${e.color ? "text-white" : "text-[#0F4F9E] bg-[#e2f0fe] "}`}
+                              >{e.name === "all" && dataLang?.all_group || e.name === "confirmed" && dataLang?.confirmed || e.name === "not_confirmed" && dataLang?.not_confirmed || e.name === "purchases_filter_production_planning" && dataLang?.purchases_filter_production_planning }</TabStatus> 
+                            </div>
+                          )
+                      })
+                     }
+                    </div>
+                    <div className='bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2'>
+                        <div className='flex gap-2'>
+                            <form className="flex items-center relative w-[15vw]">
+                                <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
+                                <input
+                                    className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md 2xl:w-[400px] w-[250px]"
+                                    type="text"  
+                                    onChange={_HandleOnChangeKeySearch.bind(this)} 
+                                    placeholder={dataLang?.branch_search}
+                                />
+                            </form>
+                            <div className='w-[15vw]'>
+                                <Select 
+                                    options={[{ value: '', label: 'Chọn chi nhánh', isDisabled: true }, ...listBr_filter]}
+                                    onChange={onchang_filter.bind(this, "branch")}
+                                    value={idBranch}
+                                    isClearable={true}
+                                    // isMulti
+                                    closeMenuOnSelect={false}
+                                    hideSelectedOptions={false}
+                                    placeholder={dataLang?.client_list_brand || "client_list_brand"}
+                                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                                    isSearchable={true}
+                                    // components={{ MultiValue }}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                    styles={{
+                                        placeholder: (base) => ({
+                                        ...base,
+                                        color: "#cbd5e1",
+                                    }),
+                                    control: (base,state) => ({
+                                        ...base,
+                                        border: 'none',
+                                        outline: 'none',
+                                        boxShadow: 'none',
+                                        ...(state.isFocused && {
+                                            boxShadow: '0 0 0 1.5px #0F4F9E',
+                                        }),
+                                    })
+                                }}
+                                />
+                            </div>
+                            <div className='w-[15vw]'>
+                                <Select 
+                                    options={[{ value: '', label: 'Chọn mã chứng từ', isDisabled: true }, ...listCode_filter]}
+                                    onChange={onchang_filter.bind(this, "code")}
+                                    value={idCode}
+                                    noOptionsMessage={() => `${dataLang?.no_data_found}`}
+                                    isClearable={true}
+                                    placeholder={"Mã chứng từ"}
+                                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                                    isSearchable={true}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                    styles={{
+                                    placeholder: (base) => ({
+                                        ...base,
+                                        color: "#cbd5e1",
+                                    }),
+                                    control: (base,state) => ({
+                                        ...base,
+                                        border: 'none',
+                                        outline: 'none',
+                                        boxShadow: 'none',
+                                        ...(state.isFocused && {
+                                            boxShadow: '0 0 0 1.5px #0F4F9E',
+                                        }),
+                                    })
+                                }}
+                                />
+                            </div>
+                            <div className='w-[15vw]'>
+                                <Select 
+                                    options={[{ value: '', label: 'Chọn người đề nghị', isDisabled: true }, ...listUser_filter]}
+                                    // formatOptionLabel={CustomSelectOption}
+                                    onChange={onchang_filter.bind(this, "user")}
+                                    value={idUser}
+                                    noOptionsMessage={() => `${dataLang?.no_data_found}`}
+                                    isClearable={true}
+                                    placeholder={"Người đề nghị"}
+                                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
+                                    isSearchable={true}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                    styles={{
+                                    placeholder: (base) => ({
+                                        ...base,
+                                        color: "#cbd5e1",
+                                    }),
+                                    control: (base,state) => ({
+                                        ...base,
+                                        border: 'none',
+                                        outline: 'none',
+                                        boxShadow: 'none',
+                                        ...(state.isFocused && {
+                                            boxShadow: '0 0 0 1.5px #0F4F9E',
+                                        }),
+                                    })
+                                }}
+                                />
+                            </div>
+                            <div className='w-[15vw] z-20'>
+                            <Datepicker            
+                                value={valueDate} 
+                                onChange={onchang_filter.bind(this, "date")}
+                                showShortcuts={true} 
+                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] "
+                                dateFormat={(date) => dayjs(date).format('DD/MM/YYYY')}
+                                locale="vi"
+                            />
+                            </div>
+                        </div>
+                        {data?.length != 0 &&
+                            <div className='flex space-x-6'>
+                                <ExcelFile filename="Yêu cầu mua hàng" element={
+                                    <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
+                                        <IconExcel size={18} />
+                                        <span>{dataLang?.client_list_exportexcel}</span>
+                                    </button>
+                                }>
+                                    <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Yêu cầu mua hàng" />
+                                </ExcelFile>
+
+                                <div className="flex space-x-2 items-center">
+                                    <label className="font-[300] text-slate-400">{dataLang?.display} :</label>
+                                    <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
+                                        <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
+                                        <option value={15}>15</option>
+                                        <option value={20}>20</option>
+                                        <option value={40}>40</option>
+                                        <option value={60}>60</option>
+                                        {/* <option value={-1}>Tất cả</option> */}
+                                    </select>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div className='min:h-[500px] 2xl:h-[76%] h-[70%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 tooltipBoundary'>
+                        <div className='pr-2'>
+                            <div className='grid grid-cols-12 sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]'>
+                            <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>Ngày chứng từ</h4>   
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>Mã chứng từ</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>Số kế hoạch SX</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>Người đề nghị</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300] text-center'>Trạng thái</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 text-center font-[300]'>Tổng mặt hàng</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-left col-span-3 font-[300]'>Trạng thái đặt hàng</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-left col-span-1 font-[300]'>Ghi chú</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>Chi nhánh</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-center  col-span-1 font-[300]'>Tác vụ</h4>
+                            </div>
+                            {onFetching ?
+                                <Loading className="h-80"color="#0f4f9e" />
+                                :
+                                <React.Fragment>
+                                    {data?.length == 0 &&
+                                        <div className=" max-w-[352px] mt-24 mx-auto" >
+                                            <div className="text-center">
+                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">{dataLang?.no_data_found || "no_data_found"}</h1>
+                                            </div>
+                                        </div>
+                                    }
+                                    <div className="divide-y divide-slate-200"> 
+                                        {data.map((e) => 
+                                            <div key={e?.id.toString()} className='grid grid-cols-12 hover:bg-slate-50 relative'>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center '>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY, h:mm:ss") : ""}</h6> 
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center  text-[#0F4F9e] font-medium cursor-pointer'><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center '>{e?.reference_no }</h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center '>{e?.staff_create_name}</h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center cursor-pointer'>{e?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>Đã duyệt <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>Chưa duyệt <TickCircle size={22}/></div>)}</h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center '>{e?.total_item}</h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-3 flex items-center '><div className='flex flex-wrap  gap-2 items-center justify-start'><span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>Chưa đặt hàng</span><span className=' font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>Đặt 1 phần (0)</span><span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'> <TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>Đặt đủ đơn (0)</span></div></h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex text-left items-center '>{e?.note}</h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center  '><span className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6>
+                                                <div className='pl-2 py-2.5 col-span-1 flex space-x-2 justify-center'>
+                                                    <BtnTacVu  dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} status={e?.status} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </React.Fragment>
+                            }
+                        </div>
+                    </div>
                 </div>
-                <div className='flex justify-between '>
-                    <p className='text-[#667085] font-[400] xl:text-base text-xs'>Hiển thị từ 1 đến 15 của 20 các mục</p>
-                </div>
+                {data?.length != 0 &&
+                    <div className='flex space-x-5 items-center'>
+                        <h6>Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords} thành phần</h6>
+                        <Pagination 
+                        postsPerPage={limit}
+                        totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                        paginate={paginate}
+                        currentPage={router.query?.page || 1}
+                        />
+                    </div> 
+                }
             </div>
         </React.Fragment>
     );
 }
-
-const Tab_DanhSach = React.memo(() => {
-    const [tab, sTab] = useState(0);
-    const _HandleSelectTab = (e) => sTab(e);
-
+const TabStatus = React.memo((props) => {
+    const router = useRouter();
     return(
-        <div className='xl:space-y-3 space-y-2'>
-            <div className='flex space-x-1 border-b border-slate-200'>
-                <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ? "text-[#0F4F9E] border-[#0F4F9E] from-[#0F4F9E]/10" : "text-slate-400 hover:text-[#0F4F9E]/70 border-transparent" } xl:text-base text-xs bg-gradient-to-t border-b-[2px] xl:py-2 py-1 xl:px-4 px-3 font-medium`}>Tất cả</button>
-                <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ? "text-[#0F4F9E] border-[#0F4F9E] from-[#0F4F9E]/10" : "text-slate-400 hover:text-[#0F4F9E]/70 border-transparent" } xl:text-base text-xs bg-gradient-to-t border-b-[2px] xl:py-2 py-1 xl:px-4 px-3 font-medium`}>Hóa đơn thuế (0)</button>
-                <button onClick={_HandleSelectTab.bind(this, 2)} className={`${tab === 2 ? "text-[#0F4F9E] border-[#0F4F9E] from-[#0F4F9E]/10" : "text-slate-400 hover:text-[#0F4F9E]/70 border-transparent" } xl:text-base text-xs bg-gradient-to-t border-b-[2px] xl:py-2 py-1 xl:px-4 px-3 font-medium`}>Hóa đơn lẻ (20)</button>
-                <button onClick={_HandleSelectTab.bind(this, 3)} className={`${tab === 3 ? "text-[#0F4F9E] border-[#0F4F9E] from-[#0F4F9E]/10" : "text-slate-400 hover:text-[#0F4F9E]/70 border-transparent" } xl:text-base text-xs bg-gradient-to-t border-b-[2px] xl:py-2 py-1 xl:px-4 px-3 font-medium`}>Đã chi (3)</button>
-                <button onClick={_HandleSelectTab.bind(this, 4)} className={`${tab === 4 ? "text-[#0F4F9E] border-[#0F4F9E] from-[#0F4F9E]/10" : "text-slate-400 hover:text-[#0F4F9E]/70 border-transparent" } xl:text-base text-xs bg-gradient-to-t border-b-[2px] xl:py-2 py-1 xl:px-4 px-3 font-medium`}>Chi 1 phần (1)</button>
-                <button onClick={_HandleSelectTab.bind(this, 5)} className={`${tab === 5 ? "text-[#0F4F9E] border-[#0F4F9E] from-[#0F4F9E]/10" : "text-slate-400 hover:text-[#0F4F9E]/70 border-transparent" } xl:text-base text-xs bg-gradient-to-t border-b-[2px] xl:py-2 py-1 xl:px-4 px-3 font-medium`}>Chưa chi (17)</button>
-            </div>
-            <div className='bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2'>
-                <form className="flex items-center relative">
-                    <IconSearch size={20} className='absolute left-3 z-10 text-[#cccccc]' />
-                    <input
-                        className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
-                        type="text"
-                        placeholder="Search by PO number, name, amount..."
-                    />
-                </form>
-                <div className='flex space-x-3'>
-                    <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-base text-xs flex items-center space-x-2 bg-white rounded'>
-                        <IconFilter size={18} />
-                        <span>Lọc</span>
-                    </button>
-                    <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-base text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded'>
-                        <IconExcel size={18} />
-                        <span>Xuất Excel</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    )
-})
+      <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[220px] flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
+        {router.query?.tab === `${props.active}` && <ArrowCircleDown   size="20" color="#0F4F9E" />}
+        {props.children}
+        <span className={`${props?.total > 0 && "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"} `}>{props?.total > 0 && props?.total}</span>
+      </button>
 
-const List_DanhSach = React.memo(() => {
-    
-    const data = [
-        {
-            id: 1,
-            type: 0,
-            vendor: "Jane Cooper",
-            date: "22/02/2022",
-            amount: 2000000,
-            note: "hi",
-            status: 0
-        },{
-            id: 2,
-            type: 0,
-            vendor: "Jane Cooper",
-            date: "22/02/2022",
-            amount: 2000000,
-            note: "hi",
-            status: 0
-        },{
-            id: 3,
-            type: 0,
-            vendor: "Jane Cooper",
-            date: "22/02/2022",
-            amount: 2000000,
-            note: "hi",
-            status: 0
-        },{
-            id: 4,
-            type: 0,
-            vendor: "Jane Cooper",
-            date: "22/02/2022",
-            amount: 2000000,
-            note: "hi",
-            status: 0
-        },{
-            id: 5,
-            type: 0,
-            vendor: "Jane Cooper",
-            date: "22/02/2022",
-            amount: 2000000,
-            note: "hi",
-            status: 0
-        },{
-            id: 6,
-            type: 0,
-            vendor: "Jane Cooper",
-            date: "22/02/2022",
-            amount: 2000000,
-            note: "hi",
-            status: 0
-        },{
-            id: 7,
-            type: 0,
-            vendor: "Jane Cooper",
-            date: "22/02/2022",
-            amount: 2000000,
-            note: "hi",
-            status: 0
-        },{
-            id: 8,
-            type: 0,
-            vendor: "Jane Cooper",
-            date: "22/02/2022",
-            amount: 2000000,
-            note: "hi",
-            status: 0
-        },{
-            id: 9,
-            type: 0,
-            vendor: "Jane Cooper",
-            date: "22/02/2022",
-            amount: 2000000,
-            note: "hi",
-            status: 0
-        },{
-            id: 10,
-            type: 0,
-            vendor: "Jane Cooper",
-            date: "22/02/2022",
-            amount: 2000000,
-            note: "hi",
-            status: 0
-        },{
-            id: 11,
-            type: 0,
-            vendor: "Jane Cooper",
-            date: "22/02/2022",
-            amount: 2000000,
-            note: "hi",
-            status: 0
-        },{
-            id: 12,
-            type: 0,
-            vendor: "Jane Cooper",
-            date: "22/02/2022",
-            amount: 2000000,
-            note: "hi",
-            status: 0
-        },{
-            id: 13,
-            type: 0,
-            vendor: "Jane Cooper",
-            date: "22/02/2022",
-            amount: 2000000,
-            note: "hi",
-            status: 0
-        }
-    ]
-    return(
-        <div className='min:h-[500px] h-[100%] max:h-[900px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
-            <div className='xl:w-[100%] w-[110%] pr-2'>
-                <div className='flex items-center sticky top-0 bg-white p-2 z-10'>
-                    <div className='w-[2%]'>
-                        <input type='checkbox' className='scale-125' />
-                    </div>
-                    <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[13%] font-[300]'>DOCUMENT NUMBER</h4>
-                    <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[13%] font-[300] text-center'>loại</h4>
-                    <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[14%] font-[300]'>Vendor</h4>
-                    <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[12%] font-[300] text-center'>Billing day</h4>
-                    <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[12%] font-[300] text-center'>Status</h4>
-                    <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[13%] font-[300] text-right'>Amount</h4>
-                    <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[13%] font-[300]'>Note</h4>
-                </div>
-                <div className='divide-y divide-slate-200 overflow-auto min:h-[400px] h-[100%] max:h-[600px]'>
-                    {data.map((e) => 
-                        <div className='flex items-center py-1.5 px-2 hover:bg-slate-100/40 ' key={e.id.toString()}>
-                            <div className='w-[2%]'>
-                                <input type='checkbox' className='scale-125' />
-                            </div>
-                            <h6 className='xl:text-base text-xs px-2 w-[13%]'>{e.id}</h6>
-                            <h6 className='xl:text-base text-xs px-2 w-[13%] text-center'>{e.type}</h6>
-                            <h6 className='xl:text-base text-xs px-2 w-[14%]'>{e.vendor}</h6>
-                            <h6 className='xl:text-base text-xs px-2 w-[12%] text-center'>{e.date}</h6>
-                            <h6 className='xl:text-base text-xs px-2 w-[12%] text-center'>{e.status}</h6>
-                            <h6 className='xl:text-base text-xs px-2 w-[13%] text-right'>{e.amount?.toLocaleString()}</h6>
-                            <h6 className='xl:text-base text-xs px-2 w-[13%]'>{e.note}</h6>
-                            <div className='w-[8%] flex justify-end'>
-                                <BtnTacVu className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded xl:text-base text-xs" />
-                                {/* <button className='bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded xl:text-base text-xs'>Tác vụ</button> */}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
-    )
-})
 
+    )
+  })
 const BtnTacVu = React.memo((props) => {
+    const [openTacvu, sOpenTacvu] = useState(false);
+    const _ToggleModal = (e) => sOpenTacvu(e);
+
+    const [openDetail, sOpenDetail] = useState(false);
+    const router = useRouter()
+
+    const _HandleDelete = (id) => {
+        Swal.fire({
+            title: `${props.dataLang?.aler_ask}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#296dc1',
+            cancelButtonColor: '#d33',
+            confirmButtonText: `${props.dataLang?.aler_yes}`,
+            cancelButtonText:`${props.dataLang?.aler_cancel}`
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Axios("DELETE", `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`, {
+            }, (err, response) => {
+              if(!err){
+                var {isSuccess, message} = response.data;
+                if(isSuccess){
+                  Toast.fire({
+                    icon: 'success',
+                    title: props.dataLang[message]
+                  })     
+                  props.onRefresh && props.onRefresh()
+                }else{
+                    Toast.fire({
+                        icon: 'error',
+                        title: props.dataLang[message]
+                    }) 
+                }
+              }
+            })     
+        }
+        })
+    }
+    const handleClick = () => {
+        if (props?.status === "1") {
+            Toast.fire({
+                icon: 'error',
+                title: `${props.dataLang?.confirmed_cant_edit}`
+              })   
+        } else {
+          router.push(`/purchase_order/purchases/form?id=${props.id}`);
+        }
+      };
     return(
         <div>
             <Popup
-                trigger={
-                    <button className={`flex space-x-1 items-center ` + props.className } >
-                        <span>Tác vụ</span>
-                        <IconDown size={15} />
-                    </button>
-                }
-                closeOnDocumentClick
+                trigger={<button className={`flex space-x-1 items-center ` + props.className } ><span>Tác vụ</span><IconDown size={12} /></button>}
                 arrow={false}
                 position="bottom right"
                 className={`dropdown-edit `}
+                keepTooltipInside={props.keepTooltipInside}
+                closeOnDocumentClick
+                nested
+                onOpen={_ToggleModal.bind(this, true)}
+                onClose={_ToggleModal.bind(this, false)}
+                // open={open || openDetail || openBom}
             >
-                <div className="w-auto">
-                    <div className="bg-white p-0.5 rounded-t w-52">
-                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Export Excel</button>
-                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Import Excel</button>
-                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Import BOM</button>
-                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Import công đoạn</button>
-                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Thống kê và tìm kiếm</button>
-                        <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Xóa</button>
+                <div className="w-auto rounded">
+                    <div className="bg-white rounded-t flex flex-col overflow-hidden">
+                        {/* <Popup_GiaiDoan setOpen={sOpen} isOpen={open} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
+                        <Popup_Bom setOpen={sOpenBom} isOpen={openBom} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
+                        <Popup_ThanhPham onRefresh={props.onRefresh} dataProductExpiry={props.dataProductExpiry} dataLang={props.dataLang} id={props?.id} setOpen={sOpenDetail} isOpen={openDetail} className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full" /> */}
+                        <button onClick={handleClick}className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">Sửa phiếu</button>
+                        <button onClick={_HandleDelete.bind(this, props.id)} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Xoá phiếu</button>
                     </div>
                 </div>
             </Popup>
         </div>
     )
 })
+const Popup_chitiet =(props)=>{
+    const scrollAreaRef = useRef(null);
+    const [open, sOpen] = useState(false);
+    const _ToggleModal = (e) => sOpen(e);
+    const [data,sData] =useState()
+    const [onFetching, sOnFetching] = useState(false);
+    useEffect(() => {
+      props?.id && sOnFetching(true) 
+    }, [open]);
+    const _ServerFetching_detailUser = () =>{
+      Axios("GET", `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+      if(!err){
+          var db =  response.data
+  
+          sData(db)
+      }
+      sOnFetching(false)
+    })
+    }
+    useEffect(() => {
+      onFetching && _ServerFetching_detailUser()
+    }, [open]);
+    let listQty = data?.items
+    let totalQuantity = 0;
+    for (let i = 0; i < listQty?.length; i++) {
+    totalQuantity += parseInt(listQty[i].quantity);
+    }
+   
+    console.log(data?.items?.map(e => e.item));
+  return (
+  <>
+   <PopupEdit   
+      title={"Chi tiết phiếu yêu cầu mua hàng"} 
+      button={props?.name} 
+      onClickOpen={_ToggleModal.bind(this, true)} 
+      open={open} onClose={_ToggleModal.bind(this,false)}
+      classNameBtn={props?.className} 
+    >
+    <div className='flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
+       
+    </div>  
+            <div className="mt-4 space-x-5 w-[999px] h-auto  ">        
+            <div>
+             <div className='w-[999px]'>
+               <div className="min:h-[200px] h-[72%] max:h-[400px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+               <h2 className='font-normal bg-[#ECF0F4] p-2'>Thông tin chung</h2>       
+                <div className='grid grid-cols-8  min-h-[200px] p-2'>
+                    <div className='col-span-3'>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Ngày chứng từ</h3><h3 className='col-span-1 font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, h:mm:ss") : ""}</h3></div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Mã chứng từ</h3><h3 className='col-span-1 font-normal'>{data?.code}</h3></div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Số kế hoạch SX</h3><h3 className='col-span-1 font-normal'>{data?.reference_no}</h3></div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Người đề nghị</h3><h3 className='col-span-1 font-normal'>{data?.user_create_name}</h3></div>
+                    </div>
+                    <div className='col-span-2 mx-auto'>
+                        <div className='my-4 font-medium '>Trạng thái đặt hàng</div>
+                        <div className=' font-normal text-sky-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-sky-200'>Chưa đặt hàng</div>
+                        <div className=' font-normal text-orange-500 rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-orange-200'>Đặt 1 phần (0)</div>
+                        <div className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>Đặt đủ đơn (0)</div>
+                    </div>
+                    <div className='col-span-3 '>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Trạng thái</h3><h3 className='col-span-1'>{data?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1'>Đã duyệt <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>Chưa duyệt <TickCircle size={22}/></div>)}</h3></div>  
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Tổng mặt hàng</h3><h3 className='col-span-1 font-normal'>{data?.items?.length}</h3></div>
+                        {/* <div className='my-4 font-medium grid grid-cols-2'>Tổng số lượng</div> */}
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Ghi chú</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Chi nhánh</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] col-span-1">{data?.branch_name}</h3></div>
+                    </div>
+                    
+                </div>
+                <div className="pr-2 w-[100%] lx:w-[110%] ">
+                  <div className="grid grid-cols-8 sticky top-0 bg-slate-100 p-2 z-10">
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{"Hình"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{"Mặt hàng"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{"Biến thể"}</h4> 
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"Đơn vị tính"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"Số lượng"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{"Số lượng đã mua"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{"Số lượng còn lại"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{"Ghi chú"}</h4>
+                  </div>
+                  {onFetching ?
+                    <Loading className="h-80"color="#0f4f9e" /> 
+                    : 
+                    data?.items?.length > 0 ? 
+                    (<>
+                         <ScrollArea     
+                           className="min-h-[300px] max-h-[330px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+                      <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px]">                       
+                        {(data?.items?.map((e) => 
+                          <div className="grid items-center grid-cols-8 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
+                            <h6 className="xl:text-base text-xs   py-0.5 col-span-1  rounded-md text-left">
+                            {e?.item?.images != null ? (<img src={e?.item?.images} alt="Product Image" style={{ width: "50px", height: "60px" }} className='object-cover rounded' />):
+                                    <div className='w-[50px] h-[60px] object-cover bg-gray-200 flex items-center justify-center rounded'>
+                                      <IconImage/>
+                                    </div>
+                                  }
+                            </h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.item?.name}</h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left break-words">{e?.item?.product_variation}</h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.unit_name}</h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.quantity}</h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.note}</h6>                
+                          </div>
+                        ))}              
+                      </div>   
+                        </ScrollArea>                       
+                      </>
+                    )  : 
+                    (
+                      <div className=" max-w-[352px] mt-24 mx-auto" >
+                        <div className="text-center">
+                          <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+                          <h1 className="textx-[#141522] text-base opacity-90 font-medium">Không tìm thấy các mục</h1>
+                          <div className="flex items-center justify-around mt-6 ">
+                              {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+                          </div>
+                        </div>
+                      </div>
+                    )}    
+                </div>
+                <div className="sticky bottom-0 bg-slate-100 p-2 z-10">
+                    <h3 className=''>Tổng số lượng : {totalQuantity}</h3>       
+                </div>
+              </div>
+            </div>
+      
+       </div>
+    
+      </div>    
+    </PopupEdit>
+  </>
+  )
+  }
 
 
 
