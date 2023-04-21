@@ -502,7 +502,7 @@ const Index = (props) => {
                                     <h5 className='text-gray-400 font-normal'>{option.e?.code}</h5>
                                     <h5 className='text-[#0F4F9E] font-medium'>{option.e?.product_variation}</h5>
                                   </div>
-                                  <h5 className='text-gray-400 font-medium text-xs'>{option.e?.text_type === "product" ? dataLang?.product : option.e?.text_type === "material" ? dataLang?.material : ""}</h5>
+                                  <h5 className='text-gray-400 font-medium text-xs'>{option.e?.text_type === "products" ? dataLang?.product : option.e?.text_type === "material" ? dataLang?.material : ""}</h5>
                                 </div>
                               </div>
                               <div className=''>
