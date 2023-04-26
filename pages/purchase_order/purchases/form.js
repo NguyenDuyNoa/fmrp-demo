@@ -37,13 +37,12 @@ const Index = (props) => {
     };
     const [onFetching, sOnFetching] = useState(false);
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
-    const [fetchingSuccess, sFetchingSuccess] = useState(false);
 
     const [data, sData] = useState([]);
     const [listBr, sListBr]= useState()
     const [idBranch, sIdBranch] = useState(null);
     const [code, sCode] = useState('')
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
+    const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD HH:mm:ss'));
     const [namePromis, sNamePromis] = useState('Yêu cầu mua hàng (PR)')
     const [note, sNote] = useState()
 
@@ -54,7 +53,6 @@ const Index = (props) => {
     const [errCode, sErrCode] = useState(false);
     const [errDate, sErrDate] = useState(false);
     const [errBranch, sErrBranch] = useState(false);
-   
     const [onSending, sOnSending] = useState(false);
     useEffect(() => {
       router.query && sErrDate(false)
@@ -63,11 +61,14 @@ const Index = (props) => {
       router.query && sErrBranch(false)
       router.query && sCode( "")
       router.query && sNamePromis('Yêu cầu mua hàng (PR)')
-      router.query && setSelectedDate(new Date().toISOString().slice(0, 10))
+      router.query && setSelectedDate(moment().format('YYYY-MM-DD HH:mm:ss'))
       router.query && sNote("")
   }, [router.query]);
   const options = data?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e}))
   const [option, sOption] = useState([{id: Date.now(), mathang: null, donvitinh:"", soluong:0, ghichu:""}]);
+    const slicedArr = option.slice(1);
+    const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
+    sortedArr.unshift(option[0]);
     const _ServerFetching =  () => {
         Axios("GET", "/api_web/api_product/searchItemsVariant?csrf_protection=true", { 
         }, (err, response) => {
@@ -75,7 +76,7 @@ const Index = (props) => {
                 var {result} =  response.data.data
                 sData(result)
             }
-            sOnFetching(false)
+           
         })
         Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {
           params:{
@@ -83,11 +84,11 @@ const Index = (props) => {
           }
        }, (err, response) => {
          if(!err){
-             var {rResult, output} =  response.data
+             var {rResult} =  response.data
              sListBr(rResult)
          }
-         sOnFetching(false)
-       })
+        })
+        sOnFetching(false)
     }
     const _ServerFetchingDetail =  () => {
       Axios("GET", `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`, {
@@ -96,7 +97,7 @@ const Index = (props) => {
             var rResult = response.data;
           sCode(rResult?.code )
           sNamePromis(rResult?.name)
-          setSelectedDate(moment(rResult?.date).format("YYYY-MM-DD"))
+          setSelectedDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
           sNote(rResult?.note)
           sIdBranch(({label: rResult?.branch_name, value:rResult?.branch_id}))
           const itemlast =  [{mathang: null}]
@@ -137,7 +138,7 @@ const Index = (props) => {
         if(type == "branch"){
           sIdBranch(value)
         }else if(type == "date"){
-          setSelectedDate(value.target.value)
+          setSelectedDate(moment(value.target.value).format('YYYY-MM-DD HH:mm:ss'))
         }else if(type == "code"){
           sCode(value.target.value)
         }else if(type == "namePromis"){
@@ -217,20 +218,19 @@ const Index = (props) => {
       };
       const _HandleSubmit = (e) => {
         e.preventDefault();
-        if(namePromis?.length == 0 || selectedDate?.length == 0 || branch_id == null){
-          namePromis?.length == 0 && sErrName(true);
-          selectedDate?.length == 0 && sErrDate(true)
-          branch_id == null && sErrBranch(true)
-            Toast.fire({
-                icon: 'error',
-                title: `${props.dataLang?.required_field_null}`
-            })
-        }else {
-            sOnSending(true)
-        }
+          if(namePromis?.length == 0 || selectedDate?.length == 0 || branch_id == null){
+            namePromis?.length == 0 && sErrName(true);
+            selectedDate?.length == 0 && sErrDate(true)
+            branch_id == null && sErrBranch(true)
+              Toast.fire({
+                  icon: 'error',
+                  title: `${props.dataLang?.required_field_null}`
+              })
+          }else {
+              sOnSending(true)
+          }
       }
-
-      const dataOption = option?.map(e => { return {data: e?.mathang?.value, soluong: e.soluong, ghichu:e.ghichu}})
+      const dataOption = sortedArr?.map(e => { return {data: e?.mathang?.value, soluong: e.soluong, ghichu:e.ghichu}})
       const newDataOption = dataOption?.filter(e => e?.data !== undefined);
       const readOnlyFirst = true;
 
@@ -238,7 +238,7 @@ const Index = (props) => {
         var formData = new FormData();
         formData.append("code", code)
         formData.append("name", namePromis)
-        formData.append("date", selectedDate)
+        formData.append("date", (moment(selectedDate).format("YYYY-MM-DD HH:mm:ss")))
         formData.append("branch_id", branch_id)
         formData.append("note", note)
         newDataOption.forEach((item, index) => {
@@ -246,7 +246,7 @@ const Index = (props) => {
           formData.append(`items[${index}][quantity]`, item?.soluong);
           formData.append(`items[${index}][note]`, item?.ghichu);
       });  
-        Axios("POST", `/api_web/Api_purchases/purchases/?csrf_protection=true`, {
+        Axios("POST", `${id ? `/api_web/Api_purchases/purchases/${id}?csrf_protection=true` : `/api_web/Api_purchases/purchases/?csrf_protection=true`}`, {
             data: formData,
             headers: {'Content-Type': 'multipart/form-data'}
         }, (err, response) => {
@@ -259,7 +259,8 @@ const Index = (props) => {
                     })
                     sCode("")
                     sNamePromis('Yêu cầu mua hàng (PR)')
-                    setSelectedDate(new Date().toISOString().slice(0, 10))
+                    // setSelectedDate(new Date().toISOString().slice(0, 10))
+                    setSelectedDate(moment().format('YYYY-MM-DD HH:mm:ss'))
                     sNote("")
                     sIdBranch(null)
                     sErrDate(false)
@@ -311,9 +312,10 @@ const Index = (props) => {
         sErrName(false)
       }, [namePromis?.length > 0]);
 
-      // useEffect(() => {
-      //   sErrCode(false)
-      // }, [code?.length > 0]);
+      useEffect(() => {
+      
+        sErrCode(false)
+      }, [code?.length > 0]);
 
       useEffect(() => {
         sErrDate(false)
@@ -346,64 +348,64 @@ const Index = (props) => {
   return (
     <React.Fragment>
     <Head>
-        <title>{id ? "Sửa phiếu yêu cầu mua hàng" : "Tạo phiếu yêu cầu mua hàng"}</title>
+        <title>{id ? dataLang?.purchase_edit || "purchase_edit" : dataLang?.purchase_add || "purchase_add"}</title>
     </Head>
     {/* <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between'> */}
     <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between'>
         <div className='h-[97%] space-y-3 overflow-hidden'>
             <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
-                <h6 className='text-[#141522]/40'>{"Mua hàng"}</h6>
+                <h6 className='text-[#141522]/40'>{dataLang?.purchase_purchase || "purchase_purchase"}</h6>
                 <span className='text-[#141522]/40'>/</span>
-                <h6>{id ? "Sửa phiếu yêu cầu mua hàng" : "Tạo phiếu yêu cầu mua hàng"}</h6>
+                <h6>{id ? dataLang?.purchase_edit || "purchase_edit" : dataLang?.purchase_add || "purchase_add"}</h6>
             </div>
             <div className='flex justify-between items-center'>
-                <h2 className='xl:text-2xl text-xl '>{id ? "Sửa phiếu yêu cầu mua hàng" : "Tạo phiếu yêu cầu mua hàng"}</h2>
+                <h2 className='xl:text-2xl text-xl '>{id ? dataLang?.purchase_edit || "purchase_edit" : dataLang?.purchase_add || "purchase_add"}</h2>
                 <div className="flex justify-end items-center">
                     <button   onClick={() => router.back()} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105">{dataLang?.warehouses_detail_back}</button>
                   </div>
             </div>    
             <div className=' w-full rounded'>
               <div className=''>  
-                  <h2 className='font-normal bg-[#ECF0F4] p-2'>Thông tin chung</h2>       
+                  <h2 className='font-normal bg-[#ECF0F4] p-2'>{dataLang?.purchase_general || "purchase_general"}</h2>       
                   
                     <div className="flex flex-wrap justify-between items-center mt-2"> 
                       <div className='w-[24.5%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{"Mã chứng từ"} </label>
+                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_code || "purchase_code"} </label>
                           <input
                             value={code}                
                             onChange={_HandleChangeInput.bind(this, "code")}
                             name="fname"                      
                             type="text"
-                            placeholder={"Mặc định theo hệ thống"}
+                            placeholder={dataLang?.purchase_err_Name_sytem || "purchase_err_Name_sytem"}
                             className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                       </div>
                       <div className='w-[24.5%]'>
-                              <label className="text-[#344054] font-normal text-sm mb-1 ">{"Ngày chứng từ"} <span className="text-red-500">*</span></label>
+                              <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_day || "purchase_day"} <span className="text-red-500">*</span></label>
                               <input
                                 value={selectedDate}              
                                 onChange={_HandleChangeInput.bind(this, "date")}
                                 name="fname"                      
-                                type="date"
-                                placeholder={"Mặc định theo hệ thống"}
+                                type="datetime-local"
+                                placeholder={dataLang?.purchase_err_Name_sytem || "purchase_err_Name_sytem"}
                                 className={`${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
-                                {errDate && <label className="text-sm text-red-500">{"Vui lòng nhập ngày chứng từ" || ""}</label>}
+                                {errDate && <label className="text-sm text-red-500">{dataLang?.purchase_err_Date || "purchase_err_Date"}</label>}
                             
                           </div>
                       <div className='w-[24.5%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{"Tên phiếu yêu cầu"}</label>
+                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_name || "purchase_name"}</label>
                             <input
                             value={namePromis}                
                             onChange={_HandleChangeInput.bind(this, "namePromis")}
                             name="fname"                      
                             type="text"
-                            placeholder={"Tên phiếu yêu cầu"}
+                            placeholder={dataLang?.purchase_name || "purchase_name"}
                             className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
-                            {errName && <label className="text-sm text-red-500">{"Vui lòng nhập tên phiếu" || ""}</label>}
+                            {errName && <label className="text-sm text-red-500">{dataLang?.purchase_err_Name || "purchase_err_Name"}</label>}
                         
                         {/* <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_name}<span className="text-red-500">*</span></label> */}
                         </div>
                         <div className='w-[24.5%]'>
-                        <label className="text-[#344054] font-normal text-sm mb-1 ">{"Chi nhánh"} <span className="text-red-500">*</span></label>
+                        <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_branch || "purchase_branch"} <span className="text-red-500">*</span></label>
                           <Select 
                               options={listBr_filter}
                               onChange={_HandleChangeInput.bind(this, "branch")}
@@ -441,6 +443,7 @@ const Index = (props) => {
                                   // border: 'none',
                                   // outline: 'none',
                                   boxShadow: 'none',
+                                  padding:"2.7px",
                                 ...(state.isFocused && {
                                   border: '0 0 0 1px #92BFF7',
                                 }),
@@ -448,7 +451,7 @@ const Index = (props) => {
                             }}
                             />
                             
-                            {errBranch && <label className="text-sm text-red-500">{"Vui lòng chọn chi nhánh" || ""}</label>}
+                            {errBranch && <label className="text-sm text-red-500">{dataLang?.purchase_err_branch || "purchase_err_branch"}</label>}
                           </div>
                       
                         
@@ -456,15 +459,15 @@ const Index = (props) => {
                  
               </div>
             </div>
-            <h2 className='font-normal bg-[#ECF0F4] p-2  '>Thông tin mặt hàng</h2>  
+            <h2 className='font-normal bg-[#ECF0F4] p-2  '>{dataLang?.purchase_iteminfo || "purchase_iteminfo"}</h2>  
               <div className='pr-2'>
               <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10'>
                   <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase col-span-1      text-center  font-[400]'>{"Stt"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase col-span-4   truncate font-[400]'>{"Mặt hàng"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase col-span-1     text-center  truncate font-[400]'>{"Đơn vị tính"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center   truncate font-[400]'>{"Số lượng"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-4     truncate font-[400]'>{"Ghi chú"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1 text-center     truncate font-[400]'>{"Thao tác"}</h4>
+                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase col-span-4   truncate font-[400]'>{dataLang?.purchase_items || "purchase_items"}</h4>
+                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase col-span-1     text-center  truncate font-[400]'>{dataLang?.purchase_unit || "purchase_unit"}</h4>
+                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center   truncate font-[400]'>{dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-4     truncate font-[400]'>{dataLang?.purchase_note || "purchase_note"}</h4>
+                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1 text-center     truncate font-[400]'>{dataLang?.purchase_operation || "purchase_operation"}</h4>
               </div>     
               </div>     
             <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
@@ -474,7 +477,7 @@ const Index = (props) => {
                   <React.Fragment>
                       <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]"> 
                       {/* <ScrollArea className=" h-[400px] overflow-hidden" speed={1}  smoothScrolling={true}> */}
-                          {option.map((e,index) => 
+                          {sortedArr.map((e,index) => 
                            <div className='grid grid-cols-12 gap-1 py-1 ' key={e.id}>
                            <div className='col-span-1 flex items-center justify-center'>
                              <h3 className="text-[#344054] font-normal text-center text-sm mb-1 ml-2 ">{index + 1}</h3>
@@ -502,21 +505,21 @@ const Index = (props) => {
                                     <h5 className='text-gray-400 font-normal'>{option.e?.code}</h5>
                                     <h5 className='text-[#0F4F9E] font-medium'>{option.e?.product_variation}</h5>
                                   </div>
-                                  <h5 className='text-gray-400 font-medium text-xs'>{option.e?.text_type === "products" ? dataLang?.product : option.e?.text_type === "material" ? dataLang?.material : ""}</h5>
+                                  <h5 className='text-gray-400 font-medium text-xs'>{dataLang[option.e?.text_type]}</h5>
                                 </div>
                               </div>
                               <div className=''>
                                  <div className='text-right opacity-0'>{"0"}</div>
                                  <div className='flex gap-2'>
                                    <div className='flex items-center gap-2'>
-                                     <h5 className='text-gray-400 font-normal'>Tồn:</h5><h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse ?? 0}</h5>
+                                     <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse ?? 0}</h5>
                                    </div>
                                   
                                   </div>
                               </div>
                             </div>
                           )}
-                           placeholder={"Mặt hàng"} 
+                           placeholder={dataLang?.purchase_items || "purchase_items"} 
                            hideSelectedOptions={false}
                            className="rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2" 
                            isSearchable={true}
@@ -594,12 +597,12 @@ const Index = (props) => {
                   </React.Fragment>
                 </div>
             </div>
-            <h2 className='font-normal bg-[white] shadow-xl p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]'>Tổng cộng </h2>  
+            <h2 className='font-normal bg-[white] shadow-xl p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]'>{dataLang?.purchase_total || "purchase_total"} </h2>  
 
         </div>
         <div className='grid grid-cols-12'>
             <div className='col-span-10'>
-                        <div className="text-[#344054] font-normal text-sm mb-1 ">{"Ghi chú"}</div>
+                        <div className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_note || ""}</div>
                           <textarea
                             value={note}       
                             placeholder={props.dataLang?.client_popup_note}         
@@ -611,16 +614,16 @@ const Index = (props) => {
             </div>
             <div className="text-right mt-5 space-y-4 col-span-2 flex-col justify-between ">
                 <div className='flex justify-between '>
-                  <div className='font-normal'><h3>Tổng số lượng</h3></div>
+                  <div className='font-normal'><h3>{dataLang?.purchase_totalCount || "purchase_totalCount"}</h3></div>
                   <div className='font-normal'><h3 className='text-blue-600'>{totalSoluong}</h3></div>
                 </div>
                 <div className='flex justify-between '>
-                  <div className='font-normal'><h3>Tổng số mặt hàng</h3></div>
+                  <div className='font-normal'><h3>{dataLang?.purchase_totalItem || "purchase_totalItem"}</h3></div>
                   <div className='font-normal'><h3 className='text-blue-600'>{totalQty}</h3></div>
                 </div>
                 <div className='space-x-2'>
-                <button onClick={() => router.back()} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]">{"Quay lại"}</button>
-                  <button onClick={_HandleSubmit.bind(this)}  type="submit"className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]">{"Lưu"}</button>
+                <button onClick={() => router.back()} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]">{dataLang?.purchase_back || "purchase_back"}</button>
+                  <button onClick={_HandleSubmit.bind(this)}  type="submit"className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]">{dataLang?.purchase_save || "purchase_save"}</button>
                 </div>
             </div>
         </div>

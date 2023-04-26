@@ -8,14 +8,12 @@ import {
     Grid6 as IconExcel, Filter as IconFilter, Calendar as IconCalendar, SearchNormal1 as IconSearch,
     ArrowDown2 as IconDown,Add as IconAdd, TickCircle, ArrowCircleDown,Image as IconImage
 } from "iconsax-react";
-// import { Edit as IconEdit,  Grid6 as IconExcel, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User  } from "iconsax-react";
-
 import Select from 'react-select';
-// import Datepicker from "react-tailwindcss-datepicker"; 
 import Popup from 'reactjs-popup';
 import { useRef } from 'react';
-import PopupEdit from "/components/UI/popup";
 import { useRouter } from 'next/router';
+
+import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
 import {_ServerInstance as Axios} from '/services/axios';
 import Pagination from '/components/UI/pagination';
@@ -23,7 +21,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Datepicker from 'react-tailwindcss-datepicker'
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
-import { format } from "date-fns";
+import ModalImage from "react-modal-image";
 
 dayjs.locale('vi');
 
@@ -49,7 +47,7 @@ const Index = (props) => {
     const router = useRouter();
     const [data, sData] = useState([]);
     const [dataExcel, sDataExcel] = useState([]);
-    const [onFetching, sOnFetching] = useState(true);
+    const [onFetching, sOnFetching] = useState(false);
     const [totalItems, sTotalItems] = useState([]);
     const [keySearch, sKeySearch] = useState("")
     const [limit, sLimit] = useState(15);
@@ -67,8 +65,20 @@ const Index = (props) => {
     const [active,sActive] = useState("")
     const [onSending, sOnSending] = useState(false);
 
+    const _HandleSelectTab = (e) => {
+      router.push({
+          pathname: router.route,    
+          query: { tab: e }
+      })
+    }
+    useEffect(() => {
+      router.push({
+          pathname: router.route,    
+          query: { tab: router.query?.tab ? router.query?.tab : ""  }
+      })
+    }, []);
 
-    const _ServerFetching = () => {
+    const _ServerFetching =   () => {
       const id = Number(tabPage)
         Axios("GET", "/api_web/Api_purchases/purchases/?csrf_protection=true", {
             params: {
@@ -85,14 +95,16 @@ const Index = (props) => {
             }
         }, (err, response) => {
             if(!err){
-                var {output, rResult} = response.data;
+                var {output, rResult} =  response.data;
                 sData(rResult)
                 sDataExcel(rResult)
                 sTotalItems(output)
+                sListCode(rResult)
             }
             sOnFetching(false)
         })
     }
+    
     const _ServerFetching_filter =  () =>{
       Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
       if(!err){
@@ -100,12 +112,12 @@ const Index = (props) => {
           sListBr(rResult)
       }
     })
-    Axios("GET", `/api_web/Api_purchases/purchases/?csrf_protection=true`, {}, (err, response) => {
-       if(!err){
-           var {rResult} =  response.data
-           sListCode(rResult)
-       }
-    })
+    // Axios("GET", `/api_web/Api_purchases/purchases/?csrf_protection=true`, {}, (err, response) => {
+    //    if(!err){
+    //        var {rResult} =  response.data
+    //        sListCode(rResult)
+    //    }
+    // })
     Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {}, (err, response) => {
        if(!err){
            var {rResult} =  response.data
@@ -137,6 +149,7 @@ const Index = (props) => {
       }, (err, response) => {
         if(!err){
             var data =  response.data
+            console.log(data);
             sListDs(data)
         }
         sOnFetching(false)
@@ -152,18 +165,7 @@ const Index = (props) => {
         })
       }
 
-      const _HandleSelectTab = (e) => {
-        router.push({
-            pathname: router.route,    
-            query: { tab: e }
-        })
-      }
-      useEffect(() => {
-        router.push({
-            pathname: router.route,    
-            query: { tab: router.query?.tab ? router.query?.tab : ""  }
-        })
-      }, []);
+      
     const _HandleOnChangeKeySearch = ({target: {value}}) => {
         sKeySearch(value)
         router.replace({
@@ -183,8 +185,8 @@ const Index = (props) => {
         onFetching && _ServerFetching() || onFetching && _ServerFetching_group()   || onFetching && _ServerFetching_filter()   
       }, [onFetching]);
       useEffect(() => {
-        router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || tabPage == "" && sOnFetching(true) || (idBranch?.length > 0 && sOnFetching(true)) || (idCode?.length > 0 && sOnFetching(true)) || (idUser?.length > 0 && sOnFetching(true)) || (valueDate?.length > 0 && sOnFetching(true))
-      }, [limit,router.query?.page, router.query?.tab,tabPage,idBranch,idCode,idUser,valueDate]);
+        router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query.tab == "" && sOnFetching(true) || (idBranch?.length > 0 && sOnFetching(true)) || (idCode?.length > 0 && sOnFetching(true)) || (idUser?.length > 0 && sOnFetching(true)) || (valueDate?.length > 0 && sOnFetching(true))
+      }, [limit,router.query?.page, router.query?.tab,idBranch,idCode,idUser,valueDate]);
 
         const _ToggleStatus = (id) => {
             Swal.fire({
@@ -239,17 +241,17 @@ const Index = (props) => {
             {
                 columns: [
                     {title: "ID", width: {wch: 4}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `Ngày chứng từ `, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `Mã chứng từ`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `Số kế hoạc SX`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `Người đề nghị`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `Trạng thái`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `Tổng mặt hàng`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `Chưa đặt hàng`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `Đặt 1 phần`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `Đặt đủ đơn`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `Ghi chú`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `Chi nhánh`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `${dataLang?.purchase_day || "purchase_day"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `${dataLang?.purchase_code || "purchase_code"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `${dataLang?.purchase_planNumber || "purchase_planNumber"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `${dataLang?.purchase_propnent || "purchase_propnent"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `${dataLang?.purchase_status || "purchase_status"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `${dataLang?.purchase_totalitem || "purchase_totalitem"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `${dataLang?.purchase_ordered || "purchase_ordered"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `${dataLang?.purchase_portion || "purchase_portion"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `${dataLang?.purchase_enough || "purchase_enough"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `${dataLang?.purchase_note || "purchase_note"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `${dataLang?.purchase_branch || "purchase_branch"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
                 ],
                 data: dataExcel?.map((e) =>
                     [
@@ -275,18 +277,18 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>Yêu cầu mua hàng</title>
+                <title>{dataLang?.purchase_title}</title>
             </Head>
             <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between'>
                 <div className='h-[97%] space-y-3 overflow-hidden'>
                     <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
-                        <h6 className='text-[#141522]/40'>{"Yêu cầu mua hàng"}</h6>
+                        <h6 className='text-[#141522]/40'>{dataLang?.purchase_title}</h6>
                         <span className='text-[#141522]/40'>/</span>
-                        <h6 className='text-[#141522]/40'>{"Yêu cầu mua hàng"}</h6>
+                        <h6 className='text-[#141522]/40'>{dataLang?.purchase_title}</h6>
                        
                     </div>
                     <div className='flex justify-between items-center'>
-                        <h2 className='xl:text-3xl text-xl font-medium '>Yêu cầu mua hàng</h2>
+                        <h2 className='xl:text-3xl text-xl font-medium '>{dataLang?.purchase_title}</h2>
                         <div className='flex space-x-3 items-center'>
                         <Link href="/purchase_order/purchases/form" className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>Tạo mới</Link>
                         </div>
@@ -301,7 +303,7 @@ const Index = (props) => {
                                 total={e.count} 
                                 active={e.id} 
                                 className={`${e.color ? "text-white" : "text-[#0F4F9E] bg-[#e2f0fe] "}`}
-                              >{e.name === "all" && dataLang?.all_group || e.name === "confirmed" && dataLang?.confirmed || e.name === "not_confirmed" && dataLang?.not_confirmed || e.name === "purchases_filter_production_planning" && dataLang?.purchases_filter_production_planning }</TabStatus> 
+                              >{dataLang[e?.name]}</TabStatus> 
                             </div>
                           )
                       })
@@ -320,7 +322,7 @@ const Index = (props) => {
                             </form>
                             <div className='w-[15vw]'>
                                 <Select 
-                                    options={[{ value: '', label: 'Chọn chi nhánh', isDisabled: true }, ...listBr_filter]}
+                                    options={[{ value: '', label: dataLang?.client_list_filterbrand, isDisabled: true }, ...listBr_filter]}
                                     onChange={onchang_filter.bind(this, "branch")}
                                     value={idBranch}
                                     isClearable={true}
@@ -360,12 +362,12 @@ const Index = (props) => {
                             </div>
                             <div className='w-[15vw]'>
                                 <Select 
-                                    options={[{ value: '', label: 'Chọn mã chứng từ', isDisabled: true }, ...listCode_filter]}
+                                    options={[{ value: '', label: dataLang?.purchase_code, isDisabled: true }, ...listCode_filter]}
                                     onChange={onchang_filter.bind(this, "code")}
                                     value={idCode}
                                     noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                     isClearable={true}
-                                    placeholder={"Mã chứng từ"}
+                                    placeholder={dataLang?.purchase_code || "purchase_code"}
                                     className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
                                     isSearchable={true}
                                     style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -397,13 +399,13 @@ const Index = (props) => {
                             </div>
                             <div className='w-[15vw]'>
                                 <Select 
-                                    options={[{ value: '', label: 'Chọn người đề nghị', isDisabled: true }, ...listUser_filter]}
+                                    options={[{ value: '', label: dataLang?.purchase_propnent, isDisabled: true }, ...listUser_filter]}
                                     // formatOptionLabel={CustomSelectOption}
                                     onChange={onchang_filter.bind(this, "user")}
                                     value={idUser}
                                     noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                     isClearable={true}
-                                    placeholder={"Người đề nghị"}
+                                    placeholder={dataLang?.purchase_propnent || "purchase_propnent"}
                                     className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
                                     isSearchable={true}
                                     style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -446,13 +448,13 @@ const Index = (props) => {
                         </div>
                         {data?.length != 0 &&
                             <div className='flex space-x-6'>
-                                <ExcelFile filename="Yêu cầu mua hàng" element={
+                                <ExcelFile filename={dataLang?.purchase_title} element={
                                     <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
                                         <IconExcel size={18} />
                                         <span>{dataLang?.client_list_exportexcel}</span>
                                     </button>
                                 }>
-                                    <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Yêu cầu mua hàng" />
+                                    <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name={dataLang?.purchase_title} />
                                 </ExcelFile>
 
                                 <div className="flex space-x-2 items-center">
@@ -472,16 +474,16 @@ const Index = (props) => {
                     <div className='min:h-[500px] 2xl:h-[76%] h-[70%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 tooltipBoundary'>
                         <div className='pr-2'>
                             <div className='grid grid-cols-12 sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]'>
-                            <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>Ngày chứng từ</h4>   
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>Mã chứng từ</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>Số kế hoạch SX</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>Người đề nghị</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300] text-center'>Trạng thái</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 text-center font-[300]'>Tổng mặt hàng</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-left col-span-3 font-[300]'>Trạng thái đặt hàng</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-left col-span-1 font-[300]'>Ghi chú</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>Chi nhánh</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-center  col-span-1 font-[300]'>Tác vụ</h4>
+                            <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{dataLang?.purchase_day || "purchase_day"}</h4>   
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>{dataLang?.purchase_code || "purchase_code"}</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>{dataLang?.purchase_planNumber || "purchase_planNumber"}</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>{dataLang?.purchase_propnent || "purchase_propnent"}</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300] text-center'>{dataLang?.purchase_status || "purchase_status"}</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 text-center font-[300]'>{dataLang?.purchase_totalitem || "purchase_totalitem"}</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-left col-span-3 font-[300]'>{dataLang?.purchase_orderStatus || "purchase_orderStatus"}</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-left col-span-1 font-[300]'>{dataLang?.purchase_note || "purchase_note"}</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{dataLang?.purchase_branch || "purchase_branch"}</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-center  col-span-1 font-[300]'>{dataLang?.purchase_action || "purchase_action"}</h4>
                             </div>
                             {onFetching ?
                                 <Loading className="h-80"color="#0f4f9e" />
@@ -496,7 +498,7 @@ const Index = (props) => {
                                         </div>
                                     }
                                     <div className="divide-y divide-slate-200"> 
-                                        {data.map((e) => 
+                                        {data?.map((e) => 
                                             <div key={e?.id.toString()} className='grid grid-cols-12 hover:bg-slate-50 relative'>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center '>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY, h:mm:ss") : ""}</h6> 
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center  text-[#0F4F9e] font-medium cursor-pointer'><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
@@ -597,7 +599,7 @@ const BtnTacVu = React.memo((props) => {
     return(
         <div>
             <Popup
-                trigger={<button className={`flex space-x-1 items-center ` + props.className } ><span>Tác vụ</span><IconDown size={12} /></button>}
+                trigger={<button className={`flex space-x-1 items-center ` + props.className } ><span>{props.dataLang?.purchase_action || "purchase_action"}</span><IconDown size={12} /></button>}
                 arrow={false}
                 position="bottom right"
                 className={`dropdown-edit `}
@@ -613,8 +615,8 @@ const BtnTacVu = React.memo((props) => {
                         {/* <Popup_GiaiDoan setOpen={sOpen} isOpen={open} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
                         <Popup_Bom setOpen={sOpenBom} isOpen={openBom} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
                         <Popup_ThanhPham onRefresh={props.onRefresh} dataProductExpiry={props.dataProductExpiry} dataLang={props.dataLang} id={props?.id} setOpen={sOpenDetail} isOpen={openDetail} className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full" /> */}
-                        <button onClick={handleClick}className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">Sửa phiếu</button>
-                        <button onClick={_HandleDelete.bind(this, props.id)} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>Xoá phiếu</button>
+                        <button onClick={handleClick}className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">{props.dataLang?.purchase_editVoites || "purchase_editVoites"}</button>
+                        <button onClick={_HandleDelete.bind(this, props.id)} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_deleteVoites || "purchase_deleteVoites"}</button>
                     </div>
                 </div>
             </Popup>
@@ -648,12 +650,10 @@ const Popup_chitiet =(props)=>{
     for (let i = 0; i < listQty?.length; i++) {
     totalQuantity += parseInt(listQty[i].quantity);
     }
-   
-    console.log(data?.items?.map(e => e.item));
   return (
   <>
    <PopupEdit   
-      title={"Chi tiết phiếu yêu cầu mua hàng"} 
+      title={props.dataLang?.purchase_detail_title || "purchase_detail_title"} 
       button={props?.name} 
       onClickOpen={_ToggleModal.bind(this, true)} 
       open={open} onClose={_ToggleModal.bind(this,false)}
@@ -662,58 +662,59 @@ const Popup_chitiet =(props)=>{
     <div className='flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
        
     </div>  
-            <div className="mt-4 space-x-5 w-[999px] h-auto  ">        
+            <div className="mt-4 space-x-5 w-[999px] h-auto ">        
             <div>
              <div className='w-[999px]'>
-               <div className="min:h-[200px] h-[72%] max:h-[400px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-               <h2 className='font-normal bg-[#ECF0F4] p-2'>Thông tin chung</h2>       
-                <div className='grid grid-cols-8  min-h-[200px] p-2'>
+               <div className="min:h-[170px] h-[72%] max:h-[100px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+               <h2 className='font-normal bg-[#ECF0F4] p-2'>{props?.dataLang?.purchase_general || "purchase_general"}</h2>       
+                <div className='grid grid-cols-8  min-h-[170px] p-2'>
                     <div className='col-span-3'>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Ngày chứng từ</h3><h3 className='col-span-1 font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, h:mm:ss") : ""}</h3></div>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Mã chứng từ</h3><h3 className='col-span-1 font-normal'>{data?.code}</h3></div>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Số kế hoạch SX</h3><h3 className='col-span-1 font-normal'>{data?.reference_no}</h3></div>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Người đề nghị</h3><h3 className='col-span-1 font-normal'>{data?.user_create_name}</h3></div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_day || "purchase_day"}</h3><h3 className='col-span-1 font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, h:mm:ss") : ""}</h3></div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_code || "purchase_code"}</h3><h3 className='col-span-1 font-normal'>{data?.code}</h3></div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_planNumber || "purchase_planNumber"}</h3><h3 className='col-span-1 font-normal'>{data?.reference_no}</h3></div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_propnent || "purchase_propnent"}</h3><h3 className='col-span-1 font-normal'>{data?.user_create_name}</h3></div>
                     </div>
+
                     <div className='col-span-2 mx-auto'>
-                        <div className='my-4 font-medium '>Trạng thái đặt hàng</div>
-                        <div className=' font-normal text-sky-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-sky-200'>Chưa đặt hàng</div>
-                        <div className=' font-normal text-orange-500 rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-orange-200'>Đặt 1 phần (0)</div>
-                        <div className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>Đặt đủ đơn (0)</div>
+                        <div className='my-4 font-medium '>{props.dataLang?.purchase_orderStatus || "purchase_orderStatus"}</div>
+                        <div className=' font-normal text-sky-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-sky-200'>{props.dataLang?.purchase_ordered || "purchase_ordered"}</div>
+                        <div className=' font-normal text-orange-500 rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-orange-200'>{props.dataLang?.purchase_portion || "purchase_portion"} (0)</div>
+                        <div className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_enough || "purchase_enough"} (0)</div>
                     </div>
                     <div className='col-span-3 '>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Trạng thái</h3><h3 className='col-span-1'>{data?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1'>Đã duyệt <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>Chưa duyệt <TickCircle size={22}/></div>)}</h3></div>  
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Tổng mặt hàng</h3><h3 className='col-span-1 font-normal'>{data?.items?.length}</h3></div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_status || "purchase_status"}i</h3><h3 className='col-span-1'>{data?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1'>{props.dataLang?.purchase_approved || "purchase_approved"} <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>{props.dataLang?.purchase_notapproved || "purchase_notapproved"} <TickCircle size={22}/></div>)}</h3></div>  
                         {/* <div className='my-4 font-medium grid grid-cols-2'>Tổng số lượng</div> */}
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Ghi chú</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>Chi nhánh</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] col-span-1">{data?.branch_name}</h3></div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_note || "purchase_note"}</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_branch || "purchase_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] col-span-1">{data?.branch_name}</h3></div>
                     </div>
                     
                 </div>
                 <div className="pr-2 w-[100%] lx:w-[110%] ">
                   <div className="grid grid-cols-8 sticky top-0 bg-slate-100 p-2 z-10">
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{"Hình"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{"Mặt hàng"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{"Biến thể"}</h4> 
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"Đơn vị tính"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"Số lượng"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{"Số lượng đã mua"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{"Số lượng còn lại"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{"Ghi chú"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_items || "purchase_items"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_quantity_purchased || "purchase_quantity_purchased"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_reaining_amout || "purchase_reaining_amout"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_note || "purchase_note"}</h4>
                   </div>
                   {onFetching ?
-                    <Loading className="h-80"color="#0f4f9e" /> 
+                    <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
                     : 
                     data?.items?.length > 0 ? 
                     (<>
                          <ScrollArea     
-                           className="min-h-[300px] max-h-[330px] overflow-hidden"  speed={1}  smoothScrolling={true}>
-                      <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px]">                       
+                           className="min-h-[90px] max-h-[200px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+                      <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">                       
                         {(data?.items?.map((e) => 
                           <div className="grid items-center grid-cols-8 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
                             <h6 className="xl:text-base text-xs   py-0.5 col-span-1  rounded-md text-left">
-                            {e?.item?.images != null ? (<img src={e?.item?.images} alt="Product Image" style={{ width: "50px", height: "60px" }} className='object-cover rounded' />):
-                                    <div className='w-[50px] h-[60px] object-cover bg-gray-200 flex items-center justify-center rounded'>
-                                      <IconImage/>
+                            {e?.item?.images != null ? (<ModalImage  small={e?.item?.images} large={e?.item?.images} alt="Product Image" style={{ width: "50px", height: "60px" }} className='object-cover rounded' />):
+                                    <div className='w-[50px] h-[60px] object-cover bg-gray-100 flex items-center justify-center rounded'>
+                                      {/* <IconImage/> */}
+                                      <ModalImage small="/no_img.png" large="/no_img.png" className='w-full h-full rounded object-contain p-1' > </ModalImage>
                                     </div>
                                   }
                             </h6>                
@@ -740,9 +741,21 @@ const Popup_chitiet =(props)=>{
                       </div>
                     )}    
                 </div>
-                <div className="sticky bottom-0 bg-slate-100 p-2 z-10">
-                    <h3 className=''>Tổng số lượng : {totalQuantity}</h3>       
+            <h2 className='font-normal p-2  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
+                <div className="text-right mt-5  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10">
+                <div className='col-span-9'>
                 </div>
+               <div className='col-span-3 space-y-2'>
+                <div className='flex justify-between '>
+                    <div className='font-normal'><h3>{props.dataLang?.purchase_totalCount || "purchase_totalCount"}</h3></div>
+                    <div className='font-normal'><h3 className='text-blue-600'>{totalQuantity}</h3></div>
+                  </div>
+                  <div className='flex justify-between '>
+                    <div className='font-normal'><h3>{props.dataLang?.purchase_totalItem || "purchase_totalItem"}</h3></div>
+                    <div className='font-normal'><h3 className='text-blue-600'>{data?.items?.length}</h3></div>
+                  </div>  
+               </div>
+            </div>   
               </div>
             </div>
       
