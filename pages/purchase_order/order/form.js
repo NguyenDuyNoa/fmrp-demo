@@ -438,7 +438,6 @@ const Index = (props) => {
           const index = option.findIndex((x) => x.id === id);
           const newQuantity = option[index].soluong + 1;
           option[index].soluong = newQuantity;
-          
           if(option[index].thue?.e?.tax_rate == undefined){
             const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
             option[index].thanhtien = Number(tien.toFixed(2));
@@ -588,7 +587,6 @@ const Index = (props) => {
         onSending && _ServerSending()
     }, [onSending]);
 
-    console.log(sortedArr)
 
     return (
     <React.Fragment>
@@ -888,7 +886,7 @@ const Index = (props) => {
                                   <h5 className='text-gray-400 font-normal'>{option.e?.code}</h5>
                                   <h5 className='text-[#0F4F9E] font-medium'>{option.e?.product_variation}</h5>
                                 </div>
-                                <h5 className='text-gray-400 font-medium text-xs'>{dataLang[option.e?.text_type]}</h5>
+                                <h5 className='text-gray-400 font-medium text-xs'>{dataLang[option.e?.text_type]} {loai == "1" ? "-":""} {loai == "1" ? option.e?.purchases_code : ""}</h5>
                               </div>
                             </div>
                             <div className=''>
