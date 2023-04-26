@@ -155,3 +155,7 @@ input::-ms-reveal,
 	text-overflow: ellipsis !important;
 	display: block;
 }
+
+.removeDivide .css-1u9des2-indicatorSeparator{
+	width: 0px;
+}

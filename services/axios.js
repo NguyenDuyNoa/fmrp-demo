@@ -40,7 +40,7 @@ const _ServerInstance = (method, url, dataObject, callback) => {
       	callback && callback(null, response)
     }).catch(function (error){
 		if(error.response && error.response?.status === 500){
-			store.dispatch({type: "auth/update", payload: null})
+			// store.dispatch({type: "auth/update", payload: null})
 		}else{
 			callback && callback(error, null)
 		}

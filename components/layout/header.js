@@ -129,7 +129,7 @@ const Header = () => {
                     img: "/icon/header/muanhap/mua.png",
                     items: [
                         {name: "Yêu cầu mua hàng", link:'/purchase_order/purchases'},
-                        {name: "Đơn đặt hàng", link: '/purchase_order'},
+                        {name: "Đơn đặt hàng", link: '/purchase_order/order'},
                         {name: "Phiếu dịch vụ"}
                     ]
                 }

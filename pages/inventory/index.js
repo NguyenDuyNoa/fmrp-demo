@@ -67,6 +67,7 @@ const Index = (props) => {
                         <div className='pr-2'>
                             <div className='grid grid-cols-7 items-center sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]'>
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center'>Ngày chứng từ</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center'>Mã chứng từ</h4>
                             </div>
                         </div>
                     </div>
