@@ -18,7 +18,13 @@ import Loading from "components/UI/loading";
 import {_ServerInstance as Axios} from '/services/axios';
 import Pagination from '/components/UI/pagination';
 import 'react-datepicker/dist/react-datepicker.css';
-import Datepicker from 'react-tailwindcss-datepicker'
+// import Datepicker from 'react-tailwindcss-datepicker'
+import DatePicker,{registerLocale } from "react-datepicker";
+import 'react-datepicker/dist/react-datepicker.css';
+import vi from "date-fns/locale/vi"
+import { format } from 'date-fns';
+
+registerLocale("vi", vi);
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 import ModalImage from "react-modal-image";
@@ -48,6 +54,7 @@ const Index = (props) => {
     const [data, sData] = useState([]);
     const [dataExcel, sDataExcel] = useState([]);
     const [onFetching, sOnFetching] = useState(false);
+    const [onnFetching_filter, sOnFetching_filter] = useState(false);
     const [totalItems, sTotalItems] = useState([]);
     const [keySearch, sKeySearch] = useState("")
     const [limit, sLimit] = useState(15);
@@ -60,10 +67,17 @@ const Index = (props) => {
     const [idBranch, sIdBranch] = useState(null);
     const [idCode, sIdCode] = useState(null);
     const [idUser, sIdUser] = useState(null);
-    const [valueDate, sDate] = useState({startDate: null, endDate: null});
     const [status, sStatus] = useState("")
     const [active,sActive] = useState("")
     const [onSending, sOnSending] = useState(false);
+    const [dateRange, setDateRange] = useState([]);
+    const formatDate = (date) => {
+      const day = date?.getDate().toString().padStart(2, '0');
+      const month = (date?.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-indexed
+      const year = date?.getFullYear();
+      return `${year}-${month}-${day}`;
+    };
+    const formattedDateRange = dateRange.map((date) => formatDate(date));
 
     const _HandleSelectTab = (e) => {
       router.push({
@@ -77,7 +91,6 @@ const Index = (props) => {
           query: { tab: router.query?.tab ? router.query?.tab : ""  }
       })
     }, []);
-
     const _ServerFetching =   () => {
       const id = Number(tabPage)
         Axios("GET", "/api_web/Api_purchases/purchases/?csrf_protection=true", {
@@ -85,12 +98,12 @@ const Index = (props) => {
                 search: keySearch,
                 limit: limit,
                 page: router.query?.page || 1,
-                "filter[branch_id]": idBranch?.length > 0 ? idBranch.map(e => e.value) : null,
+                "filter[branch_id]": idBranch != null ? idBranch.value : null,
                 "filter[status]": tabPage !== "" ? (tabPage !== "1" ? id : 1) : null ,
                 "filter[id]": idCode?.value,
                 "filter[staff_id]" : idUser?.value,
-                "filter[start_date]": valueDate?.startDate,
-                "filter[end_date]":valueDate?.endDate,
+                "filter[start_date]": formattedDateRange[0],
+                "filter[end_date]": formattedDateRange[1],
 
             }
         }, (err, response) => {
@@ -99,7 +112,7 @@ const Index = (props) => {
                 sData(rResult)
                 sDataExcel(rResult)
                 sTotalItems(output)
-                sListCode(rResult)
+              
             }
             sOnFetching(false)
         })
@@ -110,21 +123,21 @@ const Index = (props) => {
       if(!err){
           var {rResult} =  response.data
           sListBr(rResult)
-      }
-    })
-    // Axios("GET", `/api_web/Api_purchases/purchases/?csrf_protection=true`, {}, (err, response) => {
-    //    if(!err){
-    //        var {rResult} =  response.data
-    //        sListCode(rResult)
-    //    }
-    // })
-    Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {}, (err, response) => {
-       if(!err){
-           var {rResult} =  response.data
-           sListUser(rResult)
-       }
-    })
-    sOnFetching(false)
+        }
+      })
+      Axios("GET", `/api_web/Api_purchases/purchases/?csrf_protection=true`, {}, (err, response) => {
+        if(!err){
+            var {rResult} =  response.data
+            sListCode(rResult)
+        }
+      })
+      Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {}, (err, response) => {
+        if(!err){
+            var {rResult} =  response.data
+            sListUser(rResult)
+        }
+      })
+    sOnFetching_filter(false)
     }
     const listBr_filter = listBr ? listBr?.map(e =>({label: e.name, value: e.id})) : []
     const listCode_filter = listCode ? listCode?.map(e => ({label: e.code, value : e.id})): []
@@ -137,7 +150,7 @@ const Index = (props) => {
       }else if(type == "user"){
         sIdUser(value)
       }else if(type == "date"){
-        sDate(value)
+        setDateRange(value)
       }
     }
     const _ServerFetching_group =  () =>{
@@ -149,7 +162,6 @@ const Index = (props) => {
       }, (err, response) => {
         if(!err){
             var data =  response.data
-            console.log(data);
             sListDs(data)
         }
         sOnFetching(false)
@@ -182,11 +194,14 @@ const Index = (props) => {
         }, 500);
       };
       useEffect(() => {
-        onFetching && _ServerFetching() || onFetching && _ServerFetching_group()   || onFetching && _ServerFetching_filter()   
+        onFetching && _ServerFetching() || onFetching && _ServerFetching_group()    
       }, [onFetching]);
       useEffect(() => {
-        router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query.tab == "" && sOnFetching(true) || (idBranch?.length > 0 && sOnFetching(true)) || (idCode?.length > 0 && sOnFetching(true)) || (idUser?.length > 0 && sOnFetching(true)) || (valueDate?.length > 0 && sOnFetching(true))
-      }, [limit,router.query?.page, router.query?.tab,idBranch,idCode,idUser,valueDate]);
+        onnFetching_filter && _ServerFetching_filter()      
+      }, [onnFetching_filter]);
+      useEffect(() => {
+        router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || sOnFetching_filter(true)  || router.query.tab == "" && sOnFetching(true) || (idBranch != null && sOnFetching(true)) || (idCode != null && sOnFetching(true)) || (idUser != null && sOnFetching(true)) || dateRange[0] != null && dateRange[1] != null && sOnFetching(true)
+      }, [limit,router.query?.page, router.query?.tab,idBranch,idCode,idUser,dateRange]); 
 
         const _ToggleStatus = (id) => {
             Swal.fire({
@@ -436,14 +451,28 @@ const Index = (props) => {
                                 />
                             </div>
                             <div className='w-[15vw] z-20'>
-                            <Datepicker            
+                            {/* <Datepicker            
                                 value={valueDate} 
                                 onChange={onchang_filter.bind(this, "date")}
                                 showShortcuts={true} 
                                 className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] "
                                 dateFormat={(date) => dayjs(date).format('DD/MM/YYYY')}
                                 locale="vi"
-                            />
+                            /> */}
+                            <div className='relative flex items-center'>
+                            <DatePicker
+                                selectsRange={true}
+                                startDate={dateRange[0]}
+                                endDate={dateRange[1]}
+                                onChange={onchang_filter.bind(this, "date")}
+                                locale={'vi'}
+                                dateFormat="dd-MM-yyyy"
+                                isClearable={true}
+                                placeholderText="Chọn ngày chứng từ"
+                                className="bg-white w-full py-2 rounded border border-[#cccccc] pl-10 text-black outline-[#0F4F9E]"
+                                />
+                                <IconCalendar size={22} className="absolute left-3 text-[#cccccc]" />
+                            </div>
                             </div>
                         </div>
                         {data?.length != 0 &&
@@ -480,23 +509,14 @@ const Index = (props) => {
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>{dataLang?.purchase_propnent || "purchase_propnent"}</h4>
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300] text-center'>{dataLang?.purchase_status || "purchase_status"}</h4>
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 text-center font-[300]'>{dataLang?.purchase_totalitem || "purchase_totalitem"}</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-left col-span-3 font-[300]'>{dataLang?.purchase_orderStatus || "purchase_orderStatus"}</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-left col-span-1 font-[300]'>{dataLang?.purchase_note || "purchase_note"}</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-left col-span-1 font-[300]'>{dataLang?.purchase_orderStatus || "purchase_orderStatus"}</h4>
+                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-left col-span-3 font-[300]'>{dataLang?.purchase_note || "purchase_note"}</h4>
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{dataLang?.purchase_branch || "purchase_branch"}</h4>
                                 <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-center  col-span-1 font-[300]'>{dataLang?.purchase_action || "purchase_action"}</h4>
                             </div>
                             {onFetching ?
-                                <Loading className="h-80"color="#0f4f9e" />
-                                :
-                                <React.Fragment>
-                                    {data?.length == 0 &&
-                                        <div className=" max-w-[352px] mt-24 mx-auto" >
-                                            <div className="text-center">
-                                                <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
-                                                <h1 className="textx-[#141522] text-base opacity-90 font-medium">{dataLang?.no_data_found || "no_data_found"}</h1>
-                                            </div>
-                                        </div>
-                                    }
+                                <Loading className="h-80"color="#0f4f9e" /> :
+                                data?.length > 0 ? (
                                     <div className="divide-y divide-slate-200"> 
                                         {data?.map((e) => 
                                             <div key={e?.id.toString()} className='grid grid-cols-12 hover:bg-slate-50 relative'>
@@ -506,16 +526,33 @@ const Index = (props) => {
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center '>{e?.staff_create_name}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center cursor-pointer'>{e?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>Đã duyệt <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>Chưa duyệt <TickCircle size={22}/></div>)}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center '>{e?.total_item}</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-3 flex items-center '><div className='flex flex-wrap  gap-2 items-center justify-start'><span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>Chưa đặt hàng</span><span className=' font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>Đặt 1 phần (0)</span><span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'> <TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>Đặt đủ đơn (0)</span></div></h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex text-left items-center '>{e?.note}</h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center '>
+                                                  <div className='flex flex-wrap  gap-2 items-center justify-center'>
+                                                   {
+                                                  e?.order_status?.status === "purchase_ordered" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center'>{dataLang[e?.order_status?.status]}</span>||
+                                                  e?.order_status?.status === "purchase_portion" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center'>{dataLang[e?.order_status?.status]} {`(${e?.order_status?.count})`}</span>||
+                                                  e?.order_status?.status === "purchase_enough" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{dataLang[e?.order_status?.status]} {`(${e?.order_status?.count})`}</span>
+                                                    }
+                                                  </div>
+                                                </h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-3 flex text-left items-center '>{e?.note}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center  '><span className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6>
                                                 <div className='pl-2 py-2.5 col-span-1 flex space-x-2 justify-center'>
-                                                    <BtnTacVu  dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} status={e?.status} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
+                                                    <BtnTacVu order={e?.order_status}  dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} status={e?.status} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
                                                 </div>
                                             </div>
                                         )}
                                     </div>
-                                </React.Fragment>
+                                )
+                                :(
+                                  <div className=" max-w-[352px] mt-24 mx-auto" >
+                                    <div className="text-center">
+                                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+                                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">{dataLang?.no_data_found || "no_data_found"}</h1>
+                                    </div>
+                                </div>
+                                )
+                                
                             }
                         </div>
                     </div>
@@ -553,8 +590,8 @@ const BtnTacVu = React.memo((props) => {
 
     const [openDetail, sOpenDetail] = useState(false);
     const router = useRouter()
-
     const _HandleDelete = (id) => {
+    
         Swal.fire({
             title: `${props.dataLang?.aler_ask}`,
             icon: 'warning',
@@ -592,7 +629,13 @@ const BtnTacVu = React.memo((props) => {
                 icon: 'error',
                 title: `${props.dataLang?.confirmed_cant_edit}`
               })   
-        } else {
+        }else if(props?.order?.status != "purchase_ordered"){
+          Toast.fire({
+            icon: 'error',
+            title: `${props.dataLang?.purchases_ordered_cant_edit}`
+          })  
+        } 
+        else {
           router.push(`/purchase_order/purchases/form?id=${props.id}`);
         }
       };
@@ -677,9 +720,16 @@ const Popup_chitiet =(props)=>{
 
                     <div className='col-span-2 mx-auto'>
                         <div className='my-4 font-medium '>{props.dataLang?.purchase_orderStatus || "purchase_orderStatus"}</div>
-                        <div className=' font-normal text-sky-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-sky-200'>{props.dataLang?.purchase_ordered || "purchase_ordered"}</div>
+                        <div className='flex flex-wrap  gap-2 items-center justify-start'>
+                            {
+                          data?.order_status?.status === "purchase_ordered" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200'>{props.dataLang[data?.order_status?.status]}</span>||
+                          data?.order_status?.status === "purchase_portion" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200'>{props.dataLang[data?.order_status?.status]} {`(${data?.order_status?.count})`}</span>||
+                          data?.order_status?.status === "purchase_enough" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang[data?.order_status?.status]} {`(${data?.order_status?.count})`}</span>
+                            }
+                        </div>
+                        {/* <div className=' font-normal text-sky-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-sky-200'>{props.dataLang?.purchase_ordered || "purchase_ordered"}</div>
                         <div className=' font-normal text-orange-500 rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-orange-200'>{props.dataLang?.purchase_portion || "purchase_portion"} (0)</div>
-                        <div className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_enough || "purchase_enough"} (0)</div>
+                        <div className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_enough || "purchase_enough"} (0)</div> */}
                     </div>
                     <div className='col-span-3 '>
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_status || "purchase_status"}i</h3><h3 className='col-span-1'>{data?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1'>{props.dataLang?.purchase_approved || "purchase_approved"} <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>{props.dataLang?.purchase_notapproved || "purchase_notapproved"} <TickCircle size={22}/></div>)}</h3></div>  

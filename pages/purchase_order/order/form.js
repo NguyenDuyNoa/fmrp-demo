@@ -27,6 +27,7 @@ const Toast = Swal.mixin({
 })
 const Index = (props) => {
     const router = useRouter();
+    const id = router.query?.id
     const dataLang = props.dataLang
     const scrollAreaRef = useRef(null);
     const handleMenuOpen = () => {
@@ -37,6 +38,7 @@ const Index = (props) => {
     const [onFetchingPurcher, sOnFetchingPurcher] = useState(false);
     const [onFetchingItems, sOnFetchingItems] = useState(false);
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
+    const [onFetchingDetail,sOnFetchingDetail] = useState(false)
     const [onSending, sOnSending] = useState(false);
     const [option, sOption] = useState([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}]);
     const slicedArr = option.slice(1);
@@ -71,6 +73,8 @@ const Index = (props) => {
     const readOnlyFirst = true;
 
 
+
+
     useEffect(() => {
         router.query && sErrDate(false)
         router.query && sErrSupplier(false)
@@ -82,10 +86,44 @@ const Index = (props) => {
         router.query && sNote("")
     }, [router.query]);
 
+
+    const _ServerFetchingDetail =  () => {
+      Axios("GET", `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true`, {
+    }, (err, response) => {
+        if(!err){
+          var rResult = response.data;
+          const itemlast =  [{mathang: null}];
+          const item = itemlast?.concat(rResult?.item?.map(e => ({mathang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`, value:e.item?.id}, soluong: Number(e?.quantity), dongia: Number(e?.price), chietkhau: Number(e?.discount_percent), thue: e?.tax_rate, donvitinh: e.item?.unit_name, dongiasauck: Number(e?.price_after_discount), note: e?.note})));
+          sOption(item)
+
+          sCode(rResult?.code)
+          sIdStaff(({label: rResult?.staff_name, value: rResult.staff_id}))
+          sIdBranch({label: rResult?.branch_name, value:rResult?.branch_id})
+          sIdSupplier(({label: rResult?.supplier_name, value: rResult?.supplier_id}))
+          sSelectedDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
+          sDelivery_date(moment(rResult?.delivery_date).format('YYYY-MM-DD HH:mm:ss'))
+          sLoai(rResult?.order_type)
+          sIdPurchases(rResult?.purchases?.map(e => ({label: e.code, value:e.id})))
+          sHidden(rResult?.order_type === "1" ? true : false)
+          sOnFetchingItemsAll(rResult?.order_type === "0" ? true : false)
+          sOnFetchingItems(rResult?.order_type === "1" ? true : false)
+          sNote(rResult?.note)
+         
+         
+        }
+        sOnFetchingDetail(false)
+    })
+  }
+  useEffect(() => {
+    onFetchingDetail && _ServerFetchingDetail()
+  }, [onFetchingDetail]);
+  useEffect(() => {
+    id && sOnFetchingDetail(true) 
+  }, []);
     const _HandleChangeInput = (type, value) => {
         if (type === "loai") {
             Swal.fire({
-              title: `${"Thay đổi loại đặt hàng"}`,
+              title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
               icon: 'warning',
               showCancelButton: true,
               confirmButtonColor: '#296dc1',
@@ -160,8 +198,8 @@ const Index = (props) => {
 
           newOption.forEach((item, index) => {
             if (index === 0 || !item.id) return;
-            const dongiasauchietkhau = item.dongia * (1 - chietKhauValue / 100);
-            const thanhTien = item.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
+            const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
+            const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
 
             item.thue = thuetong;
             item.chietkhau = chietkhautong;
@@ -249,7 +287,6 @@ const Index = (props) => {
     }, [onFetchingItemsAll]);
     
     const options =  dataItems?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e})) 
-
       useEffect(() => {
         onFetching && _ServerFetching() 
       }, [onFetching]);
@@ -353,16 +390,39 @@ const Index = (props) => {
          const _HandleChangeInputOption = (id, type,index3, value) => {
           var index = option.findIndex(x => x.id === id );
           if(type == "mathang"){
-            const hasSelectedOption = option.some((o) => o.mathang?.value === value.value);
-              if (hasSelectedOption) {
-                return Toast.fire({
-                title: `${"Mặt hàng này đã được chọn "}`,
-                icon: 'error',
-                confirmButtonColor: '#296dc1',
-                cancelButtonColor: '#d33',
-                confirmButtonText: `${dataLang?.aler_yes}`,
-                })
-              }else {
+            // const hasSelectedOption = option.some((o) => o.mathang?.value === value.value);
+            // const hasSelectedOption = option.some((o) => o.mathang?.value === value.value && o.mathang?.purchases_code === value.mathang?.purchases_code);
+            // const hasSelectedOption = option.some((o) => o.mathang?.value === value.value && o.mathang?.e?.purchases_code === value.mathang?.e?.purchases_code);
+            //   if (hasSelectedOption) {
+            //     return Toast.fire({
+            //     title: `${"Mặt hàng này đã được chọn "}`,
+            //     icon: 'error',
+            //     confirmButtonColor: '#296dc1',
+            //     cancelButtonColor: '#d33',
+            //     confirmButtonText: `${dataLang?.aler_yes}`,
+            //     })
+            //   }
+            //   else {
+            //     if(option[index].mathang){
+            //       option[index].mathang = value
+            //       option[index].donvitinh =  value?.e?.unit_name
+            //       // option[index].thanhtien =  value?.e?.unit_name
+            //     }else{
+            //       const newData= {id: Date.now(), mathang: value, donvitinh:value?.e?.unit_name, soluong:1,dongia:1,chietkhau: chietkhautong ? chietkhautong : 0, dongiasauck:1, thue: thuetong ? thuetong : 0, dgsauthue:1, thanhtien:1, ghichu:""}
+            //       if (newData.chietkhau) {
+            //         newData.dongiasauck *= (1 - Number(newData.chietkhau) / 100);
+            //       }
+            //       if(newData.thue?.e?.tax_rate == undefined){
+            //         const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
+            //         newData.thanhtien = Number(tien.toFixed(2));
+            //       } else { 
+            //         const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.e?.tax_rate)/100) * Number(newData.soluong);
+            //         newData.thanhtien = Number(tien.toFixed(2));
+            //       }
+                  
+            //       option.push(newData);
+            //     }
+            //   }
                 if(option[index].mathang){
                   option[index].mathang = value
                   option[index].donvitinh =  value?.e?.unit_name
@@ -379,13 +439,12 @@ const Index = (props) => {
                     const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.e?.tax_rate)/100) * Number(newData.soluong);
                     newData.thanhtien = Number(tien.toFixed(2));
                   }
-                  
                   option.push(newData);
                 }
-              }
           }else if(type == "donvitinh"){
             option[index].donvitinh = value.target?.value;
           }else if (type === "soluong") {
+            // console.log(option[index]);
             option[index].soluong = Number(value?.value);
             if(option[index].thue?.e?.tax_rate == undefined){
               const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
@@ -420,14 +479,15 @@ const Index = (props) => {
                 option[index].thanhtien = Number(tien.toFixed(2));
               }
           }else if(type == "thue"){
-              option[index].thue = value
-              if(option[index].thue?.e?.tax_rate == undefined){
-                const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-                option[index].thanhtien = Number(tien.toFixed(2));
-              }else{
-                const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.e?.tax_rate)/100) * Number(option[index].soluong);
-                option[index].thanhtien = Number(tien.toFixed(2));
-              }
+              option[index].thue = value?.value
+              console.log({label: taxOptions.find(item => item.value === value?.value)?.label, value: value?.value})
+              // if(option[index].thue?.e?.tax_rate == undefined){
+              //   const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
+              //   option[index].thanhtien = Number(tien.toFixed(2));
+              // }else{
+              //   const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.e?.tax_rate)/100) * Number(option[index].soluong);
+              //   option[index].thanhtien = Number(tien.toFixed(2));
+              // }
           }
           else if(type == "ghichu"){
               option[index].ghichu = value?.target?.value;
@@ -486,27 +546,27 @@ const Index = (props) => {
           sOption(newOption); // cập nhật lại mảng
         }
 
-        const taxOptions = [{ value: null, e: { name: "Miễn thuế", tax_rate: 0 } }, ...dataTasxes] ;
+        const taxOptions = [{ value: 0, label: "Miễn thuế", e: { name: "Miễn thuế", tax_rate: 0 } }, ...dataTasxes] ;
 
         const tinhTongTien = (option) => {
-          const tongTien = option.slice(1).reduce((accumulator, currentValue) => accumulator + currentValue.dongia * currentValue.soluong, 0);
+          const tongTien = option.slice(1).reduce((accumulator, currentValue) => accumulator + currentValue?.dongia * currentValue?.soluong, 0);
         
           const tienChietKhau = option.slice(1).reduce((acc, item) => {
-            const chiTiet = item.dongia * (item.chietkhau/100) * item.soluong;
+            const chiTiet = item?.dongia * (item?.chietkhau/100) * item?.soluong;
             return acc + chiTiet;
           }, 0);
         
           const tongTienSauCK = option.slice(1).reduce((acc, item) => {
-            const tienSauCK = item.soluong * item.dongiasauck;
+            const tienSauCK = item?.soluong * item?.dongiasauck;
             return acc + tienSauCK;
           }, 0);
         
           const tienThue = option.slice(1).reduce((acc, item) => {
-            const tienThueItem = item.dongiasauck * (isNaN(item.thue?.e?.tax_rate) ? 0 : (item.thue?.e?.tax_rate/100)) * item.soluong;
+            const tienThueItem = item?.dongiasauck * (isNaN(item?.thue?.e?.tax_rate) ? 0 : (item?.thue?.e?.tax_rate/100)) * item?.soluong;
             return acc + tienThueItem;
           }, 0);
         
-          const tongThanhTien = option.slice(1).reduce((acc, item) => acc + item.thanhtien, 0);
+          const tongThanhTien = option.slice(1).reduce((acc, item) => acc + item?.thanhtien, 0);
         
           return { tongTien: tongTien || 0, tienChietKhau: tienChietKhau || 0, tongTienSauCK: tongTienSauCK || 0, tienThue: tienThue || 0, tongThanhTien: tongThanhTien || 0 };
         };
@@ -518,7 +578,7 @@ const Index = (props) => {
         }, [option]);
 
         
-      const dataOption = option?.map(e => { return {item: e?.mathang?.value, quantity: e?.soluong, price: e?.dongia, discount_percent:e.chietkhau, note: e.ghichu, tax_id:e.thue?.value, note: e.ghichu}})
+      const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, quantity: e?.soluong, price: e?.dongia, discount_percent:e?.chietkhau, note: e?.ghichu, tax_id:e?.thue?.value,purchases_item_id: e?.mathang?.e?.purchases_item_id, note: e?.ghichu}})
       const newDataOption = dataOption?.filter(e => e?.item !== undefined);
         const _ServerSending = () => {
           var formData = new FormData();
@@ -526,10 +586,17 @@ const Index = (props) => {
           formData.append("date", (moment(selectedDate).format("YYYY-MM-DD HH:mm:ss")))
           formData.append("delivery_date", (moment(delivery_date).format("YYYY-MM-DD HH:mm:ss")))
           formData.append("suppliers_id", idSupplier.value)
+          formData.append("order_type ", loai)
           formData.append("branch_id", idBranch.value)
+          formData.append("staff_id", idStaff.value)
           formData.append("note", note)
+          if(loai === "1"){
+            idPurchases?.map((e,index) =>{
+              return formData.append(`purchase[${index}][id]`, e?.value);
+            })
+          }
           newDataOption.forEach((item, index) => {
-            formData.append(`items[${index}][purchases_item_id]`, "");
+            formData.append(`items[${index}][purchases_item_id]`, item?.purchases_item_id);
             formData.append(`items[${index}][item]`, item?.item);
             formData.append(`items[${index}][quantity]`, item?.quantity);
             formData.append(`items[${index}][price]`, item?.price);
@@ -537,7 +604,7 @@ const Index = (props) => {
             formData.append(`items[${index}][tax_id]`, item?.tax_id);
             formData.append(`items[${index}][note]`, item?.note);
         });  
-          Axios("POST", `/api_web/Api_purchase_order/purchase_order/?csrf_protection=true`, {
+          Axios("POST", `${id ? `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true` : "/api_web/Api_purchase_order/purchase_order/?csrf_protection=true"}`, {
               data: formData,
               headers: {'Content-Type': 'multipart/form-data'}
           }, (err, response) => {
@@ -587,11 +654,10 @@ const Index = (props) => {
         onSending && _ServerSending()
     }, [onSending]);
 
-
     return (
     <React.Fragment>
     <Head>
-        <title>Thông tin đơn đặt hàng</title>
+        <title>{id ? "Sửa thông tin đơn đặt hàng" :"Thêm thông tin đơn đặt hàng"}</title>
     </Head>
     <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between'>
         <div className='h-[97%] space-y-3 overflow-hidden'>
@@ -862,7 +928,7 @@ const Index = (props) => {
                   <React.Fragment>
                       <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]"> 
                           {sortedArr.map((e,index) => 
-                            <div className='grid grid-cols-12 gap-1 py-1 ' key={e.id}>
+                            <div className='grid grid-cols-12 gap-1 py-1 ' key={e?.id}>
                             <div className='col-span-3  z-[100] my-auto'>
                            <Select 
                             onInputChange={_HandleSeachApi.bind(this)}
@@ -874,11 +940,11 @@ const Index = (props) => {
                           <div className='flex items-center  justify-between py-2'>
                             <div className='flex items-center gap-2'>
                               <div>
-                                {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image" style={{ width: "50px", height: "60px" }} className='object-cover rounded' />):
-                                  <div className='w-[50px] h-[60px] object-cover bg-gray-200 flex items-center justify-center rounded'>
-                                    <IconImage/>
+                              {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />):
+                                    <div className='w-[50px] h-[60px] object-cover bg-gray-100 flex items-center justify-center rounded'>
+                                      <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
                                   </div>
-                                }
+                                  }
                               </div>
                               <div>
                                 <h3 className='font-medium'>{option.e?.name}</h3>
@@ -886,7 +952,7 @@ const Index = (props) => {
                                   <h5 className='text-gray-400 font-normal'>{option.e?.code}</h5>
                                   <h5 className='text-[#0F4F9E] font-medium'>{option.e?.product_variation}</h5>
                                 </div>
-                                <h5 className='text-gray-400 font-medium text-xs'>{dataLang[option.e?.text_type]} {loai == "1" ? "-":""} {loai == "1" ? option.e?.purchases_code : ""}</h5>
+                                <h5 className='text-gray-400 font-medium text-xs'>{dataLang[option.e?.text_type]} {loai == "1" ? "-":""} {loai == "1" ? option.e?.purchases_code : ""} {loai == "1" ? "- Số lượng:":""} {loai == "1" ? option.e?.quantity_left  : ""}</h5>
                               </div>
                             </div>
                             <div className=''>
@@ -936,16 +1002,16 @@ const Index = (props) => {
                          />
                          </div>
                          <div className='col-span-1 text-center flex items-center justify-center'>
-                           <h3 className=''>{e.donvitinh}</h3>
+                           <h3 className=''>{e?.donvitinh}</h3>
                         </div>
                         <div className='col-span-1 flex items-center justify-center'>
                            <div className="flex items-center justify-center">
                                <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                              onClick={() => handleDecrease(e.id)}  disabled={index === 0} 
+                              onClick={() => handleDecrease(e?.id)}  disabled={index === 0} 
                               ><Minus size="16"/></button>
                               <NumericFormat
                                 className="appearance-none text-center py-2 px-4 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
-                                onValueChange={_HandleChangeInputOption.bind(this, e.id, "soluong",e)}
+                                onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong",e)}
                                 value={e?.soluong || 1}
                                 thousandSeparator={false}
                                 allowNegative={false}
@@ -964,7 +1030,7 @@ const Index = (props) => {
                         <div className='col-span-1 text-center flex items-center justify-center'>
                           <NumericFormat
                                 value={e?.dongia}
-                                onValueChange={_HandleChangeInputOption.bind(this, e.id, "dongia",index)}
+                                onValueChange={_HandleChangeInputOption.bind(this, e?.id, "dongia",index)}
                                 allowNegative={false}
                                 readOnly={index === 0 ? readOnlyFirst : false}
                                 decimalScale={0}
@@ -976,7 +1042,7 @@ const Index = (props) => {
                         <div className='col-span-1 text-center flex items-center justify-center'>
                           <NumericFormat
                               value={e?.chietkhau}
-                              onValueChange={_HandleChangeInputOption.bind(this, e.id, "chietkhau",index)}
+                              onValueChange={_HandleChangeInputOption.bind(this, e?.id, "chietkhau",index)}
                               className="appearance-none text-center py-1 px-2 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
                               thousandSeparator=","
                               allowNegative={false}
@@ -987,17 +1053,17 @@ const Index = (props) => {
                         </div>
                         
                         <div className='col-span-1 text-right flex items-center justify-end'>
-                           <h3 className='px-2'>{formatNumber(e.dongiasauck)}</h3>
+                           <h3 className='px-2'>{formatNumber(e?.dongiasauck)}</h3>
                         </div>
                         <div className='col-span-1 text-center flex justify-center items-center'>
                         <Select 
                             options={taxOptions}
-                            onChange={_HandleChangeInputOption.bind(this, e.id, "thue",index)}
-                            value={e?.thue}
+                            onChange={_HandleChangeInputOption.bind(this, e?.id, "thue",index)}
+                            value={e?.thue ? {label: taxOptions.find(item => item.value === e?.thue)?.label, value: e?.thue} : null}
                            formatOptionLabel={(option) => (
                           <div className='flex justify-start items-center gap-4 '>
                               <h2>{option?.e?.name}</h2>
-                              <h2>{option?.e?.tax_rate}</h2>
+                              <h2>{`(${option?.e?.tax_rate})`}</h2>
                           </div>
                           )}
                             placeholder={"% Thuế"} 
@@ -1005,7 +1071,7 @@ const Index = (props) => {
                             className={` "border-transparent placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
-                            dangerouslySetInnerHTML={{__html: option.label}}
+                            // dangerouslySetInnerHTML={{__html: option.label}}
                             menuPortalTarget={document.body}
                             closeMenuOnSelect={true}
                             style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -1040,13 +1106,13 @@ const Index = (props) => {
                         </div>
                        
                         <div className='col-span-1 text-right flex items-center justify-end'>
-                           <h3 className='px-2'>{formatNumber(e.thanhtien)}</h3>
+                           <h3 className='px-2'>{formatNumber(e?.thanhtien)}</h3>
                         </div>
                        
                          <div className='col-span-1 flex items-center justify-center'>
                              <input
-                                 value={e.ghichu}                
-                                 onChange={_HandleChangeInputOption.bind(this, e.id, "ghichu",index)}
+                                 value={e?.ghichu}                
+                                 onChange={_HandleChangeInputOption.bind(this, e?.id, "ghichu",index)}
                                  name="optionEmail"     
                                  placeholder='Ghi chú'                 
                                  type="text"
@@ -1055,7 +1121,7 @@ const Index = (props) => {
                          </div>
                          <div className='col-span-1 flex items-center justify-center'>
                            <button
-                            onClick={_HandleDelete.bind(this, e.id)}
+                            onClick={_HandleDelete.bind(this, e?.id)}
                              type='button' title='Xóa' className='transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2'><IconDelete /></button>
                          </div>
                            </div>
@@ -1064,9 +1130,9 @@ const Index = (props) => {
                   </React.Fragment>
                 </div>
             </div>
-        <div className='grid grid-cols-8 mb-3 font-normal bg-[#ecf0f475] p-2 items-center'>
+        <div className='grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center'>
                     <div className='col-span-2  flex items-center gap-2'>
-                          <h2>{"Chiết khấu"}</h2>
+                          <h2>{"% Chiết khấu"}</h2>
                           <div className='col-span-1 text-center flex items-center justify-center'>
                           <NumericFormat
                               value={chietkhautong}
@@ -1080,7 +1146,7 @@ const Index = (props) => {
                         </div> 
                       </div>
                       <div className='col-span-2 flex items-center gap-2'>
-                          <h2>{"Thuế "}</h2>  
+                          <h2>{"Thuế"}</h2>  
                           <Select 
                             options={taxOptions}
                             onChange={_HandleChangeInput.bind(this, "thuetong")}
@@ -1088,7 +1154,7 @@ const Index = (props) => {
                             formatOptionLabel={(option) => (
                               <div className='flex justify-start items-center gap-4 '>
                                   <h2>{option?.e?.name}</h2>
-                                  <h2>{option?.e?.tax_rate}</h2>
+                                  <h2>{`(${option?.e?.tax_rate})`}</h2>
                               </div>
                               )}
                             placeholder={"% Thuế"} 

@@ -64,6 +64,7 @@ const Form = (props) => {
     const [errNullLocate, sErrNullLocate] = useState(false);
     const [errNullLot, sErrNullLot] = useState(false);
     const [errNullDate, sErrNullDate] = useState(false);
+    const [errData, sErrData] = useState([]);
 
     const _ServerFetching = () => {
         Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {
@@ -158,15 +159,18 @@ const Form = (props) => {
                             return {...ce, amount: Number(value?.value)}
                         }else if(type === "locate"){
                             ce.locate = value;
-                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id)
+                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckSame(parentId, id, ce?.locate, ce?.lot, ce?.date);
+                            // (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id);
                             return {...ce}
                         }else if(type === "lot"){
                             ce.lot = value;
-                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id)
+                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckSame(parentId, id, ce?.locate, ce?.lot, ce?.date);
+                            // (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id);
                             return {...ce}
                         }else if(type === "date"){
                             ce.date = value;
-                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id)
+                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckSame(parentId, id, ce?.locate, ce?.lot, ce?.date);
+                            // (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id);
                             return {...ce}
                         }else if(type === "price"){
                             return {...ce, price: Number(value?.value)}
@@ -181,14 +185,30 @@ const Form = (props) => {
         sDataChoose([...newData])
     }
 
-    const _HandleCheckChild = (parentId, id) => {
+    const _HandleCheckSame = (parentId, id, locate, lot, date) => {
         setTimeout(() => {
-            const parent = dataChoose.find(item => item.id === parentId);
+            const newData = dataChoose.map(e => {
+                if(e.id === parentId){
+                    const newChild = e.child?.map(ce => {
+                        if(ce.id !== id && ce.locate?.value === locate?.value && ce.lot?.value === lot?.value && moment(ce.date).format("DD/MM/yyyy") == moment(date).format("DD/MM/yyyy")){
+                            Toast.fire({
+                                icon: 'error',
+                                title: `Trùng mặt hàng`
+                            }) 
+                            return {...ce, locate: null, amount: null, lot: null, date: null, serial: null, quantity: null, price: null}
+                        }
+                        return ce;
+                    })
+                    return {...e, child: newChild}
+                }
+                return e;
+            })
+            const parent = newData.find(item => item.id === parentId);
             if(!parent) return null;
             const child = parent.child.find(e => e.id === id)
             if(!child) return null;
             const check = parent.checkChild.find(e => e.locate === child.locate?.value && e.lot === child.lot?.value && e.date === moment(child.date).format("DD/MM/yyyy"))
-            const newData = dataChoose.map(e => {
+            const newData1 = newData.map(e => {
                 if(e.id === parentId){
                     const newChild = e.child?.map(ce => {
                         if(ce.id === id){
@@ -200,8 +220,8 @@ const Form = (props) => {
                 }
                 return e;
             })
-            sDataChoose([...newData])
-        }, 500);
+            sDataChoose([...newData1])
+        }, 1000);
     }
 
     const _ServerSending = () => {
@@ -228,7 +248,7 @@ const Form = (props) => {
                 formData.append(`data[${index}][child][${indexChild}][quantity_net]`, itemChild?.amount || 0);
                 formData.append(`data[${index}][child][${indexChild}][quantity]`, itemChild?.quantity || 0);
                 formData.append(`data[${index}][child][${indexChild}][lot]`, itemChild?.lot?.value || null );
-                formData.append(`data[${index}][child][${indexChild}][serial]`, itemChild?.serial);
+                formData.append(`data[${index}][child][${indexChild}][serial]`, itemChild?.serial || null);
             })
         })
 
@@ -236,22 +256,51 @@ const Form = (props) => {
             data: formData,
             headers: {"Content-Type": "multipart/form-data"} 
         }, (err, response) => {
-            if(!err){}
+            if(!err){
+                var {isSuccess, message, items_error} = response.data;
+                if(isSuccess){
+                    router.back();
+                    Toast.fire({
+                        icon: 'success',
+                        title: `${dataLang[message]}`
+                    })  
+                    sErrData([])
+                }else{
+                    Toast.fire({
+                        icon: 'error',
+                        title: `${dataLang[message]}`
+                    }) 
+                    sErrData(items_error)
+                }
+            }
             sOnSending(false)
         })
     }
-    console.log(dataChoose)
 
     useEffect(() => {
         onSending && _ServerSending()
     }, [onSending]);
+
+    useEffect(() => {
+        const updatedData = dataChoose.map((parent) => {
+            const updatedChild = parent.child.map((child) => {
+                const matchedItem = errData.find((item) => item.id_parent === parent.id && Number(item.id) === child.id);
+                if (matchedItem) {
+                    return { ...child, quantity: Number(matchedItem.check_quantity_stock)};
+                }else{
+                    return child;
+                }
+            });
+            return { ...parent, child: updatedChild };
+        })
+        sDataChoose([...updatedData])
+    }, [errData]);
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
         const checkErrNullLocate = dataChoose.map(item => item.child.some(itemChild => itemChild.locate === null));
         const checkErrNullLot = dataChoose.map(item => item.child.some(itemChild => itemChild.lot === null));
         const checkErrNullDate = dataChoose.map(item => item.child.some(itemChild => itemChild.date === null));
-        console.log(checkErrNullLocate[0])
 
         if(branch == null || warehouse == null || dataChoose.length == 0 || checkErrNullLocate[0] || checkErrNullLot[0] || checkErrNullDate[0]){
             branch == null && sErrBranch(true)
@@ -429,7 +478,7 @@ const Form = (props) => {
                                                                 placeholder={"Vị trí kho"}
                                                                 isClearable={true}
                                                                 classNamePrefix="Select"
-                                                                className={`${errNullLocate && ce.locate == null ? "border-red-500" : "border-transparent"}Select__custom placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`} 
+                                                                className={`${errNullLocate && ce.locate == null ? "border-red-500" : "border-transparent"}Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`} 
                                                                 isSearchable={true}
                                                                 noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                                                 menuPortalTarget={document.body}
