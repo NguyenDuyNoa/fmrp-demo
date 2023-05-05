@@ -589,7 +589,7 @@ const Index = (props) => {
           newDataOption.forEach((item, index) => {
             formData.append(`items[${index}][purchases_item_id]`, item?.purchases_item_id != undefined ? item?.purchases_item_id : "");
             formData.append(`items[${index}][item]`, item?.item);
-            formData.append(`items[${index}][id]`, item?.id);
+            formData.append(`items[${index}][id]`, router.query?.id ? item?.id : "");
             formData.append(`items[${index}][quantity]`, item?.quantity);
             formData.append(`items[${index}][price]`, item?.price);
             formData.append(`items[${index}][discount_percent]`, item?.discount_percent);
