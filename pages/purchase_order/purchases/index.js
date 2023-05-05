@@ -18,13 +18,10 @@ import Loading from "components/UI/loading";
 import {_ServerInstance as Axios} from '/services/axios';
 import Pagination from '/components/UI/pagination';
 import 'react-datepicker/dist/react-datepicker.css';
-// import Datepicker from 'react-tailwindcss-datepicker'
+import Datepicker from 'react-tailwindcss-datepicker'
 import DatePicker,{registerLocale } from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
 import vi from "date-fns/locale/vi"
-import { format } from 'date-fns';
-
-registerLocale("vi", vi);
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 import ModalImage from "react-modal-image";
@@ -71,13 +68,18 @@ const Index = (props) => {
     const [active,sActive] = useState("")
     const [onSending, sOnSending] = useState(false);
     const [dateRange, setDateRange] = useState([]);
+    const [valueDate, sValueDate] = useState({
+      startDate: null,
+      endDate:null
+    });
+
     const formatDate = (date) => {
       const day = date?.getDate().toString().padStart(2, '0');
       const month = (date?.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-indexed
       const year = date?.getFullYear();
       return `${year}-${month}-${day}`;
     };
-    const formattedDateRange = dateRange.map((date) => formatDate(date));
+    const formattedDateRange = dateRange?.map((date) => formatDate(date));
 
     const _HandleSelectTab = (e) => {
       router.push({
@@ -99,12 +101,14 @@ const Index = (props) => {
                 limit: limit,
                 page: router.query?.page || 1,
                 "filter[branch_id]": idBranch != null ? idBranch.value : null,
-                "filter[status]": tabPage !== "" ? (tabPage !== "1" ? id : 1) : null ,
+                // "filter[status]": tabPage !== "" ? (tabPage !== "1" ? id : 1) : null ,
+                "filter[status]": tabPage,
                 "filter[id]": idCode?.value,
                 "filter[staff_id]" : idUser?.value,
-                "filter[start_date]": formattedDateRange[0],
-                "filter[end_date]": formattedDateRange[1],
-
+                // "filter[start_date]": formattedDateRange[0],
+                // "filter[end_date]": formattedDateRange[1],
+                "filter[start_date]": valueDate?.startDate,
+                "filter[end_date]":valueDate?.endDate,
             }
         }, (err, response) => {
             if(!err){
@@ -150,7 +154,8 @@ const Index = (props) => {
       }else if(type == "user"){
         sIdUser(value)
       }else if(type == "date"){
-        setDateRange(value)
+        // setDateRange(value)
+        sValueDate(value)
       }
     }
     const _ServerFetching_group =  () =>{
@@ -200,8 +205,8 @@ const Index = (props) => {
         onnFetching_filter && _ServerFetching_filter()      
       }, [onnFetching_filter]);
       useEffect(() => {
-        router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || sOnFetching_filter(true)  || router.query.tab == "" && sOnFetching(true) || (idBranch != null && sOnFetching(true)) || (idCode != null && sOnFetching(true)) || (idUser != null && sOnFetching(true)) || dateRange[0] != null && dateRange[1] != null && sOnFetching(true)
-      }, [limit,router.query?.page, router.query?.tab,idBranch,idCode,idUser,dateRange]); 
+        router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || sOnFetching_filter(true)  || router.query.tab == "" && sOnFetching(true) || (idBranch != null && sOnFetching(true)) || (idCode != null && sOnFetching(true)) || (idUser != null && sOnFetching(true)) ||  valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)
+      }, [limit,router.query?.page, router.query?.tab,idBranch,idCode,idUser,valueDate.endDate, valueDate.startDate]); 
 
         const _ToggleStatus = (id) => {
             Swal.fire({
@@ -262,10 +267,7 @@ const Index = (props) => {
                     {title: `${dataLang?.purchase_propnent || "purchase_propnent"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
                     {title: `${dataLang?.purchase_status || "purchase_status"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
                     {title: `${dataLang?.purchase_totalitem || "purchase_totalitem"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `${dataLang?.purchase_ordered || "purchase_ordered"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `${dataLang?.purchase_portion || "purchase_portion"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `${dataLang?.purchase_enough || "purchase_enough"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-                    {title: `${dataLang?.purchase_note || "purchase_note"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `${dataLang?.purchase_orderStatus || "purchase_orderStatus"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
                     {title: `${dataLang?.purchase_branch || "purchase_branch"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
                 ],
                 data: dataExcel?.map((e) =>
@@ -277,9 +279,9 @@ const Index = (props) => {
                         {value: `${e?.staff_create_name ? e?.staff_create_name : ""}`},
                         {value: `${e?.status ? (e?.status === "1" ? "Đã duyệt" : "Chưa duyệt") : ""}`},
                         {value: `${e?.total_item ? e?.total_item  : ""}`},
-                        {value: `${"Chưa đặt hàng"}`},
-                        {value: `${"Đặt 1 phần"}`},
-                        {value: `${"Đặt đủ đơn"}`},
+                        {value: e?.order_status?.status === "purchase_ordered" ? dataLang[e?.order_status?.status] :""
+                        ||  `${e?.order_status.status === "purchase_portion" ?  dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})` :""}` 
+                        ||  `${e?.order_status.status === "purchase_enough" ?  dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})` : ""}`},
                         {value: `${e?.note ? e?.note :""}`},
                         {value: `${e?.branch_name ? e?.branch_name :""}`},
                        
@@ -287,8 +289,7 @@ const Index = (props) => {
                 ),
             }
         ];
-        
-       
+
     return (
         <React.Fragment>
             <Head>
@@ -451,15 +452,30 @@ const Index = (props) => {
                                 />
                             </div>
                             <div className='w-[15vw] z-20'>
-                            {/* <Datepicker            
+                            <Datepicker            
                                 value={valueDate} 
+                                i18n={"vi"} 
+                                primaryColor={"blue"} 
                                 onChange={onchang_filter.bind(this, "date")}
                                 showShortcuts={true} 
-                                className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] "
-                                dateFormat={(date) => dayjs(date).format('DD/MM/YYYY')}
-                                locale="vi"
-                            /> */}
-                            <div className='relative flex items-center'>
+                                displayFormat={"DD/MM/YYYY"} 
+                                configs={{
+                                  shortcuts: {
+                                  today: "Hôm nay" ,
+                                  yesterday: "Hôm qua" ,
+                                  past: period => `${period}  ngày qua` ,
+                                  currentMonth: "Tháng này" ,
+                                  pastMonth: "Tháng trước" 
+                                  },
+                                  footer: {
+                                  cancel: "Từ bỏ" ,
+                                  apply: "Áp dụng" 
+                                  }
+                                  }} 
+                                className="react-datepicker__input-container"
+                                inputClassName="rounded-md w-full p-2 bg-white border-none xl:text-base text-[14.5px] focus:outline-none focus:ring-0 focus:border-transparent"
+                              />
+                            {/* <div className='relative flex items-center'>
                             <DatePicker
                                 selectsRange={true}
                                 startDate={dateRange[0]}
@@ -469,10 +485,10 @@ const Index = (props) => {
                                 dateFormat="dd-MM-yyyy"
                                 isClearable={true}
                                 placeholderText="Chọn ngày chứng từ"
-                                className="bg-white w-full py-2 rounded border border-[#cccccc] pl-10 text-black outline-[#0F4F9E]"
+                                className="bg-white w-full py-2 rounded pl-10 text-black outline-[#0F4F9E]"
                                 />
-                                <IconCalendar size={22} className="absolute left-3 text-[#cccccc]" />
-                            </div>
+                                <IconCalendar size={20} className="absolute left-3 text-[#cccccc]" />
+                            </div> */}
                             </div>
                         </div>
                         {data?.length != 0 &&
@@ -732,7 +748,7 @@ const Popup_chitiet =(props)=>{
                         <div className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_enough || "purchase_enough"} (0)</div> */}
                     </div>
                     <div className='col-span-3 '>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_status || "purchase_status"}i</h3><h3 className='col-span-1'>{data?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1'>{props.dataLang?.purchase_approved || "purchase_approved"} <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>{props.dataLang?.purchase_notapproved || "purchase_notapproved"} <TickCircle size={22}/></div>)}</h3></div>  
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_status || "purchase_status"}</h3><h3 className='col-span-1'>{data?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1'>{props.dataLang?.purchase_approved || "purchase_approved"} <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>{props.dataLang?.purchase_notapproved || "purchase_notapproved"} <TickCircle size={22}/></div>)}</h3></div>  
                         {/* <div className='my-4 font-medium grid grid-cols-2'>Tổng số lượng</div> */}
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_note || "purchase_note"}</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div>
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_branch || "purchase_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] col-span-1">{data?.branch_name}</h3></div>
@@ -762,16 +778,19 @@ const Popup_chitiet =(props)=>{
                           <div className="grid items-center grid-cols-8 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
                             <h6 className="xl:text-base text-xs   py-0.5 col-span-1  rounded-md text-left">
                             {e?.item?.images != null ? (<ModalImage  small={e?.item?.images} large={e?.item?.images} alt="Product Image" style={{ width: "50px", height: "60px" }} className='object-cover rounded' />):
-                                    <div className='w-[50px] h-[60px] object-cover bg-gray-100 flex items-center justify-center rounded'>
+                                    <div className='w-[50px] h-[60px] object-cover  flex items-center justify-center rounded'>
                                       {/* <IconImage/> */}
                                       <ModalImage small="/no_img.png" large="/no_img.png" className='w-full h-full rounded object-contain p-1' > </ModalImage>
                                     </div>
                                   }
-                            </h6>                
+                            </h6>   
+
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.item?.name}</h6>                
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left break-words">{e?.item?.product_variation}</h6>                
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.unit_name}</h6>                
-                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.quantity}</h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right">{e?.quantity}</h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right ">{e?.quantity_create}</h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right">{e?.quantity_left}</h6>                
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.note}</h6>                
                           </div>
                         ))}              
