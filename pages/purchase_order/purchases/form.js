@@ -65,7 +65,6 @@ const Index = (props) => {
       router.query && setSelectedDate(moment().format('YYYY-MM-DD HH:mm:ss'))
       router.query && sNote("")
   }, [router.query]);
-  const options = data?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e}))
   const [option, sOption] = useState([{id: Date.now(), mathang: null, donvitinh:"", soluong:0, ghichu:""}]);
     const slicedArr = option.slice(1);
     const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
@@ -75,9 +74,9 @@ const Index = (props) => {
         }, (err, response) => {
             if(!err){
                 var {result} =  response.data.data
-                sData(result)
+                sData(result?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e})))
+                // const options = data?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e}))
             }
-           
         })
         Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {
           params:{
@@ -148,6 +147,7 @@ const Index = (props) => {
           sNote(value.target.value)
         }
       }
+      // console.log(sortedArr);
       const _HandleChangeInputOption = (id, type,index3, value) => {
         var index = option.findIndex(x => x.id === id );
         if(type == "mathang"){
@@ -163,6 +163,7 @@ const Index = (props) => {
             }else {
               if(option[index].mathang){
                 option[index].mathang = value
+                // console.log(value)
                 option[index].donvitinh =  value?.e?.unit_name
                 // option[index].ghichu = value.ghichu
               }else{
@@ -299,7 +300,7 @@ const Index = (props) => {
         }, (err, response) => {
               if(!err){
                 var {result} = response?.data.data
-                sData(result)
+                sData(result?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e})))
             }
           }
       )};
@@ -346,6 +347,7 @@ const Index = (props) => {
        
       //   sFetchingSuccess(false)
       // }, [fetchingSuccess]);
+
   return (
     <React.Fragment>
     <Head>
@@ -487,7 +489,7 @@ const Index = (props) => {
                            <Select 
                           onInputChange={_HandleSeachApi.bind(this)}
                           dangerouslySetInnerHTML={{__html: option.label}}
-                           options={options}
+                           options={data}
                            onChange={_HandleChangeInputOption.bind(this, e?.id, "mathang",index)}
                            value={e?.mathang}
                            formatOptionLabel={(option) => (
@@ -499,13 +501,12 @@ const Index = (props) => {
                                       <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
                                   </div>
                                   }
-                                 
                                 </div>
                                 <div>
                                   <h3 className='font-medium'>{option.e?.name}</h3>
                                   <div className='flex gap-2'>
                                     <h5 className='text-gray-400 font-normal'>{option.e?.code}</h5>
-                                    <h5 className='text-[#0F4F9E] font-medium'>{option.e?.product_variation}</h5>
+                                    <h5 className='font-medium'>{option?.e?.product_variation}</h5>
                                   </div>
                                   <h5 className='text-gray-400 font-medium text-xs'>{dataLang[option.e?.text_type]}</h5>
                                 </div>

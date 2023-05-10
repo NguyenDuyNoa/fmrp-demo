@@ -65,7 +65,7 @@ const Index = (props) => {
     const [idCode, sIdCode] = useState(null);
     const [idUser, sIdUser] = useState(null);
     const [status, sStatus] = useState("")
-    const [active,sActive] = useState("")
+    const [active,sActive] = useState(null)
     const [onSending, sOnSending] = useState(false);
     const [dateRange, setDateRange] = useState([]);
     const [valueDate, sValueDate] = useState({
@@ -182,7 +182,6 @@ const Index = (props) => {
         })
       }
 
-      
     const _HandleOnChangeKeySearch = ({target: {value}}) => {
         sKeySearch(value)
         router.replace({
@@ -205,58 +204,92 @@ const Index = (props) => {
         onnFetching_filter && _ServerFetching_filter()      
       }, [onnFetching_filter]);
       useEffect(() => {
-        router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || sOnFetching_filter(true)  || router.query.tab == "" && sOnFetching(true) || (idBranch != null && sOnFetching(true)) || (idCode != null && sOnFetching(true)) || (idUser != null && sOnFetching(true)) ||  valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)
+        router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || sOnFetching_filter(true)  || router.query.tab == "" && sOnFetching(true) || (idBranch != null && sOnFetching(true)) || (idCode != null && sOnFetching(true)) || (idUser != null && sOnFetching(true)) ||  valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true) 
       }, [limit,router.query?.page, router.query?.tab,idBranch,idCode,idUser,valueDate.endDate, valueDate.startDate]); 
 
-        const _ToggleStatus = (id) => {
-            Swal.fire({
-               title: `${"Thay đổi trạng thái"}`,
-               icon: 'warning',
-               showCancelButton: true,
-               confirmButtonColor: '#296dc1',
-               cancelButtonColor: '#d33',
-               confirmButtonText: `${dataLang?.aler_yes}`,
-               cancelButtonText:`${dataLang?.aler_cancel}`
-             }).then((result) => {
-               if (result.isConfirmed) {
-                 sStatus(id)
-                 var index = data.findIndex(x => x.id === id);
-                 if (index !== -1 && data[index].status === "0") {
-                  sActive(data[index].status = "1")
-                 }else if (index !== -1 && data[index].status === "1") {
-                    sActive(data[index].status = "0")
-                  }
-                 sData([...data])
-               }
-             })
-           }
-        const _ServerSending =  () => {
-            let id = status
-            Axios("POST",`${id && `/api_web/Api_purchases/updateStatus/${id}/${active}}?csrf_protection=true`}`, {
-               
+      // const _ToggleStatus = (id,db) => {
+      //       Swal.fire({
+      //          title: `${"Thay đổi trạng thái"}`,
+      //          icon: 'warning',
+      //          showCancelButton: true,
+      //          confirmButtonColor: '#296dc1',
+      //          cancelButtonColor: '#d33',
+      //          confirmButtonText: `${dataLang?.aler_yes}`,
+      //          cancelButtonText:`${dataLang?.aler_cancel}`
+      //        }).then((result) => {
+      //          if (result.isConfirmed) {
+      //             sStatus(id)
+      //             var index = data.findIndex(x => x.id === id);
+      //             console.log(data[index]?.status);
+      //            if (index !== -1 && data[index].status === "0") {
+      //               sActive(data[index].status = "1")
+      //            }else if (index !== -1 && data[index].status === "1") {
+      //               sActive(data[index].status = "0")
+      //             }
+      //            sData([...data])
+      //          }
+      //        })
+      //      }
+      const _ToggleStatus =  (id) => {
+        
+        Swal.fire({
+            title: `${"Thay đổi trạng thái"}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#296dc1',
+            cancelButtonColor: '#d33',
+            confirmButtonText: `${dataLang?.aler_yes}`,
+            cancelButtonText:`${dataLang?.aler_cancel}`
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Xác định trạng thái mới
+                const index = data.findIndex(x => x.id === id);
+                const newStatus = data[index].status === "0" ? "1" : "0";
+                // Gửi yêu cầu cập nhật trạng thái lên server
+                _ServerSending(id, newStatus)
+                sActive(newStatus)
+                // Không cần cập nhật trạng thái trên giao diện ngay tại đây
+            }
+        });
+    };
+        const _ServerSending =  (id, newStatus) => {
+            // let id = status
+          Axios("POST",`${`/api_web/Api_purchases/updateStatus/${id}/${newStatus}?csrf_protection=true`}`, {
                 headers: {"Content-Type": "multipart/form-data"} 
             }, (err, response) => {
                 if(!err){
-                    var {isSuccess, message } = response.data;  
+                    var {isSuccess, message} = response.data;  
                     if(isSuccess){
                         Toast.fire({
                             icon: 'success',
                             title: `${dataLang[message]}`
                         })
                       }
+                      else{
+                        Toast.fire({
+                          icon: 'error',
+                          title: `${dataLang[message]}`
+                      })
+                    }
                 }
                 sOnSending(false)
+                _ServerFetching()
+                _ServerFetching_group()
             })
         }
-        useEffect(() => {
-        onSending && _ServerSending() 
-        }, [onSending]);
+
+        // useEffect(() => {
+        //     onSending && _ServerSending()  
+        // }, [onSending]);
         useEffect(()=>{
-           sOnSending(true)
-        },[active])
-        useEffect(()=>{
-           sOnSending(true)
-        },[status])
+          active != null && sOnSending(true)
+        },[active != null])
+        // useEffect(()=>{
+        //   stt != undefined && sOnSending(true)
+        // },[stt])
+        // useEffect(()=>{
+        //    sOnSending(true)
+        // },[status])
         const multiDataSet = [
             {
                 columns: [
@@ -640,17 +673,18 @@ const BtnTacVu = React.memo((props) => {
         })
     }
     const handleClick = () => {
-        if (props?.status === "1") {
+      if(props?.order?.status != "purchase_ordered"){
+        Toast.fire({
+          icon: 'error',
+          title: `${props.dataLang?.purchases_ordered_cant_edit}`
+        })  
+      } 
+       else if (props?.status === "1") {
             Toast.fire({
                 icon: 'error',
                 title: `${props.dataLang?.confirmed_cant_edit}`
               })   
-        }else if(props?.order?.status != "purchase_ordered"){
-          Toast.fire({
-            icon: 'error',
-            title: `${props.dataLang?.purchases_ordered_cant_edit}`
-          })  
-        } 
+        }
         else {
           router.push(`/purchase_order/purchases/form?id=${props.id}`);
         }
@@ -790,7 +824,7 @@ const Popup_chitiet =(props)=>{
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.unit_name}</h6>                
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right">{e?.quantity}</h6>                
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right ">{e?.quantity_create}</h6>                
-                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right">{e?.quantity_left}</h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right">{Number(e?.quantity_left) < 0 ? "Đặt dư" +" "+ Number(Math.abs(e?.quantity_left))  : e?.quantity_left}</h6>                
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.note}</h6>                
                           </div>
                         ))}              

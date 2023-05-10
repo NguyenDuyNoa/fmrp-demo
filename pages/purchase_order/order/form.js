@@ -40,7 +40,7 @@ const Index = (props) => {
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
     const [onFetchingDetail,sOnFetchingDetail] = useState(false)
     const [onSending, sOnSending] = useState(false);
-    const [option, sOption] = useState([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}]);
+    const [option, sOption] = useState([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:"",purchases_order_item_id: ""}]);
     const slicedArr = option.slice(1);
     const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
     sortedArr.unshift(option[0]);
@@ -52,10 +52,13 @@ const Index = (props) => {
     const [dataItems, sDataItems] = useState([])
     const [dataTasxes, sDataTasxes] = useState([])
     const [dataBranch, sDataBranch]= useState([])
+
+    const [dataId, sDataId] = useState([])
+
     const [code, sCode] = useState('')
     const [note, sNote] = useState('')
     const [thuetong, sThuetong] = useState()
-    const [chietkhautong, sChietkhautong] = useState()
+    const [chietkhautong, sChietkhautong] = useState(0)
     const [selectedDate, sSelectedDate] = useState(moment().format('YYYY-MM-DD HH:mm:ss'));
     const [delivery_date, sDelivery_date] = useState(moment().format('YYYY-MM-DD'));
     const [idSupplier, sIdSupplier] = useState(null)
@@ -90,7 +93,7 @@ const Index = (props) => {
         if(!err){
           var rResult = response.data;
           const itemlast =  [{mathang: null}];
-          const item = itemlast?.concat(rResult?.item?.map(e => ({id: e.id,mathang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`, value:e.item?.id}, soluong: Number(e?.quantity), dongia: Number(e?.price), chietkhau: Number(e?.discount_percent), thue: {tax_rate: e?.tax_rate, value: e?.tax_id}, donvitinh: e.item?.unit_name, dongiasauck: Number(e?.price_after_discount), note: e?.note, thanhtien:Number(e?.price_after_discount) * (1 + Number(e?.tax_rate)/100) * Number(e?.quantity)})));
+          const item = itemlast?.concat(rResult?.item?.map(e => ({purchases_order_item_id: e?.purchases_order_item_id, id: e.purchases_order_item_id,mathang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`, value:e.item?.id}, soluong: Number(e?.quantity), dongia: Number(e?.price), chietkhau: Number(e?.discount_percent), thue: {tax_rate: e?.tax_rate, value: e?.tax_id}, donvitinh: e.item?.unit_name, dongiasauck: Number(e?.price_after_discount), note: e?.note, thanhtien:Number(e?.price_after_discount) * (1 + Number(e?.tax_rate)/100) * Number(e?.quantity)})));
           sOption(item)
           sCode(rResult?.code)
           sIdStaff(({label: rResult?.staff_name, value: rResult.staff_id}))
@@ -104,6 +107,7 @@ const Index = (props) => {
           sOnFetchingItemsAll(rResult?.order_type === "0" ? true : false)
           sOnFetchingItems(rResult?.order_type === "1" ? true : false)
           sNote(rResult?.note)
+          sDataId(item?.map(e => ({id:e?.id})))
          
          
         }
@@ -150,18 +154,32 @@ const Index = (props) => {
             sDelivery_date(moment(value.target.value).format('YYYY-MM-DD'))
         }else if(type === "purchases"){
             sIdPurchases(value)
+            if(value?.length > 0){
+              sOption([...sortedArr])
+            }else{
+             sOption(id ? [...sortedArr] : [{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+            }
+            // sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
         }else if(type === "note"){
             sNote(value.target.value)
         }else if(type == "branch"){
             sIdBranch(value)
             sIdPurchases([])
+            if(value != null){
+              sOption([...sortedArr])
+            }
+            else{
+             sOption(id ? [...sortedArr] : [{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+            }
         }else if(type == "thuetong"){
            sThuetong(value)
         }else if(type == "chietkhautong"){
            sChietkhautong(value?.value)
-        
         }
     }
+    useEffect(() =>{
+      idBranch != null &&  idPurchases?.length == 0 &&  sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+    },[idBranch])
       // useEffect(() => {
       //   if (thuetong !== null || chietkhautong !== null) {
       //     const newArray = option.map((item,index) => {
@@ -184,7 +202,7 @@ const Index = (props) => {
       //     sOption(newArray);
       //   }
       // }, [thuetong, chietkhautong]);
-
+      
       useEffect(() => {
         if (thuetong == null && chietkhautong == null) return;
         sOption(prevOption => {
@@ -261,7 +279,6 @@ const Index = (props) => {
         })
         sOnFetchingItems(false)  
     }
-
     useEffect(()=>{
       onFetchingItems && _ServerFetching_Items() 
     },[onFetchingItems])
@@ -309,12 +326,29 @@ const Index = (props) => {
       
       const _HandleSubmit = (e) => {
         e.preventDefault();
-          if(selectedDate == null || idSupplier == null || idStaff == null || delivery_date == null || idBranch == null ){
+         if(loai == "0"){
+          if(selectedDate == null || idSupplier == null || idStaff == null || delivery_date == null || idBranch == null){
             selectedDate == null && sErrDate(true)
             idSupplier == null && sErrSupplier(true)
             idStaff == null && sErrStaff(true)
-            delivery_date == null && sErrDateDelivery(true)
             idBranch == null && sErrBranch(true)
+            delivery_date == null && sErrDateDelivery(true)
+           
+              Toast.fire({
+                  icon: 'error',
+                  title: `${dataLang?.required_field_null}`
+              })
+          }
+          else {
+              sOnSending(true)
+          }
+         }else{
+          if(selectedDate == null || idSupplier == null || idStaff == null || delivery_date == null || idBranch == null || idPurchases?.length == 0){
+            selectedDate == null && sErrDate(true)
+            idSupplier == null && sErrSupplier(true)
+            idStaff == null && sErrStaff(true)
+            idBranch == null && sErrBranch(true)
+            delivery_date == null && sErrDateDelivery(true)
             idPurchases?.length == 0 && sErrPurchase(true)
               Toast.fire({
                   icon: 'error',
@@ -324,6 +358,7 @@ const Index = (props) => {
           else {
               sOnSending(true)
           }
+         }
       }
 
       useEffect(() => {
@@ -342,7 +377,7 @@ const Index = (props) => {
         sErrBranch(false)
       }, [idBranch != null]);
       useEffect(() => {
-          sErrPurchase(false)
+         sErrPurchase(false)
       }, [idPurchases?.length > 0 ]);
 
       const _HandleSeachApi = (inputValue) => {
@@ -420,9 +455,10 @@ const Index = (props) => {
                 if(option[index].mathang){
                   option[index].mathang = value
                   option[index].donvitinh =  value?.e?.unit_name
-                  // option[index].thanhtien =  value?.e?.unit_name
+                  option[index].soluong =  idPurchases?.length ? Number(value?.e?.quantity_left) : 1
+                  option[index].thanhtien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
                 }else{
-                  const newData= {id: Date.now(), mathang: value, donvitinh:value?.e?.unit_name, soluong:1,dongia:1,chietkhau: chietkhautong ? chietkhautong : 0, dongiasauck:1, thue: thuetong ? thuetong : 0, dgsauthue:1, thanhtien:1, ghichu:""}
+                  const newData= {id: Date.now(), mathang: value, donvitinh:value?.e?.unit_name, soluong: idPurchases?.length ? Number(value?.e?.quantity_left) : 1, dongia:1, chietkhau: chietkhautong ? chietkhautong : 0, dongiasauck:1, thue: thuetong ? thuetong : 0, dgsauthue:1, thanhtien:1, ghichu:""}
                   if (newData.chietkhau) {
                     newData.dongiasauck *= (1 - Number(newData.chietkhau) / 100);
                   }
@@ -471,7 +507,6 @@ const Index = (props) => {
                 option[index].thanhtien = Number(tien.toFixed(2));
               }
           }else if(type == "thue"){
-              // option[index].thue = value?.value
               option[index].thue = value
               if(option[index].thue?.tax_rate == undefined){
                 const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
@@ -499,11 +534,12 @@ const Index = (props) => {
           }
           sOption([...option]);
         };
+    
         const handleDecrease = (id) => {
           const index = option.findIndex((x) => x.id === id);
-          const newQuantity = option[index].soluong - 1;
+          const newQuantity = Number(option[index].soluong) - 1;
           if (newQuantity >= 1) { // chỉ giảm số lượng khi nó lớn hơn hoặc bằng 1
-            option[index].soluong = newQuantity;
+            option[index].soluong = Number(newQuantity);
             if(option[index].thue?.tax_rate == undefined){
               const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
               option[index].thanhtien = Number(tien.toFixed(2));
@@ -512,7 +548,6 @@ const Index = (props) => {
               option[index].thanhtien = Number(tien.toFixed(2));
             }
             sOption([...option]);
-
           }else{
             return  Toast.fire({
               title: `${"Số lượng tối thiểu"}`,
@@ -534,12 +569,14 @@ const Index = (props) => {
           })
         }
           const newOption = option.filter(x => x.id !== id); // loại bỏ phần tử cần xóa
+          const fakeDataId = newOption.dataId
           sOption(newOption); // cập nhật lại mảng
         }
 
         const taxOptions = [{ label: "Miễn thuế", value: "0",   tax_rate: "0"}, ...dataTasxes] 
 
         const tinhTongTien = (option) => {
+
           const tongTien = option.slice(1).reduce((accumulator, currentValue) => accumulator + currentValue?.dongia * currentValue?.soluong, 0);
         
           const tienChietKhau = option.slice(1).reduce((acc, item) => {
@@ -568,9 +605,8 @@ const Index = (props) => {
           setTongTienState(tongTien);
         }, [option]);
 
-        
-      const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, quantity: e?.soluong, price: e?.dongia, discount_percent:e?.chietkhau, tax_id:e?.thue?.value,purchases_item_id: e?.mathang?.e?.purchases_item_id, note: e?.ghichu,id:e?.id}})
-      const newDataOption = dataOption?.filter(e => e?.item !== undefined);
+      const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, quantity: Number(e?.soluong), price: e?.dongia, discount_percent:e?.chietkhau, tax_id:e?.thue?.value,purchases_item_id: e?.mathang?.e?.purchases_item_id, note: e?.ghichu, id:e?.id, purchases_order_item_id: e?.purchases_order_item_id}})
+      let newDataOption = dataOption?.filter(e => e?.item !== undefined);
         const _ServerSending = () => {
           var formData = new FormData();
           formData.append("code", code)
@@ -588,9 +624,10 @@ const Index = (props) => {
           }
           newDataOption.forEach((item, index) => {
             formData.append(`items[${index}][purchases_item_id]`, item?.purchases_item_id != undefined ? item?.purchases_item_id : "");
+            formData.append(`items[${index}][purchases_order_item_id]`, item?.purchases_order_item_id != undefined ? item?.purchases_order_item_id : "");
             formData.append(`items[${index}][item]`, item?.item);
             formData.append(`items[${index}][id]`, router.query?.id ? item?.id : "");
-            formData.append(`items[${index}][quantity]`, item?.quantity);
+            formData.append(`items[${index}][quantity]`, item?.quantity.toString());
             formData.append(`items[${index}][price]`, item?.price);
             formData.append(`items[${index}][discount_percent]`, item?.discount_percent);
             formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
@@ -652,7 +689,6 @@ const Index = (props) => {
 //   return formattedDate;
 // }
 
-
     return (
     <React.Fragment>
     <Head>
@@ -697,7 +733,6 @@ const Index = (props) => {
                               type="datetime-local"
                               className={`${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                               {errDate && <label className="text-sm text-red-500">{dataLang?.purchase_err_Date || "purchase_err_Date"}</label>}
-                          
                         </div>
                         <div className='w-[24.5%]'>
                       <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_supplier} <span className="text-red-500">*</span></label>
@@ -949,7 +984,7 @@ const Index = (props) => {
                                 <h3 className='font-medium'>{option.e?.name}</h3>
                                 <div className='flex gap-2'>
                                   <h5 className='text-gray-400 font-normal'>{option.e?.code}</h5>
-                                  <h5 className='text-[#0F4F9E] font-medium'>{option.e?.product_variation}</h5>
+                                  <h5 className='font-medium'>{option.e?.product_variation}</h5>
                                 </div>
                                 <h5 className='text-gray-400 font-medium text-xs'>{dataLang[option.e?.text_type]} {loai == "1" ? "-":""} {loai == "1" ? option.e?.purchases_code : ""} {loai == "1" ? "- Số lượng:":""} {loai == "1" ? option.e?.quantity_left  : ""}</h5>
                               </div>
@@ -1045,8 +1080,8 @@ const Index = (props) => {
                               className="appearance-none text-center py-1 px-2 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
                               thousandSeparator=","
                               allowNegative={false}
-                              readOnly={index === 0 ? readOnlyFirst : false}
-                              decimalScale={0}
+                              // readOnly={index === 0 ? readOnlyFirst : false}
+                              // decimalScale={0}
                               isNumericString={true}   
                           />
                         </div>

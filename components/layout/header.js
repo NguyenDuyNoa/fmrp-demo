@@ -141,7 +141,7 @@ const Header = () => {
                     title: "Nhập hàng & trả hàng",
                     img: "/icon/header/kho/Vector-9.png",
                     items: [
-                        {name: "Nhập hàng"},
+                        {name: "Nhập hàng", link: '/purchase_order/import'},
                         {name: "Trả hàng"}
                     ]
                 }
