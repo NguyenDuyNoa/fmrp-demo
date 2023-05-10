@@ -218,9 +218,13 @@ const Index = (props) => {
         }, 500);
       };
 
+      // const formatNumber = (number) => {
+      //   const integerPart = Math.floor(number).toString();
+      //   return integerPart;
+      // }
       const formatNumber = (number) => {
-        const integerPart = Math.floor(number).toString();
-        return integerPart;
+        const integerPart = Math.floor(number)
+        return integerPart.toLocaleString("en")
       }
       // const formatNumberWithCommas = (number) => {
       //   return number?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -291,7 +295,7 @@ const Index = (props) => {
                   </div>
                 </div>
                 
-                <div  className="flex space-x-3 items-center  h-[6vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <div  className="flex space-x-3 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                      {listDs &&   listDs.map((e)=>{
                           return (
                             <div>
@@ -550,13 +554,13 @@ const Index = (props) => {
                     <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10">
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_dayvoucers || "purchase_order_table_dayvoucers"}</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_code || "purchase_order_table_code"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_number || "purchase_order_table_number"}</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_totalTax || "purchase_order_table_totalTax"}</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_intoMoney || "purchase_order_table_intoMoney"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_statusOfSpending || "purchase_order_table_statusOfSpending"}</h4>
+                                {/* <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_statusOfSpending || "purchase_order_table_statusOfSpending"}</h4> */}
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_importStatus || "purchase_order_table_importStatus"}</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}</h4>
@@ -566,24 +570,23 @@ const Index = (props) => {
                       : 
                       data?.length > 0 ? 
                       (<>
-                          <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">                       
+                          <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">                       
                           {(data?.map((e) => 
                                 <div className='grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 ' key={e.id.toString()}>
                                 <h6 className='xl:text-base text-xs px-2 col-span-1 text-center'>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
                                 <h6 className='xl:text-base text-xs px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
-                                <h6 className='xl:text-base text-xs px-2 col-span-1 text-left'>{e.supplier_name}</h6>
+                                <h6 className='xl:text-base text-xs px-2 col-span-2 text-left'>{e.supplier_name}</h6>
                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center'>{e?.order_type  == "0" ? (<span className='font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200'>Tạo mới</span>) : (<span className='font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200'>YCMH</span>)}</h6>
                                 <h6 className='xl:text-base text-xs px-2 col-span-1 text-left flex gap-2 flex-wrap'>{e?.purchases?.map(e => {return (<span>{e.code}</span>)})}</h6>
                                 <h6 className='xl:text-base text-xs px-2 col-span-1 text-right'>{formatNumber(e.total_price)}</h6>
                                 <h6 className='xl:text-base text-xs px-2 col-span-1 text-right'>{formatNumber(e.total_tax_price)}</h6>
                                 <h6 className='xl:text-base text-xs px-2 col-span-1 text-right'>{formatNumber(e.total_amount)}</h6>
-
-                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center '>
+                                {/* <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center '>
                                     {e?.status_pay === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{dataLang?.purchase_order_table_havent_spent_yet || "purchase_order_table_havent_spent_yet"}</span>||
                                      e?.status_pay === "1" &&  <span className=' font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{dataLang?.purchase_order_table_spend_one_part || "purchase_order_table_spend_one_part"}</span> ||
                                      e?.status_pay === "2" &&   <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{dataLang?.purchase_order_table_enough_spent || "purchase_order_table_enough_spent"}</span>
                                     }
-                                </h6>
+                                </h6> */}
                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center '>
                                     {e?.import_status  === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{dataLang?.purchase_order_table_not_yet_entered || "purchase_order_table_not_yet_entered"}</span>||
                                      e?.import_status  === "1" &&  <span className=' font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{dataLang?.purchase_order_table_enter_one_part || "purchase_order_table_enter_one_part"}</span> ||
@@ -673,7 +676,7 @@ const Popup_chitiet =(props)=>{
 
   const formatNumber = num => {
     if (!num && num !== 0) return 0;
-    return Math.floor(num);
+    return Math.floor(num).toLocaleString("en");
   };
 
   const _ServerFetching_detailUser = () =>{
@@ -690,6 +693,22 @@ const Popup_chitiet =(props)=>{
   useEffect(() => {
     onFetching && _ServerFetching_detailUser()
   }, [open]);
+
+  
+  const scrollableDiv = document.querySelector('.customsroll');
+  scrollableDiv?.addEventListener('wheel', (event) => {
+    const deltaY = event.deltaY;
+    const top = scrollableDiv.scrollTop;
+    const height = scrollableDiv.scrollHeight;
+    const offset = scrollableDiv.offsetHeight;
+    const isScrolledToTop = top === 0;
+    const isScrolledToBottom = top === height - offset;
+  
+    if ((deltaY < 0 && isScrolledToTop) || (deltaY > 0 && isScrolledToBottom)) {
+      event.preventDefault();
+    }
+  });
+ 
 return (
 <>
  <PopupEdit   
@@ -702,10 +721,10 @@ return (
   <div className='flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
      
   </div>  
-          <div className="mt-4 space-x-5 w-[999px] h-auto">        
+          <div className="mt-4 space-x-5 w-[999px] xl:h-[550px] customsroll overflow-hidden  3xl:h-auto 2xl:scrollbar-thin 2xl:scrollbar-thumb-slate-300 2xl:scrollbar-track-slate-100">        
           <div>
            <div className='w-[999px]'>
-             <div className="min:h-[170px] h-[72%] max:h-[100px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+             <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
              <h2 className='font-normal bg-[#ECF0F4] p-2'>{props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
               <div className='grid grid-cols-8  min-h-[170px] p-2'>
                   <div className='col-span-3'>
@@ -771,7 +790,7 @@ return (
                       {(data?.item?.map((e) => 
                         <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id?.toString()}>
                           <h6 className="xl:text-base text-xs   py-0.5 col-span-1  rounded-md text-left">
-                          {e?.item?.images != null ? (<ModalImage  small={e?.item?.images} large={e?.item?.images} alt="Product Image"  className='object-cover rounded w-[50px] h-[60px]' />):
+                          {e?.item?.images != null ? (<ModalImage   small={e?.item?.images} large={e?.item?.images} alt="Product Image"  className='custom-modal-image object-cover rounded w-[50px] h-[60px]' />):
                                   <div className='w-[50px] h-[60px] object-cover  flex items-center justify-center rounded'>
                                     <ModalImage small="/no_img.png" large="/no_img.png" className='w-full h-full rounded object-contain p-1' > </ModalImage>
                                   </div>
@@ -781,11 +800,11 @@ return (
                           <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left break-words">{e?.item?.product_variation}</h6>                
                           <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.unit_name}</h6>                
                           <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.quantity}</h6>                
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.price}</h6>                
+                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price)}</h6>                
                           <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.discount_percent + "%"}</h6>                
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-2  rounded-md text-center">{e?.price_after_discount}</h6>                
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.tax_rate + "%"}</h6>                
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.amount}</h6>                
+                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-2  rounded-md text-center">{formatNumber(e?.price_after_discount)}</h6>                
+                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.tax_rate) + "%"}</h6>                
+                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.amount)}</h6>                
                                          
                           <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.note != undefined ? e?.note : ""}</h6>                
                         </div>
@@ -807,29 +826,29 @@ return (
                   )}    
               </div>
           <h2 className='font-normal p-2  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
-              <div className="text-right mt-5  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10">
+              <div className="text-right mt-5  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
               <div className='col-span-9'>
               </div>
              <div className='col-span-3 space-y-2'>
               <div className='flex justify-between '>
                   <div className='font-normal'><h3>{props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(data?.total_price)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-blue-600'>{formatNumber(data?.total_price)}</h3></div>
                 </div>
                 <div className='flex justify-between '>
                   <div className='font-normal'><h3>{props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(data?.total_discount)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-blue-600'>{formatNumber(data?.total_discount)}</h3></div>
                 </div>  
                 <div className='flex justify-between '>
                   <div className='font-normal'><h3>{props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(data?.total_price_after_discount)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-blue-600'>{formatNumber(data?.total_price_after_discount)}</h3></div>
                 </div>  
                 <div className='flex justify-between '>
                   <div className='font-normal'><h3>{props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(data?.total_tax)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-blue-600'>{formatNumber(data?.total_tax)}</h3></div>
                 </div>  
                 <div className='flex justify-between '>
                   <div className='font-normal'><h3>{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(data?.total_amount)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-blue-600'>{formatNumber(data?.total_amount)}</h3></div>
                 </div>  
              </div>
           </div>   
