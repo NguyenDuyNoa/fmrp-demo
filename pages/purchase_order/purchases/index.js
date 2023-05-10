@@ -811,7 +811,7 @@ const Popup_chitiet =(props)=>{
                         {(data?.items?.map((e) => 
                           <div className="grid items-center grid-cols-8 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
                             <h6 className="xl:text-base text-xs   py-0.5 col-span-1  rounded-md text-left">
-                            {e?.item?.images != null ? (<ModalImage  small={e?.item?.images} large={e?.item?.images} alt="Product Image" style={{ width: "50px", height: "60px" }} className='object-cover rounded' />):
+                            {e?.item?.images != null ? (<ModalImage  small={e?.item?.images} large={e?.item?.images} alt="Product Image"  className='object-cover rounded w-[50px] h-[60px]' />):
                                     <div className='w-[50px] h-[60px] object-cover  flex items-center justify-center rounded'>
                                       {/* <IconImage/> */}
                                       <ModalImage small="/no_img.png" large="/no_img.png" className='w-full h-full rounded object-contain p-1' > </ModalImage>
