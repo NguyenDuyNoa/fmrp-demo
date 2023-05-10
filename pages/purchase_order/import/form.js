@@ -359,7 +359,7 @@ const Index = (props) => {
     }
     const taxOptions = [{ label: "Miễn thuế", value: "0",   tax_rate: "0"}, ...dataTasxes]
     const allItems = [{ value: "0", label: "Chọn tất cả"}, {value: null, label: "Bỏ chọn tất cả"}, ...options]
-    console.log(allItems);
+    console.log(allItems,taxOptions);
     return (
     <React.Fragment>
     <Head>
