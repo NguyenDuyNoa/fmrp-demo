@@ -731,7 +731,6 @@ return (
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"}</h3><h3 className='col-span-1 font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}</h3></div>
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"}</h3><h3 className='col-span-1 font-normal'>{data?.delivery_date != null ? moment(data?.delivery_date).format("DD/MM/YYYY") : ""}</h3></div>
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_detail_voucher_code || "purchase_order_detail_voucher_code"}</h3><h3 className='col-span-1 font-normal'>{data?.code}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h3><h3 className='col-span-1 font-normal'>{data?.supplier_name}</h3></div>
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}</h3><h3 className='col-span-1 font-normal'>{data?.order_type  == "0" ? (<span className='font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200'>Tạo mới</span>) : (<span className='font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200'>YCMH</span>)}</h3></div>
                   </div>
 
@@ -750,16 +749,13 @@ return (
                       </div>
                   </div>
                   <div className='col-span-3 '>
-                  {/* <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{"Tổng tiền"}</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div>
-                  <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{"Tổng tiền thuế"}</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div>
-                  <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{"Thành tiền"}</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div> */}
-                        <div className='my-4 font-medium '>{props.dataLang?.purchase_order_table_statusOfSpending || "purchase_order_table_statusOfSpending"}</div>
-                      <div className='flex flex-wrap  gap-2 items-center justify-start'>
+                      {/* <div className='flex flex-wrap  gap-2 items-center justify-start'>
                       {data?.status_pay === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{props.dataLang?.purchase_order_table_havent_spent_yet || "purchase_order_table_havent_spent_yet"}</span>||
                         data?.status_pay === "1" &&  <span className=' font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{props.dataLang?.purchase_order_table_spend_one_part || "purchase_order_table_spend_one_part"}</span> ||
                         data?.status_pay === "2" &&   <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_order_table_enough_spent || "purchase_order_table_enough_spent"}</span>
                        }
-                      </div>
+                      </div> */}
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h3><h3 className='col-span-1 font-normal'>{data?.supplier_name}</h3></div>
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] col-span-1">{data?.branch_name}</h3></div>
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_note || "purchase_order_note"}</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div>
                   </div>
