@@ -323,6 +323,11 @@ const Index = (props) => {
             }
         ];
 
+        const formatNumber = (number) => {
+          const integerPart = Math.floor(number)
+          return integerPart.toLocaleString("en")
+        }
+
     return (
         <React.Fragment>
             <Head>
@@ -574,7 +579,7 @@ const Index = (props) => {
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center '>{e?.reference_no }</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center '>{e?.staff_create_name}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center cursor-pointer'>{e?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>Đã duyệt <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>Chưa duyệt <TickCircle size={22}/></div>)}</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center '>{e?.total_item}</h6>
+                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center '>{formatNumber(e?.total_item)}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center '>
                                                   <div className='flex flex-wrap  gap-2 items-center justify-center'>
                                                    {
@@ -738,11 +743,18 @@ const Popup_chitiet =(props)=>{
     useEffect(() => {
       onFetching && _ServerFetching_detailUser()
     }, [open]);
+
     let listQty = data?.items
     let totalQuantity = 0;
     for (let i = 0; i < listQty?.length; i++) {
     totalQuantity += parseInt(listQty[i].quantity);
     }
+
+    const formatNumber = (number) => {
+      const integerPart = Math.floor(number)
+      return integerPart.toLocaleString("en")
+    }
+
   return (
   <>
    <PopupEdit   
@@ -822,8 +834,8 @@ const Popup_chitiet =(props)=>{
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.item?.name}</h6>                
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left break-words">{e?.item?.product_variation}</h6>                
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.unit_name}</h6>                
-                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right">{e?.quantity}</h6>                
-                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right ">{e?.quantity_create}</h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right">{formatNumber(e?.quantity)}</h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right ">{formatNumber(e?.quantity_create)}</h6>                
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right">{Number(e?.quantity_left) < 0 ? "Đặt dư" +" "+ Number(Math.abs(e?.quantity_left))  : e?.quantity_left}</h6>                
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.note}</h6>                
                           </div>
@@ -851,11 +863,11 @@ const Popup_chitiet =(props)=>{
                <div className='col-span-3 space-y-2'>
                 <div className='flex justify-between '>
                     <div className='font-normal'><h3>{props.dataLang?.purchase_totalCount || "purchase_totalCount"}</h3></div>
-                    <div className='font-normal'><h3 className='text-blue-600'>{totalQuantity}</h3></div>
+                    <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(totalQuantity)}</h3></div>
                   </div>
                   <div className='flex justify-between '>
                     <div className='font-normal'><h3>{props.dataLang?.purchase_totalItem || "purchase_totalItem"}</h3></div>
-                    <div className='font-normal'><h3 className='text-blue-600'>{data?.items?.length}</h3></div>
+                    <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(data?.items?.length)}</h3></div>
                   </div>  
                </div>
             </div>   
