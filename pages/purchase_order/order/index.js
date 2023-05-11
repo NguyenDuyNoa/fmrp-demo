@@ -223,6 +223,7 @@ const Index = (props) => {
       //   return integerPart;
       // }
       const formatNumber = (number) => {
+        if (!number && number !== 0) return 0;
         const integerPart = Math.floor(number)
         return integerPart.toLocaleString("en")
       }
@@ -554,7 +555,7 @@ const Index = (props) => {
                     <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10">
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_dayvoucers || "purchase_order_table_dayvoucers"}</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_code || "purchase_order_table_code"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_number || "purchase_order_table_number"}</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h4>
@@ -562,6 +563,7 @@ const Index = (props) => {
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_intoMoney || "purchase_order_table_intoMoney"}</h4>
                                 {/* <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_statusOfSpending || "purchase_order_table_statusOfSpending"}</h4> */}
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_importStatus || "purchase_order_table_importStatus"}</h4>
+                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_note || "purchase_order_note"}</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h4>
                                 <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}</h4>
                     </div>
@@ -575,9 +577,9 @@ const Index = (props) => {
                                 <div className='grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 ' key={e.id.toString()}>
                                 <h6 className='xl:text-base text-xs px-2 col-span-1 text-center'>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
                                 <h6 className='xl:text-base text-xs px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
-                                <h6 className='xl:text-base text-xs px-2 col-span-2 text-left'>{e.supplier_name}</h6>
+                                <h6 className='xl:text-base text-xs px-2 col-span-1 text-left'>{e.supplier_name}</h6>
                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center'>{e?.order_type  == "0" ? (<span className='font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200'>Tạo mới</span>) : (<span className='font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200'>YCMH</span>)}</h6>
-                                <h6 className='xl:text-base text-xs px-2 col-span-1 text-left flex gap-2 flex-wrap'>{e?.purchases?.map(e => {return (<span>{e.code}</span>)})}</h6>
+                                <h6 className='xl:text-base text-xs px-2 col-span-1 text-left flex gap-2 flex-wrap'>{e?.purchases?.reduce((acc, cur) => acc + (acc ? ', ' : '') + cur.code, '').split('').join('').replace(/^,/, '')}</h6>
                                 <h6 className='xl:text-base text-xs px-2 col-span-1 text-right'>{formatNumber(e.total_price)}</h6>
                                 <h6 className='xl:text-base text-xs px-2 col-span-1 text-right'>{formatNumber(e.total_tax_price)}</h6>
                                 <h6 className='xl:text-base text-xs px-2 col-span-1 text-right'>{formatNumber(e.total_amount)}</h6>
@@ -593,6 +595,7 @@ const Index = (props) => {
                                      e?.import_status  === "2" &&   <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{dataLang?.purchase_order_table_enter_enough || "purchase_order_table_enter_enough"}</span>
                                     }
                                 </h6>
+                                <h6 className='xl:text-base text-xs px-2 col-span-1 text-left'>{e.note}</h6>
                                 <h6 className='xl:text-base text-xs px-2 col-span-1'><span className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6> 
                                 <div className='col-span-1 flex justify-center'>
                                     <BtnTacVu onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} status={e?.status} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded xl:text-base text-xs" />
@@ -620,7 +623,7 @@ const Index = (props) => {
               </div>     
             </div>
             <div className='grid grid-cols-12 bg-gray-100 items-center'>
-                    <div className='col-span-6 p-2 text-center'>
+                    <div className='col-span-5 p-2 text-center'>
                         <h3 className='uppercase font-normal'>{dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}</h3>
                     </div>  
                     <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap'>
@@ -674,9 +677,14 @@ const Popup_chitiet =(props)=>{
     props?.id && sOnFetching(true) 
   }, [open]);
 
+  // const formatNumber = num => {
+  //   if (!num && num !== 0) return 0;
+  //   return Math.floor(num).toLocaleString("en");
+  // };
   const formatNumber = num => {
     if (!num && num !== 0) return 0;
-    return Math.floor(num).toLocaleString("en");
+    const roundedNum = Number(num).toFixed(2);
+    return parseFloat(roundedNum).toLocaleString("en");
   };
 
   const _ServerFetching_detailUser = () =>{
@@ -745,7 +753,7 @@ return (
                       </div>
                       <div className='my-4 font-medium '>{props.dataLang?.purchase_order_table_number || "purchase_order_table_number"}</div>
                       <div className='flex flex-wrap  gap-2 items-center justify-start'>
-                        {data?.purchases?.map(e => {return (<span>{e.code}</span>)})}
+                          {data?.purchases?.reduce((acc, cur) => acc + (acc ? ', ' : '') + cur.code, '').split('').join('').replace(/^,/, '')}
                       </div>
                   </div>
                   <div className='col-span-3 '>

@@ -227,7 +227,8 @@ const Index = (props) => {
       // }, [thuetong, chietkhautong]);
       
       useEffect(() => {
-        if (thuetong == null && chietkhautong == null) return;
+        // if (thuetong == null && chietkhautong == null) return;
+        if (thuetong == null) return;
         sOption(prevOption => {
           const newOption = [...prevOption];
           const thueValue = thuetong?.tax_rate || 0;
@@ -235,9 +236,29 @@ const Index = (props) => {
 
           newOption.forEach((item, index) => {
             if (index === 0 || !item.id) return;
-            const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
+            // const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
             const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
+            item.thue = thuetong;
+            // item.chietkhau = chietkhautong;
+            // item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
+            item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
+          });
+          return newOption;
+        });
+      }, [thuetong,chietkhautong]);
 
+      useEffect(() => {
+        // if (thuetong == null && chietkhautong == null) return;
+        if (chietkhautong == null) return;
+        sOption(prevOption => {
+          const newOption = [...prevOption];
+          const thueValue = thuetong?.tax_rate || 0;
+          const chietKhauValue = chietkhautong || 0;
+          newOption.forEach((item, index) => {
+            if (index === 0 || !item.id) return;
+            const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
+            console.log(dongiasauchietkhau);
+            const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
             item.thue = thuetong;
             item.chietkhau = chietkhautong;
             item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
@@ -245,7 +266,11 @@ const Index = (props) => {
           });
           return newOption;
         });
-      }, [thuetong, chietkhautong]);
+      }, [chietkhautong]);
+
+
+    
+
 
       const _ServerFetching =  () => {
         Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
@@ -292,7 +317,8 @@ const Index = (props) => {
     const _ServerFetching_Items =  () => {
         Axios("GET", "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true", { 
           params:{
-            "filter[purchases_id]":  idPurchases?.length > 0 ? idPurchases.map(e => e.value) : -1
+            "filter[purchases_id]":  idPurchases?.length > 0 ? idPurchases.map(e => e.value) : -1,
+            "purchase_order_id": id
          }
         }, (err, response) => {
             if(!err){
@@ -308,6 +334,9 @@ const Index = (props) => {
 
     const _ServerFetching_ItemsAll =  () => {
         Axios("GET", "/api_web/Api_product/searchItemsVariant?csrf_protection=true", {
+          params:{
+           "purchase_order_id": id
+         }
         }, (err, response) => {
             if(!err){
                 var {result} =  response.data.data
@@ -409,6 +438,9 @@ const Index = (props) => {
           Axios("POST", `/api_web/Api_product/searchItemsVariant?csrf_protection=true`, {
             data: {
               term: inputValue,
+            },
+            params:{
+              "purchase_order_id": id
             }
           }, (err, response) => {
                 if(!err){
@@ -422,7 +454,8 @@ const Index = (props) => {
               term: inputValue,
             },
             params:{
-              "filter[purchases_id]":  idPurchases?.length > 0 ? idPurchases.map(e => e.value) : -1
+              "filter[purchases_id]":  idPurchases?.length > 0 ? idPurchases.map(e => e.value) : -1,
+              "purchase_order_id": id
             }
           }, (err, response) => {
                 if(!err){
@@ -443,9 +476,10 @@ const Index = (props) => {
 
         const formatNumber = (num) => {
           if (!num && num !== 0) return 0;
-          return num.toLocaleString("en", {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
+          const roundedNum = parseFloat(num.toFixed(2));
+          return roundedNum.toLocaleString("en", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
             useGrouping: true
           });
         };
@@ -491,6 +525,7 @@ const Index = (props) => {
                   option[index].donvitinh =  value?.e?.unit_name
                   option[index].soluong =  idPurchases?.length ? Number(value?.e?.quantity_left) : 1
                   option[index].thanhtien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
+                  
                 }else{
                   const newData= {id: Date.now(), mathang: value, donvitinh:value?.e?.unit_name, soluong: idPurchases?.length ? Number(value?.e?.quantity_left) : 1, dongia:1, chietkhau: chietkhautong ? chietkhautong : 0, dongiasauck:1, thue: thuetong ? thuetong : 0, dgsauthue:1, thanhtien:1, ghichu:""}
                   if (newData.chietkhau) {
@@ -1130,7 +1165,7 @@ const Index = (props) => {
                             placeholder={"% Thuế"} 
                             hideSelectedOptions={false}
                             formatOptionLabel={(option) => (
-                              <div className='flex justify-start items-center gap-4 '>
+                              <div className='flex justify-start items-center gap-1 '>
                                   <h2>{option?.label}</h2>
                                   <h2>{`(${option?.tax_rate})`}</h2>
                               </div>
@@ -1217,7 +1252,7 @@ const Index = (props) => {
                             onChange={_HandleChangeInput.bind(this, "thuetong")}
                             value={thuetong}
                             formatOptionLabel={(option) => (
-                              <div className='flex justify-start items-center gap-4 '>
+                              <div className='flex justify-start items-center gap-1 '>
                                   <h2>{option?.label}</h2>
                                   <h2>{`(${option?.tax_rate})`}</h2>
                               </div>
