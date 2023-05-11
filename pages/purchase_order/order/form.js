@@ -246,7 +246,7 @@ const Index = (props) => {
           return newOption;
         });
       // }, [thuetong,chietkhautong]);
-      }, [thuetong]);
+      }, [thuetong,chietkhautong]);
 
       useEffect(() => {
         // if (thuetong == null && chietkhautong == null) return;
