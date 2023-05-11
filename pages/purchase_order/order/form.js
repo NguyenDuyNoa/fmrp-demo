@@ -259,12 +259,12 @@ const Index = (props) => {
             if (index === 0 || !item.id) return;
             const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
             // const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
-            const thanhTien =  item?.dongiasauck * (1 + Number(thueValue) / 100) * item.soluong
+            const thue = 1 + Number(thueValue) / 100
+            const thanhTien =  item?.dongiasauck * thue * item.soluong
             item.thue = thuetong;
             item.chietkhau = chietkhautong;
             item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
             item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
-            console.log(item.thanhtien);
 
           });
           return newOption;
@@ -354,7 +354,6 @@ const Index = (props) => {
     }, [onFetchingItemsAll]);
     
     const options =  dataItems?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e})) 
-      console.log(options);
     useEffect(() => {
         onFetching && _ServerFetching() 
       }, [onFetching]);
