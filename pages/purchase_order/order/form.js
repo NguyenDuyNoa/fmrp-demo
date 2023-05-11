@@ -248,28 +248,28 @@ const Index = (props) => {
       // }, [thuetong,chietkhautong]);
       }, [thuetong]);
       useEffect(() => {
-        // if (thuetong == null && chietkhautong == null) return;
         if (chietkhautong == null) return;
-        sOption(prevOption => {
-          const newOption = [...prevOption];
-          const thueValue = thuetong?.tax_rate || 0;
-          const chietKhauValue = chietkhautong || 0;
-          newOption.forEach((item, index) => {
-            if (index === 0 || !item.id) return;
-            const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
-            // const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
-            const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong
-            item.thue = thuetong;
-            item.chietkhau = chietkhautong;
-            item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
-            item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
-            console.log(item.thanhtien);
-
+        const timeoutId = setTimeout(() => {
+          sOption(prevOption => {
+            const newOption = [...prevOption];
+            const thueValue = thuetong?.tax_rate || 0;
+            const chietKhauValue = chietkhautong || 0;
+            newOption.forEach((item, index) => {
+              if (index === 0 || !item.id) return;
+              const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
+              const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong
+              item.thue = thuetong;
+              item.chietkhau = chietkhautong;
+              item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
+              item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
+              console.log(item.thanhtien);
+            });
+            return newOption;
           });
-          return newOption;
-        });
+        }, 300); // Delay 0.3 giây
+        return () => clearTimeout(timeoutId); // Cleanup function
       }, [chietkhautong]);
-
+      
 
     
 
