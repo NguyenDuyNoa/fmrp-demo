@@ -259,7 +259,7 @@ const Index = (props) => {
             if (index === 0 || !item.id) return;
             const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
             // const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
-            const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong
+            const thanhTien = item?.dongiasauck ? item?.dongiasauck * (1 + Number(thueValue) / 100) * item.soluong : 0
             item.thue = thuetong;
             item.chietkhau = chietkhautong;
             item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
