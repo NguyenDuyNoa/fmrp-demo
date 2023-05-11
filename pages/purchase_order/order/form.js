@@ -259,7 +259,7 @@ const Index = (props) => {
             if (index === 0 || !item.id) return;
             const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
             // const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
-            const thanhTien =  chietKhauValue ? item?.dongiasauck  * item.soluong : item?.dongiasauck * (1 + Number(thueValue) / 100) * item.soluong
+            const thanhTien =  item?.dongiasauck * (1 + Number(thueValue) / 100) * item.soluong
             item.thue = thuetong;
             item.chietkhau = chietkhautong;
             item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
@@ -478,13 +478,14 @@ const Index = (props) => {
         // };
 
         const formatNumber = (num) => {
-          if (!num && num !== 0) return 0;
-          const roundedNum = parseFloat(num.toFixed(2));
-          return roundedNum.toLocaleString("en", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-            useGrouping: true
-          });
+          // if (!num && num !== 0) return 0;
+          // const roundedNum = parseFloat(num.toFixed(2));
+          // return roundedNum.toLocaleString("en", {
+          //   minimumFractionDigits: 2,
+          //   maximumFractionDigits: 2,
+          //   useGrouping: true
+          // });
+          return num
         };
 
          const _HandleChangeInputOption = (id, type,index3, value) => {
