@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head';
 import {_ServerInstance as Axios} from '/services/axios';
+import { v4 as uuidv4 } from 'uuid';
 
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
@@ -9,13 +10,14 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 });
 import dynamic from 'next/dynamic';
 import Select,{components } from 'react-select';
-import { Edit as IconEdit,  Grid6 as IconExcel, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User,Image as IconImage, Add, Minus  } from "iconsax-react";
+const { Option, SelectAllOption, DeselectAllOption } = components;
+
+import { Edit as IconEdit,  Grid6 as IconExcel, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User,Image as IconImage, Add, Minus, Check, TickCircle  } from "iconsax-react";
 import Swal from 'sweetalert2';
 import { useEffect } from 'react';
 import {NumericFormat} from "react-number-format";
 import Link from 'next/link';
 import moment from 'moment/moment';
-import { NULL } from 'sass';
 import { name } from 'dayjs/locale/vi';
 
 
@@ -99,7 +101,7 @@ const Index = (props) => {
     const _ServerFetching_TheOrder =  () => {
       Axios("GET", "/api_web/Api_purchases/purchasesOptionNotComplete?csrf_protection=true", {
         params:{
-            "filter[branch_id]": idBranch != null ? idBranch?.value : - 1
+          "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
          }
       }, (err, response) => {
           if(!err){
@@ -109,21 +111,30 @@ const Index = (props) => {
       })
       sOnFetchingTheOrder(false)  
   }
+
+  useEffect(()=>{
+     idSupplier === null && sDataThe_order([]) || sIdTheOrder(null)
+  },[idSupplier])
+
     const _ServerFetching_Supplier =  () => {
       Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {
         params:{
-            "filter[order]": idBranch != null ? idBranch?.value : - 1
+          "filter[branch_id]": idBranch != null ? idBranch.value : null ,
          }
       }, (err, response) => {
           if(!err){
-              var db =  response.data
-              sDataSupplier(db?.map(e => ({label: e.name, value:e.id })))
+              var {rResult} =  response.data
+              sDataSupplier(rResult?.map(e => ({label: e.name, value:e.id })))
           }
       })
       sOnFetchingSupplier(false)  
   }
 
+    useEffect(()=>{
+      idBranch === null && sDataSupplier([]) || sIdSupplier(null)
+    },[idBranch])
 
+ const [mantItem, sMangitem] = useState([])
     const _HandleChangeInput = (type, value) => {
       if(type == "code"){
           sCode(value.target.value)
@@ -138,14 +149,33 @@ const Index = (props) => {
       }else if(type == "branch"){
           sIdBranch(value)
       }else if(type == "mathangAll"){
-        // sMathangAll(value)
-        if (value.length === allItems.length) {
-          sMathangAll(allItems);
-        } else {
-          sMathangAll(value);
+        if(value.value === "0"){
+
+          sMathangAll(value)
+          const fakeData = [{id: Date.now(), mathang: null}]
+          const data = fakeData?.concat(allItems?.slice(2)?.map(e => ({id: uuidv4(), mathang: e, khohang: e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: 1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""})))
+          sOption(data);
+
+        }else if(value.value === null){
+
+          sMathangAll(value)
+          sMangitem([])
+          sOption([{id: Date.now(), mathang: null}])
+
+        }else if(value.value != "0" || value.value != null){
+
+          sMathangAll(value)
+          const dataItem = [allItems.find(item => item.value === value.value)]
+          const fakeData = [{id: Date.now(), mathang: null}]
+          sOption(fakeData?.concat(dataItem?.map(e => ({id: uuidv4(), mathang: e, khohang: e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: 1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""}))))
+        
+        }
+        else{
+          sMathangAll(value)
         }
       }
   }
+
     const _HandleSubmit = (e) => {
       e.preventDefault();
         if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null ){
@@ -224,7 +254,7 @@ const Index = (props) => {
   }, [idBranch]);
 
   useEffect(() => {
-    idBranch != null && sOnFetchingTheOrder(true)
+    idBranch != null && sOnFetchingSupplier(true)
   }, [idBranch]);
 
   useEffect(() => {
@@ -232,15 +262,16 @@ const Index = (props) => {
   }, [idTheOrder]);
 
   useEffect(() => {
-    idTheOrder != null && sOnFetchingSupplier(true)
-  }, [idTheOrder]);
-
+    idSupplier != null && sOnFetchingTheOrder(true)
+  }, [idSupplier]);
+  
   const _HandleChangeInputOption = (id, type,index3, value) => {
     var index = option.findIndex(x => x.id === id );
     if(type == "mathang"){
-          if(option[index].mathang){
+          if(option[index]?.mathang){
             option[index].mathang = value
             option[index].donvitinh =  value?.e?.unit_name
+            // sMathangAll([])
             // option[index].soluong =  idPurchases?.length ? Number(value?.e?.quantity_left) : 1
             // option[index].thanhtien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
           }else{
@@ -256,6 +287,7 @@ const Index = (props) => {
               newData.thanhtien = Number(tien.toFixed(2));
             }
             option.push(newData);
+            console.log(newData);
           }
     }else if(type == "donvitinh"){
       option[index].donvitinh = value.target?.value;
@@ -358,9 +390,67 @@ const Index = (props) => {
       sOption(newOption); // cập nhật lại mảng
     }
     const taxOptions = [{ label: "Miễn thuế", value: "0",   tax_rate: "0"}, ...dataTasxes]
+    
+    
     const allItems = [{ value: "0", label: "Chọn tất cả"}, {value: null, label: "Bỏ chọn tất cả"}, ...options]
-    console.log(allItems,taxOptions);
-    return (
+
+
+
+    const CustomOption = ({ data, ...props }) => {
+      const { label, value, e } = data;
+      const isSelectAll = value === "0";
+      const isDeselectAll = value === null;
+      return (
+        <components.Option {...props}>
+           <div className='grid grid-cols-12 items-center'>
+              {isSelectAll && <span className='col-span-12'>Chọn tất cả</span>}
+              {isDeselectAll && <span className='col-span-12'>Bỏ chọn tất cả</span>}
+        {!isSelectAll && !isDeselectAll && (
+          <>
+            <div className='col-span-10'>
+              <div className='grid grid-cols-12'>
+                <div className='col-span-1'>
+                {e?.images != null ? (
+                  <img src={e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />
+                ) : (
+                  <div className='w-[50px] h-[60px] object-cover flex items-center justify-center rounded'>
+                    <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
+                  </div>
+                )}
+                </div>
+                <div className='col-span-11'>
+                <h3 className='font-medium'>{e?.name}</h3>
+                <div className='flex gap-2'>
+                  <h5 className='text-gray-400 font-normal'>{e?.code}</h5>
+                  <h5 className='font-medium'>{e?.product_variation}</h5>
+                </div>
+                <h5 className='text-gray-400 font-medium text-xs'>{dataLang[e?.text_type]}</h5>
+                </div>
+              </div>
+            </div>
+            <div className='col-span-2'>
+              {value === mathangAll?.value && (
+                <span className=""><TickCircle
+                size="18"
+                color="#FF8A65"
+                /></span>
+              )}
+              {mathangAll?.value === "0" && (
+                <span className=""><TickCircle
+                size="18"
+                color="#FF8A65"
+                /></span>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+        </components.Option>
+      );
+    };
+
+    
+  return (
     <React.Fragment>
     <Head>
         <title>{"Thêm nhập hàng"}</title>
@@ -445,46 +535,6 @@ const Index = (props) => {
                           {errBranch && <label className="text-sm text-red-500">{dataLang?.purchase_order_errBranch || "purchase_order_errBranch"}</label>}
                         </div>
                         <div className='col-span-1'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{"Đơn đặt hàng (P0)"} <span className="text-red-500">*</span></label>
-                          <Select 
-                              options={dataThe_order}
-                              onChange={_HandleChangeInput.bind(this, "theorder")}
-                              value={idTheOrder}
-                              isClearable={true}
-                              closeMenuOnSelect={true}
-                              hideSelectedOptions={false}
-                              placeholder={"Đơn đặt hàng (P0)"} 
-                              className={`${errTheOrder ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
-                              isSearchable={true}
-                              components={{ MultiValue }}
-                              style={{ border: "none", boxShadow: "none", outline: "none" }}
-                              theme={(theme) => ({
-                                  ...theme,
-                                  colors: {
-                                      ...theme.colors,
-                                      primary25: '#EBF5FF',
-                                      primary50: '#92BFF7',
-                                      primary: '#0F4F9E',
-                                  },
-                              })}
-                              styles={{
-                              placeholder: (base) => ({
-                              ...base,
-                              color: "#cbd5e1",
-                              }),
-                              control: (base,state) => ({
-                                  ...base,
-                                  boxShadow: 'none',
-                                  padding:"2.7px",
-                                ...(state.isFocused && {
-                                  border: '0 0 0 1px #92BFF7',
-                                }),
-                              })
-                          }}
-                          />
-                          {errTheOrder && <label className="text-sm text-red-500">{"Vui lòng chọn đơn đặt hàng (PO)"}</label>}
-                        </div>
-                        <div className='col-span-1'>
                       <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_supplier} <span className="text-red-500">*</span></label>
                         <Select 
                             options={dataSupplier}
@@ -530,15 +580,57 @@ const Index = (props) => {
                           />
                           {errSupplier && <label className="text-sm text-red-500">{dataLang?.purchase_order_errSupplier || "purchase_order_errSupplier"}</label>}
                         </div>
+                        <div className='col-span-1'>
+                          <label className="text-[#344054] font-normal text-sm mb-1 ">{"Đơn đặt hàng (P0)"} <span className="text-red-500">*</span></label>
+                          <Select 
+                              options={dataThe_order}
+                              onChange={_HandleChangeInput.bind(this, "theorder")}
+                              value={idTheOrder}
+                              isClearable={true}
+                              noOptionsMessage={() => "Không có dữ liệu"}
+                              closeMenuOnSelect={true}
+                              hideSelectedOptions={false}
+                              placeholder={"Đơn đặt hàng (P0)"} 
+                              className={`${errTheOrder ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
+                              isSearchable={true}
+                              components={{ MultiValue }}
+                              style={{ border: "none", boxShadow: "none", outline: "none" }}
+                              theme={(theme) => ({
+                                  ...theme,
+                                  colors: {
+                                      ...theme.colors,
+                                      primary25: '#EBF5FF',
+                                      primary50: '#92BFF7',
+                                      primary: '#0F4F9E',
+                                  },
+                              })}
+                              styles={{
+                              placeholder: (base) => ({
+                              ...base,
+                              color: "#cbd5e1",
+                              }),
+                              control: (base,state) => ({
+                                  ...base,
+                                  boxShadow: 'none',
+                                  padding:"2.7px",
+                                ...(state.isFocused && {
+                                  border: '0 0 0 1px #92BFF7',
+                                }),
+                              })
+                          }}
+                          />
+                          {errTheOrder && <label className="text-sm text-red-500">{"Vui lòng chọn đơn đặt hàng (PO)"}</label>}
+                        </div>
+                        
                         <div className='col-span-2  z-[100] my-auto'>
                           <label className="text-[#344054] font-normal text-sm mb-1 ">{"Chọn nhanh mặt hàng"} </label>
                            <Select 
                             onInputChange={_HandleSeachApi.bind(this)}
                             dangerouslySetInnerHTML={{__html: option.label}}
                             options={allItems}
-                            isLoading
                             onChange={_HandleChangeInput.bind(this,  "mathangAll",)}
                             value={mathangAll}
+                            components={{ Option: CustomOption }}
                             formatOptionLabel={(option) => {
                               if(option.value === "0"){
                                 return (
@@ -585,6 +677,7 @@ const Index = (props) => {
                                 )
                               }
                             }}
+                            // components={{ DropdownIndicator }}
                            placeholder={dataLang?.purchase_items || "purchase_items"} 
                            hideSelectedOptions={false}
                            className="rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2" 
@@ -833,7 +926,7 @@ const Index = (props) => {
                             placeholder={"% Thuế"} 
                             hideSelectedOptions={false}
                             formatOptionLabel={(option) => (
-                              <div className='flex justify-start items-center gap-4 '>
+                              <div className='flex justify-start items-center gap-1 '>
                                   <h2>{option?.label}</h2>
                                   <h2>{`(${option?.tax_rate})`}</h2>
                               </div>
@@ -876,7 +969,7 @@ const Index = (props) => {
                         </div>
                         <div className='col-span-1 text-right flex items-center justify-end'>
                            {/* <h3 className='px-2'>{formatNumber(e.thanhtien)}</h3> */}
-                           <h3 className='px-2'>{e.thanhtien}</h3>
+                           <h3 className='px-2'>{e?.thanhtien}</h3>
                         </div>
                          <div className='col-span-1 flex items-center justify-center'>
                              <input
