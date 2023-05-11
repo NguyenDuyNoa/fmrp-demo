@@ -620,7 +620,7 @@ const Index = (props) => {
               </div>     
             </div>
             <div className='grid grid-cols-12 bg-gray-100 items-center'>
-                    <div className='col-span-5 p-2 text-center'>
+                    <div className='col-span-6 p-2 text-center'>
                         <h3 className='uppercase font-normal'>{dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}</h3>
                     </div>  
                     <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap'>
@@ -795,7 +795,7 @@ return (
                           <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.item?.name}</h6>                
                           <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left break-words">{e?.item?.product_variation}</h6>                
                           <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.unit_name}</h6>                
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.quantity}</h6>                
+                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.quantity)}</h6>                
                           <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price)}</h6>                
                           <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.discount_percent + "%"}</h6>                
                           <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-2  rounded-md text-center">{formatNumber(e?.price_after_discount)}</h6>                
@@ -823,29 +823,21 @@ return (
               </div>
           <h2 className='font-normal p-2  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
               <div className="text-right mt-5  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
-              <div className='col-span-9'>
+              <div className='col-span-7'>
               </div>
+             <div className='col-span-2 space-y-2'>
+                  <div className='font-normal text-left'><h3>{props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3></div>
+                  <div className='font-normal text-left'><h3>{props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}</h3></div>
+                  <div className='font-normal text-left'><h3>{props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}</h3></div>
+                  <div className='font-normal text-left'><h3>{props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}</h3></div>
+                  <div className='font-normal text-left'><h3>{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h3></div>
+             </div>
              <div className='col-span-3 space-y-2'>
-              <div className='flex justify-between '>
-                  <div className='font-normal'><h3>{props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-blue-600'>{formatNumber(data?.total_price)}</h3></div>
-                </div>
-                <div className='flex justify-between '>
-                  <div className='font-normal'><h3>{props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-blue-600'>{formatNumber(data?.total_discount)}</h3></div>
-                </div>  
-                <div className='flex justify-between '>
-                  <div className='font-normal'><h3>{props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-blue-600'>{formatNumber(data?.total_price_after_discount)}</h3></div>
-                </div>  
-                <div className='flex justify-between '>
-                  <div className='font-normal'><h3>{props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-blue-600'>{formatNumber(data?.total_tax)}</h3></div>
-                </div>  
-                <div className='flex justify-between '>
-                  <div className='font-normal'><h3>{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-blue-600'>{formatNumber(data?.total_amount)}</h3></div>
-                </div>  
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600'>{formatNumber(data?.total_price)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600'>{formatNumber(data?.total_discount)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600'>{formatNumber(data?.total_price_after_discount)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600'>{formatNumber(data?.total_tax)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600'>{formatNumber(data?.total_amount)}</h3></div>
              </div>
           </div>   
             </div>

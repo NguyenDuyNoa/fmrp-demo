@@ -44,6 +44,7 @@ const Index = (props) => {
     const slicedArr = option.slice(1);
     const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
     sortedArr.unshift(option[0]);
+    
     const [hidden, sHidden] = useState(false)
     const [loai, sLoai] = useState("0");
     const [dataSupplier, sDataSupplier] = useState([])
@@ -120,6 +121,7 @@ const Index = (props) => {
     useEffect(() => {
       id && sOnFetchingDetail(true) 
     }, []);
+
     const _HandleChangeInput = (type, value) => {
         if (type === "loai") {
             Swal.fire({
@@ -163,23 +165,44 @@ const Index = (props) => {
         }else if(type === "note"){
             sNote(value.target.value)
         }else if(type == "branch"){
+            if (sortedArr?.slice(1)?.length > 0) {
+              Swal.fire({
+                title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#296dc1',
+                cancelButtonColor: '#d33',
+                confirmButtonText: `${dataLang?.aler_yes}`,
+                cancelButtonText:`${dataLang?.aler_cancel}`
+            }).then((result) => {
+              if (result.isConfirmed) {
+                  sIdBranch(value)
+                  sIdPurchases([])
+                  sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+              } 
+            })
+          }else{
             sIdBranch(value)
             sIdPurchases([])
-            if(value != null){
-              sOption([...sortedArr])
-            }
-            else{
-             sOption(id ? [...sortedArr] : [{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
-            }
+            sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+          }
+          
+            // if(value != null){
+            //   sOption([...sortedArr])
+            // }
+            // else{
+            //  sOption(id ? [...sortedArr] : [{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+            // }
         }else if(type == "thuetong"){
            sThuetong(value)
         }else if(type == "chietkhautong"){
            sChietkhautong(value?.value)
         }
     }
-    useEffect(() =>{
-      idBranch != null &&  idPurchases?.length == 0 &&  sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
-    },[idBranch])
+    // useEffect(() =>{
+    //   idBranch != null &&  idPurchases?.length == 0 && sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+    // },[idBranch])
+
       // useEffect(() => {
       //   if (thuetong !== null || chietkhautong !== null) {
       //     const newArray = option.map((item,index) => {
@@ -299,7 +322,8 @@ const Index = (props) => {
     }, [onFetchingItemsAll]);
     
     const options =  dataItems?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e})) 
-      useEffect(() => {
+      console.log(options);
+    useEffect(() => {
         onFetching && _ServerFetching() 
       }, [onFetching]);
       useEffect(()=>{
@@ -412,10 +436,20 @@ const Index = (props) => {
          const hiddenOptions = idPurchases?.length > 3 ? idPurchases?.slice(0, 3) : [];
          const fakeDataPurchases = idBranch != null ? dataPurchases.filter((x) => !hiddenOptions.includes(x.value)) : []
          
-         const formatNumber = (num) => {
+        //  const formatNumber = (num) => {
+        //   if (!num && num !== 0) return 0;
+        //   return num.toLocaleString(undefined, {minimumFractionDigits: 2});
+        // };
+
+        const formatNumber = (num) => {
           if (!num && num !== 0) return 0;
-          return num.toLocaleString(undefined, {minimumFractionDigits: 2});
+          return num.toLocaleString("en", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+            useGrouping: true
+          });
         };
+
          const _HandleChangeInputOption = (id, type,index3, value) => {
           var index = option.findIndex(x => x.id === id );
           if(type == "mathang"){
@@ -688,7 +722,6 @@ const Index = (props) => {
 //   const formattedDate = date.format("DD/MM/YYYY, HH:mm:ss");
 //   return formattedDate;
 // }
-
     return (
     <React.Fragment>
     <Head>
@@ -965,12 +998,12 @@ const Index = (props) => {
                             <div className='grid grid-cols-12 gap-1 py-1 ' key={e?.id}>
                             <div className='col-span-3  z-[100] my-auto'>
                            <Select 
-                            onInputChange={_HandleSeachApi.bind(this)}
-                            dangerouslySetInnerHTML={{__html: option.label}}
+                           onInputChange={_HandleSeachApi.bind(this)}
+                           dangerouslySetInnerHTML={{__html: option.label}}
                            options={options}
                            onChange={_HandleChangeInputOption.bind(this, e?.id, "mathang",index)}
                            value={e?.mathang}
-                        formatOptionLabel={(option) => (
+                           formatOptionLabel={(option) => (
                           <div className='flex items-center  justify-between py-2'>
                             <div className='flex items-center gap-2'>
                               <div>
@@ -993,7 +1026,7 @@ const Index = (props) => {
                                <div className='text-right opacity-0'>{"0"}</div>
                                <div className='flex gap-2'>
                                  <div className='flex items-center gap-2'>
-                                   <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse ?? 0}</h5>
+                                   <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className=' font-medium'>{option.e?.qty_warehouse ? option.e?.qty_warehouse : "0" }</h5>
                                  </div>
                                 
                                 </div>
