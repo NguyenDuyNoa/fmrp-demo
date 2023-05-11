@@ -43,6 +43,8 @@ const Index = (props) => {
     const [onFetchingTheOrder, sOnFetchingTheOrder] = useState(false);
     const [onFetchingSupplier, sOnFetchingSupplier] = useState(false);
 
+    const [onSending, sOnSending] = useState(false);
+
  
     const [code, sCode] = useState('')
     const [note, sNote] = useState('')
@@ -266,12 +268,24 @@ const Index = (props) => {
   }, [idSupplier]);
   
   const _HandleChangeInputOption = (id, type,index3, value) => {
-    var index = option.findIndex(x => x.id === id );
+    var index = option.findIndex(x => x.id === id);
+
     if(type == "mathang"){
-          if(option[index]?.mathang){
+      //  const hasSelectedOption = option.some((o) => o.mathang?.value === value.value && o.mathang?.e?.purchases_code === value.mathang?.e?.purchases_code);
+      //     if (hasSelectedOption) {
+      //       Toast.fire({
+      //         title: `${"Mặt hàng đã được chọn"}`,
+      //         icon: 'error',
+      //         confirmButtonColor: '#296dc1',
+      //         cancelButtonColor: '#d33',
+      //         confirmButtonText: `${dataLang?.aler_yes}`,
+      //         })
+      //       return  
+      //     }
+         if(option[index]?.mathang){
             option[index].mathang = value
             option[index].donvitinh =  value?.e?.unit_name
-            // sMathangAll([])
+            sMathangAll(null)
             // option[index].soluong =  idPurchases?.length ? Number(value?.e?.quantity_left) : 1
             // option[index].thanhtien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
           }else{
@@ -286,8 +300,8 @@ const Index = (props) => {
               const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.e?.tax_rate)/100) * Number(newData.soluong);
               newData.thanhtien = Number(tien.toFixed(2));
             }
+            sMathangAll(null)
             option.push(newData);
-            console.log(newData);
           }
     }else if(type == "donvitinh"){
       option[index].donvitinh = value.target?.value;
