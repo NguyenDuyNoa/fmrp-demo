@@ -478,14 +478,13 @@ const Index = (props) => {
         // };
 
         const formatNumber = (num) => {
-          // if (!num && num !== 0) return 0;
-          // const roundedNum = parseFloat(num.toFixed(2));
-          // return roundedNum.toLocaleString("en", {
-          //   minimumFractionDigits: 2,
-          //   maximumFractionDigits: 2,
-          //   useGrouping: true
-          // });
-          return num
+          if (!num && num !== 0) return 0;
+          const roundedNum = parseFloat(num.toFixed(2));
+          return roundedNum.toLocaleString("en", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            useGrouping: true
+          });
         };
 
          const _HandleChangeInputOption = (id, type,index3, value) => {
