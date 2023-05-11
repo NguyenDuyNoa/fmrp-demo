@@ -247,7 +247,6 @@ const Index = (props) => {
         });
       // }, [thuetong,chietkhautong]);
       }, [thuetong]);
-      console.log(option);
       useEffect(() => {
         // if (thuetong == null && chietkhautong == null) return;
         if (chietkhautong == null) return;
@@ -1211,7 +1210,7 @@ const Index = (props) => {
                           />
                         </div>
                         <div className='col-span-1 text-right flex items-center justify-end'>
-                           <h3 className='px-2'>{formatNumber(e.thanhtien)}</h3>
+                           <h3 className='px-2'>{formatNumber(e?.thanhtien)}</h3>
                         </div>
                          <div className='col-span-1 flex items-center justify-center'>
                              <input
