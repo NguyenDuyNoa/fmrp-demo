@@ -247,6 +247,7 @@ const Index = (props) => {
         });
       // }, [thuetong,chietkhautong]);
       }, [thuetong]);
+      console.log(option);
       useEffect(() => {
         // if (thuetong == null && chietkhautong == null) return;
         if (chietkhautong == null) return;
@@ -254,12 +255,12 @@ const Index = (props) => {
           const newOption = [...prevOption];
           // const thueValue = thuetong?.tax_rate || 0;
           const thueValue = thuetong?.tax_rate ? thuetong?.tax_rate : 0
-          const chietKhauValue = chietkhautong || 0;
+          const chietKhauValue = chietkhautong ? chietkhautong : 0;
           newOption.forEach((item, index) => {
             if (index === 0 || !item.id) return;
             const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
             // const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
-            const thanhTien = item?.dongiasauck ? item?.dongiasauck * (1 + Number(thueValue) / 100) * item.soluong : 0
+            const thanhTien =  item?.dongiasauck * (1 + Number(thueValue) / 100) * item.soluong
             item.thue = thuetong;
             item.chietkhau = chietkhautong;
             item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
