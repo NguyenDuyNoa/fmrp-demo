@@ -450,7 +450,6 @@ const Index = (props) => {
     // const allItems = [{ value: "0", label: "Chọn tất cả"}, {value: null, label: "Bỏ chọn tất cả"}, ...options]
     const allItems = [...options]
 
-
     // const CustomOption = ({ data, ...props }) => {
     //   const { label, value, e } = data;
     //   const isSelectAll = value === "0";
