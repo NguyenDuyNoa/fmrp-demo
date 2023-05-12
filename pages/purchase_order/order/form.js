@@ -273,8 +273,6 @@ const Index = (props) => {
       }, [chietkhautong]);
 
     
-console.log(option);
-
       const _ServerFetching =  () => {
         Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
             if(!err){
