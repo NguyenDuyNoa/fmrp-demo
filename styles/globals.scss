@@ -161,7 +161,7 @@ input::-ms-reveal,
 }
 .transition-all.ease-out.duration-300.absolute.z-10{
 	bottom: 0 !important;
-	transform: translateY(100%);
+	transform: translateY(100%) !important;
 }
 
 /// model img Chi tiet YCMH
