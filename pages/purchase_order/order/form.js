@@ -434,7 +434,7 @@ const Index = (props) => {
       }, [idPurchases?.length > 0 ]);
 
       const _HandleSeachApi = (inputValue) => {
-        {loai === "0" ? 
+        {loai === "0"
           Axios("POST", `/api_web/Api_product/searchItemsVariant?csrf_protection=true`, {
             data: {
               term: inputValue,
@@ -448,21 +448,21 @@ const Index = (props) => {
                   sDataItems(result)
               }
           })
-          :
-          Axios("POST", `/api_web/Api_purchases/searchItemsVariant?csrf_protection=true`, {
-            data: {
-              term: inputValue,
-            },
-            params:{
-              "filter[purchases_id]":  idPurchases?.length > 0 ? idPurchases.map(e => e.value) : -1,
-              "purchase_order_id": id
-            }
-          }, (err, response) => {
-                if(!err){
-                  var {result} = response?.data.data
-                  sDataItems(result)
-              }
-          })
+         
+          // Axios("POST", `/api_web/Api_purchases/searchItemsVariant?csrf_protection=true`, {
+          //   data: {
+          //     term: inputValue,
+          //   },
+          //   params:{
+          //     "filter[purchases_id]":  idPurchases?.length > 0 ? idPurchases.map(e => e.value) : -1,
+          //     "purchase_order_id": id
+          //   }
+          // }, (err, response) => {
+          //       if(!err){
+          //         var {result} = response?.data.data
+          //         sDataItems(result)
+          //     }
+          // })
         }
       };
          

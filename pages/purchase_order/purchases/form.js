@@ -245,7 +245,7 @@ const Index = (props) => {
         formData.append("note", note)
         newDataOption.forEach((item, index) => {
           formData.append(`items[${index}][item]`, item?.data);
-          formData.append(`items[${index}][quantity]`, item?.soluong);
+          formData.append(`items[${index}][quantity]`,  item?.soluong.toString());
           formData.append(`items[${index}][note]`, item?.ghichu);
       });  
         Axios("POST", `${id ? `/api_web/Api_purchases/purchases/${id}?csrf_protection=true` : `/api_web/Api_purchases/purchases/?csrf_protection=true`}`, {
