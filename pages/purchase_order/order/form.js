@@ -260,7 +260,7 @@ const Index = (props) => {
             const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
             // const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
             const thanhTien =  item?.dongiasauck * (1 + thueValue / 100) * item.soluong
-            item.thue = thuetong;
+            // item.thue = thuetong;
             item.chietkhau = chietkhautong;
             item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
             item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
