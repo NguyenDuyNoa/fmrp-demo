@@ -261,10 +261,11 @@ const Index = (props) => {
             // const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
             const thanhTien =  item?.dongiasauck * (1 + thueValue / 100) * item.soluong
             // item.thue = thuetong;
-            item.chietkhau = chietkhautong;
+            item.chietkhau = Number(chietkhautong);
             item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
             item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
           });
+          console.log(newOption);
           return newOption;
         });
       }, [chietkhautong]);
@@ -662,7 +663,6 @@ const Index = (props) => {
           }, 0);
         
           const tongThanhTien = option.slice(1).reduce((acc, item) => acc + item?.thanhtien, 0);
-        
           return { tongTien: tongTien || 0, tienChietKhau: tienChietKhau || 0, tongTienSauCK: tongTienSauCK || 0, tienThue: tienThue || 0, tongThanhTien: tongThanhTien || 0 };
         };
 
@@ -1205,8 +1205,8 @@ const Index = (props) => {
                           />
                         </div>
                         <div className='col-span-1 text-right flex items-center justify-end'>
-                          {/* <h3 className='px-2'>{formatNumber(e?.thanhtien)}</h3> */}
-                          <h3 className='px-2'>{formatNumber(e?.dongiasauck * (1 + Number(e?.thue?.tax_rate || 0) / 100) * e?.soluong)}</h3>
+                          <h3 className='px-2'>{formatNumber(e?.thanhtien)}</h3>
+                          {/* <h3 className='px-2'>{formatNumber(e?.dongiasauck * (1 + Number(e?.thue?.tax_rate || 0) / 100) * e?.soluong)}</h3> */}
                         </div>
                          <div className='col-span-1 flex items-center justify-center'>
                              <input
