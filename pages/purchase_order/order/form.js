@@ -260,18 +260,17 @@ const Index = (props) => {
             const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
             // const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
             const thanhTien =  item?.dongiasauck * (1 + thueValue / 100) * item.soluong
-            // item.thue = thuetong;
+            item.thue = thuetong;
             item.chietkhau = Number(chietkhautong);
             item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
             item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
           });
-          console.log(newOption);
           return newOption;
         });
       }, [chietkhautong]);
 
     
-
+console.log(option);
 
       const _ServerFetching =  () => {
         Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
@@ -671,7 +670,6 @@ const Index = (props) => {
           const tongTien = tinhTongTien(option);
           setTongTienState(tongTien);
         }, [option]);
-
       const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, quantity: Number(e?.soluong), price: e?.dongia, discount_percent:e?.chietkhau, tax_id:e?.thue?.value,purchases_item_id: e?.mathang?.e?.purchases_item_id, note: e?.ghichu, id:e?.id, purchases_order_item_id: e?.purchases_order_item_id}})
       let newDataOption = dataOption?.filter(e => e?.item !== undefined);
         const _ServerSending = () => {
@@ -1205,8 +1203,8 @@ const Index = (props) => {
                           />
                         </div>
                         <div className='col-span-1 text-right flex items-center justify-end'>
-                          <h3 className='px-2'>{formatNumber(e?.thanhtien)}</h3>
-                          {/* <h3 className='px-2'>{formatNumber(e?.dongiasauck * (1 + Number(e?.thue?.tax_rate || 0) / 100) * e?.soluong)}</h3> */}
+                          {/* <h3 className='px-2'>{formatNumber(e?.thanhtien)}</h3> */}
+                          <h3 className='px-2'>{formatNumber(e?.dongiasauck * (1 + Number(e?.thue?.tax_rate || 0) / 100) * e?.soluong)}</h3>
                         </div>
                          <div className='col-span-1 flex items-center justify-center'>
                              <input
