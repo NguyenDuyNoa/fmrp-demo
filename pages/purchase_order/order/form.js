@@ -258,8 +258,11 @@ const Index = (props) => {
           newOption.forEach((item, index) => {
             if (index === 0 || !item.id) return;
             const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
+// console.log("dongiasauchietkhau",dongiasauchietkhau);
+// console.log("item?.dongiasauck",item?.dongiasauck);
+
             // const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
-            const thanhTien =  item?.dongiasauck * (1 + thueValue / 100) * item.soluong
+            const thanhTien =  dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
             item.thue = thuetong;
             item.chietkhau = Number(chietkhautong);
             item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
@@ -1203,8 +1206,8 @@ console.log(option);
                           />
                         </div>
                         <div className='col-span-1 text-right flex items-center justify-end'>
-                          {/* <h3 className='px-2'>{formatNumber(e?.thanhtien)}</h3> */}
-                          <h3 className='px-2'>{formatNumber(e?.dongiasauck * (1 + Number(e?.thue?.tax_rate || 0) / 100) * e?.soluong)}</h3>
+                          <h3 className='px-2'>{formatNumber(e?.thanhtien)}</h3>
+                          {/* <h3 className='px-2'>{formatNumber(e?.dongiasauck * (1 + Number(e?.thue?.tax_rate || 0) / 100) * e?.soluong)}</h3> */}
                         </div>
                          <div className='col-span-1 flex items-center justify-center'>
                              <input
