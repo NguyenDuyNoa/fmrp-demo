@@ -140,7 +140,7 @@ const Index = (props) => {
 
 
     const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
-    const options = listBr_filter? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value)) : [];
+    const options = listBr_filter ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value)) : [];
     const paginate = pageNumber => {
         router.push({
           pathname: router.route,

@@ -9,8 +9,8 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
 import dynamic from 'next/dynamic';
-import Select,{components } from 'react-select';
-const { Option, SelectAllOption, DeselectAllOption } = components;
+import Select,{components,MenuListProps  } from 'react-select';
+
 
 import { Edit as IconEdit,  Grid6 as IconExcel, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User,Image as IconImage, Add, Minus, Check, TickCircle  } from "iconsax-react";
 import Swal from 'sweetalert2';
@@ -18,8 +18,6 @@ import { useEffect } from 'react';
 import {NumericFormat} from "react-number-format";
 import Link from 'next/link';
 import moment from 'moment/moment';
-import { name } from 'dayjs/locale/vi';
-
 
 
 const Toast = Swal.mixin({
@@ -29,6 +27,7 @@ const Toast = Swal.mixin({
   timer: 2000,
   timerProgressBar: true,
 })
+
 const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id
@@ -42,6 +41,7 @@ const Index = (props) => {
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
     const [onFetchingTheOrder, sOnFetchingTheOrder] = useState(false);
     const [onFetchingSupplier, sOnFetchingSupplier] = useState(false);
+    const [onFetchingWarehouser, sOnFetchingWarehouse] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
 
@@ -53,6 +53,7 @@ const Index = (props) => {
     const [dataThe_order, sDataThe_order] = useState([])
     const [dataBranch, sDataBranch]= useState([])
     const [dataItems, sDataItems] = useState([])
+    const [warehouse, sDataWarehouse] = useState([])
     const [dataTasxes, sDataTasxes] = useState([])
 
     const [option, sOption] = useState([{id: Date.now(), mathang: null, khohang: null, donvitinh: "", soluong: 1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""}]);
@@ -70,6 +71,7 @@ const Index = (props) => {
     const [errBranch, sErrBranch] = useState(false)
 
     const [mathangAll, sMathangAll] = useState([])
+    const [khotong, sKhotong] = useState(null)
 
     useEffect(() => {
       router.query && sErrDate(false)
@@ -99,7 +101,6 @@ const Index = (props) => {
     useEffect(() => {
       onFetching && _ServerFetching() 
     }, [onFetching]);
-
     const _ServerFetching_TheOrder =  () => {
       Axios("GET", "/api_web/Api_purchases/purchasesOptionNotComplete?csrf_protection=true", {
         params:{
@@ -146,38 +147,60 @@ const Index = (props) => {
           sIdSupplier(value)
       }else if(type === "theorder"){
           sIdTheOrder(value)
+          sOption([{id: Date.now(), mathang: null}])
+          if(value === null){
+            sDataItems([])
+          }
       }else if(type === "note"){
           sNote(value.target.value)
       }else if(type == "branch"){
           sIdBranch(value)
       }else if(type == "mathangAll"){
-        if(value.value === "0"){
-
           sMathangAll(value)
-          const fakeData = [{id: Date.now(), mathang: null}]
-          const data = fakeData?.concat(allItems?.slice(2)?.map(e => ({id: uuidv4(), mathang: e, khohang: e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: 1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""})))
-          sOption(data);
+          if(value?.length === 0){
+            sOption([{id: Date.now(), mathang: null}])
+          }
+        // if(value.value === "0"){
 
-        }else if(value.value === null){
+        //   sMathangAll(value)
+        //   const fakeData = [{id: Date.now(), mathang: null}]
+        //   const data = fakeData?.concat(allItems?.slice(2)?.map(e => ({id: uuidv4(), mathang: e, khohang: e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""})))
+        //   sOption(data);
 
-          sMathangAll(value)
-          sMangitem([])
-          sOption([{id: Date.now(), mathang: null}])
+        // }else if(value.value === null){
 
-        }else if(value.value != "0" || value.value != null){
+        //   sMathangAll(value)
+        //   sMangitem([])
+        //   sOption([{id: Date.now(), mathang: null}])
 
-          sMathangAll(value)
-          const dataItem = [allItems.find(item => item.value === value.value)]
-          const fakeData = [{id: Date.now(), mathang: null}]
-          sOption(fakeData?.concat(dataItem?.map(e => ({id: uuidv4(), mathang: e, khohang: e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: 1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""}))))
+        // }else if(value.value != "0" || value.value != null){
+          
+        //   sMathangAll(value)
+        //   const dataItem = [allItems.find(item => item.value === value.value)]
+        //   const fakeData = [{id: Date.now(), mathang: null}]
+        //   sOption(fakeData?.concat(dataItem?.map(e => ({id: uuidv4(), mathang: e, khohang: e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: 1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""}))))
         
-        }
-        else{
-          sMathangAll(value)
-        }
+        // }
+        // else{
+        //   sMathangAll(value)
+        // }
+      }
+      else if(type === "khotong"){
+          sKhotong(value)
       }
   }
 
+
+  useEffect(() => {
+        sOption(prevOption => {
+          const newOption = [...prevOption];
+          newOption.forEach((item, index) => {
+            if (index === 0 || !item.id) return;
+            item.khohang = khotong;
+          });
+          return newOption;
+        });
+  }, [khotong]);
     const _HandleSubmit = (e) => {
       e.preventDefault();
         if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null ){
@@ -208,24 +231,13 @@ const Index = (props) => {
         sErrTheOrder(false)
     }, [idTheOrder != null]);
 
-
-    const _HandleSeachApi = (inputValue) => {
-      
-        Axios("POST", `/api_web/Api_product/searchItemsVariant?csrf_protection=true`, {
-          data: {
-            term: inputValue,
-          }
-        }, (err, response) => {
-              if(!err){
-                var {result} = response?.data.data
-                sDataItems(result)
-            }
-        })
-    };
     const options =  dataItems?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e})) 
 
     const _ServerFetching_ItemsAll =  () => {
-      Axios("GET", "/api_web/Api_product/searchItemsVariant?csrf_protection=true", {
+      Axios("GET", "/api_web/Api_purchase_order/searchItemsVariant/?csrf_protection=true", {
+        params:{
+          "filter[purchase_order_id]":idTheOrder ? idTheOrder?.value : null
+        }
       }, (err, response) => {
           if(!err){
               var {result} =  response.data.data
@@ -234,14 +246,39 @@ const Index = (props) => {
       })
       sOnFetchingItemsAll(false)  
   }
+  const _ServerFetching_Warehouse =  () => {
+    Axios("GET", "/api_web/api_warehouse/location/?csrf_protection=true", {
+      params:{
+        "filter[branch_id]":idBranch.value
+      }
+    }, (err, response) => {
+
+        if(!err){
+            var result =  response.data.rResult
+            sDataWarehouse(result?.map(e => ({label: e?.name, value:e?.id,  warehouse_name:e?.warehouse_name})))
+        } 
+    })
+    sOnFetchingWarehouse(false)  
+}
   useEffect(() => {
     onFetchingItemsAll && _ServerFetching_ItemsAll() 
   }, [onFetchingItemsAll]);
 
   useEffect(() => {
+    onFetchingWarehouser && _ServerFetching_Warehouse() 
+  }, [onFetchingWarehouser]);
+
+  useEffect(() => {
     router.query && sOnFetching(true) 
-    router.query && sOnFetchingItemsAll(true) 
   }, [router.query]);
+
+  useEffect(() => {
+    idTheOrder != null && sOnFetchingItemsAll(true)
+  }, [idTheOrder]);
+  
+  useEffect(() => {
+    idBranch != null && sOnFetchingWarehouse(true)
+  }, [idBranch]);
 
   useEffect(()=>{
     onFetchingTheOrder && _ServerFetching_TheOrder() 
@@ -269,7 +306,6 @@ const Index = (props) => {
   
   const _HandleChangeInputOption = (id, type,index3, value) => {
     var index = option.findIndex(x => x.id === id);
-
     if(type == "mathang"){
       //  const hasSelectedOption = option.some((o) => o.mathang?.value === value.value && o.mathang?.e?.purchases_code === value.mathang?.e?.purchases_code);
       //     if (hasSelectedOption) {
@@ -286,10 +322,10 @@ const Index = (props) => {
             option[index].mathang = value
             option[index].donvitinh =  value?.e?.unit_name
             sMathangAll(null)
-            // option[index].soluong =  idPurchases?.length ? Number(value?.e?.quantity_left) : 1
+            option[index].soluong =  idTheOrder != null ? Number(value?.e?.quantity_left) : 1
             // option[index].thanhtien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
           }else{
-            const newData= {id: Date.now(), mathang: value, khohang: null, donvitinh: value?.e?.unit_name, soluong: 1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""}
+            const newData= {id: Date.now(), mathang: value, khohang: null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""}
             if (newData.chietkhau) {
               newData.dongiasauck *= (1 - Number(newData.chietkhau) / 100);
             }
@@ -406,64 +442,102 @@ const Index = (props) => {
     const taxOptions = [{ label: "Miễn thuế", value: "0",   tax_rate: "0"}, ...dataTasxes]
     
     
-    const allItems = [{ value: "0", label: "Chọn tất cả"}, {value: null, label: "Bỏ chọn tất cả"}, ...options]
+    // const allItems = [{ value: "0", label: "Chọn tất cả"}, {value: null, label: "Bỏ chọn tất cả"}, ...options]
+    const allItems = [...options]
 
 
-
-    const CustomOption = ({ data, ...props }) => {
-      const { label, value, e } = data;
-      const isSelectAll = value === "0";
-      const isDeselectAll = value === null;
+    // const CustomOption = ({ data, ...props }) => {
+    //   const { label, value, e } = data;
+    //   const isSelectAll = value === "0";
+    //   const isDeselectAll = value === null;
+    //   return (
+    //     <components.Option {...props}>
+    //        <div className='grid grid-cols-12 items-center'>
+    //           {isSelectAll && <span className='col-span-12'>Chọn tất cả</span>}
+    //           {isDeselectAll && <span className='col-span-12'>Bỏ chọn tất cả</span>}
+    //     {!isSelectAll && !isDeselectAll && (
+    //       <>
+    //         <div className='col-span-10'>
+    //           <div className='grid grid-cols-12'>
+    //             <div className='col-span-2'>
+    //             {e?.images != null ? (
+    //               <img src={e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />
+    //             ) : (
+    //               <div className='w-[50px] h-[60px] object-cover flex items-center justify-center rounded'>
+    //                 <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
+    //               </div>
+    //             )}
+    //             </div>
+    //             <div className='col-span-10'>
+    //             <h3 className='font-medium'>{e?.name}</h3>
+    //             <div className='flex gap-2'>
+    //               <h5 className='text-gray-400 font-normal'>{e?.code}</h5>
+    //               <h5 className='font-medium'>{e?.product_variation}</h5>
+    //             </div>
+    //             <h5 className='text-gray-400 font-medium text-xs'>{dataLang[e?.text_type]}</h5>
+    //             </div>
+    //           </div>
+    //         </div>
+    //         <div className='col-span-2'>
+    //           {value === mathangAll?.value && (
+    //             <span className=""><TickCircle
+    //             size="18"
+    //             color="#FF8A65"
+    //             /></span>
+    //           )}
+    //           {mathangAll?.value === "0" && (
+    //             <span className=""><TickCircle
+    //             size="18"
+    //             color="#FF8A65"
+    //             /></span>
+    //           )}
+    //         </div>
+    //       </>
+    //     )}
+    //   </div>
+    //     </components.Option>
+    //   );
+    // };
+    
+    const formatOptionLabel = ({ label, value, group }) => {
+      if (group) {
+        return (
+          <div>
+            <span>{group.label} - </span>
+            <span>{label}</span>
+          </div>
+        );
+      }
+      return label;
+    };
+    const [test , selectOption] = useState([])
+    const handleSelectAll = () => {
+      // const allValues = allItems.map(option => option.value);
+      // selectOption(allValues);
+      const fakeData = [{id: Date.now(), mathang: null}]
+      const data = fakeData?.concat(allItems?.map(e => ({id: uuidv4(), mathang: e, khohang: e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""})))
+      sOption(data);
+    };
+    const handleDeselectAll = () => {
+      // selectOption([]);
+      sOption([{id: Date.now(), mathang: null}])
+    };
+    const MenuList = (props) => {
       return (
-        <components.Option {...props}>
-           <div className='grid grid-cols-12 items-center'>
-              {isSelectAll && <span className='col-span-12'>Chọn tất cả</span>}
-              {isDeselectAll && <span className='col-span-12'>Bỏ chọn tất cả</span>}
-        {!isSelectAll && !isDeselectAll && (
-          <>
-            <div className='col-span-10'>
-              <div className='grid grid-cols-12'>
-                <div className='col-span-1'>
-                {e?.images != null ? (
-                  <img src={e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />
-                ) : (
-                  <div className='w-[50px] h-[60px] object-cover flex items-center justify-center rounded'>
-                    <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
-                  </div>
-                )}
-                </div>
-                <div className='col-span-11'>
-                <h3 className='font-medium'>{e?.name}</h3>
-                <div className='flex gap-2'>
-                  <h5 className='text-gray-400 font-normal'>{e?.code}</h5>
-                  <h5 className='font-medium'>{e?.product_variation}</h5>
-                </div>
-                <h5 className='text-gray-400 font-medium text-xs'>{dataLang[e?.text_type]}</h5>
-                </div>
-              </div>
-            </div>
-            <div className='col-span-2'>
-              {value === mathangAll?.value && (
-                <span className=""><TickCircle
-                size="18"
-                color="#FF8A65"
-                /></span>
-              )}
-              {mathangAll?.value === "0" && (
-                <span className=""><TickCircle
-                size="18"
-                color="#FF8A65"
-                /></span>
-              )}
-            </div>
-          </>
-        )}
-      </div>
-        </components.Option>
+        <components.MenuList {...props}>
+          <div className='grid grid-cols-2 items-center  cursor-pointer'>
+            <div className='hover:bg-slate-200 p-2 col-span-1 text-center ' onClick={handleSelectAll}>Chọn tất cả</div>
+            <div className='hover:bg-slate-200 p-2 col-span-1 text-center' onClick={handleDeselectAll}>Bỏ chọn tất cả</div>
+          </div>
+          {props.children}
+        </components.MenuList>
       );
     };
 
-    
+    // const hiddenOptions = mathangAll?.length > 0 ? mathangAll?.slice(0, 0) : [];
+    // const allItemsOptions = allItems ? allItems?.filter((x) => !hiddenOptions.includes(x.value)) : [];
+
+
   return (
     <React.Fragment>
     <Head>
@@ -488,8 +562,8 @@ const Index = (props) => {
             <div className=' w-full rounded'>
               <div className=''>  
                   <h2 className='font-normal bg-[#ECF0F4] p-2'>{dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
-                    <div className="grid grid-cols-5  gap-3 items-center mt-2"> 
-                        <div className='col-span-1'>
+                    <div className="grid grid-cols-10  gap-3 items-center mt-2"> 
+                        <div className='col-span-2'>
                           <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_code || "purchase_order_table_code"} </label>
                           <input
                               value={code}                
@@ -499,7 +573,7 @@ const Index = (props) => {
                               placeholder={dataLang?.purchase_order_system_default || "purchase_order_system_default"} 
                               className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                         </div>
-                        <div className='col-span-1'>
+                        <div className='col-span-2'>
                             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"} <span className="text-red-500">*</span></label>
                             <input
                               value={date}    
@@ -508,7 +582,7 @@ const Index = (props) => {
                               type="datetime-local"
                               className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                         </div>
-                        <div className='col-span-1'>
+                        <div className='col-span-2'>
                           <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_branch || "purchase_order_table_branch"} <span className="text-red-500">*</span></label>
                           <Select 
                               options={dataBranch}
@@ -536,6 +610,10 @@ const Index = (props) => {
                               ...base,
                               color: "#cbd5e1",
                               }),
+                              menu: (provided) => ({
+                                ...provided,
+                                zIndex: 9999, // Giá trị z-index tùy chỉnh
+                              }),
                               control: (base,state) => ({
                                   ...base,
                                   boxShadow: 'none',
@@ -548,7 +626,7 @@ const Index = (props) => {
                           />
                           {errBranch && <label className="text-sm text-red-500">{dataLang?.purchase_order_errBranch || "purchase_order_errBranch"}</label>}
                         </div>
-                        <div className='col-span-1'>
+                        <div className='col-span-2'>
                       <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_supplier} <span className="text-red-500">*</span></label>
                         <Select 
                             options={dataSupplier}
@@ -594,7 +672,7 @@ const Index = (props) => {
                           />
                           {errSupplier && <label className="text-sm text-red-500">{dataLang?.purchase_order_errSupplier || "purchase_order_errSupplier"}</label>}
                         </div>
-                        <div className='col-span-1'>
+                        <div className='col-span-2 z-[999]'>
                           <label className="text-[#344054] font-normal text-sm mb-1 ">{"Đơn đặt hàng (P0)"} <span className="text-red-500">*</span></label>
                           <Select 
                               options={dataThe_order}
@@ -622,6 +700,9 @@ const Index = (props) => {
                               placeholder: (base) => ({
                               ...base,
                               color: "#cbd5e1",
+                              }), menu: (provided) => ({
+                                ...provided,
+                                zIndex: 9999, // Giá trị z-index tùy chỉnh
                               }),
                               control: (base,state) => ({
                                   ...base,
@@ -635,16 +716,25 @@ const Index = (props) => {
                           />
                           {errTheOrder && <label className="text-sm text-red-500">{"Vui lòng chọn đơn đặt hàng (PO)"}</label>}
                         </div>
-                        
-                        <div className='col-span-2  z-[100] my-auto'>
+
+                    </div> 
+              </div>
+            </div>
+            <div className=' bg-[#ECF0F4] p-2 grid  grid-cols-12'>
+              <div className='font-normal'>{"Thông tin mặt hàng"}</div>
+            </div> 
+            <div className='grid grid-cols-10 items-end gap-1'>
+                        <div div className='col-span-2  z-[100] my-auto'>
                           <label className="text-[#344054] font-normal text-sm mb-1 ">{"Chọn nhanh mặt hàng"} </label>
                            <Select 
-                            onInputChange={_HandleSeachApi.bind(this)}
                             dangerouslySetInnerHTML={{__html: option.label}}
                             options={allItems}
+                            closeMenuOnSelect={false}
                             onChange={_HandleChangeInput.bind(this,  "mathangAll",)}
                             value={mathangAll}
-                            components={{ Option: CustomOption }}
+                            isMulti
+                            // components={{ Option: CustomOption,MenuList }}
+                            components={{ MenuList,MultiValue }}
                             formatOptionLabel={(option) => {
                               if(option.value === "0"){
                                 return (
@@ -694,7 +784,7 @@ const Index = (props) => {
                             // components={{ DropdownIndicator }}
                            placeholder={dataLang?.purchase_items || "purchase_items"} 
                            hideSelectedOptions={false}
-                           className="rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2" 
+                           className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
                            isSearchable={true}
                            noOptionsMessage={() => "Không có dữ liệu"}
                            menuPortalTarget={document.body}
@@ -714,30 +804,83 @@ const Index = (props) => {
                              color: "#cbd5e1",
                              }),
                              menuPortal: (base) => ({
-                              ...base,
-                              zIndex: 9999
-                            }), 
-                            control: (base, state) => ({
-                              ...base,
-                              ...(state.isFocused && {
-                                border: '0 0 0 1px #92BFF7',
-                                boxShadow: 'none'
-                              }),
-                            }),
+                               ...base,
+                               zIndex: 100
+                             }), 
+                             control: (base,state) => ({
+                               ...base,
+                               boxShadow: 'none',
+                               padding:"2.7px",
+                             ...(state.isFocused && {
+                               border: '0 0 0 1px #92BFF7',
+                             }),
+                           })
                          }}
                          />
-                            </div>
-                    </div> 
-              </div>
-            </div>
-            <h2 className='font-normal bg-[#ECF0F4] p-2  '>{dataLang?.purchase_order_purchase_item_information || "purchase_order_purchase_item_information"}</h2>  
+                        </div>
+                        <div className='col-span-2 z-[10]'>
+                          <label className="text-[#344054] font-normal text-sm mb-1 ">{"Chọn nhanh kho - vị trí kho"} </label>
+                          <Select 
+                            // options={taxOptions}
+                            onChange={_HandleChangeInput.bind(this, "khotong")}
+                            value={khotong}
+                            formatOptionLabel={(option) => (
+                              <div className='flex justify-start items-center gap-1 '>
+                                  <h2>kho: {option?.warehouse_name}</h2>
+                                  <h2>Vị trí kho</h2>
+                                  <h2>{option?.label}</h2>
+                              </div>
+                              )}
+                            options={warehouse}
+                            isClearable
+                            placeholder={"CHọn kho - vị trí kho"} 
+                            hideSelectedOptions={false}
+                            className={` "border-transparent placeholder:text-slate-300  z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
+                            isSearchable={true}
+                            noOptionsMessage={() => "Không có dữ liệu"}
+                           dangerouslySetInnerHTML={{__html: option.label}}
+                            menuPortalTarget={document.body}
+                            closeMenuOnSelect={true}
+                            style={{ border: "none", boxShadow: "none", outline: "none" }}
+                            theme={(theme) => ({
+                                ...theme,
+                                colors: {
+                                    ...theme.colors,
+                                    primary25: '#EBF5FF',
+                                    primary50: '#92BFF7',
+                                    primary: '#0F4F9E',
+                                },
+                            })}
+                            styles={{
+                              placeholder: (base) => ({
+                              ...base,
+                              color: "#cbd5e1",
+                              }),
+                              menuPortal: (base) => ({
+                                ...base,
+                                zIndex: 20
+                              }), 
+                              control: (base,state) => ({
+                                ...base,
+                                boxShadow: 'none',
+                                padding:"2.7px",
+                              ...(state.isFocused && {
+                                border: '0 0 0 1px #92BFF7',
+                              }),
+                            })
+                          }}
+                          />     
+                        </div>
+              </div> 
               <div className='pr-2'>
               <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10'>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-3    text-center    truncate font-[400]'>{"Mặt hàng"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]'>{"Kho hàng"}</h4>
+                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-2    text-center    truncate font-[400]'>{"Mặt hàng"}</h4>
+                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]'>{"Kho hàng - Vị trí"}</h4>
                   <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Đơn vị tính"}</h4>
                   <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Số lượng"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Giá nhập"}</h4>
+                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Đơn giá"}</h4>
+                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"% Chiết khấu"}</h4>
+                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Đơn giá sau CK"}</h4>
                   <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"% thuế"}</h4>
                   <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{"Thành tiền"}</h4>
                   <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{"Ghi chú"}</h4>
@@ -750,9 +893,8 @@ const Index = (props) => {
                       <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]"> 
                           {sortedArr.map((e,index) => 
                             <div className='grid grid-cols-12 gap-1 py-1 ' key={e?.id}>
-                            <div className='col-span-3  z-[100] my-auto'>
+                            <div className='col-span-2  z-[100] my-auto'>
                            <Select 
-                            onInputChange={_HandleSeachApi.bind(this)}
                             dangerouslySetInnerHTML={{__html: option.label}}
                            options={options}
                            onChange={_HandleChangeInputOption.bind(this, e?.id, "mathang",index)}
@@ -822,7 +964,7 @@ const Index = (props) => {
                          }}
                          />
                             </div>
-                            <div className='col-span-2  z-[19] my-auto'>
+                            <div className='col-span-1  z-[19] my-auto'>
                            <Select 
                           //   onInputChange={_HandleSeachApi.bind(this)}
                           //   dangerouslySetInnerHTML={{__html: option.label}}
@@ -931,6 +1073,21 @@ const Index = (props) => {
                                 className="appearance-none text-center py-1 px-2 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
                                 thousandSeparator=","
                             />
+                        </div>
+                        <div className='col-span-1 text-center flex items-center justify-center'>
+                          <NumericFormat
+                              value={e?.chietkhau}
+                              onValueChange={_HandleChangeInputOption.bind(this, e?.id, "chietkhau",index)}
+                              className="appearance-none text-center py-1 px-2 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
+                              thousandSeparator=","
+                              allowNegative={false}
+                              // readOnly={index === 0 ? readOnlyFirst : false}
+                              // decimalScale={0}
+                              isNumericString={true}   
+                          />
+                        </div>
+                        <div className='col-span-1 text-right flex items-center justify-end'>
+                           <h3 className='px-2'>{e?.dongiasauck}</h3>
                         </div>
                         <div className='col-span-1 flex justify-center items-center'>
                         <Select 
@@ -1070,7 +1227,7 @@ const MoreSelectedBadge = ({ items }) => {
   };
   
 const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 2;
+    const maxToShow = 0;
     const overflow = getValue()
       .slice(maxToShow)
       .map((x) => x.label);
