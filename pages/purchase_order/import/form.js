@@ -159,7 +159,12 @@ const Index = (props) => {
           sMathangAll(value)
           if(value?.length === 0){
             sOption([{id: Date.now(), mathang: null}])
+          }else if(value?.length > 0){
+            const fakeData = [{id: Date.now(), mathang: null}]
+            const data = fakeData?.concat(value?.map(e => ({id: uuidv4(), mathang: e, khohang: e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""})))
+            sOption(data);
           }
+          console.log(value);
         // if(value.value === "0"){
 
         //   sMathangAll(value)
@@ -536,7 +541,57 @@ const Index = (props) => {
 
     // const hiddenOptions = mathangAll?.length > 0 ? mathangAll?.slice(0, 0) : [];
     // const allItemsOptions = allItems ? allItems?.filter((x) => !hiddenOptions.includes(x.value)) : [];
-
+ const CustomOption = ({ data, ...props }) => {
+      const { label, value, e } = data;
+      const isSelectAll = value === "0";
+      const isDeselectAll = value === null;
+      return (
+        <components.Option {...props}>
+           <div className='grid grid-cols-12 items-center'>
+        {!isSelectAll && !isDeselectAll && (
+          <>
+            <div className='col-span-10'>
+              <div className='grid grid-cols-12'>
+                <div className='col-span-2'>
+                {e?.images != null ? (
+                  <img src={e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />
+                ) : (
+                  <div className='w-[50px] h-[60px] object-cover flex items-center justify-center rounded'>
+                    <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
+                  </div>
+                )}
+                </div>
+                <div className='col-span-10'>
+                <h3 className='font-medium'>{e?.name}</h3>
+                <div className='flex gap-2'>
+                  <h5 className='text-gray-400 font-normal'>{e?.code}</h5>
+                  <h5 className='font-medium'>{e?.product_variation}</h5>
+                </div>
+                <h5 className='text-gray-400 font-medium text-xs'>{dataLang[e?.text_type]}</h5>
+                </div>
+              </div>
+            </div>
+            <div className='col-span-2'>
+              {value === mathangAll?.value && (
+                <span className=""><TickCircle
+                size="18"
+                color="#FF8A65"
+                /></span>
+              )}
+              {mathangAll?.value === "0" && (
+                <span className=""><TickCircle
+                size="18"
+                color="#FF8A65"
+                /></span>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+        </components.Option>
+      );
+    };
+    
 
   return (
     <React.Fragment>

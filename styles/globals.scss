@@ -159,7 +159,10 @@ input::-ms-reveal,
 .removeDivide .css-1u9des2-indicatorSeparator{
 	width: 0px;
 }
-
+.transition-all.ease-out.duration-300.absolute.z-10{
+	bottom: 0 !important;
+	transform: translateY(100%);
+}
 
 /// model img Chi tiet YCMH
 
