@@ -524,7 +524,6 @@ const Index = (props) => {
                   option[index].donvitinh =  value?.e?.unit_name
                   option[index].soluong =  idPurchases?.length ? Number(value?.e?.quantity_left) : 1
                   option[index].thanhtien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-                  
                 }else{
                   const newData= {id: Date.now(), mathang: value, donvitinh:value?.e?.unit_name, soluong: idPurchases?.length ? Number(value?.e?.quantity_left) : 1, dongia:1, chietkhau: chietkhautong ? chietkhautong : 0, dongiasauck:1, thue: thuetong ? thuetong : 0, dgsauthue:1, thanhtien:1, ghichu:""}
                   if (newData.chietkhau) {
@@ -1206,7 +1205,8 @@ const Index = (props) => {
                           />
                         </div>
                         <div className='col-span-1 text-right flex items-center justify-end'>
-                           <h3 className='px-2'>{formatNumber(e?.thanhtien)}</h3>
+                          {/* <h3 className='px-2'>{formatNumber(e?.thanhtien)}</h3> */}
+                          <h3 className='px-2'>{formatNumber(e?.dongiasauck * (1 + Number(e?.thue?.tax_rate || 0) / 100) * e?.soluong)}</h3>
                         </div>
                          <div className='col-span-1 flex items-center justify-center'>
                              <input
