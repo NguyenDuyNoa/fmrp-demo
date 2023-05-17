@@ -12,13 +12,12 @@ import dynamic from 'next/dynamic';
 import Select,{components,MenuListProps  } from 'react-select';
 
 
-import { Edit as IconEdit,  Grid6 as IconExcel, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User,Image as IconImage, Add, Minus, Check, TickCircle  } from "iconsax-react";
+import { Add, Trash as IconDelete,Image as IconImage, Minus} from "iconsax-react";
 import Swal from 'sweetalert2';
 import { useEffect } from 'react';
 import {NumericFormat} from "react-number-format";
 import Link from 'next/link';
 import moment from 'moment/moment';
-
 
 const Toast = Swal.mixin({
   toast: true,
@@ -29,22 +28,28 @@ const Toast = Swal.mixin({
 })
 
 const Index = (props) => {
+
     const router = useRouter();
     const id = router.query?.id
+
     const dataLang = props?.dataLang
     const scrollAreaRef = useRef(null);
     const handleMenuOpen = () => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
+
     const [onFetching, sOnFetching] = useState(false);
+    const [onFetchingDetail, sOnFetchingDetail] = useState(false);
+
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
     const [onFetchingTheOrder, sOnFetchingTheOrder] = useState(false);
     const [onFetchingSupplier, sOnFetchingSupplier] = useState(false);
     const [onFetchingWarehouser, sOnFetchingWarehouse] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
-
+    const [thuetong, sThuetong] = useState()
+    const [chietkhautong, sChietkhautong] = useState(0)
  
     const [code, sCode] = useState('')
     const [note, sNote] = useState('')
@@ -56,7 +61,7 @@ const Index = (props) => {
     const [warehouse, sDataWarehouse] = useState([])
     const [dataTasxes, sDataTasxes] = useState([])
 
-    const [option, sOption] = useState([{id: Date.now(), mathang: null, khohang: null, donvitinh: "", soluong: 1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""}]);
+    const [option, sOption] = useState([{id: Date.now(), mathang: null, khohang: null, donvitinh: "", soluong: 1, dongia: 1, thue: 0, thanhtien: 1, ghichu: ""}]);
     const slicedArr = option.slice(1);
     const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
     sortedArr.unshift(option[0]);
@@ -82,6 +87,46 @@ const Index = (props) => {
       router.query && sNote("")
   }, [router.query]);
 
+
+  const _ServerFetchingDetail =  () => {
+    Axios("GET", `/api_web/Api_import/import/${id}?csrf_protection=true`, {
+  }, (err, response) => {
+      if(!err){
+        var rResult = response.data;
+        const itemlast =  [{mathang: null}];
+        const item = itemlast?.concat(rResult?.items?.map(e => ({
+                      purchases_order_item_id: e?.item?.purchase_order_item_id, 
+                      id: e.id,
+                      mathang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,value:e.item?.id}, 
+                      khohang: {label: e?.location_name, value: e?.location_warehouses_id,warehouse_name:e?.warehouse_name},
+                      soluong: Number(e?.quantity), 
+                      dongia: Number(e?.price),
+                      chietkhau: Number(e?.discount_percent),
+                      thue: {tax_rate: e?.tax_rate,value: e?.tax_id},
+                      donvitinh: e.items?.unit_name,
+                      dongiasauck: Number(e?.price_after_discount),
+                      note: e?.note,
+                      thanhtien: Number(e?.price_after_discount) * (1 + Number(e?.tax_rate)/100) * Number(e?.quantity)
+                    })));
+        sOption(item)
+        sCode(rResult?.code)
+        sIdBranch({label: rResult?.branch_name, value:rResult?.branch_id})
+        sIdSupplier({label: rResult?.supplier_name, value: rResult?.supplier_id})
+        sIdTheOrder({label: rResult?.purchase_order_code, label: rResult?.purchase_order_id})
+        sDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
+        sNote(rResult?.note)
+      }
+      sOnFetchingDetail(false)
+  })
+}
+  useEffect(() => {
+    onFetchingDetail && _ServerFetchingDetail()
+  }, [onFetchingDetail]);
+
+  useEffect(() => {
+    id && sOnFetchingDetail(true) 
+  }, []);
+
     const _ServerFetching =  () => {
       Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
           if(!err){
@@ -101,8 +146,10 @@ const Index = (props) => {
     useEffect(() => {
       onFetching && _ServerFetching() 
     }, [onFetching]);
+
+
     const _ServerFetching_TheOrder =  () => {
-      Axios("GET", "/api_web/Api_purchases/purchasesOptionNotComplete?csrf_protection=true", {
+      Axios("GET", "/api_web/Api_purchase_order/purchase_order_combobox/?csrf_protection=true", {
         params:{
           "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
          }
@@ -117,7 +164,7 @@ const Index = (props) => {
 
   useEffect(()=>{
      idSupplier === null && sDataThe_order([]) || sIdTheOrder(null)
-  },[idSupplier])
+  },[])
 
     const _ServerFetching_Supplier =  () => {
       Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {
@@ -135,77 +182,121 @@ const Index = (props) => {
 
     useEffect(()=>{
       idBranch === null && sDataSupplier([]) || sIdSupplier(null)
-    },[idBranch])
+    },[])
 
- const [mantItem, sMangitem] = useState([])
     const _HandleChangeInput = (type, value) => {
+      if(option?.length > 1){
+        if(type ==="branch" || type === "supplier" || type === "theorder"){
+          Swal.fire({
+            title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#296dc1',
+            cancelButtonColor: '#d33',
+            confirmButtonText: `${dataLang?.aler_yes}`,
+            cancelButtonText:`${dataLang?.aler_cancel}`
+        }).then((result) => {
+          if (result.isConfirmed) {
+             sOption([{id: Date.now(), mathang: null}])
+              sDataItems([])
+              sDataWarehouse([])
+              sIdTheOrder(null)
+              sIdSupplier(null)
+              sKhotong([])
+          }
+        })
+        }
+      }
       if(type == "code"){
           sCode(value.target.value)
       }else if(type === "date"){
           sDate(moment(value.target.value).format('YYYY-MM-DD HH:mm:ss'))
       }else if(type === "supplier"){
           sIdSupplier(value)
+          sOption([{id: Date.now(), mathang: null}])
+          sMathangAll([])
+          sDataItems([])
       }else if(type === "theorder"){
           sIdTheOrder(value)
           sOption([{id: Date.now(), mathang: null}])
-          if(value === null){
-            sDataItems([])
-          }
+          sDataItems([])
       }else if(type === "note"){
           sNote(value.target.value)
       }else if(type == "branch"){
           sIdBranch(value)
+          // sOption([{id: Date.now(), mathang: null}])
+          // sDataItems([])
+          // sDataWarehouse([])
+          sIdTheOrder(null)
+          sIdSupplier(null)
+          sKhotong([])
       }else if(type == "mathangAll"){
           sMathangAll(value)
           if(value?.length === 0){
             sOption([{id: Date.now(), mathang: null}])
           }else if(value?.length > 0){
             const fakeData = [{id: Date.now(), mathang: null}]
-            const data = fakeData?.concat(value?.map(e => ({id: uuidv4(), mathang: e, khohang: e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""})))
+            const data = fakeData?.concat(value?.map(e => ({id: uuidv4(), mathang: e, khohang: null, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.mathang?.e?.price ? Number(e?.mathang?.e?.price) : 1, chietkhau: e?.e?.discount_percent, dongiasauck: Number(e?.e?.price_after_discount),thue: {label:e?.e?.tax_name ,value :e?.e?.tax_rate, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
             sOption(data);
           }
-          console.log(value);
-        // if(value.value === "0"){
-
-        //   sMathangAll(value)
-        //   const fakeData = [{id: Date.now(), mathang: null}]
-        //   const data = fakeData?.concat(allItems?.slice(2)?.map(e => ({id: uuidv4(), mathang: e, khohang: e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""})))
-        //   sOption(data);
-
-        // }else if(value.value === null){
-
-        //   sMathangAll(value)
-        //   sMangitem([])
-        //   sOption([{id: Date.now(), mathang: null}])
-
-        // }else if(value.value != "0" || value.value != null){
-          
-        //   sMathangAll(value)
-        //   const dataItem = [allItems.find(item => item.value === value.value)]
-        //   const fakeData = [{id: Date.now(), mathang: null}]
-        //   sOption(fakeData?.concat(dataItem?.map(e => ({id: uuidv4(), mathang: e, khohang: e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: 1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""}))))
-        
-        // }
-        // else{
-        //   sMathangAll(value)
-        // }
-      }
-      else if(type === "khotong"){
+      }else if(type === "khotong"){
           sKhotong(value)
+      }else if(type == "thuetong"){
+        sThuetong(value)
+      }else if(type == "chietkhautong"){
+        sChietkhautong(value?.value)
       }
   }
 
 
+  
   useEffect(() => {
         sOption(prevOption => {
           const newOption = [...prevOption];
           newOption.forEach((item, index) => {
-            if (index === 0 || !item.id) return;
+            if (index === 0 || !item?.id) return;
             item.khohang = khotong;
           });
           return newOption;
         });
   }, [khotong]);
+
+  useEffect(() => {
+    if (thuetong == null) return;
+    sOption(prevOption => {
+      const newOption = [...prevOption];
+      const thueValue = thuetong?.tax_rate || 0;
+      const chietKhauValue = chietkhautong || 0;
+      newOption.forEach((item, index) => {
+        if (index === 0 || !item?.id) return;
+        const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
+        const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
+        item.thue = thuetong;
+        item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
+      });
+      return newOption;
+    });
+  }, [thuetong]);
+
+  useEffect(() => {
+    if (chietkhautong == null) return;
+    sOption(prevOption => {
+      const newOption = [...prevOption];
+      const thueValue = thuetong?.tax_rate != undefined ? thuetong?.tax_rate : 0
+      const chietKhauValue = chietkhautong ? chietkhautong : 0;
+      newOption.forEach((item, index) => {
+        if (index === 0 || !item?.id) return;
+        const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
+        const thanhTien =  dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
+        item.chietkhau = Number(chietkhautong);
+        item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
+        item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
+      });
+      return newOption;
+    });
+  }, [chietkhautong]);
+
+
     const _HandleSubmit = (e) => {
       e.preventDefault();
         if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null ){
@@ -226,12 +317,15 @@ const Index = (props) => {
     useEffect(() => {
       sErrDate(false)
     }, [date != null]);
+
     useEffect(() => {
       sErrSupplier(false)
     }, [idSupplier != null]);
+
     useEffect(() => {
       sErrBranch(false)
     }, [idBranch != null]);
+
     useEffect(() => {
         sErrTheOrder(false)
     }, [idTheOrder != null]);
@@ -251,6 +345,7 @@ const Index = (props) => {
       })
       sOnFetchingItemsAll(false)  
   }
+
   const _ServerFetching_Warehouse =  () => {
     Axios("GET", "/api_web/api_warehouse/location/?csrf_protection=true", {
       params:{
@@ -308,7 +403,9 @@ const Index = (props) => {
   useEffect(() => {
     idSupplier != null && sOnFetchingTheOrder(true)
   }, [idSupplier]);
-  
+
+
+
   const _HandleChangeInputOption = (id, type,index3, value) => {
     var index = option.findIndex(x => x.id === id);
     if(type == "mathang"){
@@ -323,28 +420,37 @@ const Index = (props) => {
       //         })
       //       return  
       //     }
-         if(option[index]?.mathang){
+      if(option[index]?.mathang){
             option[index].mathang = value
             option[index].donvitinh =  value?.e?.unit_name
             sMathangAll(null)
+            option[index].dongia = value?.e?.price
+            option[index].khohang =  khotong ? khotong : null
             option[index].soluong =  idTheOrder != null ? Number(value?.e?.quantity_left) : 1
-            // option[index].thanhtien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
+            option[index].chietkhau = chietkhautong ? chietkhautong : Number(value?.e?.discount_percent)
+            option[index].dongiasauck = Number(value?.e?.price_after_discount)
+            option[index].thue = thuetong ? thuetong : {label: value?.e?.tax_name, value:value?.e?.tax_id, tax_rate: value?.e?.tax_rate}
+            option[index].thanhtien = Number(value?.e?.amount)
           }else{
-            const newData= {id: Date.now(), mathang: value, khohang: null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""}
+            const newData= {id: Date.now(), mathang: value, khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: value?.e?.price, chietkhau: value?.e?.discount_percent,dongiasauck: value?.e?.price_after_discount, thue: thuetong ? thuetong : 0, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
             if (newData.chietkhau) {
               newData.dongiasauck *= (1 - Number(newData.chietkhau) / 100);
             }
             if(newData.thue?.e?.tax_rate == undefined){
               const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
               newData.thanhtien = Number(tien.toFixed(2));
-            } else { 
+            }else { 
               const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.e?.tax_rate)/100) * Number(newData.soluong);
               newData.thanhtien = Number(tien.toFixed(2));
             }
             sMathangAll(null)
             option.push(newData);
           }
-    }else if(type == "donvitinh"){
+    }else if(type ==="khohang"){
+      option[index].khohang = value
+      sCustomStyle(value)
+    }
+    else if(type == "donvitinh"){
       option[index].donvitinh = value.target?.value;
     }else if (type === "soluong") {
       option[index].soluong = Number(value?.value);
@@ -388,8 +494,7 @@ const Index = (props) => {
           const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
           option[index].thanhtien = Number(tien.toFixed(2));
         }
-    }
-    else if(type == "ghichu"){
+    }else if(type == "ghichu"){
         option[index].ghichu = value?.target?.value;
     }
     sOption([...option])
@@ -431,6 +536,7 @@ const Index = (props) => {
         })
     }
   };
+
     const _HandleDelete =  (id) => {
     if (id === option[0].id) {
       return Toast.fire({
@@ -447,7 +553,6 @@ const Index = (props) => {
     const taxOptions = [{ label: "Miễn thuế", value: "0",   tax_rate: "0"}, ...dataTasxes]
     
     
-    // const allItems = [{ value: "0", label: "Chọn tất cả"}, {value: null, label: "Bỏ chọn tất cả"}, ...options]
     const allItems = [...options]
 
     // const CustomOption = ({ data, ...props }) => {
@@ -514,88 +619,177 @@ const Index = (props) => {
       }
       return label;
     };
-    const [test , selectOption] = useState([])
+
     const handleSelectAll = () => {
-      // const allValues = allItems.map(option => option.value);
-      // selectOption(allValues);
       const fakeData = [{id: Date.now(), mathang: null}]
-      const data = fakeData?.concat(allItems?.map(e => ({id: uuidv4(), mathang: e, khohang: e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, gianhap: 1, thue: 0, thanhtien: 1, ghichu: ""})))
+      const data = fakeData?.concat(allItems?.map(e => ({id: uuidv4(), mathang: e, khohang: khotong ? khotong : e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.e?.price, chietkhau:chietkhautong ?  chietkhautong : e?.e?.discount_percent, dongiasauck:Number(e?.e?.price_after_discount), thue: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_rate, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
       sOption(data);
+      sMathangAll(data)
     };
+
     const handleDeselectAll = () => {
-      // selectOption([]);
+      sMathangAll([])
       sOption([{id: Date.now(), mathang: null}])
     };
+
     const MenuList = (props) => {
       return (
         <components.MenuList {...props}>
+          {allItems?.length > 0 &&
           <div className='grid grid-cols-2 items-center  cursor-pointer'>
             <div className='hover:bg-slate-200 p-2 col-span-1 text-center ' onClick={handleSelectAll}>Chọn tất cả</div>
             <div className='hover:bg-slate-200 p-2 col-span-1 text-center' onClick={handleDeselectAll}>Bỏ chọn tất cả</div>
           </div>
+          }
           {props.children}
         </components.MenuList>
       );
     };
 
-    // const hiddenOptions = mathangAll?.length > 0 ? mathangAll?.slice(0, 0) : [];
-    // const allItemsOptions = allItems ? allItems?.filter((x) => !hiddenOptions.includes(x.value)) : [];
- const CustomOption = ({ data, ...props }) => {
-      const { label, value, e } = data;
-      const isSelectAll = value === "0";
-      const isDeselectAll = value === null;
-      return (
-        <components.Option {...props}>
-           <div className='grid grid-cols-12 items-center'>
-        {!isSelectAll && !isDeselectAll && (
-          <>
-            <div className='col-span-10'>
-              <div className='grid grid-cols-12'>
-                <div className='col-span-2'>
-                {e?.images != null ? (
-                  <img src={e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />
-                ) : (
-                  <div className='w-[50px] h-[60px] object-cover flex items-center justify-center rounded'>
-                    <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
-                  </div>
-                )}
-                </div>
-                <div className='col-span-10'>
-                <h3 className='font-medium'>{e?.name}</h3>
-                <div className='flex gap-2'>
-                  <h5 className='text-gray-400 font-normal'>{e?.code}</h5>
-                  <h5 className='font-medium'>{e?.product_variation}</h5>
-                </div>
-                <h5 className='text-gray-400 font-medium text-xs'>{dataLang[e?.text_type]}</h5>
-                </div>
-              </div>
-            </div>
-            <div className='col-span-2'>
-              {value === mathangAll?.value && (
-                <span className=""><TickCircle
-                size="18"
-                color="#FF8A65"
-                /></span>
-              )}
-              {mathangAll?.value === "0" && (
-                <span className=""><TickCircle
-                size="18"
-                color="#FF8A65"
-                /></span>
-              )}
-            </div>
-          </>
-        )}
-      </div>
-        </components.Option>
-      );
+
+    const formatNumber = (num) => {
+      if (!num && num !== 0) return 0;
+      const roundedNum = parseFloat(num.toFixed(2));
+      return roundedNum.toLocaleString("en", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: true
+      });
     };
+
+
+    const tinhTongTien = (option) => {
+
+      const tongTien = option.slice(1).reduce((accumulator, currentValue) => accumulator + currentValue?.dongia * currentValue?.soluong, 0);
+    
+      const tienChietKhau = option.slice(1).reduce((acc, item) => {
+        const chiTiet = item?.dongia * (item?.chietkhau/100) * item?.soluong;
+        return acc + chiTiet;
+      }, 0);
+    
+      const tongTienSauCK = option.slice(1).reduce((acc, item) => {
+        const tienSauCK = item?.soluong * item?.dongiasauck;
+        return acc + tienSauCK;
+      }, 0);
+    
+      const tienThue = option.slice(1).reduce((acc, item) => {
+        const tienThueItem = item?.dongiasauck * (isNaN(item?.thue?.tax_rate) ? 0 : (item?.thue?.tax_rate/100)) * item?.soluong;
+        return acc + tienThueItem;
+      }, 0);
+    
+      const tongThanhTien = option.slice(1).reduce((acc, item) => acc + item?.thanhtien, 0);
+      return { tongTien: tongTien || 0, tienChietKhau: tienChietKhau || 0, tongTienSauCK: tongTienSauCK || 0, tienThue: tienThue || 0, tongThanhTien: tongThanhTien || 0 };
+    };
+
+    const [tongTienState, setTongTienState] = useState({ tongTien: 0, tienChietKhau: 0, tongTienSauCK: 0, tienThue: 0, tongThanhTien: 0 });
+    
+    useEffect(() => {
+      const tongTien = tinhTongTien(option);
+      setTongTienState(tongTien);
+    }, [option])
+
+    const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, purchases_order_item_id: e?.mathang?.e?.purchase_order_item_id, location_warehouses_id: e?.khohang?.value, quantity: Number(e?.soluong), price: e?.dongia, discount_percent:e?.chietkhau, tax_id:e?.thue?.value, note: e?.ghichu, id:e?.id}})
+    let newDataOption = dataOption?.filter(e => e?.item !== undefined);
+       
+    const _ServerSending = () => {
+          var formData = new FormData();
+          formData.append("code", code)
+          formData.append("date", (moment(date).format("YYYY-MM-DD HH:mm:ss")))
+          formData.append("branch_id", idBranch.value)
+          formData.append("suppliers_id", idSupplier.value)
+          formData.append("id_order", idTheOrder.value)
+          formData.append("note", note)
+          newDataOption.forEach((item, index) => {
+            formData.append(`items[${index}][item]`, item?.item);
+            formData.append(`items[${index}][price]`, item?.price);
+            formData.append(`items[${index}][purchase_order_item_id]`, item?.purchases_order_item_id != undefined ? item?.purchases_order_item_id : "");
+            formData.append(`items[${index}][id]`, router.query?.id ? item?.id : "");
+            formData.append(`items[${index}][quantity]`, item?.quantity.toString());
+            formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
+            formData.append(`items[${index}][discount_percent]`, item?.discount_percent);
+            formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
+            formData.append(`items[${index}][location_warehouses_id]`, item?.location_warehouses_id != undefined ? item?.location_warehouses_id : "");
+        });  
+          Axios("POST", `${id ? `/api_web/Api_import/import/${id}?csrf_protection=true` : "/api_web/Api_import/import/?csrf_protection=true"}`, {
+              data: formData,
+              headers: {'Content-Type': 'multipart/form-data'}
+          }, (err, response) => {
+              if(!err){
+                  var {isSuccess, message} = response.data
+                  if(isSuccess){
+                      Toast.fire({
+                          icon: 'success',
+                          title: `${dataLang[message]}`
+                      })
+                      sCode("")
+                      sDate(new Date().toISOString().slice(0, 10))
+                      sIdSupplier(null)
+                      sIdBranch(null)
+                      sIdTheOrder(null)
+                      sNote("")
+                      sErrBranch(false)
+                      sErrDate(false)
+                      sErrTheOrder(false)
+                      sErrSupplier(false)
+                      sOption([{id: Date.now(), mathang: null}])
+                      router.back()
+                  }else {
+                    if(tongTienState.tongTien == 0){
+                      Toast.fire({
+                        icon: 'error',
+                        title: `Chưa nhập thông tin mặt hàng`
+                    })
+                    }
+                    else{
+                      Toast.fire({
+                        icon: 'error',
+                        title: `${dataLang[message]}`
+                      })
+                    }
+                     
+                  }
+              }
+              sOnSending(false)
+          })
+      }
+      useEffect(() => {
+        onSending && _ServerSending()
+    }, [onSending]);
+
+    const [isExpanded, setIsExpanded] = useState(false);
+
+
+    const toggleExpand = () => {
+      setIsExpanded(!isExpanded);
+    };
+
+    const [cutTomStyle, sCustomStyle] = useState(null)
+    const customStyles = {
+      control: (base, state) => ({
+        ...base,
+        width: cutTomStyle || (state.isFocused && isExpanded) ? '200px' : '200px',
+        transition: 'width 0.5s',
+        border: state.isFocused && isExpanded ? '0 0 0 1px #92BFF7' : '0 0 0 1px #92BFF7',
+        boxShadow: state.isFocused && isExpanded ? 'none' : 'none',
+        '@media (max-width: 1536px)': {
+          width: '200px', 
+        },
+        '@media (max-width: 1280px)': {
+          width: '150px', 
+        },
+      }),
+      menuPortal: (base) => ({
+        ...base,
+        zIndex: 9999, // Đặt giá trị z-index cao
+      }),
+    };
+
     
 
   return (
     <React.Fragment>
     <Head>
-        <title>{"Thêm nhập hàng"}</title>
+        <title>{id ? "Sửa nhập hàng" : "Thêm nhập hàng"}</title>
     </Head>
     <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between'>
         <div className='h-[97%] space-y-3 overflow-hidden'>
@@ -648,7 +842,7 @@ const Index = (props) => {
                               placeholder={dataLang?.purchase_order_branch || "purchase_order_branch"} 
                               className={`${errBranch ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
                               isSearchable={true}
-                              components={{ MultiValue }}
+                              // components={{ MultiValue }}
                               style={{ border: "none", boxShadow: "none", outline: "none" }}
                               theme={(theme) => ({
                                   ...theme,
@@ -726,7 +920,7 @@ const Index = (props) => {
                           />
                           {errSupplier && <label className="text-sm text-red-500">{dataLang?.purchase_order_errSupplier || "purchase_order_errSupplier"}</label>}
                         </div>
-                        <div className='col-span-2 z-[999]'>
+                        <div className='col-span-2 '>
                           <label className="text-[#344054] font-normal text-sm mb-1 ">{"Đơn đặt hàng (P0)"} <span className="text-red-500">*</span></label>
                           <Select 
                               options={dataThe_order}
@@ -739,7 +933,7 @@ const Index = (props) => {
                               placeholder={"Đơn đặt hàng (P0)"} 
                               className={`${errTheOrder ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
                               isSearchable={true}
-                              components={{ MultiValue }}
+                              // components={{ MultiValue }}
                               style={{ border: "none", boxShadow: "none", outline: "none" }}
                               theme={(theme) => ({
                                   ...theme,
@@ -770,22 +964,20 @@ const Index = (props) => {
                           />
                           {errTheOrder && <label className="text-sm text-red-500">{"Vui lòng chọn đơn đặt hàng (PO)"}</label>}
                         </div>
-
                     </div> 
               </div>
             </div>
             <div className=' bg-[#ECF0F4] p-2 grid  grid-cols-12'>
-              <div className='font-normal'>{"Thông tin mặt hàng"}</div>
+              <div className='font-normal col-span-12'>{"Thông tin mặt hàng"}</div>
             </div> 
-            <div className='grid grid-cols-10 items-end gap-1'>
+            <div className='grid grid-cols-10 items-end gap-3'>
                         <div div className='col-span-2  z-[100] my-auto'>
                           <label className="text-[#344054] font-normal text-sm mb-1 ">{"Chọn nhanh mặt hàng"} </label>
                            <Select 
-                            dangerouslySetInnerHTML={{__html: option.label}}
                             options={allItems}
                             closeMenuOnSelect={false}
                             onChange={_HandleChangeInput.bind(this,  "mathangAll",)}
-                            value={mathangAll}
+                            value={mathangAll?.value ? mathangAll?.value : sortedArr?.map(e => e?.mathang)}
                             isMulti
                             // components={{ Option: CustomOption,MenuList }}
                             components={{ MenuList,MultiValue }}
@@ -841,7 +1033,7 @@ const Index = (props) => {
                            className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
                            isSearchable={true}
                            noOptionsMessage={() => "Không có dữ liệu"}
-                           menuPortalTarget={document.body}
+                           menuPortalTarget={document.body} 
                            style={{ border: "none", boxShadow: "none", outline: "none" }}
                            theme={(theme) => ({
                                ...theme,
@@ -887,7 +1079,7 @@ const Index = (props) => {
                               )}
                             options={warehouse}
                             isClearable
-                            placeholder={"CHọn kho - vị trí kho"} 
+                            placeholder={"Chọn kho - vị trí kho"} 
                             hideSelectedOptions={false}
                             className={` "border-transparent placeholder:text-slate-300  z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
@@ -912,7 +1104,7 @@ const Index = (props) => {
                               }),
                               menuPortal: (base) => ({
                                 ...base,
-                                zIndex: 20
+                                zIndex: 999
                               }), 
                               control: (base,state) => ({
                                 ...base,
@@ -928,17 +1120,17 @@ const Index = (props) => {
               </div> 
               <div className='pr-2'>
               <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10'>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-2    text-center    truncate font-[400]'>{"Mặt hàng"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]'>{"Kho hàng - Vị trí"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Đơn vị tính"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Số lượng"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Đơn giá"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"% Chiết khấu"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Đơn giá sau CK"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"% thuế"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{"Thành tiền"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{"Ghi chú"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{"Thao tác"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-2    text-center    truncate font-[400]'>{"Mặt hàng"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]'>{"Kho hàng - Vị trí"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-right  truncate font-[400]'>{"ĐVT"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Số lượng"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Đơn giá"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"% Chiết khấu"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Đơn giá sau CK"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"% thuế"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{"Thành tiền"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{"Ghi chú"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{"Thao tác"}</h4>
               </div>     
               </div>     
             <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
@@ -956,27 +1148,27 @@ const Index = (props) => {
                            formatOptionLabel={(option) => (
                           <div className='flex items-center  justify-between py-2'>
                             <div className='flex items-center gap-2'>
-                              <div>
+                              <div className='2xl:h-[60px] xl:w-[40px] xl:h-[50px] w-[30px] h-[40px]'>
                               {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />):
-                                    <div className='w-[50px] h-[60px] object-cover  flex items-center justify-center rounded'>
+                                    <div className='2xl:w-[50px] 2xl:h-[60px] xl:w-[40px] xl:h-[50px] w-[30px] h-[40px] object-cover  flex items-center justify-center rounded'>
                                       <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
                                   </div>
                                   }
                               </div>
                               <div>
-                                <h3 className='font-medium'>{option.e?.name}</h3>
+                                <h3 className='font-medium 2xl:text-[12px] xl:text-[10px] text-[8px]'>{option.e?.name}</h3>
                                 <div className='flex gap-2'>
-                                  <h5 className='text-gray-400 font-normal'>{option.e?.code}</h5>
-                                  <h5 className='font-medium'>{option.e?.product_variation}</h5>
+                                  <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[10px] text-[8px]' >{option.e?.code}</h5>
+                                  <h5 className='font-medium 2xl:text-[12px] xl:text-[10px] text-[8px]'>{option.e?.product_variation}</h5>
                                 </div>
-                                <h5 className='text-gray-400 font-medium text-xs'>{dataLang[option.e?.text_type]}</h5>
+                                <h5 className='text-gray-400 font-medium text-xs 2xl:text-[12px] xl:text-[10px] text-[8px]'>{dataLang[option.e?.text_type]}</h5>
                               </div>
                             </div>
                             <div className=''>
                                <div className='text-right opacity-0'>{"0"}</div>
                                <div className='flex gap-2'>
                                  <div className='flex items-center gap-2'>
-                                   <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse ?? 0}</h5>
+                                   <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[10px] text-[8px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[10px] text-[8px]'>{option.e?.qty_warehouse ?? 0}</h5>
                                  </div>
                                 
                                 </div>
@@ -985,7 +1177,7 @@ const Index = (props) => {
                         )}
                            placeholder={dataLang?.purchase_items || "purchase_items"} 
                            hideSelectedOptions={false}
-                           className="rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2" 
+                           className="rounded-md bg-white  2xl:text-[12px] xl:text-[10px] text-[8px] z-20 mb-2" 
                            isSearchable={true}
                            noOptionsMessage={() => "Không có dữ liệu"}
                            menuPortalTarget={document.body}
@@ -1018,46 +1210,25 @@ const Index = (props) => {
                          }}
                          />
                             </div>
-                            <div className='col-span-1  z-[19] my-auto'>
+                            <div className='col-span-1  z-[100] my-auto'>
                            <Select 
-                          //   onInputChange={_HandleSeachApi.bind(this)}
-                          //   dangerouslySetInnerHTML={{__html: option.label}}
-                          //  options={options}
-                          //  onChange={_HandleChangeInputOption.bind(this, e?.id, "mathang",index)}
-                          //  value={e?.mathang}
-                           formatOptionLabel={(option) => (
-                          <div className='flex items-center  justify-between py-2'>
-                            {/* <div className='flex items-center gap-2'>
-                              <div>
-                              {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />):
-                                    <div className='w-[50px] h-[60px] object-cover  flex items-center justify-center rounded'>
-                                      <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
-                                  </div>
-                                  }
-                              </div>
-                              <div>
-                                <h3 className='font-medium'>{option.e?.name}</h3>
-                                <div className='flex gap-2'>
-                                  <h5 className='text-gray-400 font-normal'>{option.e?.code}</h5>
-                                  <h5 className='text-[#0F4F9E] font-medium'>{option.e?.product_variation}</h5>
-                                </div>
-                                <h5 className='text-gray-400 font-medium text-xs'>{dataLang[option.e?.text_type]} {loai == "1" ? "-":""} {loai == "1" ? option.e?.purchases_code : ""} {loai == "1" ? "- Số lượng:":""} {loai == "1" ? option.e?.quantity_left  : ""}</h5>
-                              </div>
-                            </div>
+                           
+                          onChange={_HandleChangeInputOption.bind(this, e?.id,"khohang",index)}
+                          value={e?.khohang}
+                          formatOptionLabel={(option) => (
                             <div className=''>
-                               <div className='text-right opacity-0'>{"0"}</div>
-                               <div className='flex gap-2'>
-                                 <div className='flex items-center gap-2'>
-                                   <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse ?? 0}</h5>
-                                 </div>
-                                
-                                </div>
-                            </div> */}
-                          </div>
-                        )}
-                           placeholder={"Kho hàng"} 
+                                <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>Kho: {option?.warehouse_name}</h2>
+                                <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{option?.label}</h2>
+                            </div>
+                            )}
+                             // Các props khác của Select
+                          onFocus={toggleExpand} // Xử lý khi người dùng nhấp vào để mở rộng menu
+                          onBlur={toggleExpand} // Xử lý khi người dùn
+                          options={warehouse}
+                          // isClearable
+                          placeholder={"Kho - vị trí kho"} 
                            hideSelectedOptions={false}
-                           className="rounded-md bg-white  xl:text-base text-[14.5px] z-19 mb-2" 
+                           className="rounded-md bg-white  2xl:text-[12px] xl:text-[10px] text-[8px] z-19 mb-2" 
                            isSearchable={true}
                            noOptionsMessage={() => "Không có dữ liệu"}
                            menuPortalTarget={document.body}
@@ -1070,28 +1241,33 @@ const Index = (props) => {
                                    primary50: '#92BFF7',
                                    primary: '#0F4F9E',
                                },
+                               
                            })}
-                           styles={{
-                             placeholder: (base) => ({
-                             ...base,
-                             color: "#cbd5e1",
-                             }),
-                             menuPortal: (base) => ({
-                              ...base,
-                              zIndex: 9999
-                            }), 
-                            control: (base, state) => ({
-                              ...base,
-                              ...(state.isFocused && {
-                                border: '0 0 0 1px #92BFF7',
-                                boxShadow: 'none'
-                              }),
-                            }),
-                         }}
+                        //    styles={{
+                        //      placeholder: (base) => ({
+                        //      ...base,
+                        //      color: "#cbd5e1",
+                        //      }),
+                        //      menuPortal: (base) => ({
+                        //       ...base,
+                        //       zIndex: 9999,
+                        //       width: '200px', // Kích thước menu
+                        //     }), 
+                        //     control: (base, state) => ({
+                        //       ...base,
+                        //       width: state.isFocused && isExpanded ? '200px' : 'full', // Thay đổi độ rộng của input
+                        //       transition: 'width 0.5s',
+                        //       ...(state.isFocused && {
+                        //         border: '0 0 0 1px #92BFF7',
+                        //         boxShadow: 'none'
+                        //       }),
+                        //     }),
+                        //  }}
+                        styles={customStyles}
                          />
                             </div>
                          <div className='col-span-1 text-center flex items-center justify-center'>
-                           <h3 className=''>{e?.donvitinh}</h3>
+                           <h3 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{e?.donvitinh}</h3>
                         </div>
                         <div className='col-span-1 flex items-center justify-center'>
                            <div className="flex items-center justify-center">
@@ -1099,32 +1275,32 @@ const Index = (props) => {
                               onClick={() => handleDecrease(e?.id)}  disabled={index === 0} 
                               ><Minus size="16"/></button>
                               <NumericFormat
-                                className="appearance-none text-center py-2 px-4 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
+                                className="appearance-none 2xl:text-[12px] xl:text-[10px] text-[8px] text-center py-2 px-4 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
                                 onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong",e)}
                                 value={e?.soluong || 1}
-                                thousandSeparator={false}
                                 allowNegative={false}
                                 // readOnly={index === 0 ? readOnlyFirst : false}
                                 decimalScale={0}
                                 isNumericString={true}  
+                                thousandSeparator=","
                                 isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
                                 />
                                 <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                 onClick={() => handleIncrease(e.id)} disabled={index === 0}
                                 >
-                                    <Add size="16"/>
+                                  <Add size="16"/>
                                 </button>
                               </div>
                         </div>
                         <div className='col-span-1 text-center flex items-center justify-center'>
                           <NumericFormat
-                                value={e?.gianhap}
-                                onValueChange={_HandleChangeInputOption.bind(this, e?.id, "gianhap",index)}
+                                value={e?.dongia}
+                                onValueChange={_HandleChangeInputOption.bind(this, e?.id, "dongia",index)}
                                 allowNegative={false}
                                 // readOnly={index === 0 ? readOnlyFirst : false}
                                 decimalScale={0}
                                 isNumericString={true}   
-                                className="appearance-none text-center py-1 px-2 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
+                                className="appearance-none 2xl:text-[13px] xl:text-[10px] text-[8px] text-center py-1 px-2 font-medium w-28 focus:outline-none border-b-2 border-gray-200"
                                 thousandSeparator=","
                             />
                         </div>
@@ -1132,7 +1308,7 @@ const Index = (props) => {
                           <NumericFormat
                               value={e?.chietkhau}
                               onValueChange={_HandleChangeInputOption.bind(this, e?.id, "chietkhau",index)}
-                              className="appearance-none text-center py-1 px-2 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
+                              className="appearance-none 2xl:text-[13px] xl:text-[10px] text-[8px] text-center py-1 px-2 font-medium w-28 focus:outline-none border-b-2 border-gray-200"
                               thousandSeparator=","
                               allowNegative={false}
                               // readOnly={index === 0 ? readOnlyFirst : false}
@@ -1141,7 +1317,7 @@ const Index = (props) => {
                           />
                         </div>
                         <div className='col-span-1 text-right flex items-center justify-end'>
-                           <h3 className='px-2'>{e?.dongiasauck}</h3>
+                           <h3 className='px-2 2xl:text-[12px] xl:text-[10px] text-[8px]'>{formatNumber(e?.dongiasauck)}</h3>
                         </div>
                         <div className='col-span-1 flex justify-center items-center'>
                         <Select 
@@ -1152,11 +1328,11 @@ const Index = (props) => {
                             hideSelectedOptions={false}
                             formatOptionLabel={(option) => (
                               <div className='flex justify-start items-center gap-1 '>
-                                  <h2>{option?.label}</h2>
-                                  <h2>{`(${option?.tax_rate})`}</h2>
+                                  <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{option?.label}</h2>
+                                  <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{`(${option?.tax_rate})`}</h2>
                               </div>
                             )}
-                            className={` "border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
+                            className={`  2xl:text-[12px] xl:text-[10px] text-[8px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
                             // dangerouslySetInnerHTML={{__html: option.label}}
@@ -1194,7 +1370,7 @@ const Index = (props) => {
                         </div>
                         <div className='col-span-1 text-right flex items-center justify-end'>
                            {/* <h3 className='px-2'>{formatNumber(e.thanhtien)}</h3> */}
-                           <h3 className='px-2'>{e?.thanhtien}</h3>
+                           <h3 className='px-2 2xl:text-[13px] xl:text-[10px] text-[8px]'>{formatNumber(e?.thanhtien)}</h3>
                         </div>
                          <div className='col-span-1 flex items-center justify-center'>
                              <input
@@ -1217,6 +1393,74 @@ const Index = (props) => {
                   </React.Fragment>
                 </div>
             </div>
+            <div className='grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center'>
+                    <div className='col-span-2  flex items-center gap-2'>
+                          <h2>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h2>
+                          <div className='col-span-1 text-center flex items-center justify-center'>
+                          <NumericFormat
+                              value={chietkhautong}
+                              onValueChange={_HandleChangeInput.bind(this, "chietkhautong")}
+                              className=" text-center py-1 px-2 bg-transparent font-medium w-20 focus:outline-none border-b-2 border-gray-300"
+                              thousandSeparator=","
+                              allowNegative={false}
+                              decimalScale={0}
+                              isNumericString={true}   
+                          />
+                        </div> 
+                      </div>
+                      <div className='col-span-2 flex items-center gap-2'>
+                          <h2>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h2>  
+                          <Select 
+                            options={taxOptions}
+                            onChange={_HandleChangeInput.bind(this, "thuetong")}
+                            value={thuetong}
+                            formatOptionLabel={(option) => (
+                              <div className='flex justify-start items-center gap-1 '>
+                                  <h2>{option?.label}</h2>
+                                  <h2>{`(${option?.tax_rate})`}</h2>
+                              </div>
+                              )}
+                            placeholder={dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"} 
+                            hideSelectedOptions={false}
+                            className={` "border-transparent placeholder:text-slate-300 w-[70%] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
+                            isSearchable={true}
+                            noOptionsMessage={() => "Không có dữ liệu"}
+                           dangerouslySetInnerHTML={{__html: option.label}}
+                            menuPortalTarget={document.body}
+                            closeMenuOnSelect={true}
+                            style={{ border: "none", boxShadow: "none", outline: "none" }}
+                            theme={(theme) => ({
+                                ...theme,
+                                colors: {
+                                    ...theme.colors,
+                                    primary25: '#EBF5FF',
+                                    primary50: '#92BFF7',
+                                    primary: '#0F4F9E',
+                                },
+                            })}
+                            styles={{
+                              placeholder: (base) => ({
+                              ...base,
+                              color: "#cbd5e1",
+                              }),
+                              menuPortal: (base) => ({
+                                ...base,
+                                zIndex: 20
+                              }), 
+                              control: (base,state) => ({
+                                ...base,
+                                boxShadow: 'none',
+                                padding:"2.7px",
+                              ...(state.isFocused && {
+                                border: '0 0 0 1px #92BFF7',
+                              }),
+                            })
+                          }}
+                          />     
+                      </div>
+                      
+                     
+                  </div>
         <h2 className='font-normal bg-[white]  p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]'>{dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"} </h2>  
         </div>
         <div className='grid grid-cols-12'>
@@ -1235,16 +1479,24 @@ const Index = (props) => {
                 <div className='flex justify-between '>
                 </div>
                 <div className='flex justify-between '>
-                     <div className='font-normal'><h3>{"Tổng số lượng"}</h3></div>
-                    {/* <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tongTien)}</h3></div> */}
+                     <div className='font-normal '><h3>{dataLang?.purchase_order_table_total ||"purchase_order_table_total" }</h3></div>
+                    <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tongTien)}</h3></div>
                 </div>
                 <div className='flex justify-between '>
-                     <div className='font-normal'><h3>{"Tổng số lượng duyệt"}</h3></div>
-                    {/* <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tienChietKhau)}</h3></div> */}
+                     <div className='font-normal'><h3>{dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}</h3></div>
+                    <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tienChietKhau)}</h3></div>
                 </div>
                 <div className='flex justify-between '>
-                     <div className='font-normal'><h3>{"Tổng giá trị"}</h3></div>
-                    {/* <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tongTienSauCK)}</h3></div> */}
+                     <div className='font-normal'><h3>{dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}</h3></div>
+                    <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tongTienSauCK)}</h3></div>
+                </div>
+                <div className='flex justify-between '>
+                     <div className='font-normal'><h3>{dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}</h3></div>
+                    <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tienThue)}</h3></div>
+                </div>
+                <div className='flex justify-between '>
+                     <div className='font-normal'><h3>{dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h3></div>
+                    <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tongThanhTien)}</h3></div>
                 </div>
                 <div className='space-x-2'>
                 <button
@@ -1273,10 +1525,11 @@ const MoreSelectedBadge = ({ items }) => {
   
     const title = items.join(", ");
     const length = items.length;
-    const label = `+ ${length}`;
+    // const label = `+ ${length}`;
+    const label = ``;
   
     return (
-      <div style={style} title={title}>{label}</div>
+      <div  title={title}>{label}</div>
     );
   };
   

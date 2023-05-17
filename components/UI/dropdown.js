@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Link from 'next/link';
 import Image from "next/image";
 
@@ -28,7 +28,7 @@ const Dropdown = (props) => {
                                 {e.sub?.map((ce, ci) => 
                                     <div className="space-y-0.5" key={ci}>
                                         {ce.link ? 
-                                            <Link title={ce.title} href={ce.link} className="flex items-center space-x-2 mb-2 px-3 py-2 rounded hover:bg-[#ececee87] text-[#344054]">
+                                            <Link title={ce.title} href={ce.link}  className="flex items-center space-x-2 mb-2  px-3 py-2 rounded hover:bg-[#ececee87] text-[#344054]">
                                                 {ce?.img ?
                                                     <React.Fragment>
                                                         <Image alt={ce.title} src={ce?.img} width={24} height={24} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
@@ -51,11 +51,17 @@ const Dropdown = (props) => {
                                             </React.Fragment>
                                         }
                                         {ce.items?.map((e, i) => 
-                                            <Link href={e.link ? e.link : "#"} title={e.name} className="outline-none" key={i}>
+                                            <Link  href={e.link ? e.link : "#"} title={e.name} className="outline-none" key={i}>
                                                 {/* <a title={e.name} className="outline-none"> */}
-                                                    <li className="text-[14px] text-[#344054] marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
-                                                        {e.name}
-                                                    </li>
+                                                <ZoomableElement name={e?.name}/>
+                                                    {/* <li 
+                                                     style={zoomedStyle} 
+                                                     onMouseDown={handleMouseDown}
+                                                     onMouseUp={handleMouseUp}
+                                                     onMouseEnter={handleMouseEnter}
+                                                     className="text-[14px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
+                                                    {e.name}
+                                                    </li> */}
                                                 {/* </a> */}
                                             </Link>
                                         )}
@@ -70,4 +76,31 @@ const Dropdown = (props) => {
     );
 }
 
+const ZoomableElement = (props) => {
+    const [isZoomed, setIsZoomed] = useState(false);
+
+    const handleClick = () => {
+      setIsZoomed(true);
+  
+      setTimeout(() => {
+        setIsZoomed(false);
+      }, 200);
+    };
+  
+    const zoomedStyle = {
+        transform: isZoomed ? 'scale(1.1)' : 'scale(1)',
+        transition: 'transform 0.2s',
+        willChange: 'transform',
+      };
+    return (
+      <div
+      style={zoomedStyle}
+      onClick={handleClick}
+      >
+      <li className="text-[14px] text-[#344054] focus:transform-gpu marker:text-[#9295A4] px-3 py-2 rounded hover:bg-[#ececee87]">
+        {props?.name}
+        </li>
+      </div>
+    );
+  };
 export default Dropdown;

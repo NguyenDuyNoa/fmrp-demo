@@ -279,7 +279,7 @@ const Index = (props) => {
                 <title>{dataLang?.purchase_order || "purchase_order"} </title>
             </Head>
             <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
-            <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
+            <div className="flex space-x-3 xl:text-xs text-[12px]">
             <h6 className="text-[#141522]/40">{dataLang?.purchase_order || "purchase_order"}</h6>
             <span className="text-[#141522]/40">/</span>
             <h6>{dataLang?.purchase_order_list || "purchase_order"}</h6>
@@ -291,8 +291,8 @@ const Index = (props) => {
                 <div className='flex justify-between'>
                     <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.purchase_order || "purchase_order"}</h2>
                     <div className="flex justify-end items-center">
-                    <Link href="/purchase_order/order/form" className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>{dataLang?.purchase_order_new || "purchase_order_new"}</Link>
-                    {/* <Popup_dsncc  listBr={listBr}  listSelectCt={listSelectCt}  onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> */}
+                    <Link href="/purchase_order/order/form" className='xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>{dataLang?.purchase_order_new || "purchase_order_new"}</Link>
+                    {/* <Popup_dsncc  listBr={listBr}  listSelectCt={listSelectCt}  onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> */}
                   </div>
                 </div>
                 
@@ -308,7 +308,7 @@ const Index = (props) => {
                               onClick={_HandleSelectTab.bind(this, `${e.id}`)} 
                               total={e.count} 
                               active={e.id} 
-                              className={"text-[#0F4F9E] "}
+                              className={"text-[#0F4F9E]"}
                             >{dataLang[e?.name]}</TabClient> 
                           </div>
                           )
@@ -317,255 +317,263 @@ const Index = (props) => {
                 </div>
               <div className="space-y-2 2xl:h-[91%] h-[92%] overflow-hidden">    
                 <div className="xl:space-y-3 space-y-2">
-                    <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
-                        <div className='flex space-x-5'>
-                        <div className='w-[12vw]'>
-                            <form className="flex items-center relative ">
-                                <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
-                                <input
-                                    className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10  py-1.5 rounded-md "
-                                    type="text" 
-                                    onChange={_HandleOnChangeKeySearch.bind(this)} 
-                                    placeholder={dataLang?.branch_search}
-                                />
-                            </form>
-                        </div>
-                        <div className='ml-1 w-[12vw]'>
-                            <Select 
-                                 options={[{ value: '', label: dataLang?.purchase_order_branch || "purchase_order_branch", isDisabled: true }, ...listBr_filter]}
-                                 onChange={onchang_filter.bind(this, "branch")}
-                                 value={idBranch}
-                                 placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"} 
-                                hideSelectedOptions={false}
-                                isClearable={true}
-                                className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
-                                isSearchable={true}
-                                noOptionsMessage={() => "Không có dữ liệu"}
-                                // components={{ MultiValue }}
-                                closeMenuOnSelect={true}
-                                style={{ border: "none", boxShadow: "none", outline: "none" }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: '#EBF5FF',
-                                        primary50: '#92BFF7',
-                                        primary: '#0F4F9E',
-                                    },
-                                })}
-                                styles={{
-                                  placeholder: (base) => ({
-                                  ...base,
-                                  color: "#cbd5e1",
-                                  }),
-                                  control: (base,state) => ({
-                                    ...base,
-                                    border: 'none',
-                                    outline: 'none',
-                                    boxShadow: 'none',
-                                   ...(state.isFocused && {
-                                    boxShadow: '0 0 0 1.5px #0F4F9E',
-                                  }),
-                                 })
-                              }}
-                              />
-                        </div>
-                        <div className='ml-1   w-[12vw]'>
-                            <Select 
-                                 options={[{ value: '', label: dataLang?.purchase_order_vouchercode || "purchase_order_vouchercode", isDisabled: true }, ...listCode_filter]}
-                                 onChange={onchang_filter.bind(this, "code")}
-                                 value={idCode}
-                                 placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"} 
-                                hideSelectedOptions={false}
-                                isClearable={true}
-                                className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
-                                isSearchable={true}
-                                noOptionsMessage={() => "Không có dữ liệu"}
-                                // components={{ MultiValue }}
-                                style={{ border: "none", boxShadow: "none", outline: "none" }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: '#EBF5FF',
-                                        primary50: '#92BFF7',
-                                        primary: '#0F4F9E',
-                                    },
-                                })}
-                                styles={{
-                                  placeholder: (base) => ({
-                                  ...base,
-                                  color: "#cbd5e1",
-                                  }),
-                                  control: (base,state) => ({
-                                    ...base,
-                                    border: 'none',
-                                    outline: 'none',
-                                    boxShadow: 'none',
-                                   ...(state.isFocused && {
-                                    boxShadow: '0 0 0 1.5px #0F4F9E',
-                                  }),
-                                 })
-                              }}
-                              />
-                        </div>
-                        <div className='ml-1   w-[12vw]'>
-                            <Select 
-                                //  options={listBr_filter}
-                                 options={[{ value: '', label: dataLang?.purchase_order_supplier || "purchase_order_supplier", isDisabled: true }, ...listSupplier]}
-                                 onChange={onchang_filter.bind(this, "supplier")}
-                                 value={idSupplier}
-                                 placeholder={dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"} 
-                                hideSelectedOptions={false}
-                                isClearable={true}
-                                className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
-                                isSearchable={true}
-                                noOptionsMessage={() => "Không có dữ liệu"}
-                                style={{ border: "none", boxShadow: "none", outline: "none" }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: '#EBF5FF',
-                                        primary50: '#92BFF7',
-                                        primary: '#0F4F9E',
-                                    },
-                                })}
-                                styles={{
-                                  placeholder: (base) => ({
-                                  ...base,
-                                  color: "#cbd5e1",
-                                  }),
-                                  control: (base,state) => ({
-                                    ...base,
-                                    border: 'none',
-                                    outline: 'none',
-                                    boxShadow: 'none',
-                                   ...(state.isFocused && {
-                                    boxShadow: '0 0 0 1.5px #0F4F9E',
-                                  }),
-                                 })
-                              }}
-                              />
-                        </div>
-                        <div className='ml-1   w-[13vw]'>
-                            <Select 
-                                //  options={listBr_filter}
-                                 options={[{ value: '', label: 'Chọn loại đặt hàng', isDisabled: true }, ...listOrderType]}
-                                 onChange={onchang_filter.bind(this, "OrderType")}
-                                 value={idOrderType}
-                                 placeholder={"Loại đặt hàng"} 
-                                hideSelectedOptions={false}
-                                isClearable={true}
-                                className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
-                                isSearchable={true}
-                                noOptionsMessage={() => "Không có dữ liệu"}
-                                // components={{ MultiValue }}
-                                style={{ border: "none", boxShadow: "none", outline: "none" }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: '#EBF5FF',
-                                        primary50: '#92BFF7',
-                                        primary: '#0F4F9E',
-                                    },
-                                })}
-                                styles={{
-                                  placeholder: (base) => ({
-                                  ...base,
-                                  color: "#cbd5e1",
-                                  }),
-                                  control: (base,state) => ({
-                                    ...base,
-                                    border: 'none',
-                                    outline: 'none',
-                                    boxShadow: 'none',
-                                   ...(state.isFocused && {
-                                    boxShadow: '0 0 0 1.5px #0F4F9E',
-                                  }),
-                                 })
-                              }}
-                              />
-                        </div>
-                        <div className='z-20 ml-1   w-[12vw]'>
-                        <Datepicker            
-                                value={valueDate} 
-                                i18n={"vi"} 
-                                primaryColor={"blue"} 
-                                onChange={onchang_filter.bind(this, "date")}
-                                showShortcuts={true} 
-                                displayFormat={"DD/MM/YYYY"} 
-                                configs={{
-                                  shortcuts: {
-                                  today: "Hôm nay" ,
-                                  yesterday: "Hôm qua" ,
-                                  past: period => `${period}  ngày qua` ,
-                                  currentMonth: "Tháng này" ,
-                                  pastMonth: "Tháng trước" 
-                                  },
-                                  footer: {
-                                  cancel: "Từ bỏ" ,
-                                  apply: "Áp dụng" 
-                                  }
-                                  }} 
-                                className="react-datepicker__input-container"
-                                inputClassName="rounded-md w-full p-2 bg-white  placeholder:text-xs border-none xl:text-base text-[14.5px] focus:outline-none focus:ring-0 focus:border-transparent"
-                              />
-                          {/* <div className='relative flex items-center'>
-                              <DatePicker
-                                  selectsRange={true}
-                                  startDate={dateRange[0]}
-                                  endDate={dateRange[1]}
-                                  onChange={onchang_filter.bind(this, "date")}
-                                  locale={'vi'}
-                                  dateFormat="dd-MM-yyyy"
-                                  isClearable={true}
-                                  placeholderText={dataLang?.purchase_order_table_dayvoucers || "purchase_order_table_dayvoucers"}
-                                  className="bg-white w-full py-[7px] rounded pl-10 text-black outline-[#0F4F9E]"
+                    <div className="bg-slate-100 w-full rounded grid grid-cols-7  xl:p-3 p-2 gap-2">
+                        <div className='col-span-6'>
+                         <div className='grid grid-cols-6'>
+                            <div className='col-span-1'>
+                                <form className="flex items-center relative">
+                                    <IconSearch size={20} className="absolute 2xl:left-3 z-10  text-[#cccccc] xl:left-[4%] left-[1%]" />
+                                      <input
+                                          className=" relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  py-2.5 rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
+                                          type="text" 
+                                          onChange={_HandleOnChangeKeySearch.bind(this)} 
+                                          placeholder={dataLang?.branch_search}
+                                      />
+                                </form>
+                            </div>
+                            <div className='ml-1 col-span-1'>
+                                <Select 
+                                    options={[{ value: '', label: dataLang?.purchase_order_branch || "purchase_order_branch", isDisabled: true }, ...listBr_filter]}
+                                    onChange={onchang_filter.bind(this, "branch")}
+                                    value={idBranch}
+                                    placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"} 
+                                    hideSelectedOptions={false}
+                                    isClearable={true}
+                                    className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px] z-20" 
+                                    isSearchable={true}
+                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                    // components={{ MultiValue }}
+                                    closeMenuOnSelect={true}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                    styles={{
+                                      placeholder: (base) => ({
+                                      ...base,
+                                      color: "#cbd5e1",
+                                      }),
+                                      control: (base,state) => ({
+                                        ...base,
+                                        border: 'none',
+                                        outline: 'none',
+                                        boxShadow: 'none',
+                                      ...(state.isFocused && {
+                                        boxShadow: '0 0 0 1.5px #0F4F9E',
+                                      }),
+                                    })
+                                  }}
                                   />
-                                  <IconCalendar size={20} className="absolute left-3 text-[#cccccc]" />
-                          </div> */}
+                            </div>
+                            <div className='ml-1  col-span-1'>
+                                <Select 
+                                    options={[{ value: '', label: dataLang?.purchase_order_vouchercode || "purchase_order_vouchercode", isDisabled: true }, ...listCode_filter]}
+                                    onChange={onchang_filter.bind(this, "code")}
+                                    value={idCode}
+                                    placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"} 
+                                    hideSelectedOptions={false}
+                                    isClearable={true}
+                                    className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px] z-20" 
+                                    isSearchable={true}
+                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                    // components={{ MultiValue }}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                    styles={{
+                                      placeholder: (base) => ({
+                                      ...base,
+                                      color: "#cbd5e1",
+                                      }),
+                                      control: (base,state) => ({
+                                        ...base,
+                                        border: 'none',
+                                        outline: 'none',
+                                        boxShadow: 'none',
+                                      ...(state.isFocused && {
+                                        boxShadow: '0 0 0 1.5px #0F4F9E',
+                                      }),
+                                    })
+                                  }}
+                                  />
+                            </div>
+                            <div className='ml-1   col-span-1'>
+                                <Select 
+                                    //  options={listBr_filter}
+                                    options={[{ value: '', label: dataLang?.purchase_order_supplier || "purchase_order_supplier", isDisabled: true }, ...listSupplier]}
+                                    onChange={onchang_filter.bind(this, "supplier")}
+                                    value={idSupplier}
+                                    placeholder={dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"} 
+                                    hideSelectedOptions={false}
+                                    isClearable={true}
+                                    className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px] z-20" 
+                                    isSearchable={true}
+                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                    styles={{
+                                      placeholder: (base) => ({
+                                      ...base,
+                                      color: "#cbd5e1",
+                                      }),
+                                      control: (base,state) => ({
+                                        ...base,
+                                        border: 'none',
+                                        outline: 'none',
+                                        boxShadow: 'none',
+                                      ...(state.isFocused && {
+                                        boxShadow: '0 0 0 1.5px #0F4F9E',
+                                      }),
+                                    })
+                                  }}
+                                  />
+                            </div>
+                            <div className='ml-1   col-span-1'>
+                                <Select 
+                                    //  options={listBr_filter}
+                                    options={[{ value: '', label: 'Chọn loại đặt hàng', isDisabled: true }, ...listOrderType]}
+                                    onChange={onchang_filter.bind(this, "OrderType")}
+                                    value={idOrderType}
+                                    placeholder={"Loại đặt hàng"} 
+                                    hideSelectedOptions={false}
+                                    isClearable={true}
+                                    className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20" 
+                                    isSearchable={true}
+                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                    // components={{ MultiValue }}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                    styles={{
+                                      placeholder: (base) => ({
+                                      ...base,
+                                      color: "#cbd5e1",
+                                      }),
+                                      control: (base,state) => ({
+                                        ...base,
+                                        border: 'none',
+                                        outline: 'none',
+                                        boxShadow: 'none',
+                                      ...(state.isFocused && {
+                                        boxShadow: '0 0 0 1.5px #0F4F9E',
+                                      }),
+                                    })
+                                  }}
+                                  />
+                            </div>
+                            <div className='z-20 ml-1   col-span-1'>
+                            <Datepicker            
+                                    value={valueDate} 
+                                    i18n={"vi"} 
+                                    primaryColor={"blue"} 
+                                    onChange={onchang_filter.bind(this, "date")}
+                                    showShortcuts={true} 
+                                    displayFormat={"DD/MM/YYYY"} 
+                                    configs={{
+                                      shortcuts: {
+                                      today: "Hôm nay" ,
+                                      yesterday: "Hôm qua" ,
+                                      past: period => `${period}  ngày qua` ,
+                                      currentMonth: "Tháng này" ,
+                                      pastMonth: "Tháng trước" 
+                                      },
+                                      footer: {
+                                      cancel: "Từ bỏ" ,
+                                      apply: "Áp dụng" 
+                                      }
+                                      }} 
+                                      className="react-datepicker__input-container 2xl:placeholder:text-xs xl:placeholder:text-xs placeholder:text-[8px]"
+                                      inputClassName="rounded-md w-full 2xl:p-2 xl:p-[11px] p-3 bg-white focus:outline-[#0F4F9E]  2xl:placeholder:text-xs xl:placeholder:text-xs placeholder:text-[8px] border-none  2xl:text-base xl:text-xs text-[10px]  focus:outline-none focus:ring-0 focus:border-transparent"
+                                  />
+                              {/* <div className='relative flex items-center'>
+                                  <DatePicker
+                                      selectsRange={true}
+                                      startDate={dateRange[0]}
+                                      endDate={dateRange[1]}
+                                      onChange={onchang_filter.bind(this, "date")}
+                                      locale={'vi'}
+                                      dateFormat="dd-MM-yyyy"
+                                      isClearable={true}
+                                      placeholderText={dataLang?.purchase_order_table_dayvoucers || "purchase_order_table_dayvoucers"}
+                                      className="bg-white w-full py-[7px] rounded pl-10 text-black outline-[#0F4F9E]"
+                                      />
+                                      <IconCalendar size={20} className="absolute left-3 text-[#cccccc]" />
+                              </div> */}
+                            </div>
+                          </div>
                         </div>
-                        </div>
-                        <div className="flex space-x-2 items-center">
-                        {
-                        dataExcel?.length > 0 &&(
-                            <ExcelFile filename="Danh sách đơn đặt hàng (PO)" title="DSDDH" element={
-                            <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
-                                <IconExcel size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
-                            <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
-                        </ExcelFile>
-                        )
-                        }
-                        <label className="font-[300] text-slate-400">{dataLang?.display}</label>
-                            <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
-                                <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
-                                <option value={15}>15</option>
-                                <option value={20}>20</option>
-                                <option value={40}>40</option>
-                                <option value={60}>60</option>
-                                {/* <option value={-1}>Tất cả</option> */}
-                            </select>
+                        <div className="col-span-1">
+                          <div className='flex justify-end items-center gap-2'>
+                             <div>
+                             {
+                              dataExcel?.length > 0 &&(
+                                  <ExcelFile filename="Danh sách yêu cầu mua hàng" title="DSYCMH" element={
+                                  <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
+                                      <IconExcel className='2xl:scale-100 xl:scale-100 scale-75' size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
+                                  <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
+                              </ExcelFile>
+                              )
+                              }
+                             </div>
+                            <div className=''>
+                                <div className="font-[300] text-slate-400 2xl:text-xs xl:text-sm text-[8px]">{dataLang?.display}</div>
+                                <select className="outline-none  text-[10px] xl:text-xs 2xl:text-sm" onChange={(e) => sLimit(e.target.value)} value={limit}>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm hidden' disabled>{limit == -1 ? "Tất cả": limit}</option>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm' value={15}>15</option>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm' value={20}>20</option>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm' value={40}>40</option>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm' value={60}>60</option>
+                                      {/* <option value={-1}>Tất cả</option> */}
+                                  </select>
+                            </div>
+                          </div>
                         </div>
                     </div>
                 </div>
                 <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%] lx:w-[120%] ">
                     <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10">
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_dayvoucers || "purchase_order_table_dayvoucers"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_code || "purchase_order_table_code"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_number || "purchase_order_table_number"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_totalTax || "purchase_order_table_totalTax"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_intoMoney || "purchase_order_table_intoMoney"}</h4>
-                                {/* <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_statusOfSpending || "purchase_order_table_statusOfSpending"}</h4> */}
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_importStatus || "purchase_order_table_importStatus"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_note || "purchase_order_note"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h4>
-                                <h4 className='xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_dayvoucers || "purchase_order_table_dayvoucers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_code || "purchase_order_table_code"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_number || "purchase_order_table_number"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_totalTax || "purchase_order_table_totalTax"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_intoMoney || "purchase_order_table_intoMoney"}</h4>
+                                {/* <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_statusOfSpending || "purchase_order_table_statusOfSpending"}</h4> */}
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_importStatus || "purchase_order_table_importStatus"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_note || "purchase_order_note"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}</h4>
                     </div>
                     {onFetching ?
                       <Loading className="h-80"color="#0f4f9e" /> 
@@ -575,30 +583,30 @@ const Index = (props) => {
                           <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">                       
                           {(data?.map((e) => 
                                 <div className='grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 ' key={e.id.toString()}>
-                                <h6 className='xl:text-base text-xs px-2 col-span-1 text-center'>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
-                                <h6 className='xl:text-base text-xs px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
-                                <h6 className='xl:text-base text-xs px-2 col-span-1 text-left'>{e.supplier_name}</h6>
-                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center'>{e?.order_type  == "0" ? (<span className='font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200'>Tạo mới</span>) : (<span className='font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200'>YCMH</span>)}</h6>
-                                <h6 className='xl:text-base text-xs px-2 col-span-1 text-left flex gap-2 flex-wrap'>{e?.purchases?.reduce((acc, cur) => acc + (acc ? ', ' : '') + cur.code, '').split('').join('').replace(/^,/, '')}</h6>
-                                <h6 className='xl:text-base text-xs px-2 col-span-1 text-right'>{formatNumber(e.total_price)}</h6>
-                                <h6 className='xl:text-base text-xs px-2 col-span-1 text-right'>{formatNumber(e.total_tax_price)}</h6>
-                                <h6 className='xl:text-base text-xs px-2 col-span-1 text-right'>{formatNumber(e.total_amount)}</h6>
+                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center'>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
+                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
+                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left'>{e.supplier_name}</h6>
+                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center'>{e?.order_type  == "0" ? (<span className='font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200 2xl:text-xs xl:text-xs text-[8px]'>Tạo mới</span>) : (<span className='font-normal 2xl:text-xs xl:text-xs text-[8px] text-lime-500  rounded-xl py-1 px-3  bg-lime-200'>YCMH</span>)}</h6>
+                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left flex gap-2 flex-wrap'>{e?.purchases?.reduce((acc, cur) => acc + (acc ? ', ' : '') + cur.code, '').split('').join('').replace(/^,/, '')}</h6>
+                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_price)}</h6>
+                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_tax_price)}</h6>
+                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_amount)}</h6>
                                 {/* <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center '>
                                     {e?.status_pay === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{dataLang?.purchase_order_table_havent_spent_yet || "purchase_order_table_havent_spent_yet"}</span>||
                                      e?.status_pay === "1" &&  <span className=' font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{dataLang?.purchase_order_table_spend_one_part || "purchase_order_table_spend_one_part"}</span> ||
                                      e?.status_pay === "2" &&   <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{dataLang?.purchase_order_table_enough_spent || "purchase_order_table_enough_spent"}</span>
                                     }
                                 </h6> */}
-                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center '>
-                                    {e?.import_status  === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{dataLang?.purchase_order_table_not_yet_entered || "purchase_order_table_not_yet_entered"}</span>||
-                                     e?.import_status  === "1" &&  <span className=' font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{dataLang?.purchase_order_table_enter_one_part || "purchase_order_table_enter_one_part"}</span> ||
-                                     e?.import_status  === "2" &&   <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{dataLang?.purchase_order_table_enter_enough || "purchase_order_table_enter_enough"}</span>
+                                <h6 className='px-2 py-2.5  col-span-1 flex items-center justify-center text-center '>
+                                    {e?.import_status  === "0" && <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{dataLang?.purchase_order_table_not_yet_entered || "purchase_order_table_not_yet_entered"}</span>||
+                                     e?.import_status  === "1" &&  <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{dataLang?.purchase_order_table_enter_one_part || "purchase_order_table_enter_one_part"}</span> ||
+                                     e?.import_status  === "2" &&   <span className='flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full ' color='white' size={15}/>{dataLang?.purchase_order_table_enter_enough || "purchase_order_table_enter_enough"}</span>
                                     }
                                 </h6>
-                                <h6 className='xl:text-base text-xs px-2 col-span-1 text-left'>{e.note}</h6>
-                                <h6 className='xl:text-base text-xs px-2 col-span-1'><span className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6> 
+                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left'>{e.note}</h6>
+                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1'><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6> 
                                 <div className='col-span-1 flex justify-center'>
-                                    <BtnTacVu onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} status={e?.status} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded xl:text-base text-xs" />
+                                    <BtnTacVu onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} status={e?.status} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
                                     {/* <button className='bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded xl:text-base text-xs'>Tác vụ</button> */}
                                 </div>
                                 </div>
@@ -613,7 +621,7 @@ const Index = (props) => {
                             <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
                             <h1 className="textx-[#141522] text-base opacity-90 font-medium">{dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
                             <div className="flex items-center justify-around mt-6 ">
-                                {/* <Popup_dsncc onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+                                {/* <Popup_dsncc onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
                             </div>
                           </div>
                         </div>
@@ -624,16 +632,16 @@ const Index = (props) => {
             </div>
             <div className='grid grid-cols-12 bg-gray-100 items-center'>
                     <div className='col-span-5 p-2 text-center'>
-                        <h3 className='uppercase font-normal'>{dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}</h3>
+                        <h3 className='uppercase font-normal 2xl:text-base xl:text-xs text-[8px]'>{dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}</h3>
                     </div>  
                     <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap'>
-                        <h3 className='font-normal'>{formatNumber(total?.total_price)}</h3>
+                        <h3 className='font-normal 2xl:text-base xl:text-xs text-[8px]'>{formatNumber(total?.total_price)}</h3>
                     </div>  
                     <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap '>
-                        <h3 className='font-normal'>{formatNumber(total?.total_tax_price)}</h3>
+                        <h3 className='font-normal 2xl:text-base xl:text-xs text-[8px]'>{formatNumber(total?.total_tax_price)}</h3>
                     </div>  
                     <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap'>
-                        <h3 className='font-normal'>{formatNumber(total?.total_amount)}</h3>
+                        <h3 className='font-normal 2xl:text-base xl:text-xs text-[8px]'>{formatNumber(total?.total_amount)}</h3>
                     </div>  
             </div>
             {data?.length != 0 &&
@@ -656,10 +664,10 @@ const Index = (props) => {
 const TabClient = React.memo((props) => {
   const router = useRouter();
   return(
-    <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[220px] flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
+    <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[220px] 2xl:text-sm xl:text-sm text-xs flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
       {router.query?.tab === `${props.active}` && <ArrowCircleDown   size="20" color="#0F4F9E" />}
       {props.children}
-      <span className={`${props?.total > 0 && "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"} `}>{props?.total > 0 && props?.total}</span>
+      <span className={`${props?.total > 0 && "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00]  translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center 2xl:py-1 py-1"} `}>{props?.total > 0 && props?.total}</span>
     </button>
 
 
@@ -823,7 +831,7 @@ return (
                         <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
                         <h1 className="textx-[#141522] text-base opacity-90 font-medium">{props.dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
                         <div className="flex items-center justify-around mt-6 ">
-                            {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+                            {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
                         </div>
                       </div>
                     </div>
@@ -944,8 +952,8 @@ const BtnTacVu = React.memo((props) => {
                     <div className="bg-white rounded-t flex flex-col overflow-hidden">
                         <button
                          onClick={handleClick}
-                         className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</button>
-                        <button onClick={_HandleDelete.bind(this, props.id)} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</button>
+                         className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</button>
+                        <button onClick={_HandleDelete.bind(this, props.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</button>
                     </div>
                 </div>
             </Popup>

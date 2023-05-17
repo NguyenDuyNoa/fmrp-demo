@@ -178,8 +178,7 @@ const Index = (props) => {
         }else if(type == "donvitinh"){
           option[index].donvitinh = value.target?.value;
         }else if (type === "soluong") {
-          option[index].soluong = Number(value?.target.value);
-          sOption([...option]);
+          option[index].soluong = Number(value?.value);
           const newTotal = option.reduce((total, item) => {
             if (!isNaN(item.soluong)) {
               return total + parseInt(item.soluong);
@@ -188,6 +187,7 @@ const Index = (props) => {
               return total;
             }
           }, 0);
+          sOption([...option]);
           setTotalSoluong(newTotal);
         }else if(type == "ghichu"){
           option[index].ghichu = value?.target?.value;
@@ -348,6 +348,17 @@ const Index = (props) => {
       //   sFetchingSuccess(false)
       // }, [fetchingSuccess]);
 
+      const formatNumber = (num) => {
+        if (!num && num !== 0) return 0;
+        const roundedNum = parseFloat(num.toFixed(2));
+        return roundedNum.toLocaleString("en", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+          useGrouping: true
+        });
+      };
+
+
   return (
     <React.Fragment>
     <Head>
@@ -465,12 +476,12 @@ const Index = (props) => {
             <h2 className='font-normal bg-[#ECF0F4] p-2  '>{dataLang?.purchase_iteminfo || "purchase_iteminfo"}</h2>  
               <div className='pr-2'>
               <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10'>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase col-span-1      text-center  font-[400]'>{"Stt"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase col-span-4   truncate font-[400]'>{dataLang?.purchase_items || "purchase_items"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase col-span-1     text-center  truncate font-[400]'>{dataLang?.purchase_unit || "purchase_unit"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center   truncate font-[400]'>{dataLang?.purchase_quantity || "purchase_quantity"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-4     truncate font-[400]'>{dataLang?.purchase_note || "purchase_note"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1 text-center     truncate font-[400]'>{dataLang?.purchase_operation || "purchase_operation"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase col-span-1      text-center  font-[400]'>{"Stt"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase col-span-4   truncate font-[400]'>{dataLang?.purchase_items || "purchase_items"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase col-span-1     text-center  truncate font-[400]'>{dataLang?.purchase_unit || "purchase_unit"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center   truncate font-[400]'>{dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-4     truncate font-[400]'>{dataLang?.purchase_note || "purchase_note"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1 text-center     truncate font-[400]'>{dataLang?.purchase_operation || "purchase_operation"}</h4>
               </div>     
               </div>     
             <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
@@ -563,20 +574,20 @@ const Index = (props) => {
                          <div className='col-span-1 flex items-center justify-center'>
                            <div className="flex items-center justify-center">
                                <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                              onClick={() => handleDecrease(e.id)}  disabled={index === 0} ><Minus size="16"/></button>
+                              onClick={() => handleDecrease(e.id)}  disabled={index === 0} ><Minus size="14"/></button>
                               <NumericFormat
-                                className="appearance-none text-center py-2 px-4 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
-                                onChange={_HandleChangeInputOption.bind(this, e.id, "soluong",e)}
+                                  className="appearance-none text-center 2xl:text-[12px] xl:text-[10px] text-[8px] py-2 px-4 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
+                                onValueChange={_HandleChangeInputOption.bind(this, e.id, "soluong",e)}
                                 value={e?.soluong || 1}
-                                thousandSeparator={false}
-                                // allowNegative={false}
-                                readOnly={index === 0 ? readOnlyFirst : false}
+                                allowNegative={false}
+                                // readOnly={index === 0 ? readOnlyFirst : false}
                                 decimalScale={0}
-                                // isNumericString={true}   
-                                isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
+                                isNumericString={true}  
+                                thousandSeparator=","
+                                isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}      
                                 />
                                 <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                                onClick={() => handleIncrease(e.id)} disabled={index === 0}><Add size="16"/></button>
+                                onClick={() => handleIncrease(e.id)} disabled={index === 0}><Add size="14"/></button>
                               </div>
                             </div>
                          <div className='col-span-4 flex items-center justify-center'>
@@ -618,11 +629,11 @@ const Index = (props) => {
             <div className="text-right mt-5 space-y-4 col-span-2 flex-col justify-between ">
                 <div className='flex justify-between '>
                   <div className='font-normal'><h3>{dataLang?.purchase_totalCount || "purchase_totalCount"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600'>{totalSoluong}</h3></div>
+                  <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(totalSoluong)}</h3></div>
                 </div>
                 <div className='flex justify-between '>
                   <div className='font-normal'><h3>{dataLang?.purchase_totalItem || "purchase_totalItem"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600'>{totalQty}</h3></div>
+                  <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(totalQty)}</h3></div>
                 </div>
                 <div className='space-x-2'>
                 <button onClick={() => router.back()} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]">{dataLang?.purchase_back || "purchase_back"}</button>

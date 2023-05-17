@@ -363,210 +363,218 @@ const Index = (props) => {
                       })
                      }
                     </div>
-                    <div className='bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2'>
-                        <div className='flex gap-2'>
-                            <form className="flex items-center relative w-[15vw]">
-                                <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
-                                <input
-                                    className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md 2xl:w-[400px] w-[250px]"
-                                    type="text"  
-                                    onChange={_HandleOnChangeKeySearch.bind(this)} 
-                                    placeholder={dataLang?.branch_search}
-                                />
-                            </form>
-                            <div className='w-[15vw]'>
-                                <Select 
-                                    options={[{ value: '', label: dataLang?.client_list_filterbrand, isDisabled: true }, ...listBr_filter]}
-                                    onChange={onchang_filter.bind(this, "branch")}
-                                    value={idBranch}
-                                    isClearable={true}
-                                    // isMulti
-                                    closeMenuOnSelect={false}
-                                    hideSelectedOptions={false}
-                                    placeholder={dataLang?.client_list_brand || "client_list_brand"}
-                                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                                    isSearchable={true}
-                                    // components={{ MultiValue }}
-                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
-                                    theme={(theme) => ({
-                                        ...theme,
-                                        colors: {
-                                            ...theme.colors,
-                                            primary25: '#EBF5FF',
-                                            primary50: '#92BFF7',
-                                            primary: '#0F4F9E',
-                                        },
-                                    })}
-                                    styles={{
-                                        placeholder: (base) => ({
-                                        ...base,
-                                        color: "#cbd5e1",
-                                    }),
-                                    control: (base,state) => ({
-                                        ...base,
-                                        border: 'none',
-                                        outline: 'none',
-                                        boxShadow: 'none',
-                                        ...(state.isFocused && {
-                                            boxShadow: '0 0 0 1.5px #0F4F9E',
-                                        }),
-                                    })
-                                }}
-                                />
-                            </div>
-                            <div className='w-[15vw]'>
-                                <Select 
-                                    options={[{ value: '', label: dataLang?.purchase_code, isDisabled: true }, ...listCode_filter]}
-                                    onChange={onchang_filter.bind(this, "code")}
-                                    value={idCode}
-                                    noOptionsMessage={() => `${dataLang?.no_data_found}`}
-                                    isClearable={true}
-                                    placeholder={dataLang?.purchase_code || "purchase_code"}
-                                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                                    isSearchable={true}
-                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
-                                    theme={(theme) => ({
-                                        ...theme,
-                                        colors: {
-                                            ...theme.colors,
-                                            primary25: '#EBF5FF',
-                                            primary50: '#92BFF7',
-                                            primary: '#0F4F9E',
-                                        },
-                                    })}
-                                    styles={{
-                                    placeholder: (base) => ({
-                                        ...base,
-                                        color: "#cbd5e1",
-                                    }),
-                                    control: (base,state) => ({
-                                        ...base,
-                                        border: 'none',
-                                        outline: 'none',
-                                        boxShadow: 'none',
-                                        ...(state.isFocused && {
-                                            boxShadow: '0 0 0 1.5px #0F4F9E',
-                                        }),
-                                    })
-                                }}
-                                />
-                            </div>
-                            <div className='w-[15vw]'>
-                                <Select 
-                                    options={[{ value: '', label: dataLang?.purchase_propnent, isDisabled: true }, ...listUser_filter]}
-                                    // formatOptionLabel={CustomSelectOption}
-                                    onChange={onchang_filter.bind(this, "user")}
-                                    value={idUser}
-                                    noOptionsMessage={() => `${dataLang?.no_data_found}`}
-                                    isClearable={true}
-                                    placeholder={dataLang?.purchase_propnent || "purchase_propnent"}
-                                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20" 
-                                    isSearchable={true}
-                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
-                                    theme={(theme) => ({
-                                        ...theme,
-                                        colors: {
-                                            ...theme.colors,
-                                            primary25: '#EBF5FF',
-                                            primary50: '#92BFF7',
-                                            primary: '#0F4F9E',
-                                        },
-                                    })}
-                                    styles={{
-                                    placeholder: (base) => ({
-                                        ...base,
-                                        color: "#cbd5e1",
-                                    }),
-                                    control: (base,state) => ({
-                                        ...base,
-                                        border: 'none',
-                                        outline: 'none',
-                                        boxShadow: 'none',
-                                        ...(state.isFocused && {
-                                            boxShadow: '0 0 0 1.5px #0F4F9E',
-                                        }),
-                                    })
-                                }}
-                                />
-                            </div>
-                            <div className='w-[15vw] z-20'>
-                            <Datepicker            
-                                value={valueDate} 
-                                i18n={"vi"} 
-                                primaryColor={"blue"} 
-                                onChange={onchang_filter.bind(this, "date")}
-                                showShortcuts={true} 
-                                displayFormat={"DD/MM/YYYY"} 
-                                configs={{
-                                  shortcuts: {
-                                  today: "Hôm nay" ,
-                                  yesterday: "Hôm qua" ,
-                                  past: period => `${period}  ngày qua` ,
-                                  currentMonth: "Tháng này" ,
-                                  pastMonth: "Tháng trước" 
-                                  },
-                                  footer: {
-                                  cancel: "Từ bỏ" ,
-                                  apply: "Áp dụng" 
-                                  }
-                                  }} 
-                                className="react-datepicker__input-container"
-                                inputClassName="rounded-md w-full p-2 bg-white border-none xl:text-base text-[14.5px] focus:outline-none focus:ring-0 focus:border-transparent"
-                              />
-                            {/* <div className='relative flex items-center'>
-                            <DatePicker
-                                selectsRange={true}
-                                startDate={dateRange[0]}
-                                endDate={dateRange[1]}
-                                onChange={onchang_filter.bind(this, "date")}
-                                locale={'vi'}
-                                dateFormat="dd-MM-yyyy"
-                                isClearable={true}
-                                placeholderText="Chọn ngày chứng từ"
-                                className="bg-white w-full py-2 rounded pl-10 text-black outline-[#0F4F9E]"
-                                />
-                                <IconCalendar size={20} className="absolute left-3 text-[#cccccc]" />
-                            </div> */}
+                    
+                    <div className="bg-slate-100 w-full rounded grid grid-cols-6  xl:p-3 p-2 gap-2">
+                        <div className='col-span-5'>
+                           <div className='grid grid-cols-5'>
+                             <div className='col-span-1'>
+                                  <form className="flex items-center relative">
+                                      <IconSearch size={20} className="absolute 2xl:left-3 z-10  text-[#cccccc] xl:left-[4%] left-[1%]" />
+                                        <input
+                                            className=" relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-2    xl:py-3 py-3 rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
+                                            type="text" 
+                                            onChange={_HandleOnChangeKeySearch.bind(this)} 
+                                            placeholder={dataLang?.branch_search}
+                                        />
+                                  </form>
+                              </div>
+                              <div className='ml-1 col-span-1'>
+                                  <Select 
+                                      options={[{ value: '', label: dataLang?.client_list_filterbrand, isDisabled: true }, ...listBr_filter]}
+                                      onChange={onchang_filter.bind(this, "branch")}
+                                      value={idBranch}
+                                      isClearable={true}
+                                      // isMulti
+                                      closeMenuOnSelect={false}
+                                      hideSelectedOptions={false}
+                                      placeholder={dataLang?.client_list_brand || "client_list_brand"}
+                                      className="rounded-md py-0.5 bg-white border-none 2xl:text-base xl:text-xs text-[10px] z-20" 
+                                      isSearchable={true}
+                                      // components={{ MultiValue }}
+                                      style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                      theme={(theme) => ({
+                                          ...theme,
+                                          colors: {
+                                              ...theme.colors,
+                                              primary25: '#EBF5FF',
+                                              primary50: '#92BFF7',
+                                              primary: '#0F4F9E',
+                                          },
+                                      })}
+                                      styles={{
+                                          placeholder: (base) => ({
+                                          ...base,
+                                          color: "#cbd5e1",
+                                      }),
+                                      control: (base,state) => ({
+                                          ...base,
+                                          border: 'none',
+                                          outline: 'none',
+                                          boxShadow: 'none',
+                                          ...(state.isFocused && {
+                                              boxShadow: '0 0 0 1.5px #0F4F9E',
+                                          }),
+                                      })
+                                  }}
+                                  />
+                              </div>
+                              <div className='ml-1 col-span-1'>
+                                  <Select 
+                                      options={[{ value: '', label: dataLang?.purchase_code, isDisabled: true }, ...listCode_filter]}
+                                      onChange={onchang_filter.bind(this, "code")}
+                                      value={idCode}
+                                      noOptionsMessage={() => `${dataLang?.no_data_found}`}
+                                      isClearable={true}
+                                      placeholder={dataLang?.purchase_code || "purchase_code"}
+                                      className="rounded-md py-0.5 bg-white border-none 2xl:text-base xl:text-xs text-[10px] z-20" 
+                                      isSearchable={true}
+                                      style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                      theme={(theme) => ({
+                                          ...theme,
+                                          colors: {
+                                              ...theme.colors,
+                                              primary25: '#EBF5FF',
+                                              primary50: '#92BFF7',
+                                              primary: '#0F4F9E',
+                                          },
+                                      })}
+                                      styles={{
+                                      placeholder: (base) => ({
+                                          ...base,
+                                          color: "#cbd5e1",
+                                      }),
+                                      control: (base,state) => ({
+                                          ...base,
+                                          border: 'none',
+                                          outline: 'none',
+                                          boxShadow: 'none',
+                                          ...(state.isFocused && {
+                                              boxShadow: '0 0 0 1.5px #0F4F9E',
+                                          }),
+                                      })
+                                  }}
+                                  />
+                              </div>
+                              <div className='ml-1 col-span-1'>
+                                  <Select 
+                                      options={[{ value: '', label: dataLang?.purchase_propnent, isDisabled: true }, ...listUser_filter]}
+                                      // formatOptionLabel={CustomSelectOption}
+                                      onChange={onchang_filter.bind(this, "user")}
+                                      value={idUser}
+                                      noOptionsMessage={() => `${dataLang?.no_data_found}`}
+                                      isClearable={true}
+                                      placeholder={dataLang?.purchase_propnent || "purchase_propnent"}
+                                      className="rounded-md py-0.5 bg-white border-none 2xl:text-base xl:text-xs text-[10px] z-20" 
+                                      isSearchable={true}
+                                      style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                      theme={(theme) => ({
+                                          ...theme,
+                                          colors: {
+                                              ...theme.colors,
+                                              primary25: '#EBF5FF',
+                                              primary50: '#92BFF7',
+                                              primary: '#0F4F9E',
+                                          },
+                                      })}
+                                      styles={{
+                                      placeholder: (base) => ({
+                                          ...base,
+                                          color: "#cbd5e1",
+                                      }),
+                                      control: (base,state) => ({
+                                          ...base,
+                                          border: 'none',
+                                          outline: 'none',
+                                          boxShadow: 'none',
+                                          ...(state.isFocused && {
+                                              boxShadow: '0 0 0 1.5px #0F4F9E',
+                                          }),
+                                      })
+                                  }}
+                                  />
+                              </div>
+                              <div className='ml-1 col-span-1 z-20'>
+                              <Datepicker            
+                                  value={valueDate} 
+                                  i18n={"vi"} 
+                                  primaryColor={"blue"} 
+                                  onChange={onchang_filter.bind(this, "date")}
+                                  showShortcuts={true} 
+                                  displayFormat={"DD/MM/YYYY"} 
+                                  
+                                  configs={{
+                                    shortcuts: {
+                                    today: "Hôm nay" ,
+                                    yesterday: "Hôm qua" ,
+                                    past: period => `${period}  ngày qua` ,
+                                    currentMonth: "Tháng này" ,
+                                    pastMonth: "Tháng trước" 
+                                    },
+                                    footer: {
+                                    cancel: "Từ bỏ" ,
+                                    apply: "Áp dụng" 
+                                    }
+                                    }} 
+                                    className="react-datepicker__input-container 2xl:placeholder:text-xs xl:placeholder:text-xs placeholder:text-[8px]"
+                                    inputClassName="rounded-md w-full 2xl:p-2 xl:p-[11px] p-3 bg-white focus:outline-[#0F4F9E]  2xl:placeholder:text-xs xl:placeholder:text-xs placeholder:text-[8px] border-none  2xl:text-base xl:text-xs text-[10px]  focus:outline-none focus:ring-0 focus:border-transparent"
+                                    />
+                              {/* <div className='relative flex items-center'>
+                              <DatePicker
+                                  selectsRange={true}
+                                  startDate={dateRange[0]}
+                                  endDate={dateRange[1]}
+                                  onChange={onchang_filter.bind(this, "date")}
+                                  locale={'vi'}
+                                  dateFormat="dd-MM-yyyy"
+                                  isClearable={true}
+                                  placeholderText="Chọn ngày chứng từ"
+                                  className="bg-white w-full py-2 rounded pl-10 text-black outline-[#0F4F9E]"
+                                  />
+                                  <IconCalendar size={20} className="absolute left-3 text-[#cccccc]" />
+                              </div> */}
+                              </div>
                             </div>
                         </div>
-                        {data?.length != 0 &&
-                            <div className='flex space-x-6'>
-                                <ExcelFile filename={dataLang?.purchase_title} element={
-                                    <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
-                                        <IconExcel size={18} />
-                                        <span>{dataLang?.client_list_exportexcel}</span>
-                                    </button>
-                                }>
-                                    <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name={dataLang?.purchase_title} />
-                                </ExcelFile>
-
-                                <div className="flex space-x-2 items-center">
-                                    <label className="font-[300] text-slate-400">{dataLang?.display} :</label>
-                                    <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
-                                        <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
-                                        <option value={15}>15</option>
-                                        <option value={20}>20</option>
-                                        <option value={40}>40</option>
-                                        <option value={60}>60</option>
-                                        {/* <option value={-1}>Tất cả</option> */}
-                                    </select>
-                                </div>
+                        <div className="col-span-1">
+                          <div className='flex justify-end items-center gap-2'>
+                             <div>
+                             {
+                              dataExcel?.length > 0 &&(
+                                  <ExcelFile filename="Danh sách đơn đặt hàng (PO)" title="DSDDH" element={
+                                  <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
+                                      <IconExcel className='2xl:scale-100 xl:scale-100 scale-75' size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
+                                  <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
+                              </ExcelFile>
+                              )
+                              }
+                             </div>
+                            <div className=''>
+                                <div className="font-[300] text-slate-400 2xl:text-xs xl:text-sm text-[8px]">{dataLang?.display}</div>
+                                <select className="outline-none  text-[10px] xl:text-xs 2xl:text-sm" onChange={(e) => sLimit(e.target.value)} value={limit}>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm hidden' disabled>{limit == -1 ? "Tất cả": limit}</option>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm' value={15}>15</option>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm' value={20}>20</option>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm' value={40}>40</option>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm' value={60}>60</option>
+                                      {/* <option value={-1}>Tất cả</option> */}
+                                  </select>
                             </div>
-                        }
+                          </div>
+                        </div>
                     </div>
                     <div className='min:h-[500px] 2xl:h-[76%] h-[70%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 tooltipBoundary'>
                         <div className='pr-2'>
                             <div className='grid grid-cols-12 sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]'>
-                            <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{dataLang?.purchase_day || "purchase_day"}</h4>   
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>{dataLang?.purchase_code || "purchase_code"}</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>{dataLang?.purchase_planNumber || "purchase_planNumber"}</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>{dataLang?.purchase_propnent || "purchase_propnent"}</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 font-[300] text-center'>{dataLang?.purchase_status || "purchase_status"}</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase  col-span-1 text-center font-[300]'>{dataLang?.purchase_totalitem || "purchase_totalitem"}</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-left col-span-1 font-[300]'>{dataLang?.purchase_orderStatus || "purchase_orderStatus"}</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-left col-span-3 font-[300]'>{dataLang?.purchase_note || "purchase_note"}</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{dataLang?.purchase_branch || "purchase_branch"}</h4>
-                                <h4 className='xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase text-center  col-span-1 font-[300]'>{dataLang?.purchase_action || "purchase_action"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_day || "purchase_day"}</h4>   
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>{dataLang?.purchase_code || "purchase_code"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>{dataLang?.purchase_planNumber || "purchase_planNumber"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>{dataLang?.purchase_propnent || "purchase_propnent"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase  col-span-1 font-[300] text-center'>{dataLang?.purchase_status || "purchase_status"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase  col-span-1 text-center font-[300]'>{dataLang?.purchase_totalitem || "purchase_totalitem"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase text-left col-span-1 font-[300]'>{dataLang?.purchase_orderStatus || "purchase_orderStatus"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase text-left col-span-3 font-[300]'>{dataLang?.purchase_note || "purchase_note"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{dataLang?.purchase_branch || "purchase_branch"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase text-center  col-span-1 font-[300]'>{dataLang?.purchase_action || "purchase_action"}</h4>
                             </div>
                             {onFetching ?
                                 <Loading className="h-80"color="#0f4f9e" /> :
@@ -574,25 +582,25 @@ const Index = (props) => {
                                     <div className="divide-y divide-slate-200"> 
                                         {data?.map((e) => 
                                             <div key={e?.id.toString()} className='grid grid-cols-12 hover:bg-slate-50 relative'>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center '>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY, h:mm:ss") : ""}</h6> 
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center  text-[#0F4F9e] font-medium cursor-pointer'><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center '>{e?.reference_no }</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center '>{e?.staff_create_name}</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center cursor-pointer'>{e?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>Đã duyệt <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>Chưa duyệt <TickCircle size={22}/></div>)}</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center '>{formatNumber(e?.total_item)}</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center '>
+                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center'>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6> 
+                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center  text-[#0F4F9e] font-medium cursor-pointer'><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
+                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center '>{e?.reference_no }</h6>
+                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center '>{e?.staff_create_name}</h6>
+                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer'>{e?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1 2xl:text-base xl:text-xs text-[8px]' onClick={() => _ToggleStatus(e?.id)}>Đã duyệt <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1 2xl:text-base xl:text-xs text-[8px]' onClick={() => _ToggleStatus(e?.id)}>Chưa duyệt <TickCircle size={22}/></div>)}</h6>
+                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center '>{formatNumber(e?.total_item)}</h6>
+                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center '>
                                                   <div className='flex flex-wrap  gap-2 items-center justify-center'>
                                                    {
-                                                  e?.order_status?.status === "purchase_ordered" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center'>{dataLang[e?.order_status?.status]}</span>||
-                                                  e?.order_status?.status === "purchase_portion" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center'>{dataLang[e?.order_status?.status]} {`(${e?.order_status?.count})`}</span>||
-                                                  e?.order_status?.status === "purchase_enough" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{dataLang[e?.order_status?.status]} {`(${e?.order_status?.count})`}</span>
+                                                  e?.order_status?.status === "purchase_ordered" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{dataLang[e?.order_status?.status]}</span>||
+                                                  e?.order_status?.status === "purchase_portion" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{dataLang[e?.order_status?.status]} {`(${e?.order_status?.count})`}</span>||
+                                                  e?.order_status?.status === "purchase_enough" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 2xl:text-sm xl:text-xs text-[8px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{dataLang[e?.order_status?.status]} {`(${e?.order_status?.count})`}</span>
                                                     }
                                                   </div>
                                                 </h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-3 flex text-left items-center '>{e?.note}</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center  '><span className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6>
+                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-3 flex text-left items-center '>{e?.note}</h6>
+                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center  '><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6>
                                                 <div className='pl-2 py-2.5 col-span-1 flex space-x-2 justify-center'>
-                                                    <BtnTacVu order={e?.order_status}  dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} status={e?.status} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs" />
+                                                    <BtnTacVu order={e?.order_status}  dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} status={e?.status} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] 2xl:text-base xl:text-xs text-[8px]" />
                                                 </div>
                                             </div>
                                         )}
@@ -629,7 +637,7 @@ const Index = (props) => {
 const TabStatus = React.memo((props) => {
     const router = useRouter();
     return(
-      <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[220px] flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
+      <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[220px] flex gap-2 2xl:text-sm xl:text-sm text-xs items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
         {router.query?.tab === `${props.active}` && <ArrowCircleDown   size="20" color="#0F4F9E" />}
         {props.children}
         <span className={`${props?.total > 0 && "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"} `}>{props?.total > 0 && props?.total}</span>
@@ -713,8 +721,8 @@ const BtnTacVu = React.memo((props) => {
                         {/* <Popup_GiaiDoan setOpen={sOpen} isOpen={open} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
                         <Popup_Bom setOpen={sOpenBom} isOpen={openBom} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
                         <Popup_ThanhPham onRefresh={props.onRefresh} dataProductExpiry={props.dataProductExpiry} dataLang={props.dataLang} id={props?.id} setOpen={sOpenDetail} isOpen={openDetail} className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full" /> */}
-                        <button onClick={handleClick}className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">{props.dataLang?.purchase_editVoites || "purchase_editVoites"}</button>
-                        <button onClick={_HandleDelete.bind(this, props.id)} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_deleteVoites || "purchase_deleteVoites"}</button>
+                        <button onClick={handleClick}className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">{props.dataLang?.purchase_editVoites || "purchase_editVoites"}</button>
+                        <button onClick={_HandleDelete.bind(this, props.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_deleteVoites || "purchase_deleteVoites"}</button>
                     </div>
                 </div>
             </Popup>
@@ -774,7 +782,7 @@ const Popup_chitiet =(props)=>{
                <h2 className='font-normal bg-[#ECF0F4] p-2'>{props?.dataLang?.purchase_general || "purchase_general"}</h2>       
                 <div className='grid grid-cols-8  min-h-[170px] p-2'>
                     <div className='col-span-3'>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_day || "purchase_day"}</h3><h3 className='col-span-1 font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, h:mm:ss") : ""}</h3></div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_day || "purchase_day"}</h3><h3 className='col-span-1 font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}</h3></div>
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_code || "purchase_code"}</h3><h3 className='col-span-1 font-normal'>{data?.code}</h3></div>
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_planNumber || "purchase_planNumber"}</h3><h3 className='col-span-1 font-normal'>{data?.reference_no}</h3></div>
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_propnent || "purchase_propnent"}</h3><h3 className='col-span-1 font-normal'>{data?.user_create_name}</h3></div>
