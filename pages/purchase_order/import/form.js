@@ -216,20 +216,26 @@ const Index = (props) => {
           sOption([{id: Date.now(), mathang: null}])
           sMathangAll([])
           sDataItems([])
+          sIdTheOrder(null)
+          if(value == null){
+            sDataThe_order([])
+          }
       }else if(type === "theorder"){
           sIdTheOrder(value)
-          sOption([{id: Date.now(), mathang: null}])
-          sDataItems([])
+          if(value == null){
+            sDataItems([])
+          }
       }else if(type === "note"){
           sNote(value.target.value)
       }else if(type == "branch"){
           sIdBranch(value)
-          // sOption([{id: Date.now(), mathang: null}])
-          // sDataItems([])
-          // sDataWarehouse([])
           sIdTheOrder(null)
           sIdSupplier(null)
           sKhotong([])
+          if(value == null){
+            sDataSupplier([])
+            sDataThe_order([])
+          }
       }else if(type == "mathangAll"){
           sMathangAll(value)
           if(value?.length === 0){
@@ -397,9 +403,9 @@ const Index = (props) => {
     idBranch != null && sOnFetchingSupplier(true)
   }, [idBranch]);
 
-  useEffect(() => {
-    idTheOrder == null && sIdSupplier(null)
-  }, [idTheOrder]);
+  // useEffect(() => {
+  //   idTheOrder == null && sIdSupplier(null)
+  // }, [idTheOrder]);
 
   useEffect(() => {
     idSupplier != null && sOnFetchingTheOrder(true)
@@ -433,9 +439,7 @@ const Index = (props) => {
             option[index].dongiasauck = Number(value?.e?.price_after_discount)
             option[index].thue =  thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}  
             option[index].thanhtien = Number(value?.e?.amount)
-console.log(value);
           }else{
-        //  console.log({label: value?.e.name, value: value?.e.id, tax_rate: value?.e.tax_rate});
             const newData= {id: Date.now(), mathang: value, khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: value?.e?.price, chietkhau: value?.e?.discount_percent,dongiasauck: value?.e?.price_after_discount, thue: value ? [{label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e.tax_id, tax_rate: value?.e.tax_rate}] : thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
             if (newData.chietkhau) {
               newData.dongiasauck *= (1 - Number(newData.chietkhau) / 100);
@@ -771,7 +775,7 @@ console.log(value);
     const customStyles = {
       control: (base, state) => ({
         ...base,
-        width: cutTomStyle || (state.isFocused && isExpanded) ? '200px' : '200px',
+        width: cutTomStyle || (state.isFocused && isExpanded) ? '230px' : '220px',
         transition: 'width 0.5s',
         border: state.isFocused && isExpanded ? '0 0 0 1px #92BFF7' : '0 0 0 1px #92BFF7',
         boxShadow: state.isFocused && isExpanded ? 'none' : 'none',
@@ -793,17 +797,17 @@ console.log(value);
   return (
     <React.Fragment>
     <Head>
-        <title>{id ? "Sửa nhập hàng" : "Thêm nhập hàng"}</title>
+        <title>{id ? dataLang?.import_from_title_edit : dataLang?.import_from_title_add}</title>
     </Head>
     <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between'>
         <div className='h-[97%] space-y-3 overflow-hidden'>
             <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
-                <h6 className='text-[#141522]/40'>{"Nhập hàng && Trả hàng"}</h6>
+                <h6 className='text-[#141522]/40'>{dataLang?.import_title || "import_title"}</h6>
                 <span className='text-[#141522]/40'>/</span>
-                <h6>{"Nhập hàng"}</h6>
+                <h6>{id ? dataLang?.import_from_title_edit : dataLang?.import_from_title_add}</h6>
             </div>
             <div className='flex justify-between items-center'>
-                <h2 className='xl:text-2xl text-xl '>{"Nhập hàng"}</h2>
+                <h2 className='xl:text-2xl text-xl '>{dataLang?.import_title || "import_title"}</h2>
                 <div className="flex justify-end items-center">
                     <button   
                     onClick={() => router.back()} 
@@ -816,7 +820,7 @@ console.log(value);
                   <h2 className='font-normal bg-[#ECF0F4] p-2'>{dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
                     <div className="grid grid-cols-10  gap-3 items-center mt-2"> 
                         <div className='col-span-2'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_code || "purchase_order_table_code"} </label>
+                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_code_vouchers || "import_code_vouchers"} </label>
                           <input
                               value={code}                
                               onChange={_HandleChangeInput.bind(this, "code")}
@@ -826,7 +830,7 @@ console.log(value);
                               className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                         </div>
                         <div className='col-span-2'>
-                            <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"} <span className="text-red-500">*</span></label>
+                            <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_day_vouchers || "import_day_vouchers"} <span className="text-red-500">*</span></label>
                             <input
                               value={date}    
                               onChange={_HandleChangeInput.bind(this, "date")}
@@ -835,7 +839,7 @@ console.log(value);
                               className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                         </div>
                         <div className='col-span-2'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_branch || "purchase_order_table_branch"} <span className="text-red-500">*</span></label>
+                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_branch || "import_branch"} <span className="text-red-500">*</span></label>
                           <Select 
                               options={dataBranch}
                               onChange={_HandleChangeInput.bind(this, "branch")}
@@ -843,7 +847,7 @@ console.log(value);
                               isClearable={true}
                               closeMenuOnSelect={true}
                               hideSelectedOptions={false}
-                              placeholder={dataLang?.purchase_order_branch || "purchase_order_branch"} 
+                              placeholder={dataLang?.import_branch || "import_branch"} 
                               className={`${errBranch ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
                               isSearchable={true}
                               // components={{ MultiValue }}
@@ -879,12 +883,12 @@ console.log(value);
                           {errBranch && <label className="text-sm text-red-500">{dataLang?.purchase_order_errBranch || "purchase_order_errBranch"}</label>}
                         </div>
                         <div className='col-span-2'>
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_supplier} <span className="text-red-500">*</span></label>
+                      <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_supplier || "import_supplier"} <span className="text-red-500">*</span></label>
                         <Select 
                             options={dataSupplier}
                             onChange={_HandleChangeInput.bind(this, "supplier")}
                             value={idSupplier}
-                            placeholder={dataLang?.purchase_order_supplier || "purchase_order_supplier"} 
+                            placeholder={dataLang?.import_supplier || "import_supplier"} 
                             hideSelectedOptions={false}
                             isClearable={true}
                             className={`${errSupplier ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-[100] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
@@ -972,11 +976,11 @@ console.log(value);
               </div>
             </div>
             <div className=' bg-[#ECF0F4] p-2 grid  grid-cols-12'>
-              <div className='font-normal col-span-12'>{"Thông tin mặt hàng"}</div>
+              <div className='font-normal col-span-12'>{dataLang?.import_item_information || "import_item_information"}</div>
             </div> 
             <div className='grid grid-cols-10 items-end gap-3'>
                         <div div className='col-span-2  z-[100] my-auto'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{"Chọn nhanh mặt hàng"} </label>
+                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_click_items || "import_click_items"} </label>
                            <Select 
                             options={allItems}
                             closeMenuOnSelect={false}
@@ -1069,21 +1073,21 @@ console.log(value);
                          />
                         </div>
                         <div className='col-span-2 z-[10]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{"Chọn nhanh kho - vị trí kho"} </label>
+                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_click_house || "import_click_house"} </label>
                           <Select 
                             // options={taxOptions}
                             onChange={_HandleChangeInput.bind(this, "khotong")}
                             value={khotong}
                             formatOptionLabel={(option) => (
                               <div className='flex justify-start items-center gap-1 '>
-                                  <h2>kho: {option?.warehouse_name}</h2>
-                                  <h2>Vị trí kho</h2>
+                                  <h2>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
+                                  <h2>{dataLang?.import_Warehouse_location || "import_Warehouse_ocation" }</h2>
                                   <h2>{option?.label}</h2>
                               </div>
                               )}
                             options={warehouse}
                             isClearable
-                            placeholder={"Chọn kho - vị trí kho"} 
+                            placeholder={dataLang?.import_click_house || "import_click_house"} 
                             hideSelectedOptions={false}
                             className={` "border-transparent placeholder:text-slate-300  z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
@@ -1124,17 +1128,17 @@ console.log(value);
               </div> 
               <div className='pr-2'>
               <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10'>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-2    text-center    truncate font-[400]'>{"Mặt hàng"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]'>{"Kho hàng - Vị trí"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-2    text-center    truncate font-[400]'>{dataLang?.import_from_items || "import_from_items"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]'>{dataLang?.import_from_ware_loca || "import_from_ware_loca"}</h4>
                   <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-right  truncate font-[400]'>{"ĐVT"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Số lượng"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Đơn giá"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"% Chiết khấu"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Đơn giá sau CK"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"% thuế"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{"Thành tiền"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{"Ghi chú"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{"Thao tác"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_quantity || "import_from_quantity"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_discount || "import_from_discount"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_tax || "import_from_tax"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_into_money || "import_into_money"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_note || "import_from_note"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_operation || "import_from_operation"}</h4>
               </div>     
               </div>     
             <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
@@ -1221,7 +1225,7 @@ console.log(value);
                           value={e?.khohang}
                           formatOptionLabel={(option) => (
                             <div className=''>
-                                <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>Kho: {option?.warehouse_name}</h2>
+                                <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
                                 <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{option?.label}</h2>
                             </div>
                             )}
@@ -1270,7 +1274,7 @@ console.log(value);
                         styles={customStyles}
                          />
                             </div>
-                         <div className='col-span-1 text-center flex items-center justify-center'>
+                         <div className='col-span-1 text-end flex items-center justify-end'>
                            <h3 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{e?.donvitinh}</h3>
                         </div>
                         <div className='col-span-1 flex items-center justify-center'>
@@ -1283,6 +1287,7 @@ console.log(value);
                                 onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong",e)}
                                 value={e?.soluong || 1}
                                 allowNegative={false}
+                                disabled={index===0}
                                 // readOnly={index === 0 ? readOnlyFirst : false}
                                 decimalScale={0}
                                 isNumericString={true}  
@@ -1299,6 +1304,7 @@ console.log(value);
                         <div className='col-span-1 text-center flex items-center justify-center'>
                           <NumericFormat
                                 value={e?.dongia}
+                                disabled={index===0}
                                 onValueChange={_HandleChangeInputOption.bind(this, e?.id, "dongia",index)}
                                 allowNegative={false}
                                 // readOnly={index === 0 ? readOnlyFirst : false}
@@ -1311,6 +1317,7 @@ console.log(value);
                         <div className='col-span-1 text-center flex items-center justify-center'>
                           <NumericFormat
                               value={e?.chietkhau}
+                              disabled={index===0}
                               onValueChange={_HandleChangeInputOption.bind(this, e?.id, "chietkhau",index)}
                               className="appearance-none 2xl:text-[13px] xl:text-[10px] text-[8px] text-center py-1 px-2 font-medium w-28 focus:outline-none border-b-2 border-gray-200"
                               thousandSeparator=","
@@ -1325,7 +1332,7 @@ console.log(value);
                         </div>
                         <div className='col-span-1 flex justify-center items-center'>
                         <Select 
-                            options={taxOptions}
+                            options={index === 0 ? [] : taxOptions}
                             onChange={_HandleChangeInputOption.bind(this, e?.id, "thue", index)}
                             value={
                               e?.thue
@@ -1341,7 +1348,7 @@ console.log(value);
                                 : null
                             }
                             // value={e?.thue ? ( {label: taxOptions.find(item => item.value === e?.thue?.value)?.label, value: e?.thue?.value, tax_rate: e?.thue?.tax_rate}) : null}
-                            placeholder={"% Thuế"} 
+                            placeholder={dataLang?.import_from_tax || "import_from_tax"} 
                             hideSelectedOptions={false}
                             formatOptionLabel={(option) => (
                               <div className='flex justify-start items-center gap-1 '>
@@ -1391,7 +1398,8 @@ console.log(value);
                         </div>
                          <div className='col-span-1 flex items-center justify-center'>
                              <input
-                                 value={e?.ghichu}                
+                                 value={e?.ghichu}  
+                                 disabled={index === 0}              
                                  onChange={_HandleChangeInputOption.bind(this, e?.id, "ghichu",index)}
                                  name="optionEmail"     
                                  placeholder='Ghi chú'                 

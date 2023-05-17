@@ -270,16 +270,16 @@ const Index = (props) => {
       {
           columns: [
               {title: "ID", width: {wch: 4}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${"Ngày chứng từ"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${"Mã chứng từ"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${"Nhà cung cấp"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${"Đơn đặt hàng"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${"Tổng tiền"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${"Tiền thuế"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${"Thành tiền"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${"Trạng thái thanh toán"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${"Duyệt thủ kho"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
-              {title: `${"Chi nhánh"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.import_day_vouchers || "import_day_vouchers"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.import_code_vouchers || "import_code_vouchers"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.import_supplier || "import_supplier"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.import_the_order || "import_the_order"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.import_total_amount || "import_total_amount"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.import_tax_money || "import_tax_money"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.import_into_money || "import_into_money"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.import_payment_status || "import_payment_status"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.import_branch || "import_branch"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
           ],
           data: dataExcel?.map((e) =>
               [
@@ -304,20 +304,20 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{"Nhập hàng"} </title>
+                <title>{dataLang?.import_title || "import_title"} </title>
             </Head>
             <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
             <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-            <h6 className="text-[#141522]/40">{"Nhập hàng"}</h6>
+            <h6 className="text-[#141522]/40">{dataLang?.import_title || "import_title"}</h6>
             <span className="text-[#141522]/40">/</span>
-            <h6>{"Danh sách nhập hàng"}</h6>
+            <h6>{dataLang?.import_list || "import_list"}</h6>
             </div>
 
         <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
           <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
             <div className="space-y-3 h-[96%] overflow-hidden">
                 <div className='flex justify-between'>
-                    <h2 className="text-2xl text-[#52575E] capitalize">{"Danh sách nhập hàng"}</h2>
+                    <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.import_list || "import_list"}</h2>
                     <div className="flex justify-end items-center">
                      <Link href="/purchase_order/import/form" className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>{dataLang?.purchase_order_new || "purchase_order_new"}</Link>
                   </div>
@@ -366,7 +366,7 @@ const Index = (props) => {
                                   placeholder={dataLang?.purchase_order_table_branch || "purchase_order_table_branch"} 
                                   hideSelectedOptions={false}
                                   isClearable={true}
-                                  className="rounded-md bg-white  xl:text-base  2xl:text-base xl:text-xs text-[10px]  z-20" 
+                                  className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20" 
                                   isSearchable={true}
                                   noOptionsMessage={() => "Không có dữ liệu"}
                                   // components={{ MultiValue }}
@@ -534,17 +534,17 @@ const Index = (props) => {
                 <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%] lx:w-[120%] ">
                     <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10 shadow">
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Ngày chứng từ"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Mã chứng từ"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Nhà cung cấp"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Đơn đặt hàng"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Tổng tiền"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Tiền thuế"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Thành tiền"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{"Trạng thái thanh toán"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Duyệt thủ kho"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Chi nhánh"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{"Tác vụ"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_day_vouchers || "import_day_vouchers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_code_vouchers || "import_code_vouchers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_supplier || "import_supplier"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_the_order || "import_the_order"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_total_amount || "import_total_amount"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_tax_money || "import_tax_money"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_into_money || "import_into_money"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{dataLang?.import_payment_status || "import_payment_status"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_branch || "import_branch"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_action || "import_action"}</h4>
                     </div>
                     {onFetching ?
                       <Loading className="h-80"color="#0f4f9e" /> 
@@ -596,7 +596,7 @@ const Index = (props) => {
             </div>
             <div className='grid grid-cols-12 bg-gray-100 items-center'>
                     <div className='col-span-4 p-2 text-center'>
-                        <h3 className='uppercase font-normal 2xl:text-base xl:text-xs text-[8px]'>{dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}</h3>
+                        <h3 className='uppercase font-normal 2xl:text-base xl:text-xs text-[8px]'>{dataLang?.import_total || "import_total"}</h3>
                     </div>  
                     <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap'>
                         <h3 className='font-normal 2xl:text-base xl:text-xs text-[8px]'>{formatNumber(total?.total_price)}</h3>
