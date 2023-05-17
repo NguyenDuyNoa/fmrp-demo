@@ -78,6 +78,8 @@ const Index = (props) => {
     const [mathangAll, sMathangAll] = useState([])
     const [khotong, sKhotong] = useState(null)
 
+    const [cutTomStyle, sCustomStyle] = useState(null)
+
     useEffect(() => {
       router.query && sErrDate(false)
       router.query && sErrSupplier(false)
@@ -222,8 +224,7 @@ const Index = (props) => {
           }
       }else if(type === "theorder"){
           sIdTheOrder(value)
-          if(value == null){
-            sDataItems([])
+          if(value == null){ sDataItems([])
           }
       }else if(type === "note"){
           sNote(value.target.value)
@@ -243,7 +244,6 @@ const Index = (props) => {
           }else if(value?.length > 0){
             const fakeData = [{id: Date.now(), mathang: null}]
             const data = fakeData?.concat(value?.map(e => ({id: uuidv4(), mathang: e, khohang: null, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.mathang?.e?.price ? Number(e?.mathang?.e?.price) : 1, chietkhau: e?.e?.discount_percent, dongiasauck: Number(e?.e?.price_after_discount),thue: {label:e?.e?.tax_name ,value :e?.e?.tax_rate, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
-           console.log({label: value?.e?.tax_name, value:value?.e?.tax_id, tax_rate: value?.e?.tax_rate});
             sOption(data);
           }
       }else if(type === "khotong"){
@@ -255,18 +255,18 @@ const Index = (props) => {
       }
   }
 
-
   
   useEffect(() => {
         sOption(prevOption => {
           const newOption = [...prevOption];
           newOption.forEach((item, index) => {
             if (index === 0 || !item?.id) return;
-            item.khohang = khotong;
+            item.khohang = khotong
           });
           return newOption;
         });
   }, [khotong]);
+
 
   useEffect(() => {
     if (thuetong == null) return;
@@ -396,7 +396,7 @@ const Index = (props) => {
   },[onFetchingSupplier])
 
   useEffect(() => {
-    idBranch == null && sIdTheOrder(null) ||  idBranch == null && sDataThe_order([])
+    idBranch == null && sIdTheOrder(null) ||  idBranch == null && sDataThe_order([]) || idBranch == null && sDataWarehouse([]) 
   }, [idBranch]);
 
   useEffect(() => {
@@ -429,6 +429,7 @@ const Index = (props) => {
       //     }
 
       if(option[index]?.mathang){
+
             option[index].mathang = value
             option[index].donvitinh =  value?.e?.unit_name
             sMathangAll(null)
@@ -440,15 +441,17 @@ const Index = (props) => {
             option[index].thue =  thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}  
             option[index].thanhtien = Number(value?.e?.amount)
           }else{
-            const newData= {id: Date.now(), mathang: value, khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: value?.e?.price, chietkhau: value?.e?.discount_percent,dongiasauck: value?.e?.price_after_discount, thue: value ? [{label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e.tax_id, tax_rate: value?.e.tax_rate}] : thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
+            // const newData= {id: Date.now(), mathang: value, dongiasauck: Number(value?.e?.price_after_discount), khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: Number(value?.e?.price), chietkhau: Number(value?.e?.discount_percent), thue: value ? [{label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e.tax_id, tax_rate: value?.e.tax_rate}] : thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
+            const newData= {id: Date.now(), mathang: value, dongiasauck: Number(value?.e?.price_after_discount), khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: Number(value?.e?.price), chietkhau: Number(value?.e?.discount_percent), thue: thuetong ? thuetong : {label: value?.e.tax_name,value:Number(value?.e.tax_id), tax_rate:Number(value?.e.tax_rate)}, thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
             if (newData.chietkhau) {
-              newData.dongiasauck *= (1 - Number(newData.chietkhau) / 100);
+              // newData.dongiasauck *=  (1 - Number(newData.chietkhau) / 100);
+              newData.dongiasauck = Number(newData.dongia) * (1 - Number(newData.chietkhau) / 100);
             }
-            if(newData.thue?.e?.tax_rate == undefined){
+            if(newData.thue?.tax_rate == undefined){
               const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
               newData.thanhtien = Number(tien.toFixed(2));
             }else { 
-              const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.e?.tax_rate)/100) * Number(newData.soluong);
+              const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.tax_rate)/100) * Number(newData.soluong);
               newData.thanhtien = Number(tien.toFixed(2));
             }
             sMathangAll(null)
@@ -462,12 +465,19 @@ const Index = (props) => {
       option[index].donvitinh = value.target?.value;
     }else if (type === "soluong") {
       option[index].soluong = Number(value?.value);
-      if(option[index].thue?.tax_rate == undefined){
-        const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-        option[index].thanhtien = Number(tien.toFixed(2));
-      }else{
-        const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-        option[index].thanhtien = Number(tien.toFixed(2));
+      // if(option[index].thue?.tax_rate == undefined){
+      //   const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
+      //   option[index].thanhtien = Number(tien.toFixed(2));
+      // }else{
+      //   const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
+      //   option[index].thanhtien = Number(tien.toFixed(2));
+      // }
+      if(newData.thue?.tax_rate == undefined){
+        const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
+        newData.thanhtien = Number(tien.toFixed(2));
+      }else { 
+        const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.tax_rate)/100) * Number(newData.soluong);
+        newData.thanhtien = Number(tien.toFixed(2));
       }
       sOption([...option]);
     }else if(type == "dongia"){
@@ -507,6 +517,7 @@ const Index = (props) => {
     }
     sOption([...option])
   }
+
   const handleIncrease = (id) => {
     const index = option.findIndex((x) => x.id === id);
     const newQuantity = option[index].soluong + 1;
@@ -562,71 +573,6 @@ const Index = (props) => {
     
     
     const allItems = [...options]
-
-    // const CustomOption = ({ data, ...props }) => {
-    //   const { label, value, e } = data;
-    //   const isSelectAll = value === "0";
-    //   const isDeselectAll = value === null;
-    //   return (
-    //     <components.Option {...props}>
-    //        <div className='grid grid-cols-12 items-center'>
-    //           {isSelectAll && <span className='col-span-12'>Chọn tất cả</span>}
-    //           {isDeselectAll && <span className='col-span-12'>Bỏ chọn tất cả</span>}
-    //     {!isSelectAll && !isDeselectAll && (
-    //       <>
-    //         <div className='col-span-10'>
-    //           <div className='grid grid-cols-12'>
-    //             <div className='col-span-2'>
-    //             {e?.images != null ? (
-    //               <img src={e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />
-    //             ) : (
-    //               <div className='w-[50px] h-[60px] object-cover flex items-center justify-center rounded'>
-    //                 <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
-    //               </div>
-    //             )}
-    //             </div>
-    //             <div className='col-span-10'>
-    //             <h3 className='font-medium'>{e?.name}</h3>
-    //             <div className='flex gap-2'>
-    //               <h5 className='text-gray-400 font-normal'>{e?.code}</h5>
-    //               <h5 className='font-medium'>{e?.product_variation}</h5>
-    //             </div>
-    //             <h5 className='text-gray-400 font-medium text-xs'>{dataLang[e?.text_type]}</h5>
-    //             </div>
-    //           </div>
-    //         </div>
-    //         <div className='col-span-2'>
-    //           {value === mathangAll?.value && (
-    //             <span className=""><TickCircle
-    //             size="18"
-    //             color="#FF8A65"
-    //             /></span>
-    //           )}
-    //           {mathangAll?.value === "0" && (
-    //             <span className=""><TickCircle
-    //             size="18"
-    //             color="#FF8A65"
-    //             /></span>
-    //           )}
-    //         </div>
-    //       </>
-    //     )}
-    //   </div>
-    //     </components.Option>
-    //   );
-    // };
-    
-    const formatOptionLabel = ({ label, value, group }) => {
-      if (group) {
-        return (
-          <div>
-            <span>{group.label} - </span>
-            <span>{label}</span>
-          </div>
-        );
-      }
-      return label;
-    };
 
     const handleSelectAll = () => {
       const fakeData = [{id: Date.now(), mathang: null}]
@@ -697,6 +643,7 @@ const Index = (props) => {
     }, [option])
 
     const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, purchases_order_item_id: e?.mathang?.e?.purchase_order_item_id, location_warehouses_id: e?.khohang?.value, quantity: Number(e?.soluong), price: e?.dongia, discount_percent:e?.chietkhau, tax_id:e?.thue?.value, note: e?.ghichu, id:e?.id}})
+   
     let newDataOption = dataOption?.filter(e => e?.item !== undefined);
        
     const _ServerSending = () => {
@@ -760,7 +707,8 @@ const Index = (props) => {
               sOnSending(false)
           })
       }
-      useEffect(() => {
+
+    useEffect(() => {
         onSending && _ServerSending()
     }, [onSending]);
 
@@ -771,7 +719,6 @@ const Index = (props) => {
       setIsExpanded(!isExpanded);
     };
 
-    const [cutTomStyle, sCustomStyle] = useState(null)
     const customStyles = {
       control: (base, state) => ({
         ...base,

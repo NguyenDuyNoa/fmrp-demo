@@ -39,6 +39,8 @@ const Index = (props) => {
     const [onFetchingItems, sOnFetchingItems] = useState(false);
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
     const [onFetchingDetail,sOnFetchingDetail] = useState(false)
+    const [onFetchingSupplier,sOnFetchingSupplier] = useState(false)
+    const [onFetchingStaff,sOnFetchingStaff] = useState(false)
     const [onSending, sOnSending] = useState(false);
     const [option, sOption] = useState([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:"",purchases_order_item_id: ""}]);
     const slicedArr = option.slice(1);
@@ -181,9 +183,14 @@ const Index = (props) => {
                   sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
               } 
             })
-          }else{
+          }
+          else{
             sIdBranch(value)
             sIdPurchases([])
+            sIdSupplier(null)
+            sDataSupplier([])
+            sDataStaff([])
+            sIdStaff(null)
             sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
           }
           
@@ -247,6 +254,7 @@ const Index = (props) => {
         });
       // }, [thuetong,chietkhautong]);
       }, [thuetong]);
+
       useEffect(() => {
         // if (thuetong == null && chietkhautong == null) return;
         if (chietkhautong == null) return;
@@ -272,20 +280,10 @@ const Index = (props) => {
         });
       }, [chietkhautong]);
 
+
     
       const _ServerFetching =  () => {
-        Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
-            if(!err){
-                var db =  response.data.rResult
-                sDataSupplier(db?.map(e => ({label: e.name, value:e.id })))
-            }
-        })
-        Axios("GET", "/api_web/Api_staff/staffOption?csrf_protection=true", {}, (err, response) => {
-            if(!err){
-                var {rResult} =  response.data
-                sDataStaff(rResult?.map(e => ({label: e.name, value: e.staffid})))                
-            }
-        })
+       
         Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
             if(!err){
                 var {rResult} =  response.data
@@ -301,6 +299,60 @@ const Index = (props) => {
        
         sOnFetching(false)  
     }
+
+    const _ServerFetching_Supplier =  () => {
+      Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {
+        params:{
+          "filter[branch_id]": idBranch != null ? idBranch.value : null ,
+         }
+      }, (err, response) => {
+          if(!err){
+            var db =  response.data.rResult
+            sDataSupplier(db?.map(e => ({label: e.name, value:e.id })))
+          }
+      })
+      sOnFetchingSupplier(false)  
+  } 
+    const _ServerFetching_Staff =  () => {
+      Axios("GET", "/api_web/Api_staff/staffOption?csrf_protection=true", {
+        params:{
+          "filter[branch_id]": idBranch != null ? idBranch.value : null ,
+         }
+      }, (err, response) => {
+          if(!err){
+              var {rResult} =  response.data
+              sDataStaff(rResult?.map(e => ({label: e.name, value: e.staffid})))     
+          }
+      })
+      sOnFetchingStaff(false)  
+  }
+
+    useEffect(()=>{
+      idBranch === null && sDataSupplier([]) || sIdSupplier(null) ||  idBranch === null && sDataStaff([]) || sIdStaff(null)
+    },[])
+
+
+    useEffect(()=>{
+      onFetchingSupplier && _ServerFetching_Supplier() 
+    },[onFetchingSupplier])
+    
+    useEffect(()=>{
+      onFetchingStaff && _ServerFetching_Staff() 
+    },[onFetchingStaff])
+
+    useEffect(() => {
+      idBranch != null && sOnFetchingSupplier(true)
+    }, [idBranch]);
+  
+    // useEffect(() => {
+    //   idTheOrder == null && sIdSupplier(null)
+    // }, [idTheOrder]);
+  
+    useEffect(() => {
+      idSupplier != null && sOnFetchingStaff(true)
+    }, [idSupplier]);
+
+
     const _ServerFetching_Purcher =  () => {
         Axios("GET", "/api_web/Api_purchases/purchasesOptionNotComplete?csrf_protection=true", {
           params:{
@@ -790,15 +842,46 @@ const Index = (props) => {
                               placeholder={dataLang?.purchase_order_system_default || "purchase_order_system_default"} 
                               className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                         </div>
-                        <div className='w-[24.5%]'>
-                            <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"} <span className="text-red-500">*</span></label>
-                            <input
-                              value={selectedDate}    
-                              onChange={_HandleChangeInput.bind(this, "date")}
-                              name="fname"                      
-                              type="datetime-local"
-                              className={`${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
-                              {errDate && <label className="text-sm text-red-500">{dataLang?.purchase_err_Date || "purchase_err_Date"}</label>}
+                       
+                        <div className=' w-[23vw]'>
+                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_branch || "purchase_order_table_branch"} <span className="text-red-500">*</span></label>
+                          <Select 
+                              options={dataBranch}
+                              onChange={_HandleChangeInput.bind(this, "branch")}
+                              value={idBranch}
+                              isClearable={true}
+                              closeMenuOnSelect={true}
+                              hideSelectedOptions={false}
+                              placeholder={dataLang?.purchase_order_branch || "purchase_order_branch"} 
+                              className={`${errBranch ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
+                              isSearchable={true}
+                              components={{ MultiValue }}
+                              style={{ border: "none", boxShadow: "none", outline: "none" }}
+                              theme={(theme) => ({
+                                  ...theme,
+                                  colors: {
+                                      ...theme.colors,
+                                      primary25: '#EBF5FF',
+                                      primary50: '#92BFF7',
+                                      primary: '#0F4F9E',
+                                  },
+                              })}
+                              styles={{
+                              placeholder: (base) => ({
+                              ...base,
+                              color: "#cbd5e1",
+                              }),
+                              control: (base,state) => ({
+                                  ...base,
+                                  boxShadow: 'none',
+                                  padding:"2.7px",
+                                ...(state.isFocused && {
+                                  border: '0 0 0 1px #92BFF7',
+                                }),
+                              })
+                          }}
+                          />
+                          {errBranch && <label className="text-sm text-red-500">{dataLang?.purchase_order_errBranch || "purchase_order_errBranch"}</label>}
                         </div>
                         <div className='w-[24.5%]'>
                       <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_supplier} <span className="text-red-500">*</span></label>
@@ -892,6 +975,16 @@ const Index = (props) => {
                         {errStaff && <label className="text-sm text-red-500">{dataLang?.purchase_order_errStaff || "purchase_order_errStaff"}</label>}
                         </div>
                         <div className='w-[24.5%]'>
+                            <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"} <span className="text-red-500">*</span></label>
+                            <input
+                              value={selectedDate}    
+                              onChange={_HandleChangeInput.bind(this, "date")}
+                              name="fname"                      
+                              type="datetime-local"
+                              className={`${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
+                              {errDate && <label className="text-sm text-red-500">{dataLang?.purchase_err_Date || "purchase_err_Date"}</label>}
+                        </div>
+                        <div className='w-[24.5%]'>
                             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"} <span className="text-red-500">*</span></label>
                             <input
                               value={delivery_date}              
@@ -902,46 +995,6 @@ const Index = (props) => {
                               className={`${errDateDelivery ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                               {errDateDelivery && <label className="text-sm text-red-500">{"purchase_err_Date"}</label>}
                           
-                        </div>
-                        <div className=' w-[23vw]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_branch || "purchase_order_table_branch"} <span className="text-red-500">*</span></label>
-                          <Select 
-                              options={dataBranch}
-                              onChange={_HandleChangeInput.bind(this, "branch")}
-                              value={idBranch}
-                              isClearable={true}
-                              closeMenuOnSelect={true}
-                              hideSelectedOptions={false}
-                              placeholder={dataLang?.purchase_order_branch || "purchase_order_branch"} 
-                              className={`${errBranch ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
-                              isSearchable={true}
-                              components={{ MultiValue }}
-                              style={{ border: "none", boxShadow: "none", outline: "none" }}
-                              theme={(theme) => ({
-                                  ...theme,
-                                  colors: {
-                                      ...theme.colors,
-                                      primary25: '#EBF5FF',
-                                      primary50: '#92BFF7',
-                                      primary: '#0F4F9E',
-                                  },
-                              })}
-                              styles={{
-                              placeholder: (base) => ({
-                              ...base,
-                              color: "#cbd5e1",
-                              }),
-                              control: (base,state) => ({
-                                  ...base,
-                                  boxShadow: 'none',
-                                  padding:"2.7px",
-                                ...(state.isFocused && {
-                                  border: '0 0 0 1px #92BFF7',
-                                }),
-                              })
-                          }}
-                          />
-                          {errBranch && <label className="text-sm text-red-500">{dataLang?.purchase_order_errBranch || "purchase_order_errBranch"}</label>}
                         </div>
                         <div className='w-[24.5%]'>
                           <label  className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"} </label>
