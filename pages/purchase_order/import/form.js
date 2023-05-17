@@ -421,6 +421,7 @@ const Index = (props) => {
       //         })
       //       return  
       //     }
+
       if(option[index]?.mathang){
             option[index].mathang = value
             option[index].donvitinh =  value?.e?.unit_name
@@ -430,13 +431,12 @@ const Index = (props) => {
             option[index].soluong =  idTheOrder != null ? Number(value?.e?.quantity_left) : 1
             option[index].chietkhau = chietkhautong ? chietkhautong : Number(value?.e?.discount_percent)
             option[index].dongiasauck = Number(value?.e?.price_after_discount)
-            option[index].thue = thuetong ? thuetong : [{label: value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}]
+            option[index].thue =  thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}  
             option[index].thanhtien = Number(value?.e?.amount)
+console.log(value);
           }else{
         //  console.log({label: value?.e.name, value: value?.e.id, tax_rate: value?.e.tax_rate});
-            const newData= {id: Date.now(), mathang: value, khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: value?.e?.price, chietkhau: value?.e?.discount_percent,dongiasauck: value?.e?.price_after_discount, thue: thuetong ? thuetong : [{label: value?.e.name, value: value?.e.tax_id, tax_rate: value?.e.tax_rate}], thanhtien: value?.e?.amount, ghichu: value?.e?.note}
-            console.log(value?.e);
-            console.log("newData",newData);
+            const newData= {id: Date.now(), mathang: value, khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: value?.e?.price, chietkhau: value?.e?.discount_percent,dongiasauck: value?.e?.price_after_discount, thue: value ? [{label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e.tax_id, tax_rate: value?.e.tax_rate}] : thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
             if (newData.chietkhau) {
               newData.dongiasauck *= (1 - Number(newData.chietkhau) / 100);
             }
@@ -1336,7 +1336,7 @@ const Index = (props) => {
                                         value: e?.thue?.value,
                                         tax_rate: e?.thue?.tax_rate
                                       }
-                                    : e.thue
+                                    : e?.thue
                                   )
                                 : null
                             }
