@@ -156,7 +156,7 @@ const Index = (props) => {
       }, (err, response) => {
           if(!err){
               var db =  response.data
-              sDataThe_order(db?.map(e => ({label: e?.code, value: e?.id})))
+              sDataThe_order(db?.map(e => ({label: e?.code, value: e?.id})) || {label: db?.code, value: db?.id})
           }
       })
       sOnFetchingTheOrder(false)  
@@ -237,6 +237,7 @@ const Index = (props) => {
           }else if(value?.length > 0){
             const fakeData = [{id: Date.now(), mathang: null}]
             const data = fakeData?.concat(value?.map(e => ({id: uuidv4(), mathang: e, khohang: null, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.mathang?.e?.price ? Number(e?.mathang?.e?.price) : 1, chietkhau: e?.e?.discount_percent, dongiasauck: Number(e?.e?.price_after_discount),thue: {label:e?.e?.tax_name ,value :e?.e?.tax_rate, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
+           console.log({label: value?.e?.tax_name, value:value?.e?.tax_id, tax_rate: value?.e?.tax_rate});
             sOption(data);
           }
       }else if(type === "khotong"){
@@ -429,10 +430,13 @@ const Index = (props) => {
             option[index].soluong =  idTheOrder != null ? Number(value?.e?.quantity_left) : 1
             option[index].chietkhau = chietkhautong ? chietkhautong : Number(value?.e?.discount_percent)
             option[index].dongiasauck = Number(value?.e?.price_after_discount)
-            option[index].thue = thuetong ? thuetong : {label: value?.e?.tax_name, value:value?.e?.tax_id, tax_rate: value?.e?.tax_rate}
+            option[index].thue = thuetong ? thuetong : [{label: value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}]
             option[index].thanhtien = Number(value?.e?.amount)
           }else{
-            const newData= {id: Date.now(), mathang: value, khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: value?.e?.price, chietkhau: value?.e?.discount_percent,dongiasauck: value?.e?.price_after_discount, thue: thuetong ? thuetong : 0, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
+        //  console.log({label: value?.e.name, value: value?.e.id, tax_rate: value?.e.tax_rate});
+            const newData= {id: Date.now(), mathang: value, khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: value?.e?.price, chietkhau: value?.e?.discount_percent,dongiasauck: value?.e?.price_after_discount, thue: thuetong ? thuetong : [{label: value?.e.name, value: value?.e.tax_id, tax_rate: value?.e.tax_rate}], thanhtien: value?.e?.amount, ghichu: value?.e?.note}
+            console.log(value?.e);
+            console.log("newData",newData);
             if (newData.chietkhau) {
               newData.dongiasauck *= (1 - Number(newData.chietkhau) / 100);
             }
@@ -622,7 +626,7 @@ const Index = (props) => {
 
     const handleSelectAll = () => {
       const fakeData = [{id: Date.now(), mathang: null}]
-      const data = fakeData?.concat(allItems?.map(e => ({id: uuidv4(), mathang: e, khohang: khotong ? khotong : e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.e?.price, chietkhau:chietkhautong ?  chietkhautong : e?.e?.discount_percent, dongiasauck:Number(e?.e?.price_after_discount), thue: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_rate, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
+      const data = fakeData?.concat(allItems?.map(e => ({id: uuidv4(), mathang: e, khohang: khotong ? khotong : e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.e?.price, chietkhau:chietkhautong ?  chietkhautong : e?.e?.discount_percent, dongiasauck:Number(e?.e?.price_after_discount), thue: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
       sOption(data);
       sMathangAll(data)
     };
@@ -1323,7 +1327,20 @@ const Index = (props) => {
                         <Select 
                             options={taxOptions}
                             onChange={_HandleChangeInputOption.bind(this, e?.id, "thue", index)}
-                            value={e?.thue ? {label: taxOptions.find(item => item.value === e?.thue?.value)?.label, value: e?.thue?.value, tax_rate: e?.thue?.tax_rate} : null}
+                            value={
+                              e?.thue
+                                ? (
+                                    taxOptions.find(item => item.value === e?.thue?.value)
+                                    ? {
+                                        label: taxOptions.find(item => item.value === e?.thue?.value)?.label,
+                                        value: e?.thue?.value,
+                                        tax_rate: e?.thue?.tax_rate
+                                      }
+                                    : e.thue
+                                  )
+                                : null
+                            }
+                            // value={e?.thue ? ( {label: taxOptions.find(item => item.value === e?.thue?.value)?.label, value: e?.thue?.value, tax_rate: e?.thue?.tax_rate}) : null}
                             placeholder={"% Thuế"} 
                             hideSelectedOptions={false}
                             formatOptionLabel={(option) => (
