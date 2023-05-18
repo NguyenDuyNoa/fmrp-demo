@@ -357,7 +357,7 @@ const Header = () => {
                     img: "/icon/header/quytrinh/process.svg",
                     items: [
                         { name: "Quy trình sử dụng phần mềm FMRP", link: "/process" },
-                        { name: "Quy trình quản lý sản xuất" },
+                        { name: "Quy trình quản lý sản xuất",link:"/process_manufacture" },
                         { name: "Quy trình bán hàng", link: "/process_products" },
                         { name: "Quy trình mua hàng - nhập kho", link: "/process_order" }
                     ]
