@@ -74,7 +74,7 @@ const Index = (props) => {
     const [errDate, sErrDate] = useState(false)
     const [errTheOrder, sErrTheOrder] = useState(false)
     const [errBranch, sErrBranch] = useState(false)
-
+    const [errWarehouse, sErrWarehouse] = useState(false)
     const [mathangAll, sMathangAll] = useState([])
     const [khotong, sKhotong] = useState(null)
 
@@ -85,6 +85,7 @@ const Index = (props) => {
       router.query && sErrSupplier(false)
       router.query && sErrTheOrder(false)
       router.query && sErrBranch(false)
+      // router.query && sErrWarehouse(false)
       router.query && sDate(moment().format('YYYY-MM-DD HH:mm:ss'))
       router.query && sNote("")
   }, [router.query]);
@@ -114,7 +115,7 @@ const Index = (props) => {
         sCode(rResult?.code)
         sIdBranch({label: rResult?.branch_name, value:rResult?.branch_id})
         sIdSupplier({label: rResult?.supplier_name, value: rResult?.supplier_id})
-        sIdTheOrder({label: rResult?.purchase_order_code, label: rResult?.purchase_order_id})
+        sIdTheOrder({label: rResult?.purchase_order_code, value: rResult?.purchase_order_id})
         sDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
         sNote(rResult?.note)
       }
@@ -154,6 +155,7 @@ const Index = (props) => {
       Axios("GET", "/api_web/Api_purchase_order/purchase_order_combobox/?csrf_protection=true", {
         params:{
           "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
+          "import_id": id ? id : ""
          }
       }, (err, response) => {
           if(!err){
@@ -205,6 +207,10 @@ const Index = (props) => {
               sIdTheOrder(null)
               sIdSupplier(null)
               sKhotong([])
+          }else{
+            sIdBranch(value)
+            sIdPurchases([])
+            sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
           }
         })
         }
@@ -306,20 +312,27 @@ const Index = (props) => {
 
     const _HandleSubmit = (e) => {
       e.preventDefault();
-        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null ){
+
+       const checkErr = sortedArr?.map(e => { return {item: e?.mathang?.value,location_warehouses_id: e?.khohang?.value}})
+       let checkErrValidate = checkErr?.filter(e => e?.item !== undefined);
+
+      const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
+        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullLabel ){
           date == null && sErrDate(true)
           idSupplier == null && sErrSupplier(true)
           idBranch == null && sErrBranch(true)
           idTheOrder == null && sErrTheOrder(true)
+          hasNullLabel && sErrWarehouse(true) 
             Toast.fire({
                 icon: 'error',
                 title: `${dataLang?.required_field_null}`
             })
         }
         else {
+            sErrWarehouse(false)
             sOnSending(true)
         }
-    }
+      }
 
     useEffect(() => {
       sErrDate(false)
@@ -329,6 +342,11 @@ const Index = (props) => {
       sErrSupplier(false)
     }, [idSupplier != null]);
 
+ 
+
+
+
+    
     useEffect(() => {
       sErrBranch(false)
     }, [idBranch != null]);
@@ -342,7 +360,8 @@ const Index = (props) => {
     const _ServerFetching_ItemsAll =  () => {
       Axios("GET", "/api_web/Api_purchase_order/searchItemsVariant/?csrf_protection=true", {
         params:{
-          "filter[purchase_order_id]":idTheOrder ? idTheOrder?.value : null
+          "filter[purchase_order_id]":idTheOrder ? idTheOrder?.value : null,
+          "import_id": id ? id : ""
         }
       }, (err, response) => {
           if(!err){
@@ -441,6 +460,8 @@ const Index = (props) => {
             option[index].thue =  thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}  
             option[index].thanhtien = Number(value?.e?.amount)
           }else{
+      
+            console.log(sortedArr);
             // const newData= {id: Date.now(), mathang: value, dongiasauck: Number(value?.e?.price_after_discount), khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: Number(value?.e?.price), chietkhau: Number(value?.e?.discount_percent), thue: value ? [{label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e.tax_id, tax_rate: value?.e.tax_rate}] : thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
             const newData= {id: Date.now(), mathang: value, dongiasauck: Number(value?.e?.price_after_discount), khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: Number(value?.e?.price), chietkhau: Number(value?.e?.discount_percent), thue: thuetong ? thuetong : {label: value?.e.tax_name,value:Number(value?.e.tax_id), tax_rate:Number(value?.e.tax_rate)}, thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
             if (newData.chietkhau) {
@@ -688,13 +709,13 @@ const Index = (props) => {
                       sErrSupplier(false)
                       sOption([{id: Date.now(), mathang: null}])
                       router.back()
-                  }else {
+                  }else {    
                     if(tongTienState.tongTien == 0){
                       Toast.fire({
                         icon: 'error',
                         title: `Chưa nhập thông tin mặt hàng`
                     })
-                    }
+                     } 
                     else{
                       Toast.fire({
                         icon: 'error',
@@ -1165,15 +1186,15 @@ const Index = (props) => {
                          }}
                          />
                             </div>
-                            <div className='col-span-1  z-[100] my-auto'>
+                            <div className='col-span-1  my-auto'>
                            <Select 
                            
                           onChange={_HandleChangeInputOption.bind(this, e?.id,"khohang",index)}
                           value={e?.khohang}
                           formatOptionLabel={(option) => (
-                            <div className=''>
-                                <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
-                                <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option?.label}</h2>
+                            <div className='z-[100]'>
+                                <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] z-[100]'>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
+                                <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] z-[100]'>{option?.label}</h2>
                             </div>
                             )}
                              // Các props khác của Select
@@ -1183,7 +1204,8 @@ const Index = (props) => {
                           // isClearable
                           placeholder={"Kho - vị trí kho"} 
                            hideSelectedOptions={false}
-                           className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] z-19 mb-2 2xl:w-[12.5vw]  xl:w-[12vw] w-[11vw]" 
+                           className={`${index != 0 && errWarehouse && e?.khohang?.length == 0 ? "border-red-500 bg-red-500 " : "border-transparent bg-[#ffffff]"} placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal outline-none border `} 
+                          //  className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] z-19 mb-2 2xl:w-[12.5vw]  xl:w-[12vw] w-[11vw]" 
                            isSearchable={true}
                            noOptionsMessage={() => "Không có dữ liệu"}
                            menuPortalTarget={document.body}
@@ -1218,9 +1240,10 @@ const Index = (props) => {
                         //       }),
                         //     }),
                         //  }}
-                        styles={customStyles}
+                        // styles={customStyles}
                          />
-                            </div>
+                      {/* /    {index != 0 && errWarehouse ? <label className="text-sm text-red-500">{"Vui lòng chọn kho hàng"}</label>:""} */}
+                        </div>
                          <div className='col-span-1 text-end flex items-center justify-end'>
                            <h3 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] 2xl:pr-0 xl:pr-0 pr-1'>{e?.donvitinh}</h3>
                         </div>

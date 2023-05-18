@@ -157,13 +157,34 @@ const Index = (props) => {
         }else if(type === "delivery_date"){
             sDelivery_date(moment(value.target.value).format('YYYY-MM-DD'))
         }else if(type === "purchases"){
-            sIdPurchases(value)
-            if(value?.length > 0){
-              sOption([...sortedArr])
+            if(option?.length > 1){
+              Swal.fire({
+                title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#296dc1',
+                cancelButtonColor: '#d33',
+                confirmButtonText: `${dataLang?.aler_yes}`,
+                cancelButtonText:`${dataLang?.aler_cancel}`
+            }).then((result) => {
+              if (result.isConfirmed) {
+                   sIdPurchases(value)
+                  sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+              }
+            })
             }else{
-             sOption(id ? [...sortedArr] : [{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+              sIdPurchases(value)
             }
-            // sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+            // if(id){
+            //   sOption([...sortedArr])
+            // }else{
+            //   sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+            // }
+            // if(value?.length > 0){
+            //   sOption([...sortedArr])
+            // }else{
+            //  sOption(id ? [...sortedArr] : [{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+            // }
         }else if(type === "note"){
             sNote(value.target.value)
         }else if(type == "branch"){
@@ -356,7 +377,8 @@ const Index = (props) => {
     const _ServerFetching_Purcher =  () => {
         Axios("GET", "/api_web/Api_purchases/purchasesOptionNotComplete?csrf_protection=true", {
           params:{
-              "filter[branch_id]": idBranch != null ? idBranch?.value : - 1
+              "filter[branch_id]": idBranch != null ? idBranch?.value : - 1,
+              "purchase_order_id": id ? id : ""
            }
         }, (err, response) => {
             if(!err){
@@ -371,7 +393,7 @@ const Index = (props) => {
         Axios("GET", "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true", { 
           params:{
             "filter[purchases_id]":  idPurchases?.length > 0 ? idPurchases.map(e => e.value) : -1,
-            "purchase_order_id": id
+            "purchase_order_id": id ? id : ""
          }
         }, (err, response) => {
             if(!err){
@@ -384,6 +406,10 @@ const Index = (props) => {
     useEffect(()=>{
       onFetchingItems && _ServerFetching_Items() 
     },[onFetchingItems])
+
+    useEffect(()=>{
+      _ServerFetching_Items() 
+    },[idPurchases])
 
     const _ServerFetching_ItemsAll =  () => {
         Axios("GET", "/api_web/Api_product/searchItemsVariant?csrf_protection=true", {
@@ -428,6 +454,7 @@ const Index = (props) => {
       useEffect(() => {
         idPurchases?.length > 0 && sOnFetchingItems(true)
       }, [idPurchases]);
+      console.log(idPurchases);
       
       const _HandleSubmit = (e) => {
         e.preventDefault();

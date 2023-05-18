@@ -296,7 +296,7 @@ const Index = (props) => {
                   </div>
                 </div>
                 
-                <div  className="flex space-x-3 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <div  className="flex space-x-3 items-center h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                      {listDs &&   listDs.map((e)=>{
                           return (
                             <div>
@@ -664,8 +664,8 @@ const Index = (props) => {
 const TabClient = React.memo((props) => {
   const router = useRouter();
   return(
-    <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[220px] 2xl:text-sm xl:text-sm text-xs flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
-      {router.query?.tab === `${props.active}` && <ArrowCircleDown   size="20" color="#0F4F9E" />}
+    <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[180px] flex gap-2 2xl:text-sm xl:text-sm text-xs items-center rounded-[5.5px] px-2 py-2 outline-none relative `}>
+    {router.query?.tab === `${props.active}` && <ArrowCircleDown   size="20" color="#0F4F9E" />}
       {props.children}
       <span className={`${props?.total > 0 && "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00]  translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center 2xl:py-1 py-1"} `}>{props?.total > 0 && props?.total}</span>
     </button>
@@ -740,7 +740,7 @@ return (
           {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[550px] xl:h-[750px] h-[700px] customsroll overflow-hidden  3xl:h-auto 2xl:scrollbar-thin 2xl:scrollbar-thumb-slate-300 2xl:scrollbar-track-slate-100">         */}
           {/* <div className="mt-4 space-x-5 w-[999px]">         */}
           {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[750px] xl:h-[750px] h-[700px] 2xl:max-h-[750px] max-h-[600px] 2xl:overflow-visible xl:overflow-y-auto overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">         */}
-          <div className=" space-x-5 w-[999px] 2xl:h-[750px] xl:h-[640px] h-[630px] ">        
+          <div className=" space-x-5 w-[999px] 2xl:h-[650px] xl:h-[640px] h-[630px] ">        
           <div>
            <div className='w-[999px]'>
              <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
