@@ -737,17 +737,18 @@ return (
   <div className='flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
      
   </div>  
-          <div className="mt-4 space-x-5 w-[999px] xl:h-[550px] customsroll overflow-hidden  3xl:h-auto 2xl:scrollbar-thin 2xl:scrollbar-thumb-slate-300 2xl:scrollbar-track-slate-100">        
+          {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[550px] xl:h-[750px] h-[700px] customsroll overflow-hidden  3xl:h-auto 2xl:scrollbar-thin 2xl:scrollbar-thumb-slate-300 2xl:scrollbar-track-slate-100">         */}
+          <div className="mt-4 space-x-5 w-[999px] 2xl:h-[550px] xl:h-[750px] h-[700px] overflow-hidden">        
           <div>
            <div className='w-[999px]'>
              <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
              <h2 className='font-normal bg-[#ECF0F4] p-2'>{props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
               <div className='grid grid-cols-8  min-h-[170px] p-2'>
                   <div className='col-span-3'>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"}</h3><h3 className='col-span-1 font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"}</h3><h3 className='col-span-1 font-normal'>{data?.delivery_date != null ? moment(data?.delivery_date).format("DD/MM/YYYY") : ""}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_detail_voucher_code || "purchase_order_detail_voucher_code"}</h3><h3 className='col-span-1 font-normal'>{data?.code}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}</h3><h3 className='col-span-1 font-normal'>{data?.order_type  == "0" ? (<span className='font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200'>Tạo mới</span>) : (<span className='font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200'>YCMH</span>)}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 '>{props.dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"}</h3><h3 className='col-span-1  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 '>{props.dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"}</h3><h3 className='col-span-1  font-normal'>{data?.delivery_date != null ? moment(data?.delivery_date).format("DD/MM/YYYY") : ""}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 '>{props.dataLang?.purchase_order_detail_voucher_code || "purchase_order_detail_voucher_code"}</h3><h3 className='col-span-1  font-normal'>{data?.code}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 '>{props.dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}</h3><h3 className='col-span-1 font-normal'>{data?.order_type  == "0" ? (<span className='font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200'>Tạo mới</span>) : (<span className='font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200'>YCMH</span>)}</h3></div>
                   </div>
 
                   <div className='col-span-2 mx-auto'>
@@ -779,17 +780,17 @@ return (
               </div>
               <div className="pr-2 w-[100%] lx:w-[110%] ">
                 <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
-                  <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
-                  <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
-                  <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
-                  <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
-                  <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
-                  <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
-                  <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
-                  <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
-                  <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
-                  <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
-                  <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
+                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
+                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
+                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
+                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
+                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
+                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
+                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
+                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
+                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
+                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
                 </div>
                 {onFetching ?
                   <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
