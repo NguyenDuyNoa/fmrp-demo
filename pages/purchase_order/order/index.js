@@ -738,6 +738,7 @@ return (
      
   </div>  
           {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[550px] xl:h-[750px] h-[700px] customsroll overflow-hidden  3xl:h-auto 2xl:scrollbar-thin 2xl:scrollbar-thumb-slate-300 2xl:scrollbar-track-slate-100">         */}
+          {/* <div className="mt-4 space-x-5 w-[999px]">         */}
           <div className="mt-4 space-x-5 w-[999px] 2xl:h-[750px] xl:h-[750px] h-[700px]">        
           <div>
            <div className='w-[999px]'>
@@ -798,7 +799,7 @@ return (
                   data?.item?.length > 0 ? 
                   (<>
                        <ScrollArea     
-                         className="min-h-[90px] max-h-[200px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
                     <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">                       
                       {(data?.item?.map((e) => 
                         <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id?.toString()}>
