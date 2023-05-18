@@ -734,35 +734,36 @@ return (
     open={open} onClose={_ToggleModal.bind(this,false)}
     classNameBtn={props?.className} 
   >
-  <div className='flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
+  <div className='flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
      
   </div>  
           {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[550px] xl:h-[750px] h-[700px] customsroll overflow-hidden  3xl:h-auto 2xl:scrollbar-thin 2xl:scrollbar-thumb-slate-300 2xl:scrollbar-track-slate-100">         */}
           {/* <div className="mt-4 space-x-5 w-[999px]">         */}
-          <div className="mt-4 space-x-5 w-[999px] 2xl:h-[750px] xl:h-[750px] h-[700px] 2xl:max-h-[750px] max-h-[600px] 2xl:overflow-visible xl:overflow-y-auto overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">        
+          {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[750px] xl:h-[750px] h-[700px] 2xl:max-h-[750px] max-h-[600px] 2xl:overflow-visible xl:overflow-y-auto overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">         */}
+          <div className=" space-x-5 w-[999px] 2xl:h-[750px] xl:h-[640px] h-[630px] ">        
           <div>
            <div className='w-[999px]'>
-             <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-             <h2 className='font-normal bg-[#ECF0F4] p-2'>{props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
-              <div className='grid grid-cols-8  min-h-[170px] p-2'>
+             <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+             <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
+              <div className='grid grid-cols-8  min-h-[170px] px-2'>
                   <div className='col-span-3'>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 '>{props.dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"}</h3><h3 className='col-span-1  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 '>{props.dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"}</h3><h3 className='col-span-1  font-normal'>{data?.delivery_date != null ? moment(data?.delivery_date).format("DD/MM/YYYY") : ""}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 '>{props.dataLang?.purchase_order_detail_voucher_code || "purchase_order_detail_voucher_code"}</h3><h3 className='col-span-1  font-normal'>{data?.code}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 '>{props.dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}</h3><h3 className='col-span-1 font-normal'>{data?.order_type  == "0" ? (<span className='font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200'>Tạo mới</span>) : (<span className='font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200'>YCMH</span>)}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"}</h3><h3 className=' text-[13px]  font-normal'>{data?.delivery_date != null ? moment(data?.delivery_date).format("DD/MM/YYYY") : ""}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.purchase_order_detail_voucher_code || "purchase_order_detail_voucher_code"}</h3><h3 className=' text-[13px]  font-normal'>{data?.code}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}</h3><h3 className=' text-[13px] font-normal'>{data?.order_type  == "0" ? (<span className='font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200'>Tạo mới</span>) : (<span className='font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200'>YCMH</span>)}</h3></div>
                   </div>
 
                   <div className='col-span-2 mx-auto'>
-                      <div className='my-4 font-medium '>{"Trạng thái nhập hàng"}</div>
+                      <div className='my-4 font-medium text-[13px]'>{"Trạng thái nhập hàng"}</div>
                       <div className='flex flex-wrap  gap-2 items-center justify-start'>
                       {
-                        data?.import_status  === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{props.dataLang?.purchase_order_table_not_yet_entered || "purchase_order_table_not_yet_entered"}</span>||
-                        data?.import_status  === "1" &&  <span className=' font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{props.dataLang?.purchase_order_table_enter_one_part || "purchase_order_table_enter_one_part"}</span> ||
-                        data?.import_status  === "2" &&   <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_order_table_enter_enough || "purchase_order_table_enter_enough"}</span>
+                        data?.import_status  === "0" && <span className='text-[13px] font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{props.dataLang?.purchase_order_table_not_yet_entered || "purchase_order_table_not_yet_entered"}</span>||
+                        data?.import_status  === "1" &&  <span className='text-[13px] font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{props.dataLang?.purchase_order_table_enter_one_part || "purchase_order_table_enter_one_part"}</span> ||
+                        data?.import_status  === "2" &&   <span className='text-[13px] flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_order_table_enter_enough || "purchase_order_table_enter_enough"}</span>
                        }
                       </div>
-                      <div className='my-4 font-medium '>{props.dataLang?.purchase_order_table_number || "purchase_order_table_number"}</div>
-                      <div className='flex flex-wrap  gap-2 items-center justify-start'>
+                      <div className='my-4 font-medium text-[13px]'>{props.dataLang?.purchase_order_table_number || "purchase_order_table_number"}</div>
+                      <div className='flex flex-wrap  gap-2 items-center justify-start text-[13px]'>
                           {data?.purchases?.reduce((acc, cur) => acc + (acc ? ', ' : '') + cur.code, '').split('').join('').replace(/^,/, '')}
                       </div>
                   </div>
@@ -773,25 +774,25 @@ return (
                         data?.status_pay === "2" &&   <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_order_table_enough_spent || "purchase_order_table_enough_spent"}</span>
                        }
                       </div> */}
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h3><h3 className='col-span-1 font-normal'>{data?.supplier_name}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] col-span-1">{data?.branch_name}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_order_note || "purchase_order_note"}</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h3><h3 className='text-[13px] font-normal'>{data?.supplier_name}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.purchase_order_note || "purchase_order_note"}</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div>
                   </div>
                   
               </div>
               <div className="pr-2 w-[100%] lx:w-[110%] ">
                 <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
                 </div>
                 {onFetching ?
                   <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
@@ -803,24 +804,24 @@ return (
                     <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">                       
                       {(data?.item?.map((e) => 
                         <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id?.toString()}>
-                          <h6 className="xl:text-base text-xs   py-0.5 col-span-1  rounded-md text-left">
+                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left">
                           {e?.item?.images != null ? (<ModalImage   small={e?.item?.images} large={e?.item?.images} alt="Product Image"  className='custom-modal-image object-cover rounded w-[50px] h-[60px]' />):
                                   <div className='w-[50px] h-[60px] object-cover  flex items-center justify-center rounded'>
                                     <ModalImage small="/no_img.png" large="/no_img.png" className='w-full h-full rounded object-contain p-1' > </ModalImage>
                                   </div>
                           }
                           </h6>                
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.item?.name}</h6>                
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left break-words">{e?.item?.product_variation}</h6>                
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.unit_name}</h6>                
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.quantity)}</h6>                
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price)}</h6>                
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.discount_percent + "%"}</h6>                
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-2  rounded-md text-center">{formatNumber(e?.price_after_discount)}</h6>                
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.tax_rate) + "%"}</h6>                
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.amount)}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.item?.name}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-left break-words">{e?.item?.product_variation}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.unit_name}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.quantity)}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price)}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.discount_percent + "%"}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-center">{formatNumber(e?.price_after_discount)}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.tax_rate) + "%"}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.amount)}</h6>                
                                          
-                          <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.note != undefined ? e?.note : ""}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.note != undefined ? e?.note : ""}</h6>                
                         </div>
                       ))}              
                     </div>   
@@ -839,23 +840,23 @@ return (
                     </div>
                   )}    
               </div>
-          <h2 className='font-normal p-2  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
-              <div className="text-right mt-5  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+          <h2 className='font-normal p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
+              <div className="text-right mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
               <div className='col-span-7'>
               </div>
              <div className='col-span-2 space-y-2'>
-                  <div className='font-normal text-left'><h3>{props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3></div>
-                  <div className='font-normal text-left'><h3>{props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}</h3></div>
-                  <div className='font-normal text-left'><h3>{props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}</h3></div>
-                  <div className='font-normal text-left'><h3>{props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}</h3></div>
-                  <div className='font-normal text-left'><h3>{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h3></div>
+                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3></div>
+                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}</h3></div>
+                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}</h3></div>
+                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}</h3></div>
+                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h3></div>
              </div>
              <div className='col-span-3 space-y-2'>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600'>{formatNumber(data?.total_price)}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600'>{formatNumber(data?.total_discount)}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600'>{formatNumber(data?.total_price_after_discount)}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600'>{formatNumber(data?.total_tax)}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600'>{formatNumber(data?.total_amount)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_discount)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price_after_discount)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_tax)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_amount)}</h3></div>
              </div>
           </div>   
             </div>
