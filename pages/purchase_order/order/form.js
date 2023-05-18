@@ -39,6 +39,8 @@ const Index = (props) => {
     const [onFetchingItems, sOnFetchingItems] = useState(false);
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
     const [onFetchingDetail,sOnFetchingDetail] = useState(false)
+    const [onFetchingSupplier,sOnFetchingSupplier] = useState(false)
+    const [onFetchingStaff,sOnFetchingStaff] = useState(false)
     const [onSending, sOnSending] = useState(false);
     const [option, sOption] = useState([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:"",purchases_order_item_id: ""}]);
     const slicedArr = option.slice(1);
@@ -181,9 +183,14 @@ const Index = (props) => {
                   sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
               } 
             })
-          }else{
+          }
+          else{
             sIdBranch(value)
             sIdPurchases([])
+            sIdSupplier(null)
+            sDataSupplier([])
+            sDataStaff([])
+            sIdStaff(null)
             sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
           }
           
@@ -247,6 +254,7 @@ const Index = (props) => {
         });
       // }, [thuetong,chietkhautong]);
       }, [thuetong]);
+
       useEffect(() => {
         // if (thuetong == null && chietkhautong == null) return;
         if (chietkhautong == null) return;
@@ -272,20 +280,10 @@ const Index = (props) => {
         });
       }, [chietkhautong]);
 
+
     
       const _ServerFetching =  () => {
-        Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
-            if(!err){
-                var db =  response.data.rResult
-                sDataSupplier(db?.map(e => ({label: e.name, value:e.id })))
-            }
-        })
-        Axios("GET", "/api_web/Api_staff/staffOption?csrf_protection=true", {}, (err, response) => {
-            if(!err){
-                var {rResult} =  response.data
-                sDataStaff(rResult?.map(e => ({label: e.name, value: e.staffid})))                
-            }
-        })
+       
         Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
             if(!err){
                 var {rResult} =  response.data
@@ -301,6 +299,60 @@ const Index = (props) => {
        
         sOnFetching(false)  
     }
+
+    const _ServerFetching_Supplier =  () => {
+      Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {
+        params:{
+          "filter[branch_id]": idBranch != null ? idBranch.value : null ,
+         }
+      }, (err, response) => {
+          if(!err){
+            var db =  response.data.rResult
+            sDataSupplier(db?.map(e => ({label: e.name, value:e.id })))
+          }
+      })
+      sOnFetchingSupplier(false)  
+  } 
+    const _ServerFetching_Staff =  () => {
+      Axios("GET", "/api_web/Api_staff/staffOption?csrf_protection=true", {
+        params:{
+          "filter[branch_id]": idBranch != null ? idBranch.value : null ,
+         }
+      }, (err, response) => {
+          if(!err){
+              var {rResult} =  response.data
+              sDataStaff(rResult?.map(e => ({label: e.name, value: e.staffid})))     
+          }
+      })
+      sOnFetchingStaff(false)  
+  }
+
+    useEffect(()=>{
+      idBranch === null && sDataSupplier([]) || sIdSupplier(null) ||  idBranch === null && sDataStaff([]) || sIdStaff(null)
+    },[])
+
+
+    useEffect(()=>{
+      onFetchingSupplier && _ServerFetching_Supplier() 
+    },[onFetchingSupplier])
+    
+    useEffect(()=>{
+      onFetchingStaff && _ServerFetching_Staff() 
+    },[onFetchingStaff])
+
+    useEffect(() => {
+      idBranch != null && sOnFetchingSupplier(true)
+    }, [idBranch]);
+  
+    // useEffect(() => {
+    //   idTheOrder == null && sIdSupplier(null)
+    // }, [idTheOrder]);
+  
+    useEffect(() => {
+      idSupplier != null && sOnFetchingStaff(true)
+    }, [idSupplier]);
+
+
     const _ServerFetching_Purcher =  () => {
         Axios("GET", "/api_web/Api_purchases/purchasesOptionNotComplete?csrf_protection=true", {
           params:{
@@ -434,7 +486,7 @@ const Index = (props) => {
       }, [idPurchases?.length > 0 ]);
 
       const _HandleSeachApi = (inputValue) => {
-        {loai === "0"
+        if(loai === "0")
           Axios("POST", `/api_web/Api_product/searchItemsVariant?csrf_protection=true`, {
             data: {
               term: inputValue,
@@ -448,7 +500,9 @@ const Index = (props) => {
                   sDataItems(result)
               }
           })
-         
+          else{
+            return
+          }
           // Axios("POST", `/api_web/Api_purchases/searchItemsVariant?csrf_protection=true`, {
           //   data: {
           //     term: inputValue,
@@ -463,8 +517,7 @@ const Index = (props) => {
           //         sDataItems(result)
           //     }
           // })
-        }
-      };
+      }
          
          const hiddenOptions = idPurchases?.length > 3 ? idPurchases?.slice(0, 3) : [];
          const fakeDataPurchases = idBranch != null ? dataPurchases.filter((x) => !hiddenOptions.includes(x.value)) : []
@@ -789,15 +842,46 @@ const Index = (props) => {
                               placeholder={dataLang?.purchase_order_system_default || "purchase_order_system_default"} 
                               className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                         </div>
-                        <div className='w-[24.5%]'>
-                            <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"} <span className="text-red-500">*</span></label>
-                            <input
-                              value={selectedDate}    
-                              onChange={_HandleChangeInput.bind(this, "date")}
-                              name="fname"                      
-                              type="datetime-local"
-                              className={`${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
-                              {errDate && <label className="text-sm text-red-500">{dataLang?.purchase_err_Date || "purchase_err_Date"}</label>}
+                       
+                        <div className=' w-[23vw]'>
+                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_branch || "purchase_order_table_branch"} <span className="text-red-500">*</span></label>
+                          <Select 
+                              options={dataBranch}
+                              onChange={_HandleChangeInput.bind(this, "branch")}
+                              value={idBranch}
+                              isClearable={true}
+                              closeMenuOnSelect={true}
+                              hideSelectedOptions={false}
+                              placeholder={dataLang?.purchase_order_branch || "purchase_order_branch"} 
+                              className={`${errBranch ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
+                              isSearchable={true}
+                              components={{ MultiValue }}
+                              style={{ border: "none", boxShadow: "none", outline: "none" }}
+                              theme={(theme) => ({
+                                  ...theme,
+                                  colors: {
+                                      ...theme.colors,
+                                      primary25: '#EBF5FF',
+                                      primary50: '#92BFF7',
+                                      primary: '#0F4F9E',
+                                  },
+                              })}
+                              styles={{
+                              placeholder: (base) => ({
+                              ...base,
+                              color: "#cbd5e1",
+                              }),
+                              control: (base,state) => ({
+                                  ...base,
+                                  boxShadow: 'none',
+                                  padding:"2.7px",
+                                ...(state.isFocused && {
+                                  border: '0 0 0 1px #92BFF7',
+                                }),
+                              })
+                          }}
+                          />
+                          {errBranch && <label className="text-sm text-red-500">{dataLang?.purchase_order_errBranch || "purchase_order_errBranch"}</label>}
                         </div>
                         <div className='w-[24.5%]'>
                       <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_supplier} <span className="text-red-500">*</span></label>
@@ -891,6 +975,16 @@ const Index = (props) => {
                         {errStaff && <label className="text-sm text-red-500">{dataLang?.purchase_order_errStaff || "purchase_order_errStaff"}</label>}
                         </div>
                         <div className='w-[24.5%]'>
+                            <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"} <span className="text-red-500">*</span></label>
+                            <input
+                              value={selectedDate}    
+                              onChange={_HandleChangeInput.bind(this, "date")}
+                              name="fname"                      
+                              type="datetime-local"
+                              className={`${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
+                              {errDate && <label className="text-sm text-red-500">{dataLang?.purchase_err_Date || "purchase_err_Date"}</label>}
+                        </div>
+                        <div className='w-[24.5%]'>
                             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"} <span className="text-red-500">*</span></label>
                             <input
                               value={delivery_date}              
@@ -901,46 +995,6 @@ const Index = (props) => {
                               className={`${errDateDelivery ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                               {errDateDelivery && <label className="text-sm text-red-500">{"purchase_err_Date"}</label>}
                           
-                        </div>
-                        <div className=' w-[23vw]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_branch || "purchase_order_table_branch"} <span className="text-red-500">*</span></label>
-                          <Select 
-                              options={dataBranch}
-                              onChange={_HandleChangeInput.bind(this, "branch")}
-                              value={idBranch}
-                              isClearable={true}
-                              closeMenuOnSelect={true}
-                              hideSelectedOptions={false}
-                              placeholder={dataLang?.purchase_order_branch || "purchase_order_branch"} 
-                              className={`${errBranch ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
-                              isSearchable={true}
-                              components={{ MultiValue }}
-                              style={{ border: "none", boxShadow: "none", outline: "none" }}
-                              theme={(theme) => ({
-                                  ...theme,
-                                  colors: {
-                                      ...theme.colors,
-                                      primary25: '#EBF5FF',
-                                      primary50: '#92BFF7',
-                                      primary: '#0F4F9E',
-                                  },
-                              })}
-                              styles={{
-                              placeholder: (base) => ({
-                              ...base,
-                              color: "#cbd5e1",
-                              }),
-                              control: (base,state) => ({
-                                  ...base,
-                                  boxShadow: 'none',
-                                  padding:"2.7px",
-                                ...(state.isFocused && {
-                                  border: '0 0 0 1px #92BFF7',
-                                }),
-                              })
-                          }}
-                          />
-                          {errBranch && <label className="text-sm text-red-500">{dataLang?.purchase_order_errBranch || "purchase_order_errBranch"}</label>}
                         </div>
                         <div className='w-[24.5%]'>
                           <label  className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"} </label>
@@ -1010,16 +1064,16 @@ const Index = (props) => {
             <h2 className='font-normal bg-[#ECF0F4] p-2  '>{dataLang?.purchase_order_purchase_item_information || "purchase_order_purchase_item_information"}</h2>  
               <div className='pr-2'>
               <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10'>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-3    text-left    truncate font-[400]'>{dataLang?.purchase_order_purchase_from_item || "purchase_order_purchase_from_item"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_purchase_from_unit || "purchase_order_purchase_from_unit"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_quantity || "purchase_quantity"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-left    font-[400]'>{dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]'>{dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]'>{dataLang?.purchase_order_note || "purchase_order_note"}</h4>
-                  <h4 className='2xl:text-[14px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-3    text-left    truncate font-[400]'>{dataLang?.purchase_order_purchase_from_item || "purchase_order_purchase_from_item"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_purchase_from_unit || "purchase_order_purchase_from_unit"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-left    font-[400]'>{dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]'>{dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]'>{dataLang?.purchase_order_note || "purchase_order_note"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}</h4>
               </div>     
               </div>     
             <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
@@ -1046,19 +1100,19 @@ const Index = (props) => {
                                   }
                               </div>
                               <div>
-                                <h3 className='font-medium'>{option.e?.name}</h3>
+                                <h3 className='font-medium 2xl:text-[13px] xl:text-[10px] text-[8px]'>{option.e?.name}</h3>
                                 <div className='flex gap-2'>
-                                  <h5 className='text-gray-400 font-normal'>{option.e?.code}</h5>
-                                  <h5 className='font-medium'>{option.e?.product_variation}</h5>
+                                  <h5 className='text-gray-400 font-normal 2xl:text-[13px] xl:text-[10px] text-[8px]'>{option.e?.code}</h5>
+                                  <h5 className='font-medium 2xl:text-[13px] xl:text-[10px] text-[8px]'>{option.e?.product_variation}</h5>
                                 </div>
-                                <h5 className='text-gray-400 font-medium text-xs'>{dataLang[option.e?.text_type]} {loai == "1" ? "-":""} {loai == "1" ? option.e?.purchases_code : ""} {loai == "1" ? "- Số lượng:":""} {loai == "1" ? option.e?.quantity_left  : ""}</h5>
+                                <h5 className='text-gray-400 font-medium text-xs 2xl:text-[13px] xl:text-[10px] text-[8px]'>{dataLang[option.e?.text_type]} {loai == "1" ? "-":""} {loai == "1" ? option.e?.purchases_code : ""} {loai == "1" ? "- Số lượng:":""} {loai == "1" ? option.e?.quantity_left  : ""}</h5>
                               </div>
                             </div>
                             <div className=''>
                                <div className='text-right opacity-0'>{"0"}</div>
                                <div className='flex gap-2'>
                                  <div className='flex items-center gap-2'>
-                                   <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className=' font-medium'>{option.e?.qty_warehouse ? option.e?.qty_warehouse : "0" }</h5>
+                                   <h5 className='text-gray-400 font-normal 2xl:text-[13px] xl:text-[10px] text-[8px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className=' font-medium 2xl:text-[13px] xl:text-[10px] text-[8px]'>{option.e?.qty_warehouse ? option.e?.qty_warehouse : "0" }</h5>
                                  </div>
                                 
                                 </div>
@@ -1101,7 +1155,7 @@ const Index = (props) => {
                          />
                          </div>
                          <div className='col-span-1 text-center flex items-center justify-center'>
-                           <h3 className=''>{e?.donvitinh}</h3>
+                           <h3 className='2xl:text-[13px] xl:text-[10px] text-[8px]'>{e?.donvitinh}</h3>
                         </div>
                         <div className='col-span-1 flex items-center justify-center'>
                            <div className="flex items-center justify-center">
@@ -1109,10 +1163,10 @@ const Index = (props) => {
                               onClick={() => handleDecrease(e?.id)}  disabled={index === 0} 
                               ><Minus size="16"/></button>
                               <NumericFormat
-                                className="appearance-none text-center py-2 px-4 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
+                                className="appearance-none text-center 2xl:text-[12px] xl:text-[10px] text-[8px] py-2 px-4 font-medium w-24 focus:outline-none border-b-2 border-gray-200"
                                 onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong",e)}
                                 value={e?.soluong || 1}
-                                thousandSeparator={false}
+                                thousandSeparator=","
                                 allowNegative={false}
                                 readOnly={index === 0 ? readOnlyFirst : false}
                                 decimalScale={0}
@@ -1134,7 +1188,7 @@ const Index = (props) => {
                                 readOnly={index === 0 ? readOnlyFirst : false}
                                 decimalScale={0}
                                 isNumericString={true}   
-                                className="appearance-none text-center py-1 px-2 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
+                                className="appearance-none 2xl:text-[12px] xl:text-[10px] text-[8px] text-center py-1 px-2 font-medium w-28 focus:outline-none border-b-2 border-gray-200"
                                 thousandSeparator=","
                             />
                         </div>
@@ -1142,7 +1196,7 @@ const Index = (props) => {
                           <NumericFormat
                               value={e?.chietkhau}
                               onValueChange={_HandleChangeInputOption.bind(this, e?.id, "chietkhau",index)}
-                              className="appearance-none text-center py-1 px-2 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
+                              className="appearance-none text-center py-1 px-2 font-medium w-28  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[10px] text-[8px] border-gray-200"
                               thousandSeparator=","
                               allowNegative={false}
                               // readOnly={index === 0 ? readOnlyFirst : false}
@@ -1152,7 +1206,7 @@ const Index = (props) => {
                         </div>
                         
                         <div className='col-span-1 text-right flex items-center justify-end'>
-                           <h3 className='px-2'>{formatNumber(e?.dongiasauck)}</h3>
+                           <h3 className='px-2 2xl:text-[12px] xl:text-[10px] text-[8px]'>{formatNumber(e?.dongiasauck)}</h3>
                         </div>
                         <div className='col-span-1 flex justify-center items-center'>
                         <Select 
@@ -1163,11 +1217,11 @@ const Index = (props) => {
                             hideSelectedOptions={false}
                             formatOptionLabel={(option) => (
                               <div className='flex justify-start items-center gap-1 '>
-                                  <h2>{option?.label}</h2>
-                                  <h2>{`(${option?.tax_rate})`}</h2>
+                                  <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{option?.label}</h2>
+                                  <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{`(${option?.tax_rate})`}</h2>
                               </div>
                             )}
-                            className={` "border-transparent placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
+                            className={` "border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[10px] text-[8px] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
                             // dangerouslySetInnerHTML={{__html: option.label}}
@@ -1204,7 +1258,7 @@ const Index = (props) => {
                           />
                         </div>
                         <div className='col-span-1 text-right flex items-center justify-end'>
-                          <h3 className='px-2'>{formatNumber(e?.thanhtien)}</h3>
+                          <h3 className='px-2 2xl:text-[12px] xl:text-[10px] text-[8px]'>{formatNumber(e?.thanhtien)}</h3>
                           {/* <h3 className='px-2'>{formatNumber(e?.dongiasauck * (1 + Number(e?.thue?.tax_rate || 0) / 100) * e?.soluong)}</h3> */}
                         </div>
                          <div className='col-span-1 flex items-center justify-center'>
@@ -1214,7 +1268,7 @@ const Index = (props) => {
                                  name="optionEmail"     
                                  placeholder='Ghi chú'                 
                                  type="text"
-                                 className= "focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
+                                 className= "focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[10px] text-[8px]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
                                /> 
                          </div>
                          <div className='col-span-1 flex items-center justify-center'>
@@ -1305,7 +1359,7 @@ const Index = (props) => {
         <h2 className='font-normal bg-[white]  p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]'>{dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"} </h2>  
         </div>
         <div className='grid grid-cols-12'>
-            <div className='col-span-10'>
+            <div className='col-span-9'>
                 <div className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_note || "purchase_order_note"}</div>
                   <textarea
                     value={note}       
@@ -1316,7 +1370,7 @@ const Index = (props) => {
                     className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-[40%] min-h-[220px] max-h-[220px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
                   />
             </div>
-            <div className="text-right mt-5 space-y-4 col-span-2 flex-col justify-between ">
+            <div className="text-right mt-5 space-y-4 col-span-3 flex-col justify-between ">
                 <div className='flex justify-between '>
                 </div>
                 <div className='flex justify-between '>
