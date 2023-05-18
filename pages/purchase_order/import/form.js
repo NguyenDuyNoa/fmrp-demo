@@ -447,7 +447,7 @@ const Index = (props) => {
               // newData.dongiasauck *=  (1 - Number(newData.chietkhau) / 100);
               newData.dongiasauck = Number(newData.dongia) * (1 - Number(newData.chietkhau) / 100);
             }
-            if(newData.thue?.tax_rate == undefined){
+            if(newData?.thue?.tax_rate == undefined){
               const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
               newData.thanhtien = Number(tien.toFixed(2));
             }else { 
@@ -465,20 +465,20 @@ const Index = (props) => {
       option[index].donvitinh = value.target?.value;
     }else if (type === "soluong") {
       option[index].soluong = Number(value?.value);
-      // if(option[index].thue?.tax_rate == undefined){
-      //   const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-      //   option[index].thanhtien = Number(tien.toFixed(2));
-      // }else{
-      //   const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-      //   option[index].thanhtien = Number(tien.toFixed(2));
-      // }
-      if(newData.thue?.tax_rate == undefined){
-        const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
-        newData.thanhtien = Number(tien.toFixed(2));
-      }else { 
-        const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.tax_rate)/100) * Number(newData.soluong);
-        newData.thanhtien = Number(tien.toFixed(2));
+      if(option[index].thue?.tax_rate == undefined){
+        const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
+        option[index].thanhtien = Number(tien.toFixed(2));
+      }else{
+        const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
+        option[index].thanhtien = Number(tien.toFixed(2));
       }
+      // if(newData?.thue?.tax_rate == undefined){
+      //   const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
+      //   newData.thanhtien = Number(tien.toFixed(2));
+      // }else { 
+      //   const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.tax_rate)/100) * Number(newData.soluong);
+      //   newData.thanhtien = Number(tien.toFixed(2));
+      // }
       sOption([...option]);
     }else if(type == "dongia"){
         option[index].dongia = Number(value.value)
@@ -722,16 +722,16 @@ const Index = (props) => {
     const customStyles = {
       control: (base, state) => ({
         ...base,
-        width: cutTomStyle || (state.isFocused && isExpanded) ? '230px' : '220px',
+        // width: cutTomStyle || (state.isFocused && isExpanded) ? '200px' : '200px',
         transition: 'width 0.5s',
         border: state.isFocused && isExpanded ? '0 0 0 1px #92BFF7' : '0 0 0 1px #92BFF7',
-        boxShadow: state.isFocused && isExpanded ? 'none' : 'none',
-        '@media (max-width: 1536px)': {
-          width: '200px', 
-        },
-        '@media (max-width: 1280px)': {
-          width: '150px', 
-        },
+        // boxShadow: state.isFocused && isExpanded ? 'none' : 'none',
+        // '@media (max-width: 1536px)': {
+        //   width: '330px', 
+        // },
+        // '@media (min-width: 1280px)': {
+        //   width: '160px', 
+        // },
       }),
       menuPortal: (base) => ({
         ...base,
@@ -961,12 +961,12 @@ const Index = (props) => {
                                         )}
                                       </div>
                                       <div>
-                                        <h3 className='font-medium'>{option.e?.name}</h3>
+                                        <h3 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
                                         <div className='flex gap-2'>
-                                          <h5 className='text-gray-400 font-normal'>{option.e?.code}</h5>
-                                          <h5 className='font-medium'>{option.e?.product_variation}</h5>
+                                          <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.code}</h5>
+                                          <h5 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
                                         </div>
-                                        <h5 className='text-gray-400 font-medium text-xs'>{dataLang[option.e?.text_type]}</h5>
+                                        <h5 className='text-gray-400 font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
                                       </div>
                                     </div>
                                     <div className=''>
@@ -985,7 +985,7 @@ const Index = (props) => {
                             // components={{ DropdownIndicator }}
                            placeholder={dataLang?.purchase_items || "purchase_items"} 
                            hideSelectedOptions={false}
-                           className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
+                           className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20" 
                            isSearchable={true}
                            noOptionsMessage={() => "Không có dữ liệu"}
                            menuPortalTarget={document.body} 
@@ -1036,7 +1036,7 @@ const Index = (props) => {
                             isClearable
                             placeholder={dataLang?.import_click_house || "import_click_house"} 
                             hideSelectedOptions={false}
-                            className={` "border-transparent placeholder:text-slate-300  z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
+                            className={` "border-transparent placeholder:text-slate-300 2xl:text-[12px] xl:text-[13px] text-[12.5px]   z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
                            dangerouslySetInnerHTML={{__html: option.label}}
@@ -1075,17 +1075,17 @@ const Index = (props) => {
               </div> 
               <div className='pr-2'>
               <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10'>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-2    text-center    truncate font-[400]'>{dataLang?.import_from_items || "import_from_items"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]'>{dataLang?.import_from_ware_loca || "import_from_ware_loca"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-right  truncate font-[400]'>{"ĐVT"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_quantity || "import_from_quantity"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_discount || "import_from_discount"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_tax || "import_from_tax"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_into_money || "import_into_money"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_note || "import_from_note"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_operation || "import_from_operation"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-2    text-center    truncate font-[400]'>{dataLang?.import_from_items || "import_from_items"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]'>{dataLang?.import_from_ware_loca || "import_from_ware_loca"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-right  truncate font-[400]'>{"ĐVT"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_quantity || "import_from_quantity"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_discount || "import_from_discount"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_tax || "import_from_tax"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_into_money || "import_into_money"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_note || "import_from_note"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_operation || "import_from_operation"}</h4>
               </div>     
               </div>     
             <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
@@ -1103,27 +1103,27 @@ const Index = (props) => {
                            formatOptionLabel={(option) => (
                           <div className='flex items-center  justify-between py-2'>
                             <div className='flex items-center gap-2'>
-                              <div className='2xl:h-[60px] xl:w-[40px] xl:h-[50px] w-[30px] h-[40px]'>
-                              {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />):
-                                    <div className='2xl:w-[50px] 2xl:h-[60px] xl:w-[40px] xl:h-[50px] w-[30px] h-[40px] object-cover  flex items-center justify-center rounded'>
-                                      <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
+                              <div className='w-[40px] h-h-[60px]'>
+                              {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='object-cover rounded' />):
+                                    <div className=' object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]'>
+                                      <img src="/no_img.png" alt="Product Image"  className='object-cover rounded ' />
                                   </div>
                                   }
                               </div>
                               <div>
-                                <h3 className='font-medium 2xl:text-[12px] xl:text-[10px] text-[8px]'>{option.e?.name}</h3>
+                                <h3 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
                                 <div className='flex gap-2'>
-                                  <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[10px] text-[8px]' >{option.e?.code}</h5>
-                                  <h5 className='font-medium 2xl:text-[12px] xl:text-[10px] text-[8px]'>{option.e?.product_variation}</h5>
+                                  <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]' >{option.e?.code}</h5>
+                                  <h5 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
                                 </div>
-                                <h5 className='text-gray-400 font-medium text-xs 2xl:text-[12px] xl:text-[10px] text-[8px]'>{dataLang[option.e?.text_type]}</h5>
+                                <h5 className='text-gray-400 font-medium text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
                               </div>
                             </div>
                             <div className=''>
                                <div className='text-right opacity-0'>{"0"}</div>
                                <div className='flex gap-2'>
                                  <div className='flex items-center gap-2'>
-                                   <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[10px] text-[8px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[10px] text-[8px]'>{option.e?.qty_warehouse ?? 0}</h5>
+                                   <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.qty_warehouse ?? 0}</h5>
                                  </div>
                                 
                                 </div>
@@ -1132,7 +1132,7 @@ const Index = (props) => {
                         )}
                            placeholder={dataLang?.purchase_items || "purchase_items"} 
                            hideSelectedOptions={false}
-                           className="rounded-md bg-white  2xl:text-[12px] xl:text-[10px] text-[8px] z-20 mb-2" 
+                           className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20 mb-2" 
                            isSearchable={true}
                            noOptionsMessage={() => "Không có dữ liệu"}
                            menuPortalTarget={document.body}
@@ -1172,8 +1172,8 @@ const Index = (props) => {
                           value={e?.khohang}
                           formatOptionLabel={(option) => (
                             <div className=''>
-                                <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
-                                <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{option?.label}</h2>
+                                <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
+                                <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option?.label}</h2>
                             </div>
                             )}
                              // Các props khác của Select
@@ -1183,7 +1183,7 @@ const Index = (props) => {
                           // isClearable
                           placeholder={"Kho - vị trí kho"} 
                            hideSelectedOptions={false}
-                           className="rounded-md bg-white  2xl:text-[12px] xl:text-[10px] text-[8px] z-19 mb-2" 
+                           className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] z-19 mb-2 2xl:w-[12.5vw]  xl:w-[12vw] w-[11vw]" 
                            isSearchable={true}
                            noOptionsMessage={() => "Không có dữ liệu"}
                            menuPortalTarget={document.body}
@@ -1222,16 +1222,16 @@ const Index = (props) => {
                          />
                             </div>
                          <div className='col-span-1 text-end flex items-center justify-end'>
-                           <h3 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{e?.donvitinh}</h3>
+                           <h3 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] 2xl:pr-0 xl:pr-0 pr-1'>{e?.donvitinh}</h3>
                         </div>
                         <div className='col-span-1 flex items-center justify-center'>
                            <div className="flex items-center justify-center">
-                               <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                               <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5 p-  bg-slate-200 rounded-full"
                               onClick={() => handleDecrease(e?.id)}  disabled={index === 0} 
-                              ><Minus size="16"/></button>
+                              ><Minus className='2xl:scale-100 xl:scale-100 scale-70' size="16"/></button>
                               <NumericFormat
-                                className="appearance-none 2xl:text-[12px] xl:text-[10px] text-[8px] text-center py-2 px-4 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
-                                onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong",e)}
+                                  className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
+                                  onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong",e)}
                                 value={e?.soluong || 1}
                                 allowNegative={false}
                                 disabled={index===0}
@@ -1241,10 +1241,10 @@ const Index = (props) => {
                                 thousandSeparator=","
                                 isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
                                 />
-                                <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                                <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5 p-  bg-slate-200 rounded-full"
                                 onClick={() => handleIncrease(e.id)} disabled={index === 0}
                                 >
-                                  <Add size="16"/>
+                                  <Add className='2xl:scale-100 xl:scale-100 scale-70' size="16"/>
                                 </button>
                               </div>
                         </div>
@@ -1257,7 +1257,7 @@ const Index = (props) => {
                                 // readOnly={index === 0 ? readOnlyFirst : false}
                                 decimalScale={0}
                                 isNumericString={true}   
-                                className="appearance-none 2xl:text-[13px] xl:text-[10px] text-[8px] text-center py-1 px-2 font-medium w-28 focus:outline-none border-b-2 border-gray-200"
+                                className="appearance-none 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-medium 2xl:w-24 xl:w-[75px] w-[70px] focus:outline-none border-b-2 border-gray-200"
                                 thousandSeparator=","
                             />
                         </div>
@@ -1266,7 +1266,7 @@ const Index = (props) => {
                               value={e?.chietkhau}
                               disabled={index===0}
                               onValueChange={_HandleChangeInputOption.bind(this, e?.id, "chietkhau",index)}
-                              className="appearance-none 2xl:text-[13px] xl:text-[10px] text-[8px] text-center py-1 px-2 font-medium w-28 focus:outline-none border-b-2 border-gray-200"
+                              className="appearance-none 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-medium 2xl:w-24 xl:w-[75px] w-[70px] focus:outline-none border-b-2 border-gray-200"
                               thousandSeparator=","
                               allowNegative={false}
                               // readOnly={index === 0 ? readOnlyFirst : false}
@@ -1275,7 +1275,7 @@ const Index = (props) => {
                           />
                         </div>
                         <div className='col-span-1 text-right flex items-center justify-end'>
-                           <h3 className='px-2 2xl:text-[12px] xl:text-[10px] text-[8px]'>{formatNumber(e?.dongiasauck)}</h3>
+                           <h3 className='px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{formatNumber(e?.dongiasauck)}</h3>
                         </div>
                         <div className='col-span-1 flex justify-center items-center'>
                         <Select 
@@ -1299,11 +1299,11 @@ const Index = (props) => {
                             hideSelectedOptions={false}
                             formatOptionLabel={(option) => (
                               <div className='flex justify-start items-center gap-1 '>
-                                  <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{option?.label}</h2>
-                                  <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{`(${option?.tax_rate})`}</h2>
+                                  <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option?.label}</h2>
+                                  <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{`(${option?.tax_rate})`}</h2>
                               </div>
                             )}
-                            className={`  2xl:text-[12px] xl:text-[10px] text-[8px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
+                            className={`  2xl:text-[12px] xl:text-[13px] text-[12.5px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
                             // dangerouslySetInnerHTML={{__html: option.label}}
@@ -1341,7 +1341,7 @@ const Index = (props) => {
                         </div>
                         <div className='col-span-1 text-right flex items-center justify-end'>
                            {/* <h3 className='px-2'>{formatNumber(e.thanhtien)}</h3> */}
-                           <h3 className='px-2 2xl:text-[13px] xl:text-[10px] text-[8px]'>{formatNumber(e?.thanhtien)}</h3>
+                           <h3 className='px-2 2xl:text-[13px] xl:text-[13px] text-[12.5px]'>{formatNumber(e?.thanhtien)}</h3>
                         </div>
                          <div className='col-span-1 flex items-center justify-center'>
                              <input

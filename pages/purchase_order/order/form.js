@@ -831,8 +831,8 @@ const Index = (props) => {
             <div className=' w-full rounded'>
               <div className=''>  
                   <h2 className='font-normal bg-[#ECF0F4] p-2'>{dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
-                    <div className="flex flex-wrap justify-start gap-3 items-center mt-2"> 
-                        <div className='w-[24.5%]'>
+                    <div className="grid grid-cols-12 gap-3 items-center mt-2"> 
+                        <div className='col-span-3'>
                           <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_code || "purchase_order_table_code"} </label>
                           <input
                               value={code}                
@@ -843,7 +843,7 @@ const Index = (props) => {
                               className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                         </div>
                        
-                        <div className=' w-[23vw]'>
+                        <div className='col-span-3'>
                           <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_branch || "purchase_order_table_branch"} <span className="text-red-500">*</span></label>
                           <Select 
                               options={dataBranch}
@@ -883,7 +883,7 @@ const Index = (props) => {
                           />
                           {errBranch && <label className="text-sm text-red-500">{dataLang?.purchase_order_errBranch || "purchase_order_errBranch"}</label>}
                         </div>
-                        <div className='w-[24.5%]'>
+                        <div className='col-span-3'>
                       <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_supplier} <span className="text-red-500">*</span></label>
                         <Select 
                             options={dataSupplier}
@@ -929,7 +929,7 @@ const Index = (props) => {
                           />
                           {errSupplier && <label className="text-sm text-red-500">{dataLang?.purchase_order_errSupplier || "purchase_order_errSupplier"}</label>}
                         </div>
-                        <div className='w-[24.5%]'>
+                        <div className='col-span-3'>
                           <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_staff || "purchase_order_staff"} <span className="text-red-500">*</span></label>
                           <Select 
                             options={dataStaff}
@@ -974,7 +974,7 @@ const Index = (props) => {
                           />
                         {errStaff && <label className="text-sm text-red-500">{dataLang?.purchase_order_errStaff || "purchase_order_errStaff"}</label>}
                         </div>
-                        <div className='w-[24.5%]'>
+                        <div className='col-span-3'>
                             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"} <span className="text-red-500">*</span></label>
                             <input
                               value={selectedDate}    
@@ -984,7 +984,7 @@ const Index = (props) => {
                               className={`${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                               {errDate && <label className="text-sm text-red-500">{dataLang?.purchase_err_Date || "purchase_err_Date"}</label>}
                         </div>
-                        <div className='w-[24.5%]'>
+                        <div className='col-span-3'>
                             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"} <span className="text-red-500">*</span></label>
                             <input
                               value={delivery_date}              
@@ -996,21 +996,21 @@ const Index = (props) => {
                               {errDateDelivery && <label className="text-sm text-red-500">{"purchase_err_Date"}</label>}
                           
                         </div>
-                        <div className='w-[24.5%]'>
+                        <div className='col-span-3'>
                           <label  className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"} </label>
                           <div className='flex items-center gap-5'>
                               <div className="flex items-center ">
                                   <input onChange={_HandleChangeInput.bind(this, "loai")} id="default-radio-1" type="radio" value="0" checked={loai === "0" ? true : false} name="default-radio" className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
-                                  <label for="default-radio-1" className="ml-2 cursor-pointer text-sm font-medium text-gray-900 dark:text-gray-300">{dataLang?.purchase_order_new_booking || "purchase_order_new_booking"}</label>
+                                  <label for="default-radio-1" className="ml-2 cursor-pointer text-sm font-normal text-gray-900 dark:text-gray-300">{dataLang?.purchase_order_new_booking || "purchase_order_new_booking"}</label>
                               </div>
                               <div className="flex items-center">
                                   <input onChange={_HandleChangeInput.bind(this, "loai")} checked={loai === "1" ? true : false}  id="default-radio-2" type="radio" value="1" name="default-radio" className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
-                                  <label for="default-radio-2" className="ml-2 cursor-pointer text-sm font-medium text-gray-900 dark:text-gray-300">{dataLang?.purchase_order_according_to_YCMH || "purchase_order_according_to_YCMH"}</label>
+                                  <label for="default-radio-2" className="ml-2 cursor-pointer text-sm font-normal text-gray-900 dark:text-gray-300">{dataLang?.purchase_order_according_to_YCMH || "purchase_order_according_to_YCMH"}</label>
                               </div>
                           </div>
                         </div>
                         {hidden && ( 
-                          <div className='w-[24.5%]'>
+                          <div className='col-span-3'>
                             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_purchase_requisition_form || "purchase_order_purchase_requisition_form"} <span className="text-red-500">*</span></label>
                               <Select 
                                   options={fakeDataPurchases}
@@ -1064,16 +1064,16 @@ const Index = (props) => {
             <h2 className='font-normal bg-[#ECF0F4] p-2  '>{dataLang?.purchase_order_purchase_item_information || "purchase_order_purchase_item_information"}</h2>  
               <div className='pr-2'>
               <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10'>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-3    text-left    truncate font-[400]'>{dataLang?.purchase_order_purchase_from_item || "purchase_order_purchase_from_item"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_purchase_from_unit || "purchase_order_purchase_from_unit"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_quantity || "purchase_quantity"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-left    font-[400]'>{dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]'>{dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]'>{dataLang?.purchase_order_note || "purchase_order_note"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-3    text-left    truncate font-[400]'>{dataLang?.purchase_order_purchase_from_item || "purchase_order_purchase_from_item"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_purchase_from_unit || "purchase_order_purchase_from_unit"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    font-[400]'>{dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]'>{dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]'>{dataLang?.purchase_order_note || "purchase_order_note"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}</h4>
               </div>     
               </div>     
             <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
@@ -1100,19 +1100,19 @@ const Index = (props) => {
                                   }
                               </div>
                               <div>
-                                <h3 className='font-medium 2xl:text-[13px] xl:text-[10px] text-[8px]'>{option.e?.name}</h3>
+                                <h3 className='font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
                                 <div className='flex gap-2'>
-                                  <h5 className='text-gray-400 font-normal 2xl:text-[13px] xl:text-[10px] text-[8px]'>{option.e?.code}</h5>
-                                  <h5 className='font-medium 2xl:text-[13px] xl:text-[10px] text-[8px]'>{option.e?.product_variation}</h5>
+                                  <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.code}</h5>
+                                  <h5 className='font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
                                 </div>
-                                <h5 className='text-gray-400 font-medium text-xs 2xl:text-[13px] xl:text-[10px] text-[8px]'>{dataLang[option.e?.text_type]} {loai == "1" ? "-":""} {loai == "1" ? option.e?.purchases_code : ""} {loai == "1" ? "- Số lượng:":""} {loai == "1" ? option.e?.quantity_left  : ""}</h5>
+                                <h5 className='text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]} {loai == "1" ? "-":""} {loai == "1" ? option.e?.purchases_code : ""} {loai == "1" ? "- Số lượng:":""} {loai == "1" ? option.e?.quantity_left  : ""}</h5>
                               </div>
                             </div>
                             <div className=''>
                                <div className='text-right opacity-0'>{"0"}</div>
                                <div className='flex gap-2'>
                                  <div className='flex items-center gap-2'>
-                                   <h5 className='text-gray-400 font-normal 2xl:text-[13px] xl:text-[10px] text-[8px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className=' font-medium 2xl:text-[13px] xl:text-[10px] text-[8px]'>{option.e?.qty_warehouse ? option.e?.qty_warehouse : "0" }</h5>
+                                   <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className=' font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.qty_warehouse ? option.e?.qty_warehouse : "0" }</h5>
                                  </div>
                                 
                                 </div>
@@ -1155,24 +1155,24 @@ const Index = (props) => {
                          />
                          </div>
                          <div className='col-span-1 text-center flex items-center justify-center'>
-                           <h3 className='2xl:text-[13px] xl:text-[10px] text-[8px]'>{e?.donvitinh}</h3>
+                           <h3 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{e?.donvitinh}</h3>
                         </div>
                         <div className='col-span-1 flex items-center justify-center'>
                            <div className="flex items-center justify-center">
-                               <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                           <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                               onClick={() => handleDecrease(e?.id)}  disabled={index === 0} 
                               ><Minus size="16"/></button>
-                              <NumericFormat
-                                className="appearance-none text-center 2xl:text-[12px] xl:text-[10px] text-[8px] py-2 px-4 font-medium w-24 focus:outline-none border-b-2 border-gray-200"
-                                onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong",e)}
-                                value={e?.soluong || 1}
-                                thousandSeparator=","
-                                allowNegative={false}
-                                readOnly={index === 0 ? readOnlyFirst : false}
-                                decimalScale={0}
-                                isNumericString={true}  
-                                 isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
-                                />
+                                  <NumericFormat
+                                  className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200"
+                                  onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong",e)}
+                                  value={e?.soluong || 1}
+                                  thousandSeparator=","
+                                  allowNegative={false}
+                                  readOnly={index === 0 ? readOnlyFirst : false}
+                                  decimalScale={0}
+                                  isNumericString={true}  
+                                  isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
+                                  />
                                 <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                                 onClick={() => handleIncrease(e.id)} disabled={index === 0}
                                 >
@@ -1188,7 +1188,7 @@ const Index = (props) => {
                                 readOnly={index === 0 ? readOnlyFirst : false}
                                 decimalScale={0}
                                 isNumericString={true}   
-                                className="appearance-none 2xl:text-[12px] xl:text-[10px] text-[8px] text-center py-1 px-2 font-medium w-28 focus:outline-none border-b-2 border-gray-200"
+                                className="appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200"
                                 thousandSeparator=","
                             />
                         </div>
@@ -1196,7 +1196,7 @@ const Index = (props) => {
                           <NumericFormat
                               value={e?.chietkhau}
                               onValueChange={_HandleChangeInputOption.bind(this, e?.id, "chietkhau",index)}
-                              className="appearance-none text-center py-1 px-2 font-medium w-28  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[10px] text-[8px] border-gray-200"
+                              className="appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200"
                               thousandSeparator=","
                               allowNegative={false}
                               // readOnly={index === 0 ? readOnlyFirst : false}
@@ -1206,7 +1206,7 @@ const Index = (props) => {
                         </div>
                         
                         <div className='col-span-1 text-right flex items-center justify-end'>
-                           <h3 className='px-2 2xl:text-[12px] xl:text-[10px] text-[8px]'>{formatNumber(e?.dongiasauck)}</h3>
+                           <h3 className='px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{formatNumber(e?.dongiasauck)}</h3>
                         </div>
                         <div className='col-span-1 flex justify-center items-center'>
                         <Select 
@@ -1217,11 +1217,11 @@ const Index = (props) => {
                             hideSelectedOptions={false}
                             formatOptionLabel={(option) => (
                               <div className='flex justify-start items-center gap-1 '>
-                                  <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{option?.label}</h2>
-                                  <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{`(${option?.tax_rate})`}</h2>
+                                  <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option?.label}</h2>
+                                  <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{`(${option?.tax_rate})`}</h2>
                               </div>
                             )}
-                            className={` "border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[10px] text-[8px] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
+                            className={` "border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
                             // dangerouslySetInnerHTML={{__html: option.label}}
@@ -1258,7 +1258,7 @@ const Index = (props) => {
                           />
                         </div>
                         <div className='col-span-1 text-right flex items-center justify-end'>
-                          <h3 className='px-2 2xl:text-[12px] xl:text-[10px] text-[8px]'>{formatNumber(e?.thanhtien)}</h3>
+                          <h3 className='px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{formatNumber(e?.thanhtien)}</h3>
                           {/* <h3 className='px-2'>{formatNumber(e?.dongiasauck * (1 + Number(e?.thue?.tax_rate || 0) / 100) * e?.soluong)}</h3> */}
                         </div>
                          <div className='col-span-1 flex items-center justify-center'>
@@ -1268,7 +1268,7 @@ const Index = (props) => {
                                  name="optionEmail"     
                                  placeholder='Ghi chú'                 
                                  type="text"
-                                 className= "focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[10px] text-[8px]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
+                                 className= "focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12.5px]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
                                /> 
                          </div>
                          <div className='col-span-1 flex items-center justify-center'>
@@ -1289,7 +1289,7 @@ const Index = (props) => {
                           <NumericFormat
                               value={chietkhautong}
                               onValueChange={_HandleChangeInput.bind(this, "chietkhautong")}
-                              className=" text-center py-1 px-2 bg-transparent font-medium w-20 focus:outline-none border-b-2 border-gray-300"
+                              className=" text-center py-1 px-2 bg-transparent font-normal w-20 focus:outline-none border-b-2 border-gray-300"
                               thousandSeparator=","
                               allowNegative={false}
                               decimalScale={0}
