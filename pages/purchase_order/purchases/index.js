@@ -302,6 +302,7 @@ const Index = (props) => {
                     {title: `${dataLang?.purchase_totalitem || "purchase_totalitem"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
                     {title: `${dataLang?.purchase_orderStatus || "purchase_orderStatus"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
                     {title: `${dataLang?.purchase_branch || "purchase_branch"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                    {title: `${dataLang?.purchase_note || "purchase_note"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
                 ],
                 data: dataExcel?.map((e) =>
                     [
@@ -315,8 +316,8 @@ const Index = (props) => {
                         {value: e?.order_status?.status === "purchase_ordered" ? dataLang[e?.order_status?.status] :""
                         ||  `${e?.order_status.status === "purchase_portion" ?  dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})` :""}` 
                         ||  `${e?.order_status.status === "purchase_enough" ?  dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})` : ""}`},
-                        {value: `${e?.note ? e?.note :""}`},
                         {value: `${e?.branch_name ? e?.branch_name :""}`},
+                        {value: `${e?.note ? e?.note :""}`},
                        
                     ]    
                 ),
@@ -571,8 +572,8 @@ const Index = (props) => {
                                 <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>{dataLang?.purchase_propnent || "purchase_propnent"}</h4>
                                 <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase  col-span-1 font-[300] text-center'>{dataLang?.purchase_status || "purchase_status"}</h4>
                                 <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase  col-span-1 text-center font-[300]'>{dataLang?.purchase_totalitem || "purchase_totalitem"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase text-left col-span-1 font-[300]'>{dataLang?.purchase_orderStatus || "purchase_orderStatus"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase text-left col-span-3 font-[300]'>{dataLang?.purchase_note || "purchase_note"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase text-center col-span-2 font-[300]'>{dataLang?.purchase_orderStatus || "purchase_orderStatus"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase text-left col-span-2 font-[300]'>{dataLang?.purchase_note || "purchase_note"}</h4>
                                 <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{dataLang?.purchase_branch || "purchase_branch"}</h4>
                                 <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase text-center  col-span-1 font-[300]'>{dataLang?.purchase_action || "purchase_action"}</h4>
                             </div>
@@ -588,16 +589,16 @@ const Index = (props) => {
                                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center '>{e?.staff_create_name}</h6>
                                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer'>{e?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1 2xl:text-base xl:text-xs text-[8px]' onClick={() => _ToggleStatus(e?.id)}>Đã duyệt <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1 2xl:text-base xl:text-xs text-[8px]' onClick={() => _ToggleStatus(e?.id)}>Chưa duyệt <TickCircle size={22}/></div>)}</h6>
                                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center '>{formatNumber(e?.total_item)}</h6>
-                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center '>
-                                                  <div className='flex flex-wrap  gap-2 items-center justify-center'>
+                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-2 flex items-center '>
+                                                  <div className='mx-auto'>
                                                    {
-                                                  e?.order_status?.status === "purchase_ordered" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{dataLang[e?.order_status?.status]}</span>||
-                                                  e?.order_status?.status === "purchase_portion" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{dataLang[e?.order_status?.status]} {`(${e?.order_status?.count})`}</span>||
-                                                  e?.order_status?.status === "purchase_enough" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 2xl:text-sm xl:text-xs text-[8px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{dataLang[e?.order_status?.status]} {`(${e?.order_status?.count})`}</span>
+                                                  e?.order_status?.status === "purchase_ordered" && <span className='flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{dataLang[e?.order_status?.status]}</span>||
+                                                  e?.order_status?.status === "purchase_portion" && <span className=' flex items-center justify-center font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{dataLang[e?.order_status?.status]} {`(${e?.order_status?.count})`}</span>||
+                                                  e?.order_status?.status === "purchase_enough" && <span className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 2xl:text-sm xl:text-xs text-[8px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{dataLang[e?.order_status?.status]} {`(${e?.order_status?.count})`}</span>
                                                     }
                                                   </div>
                                                 </h6>
-                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-3 flex text-left items-center '>{e?.note}</h6>
+                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-2 flex  items-center '><h6 className=''>{e?.note}</h6></h6>
                                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center  '><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6>
                                                 <div className='pl-2 py-2.5 col-span-1 flex space-x-2 justify-center'>
                                                     <BtnTacVu order={e?.order_status}  dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} status={e?.status} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] 2xl:text-base xl:text-xs text-[8px]" />

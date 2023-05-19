@@ -130,7 +130,7 @@ const Header = () => {
                     items: [
                         { name: "Yêu cầu mua hàng", link: '/purchase_order/purchases' },
                         { name: "Đơn đặt hàng", link: '/purchase_order/order' },
-                        { name: "Phiếu dịch vụ" }
+                        { name: "Phiếu dịch vụ",link: '/purchase_order/serviceVoucher' }
                     ]
                 }
             ]
