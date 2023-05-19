@@ -618,9 +618,9 @@ const [browser, sBrowser] = useState("0")
                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-2 '>
                                     <div className='flex flex-wrap  gap-2 items-center justify-center'>
                                       {
-                                    e?.status === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{"Chưa thanh toán"}</span>||
-                                    e?.status === "1" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{"Thanh toán 1 phần"} {`(${e?.count})`}</span>||
-                                    e?.status === "2" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 2xl:text-sm xl:text-xs text-[8px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã thanh toán đủ"} {`(${e?.order_status?.count})`}</span>
+                                    e?.status === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{"Chưa chi"}</span>||
+                                    e?.status === "1" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{"chi 1 phần"} {`(${e?.count})`}</span>||
+                                    e?.status === "2" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 2xl:text-sm xl:text-xs text-[8px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã chi đủ"} {`(${e?.order_status?.count})`}</span>
                                       }
                                     </div>
                                   </h6>
@@ -656,7 +656,7 @@ const [browser, sBrowser] = useState("0")
                                               </svg>
                                           </div>
                                           <div className='w-[80%]'>
-                                            <label htmlFor={e.id} className='font-normal 2xl:text-base xl:text-xs text-[8px] text-[#6366f1]'>{"Chưa duyệt"}</label>
+                                            <label htmlFor={e.id} className='font-normal 2xl:[16px] xl:text-xs text-[8px] text-[#6366f1]'>{"Chưa duyệt kho"}</label>
                                           </div>
                                       </label>
                                   </div>
@@ -893,7 +893,7 @@ return (
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{"Duyệt thủ kkho"}</h3>
                           <div className='flex flex-wrap  gap-2 items-center justify-center'>
                               {
-                            data?.status === "0" && <span className=' font-normal text-[#3b82f6]  rounded-xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center text-[13px]'>{"Chưa duyệt"}</span>
+                            data?.status === "0" && <span className=' font-normal text-[#3b82f6]  rounded-xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center text-[13px]'>{"Chưa duyệt kho"}</span>
                             // data?.status === "1" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center text-[13px]'>{"Thanh toán 1 phần"} {`(${e?.count})`}</span>||
                             // data?.status === "2" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã thanh toán đủ"} {`(${e?.order_status?.count})`}</span>
                               }
