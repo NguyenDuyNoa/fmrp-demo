@@ -632,7 +632,7 @@ const [browser, sBrowser] = useState("0")
                                 </h6> */}
                                 <h6 className=' 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center '>
                                   <div className=' '>
-                                      <label className="relative flex cursor-pointer items-center rounded-xl py-1 px-2 gap-1 bg-[#e0e7ff]"
+                                      <label className="relative flex cursor-pointer items-center rounded-lg py-1.5 px-4 gap-1 bg-[#e0e7ff]"
                                           htmlFor={e?.id} data-ripple-dark="true" > 
                                           <input type="checkbox" className="before:content[''] border-[#4f46e5] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border  transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 "
                                               id={e.id}
