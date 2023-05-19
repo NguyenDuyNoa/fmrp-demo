@@ -74,7 +74,7 @@ const Index = (props) => {
     const [errDate, sErrDate] = useState(false)
     const [errTheOrder, sErrTheOrder] = useState(false)
     const [errBranch, sErrBranch] = useState(false)
-
+    const [errWarehouse, sErrWarehouse] = useState(false)
     const [mathangAll, sMathangAll] = useState([])
     const [khotong, sKhotong] = useState(null)
 
@@ -85,6 +85,7 @@ const Index = (props) => {
       router.query && sErrSupplier(false)
       router.query && sErrTheOrder(false)
       router.query && sErrBranch(false)
+      // router.query && sErrWarehouse(false)
       router.query && sDate(moment().format('YYYY-MM-DD HH:mm:ss'))
       router.query && sNote("")
   }, [router.query]);
@@ -114,7 +115,7 @@ const Index = (props) => {
         sCode(rResult?.code)
         sIdBranch({label: rResult?.branch_name, value:rResult?.branch_id})
         sIdSupplier({label: rResult?.supplier_name, value: rResult?.supplier_id})
-        sIdTheOrder({label: rResult?.purchase_order_code, label: rResult?.purchase_order_id})
+        sIdTheOrder({label: rResult?.purchase_order_code, value: rResult?.purchase_order_id})
         sDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
         sNote(rResult?.note)
       }
@@ -154,6 +155,7 @@ const Index = (props) => {
       Axios("GET", "/api_web/Api_purchase_order/purchase_order_combobox/?csrf_protection=true", {
         params:{
           "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
+          "import_id": id ? id : ""
          }
       }, (err, response) => {
           if(!err){
@@ -205,6 +207,10 @@ const Index = (props) => {
               sIdTheOrder(null)
               sIdSupplier(null)
               sKhotong([])
+          }else{
+            sIdBranch(value)
+            sIdPurchases([])
+            sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
           }
         })
         }
@@ -306,20 +312,27 @@ const Index = (props) => {
 
     const _HandleSubmit = (e) => {
       e.preventDefault();
-        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null ){
+
+       const checkErr = sortedArr?.map(e => { return {item: e?.mathang?.value,location_warehouses_id: e?.khohang?.value}})
+       let checkErrValidate = checkErr?.filter(e => e?.item !== undefined);
+
+      const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
+        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullLabel ){
           date == null && sErrDate(true)
           idSupplier == null && sErrSupplier(true)
           idBranch == null && sErrBranch(true)
           idTheOrder == null && sErrTheOrder(true)
+          hasNullLabel && sErrWarehouse(true) 
             Toast.fire({
                 icon: 'error',
                 title: `${dataLang?.required_field_null}`
             })
         }
         else {
+            sErrWarehouse(false)
             sOnSending(true)
         }
-    }
+      }
 
     useEffect(() => {
       sErrDate(false)
@@ -329,6 +342,11 @@ const Index = (props) => {
       sErrSupplier(false)
     }, [idSupplier != null]);
 
+ 
+
+
+
+    
     useEffect(() => {
       sErrBranch(false)
     }, [idBranch != null]);
@@ -342,7 +360,8 @@ const Index = (props) => {
     const _ServerFetching_ItemsAll =  () => {
       Axios("GET", "/api_web/Api_purchase_order/searchItemsVariant/?csrf_protection=true", {
         params:{
-          "filter[purchase_order_id]":idTheOrder ? idTheOrder?.value : null
+          "filter[purchase_order_id]":idTheOrder ? idTheOrder?.value : null,
+          "import_id": id ? id : ""
         }
       }, (err, response) => {
           if(!err){
@@ -441,13 +460,15 @@ const Index = (props) => {
             option[index].thue =  thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}  
             option[index].thanhtien = Number(value?.e?.amount)
           }else{
+      
+            console.log(sortedArr);
             // const newData= {id: Date.now(), mathang: value, dongiasauck: Number(value?.e?.price_after_discount), khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: Number(value?.e?.price), chietkhau: Number(value?.e?.discount_percent), thue: value ? [{label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e.tax_id, tax_rate: value?.e.tax_rate}] : thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
             const newData= {id: Date.now(), mathang: value, dongiasauck: Number(value?.e?.price_after_discount), khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: Number(value?.e?.price), chietkhau: Number(value?.e?.discount_percent), thue: thuetong ? thuetong : {label: value?.e.tax_name,value:Number(value?.e.tax_id), tax_rate:Number(value?.e.tax_rate)}, thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
             if (newData.chietkhau) {
               // newData.dongiasauck *=  (1 - Number(newData.chietkhau) / 100);
               newData.dongiasauck = Number(newData.dongia) * (1 - Number(newData.chietkhau) / 100);
             }
-            if(newData.thue?.tax_rate == undefined){
+            if(newData?.thue?.tax_rate == undefined){
               const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
               newData.thanhtien = Number(tien.toFixed(2));
             }else { 
@@ -465,20 +486,20 @@ const Index = (props) => {
       option[index].donvitinh = value.target?.value;
     }else if (type === "soluong") {
       option[index].soluong = Number(value?.value);
-      // if(option[index].thue?.tax_rate == undefined){
-      //   const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-      //   option[index].thanhtien = Number(tien.toFixed(2));
-      // }else{
-      //   const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-      //   option[index].thanhtien = Number(tien.toFixed(2));
-      // }
-      if(newData.thue?.tax_rate == undefined){
-        const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
-        newData.thanhtien = Number(tien.toFixed(2));
-      }else { 
-        const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.tax_rate)/100) * Number(newData.soluong);
-        newData.thanhtien = Number(tien.toFixed(2));
+      if(option[index].thue?.tax_rate == undefined){
+        const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
+        option[index].thanhtien = Number(tien.toFixed(2));
+      }else{
+        const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
+        option[index].thanhtien = Number(tien.toFixed(2));
       }
+      // if(newData?.thue?.tax_rate == undefined){
+      //   const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
+      //   newData.thanhtien = Number(tien.toFixed(2));
+      // }else { 
+      //   const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.tax_rate)/100) * Number(newData.soluong);
+      //   newData.thanhtien = Number(tien.toFixed(2));
+      // }
       sOption([...option]);
     }else if(type == "dongia"){
         option[index].dongia = Number(value.value)
@@ -688,13 +709,13 @@ const Index = (props) => {
                       sErrSupplier(false)
                       sOption([{id: Date.now(), mathang: null}])
                       router.back()
-                  }else {
+                  }else {    
                     if(tongTienState.tongTien == 0){
                       Toast.fire({
                         icon: 'error',
                         title: `Chưa nhập thông tin mặt hàng`
                     })
-                    }
+                     } 
                     else{
                       Toast.fire({
                         icon: 'error',
@@ -722,16 +743,16 @@ const Index = (props) => {
     const customStyles = {
       control: (base, state) => ({
         ...base,
-        width: cutTomStyle || (state.isFocused && isExpanded) ? '230px' : '220px',
+        // width: cutTomStyle || (state.isFocused && isExpanded) ? '200px' : '200px',
         transition: 'width 0.5s',
         border: state.isFocused && isExpanded ? '0 0 0 1px #92BFF7' : '0 0 0 1px #92BFF7',
-        boxShadow: state.isFocused && isExpanded ? 'none' : 'none',
-        '@media (max-width: 1536px)': {
-          width: '200px', 
-        },
-        '@media (max-width: 1280px)': {
-          width: '150px', 
-        },
+        // boxShadow: state.isFocused && isExpanded ? 'none' : 'none',
+        // '@media (max-width: 1536px)': {
+        //   width: '330px', 
+        // },
+        // '@media (min-width: 1280px)': {
+        //   width: '160px', 
+        // },
       }),
       menuPortal: (base) => ({
         ...base,
@@ -961,12 +982,12 @@ const Index = (props) => {
                                         )}
                                       </div>
                                       <div>
-                                        <h3 className='font-medium'>{option.e?.name}</h3>
+                                        <h3 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
                                         <div className='flex gap-2'>
-                                          <h5 className='text-gray-400 font-normal'>{option.e?.code}</h5>
-                                          <h5 className='font-medium'>{option.e?.product_variation}</h5>
+                                          <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.code}</h5>
+                                          <h5 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
                                         </div>
-                                        <h5 className='text-gray-400 font-medium text-xs'>{dataLang[option.e?.text_type]}</h5>
+                                        <h5 className='text-gray-400 font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
                                       </div>
                                     </div>
                                     <div className=''>
@@ -985,7 +1006,7 @@ const Index = (props) => {
                             // components={{ DropdownIndicator }}
                            placeholder={dataLang?.purchase_items || "purchase_items"} 
                            hideSelectedOptions={false}
-                           className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
+                           className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20" 
                            isSearchable={true}
                            noOptionsMessage={() => "Không có dữ liệu"}
                            menuPortalTarget={document.body} 
@@ -1036,7 +1057,7 @@ const Index = (props) => {
                             isClearable
                             placeholder={dataLang?.import_click_house || "import_click_house"} 
                             hideSelectedOptions={false}
-                            className={` "border-transparent placeholder:text-slate-300  z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
+                            className={` "border-transparent placeholder:text-slate-300 2xl:text-[12px] xl:text-[13px] text-[12.5px]   z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
                            dangerouslySetInnerHTML={{__html: option.label}}
@@ -1075,17 +1096,17 @@ const Index = (props) => {
               </div> 
               <div className='pr-2'>
               <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10'>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-2    text-center    truncate font-[400]'>{dataLang?.import_from_items || "import_from_items"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]'>{dataLang?.import_from_ware_loca || "import_from_ware_loca"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-right  truncate font-[400]'>{"ĐVT"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_quantity || "import_from_quantity"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_discount || "import_from_discount"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_tax || "import_from_tax"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_into_money || "import_into_money"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_note || "import_from_note"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_operation || "import_from_operation"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-2    text-center    truncate font-[400]'>{dataLang?.import_from_items || "import_from_items"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]'>{dataLang?.import_from_ware_loca || "import_from_ware_loca"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-right  truncate font-[400]'>{"ĐVT"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_quantity || "import_from_quantity"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_discount || "import_from_discount"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_tax || "import_from_tax"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_into_money || "import_into_money"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_note || "import_from_note"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_operation || "import_from_operation"}</h4>
               </div>     
               </div>     
             <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
@@ -1103,27 +1124,27 @@ const Index = (props) => {
                            formatOptionLabel={(option) => (
                           <div className='flex items-center  justify-between py-2'>
                             <div className='flex items-center gap-2'>
-                              <div className='2xl:h-[60px] xl:w-[40px] xl:h-[50px] w-[30px] h-[40px]'>
-                              {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />):
-                                    <div className='2xl:w-[50px] 2xl:h-[60px] xl:w-[40px] xl:h-[50px] w-[30px] h-[40px] object-cover  flex items-center justify-center rounded'>
-                                      <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
+                              <div className='w-[40px] h-h-[60px]'>
+                              {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='object-cover rounded' />):
+                                    <div className=' object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]'>
+                                      <img src="/no_img.png" alt="Product Image"  className='object-cover rounded ' />
                                   </div>
                                   }
                               </div>
                               <div>
-                                <h3 className='font-medium 2xl:text-[12px] xl:text-[10px] text-[8px]'>{option.e?.name}</h3>
+                                <h3 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
                                 <div className='flex gap-2'>
-                                  <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[10px] text-[8px]' >{option.e?.code}</h5>
-                                  <h5 className='font-medium 2xl:text-[12px] xl:text-[10px] text-[8px]'>{option.e?.product_variation}</h5>
+                                  <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]' >{option.e?.code}</h5>
+                                  <h5 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
                                 </div>
-                                <h5 className='text-gray-400 font-medium text-xs 2xl:text-[12px] xl:text-[10px] text-[8px]'>{dataLang[option.e?.text_type]}</h5>
+                                <h5 className='text-gray-400 font-medium text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
                               </div>
                             </div>
                             <div className=''>
                                <div className='text-right opacity-0'>{"0"}</div>
                                <div className='flex gap-2'>
                                  <div className='flex items-center gap-2'>
-                                   <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[10px] text-[8px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[10px] text-[8px]'>{option.e?.qty_warehouse ?? 0}</h5>
+                                   <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.qty_warehouse ?? 0}</h5>
                                  </div>
                                 
                                 </div>
@@ -1132,7 +1153,7 @@ const Index = (props) => {
                         )}
                            placeholder={dataLang?.purchase_items || "purchase_items"} 
                            hideSelectedOptions={false}
-                           className="rounded-md bg-white  2xl:text-[12px] xl:text-[10px] text-[8px] z-20 mb-2" 
+                           className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20 mb-2" 
                            isSearchable={true}
                            noOptionsMessage={() => "Không có dữ liệu"}
                            menuPortalTarget={document.body}
@@ -1165,15 +1186,15 @@ const Index = (props) => {
                          }}
                          />
                             </div>
-                            <div className='col-span-1  z-[100] my-auto'>
+                            <div className='col-span-1  my-auto'>
                            <Select 
                            
                           onChange={_HandleChangeInputOption.bind(this, e?.id,"khohang",index)}
                           value={e?.khohang}
                           formatOptionLabel={(option) => (
-                            <div className=''>
-                                <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
-                                <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{option?.label}</h2>
+                            <div className='z-[100]'>
+                                <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] z-[100]'>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
+                                <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] z-[100]'>{option?.label}</h2>
                             </div>
                             )}
                              // Các props khác của Select
@@ -1183,7 +1204,8 @@ const Index = (props) => {
                           // isClearable
                           placeholder={"Kho - vị trí kho"} 
                            hideSelectedOptions={false}
-                           className="rounded-md bg-white  2xl:text-[12px] xl:text-[10px] text-[8px] z-19 mb-2" 
+                           className={`${index != 0 && errWarehouse && e?.khohang?.length == 0 ? "border-red-500 bg-red-500 " : "border-transparent bg-[#ffffff]"} placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal outline-none border `} 
+                          //  className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] z-19 mb-2 2xl:w-[12.5vw]  xl:w-[12vw] w-[11vw]" 
                            isSearchable={true}
                            noOptionsMessage={() => "Không có dữ liệu"}
                            menuPortalTarget={document.body}
@@ -1218,20 +1240,21 @@ const Index = (props) => {
                         //       }),
                         //     }),
                         //  }}
-                        styles={customStyles}
+                        // styles={customStyles}
                          />
-                            </div>
+                      {/* /    {index != 0 && errWarehouse ? <label className="text-sm text-red-500">{"Vui lòng chọn kho hàng"}</label>:""} */}
+                        </div>
                          <div className='col-span-1 text-end flex items-center justify-end'>
-                           <h3 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{e?.donvitinh}</h3>
+                           <h3 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] 2xl:pr-0 xl:pr-0 pr-1'>{e?.donvitinh}</h3>
                         </div>
                         <div className='col-span-1 flex items-center justify-center'>
                            <div className="flex items-center justify-center">
-                               <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                               <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5 p-  bg-slate-200 rounded-full"
                               onClick={() => handleDecrease(e?.id)}  disabled={index === 0} 
-                              ><Minus size="16"/></button>
+                              ><Minus className='2xl:scale-100 xl:scale-100 scale-70' size="16"/></button>
                               <NumericFormat
-                                className="appearance-none 2xl:text-[12px] xl:text-[10px] text-[8px] text-center py-2 px-4 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
-                                onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong",e)}
+                                  className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
+                                  onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong",e)}
                                 value={e?.soluong || 1}
                                 allowNegative={false}
                                 disabled={index===0}
@@ -1241,10 +1264,10 @@ const Index = (props) => {
                                 thousandSeparator=","
                                 isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
                                 />
-                                <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                                <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5 p-  bg-slate-200 rounded-full"
                                 onClick={() => handleIncrease(e.id)} disabled={index === 0}
                                 >
-                                  <Add size="16"/>
+                                  <Add className='2xl:scale-100 xl:scale-100 scale-70' size="16"/>
                                 </button>
                               </div>
                         </div>
@@ -1257,7 +1280,7 @@ const Index = (props) => {
                                 // readOnly={index === 0 ? readOnlyFirst : false}
                                 decimalScale={0}
                                 isNumericString={true}   
-                                className="appearance-none 2xl:text-[13px] xl:text-[10px] text-[8px] text-center py-1 px-2 font-medium w-28 focus:outline-none border-b-2 border-gray-200"
+                                className="appearance-none 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-medium 2xl:w-24 xl:w-[75px] w-[70px] focus:outline-none border-b-2 border-gray-200"
                                 thousandSeparator=","
                             />
                         </div>
@@ -1266,7 +1289,7 @@ const Index = (props) => {
                               value={e?.chietkhau}
                               disabled={index===0}
                               onValueChange={_HandleChangeInputOption.bind(this, e?.id, "chietkhau",index)}
-                              className="appearance-none 2xl:text-[13px] xl:text-[10px] text-[8px] text-center py-1 px-2 font-medium w-28 focus:outline-none border-b-2 border-gray-200"
+                              className="appearance-none 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-medium 2xl:w-24 xl:w-[75px] w-[70px] focus:outline-none border-b-2 border-gray-200"
                               thousandSeparator=","
                               allowNegative={false}
                               // readOnly={index === 0 ? readOnlyFirst : false}
@@ -1275,7 +1298,7 @@ const Index = (props) => {
                           />
                         </div>
                         <div className='col-span-1 text-right flex items-center justify-end'>
-                           <h3 className='px-2 2xl:text-[12px] xl:text-[10px] text-[8px]'>{formatNumber(e?.dongiasauck)}</h3>
+                           <h3 className='px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{formatNumber(e?.dongiasauck)}</h3>
                         </div>
                         <div className='col-span-1 flex justify-center items-center'>
                         <Select 
@@ -1299,11 +1322,11 @@ const Index = (props) => {
                             hideSelectedOptions={false}
                             formatOptionLabel={(option) => (
                               <div className='flex justify-start items-center gap-1 '>
-                                  <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{option?.label}</h2>
-                                  <h2 className='2xl:text-[12px] xl:text-[10px] text-[8px]'>{`(${option?.tax_rate})`}</h2>
+                                  <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option?.label}</h2>
+                                  <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{`(${option?.tax_rate})`}</h2>
                               </div>
                             )}
-                            className={`  2xl:text-[12px] xl:text-[10px] text-[8px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
+                            className={`  2xl:text-[12px] xl:text-[13px] text-[12.5px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
                             // dangerouslySetInnerHTML={{__html: option.label}}
@@ -1341,7 +1364,7 @@ const Index = (props) => {
                         </div>
                         <div className='col-span-1 text-right flex items-center justify-end'>
                            {/* <h3 className='px-2'>{formatNumber(e.thanhtien)}</h3> */}
-                           <h3 className='px-2 2xl:text-[13px] xl:text-[10px] text-[8px]'>{formatNumber(e?.thanhtien)}</h3>
+                           <h3 className='px-2 2xl:text-[13px] xl:text-[13px] text-[12.5px]'>{formatNumber(e?.thanhtien)}</h3>
                         </div>
                          <div className='col-span-1 flex items-center justify-center'>
                              <input

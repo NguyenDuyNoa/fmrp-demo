@@ -367,24 +367,24 @@ const Index = (props) => {
     {/* <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between'> */}
     <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between'>
         <div className='h-[97%] space-y-3 overflow-hidden'>
-            <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
-                <h6 className='text-[#141522]/40'>{dataLang?.purchase_purchase || "purchase_purchase"}</h6>
-                <span className='text-[#141522]/40'>/</span>
-                <h6>{id ? dataLang?.purchase_edit || "purchase_edit" : dataLang?.purchase_add || "purchase_add"}</h6>
+            <div className='flex space-x-3 '>
+                <h6 className='text-[#141522]/40 '>{dataLang?.purchase_purchase || "purchase_purchase"}</h6>
+                <span className='text-[#141522]/40 '>/</span>
+                <h6 className=''>{id ? dataLang?.purchase_edit || "purchase_edit" : dataLang?.purchase_add || "purchase_add"}</h6>
             </div>
             <div className='flex justify-between items-center'>
-                <h2 className='xl:text-2xl text-xl '>{id ? dataLang?.purchase_edit || "purchase_edit" : dataLang?.purchase_add || "purchase_add"}</h2>
+                <h2 className=' '>{id ? dataLang?.purchase_edit || "purchase_edit" : dataLang?.purchase_add || "purchase_add"}</h2>
                 <div className="flex justify-end items-center">
                     <button   onClick={() => router.back()} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105">{dataLang?.warehouses_detail_back}</button>
                   </div>
             </div>    
             <div className=' w-full rounded'>
               <div className=''>  
-                  <h2 className='font-normal bg-[#ECF0F4] p-2'>{dataLang?.purchase_general || "purchase_general"}</h2>       
+                  <h2 className='font-normal bg-[#ECF0F4] p-2 '>{dataLang?.purchase_general || "purchase_general"}</h2>       
                   
                     <div className="flex flex-wrap justify-between items-center mt-2"> 
                       <div className='w-[24.5%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_code || "purchase_code"} </label>
+                          <label className="text-[#344054] font-normal text-sm mb-1  2xl:text-[12px] xl:text-[13px] text-[13px]">{dataLang?.purchase_code || "purchase_code"} </label>
                           <input
                             value={code}                
                             onChange={_HandleChangeInput.bind(this, "code")}
@@ -394,7 +394,7 @@ const Index = (props) => {
                             className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                       </div>
                       <div className='w-[24.5%]'>
-                              <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_day || "purchase_day"} <span className="text-red-500">*</span></label>
+                              <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">{dataLang?.purchase_day || "purchase_day"} <span className="text-red-500">*</span></label>
                               <input
                                 value={selectedDate}              
                                 onChange={_HandleChangeInput.bind(this, "date")}
@@ -406,7 +406,7 @@ const Index = (props) => {
                             
                           </div>
                       <div className='w-[24.5%]'>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_name || "purchase_name"}</label>
+                          <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">{dataLang?.purchase_name || "purchase_name"}</label>
                             <input
                             value={namePromis}                
                             onChange={_HandleChangeInput.bind(this, "namePromis")}
@@ -419,7 +419,7 @@ const Index = (props) => {
                         {/* <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.client_list_name}<span className="text-red-500">*</span></label> */}
                         </div>
                         <div className='w-[24.5%]'>
-                        <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_branch || "purchase_branch"} <span className="text-red-500">*</span></label>
+                        <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">{dataLang?.purchase_branch || "purchase_branch"} <span className="text-red-500">*</span></label>
                           <Select 
                               options={listBr_filter}
                               onChange={_HandleChangeInput.bind(this, "branch")}
@@ -473,15 +473,15 @@ const Index = (props) => {
                  
               </div>
             </div>
-            <h2 className='font-normal bg-[#ECF0F4] p-2  '>{dataLang?.purchase_iteminfo || "purchase_iteminfo"}</h2>  
+            <h2 className='font-normal bg-[#ECF0F4] p-2  2xl:text-[12px] xl:text-[13px] text-[13px] '>{dataLang?.purchase_iteminfo || "purchase_iteminfo"}</h2>  
               <div className='pr-2'>
               <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10'>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase col-span-1      text-center  font-[400]'>{"Stt"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase col-span-4   truncate font-[400]'>{dataLang?.purchase_items || "purchase_items"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase col-span-1     text-center  truncate font-[400]'>{dataLang?.purchase_unit || "purchase_unit"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1    text-center   truncate font-[400]'>{dataLang?.purchase_quantity || "purchase_quantity"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-4     truncate font-[400]'>{dataLang?.purchase_note || "purchase_note"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[10px] text-[8px] px-2  text-[#667085] uppercase  col-span-1 text-center     truncate font-[400]'>{dataLang?.purchase_operation || "purchase_operation"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[13px] px-2  text-[#667085] uppercase col-span-1      text-center  font-[400]'>{"Stt"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[13px] px-2  text-[#667085] uppercase col-span-4   truncate font-[400]'>{dataLang?.purchase_items || "purchase_items"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[13px] px-2  text-[#667085] uppercase col-span-1     text-center  truncate font-[400]'>{dataLang?.purchase_unit || "purchase_unit"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[13px] px-2  text-[#667085] uppercase  col-span-2    text-center   truncate font-[400]'>{dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[13px] px-2  text-[#667085] uppercase  col-span-3     truncate font-[400]'>{dataLang?.purchase_note || "purchase_note"}</h4>
+                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[13px] px-2  text-[#667085] uppercase  col-span-1 text-center     truncate font-[400]'>{dataLang?.purchase_operation || "purchase_operation"}</h4>
               </div>     
               </div>     
             <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
@@ -514,19 +514,19 @@ const Index = (props) => {
                                   }
                                 </div>
                                 <div>
-                                  <h3 className='font-medium'>{option.e?.name}</h3>
+                                  <h3 className='font-normal'>{option.e?.name}</h3>
                                   <div className='flex gap-2'>
                                     <h5 className='text-gray-400 font-normal'>{option.e?.code}</h5>
-                                    <h5 className='font-medium'>{option?.e?.product_variation}</h5>
+                                    <h5 className='font-normal'>{option?.e?.product_variation}</h5>
                                   </div>
-                                  <h5 className='text-gray-400 font-medium text-xs'>{dataLang[option.e?.text_type]}</h5>
+                                  <h5 className='text-gray-400 font-normal text-xs'>{dataLang[option.e?.text_type]}</h5>
                                 </div>
                               </div>
                               <div className=''>
                                  <div className='text-right opacity-0'>{"0"}</div>
                                  <div className='flex gap-2'>
                                    <div className='flex items-center gap-2'>
-                                     <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse ?? 0}</h5>
+                                     <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-normal'>{option.e?.qty_warehouse ?? 0}</h5>
                                    </div>
                                   
                                   </div>
@@ -569,14 +569,14 @@ const Index = (props) => {
                          />
                          </div>
                          <div className='col-span-1 text-center flex items-center justify-center'>
-                           <h3 className=''>{e.donvitinh}</h3>
+                           <h3 className='2xl:text-[12px] xl:text-[13px] text-[13px]'>{e.donvitinh}</h3>
                         </div>
-                         <div className='col-span-1 flex items-center justify-center'>
+                         <div className='col-span-2 flex items-center justify-center'>
                            <div className="flex items-center justify-center">
                                <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
                               onClick={() => handleDecrease(e.id)}  disabled={index === 0} ><Minus size="14"/></button>
                               <NumericFormat
-                                  className="appearance-none text-center 2xl:text-[12px] xl:text-[10px] text-[8px] py-2 px-4 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
+                                  className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[13px] py-2 px-2 font-normal w-24 focus:outline-none border-b-2 border-gray-200"
                                 onValueChange={_HandleChangeInputOption.bind(this, e.id, "soluong",e)}
                                 value={e?.soluong || 1}
                                 allowNegative={false}
@@ -590,7 +590,7 @@ const Index = (props) => {
                                 onClick={() => handleIncrease(e.id)} disabled={index === 0}><Add size="14"/></button>
                               </div>
                             </div>
-                         <div className='col-span-4 flex items-center justify-center'>
+                         <div className='col-span-3 flex items-center justify-center'>
                              <input
                                  value={e.ghichu}                
                                  onChange={_HandleChangeInputOption.bind(this, e.id, "ghichu",index)}
@@ -611,12 +611,12 @@ const Index = (props) => {
                   </React.Fragment>
                 </div>
             </div>
-            <h2 className='font-normal bg-[white] shadow-xl p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]'>{dataLang?.purchase_total || "purchase_total"} </h2>  
+            <h2 className='font-normal bg-[white] shadow-xl p-2 border-b border-b-[#a9b5c5] 2xl:text-[12px] xl:text-[13px] text-[13px]  border-t border-t-[#a9b5c5]'>{dataLang?.purchase_total || "purchase_total"} </h2>  
 
         </div>
         <div className='grid grid-cols-12'>
-            <div className='col-span-10'>
-                        <div className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_note || ""}</div>
+            <div className='col-span-9'>
+                        <div className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">{dataLang?.purchase_note || ""}</div>
                           <textarea
                             value={note}       
                             placeholder={props.dataLang?.client_popup_note}         
@@ -626,18 +626,18 @@ const Index = (props) => {
                             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-[40%] min-h-[120px] max-h-[200px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
                           />
             </div>
-            <div className="text-right mt-5 space-y-4 col-span-2 flex-col justify-between ">
+            <div className="text-right mt-5 space-y-4 col-span-3 flex-col justify-between ">
                 <div className='flex justify-between '>
-                  <div className='font-normal'><h3>{dataLang?.purchase_totalCount || "purchase_totalCount"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(totalSoluong)}</h3></div>
+                  <div className='font-normal 2xl:text-[12px] xl:text-[13px] text-[13px]'><h3>{dataLang?.purchase_totalCount || "purchase_totalCount"}</h3></div>
+                  <div className='font-normal 2xl:text-[12px] xl:text-[13px] text-[13px]'><h3 className='text-blue-600'>{formatNumber(totalSoluong)}</h3></div>
                 </div>
                 <div className='flex justify-between '>
-                  <div className='font-normal'><h3>{dataLang?.purchase_totalItem || "purchase_totalItem"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(totalQty)}</h3></div>
+                  <div className='font-normal 2xl:text-[12px] xl:text-[13px] text-[13px]'><h3>{dataLang?.purchase_totalItem || "purchase_totalItem"}</h3></div>
+                  <div className='font-normal 2xl:text-[12px] xl:text-[13px] text-[13px]'><h3 className='text-blue-600'>{formatNumber(totalQty)}</h3></div>
                 </div>
                 <div className='space-x-2'>
-                <button onClick={() => router.back()} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]">{dataLang?.purchase_back || "purchase_back"}</button>
-                  <button onClick={_HandleSubmit.bind(this)}  type="submit"className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]">{dataLang?.purchase_save || "purchase_save"}</button>
+                <button onClick={() => router.back()} className="button text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]">{dataLang?.purchase_back || "purchase_back"}</button>
+                  <button onClick={_HandleSubmit.bind(this)}  type="submit"className="button text-[#FFFFFF]  font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]">{dataLang?.purchase_save || "purchase_save"}</button>
                 </div>
             </div>
         </div>

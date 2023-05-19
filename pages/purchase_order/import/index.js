@@ -299,7 +299,39 @@ const Index = (props) => {
           ),
       }
   ];
+const [browser, sBrowser] = useState("0")
+  const _HandleChangeInput = (type, value) =>{
+    if(type === "browser"){
+      Swal.fire({
+        title: `${"Thay đổi trạng thái"}`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#296dc1',
+        cancelButtonColor: '#d33',
+        confirmButtonText: `${dataLang?.aler_yes}`,
+        cancelButtonText:`${dataLang?.aler_cancel}`
+    }).then((result) => {
+        if (result.isConfirmed) {
+           alert("Chức năng đang trong quá trình hoàn thiện, quay lại sau !")
+        }
+    });
+      // const name = value?.target.name;
+      // const id = value?.target.id;
+      // console.log(id);
+      // console.log(name);
+      // if (value?.target.checked) {
+      //     // Thêm giá trị và id vào mảng khi input được chọn
+      //     const updatedOptions = dataDepar && [...dataDepar, { name, id }];
+      //     sBrowser(updatedOptions);
+      // } else {
+      //     // Xóa giá trị và id khỏi mảng khi input được bỏ chọn
+      //     const updatedOptions = dataDepar?.filter(option => option.id !== id);
+      //     sBrowser(updatedOptions);
+      // }
+  }
+  }
 
+console.log(browser);
 
     return (
         <React.Fragment>
@@ -323,7 +355,7 @@ const Index = (props) => {
                   </div>
                 </div>
                 
-                <div  className="flex space-x-3 items-center  h-[6vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <div  className="flex space-x-3 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                      {listDs &&   listDs.map((e)=>{
                           return (
                             <div>
@@ -563,12 +595,52 @@ const Index = (props) => {
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_price)}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_tax_price)}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_amount)}</h6>
-                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-2 flex items-center justify-center text-center cursor-pointer'>{e?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>Đã duyệt <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>Chưa duyệt <TickCircle size={22}/></div>)}</h6>
-                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center '>
+                                {/* <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-2 flex items-center justify-center text-center cursor-pointer'>{e?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>Đã duyệt <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>Chưa duyệt <TickCircle size={22}/></div>)}</h6> */}
+                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-2 '>
+                                    <div className='flex flex-wrap  gap-2 items-center justify-center'>
+                                      {
+                                    e?.status === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{"Chưa thanh toán"}</span>||
+                                    e?.status === "1" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{"Thanh toán 1 phần"} {`(${e?.count})`}</span>||
+                                    e?.status === "2" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 2xl:text-sm xl:text-xs text-[8px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã thanh toán đủ"} {`(${e?.order_status?.count})`}</span>
+                                      }
+                                    </div>
+                                  </h6>
+                                {/* <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center '>
                                     {e?.warehouseman_id  === "0" && <span className='2xl:text-sm xl:text-xs text-[8px] font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200 cursor-pointer'>{"Chưa duyệt"}</span>||
                                      e?.warehouseman_id  === "1" &&  <span className='2xl:text-sm xl:text-xs text-[8px] font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200 cursor-pointer'>{"Đã duyệt"}</span> ||
                                      e?.warehouseman_id  === "2" &&   <span className='2xl:text-sm xl:text-xs text-[8px] flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã có xuất kho"}</span>
                                     }
+                                </h6> */}
+                                <h6 className=' 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center '>
+                                  <div className=' '>
+                                      <label className="relative flex cursor-pointer items-center rounded-xl py-1 px-2 gap-1 bg-[#e0e7ff]"
+                                          htmlFor={e?.id} data-ripple-dark="true" > 
+                                          <input type="checkbox" className="before:content[''] border-[#4f46e5] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border  transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 "
+                                              id={e.id}
+                                              value={e.warehouseman_id}
+                                              // checked={dataDepar?.some((selectedOpt) => selectedOpt?.id === e?.id)}
+                                              onChange={_HandleChangeInput.bind(this, "browser")}/>
+                                          <div className="pointer-events-none absolute top-2/4 left-[10%]   -translate-y-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                              <svg
+                                              xmlns="http://www.w3.org/2000/svg"
+                                              className="h-3.5 w-3.5"
+                                              viewBox="0 0 20 20"
+                                              fill="currentColor"
+                                              stroke="currentColor"
+                                              stroke-width="1"
+                                              >
+                                              <path
+                                                  fill-rule="evenodd"
+                                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                  clip-rule="evenodd"
+                                              ></path>
+                                              </svg>
+                                          </div>
+                                          <div className='w-[80%]'>
+                                            <label htmlFor={e.id} className='font-normal 2xl:text-base xl:text-xs text-[8px] text-[#6366f1]'>{"Chưa duyệt"}</label>
+                                          </div>
+                                      </label>
+                                  </div>
                                 </h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1'><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6> 
                                 <div className='col-span-1 flex justify-center'>
@@ -629,8 +701,8 @@ const Index = (props) => {
 const TabStatus = React.memo((props) => {
   const router = useRouter();
   return(
-    <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[220px] flex gap-2 2xl:text-sm xl:text-sm text-xs items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
-      {router.query?.tab === `${props.active}` && <ArrowCircleDown   size="20" color="#0F4F9E" />}
+    <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[180px] flex gap-2 2xl:text-sm xl:text-sm text-xs items-center rounded-[5.5px] px-2 py-2 outline-none relative `}>
+    {router.query?.tab === `${props.active}` && <ArrowCircleDown   size="20" color="#0F4F9E" />}
       {props.children}
       <span className={`${props?.total > 0 && "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"} `}>{props?.total > 0 && props?.total}</span>
     </button>

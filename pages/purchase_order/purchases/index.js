@@ -347,7 +347,7 @@ const Index = (props) => {
                         <Link href="/purchase_order/purchases/form" className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>Tạo mới</Link>
                         </div>
                     </div>
-                    <div className='flex items-center space-x-4 '>
+                    <div  className="flex space-x-3 items-center h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                          {listDs &&   listDs.map((e)=>{
                           return (
                            <div>
@@ -637,7 +637,7 @@ const Index = (props) => {
 const TabStatus = React.memo((props) => {
     const router = useRouter();
     return(
-      <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[220px] flex gap-2 2xl:text-sm xl:text-sm text-xs items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
+      <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[180px] flex gap-2 2xl:text-sm xl:text-sm text-xs items-center rounded-[5.5px] px-2 py-2 outline-none relative `}>
         {router.query?.tab === `${props.active}` && <ArrowCircleDown   size="20" color="#0F4F9E" />}
         {props.children}
         <span className={`${props?.total > 0 && "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"} `}>{props?.total > 0 && props?.total}</span>
