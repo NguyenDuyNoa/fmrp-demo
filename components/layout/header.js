@@ -357,7 +357,7 @@ const Header = () => {
                     img: "/icon/header/quytrinh/process.svg",
                     items: [
                         { name: "Quy trình sử dụng phần mềm FMRP", link: "/process" },
-                        { name: "Quy trình quản lý sản xuất",link:"/process_manufacture" },
+                        { name: "Quy trình quản lý sản xuất", link: "/process_manufacture" },
                         { name: "Quy trình bán hàng", link: "/process_products" },
                         { name: "Quy trình mua hàng - nhập kho", link: "/process_order" }
                     ]
@@ -374,7 +374,7 @@ const Header = () => {
                         <Link href="/">
                             <Image alt="" src="/logo.png" width={100} height={45} quality={100} className="2xl:w-[100px] w-[70px] h-auto object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                         </Link>
-                        <Dropdown data={ListDanhMuc} position={"bottom left"} className="popover-bottom-left arrow-danhmuc">Danh mục</Dropdown>
+                        <Dropdown data={ListDanhMuc} position={"bottom left"} className="popover-bottom-left arrow-danhmuc ">Danh mục</Dropdown>
                         <Dropdown data={ListBanXuatHang} position={"bottom left"} className="popover-bottom-left arrow-banxuathang">Bán & Xuất hàng</Dropdown>
                         <Dropdown data={ListMuaNhapHang} position={"bottom left"} className="popover-bottom-left-muanhaphang arrow-muanhaphang">Mua & Nhập hàng</Dropdown>
                         <Dropdown data={ListKhoSanXuat} className="popover-khosanxuat">Kho & Sản xuất</Dropdown>
@@ -399,14 +399,14 @@ const Header = () => {
                             />
                         </form>
                         <Link href="/settings" title='Cài đặt' className='hover:scale-105 transition'>
-                            <Image alt="" src="/icon/header/extent.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                            <Image alt="" src="/icon/header/extent.png" width={18} height={18} quality={100} className="object-contain min-w-[18px]" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                         </Link>
-                        <a href="#" title='Thông báo' className='hover:scale-105 transition relative'>
-                            <Image alt="" src="/icon/header/tb2.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
-                            <div className='text-[10px] bg-red-500 h-4 w-4 rounded-full absolute -top-[7px] -right-[7px] flex flex-col items-center justify-center text-white font-medium'>2</div>
+                        <a href="#" title='Thông báo' className='hover:scale-105 transition relative '>
+                            <Image alt="" src="/icon/header/tb2.png" width={18} height={18} quality={100} className="object-contain min-w-[18px]" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                            <div className='text-[10px] bg-red-500 xl:h-4 xl:w-4 lg:h-4 lg:w-4 rounded-full absolute -top-[7px] -right-[7px] flex flex-col items-center justify-center text-white font-medium'>2</div>
                         </a>
                         <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"}>
-                            <Image alt="" src="/icon/header/ques.png" width={18} height={18} quality={100} className="object-contain hover:scale-105 transition" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                            <Image alt="" src="/icon/header/ques.png" width={18} height={18} quality={100} className="object-contain hover:scale-105 transition min-w-[18px]" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                         </Dropdown>
                         <DropdownAvatar />
                     </div>
@@ -463,7 +463,7 @@ const DropdownAvatar = React.memo(() => {
                     <button className={`hover:drop-shadow-[0_0_5px_#eabd7a99]`} >
                         <div className='flex items-center self-center space-x-1'>
                             {auth?.user_avatar !== null ?
-                                <Image alt="" src={auth?.user_avatar} width={35.5} height={35.5} quality={100} className="object-cover rounded-full" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                <Image alt="" src={auth?.user_avatar} width={35.5} height={35.5} quality={100} className="lg:min-w-[20px] object-cover rounded-full" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                 :
                                 <Image alt="" src={"/avatar_null.png"} width={35.5} height={35.5} quality={100} className="object-cover rounded-full" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
 
