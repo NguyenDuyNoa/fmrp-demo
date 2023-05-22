@@ -139,6 +139,7 @@ const Index = (props) => {
     useEffect(() => {
          sOnFetching(true) || (keySearch && sOnFetching(true)) || (idBranch?.length > 0 && sOnFetching(true)) || idSpplier?.length > 0 && sOnFetching(true)
      }, [limit,router.query?.page,idBranch ,idSpplier]);
+     
     const handleDelete = (event) => {
       Swal.fire({
         title: `${dataLang?.aler_ask}`,
