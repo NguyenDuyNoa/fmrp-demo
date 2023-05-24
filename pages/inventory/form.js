@@ -64,6 +64,7 @@ const Form = (props) => {
     const [errNullLocate, sErrNullLocate] = useState(false);
     const [errNullLot, sErrNullLot] = useState(false);
     const [errNullDate, sErrNullDate] = useState(false);
+    const [errNullSerial, sErrNullSerial] = useState(false);
     const [errData, sErrData] = useState([]);
 
     const _ServerFetching = () => {
@@ -347,6 +348,7 @@ const Form = (props) => {
         const checkErrNullLocate = dataChoose.map(item => item.child.some(itemChild => itemChild.locate === null));
         const checkErrNullLot = dataChoose.map(item => item.child.some(itemChild => itemChild.lot === null));
         const checkErrNullDate = dataChoose.map(item => item.child.some(itemChild => itemChild.date === null));
+        const checkErrNullSerial = dataChoose.map(item => item.child.some(itemChild => itemChild.serial === null));
 
         const hasDuplicates = () => {
             const serialData = [];
@@ -363,13 +365,14 @@ const Form = (props) => {
                 });
         };
 
-        if(branch == null || warehouse == null || dataChoose.length == 0 || checkErrNullLocate[0] || (checkLotDate && checkErrNullLot[0]) || (checkLotDate && checkErrNullDate[0]) || (checkSerial && hasDuplicates())){
+        if(branch == null || warehouse == null || dataChoose.length == 0 || checkErrNullLocate[0] || (checkLotDate && checkErrNullLot[0]) || (checkLotDate && checkErrNullDate[0]) || (checkSerial && checkErrNullSerial[0]) || (checkSerial && hasDuplicates())){
             branch == null && sErrBranch(true)
             warehouse == null && sErrWareHouse(true)
             dataChoose.length == 0 && sErrProduct(true)
             checkErrNullLocate && sErrNullLocate(true)
             checkErrNullLot && sErrNullLot(true)
             checkErrNullDate && sErrNullDate(true)
+            checkErrNullSerial && sErrNullSerial(true)
             if(hasDuplicates()){
                 Toast.fire({
                     icon: 'error',
@@ -648,7 +651,7 @@ const Form = (props) => {
                                                                 <input 
                                                                     value={ce.serial}
                                                                     onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
-                                                                    className="text-center py-1 px-2 font-medium w-full focus:outline-none border-b-2 border-gray-200"
+                                                                    className={`${errNullSerial && (ce.serial === null || ce.serial === "") ? "border-red-500" : "border-gray-200" } text-center py-1 px-2 font-medium w-full focus:outline-none border-b-2 `}
                                                                 />
                                                             </div>
                                                         }
