@@ -126,7 +126,12 @@ const Index = (props) => {
           params:{
             limit: 0,
             search: keySearch,
-            // "filter[branch_id]": idBranch?.length > 0 ? idBranch.map(e => e.value) : null
+                  "filter[branch_id]": idBranch != null ? idBranch.value : null ,
+                  "filter[id]":idCode != null ? idCode?.value : null,
+                  "filter[supplier_id]": idSupplier ? idSupplier.value : null,
+                  "filter[order_type]": idOrderType ? idOrderType.value : null,
+                  "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null ,
+                  "filter[end_date]":valueDate?.endDate != null ? valueDate?.endDate : null ,
           }
       }, (err, response) => {
         if(!err){

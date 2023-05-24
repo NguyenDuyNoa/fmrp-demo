@@ -42,7 +42,7 @@ const Index = (props) => {
     const [onFetchingSupplier,sOnFetchingSupplier] = useState(false)
     const [onFetchingStaff,sOnFetchingStaff] = useState(false)
     const [onSending, sOnSending] = useState(false);
-    const [option, sOption] = useState([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:"",purchases_order_item_id: ""}]);
+    const [option, sOption] = useState([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, note:"",purchases_order_item_id: ""}]);
     const slicedArr = option.slice(1);
     const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
     sortedArr.unshift(option[0]);
@@ -95,6 +95,7 @@ const Index = (props) => {
     }, (err, response) => {
         if(!err){
           var rResult = response.data;
+          console.log(rResult);
           const itemlast =  [{mathang: null}];
           const item = itemlast?.concat(rResult?.item?.map(e => ({purchases_order_item_id: e?.purchases_order_item_id, id: e.purchases_order_item_id,mathang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`, value:e.item?.id}, soluong: Number(e?.quantity), dongia: Number(e?.price), chietkhau: Number(e?.discount_percent), thue: {tax_rate: e?.tax_rate, value: e?.tax_id}, donvitinh: e.item?.unit_name, dongiasauck: Number(e?.price_after_discount), note: e?.note, thanhtien:Number(e?.price_after_discount) * (1 + Number(e?.tax_rate)/100) * Number(e?.quantity)})));
           sOption(item)
@@ -143,7 +144,7 @@ const Index = (props) => {
               sOnFetchingItems(value.target.value === "1" && true)
               sThuetong('')
               sChietkhautong('')
-              sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+              sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, note:""}])
             }
           })
         }else if(type == "code"){
@@ -169,7 +170,7 @@ const Index = (props) => {
             }).then((result) => {
               if (result.isConfirmed) {
                    sIdPurchases(value)
-                  sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+                  sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, note:""}])
               }
             })
             }else{
@@ -178,12 +179,12 @@ const Index = (props) => {
             // if(id){
             //   sOption([...sortedArr])
             // }else{
-            //   sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+            //   sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, note:""}])
             // }
             // if(value?.length > 0){
             //   sOption([...sortedArr])
             // }else{
-            //  sOption(id ? [...sortedArr] : [{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+            //  sOption(id ? [...sortedArr] : [{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, note:""}])
             // }
         }else if(type === "note"){
             sNote(value.target.value)
@@ -201,7 +202,7 @@ const Index = (props) => {
               if (result.isConfirmed) {
                   sIdBranch(value)
                   sIdPurchases([])
-                  sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+                  sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, note:""}])
               } 
             })
           }
@@ -212,14 +213,14 @@ const Index = (props) => {
             sDataSupplier([])
             sDataStaff([])
             sIdStaff(null)
-            sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+            sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, note:""}])
           }
           
             // if(value != null){
             //   sOption([...sortedArr])
             // }
             // else{
-            //  sOption(id ? [...sortedArr] : [{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+            //  sOption(id ? [...sortedArr] : [{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, note:""}])
             // }
         }else if(type == "thuetong"){
            sThuetong(value)
@@ -228,7 +229,7 @@ const Index = (props) => {
         }
     }
     // useEffect(() =>{
-    //   idBranch != null &&  idPurchases?.length == 0 && sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+    //   idBranch != null &&  idPurchases?.length == 0 && sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, note:""}])
     // },[idBranch])
 
       // useEffect(() => {
@@ -454,7 +455,6 @@ const Index = (props) => {
       useEffect(() => {
         idPurchases?.length > 0 && sOnFetchingItems(true)
       }, [idPurchases]);
-      console.log(idPurchases);
       
       const _HandleSubmit = (e) => {
         e.preventDefault();
@@ -585,7 +585,7 @@ const Index = (props) => {
             //       option[index].donvitinh =  value?.e?.unit_name
             //       // option[index].thanhtien =  value?.e?.unit_name
             //     }else{
-            //       const newData= {id: Date.now(), mathang: value, donvitinh:value?.e?.unit_name, soluong:1,dongia:1,chietkhau: chietkhautong ? chietkhautong : 0, dongiasauck:1, thue: thuetong ? thuetong : 0, dgsauthue:1, thanhtien:1, ghichu:""}
+            //       const newData= {id: Date.now(), mathang: value, donvitinh:value?.e?.unit_name, soluong:1,dongia:1,chietkhau: chietkhautong ? chietkhautong : 0, dongiasauck:1, thue: thuetong ? thuetong : 0, dgsauthue:1, thanhtien:1, note:""}
             //       if (newData.chietkhau) {
             //         newData.dongiasauck *= (1 - Number(newData.chietkhau) / 100);
             //       }
@@ -606,7 +606,7 @@ const Index = (props) => {
                   option[index].soluong =  idPurchases?.length ? Number(value?.e?.quantity_left) : 1
                   option[index].thanhtien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
                 }else{
-                  const newData= {id: Date.now(), mathang: value, donvitinh:value?.e?.unit_name, soluong: idPurchases?.length ? Number(value?.e?.quantity_left) : 1, dongia:1, chietkhau: chietkhautong ? chietkhautong : 0, dongiasauck:1, thue: thuetong ? thuetong : 0, dgsauthue:1, thanhtien:1, ghichu:""}
+                  const newData= {id: Date.now(), mathang: value, donvitinh:value?.e?.unit_name, soluong: idPurchases?.length ? Number(value?.e?.quantity_left) : 1, dongia:1, chietkhau: chietkhautong ? chietkhautong : 0, dongiasauck:1, thue: thuetong ? thuetong : 0, dgsauthue:1, thanhtien:1, note:""}
                   if (newData.chietkhau) {
                     newData.dongiasauck *= (1 - Number(newData.chietkhau) / 100);
                   }
@@ -664,8 +664,8 @@ const Index = (props) => {
                 option[index].thanhtien = Number(tien.toFixed(2));
               }
           }
-          else if(type == "ghichu"){
-              option[index].ghichu = value?.target?.value;
+          else if(type == "note"){
+              option[index].note = value?.target?.value;
           }
           sOption([...option])
         }
@@ -751,7 +751,7 @@ const Index = (props) => {
           const tongTien = tinhTongTien(option);
           setTongTienState(tongTien);
         }, [option]);
-      const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, quantity: Number(e?.soluong), price: e?.dongia, discount_percent:e?.chietkhau, tax_id:e?.thue?.value,purchases_item_id: e?.mathang?.e?.purchases_item_id, note: e?.ghichu, id:e?.id, purchases_order_item_id: e?.purchases_order_item_id}})
+      const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, quantity: Number(e?.soluong), price: e?.dongia, discount_percent:e?.chietkhau, tax_id:e?.thue?.value,purchases_item_id: e?.mathang?.e?.purchases_item_id, note: e?.note, id:e?.id, purchases_order_item_id: e?.purchases_order_item_id}})
       let newDataOption = dataOption?.filter(e => e?.item !== undefined);
         const _ServerSending = () => {
           var formData = new FormData();
@@ -804,7 +804,7 @@ const Index = (props) => {
                       sErrDateDelivery(false)
                       sErrPurchase(false)
                       sErrSupplier(false)
-                      sOption([{id: Date.now(), mathang: null, donvitinh:"", soluong:0, ghichu:""}])
+                      sOption([{id: Date.now(), mathang: null, donvitinh:"", soluong:0, note:""}])
                       router.back()
                   }else {
                     if(tongTienState.tongTien == 0){
@@ -1290,8 +1290,8 @@ const Index = (props) => {
                         </div>
                          <div className='col-span-1 flex items-center justify-center'>
                              <input
-                                 value={e?.ghichu}                
-                                 onChange={_HandleChangeInputOption.bind(this, e?.id, "ghichu",index)}
+                                 value={e?.note}                
+                                 onChange={_HandleChangeInputOption.bind(this, e?.id, "note",index)}
                                  name="optionEmail"     
                                  placeholder='Ghi chú'                 
                                  type="text"

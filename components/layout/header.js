@@ -125,7 +125,7 @@ const Header = () => {
                     items: [
                         { name: "Yêu cầu mua hàng", link: '/purchase_order/purchases' },
                         { name: "Đơn đặt hàng", link: '/purchase_order/order' },
-                        { name: "Phiếu dịch vụ", link: '/purchase_order/serviceVoucher' }
+                        { name: "Phiếu dịch vụ",link: '/purchase_order/serviceVoucher' }
                     ]
                 }
             ]
@@ -148,10 +148,8 @@ const Header = () => {
                     title: "Công nợ mua",
                     img: "/icon/header/muanhap/cnm.png",
                     items: [
-                        { name: "Hóa đơn mua hàng" },
-                        { name: "Phiếu chi mua hàng" },
+                        { name: "Phiếu chi", link: '/purchase_order/payment'},
                         { name: "Công nợ nhà cung cấp" },
-                        { name: "Phiếu chi khác" }
                     ]
                 }
             ]

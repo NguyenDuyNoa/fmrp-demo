@@ -121,7 +121,11 @@ const Index = (props) => {
         params:{
           limit: 0,
           search: keySearch,
-          // "filter[branch_id]": idBranch?.length > 0 ? idBranch.map(e => e.value) : null
+          "filter[id]":idCode != null ? idCode?.value : null,
+          "filter[branch_id]": idBranch != null ? idBranch.value : null ,
+          "filter[supplier_id]": idSupplier ? idSupplier.value : null,
+          "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null ,
+          "filter[end_date]":valueDate?.endDate != null ? valueDate?.endDate : null ,
         }
     }, (err, response) => {
       if(!err){
@@ -630,16 +634,16 @@ const [browser, sBrowser] = useState("0")
                                      e?.warehouseman_id  === "2" &&   <span className='2xl:text-sm xl:text-xs text-[8px] flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã có xuất kho"}</span>
                                     }
                                 </h6> */}
-                                <h6 className=' 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center '>
-                                  <div className=' '>
-                                      <label className="relative flex cursor-pointer items-center rounded-lg py-1.5 px-4 gap-1 bg-[#e0e7ff]"
+                                <h6 className=' 2xl:text-base xl:text-xs text-[8px] col-span-1'>
+                                  <div className='w-full cursor-pointer '>
+                                      <label className="relative flex cursor-pointer items-center justify-center  py-1.5  gap-1 bg-[#e0e7ff] rounded-lg "
                                           htmlFor={e?.id} data-ripple-dark="true" > 
-                                          <input type="checkbox" className="before:content[''] border-[#4f46e5] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border  transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 "
+                                          <input type="checkbox" className="before:content[''] border-[#4f46e5] peer relative h-[20px] w-[20px] cursor-pointer appearance-none rounded-md border  transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 "
                                               id={e.id}
                                               value={e.warehouseman_id}
                                               // checked={dataDepar?.some((selectedOpt) => selectedOpt?.id === e?.id)}
                                               onChange={_HandleChangeInput.bind(this, "browser")}/>
-                                          <div className="pointer-events-none absolute top-2/4 left-[10%]   -translate-y-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                          <div className="pointer-events-none absolute top-2/4 2xl:left-[12%] xl:left-[3%] left-[2%]  -translate-y-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
                                               <svg
                                               xmlns="http://www.w3.org/2000/svg"
                                               className="h-3.5 w-3.5"
@@ -655,8 +659,8 @@ const [browser, sBrowser] = useState("0")
                                               ></path>
                                               </svg>
                                           </div>
-                                          <div className='w-[80%]'>
-                                            <label htmlFor={e.id} className='font-normal 2xl:[16px] xl:text-xs text-[8px] text-[#6366f1]'>{"Chưa duyệt kho"}</label>
+                                          <div className=''>
+                                            <label htmlFor={e.id} className='font-normal 2xl:text-[13px] xl:text-[12px] text-[10px] text-[#6366f1] cursor-pointer'>{"Chưa duyệt kho"}</label>
                                           </div>
                                       </label>
                                   </div>

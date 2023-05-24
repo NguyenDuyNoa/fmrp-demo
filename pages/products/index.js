@@ -919,7 +919,8 @@ const Popup_ThanhPham = React.memo((props) => {
 
         formData.append("name", name)
         formData.append("code", code)
-        formData.append("price_sell", code)
+        formData.append("price_sell", price)
+        console.log(typeof(price))
         formData.append("type_products", type.value)
         formData.append("category_id", category.value)
         formData.append("unit_id", unit.value)
