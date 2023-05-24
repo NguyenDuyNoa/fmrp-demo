@@ -454,7 +454,6 @@ const Index = (props) => {
       useEffect(() => {
         idPurchases?.length > 0 && sOnFetchingItems(true)
       }, [idPurchases]);
-      console.log(idPurchases);
       
       const _HandleSubmit = (e) => {
         e.preventDefault();

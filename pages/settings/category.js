@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
@@ -13,11 +13,33 @@ import {
   SearchNormal1 as IconSearch,
   ArrowCircleDown,
   CloseCircle,
-  TickCircle,
+  TickCircle, Minus as IconMinus,ArrowDown2 as IconDown,
 } from "iconsax-react";
 import Loading from "components/UI/loading";
 import Swal from "sweetalert2";
-import { FALSE } from "sass";
+import Select, { components } from 'react-select';
+
+
+
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: true,
+})
+
+
+const CustomSelectOption = ({value, label, level, code}) => (
+  <div className='flex space-x-2 truncate'>
+      {level == 1 && <span>--</span>}
+      {level == 2 && <span>----</span>}
+      {level == 3 && <span>------</span>}
+      {level == 4 && <span>--------</span>}
+      <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
+  </div>
+)
+
 
 const Index = (props) => {
   const dataLang = props.dataLang;
@@ -36,13 +58,15 @@ const Index = (props) => {
       })
   }, []);
   const [data, sData] = useState([]);
-  console.log(data);
+  
   const [onFetching, sOnFetching] = useState(false);
+  const [onFetchingOpt, sOnFetchingOpt] = useState(false);
+
   const [totalItems, sTotalItems] = useState([]);
   const [keySearch, sKeySearch] = useState("")
   const [limit, sLimit] = useState(15);
 const _ServerFetching = () => {
-  Axios("GET", `${(router.query?.tab === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`) || (router.query?.tab === "stages" && "/api_web/api_product/stage/?csrf_protection=true")} `, {
+  Axios("GET", `${(router.query?.tab === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`) || (router.query?.tab === "stages" && "/api_web/api_product/stage/?csrf_protection=true") || (router.query?.tab === "costs" && "/api_web/Api_cost/cost/?csrf_protection=true")} `, {
       params: {
           search: keySearch,
           limit: limit,
@@ -79,7 +103,7 @@ useEffect(() => {
     }).then((result) => {
       if (result.isConfirmed) {
         const id = event; 
-        Axios("DELETE",  `${(router.query.tab === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true`) || (router.query.tab === "stages" && `/api_web/api_product/stage/${id}?csrf_protection=true`) } `, {
+        Axios("DELETE",  `${(router.query.tab === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true`) || (router.query.tab === "stages" && `/api_web/api_product/stage/${id}?csrf_protection=true`) || (router.query.tab === "costs" && `/api_web/Api_cost/cost/${id}?csrf_protection=true`) } `, {
         }, (err, response) => {
           if(!err){
             var {isSuccess,message} = response.data
@@ -132,6 +156,35 @@ useEffect(() => {
     timer: 2000,
     timerProgressBar: true,
   })
+
+  const _ServerFetchingOtp = () => {
+    // Axios("GET", "/api_web/Api_cost/costCombobox/?csrf_protection=true", {}, (err, response) => {
+    //     if(!err){
+    //         var {rResult} = response.data;
+    //         console.log();
+    //         sDataOption(rResult.map(x => ({label: `${x.name + " " + "(" + x.code + ")"}`, value: x.id, level: x.level, code: x.code, parent_id: x.parent_id})))
+    //     }
+    // })
+    Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
+        if(!err){
+            var {rResult} = response.data;
+            sDataBranchOption(rResult.map(e => ({label: e.name, value: e.id})))
+            dispatch({type: "branch/update", payload: rResult.map(e => ({label: e.name, value: e.id}))})
+        }
+    })
+    sOnFetchingOpt(false)
+}
+
+  useEffect(() => {
+    onFetchingOpt && _ServerFetchingOtp()
+  }, [onFetchingOpt]);
+
+  useEffect(() => {
+    sOnFetchingOpt(true)
+  }, []);
+
+
+
   return (
   <React.Fragment>
     <Head>
@@ -153,6 +206,7 @@ useEffect(() => {
                     <div className="flex space-x-3 items-center justify-start">
                         <button onClick={_HandleSelectTab.bind(this, "units")} className={`${router.query?.tab === "units" ? "text-[#0F4F9E] bg-[#e2f0fe]" : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"} rounded-lg px-4 py-2 outline-none`}>{dataLang?.category_unit}</button>
                         <button onClick={_HandleSelectTab.bind(this, "stages")} className={`${router.query?.tab === "stages" ? "text-[#0F4F9E] bg-[#e2f0fe]" : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"} rounded-lg px-4 py-2 outline-none`}>{dataLang?.settings_category_stages_title}</button>
+                        <button onClick={_HandleSelectTab.bind(this, "costs")} className={`${router.query?.tab === "costs" ? "text-[#0F4F9E] bg-[#e2f0fe]" : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"} rounded-lg px-4 py-2 outline-none`}>{"Loại chi phí"}</button>
                     </div>
                     <div className="3xl:h-[65%] 2xl:h-[60%] xl:h-[55%] h-[57%] space-y-2">
                         <div className="flex justify-end">
@@ -184,7 +238,7 @@ useEffect(() => {
                         </div>
                         <div className="min:h-[200px] h-[100%] max:h-[500px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                             <div className={`${(router.query?.tab === "units")? "w-[100%]" : "w-[110%]" } 2xl:w-[100%] pr-2`}>
-                                <div className={`${(router.query?.tab === "units")? "grid-cols-6" : "grid-cols-9" } grid gap-5 sticky top-0 bg-white p-2 z-10`}>
+                                <div className={`${(router.query?.tab === "units") ? "grid-cols-6" : router.query?.tab === "stages" ? "grid-cols-9" : "grid-cols-11"} grid  sticky top-0 bg-white p-2 z-10`}>
                                     {((router.query?.tab === "units") ) && 
                                         <React.Fragment>
                                             <h4 className="xl:text-[14px] px-2 text-[12px] col-span-5 text-[#667085] uppercase font-[300] text-left">
@@ -200,6 +254,15 @@ useEffect(() => {
                                             <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">{dataLang?.settings_category_stages_name}</h4>
                                             <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">{dataLang?.settings_category_stages_status}</h4>
                                             <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">{dataLang?.settings_category_stages_note}</h4>
+                                        </React.Fragment>
+                                    }
+                                      {router.query?.tab === "costs" && 
+                                        <React.Fragment>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-1 text-[#667085] uppercase font-[300] text-center">{"#"}</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-3 text-[#667085] uppercase font-[300] text-left">{"Mã chi phí"}</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">{"Tên chi phí"}</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">{"Cấp"}</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">{"Chi nhánh"}</h4>
                                         </React.Fragment>
                                     }
                                     <h4 className="xl:text-[14px] px-2 text-[12px] col-span-1 text-[#667085] uppercase font-[300] text-center">
@@ -223,7 +286,7 @@ useEffect(() => {
                                         }
                                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]"> 
                                             {data.map((e) => 
-                                                <div key={e.id.toString()} className={`${(router.query?.tab === "units")  ? "grid-cols-6" : "grid-cols-9" } grid gap-5 py-2.5 px-2 hover:bg-slate-100/40 `}>
+                                                <div key={e.id.toString()} className={`${(router.query?.tab === "units")  ? "grid-cols-6" : router.query?.tab === "stages" ? "grid-cols-9" : "grid-cols-11"} grid gap-5 py-2.5 px-2 hover:bg-slate-100/40 `}>
                                                     {((router.query?.tab === "units") || (router.query?.tab === "currencies")) && 
                                                         <React.Fragment>
                                                             <h6 className="xl:text-base text-xs px-2 col-span-5">
@@ -240,13 +303,28 @@ useEffect(() => {
                                                           
                                                         </React.Fragment>
                                                     }
-                                                
+                                                    {router.query?.tab === "costs" && 
+                                                        <React.Fragment>
+                                                            <div className="col-span-11"><Items onRefresh={_ServerFetching.bind(this)} onRefreshOpt={_ServerFetchingOtp.bind(this)} dataLang={dataLang} key={e.id} data={e} className="col-span-11"/></div>
+                                                        </React.Fragment>
+                                                    }
+                                                  {router.query?.tab === "units" && 
                                                     <div className="flex space-x-2 justify-center ">
                                                        <Popup_danhmuc onRefresh={_ServerFetching.bind(this)} className="xl:text-base text-xs " dataLang={dataLang} data={e} />
                                                       <button className="xl:text-base text-xs  ">
                                                       <IconDelete onClick={()=>handleDelete(e.id)}  color="red"/>
                                                       </button>
                                                     </div>
+                                                    }
+                                                  {router.query?.tab === "stages" && 
+                                                    <div className="flex space-x-2 justify-center ">
+                                                       <Popup_danhmuc onRefresh={_ServerFetching.bind(this)} className="xl:text-base text-xs " dataLang={dataLang} data={e} />
+                                                      <button className="xl:text-base text-xs  ">
+                                                      <IconDelete onClick={()=>handleDelete(e.id)}  color="red"/>
+                                                      </button>
+                                                    </div>
+                                                    }
+                                                    
                                               </div>
                                             )}
                                         </div>
@@ -275,13 +353,151 @@ useEffect(() => {
     )
 }
 
+const Items = React.memo((props) => {
+  const [hasChild, sHasChild] = useState(false);
+  const _ToggleHasChild = () => sHasChild(!hasChild);
+
+  const _HandleDelete = (id) => {
+      Swal.fire({
+        title: `${props.dataLang?.aler_ask}`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#296dc1',
+        cancelButtonColor: '#d33',
+        confirmButtonText: `${props.dataLang?.aler_yes}`,
+        cancelButtonText:`${props.dataLang?.aler_cancel}`
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Axios("DELETE", `/api_web/Api_cost/cost/${id}?csrf_protection=true`, {
+          }, (err, response) => {
+            if(!err){
+              var {isSuccess, message} = response.data;
+              if(isSuccess){
+                Toast.fire({
+                  icon: 'success',
+                  title: props.dataLang[message]
+                })     
+              }else{
+                  Toast.fire({
+                      icon: 'error',
+                      title: props.dataLang[message]
+                  }) 
+              }
+            }
+            props.onRefresh && props.onRefresh()
+            props.onRefreshOpt && props.onRefreshOpt()
+          })     
+      }
+      })
+  }
+
+  useEffect(() => {
+      sHasChild(false)
+  }, [props.data?.children?.length == null]);
+
+  return(
+      <div key={props.data?.id}>
+          <div className='grid grid-cols-11 py-2  bg-white hover:bg-slate-50 relative'>
+              <div className='col-span-1 flex justify-center'>
+                  <button disabled={props.data?.children?.length > 0 ? false : true} onClick={_ToggleHasChild.bind(this)} className={`${hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"} hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}>
+                      <IconMinus size={16} />
+                      <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
+                  </button>
+              </div>
+              <h6 className='xl:text-base text-xs px-2 col-span-3'>{props.data?.code}</h6>
+              <h6 className='xl:text-base text-xs px-2 col-span-2'>{props.data?.name}</h6>
+              <h6 className='xl:text-base text-xs px-2 col-span-2 text-center'>{props.data?.level}</h6>
+              <div className=' col-span-2 flex flex-wrap px-2'>
+                  {props.data?.branch.map(e => 
+                      <h6 key={e?.id.toString()} className='text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[300] rounded border border-[#0F4F9E] h-fit'>{e?.name}</h6>
+                  )}
+              </div>
+              <div className='col-span-1 flex justify-center space-x-3'>
+                  <Popup_danhmuc onRefresh={props.onRefresh} onRefreshOpt={props.onRefreshOpt} dataLang={props.dataLang} data={props.data} dataOption={props.dataOption} />
+                  <button onClick={_HandleDelete.bind(this, props.data?.id)} className="xl:text-base text-xs outline-none"><IconDelete color="red"/></button>
+              </div>
+          </div>
+          {hasChild &&
+              <div className='bg-slate-50/50'>
+                  {props.data?.children?.map((e) => 
+                      <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} onRefreshOpt={props.onRefreshOpt} dataLang={props.dataLang} key={e.id} data={e}  grandchild="0"
+                          children={e?.children?.map((e => 
+                              <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} onRefreshOpt={props.onRefreshOpt} dataLang={props.dataLang} key={e.id} data={e} grandchild="1"
+                                  children={e?.children?.map((e => 
+                                      <ItemsChild onClick={_HandleDelete.bind(this, e.id)} onRefresh={props.onRefresh} onRefreshOpt={props.onRefreshOpt} dataLang={props.dataLang} key={e.id} data={e} grandchild="2" />
+                                  ))}
+                              />
+                          ))} 
+                      />
+                  )}
+              </div>
+          }
+      </div>
+  )
+})
+
+const ItemsChild = React.memo((props) => {
+  return(
+      <React.Fragment key={props.data?.id}>
+          <div className={`grid grid-cols-11 py-2.5 px-2 hover:bg-slate-100/40 `}>
+              {props.data?.level == "3" && 
+                  <div className='col-span-1 h-full flex justify-center items-center pl-24'>
+                      <IconDown className='rotate-45' />
+                  </div>
+              }
+              {props.data?.level == "2" && 
+                  <div className='col-span-1 h-full flex justify-center items-center pl-12'>
+                      <IconDown className='rotate-45' />
+                      <IconMinus className='mt-1.5' />
+                      <IconMinus className='mt-1.5' />
+                  </div>
+              }
+              {props.data?.level == "1" && 
+                  <div className='col-span-1 h-full flex justify-center items-center '>
+                      <IconDown className='rotate-45' />
+                      <IconMinus className='mt-1.5' />
+                      <IconMinus className='mt-1.5' />
+                      <IconMinus className='mt-1.5' />
+                      <IconMinus className='mt-1.5' />
+                  </div>
+              }
+              <h6 className='xl:text-base text-xs col-span-3 px-2 '>{props.data?.code}</h6>
+              <h6 className='xl:text-base text-xs col-span-2 px-2  truncate'>{props.data?.name}</h6>
+              <h6 className='xl:text-base text-xs col-span-2 px-2 text-center truncate'>{props.data?.level}</h6>
+              <div className='col-span-2 flex flex-wrap px-2'>
+                  {props.data?.branch.map(e => 
+                      <h6 key={e?.id.toString()} className='text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[300] rounded border border-[#0F4F9E] h-fit'>{e?.name}</h6>
+                  )}
+              </div>
+              <div className='col-span-1 flex justify-center space-x-2'>
+                  <Popup_danhmuc onRefresh={props.onRefresh}  dataLang={props.dataLang} data={props.data} />
+                  <button onClick={props.onClick} className="xl:text-base text-xs"><IconDelete color="red"/></button>
+              </div>
+          </div>
+          {props.children}
+      </React.Fragment>
+  )
+})
+
+
 const Popup_danhmuc = (props) => {
     const router = useRouter();
     const tabPage = router.query?.tab;
 
+    const scrollAreaRef = useRef(null);
+    const handleMenuOpen = () => {
+    const menuPortalTarget = scrollAreaRef.current;
+        return { menuPortalTarget };
+    };
+
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
     const [onSending, sOnSending] = useState(false);
+    
+
+    const [dataOption,sDataOption] = useState([])
+    const [dataBranch,sDataBranch] = useState([])
+    const [onFetching, sOnFetching] = useState(false);
 
     const [unit, sUnit] = useState("");
     
@@ -290,12 +506,29 @@ const Popup_danhmuc = (props) => {
     const [stages_status, sTagesStatus] = useState("0")
     const [stages_note, sTagesNote] = useState("")
 
+    const [costs_code, sCosts_Code] = useState(null)
+    const [costs_name, sCosts_Name] = useState(null)
+    const [costs_branch, sCosts_Branch] = useState([])
+
     const [errInput, sErrInput] = useState(false);
     const [errInputcode, sErrInputcode] = useState(false);
     const [errInputName, sErrInputName] = useState(false);
 
+    const [errCode , sErrcode] = useState(false);
+    const [errName , sErrName] = useState(false);
+    const [errBranch , sErrBranch] = useState(false);
+    
+    const [idCategory, sIdCategory] = useState(null);
+
     useEffect(() => {
       sErrInput(false)
+      sCosts_Code('')
+      sCosts_Branch([])
+      sCosts_Name('')
+      sIdCategory(null)
+      sErrcode(false)
+      sErrName(false)
+      sErrBranch(false)
       sErrInputcode(false)
       sErrInputName(false)
       sTagesName(props.data?.name ? props.data?.name : "")
@@ -303,25 +536,32 @@ const Popup_danhmuc = (props) => {
       sTagesStatus((props.data?.status_qc ? props.data?.status_qc : ""))
       sTagesNote(props.data?.note ? props.data?.note : "")
       sUnit(props.data?.unit ? props.data?.unit : "")
-  
+      open && sOnFetching(true);
     }, [open]);
 
-   
     const _ServerSending = () => {
       const id =props.data?.id;
       var data = new FormData();
-      data.append('unit', (tabPage === "units" && unit) );
+      if(tabPage === "units"){
+        data.append('unit', unit);
+      }
       if(tabPage === "stages"){
         data.append('code',  stages_code );
         data.append('name',  stages_name );
         data.append('status_qc',  stages_status);
         data.append('note',  stages_note );
-
+      }if(tabPage === "costs"){
+        data.append('code', costs_code);
+        data.append('name', costs_name);
+        data.append('parent_id', idCategory);
+        costs_branch?.map((e, index) => {
+          data.append(`branch_id[[${index}]`, e?.value);
+        })
       }
       Axios("POST", id ? 
-      `${(tabPage === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true ` || (tabPage === "stages" && `/api_web/api_product/stage/${id}?csrf_protection=true`))} `
+      `${(tabPage === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true ` || (tabPage === "stages" && `/api_web/api_product/stage/${id}?csrf_protection=true`) || (tabPage === "costs" && `/api_web/Api_cost/cost/${id}?csrf_protection=true`))} `
     :
-      `${(tabPage === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`)  || (tabPage === "stages" && `/api_web/api_product/stage/?csrf_protection=true`)} `
+      `${(tabPage === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`)  || (tabPage === "stages" && `/api_web/api_product/stage/?csrf_protection=true`) || (tabPage === "costs" && `/api_web/Api_cost/cost/?csrf_protection=true`)} `
     , {
     data: data,
     headers: {"Content-Type": "multipart/form-data"} 
@@ -339,8 +579,15 @@ const Popup_danhmuc = (props) => {
         sTagesNote("")
         sTagesStatus("")
         sErrInput(false)
+        sErrcode(false)
+        sErrName(false)
+        sCosts_Code('')
+        sCosts_Name('')
+        sIdCategory(null)
         sErrInputcode(false)
         sErrInputName(false)
+        sCosts_Branch([])
+        sErrBranch(false)
         sOpen(false)
         props.onRefresh && props.onRefresh()
     }else {
@@ -355,61 +602,56 @@ const Popup_danhmuc = (props) => {
     useEffect(() => {
       onSending && _ServerSending()
     }, [onSending])
-    // const handleSubmit = (event) => {
-    //   event.preventDefault();
-    //   const id =props.data?.id;
-    //   var data = new FormData();
-    //   data.append('unit', (tabPage === "units" && unit) );
-    //   Axios("POST", id ? 
-    //       `${(tabPage === "units" && `/api_web/Api_unit/unit/${id}?csrf_protection=true ` || (tabPage === "stages" && `/api_web/Api_payment_method/payment_method/${id}?csrf_protection=true`))} `
-    //     :
-    //       `${(tabPage === "units" && `/api_web/Api_unit/unit/?csrf_protection=true`)  || (tabPage === "stages" && `/api_web/Api_payment_method/payment_method?csrf_protection=true`)} `
-    //     , {
-    //     data: data,
-    //     headers: {"Content-Type": "multipart/form-data"} 
-    //   }, (err, response) => {
-    //     if(!err){
-    //       var {isSuccess, message} = response.data;
-    //       if(isSuccess){
-    //         Toast.fire({
-    //           icon: 'success',
-    //           title: props.dataLang[message]
-    //         })   
-    //         sUnit("")
-    //         sErrInput(false)
-    //         sOpen(false)
-    //         props.onRefresh && props.onRefresh()
-    //     }else {
-    //         Toast.fire({
-    //           icon: 'error',
-    //           title: props.dataLang[message]
-    //         })  
-    //       }
-    //     }
-    //   }) 
-    // }
+
     const _HandleChangeInput = (type, value) => {
       if(type == "unit"){
         sUnit(value.target?.value)
-      }
-       else if(type == "code"){
+      }else if(type == "code"){
         sTagesCode(value.target?.value)
-      }
-       else if(type == "name"){
+      }else if(type == "name"){
         sTagesName(value.target?.value)
-      }
-      else if(type === "status"){
+      }else if(type === "status"){
         if(value.target?.checked === false){
           sTagesStatus("0")
         }else if(value.target?.checked === true){
         sTagesStatus("1")
       }
-    }
-      else if(type == "note"){
+      }else if(type == "note"){
         sTagesNote(value.target?.value)
+      }else if(type == "costs_code"){
+        sCosts_Code(value.target?.value)
+      }else if(type == "costs_name"){
+        sCosts_Name(value.target?.value)
+      }else if(type == "costs_branch"){
+        sCosts_Branch(value)
       }
-       
     }
+
+    const valueIdCategory = (e) => sIdCategory(e?.value)
+
+
+      const _ServerFetching =  () => {
+        Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
+            if(!err){
+                var {isSuccess, result} =  response.data
+                sDataBranch(result?.map(e =>({label: e.name, value:e.id})))       
+            }
+        })
+        Axios("GET", `${props.data?.id ? `/api_web/Api_cost/costCombobox/?csrf_protection=true` : "/api_web/Api_cost/costCombobox/?csrf_protection=true"}`, {}, (err, response) => {
+          if(!err){
+              var {rResult} = response.data;
+              console.log(rResult);
+              sDataOption(rResult.map(e => ({label: e.name + " " + "(" + e.code + ")", value: e.id, level: e.level})))
+          }
+        })
+    sOnFetching(false)  
+    }
+   
+  useEffect(() => {
+      onFetching && _ServerFetching()
+  }, [onFetching]);
+
+
     const Toast = Swal.mixin({
       toast: true,
       position: 'top-end',
@@ -425,49 +667,58 @@ const Popup_danhmuc = (props) => {
              Toast.fire({
           icon: 'error',
           title: `${props.dataLang?.required_field_null}`
-      })
-        }
-        else{
+      })}else{
           sOnSending(true)
-        }
-      }
-      else if(tabPage === "stages"){
+        }}else if(tabPage === "stages"){
         if(stages_name?.length == 0 || stages_code?.length == 0){
           stages_name?.length == 0 && sErrInputName(true) 
           stages_code?.length == 0 && sErrInputcode(true) 
              Toast.fire({
           icon: 'error',
           title: `${props.dataLang?.required_field_null}`
-      })
+      })}else{
+          sOnSending(true)
         }
-        else{
+      }else if(tabPage === "costs"){
+        if(costs_code == "" || costs_name == "" || costs_branch?.length == 0){
+          costs_code == "" && sErrcode(true)
+          costs_name == "" && sErrName(true) 
+          costs_branch?.length == 0 && sErrBranch(true)
+             Toast.fire({
+          icon: 'error',
+          title: `${props.dataLang?.required_field_null}`
+      })}else{
           sOnSending(true)
         }
       }
-
-
-      // if(unit?.length == 0 || stages_name?.length == 0 || stages_code?.length == 0 ){
-      //   unit?.length ==0 && sErrInput(true) 
-      //   stages_name?.length == 0 && sErrInputName(true) 
-      //   stages_code?.length == 0 && sErrInputcode(true) 
-      //   Toast.fire({
-      //     icon: 'error',
-      //     title: `${props.dataLang?.required_field_null}`
-      // })
-      // }else{
-      //   sOnSending(true)
-      // }
     }
     useEffect(() => {
       sErrInput(false)
     }, [unit.length > 0])
+
     useEffect(() => {
       sErrInputName(false) 
       sErrInputcode(false)
     }, [stages_code.length > 0, stages_name?.length > 0])
+
+    useEffect(() =>{
+       sErrcode(false)
+    },[costs_code != ""])
+
+    useEffect(() =>{
+       sErrName(false)
+    },[costs_name != ""])
+
+    useEffect(() =>{
+      sErrBranch(false)
+   },[costs_branch?.length > 0])
+
+    const hiddenOptionsClient = costs_branch?.length > 3 ? costs_branch?.slice(0, 3) : [];
+    const optionsClient = dataBranch ? dataBranch?.filter((x) => !hiddenOptionsClient.includes(x.value)) : [];
+
     return(
       <PopupEdit  
-        title={props.data?.id ? `${(tabPage === "units" && props.dataLang?.category_unit_edit) || (tabPage === "stages" && props.dataLang?.settings_category_stages_edit) }` : `${(tabPage === "units" && props.dataLang?.category_unit_add) || (tabPage === "stages" && props.dataLang?.settings_category_stages_add)}`} 
+        title={props.data?.id ? `${(tabPage === "units" && props.dataLang?.category_unit_edit) || (tabPage === "stages" && props.dataLang?.settings_category_stages_edit) || (tabPage === "costs" && "Sửa loại chi phí") }` : `${(tabPage === "units" && props.dataLang?.category_unit_add) || (tabPage === "stages" && props.dataLang?.settings_category_stages_add) || (tabPage === "costs" && "Tạo loại chi phí")}`} 
         button={props.data?.id ? <IconEdit/> : `${props.dataLang?.branch_popup_create_new}`} 
         onClickOpen={_ToggleModal.bind(this, true)} 
         open={open} onClose={_ToggleModal.bind(this,false)}
@@ -498,17 +749,29 @@ const Popup_danhmuc = (props) => {
                 <React.Fragment>
                   <div className="flex flex-wrap justify-between">
                     <div className="w-full">
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.settings_category_stages_code}<span className="text-red-500">*</span></label>
+                      <label className="text-[#344054] font-normal text-sm mb-1 ">{"Mã chi phí"}<span className="text-red-500">*</span></label>
                       <div>
                         <input
-                          value={stages_code}                
-                          onChange={_HandleChangeInput.bind(this, "code")}
-                          placeholder={props.dataLang?.settings_category_stages_code}
+                          // value={stages_code}                
+                          // onChange={_HandleChangeInput.bind(this, "code")}
+                          placeholder={"Mã chi phí"}
                           name="fname"                      
                           type="text"
-                          className={`${errInputcode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                          className={`"focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
                         />
-                        {errInputcode && <label className="mb-4  text-[14px] text-red-500">{props.dataLang?.settings_category_stages_errCode}</label>}
+                      </div>
+                    </div>
+                    <div className="w-full">
+                      <label className="text-[#344054] font-normal text-sm mb-1 ">{"Tên chi phí"}<span className="text-red-500">*</span></label>
+                      <div>
+                        <input
+                          // value={stages_code}                
+                          // onChange={_HandleChangeInput.bind(this, "code")}
+                          placeholder={"Tên chi phí"}
+                          name="fname"                      
+                          type="text"
+                          className={`"focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
+                        />
                       </div>
                     </div>
                     <div className="w-full">
@@ -581,6 +844,93 @@ const Popup_danhmuc = (props) => {
                   </div>  
                 </React.Fragment>
               }
+              {tabPage === "costs" &&
+               <React.Fragment>
+                 <div className='py-4 space-y-5'>
+                 <div className='space-y-1'>
+                    <label className="text-[#344054] font-normal text-base">{"Mã chi phí"} <span className='text-red-500'>*</span></label>
+                    <input 
+                    value={costs_code} onChange={_HandleChangeInput.bind(this, "costs_code")}
+                     type="text" placeholder={"Mã chi phí"} className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                    {errCode && <label className="text-sm text-red-500">{"Vui lòng chọn mã chi phí"}</label>}
+                </div>
+                 <div className='space-y-1'>
+                    <label className="text-[#344054] font-normal text-base">{"Tên chi phí"} <span className='text-red-500'>*</span></label>
+                    <input 
+                    value={costs_name} onChange={_HandleChangeInput.bind(this, "costs_name")}
+                     type="text" placeholder={"Tên chi phí"} className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                    {errName && <label className="text-sm text-red-500">{"Vui lòng nhập tên chi phí"}</label>}
+                </div>
+                <div className='col-span-6 max-h-[65px] min-h-[65px]'>
+                            <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">{"Chi nhánh"} <span className="text-red-500">*</span></label>
+                              <Select   
+                                  closeMenuOnSelect={true}
+                                  placeholder={"Chi nhánh"}
+                                  options={dataBranch}
+                                  isSearchable={true}
+                                  onChange={_HandleChangeInput.bind(this, "costs_branch")}
+                                  value={costs_branch}
+                                  isMulti
+                                  components={{ MultiValue }}
+                                  LoadingIndicator
+                                  noOptionsMessage={() => "Không có dữ liệu"}
+                                  maxMenuHeight="200px"
+                                  isClearable={true} 
+                                  menuPortalTarget={document.body}
+                                  onMenuOpen={handleMenuOpen}
+                                  theme={(theme) => ({
+                                  ...theme,
+                                  colors: {
+                                      ...theme.colors,
+                                      primary25: '#EBF5FF',
+                                      primary50: '#92BFF7',
+                                      primary: '#0F4F9E',
+                                  },
+                              })}
+                                  styles={{
+                                    placeholder: (base) => ({
+                                    ...base,
+                                    color: "#cbd5e1",
+                                  
+                                    }),
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        position: "absolute", 
+                                      
+                                    }), 
+                                }}
+                                className={`${errBranch ? "border-red-500" : "border-transparent" } text-sm placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] mb-2 font-normal outline-none border `} 
+                              />
+                                {errBranch && <label className="mb-2 text-sm text-red-500">{"Vui lòng chọn chi nhánh"}</label>}
+                            </div>
+                  <div className='space-y-1 mt-2'>
+                    <label className="text-[#344054] font-normal text-base">{"Nhóm cha"}</label>
+                    <Select 
+                        options={dataOption}
+                        formatOptionLabel={CustomSelectOption}
+                        defaultValue={(idCategory == "0" || !idCategory) ? {label: `${"Nhóm cha"}`} : {label: dataOption.find(x => x?.parent_id == idCategory)?.label, code:dataOption.find(x => x?.parent_id == idCategory)?.code, value: idCategory}}
+                        value={(idCategory == "0" || !idCategory) ? {label: "Nhóm cha", code: "nhóm cha"} : {label: dataOption.find(x => x?.value == idCategory)?.label, code:dataOption.find(x => x?.value == idCategory)?.code, value: idCategory}}
+                        onChange={valueIdCategory.bind(this)}
+                        isClearable={true}
+                        placeholder={"Nhóm cha"}
+                        className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none" 
+                        isSearchable={true}
+                        theme={(theme) => ({
+                            ...theme,
+                            colors: {
+                                ...theme.colors,
+                                primary25: '#EBF5FF',
+                                primary50: '#92BFF7',
+                                primary: '#0F4F9E',
+                            },
+                        })}
+                    />
+                </div>
+                </div>
+               </React.Fragment>
+
+              }
 
               <div className="text-right mt-5 space-x-2">
                 <button type="button" onClick={_ToggleModal.bind(this,false)} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-lg border border-solid border-[#D0D5DD]">{props.dataLang?.branch_popup_exit}</button>
@@ -591,6 +941,37 @@ const Popup_danhmuc = (props) => {
         </div>
       </PopupEdit>
     )
-  }
+}
+const MoreSelectedBadge = ({ items }) => {
+  const style = {
+      marginLeft: "auto",
+      background: "#d4eefa",
+      borderRadius: "4px",
+      fontSize: "14px",
+      padding: "1px 3px",
+      order: 99
+  };
+
+  const title = items.join(", ");
+  const length = items.length;
+  const label = `+ ${length}`;
+
+  return (
+    <div style={style} title={title}>{label}</div>
+  );
+};
+
+const MultiValue = ({ index, getValue, ...props }) => {
+  const maxToShow = 3;
+  const overflow = getValue()
+    .slice(maxToShow)
+    .map((x) => x.label);
+
+  return index < maxToShow ? (
+    <components.MultiValue {...props} />
+  ) : index === maxToShow ? (
+    <MoreSelectedBadge items={overflow} />
+  ) : null;
+};
 
 export default Index;

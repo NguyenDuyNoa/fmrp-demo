@@ -153,10 +153,8 @@ const Header = () => {
                     title: "Công nợ mua",
                     img: "/icon/header/muanhap/cnm.png",
                     items: [
-                        { name: "Hóa đơn mua hàng" },
-                        { name: "Phiếu chi mua hàng" },
+                        { name: "Phiếu chi", link: '/purchase_order/payment'},
                         { name: "Công nợ nhà cung cấp" },
-                        { name: "Phiếu chi khác" }
                     ]
                 }
             ]

@@ -143,9 +143,11 @@ const Index = (props) => {
       })
     sOnFetching_filter(false)
     }
+    
     const listBr_filter = listBr ? listBr?.map(e =>({label: e.name, value: e.id})) : []
     const listCode_filter = listCode ? listCode?.map(e => ({label: e.code, value : e.id})): []
     const listUser_filter = listUser ? listUser?.map(e => ({label: e.name, value : e.staffid})): []
+
     const onchang_filter= (type, value) => {
       if(type == "branch"){
         sIdBranch(value)
@@ -158,11 +160,17 @@ const Index = (props) => {
         sValueDate(value)
       }
     }
+
     const _ServerFetching_group =  () =>{
         Axios("GET", `/api_web/Api_purchases/purchasesFilterBar/?csrf_protection=true`, {
           params:{
             limit: 0,
             search: keySearch,
+            "filter[branch_id]": idBranch != null ? idBranch.value : null,
+            "filter[id]": idCode?.value,
+            "filter[staff_id]" : idUser?.value,
+            "filter[start_date]": valueDate?.startDate,
+            "filter[end_date]":valueDate?.endDate,
           }
       }, (err, response) => {
         if(!err){
@@ -172,6 +180,7 @@ const Index = (props) => {
         sOnFetching(false)
       })
       }
+      
       const paginate = pageNumber => {
         router.push({
           pathname: router.route,

@@ -529,7 +529,6 @@ const Popup_dsncc = (props) => {
           if(!err){
             
               var db =  response.data
-            console.log(db);
               sName(db?.name)
               sCode(db?.code)
               sTaxcode(db?.tax_code)
