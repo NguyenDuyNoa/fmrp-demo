@@ -123,7 +123,7 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <tilte>Thiết lập chung</tilte>
+                <title>Thiết lập chung</title>
             </Head>
             <div className='px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen'>
                 <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
