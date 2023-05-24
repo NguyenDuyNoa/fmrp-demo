@@ -341,9 +341,12 @@ const Form = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
+        const checkLotDate = dataChoose.some(item => item?.checkExpiry == "1")
+        const checkSerial = dataChoose.some(item => item?.checkSerial == "1")
+
         const checkErrNullLocate = dataChoose.map(item => item.child.some(itemChild => itemChild.locate === null));
-        // const checkErrNullLot = dataChoose.map(item => item.child.some(itemChild => itemChild.lot === null));
-        // const checkErrNullDate = dataChoose.map(item => item.child.some(itemChild => itemChild.date === null));
+        const checkErrNullLot = dataChoose.map(item => item.child.some(itemChild => itemChild.lot === null));
+        const checkErrNullDate = dataChoose.map(item => item.child.some(itemChild => itemChild.date === null));
 
         const hasDuplicates = () => {
             const serialData = [];
@@ -359,13 +362,14 @@ const Form = (props) => {
                     return false;
                 });
         };
-        console.log(dataChoose);
 
-        if(branch == null || warehouse == null || dataChoose.length == 0 || checkErrNullLocate[0] || hasDuplicates()){
+        if(branch == null || warehouse == null || dataChoose.length == 0 || checkErrNullLocate[0] || (checkLotDate && checkErrNullLot[0]) || (checkLotDate && checkErrNullDate[0]) || (checkSerial && hasDuplicates())){
             branch == null && sErrBranch(true)
             warehouse == null && sErrWareHouse(true)
             dataChoose.length == 0 && sErrProduct(true)
             checkErrNullLocate && sErrNullLocate(true)
+            checkErrNullLot && sErrNullLot(true)
+            checkErrNullDate && sErrNullDate(true)
             if(hasDuplicates()){
                 Toast.fire({
                     icon: 'error',
@@ -542,7 +546,7 @@ const Form = (props) => {
                                                                 placeholder={"Vị trí kho"}
                                                                 isClearable={true}
                                                                 classNamePrefix="Select"
-                                                                className={`${errNullLocate && ce.locate == null ? "border-red-500" : "border-transparent"}Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`} 
+                                                                className={`${errNullLocate && ce.locate == null ? "border-red-500" : "border-transparent"} Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`} 
                                                                 isSearchable={true}
                                                                 noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                                                 menuPortalTarget={document.body}

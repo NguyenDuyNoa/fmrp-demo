@@ -124,8 +124,19 @@ const Index = (props) => {
       sOnFetchingDetail(false)
   })
 }
+  const _ServerFetchingDetailPage = () => {
+    Axios("GET", `/api_web/Api_import/getImport/${id}?csrf_protection=true`, {}, (err, response) => {
+      if(!err){
+        
+      }
+    })
+  }
+
+
   useEffect(() => {
-    onFetchingDetail && _ServerFetchingDetail()
+    // onFetchingDetail && _ServerFetchingDetail()
+    //new
+    onFetchingDetail && _ServerFetchingDetailPage()
   }, [onFetchingDetail]);
 
   useEffect(() => {
@@ -1529,20 +1540,22 @@ const Index = (props) => {
                               />
                             </div>
                             {/* <div>{ce?.thanhTien}</div> */}
-                            <div className='text-right pr-3'>{formatNumber(Number(ce?.priceAfter) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
+                            <div className='justify-center pr-3 border p-0.5 h-full flex flex-col items-end text-sm'>{formatNumber(Number(ce?.priceAfter) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
                             {/* <div>{ce?.note}</div> */}
-                            <div className='col-span-1 flex items-center justify-center'>
+                            <div className='col-span-1 flex items-center justify-center border h-full p-0.5'>
                              <input
                                  value={ce?.note}  
                                  onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "note")}
                                  placeholder='Ghi chú'                 
                                  type="text"
-                                 className= "focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
+                                 className= "  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
                                /> 
                             </div>
-                            <button title='Xóa' onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)} className='transition w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center'>
-                              <IconDelete />
-                            </button>
+                            <div className='border h-full p-0.5 flex flex-col items-center justify-center'>
+                              <button title='Xóa' onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)} className=' text-red-500 flex flex-col justify-center items-center'>
+                                <IconDelete />
+                              </button>
+                            </div>
                           </React.Fragment>
                         )}
                       </div>
