@@ -252,6 +252,7 @@ const Index = (props) => {
                 // {title: `${dataLang?.purchase_order_table_statusOfSpending || "purchase_order_table_statusOfSpending"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
                 {title: `${dataLang?.purchase_order_table_importStatus || "purchase_order_table_importStatus"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
                 {title: `${dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.purchase_order_note || "purchase_order_note"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
             ],
             data: dataExcel?.map((e) =>
                 [
@@ -267,6 +268,7 @@ const Index = (props) => {
                     // {value: `${e?.import_status ? e?.import_status === "0" && "Chưa chi" || e?.import_status === "1" && "Chi 1 phần" ||  e?.import_status === "2"  &&"Đã chi đủ" : ""}`},
                     {value: `${e?.status_pay ? e?.status_pay === "0" && "Chưa nhập" || e?.status_pay === "1" && "Nhập 1 phần" ||  e?.status_pay === "2"  && "Đã nhập đủ đủ" : ""}`},
                     {value: `${e?.branch_name ? e?.branch_name :""}`},
+                    {value: `${e?.note ? e?.note :""}`},
                    
                 ]    
             ),
@@ -586,7 +588,7 @@ const Index = (props) => {
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center'>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left'>{e.supplier_name}</h6>
-                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center'>{e?.order_type  == "0" ? (<span className='font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200 2xl:text-xs xl:text-xs text-[8px]'>Tạo mới</span>) : (<span className='font-normal 2xl:text-xs xl:text-xs text-[8px] text-lime-500  rounded-xl py-1 px-3  bg-lime-200'>YCMH</span>)}</h6>
+                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center'>{e?.order_type  == "0" ? (<span className='font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200 2xl:text-xs xl:text-xs text-[8px] min-w-[80px]'>Tạo mới</span>) : (<span className='min-w-[80px] font-normal 2xl:text-xs xl:text-xs text-[8px] text-lime-500  rounded-xl py-1 px-3  bg-lime-200'>YCMH</span>)}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left flex gap-2 flex-wrap'>{e?.purchases?.reduce((acc, cur) => acc + (acc ? ', ' : '') + cur.code, '').split('').join('').replace(/^,/, '')}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_price)}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_tax_price)}</h6>
@@ -598,15 +600,15 @@ const Index = (props) => {
                                     }
                                 </h6> */}
                                 <h6 className='px-2 py-2.5  col-span-1 flex items-center justify-center text-center '>
-                                    {e?.import_status  === "0" && <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{dataLang?.purchase_order_table_not_yet_entered || "purchase_order_table_not_yet_entered"}</span>||
-                                     e?.import_status  === "1" &&  <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{dataLang?.purchase_order_table_enter_one_part || "purchase_order_table_enter_one_part"}</span> ||
-                                     e?.import_status  === "2" &&   <span className='flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full ' color='white' size={15}/>{dataLang?.purchase_order_table_enter_enough || "purchase_order_table_enter_enough"}</span>
+                                    {e?.import_status  === "not_stocked" && <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200'>{dataLang[e?.import_status]}</span>||
+                                     e?.import_status  === "stocked_part" &&  <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200'>{dataLang[e?.import_status]}</span> ||
+                                     e?.import_status  === "stocked" &&   <span className='flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200'><TickCircle className='bg-lime-500 rounded-full ' color='white' size={15}/>{dataLang[e?.import_status]}</span>
                                     }
                                 </h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left'>{e.note}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1'><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6> 
                                 <div className='col-span-1 flex justify-center'>
-                                    <BtnTacVu onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} status={e?.status} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
+                                    <BtnTacVu onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} status={e?.import_status} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
                                     {/* <button className='bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded xl:text-base text-xs'>Tác vụ</button> */}
                                 </div>
                                 </div>
@@ -740,7 +742,7 @@ return (
           {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[550px] xl:h-[750px] h-[700px] customsroll overflow-hidden  3xl:h-auto 2xl:scrollbar-thin 2xl:scrollbar-thumb-slate-300 2xl:scrollbar-track-slate-100">         */}
           {/* <div className="mt-4 space-x-5 w-[999px]">         */}
           {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[750px] xl:h-[750px] h-[700px] 2xl:max-h-[750px] max-h-[600px] 2xl:overflow-visible xl:overflow-y-auto overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">         */}
-          <div className=" space-x-5 w-[999px] 2xl:h-[650px] xl:h-[640px] h-[630px] ">        
+          <div className=" space-x-5 w-[999px]  2xl:h-auto xl:h-[680px] h-[650px] ">        
           <div>
            <div className='w-[999px]'>
              <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
@@ -871,24 +873,6 @@ return (
 }
 
 
-// const Tab_DanhSach = React.memo(() => {
-//     const [tab, sTab] = useState(0);
-//     const _HandleSelectTab = (e) => sTab(e);
-
-//     return(
-//         <div className='xl:space-y-3 space-y-2'>
-//             <div className='flex space-x-1 border-b border-slate-200'>
-//                 <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ? "text-[#0F4F9E] border-[#0F4F9E] from-[#0F4F9E]/10" : "text-slate-400 hover:text-[#0F4F9E]/70 border-transparent" } xl:text-base text-xs bg-gradient-to-t border-b-[2px] xl:py-2 py-1 xl:px-4 px-3 font-medium`}>Tất cả</button>
-//                 <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ? "text-[#0F4F9E] border-[#0F4F9E] from-[#0F4F9E]/10" : "text-slate-400 hover:text-[#0F4F9E]/70 border-transparent" } xl:text-base text-xs bg-gradient-to-t border-b-[2px] xl:py-2 py-1 xl:px-4 px-3 font-medium`}>Hóa đơn thuế (0)</button>
-//                 <button onClick={_HandleSelectTab.bind(this, 2)} className={`${tab === 2 ? "text-[#0F4F9E] border-[#0F4F9E] from-[#0F4F9E]/10" : "text-slate-400 hover:text-[#0F4F9E]/70 border-transparent" } xl:text-base text-xs bg-gradient-to-t border-b-[2px] xl:py-2 py-1 xl:px-4 px-3 font-medium`}>Hóa đơn lẻ (20)</button>
-//                 <button onClick={_HandleSelectTab.bind(this, 3)} className={`${tab === 3 ? "text-[#0F4F9E] border-[#0F4F9E] from-[#0F4F9E]/10" : "text-slate-400 hover:text-[#0F4F9E]/70 border-transparent" } xl:text-base text-xs bg-gradient-to-t border-b-[2px] xl:py-2 py-1 xl:px-4 px-3 font-medium`}>Đã chi (3)</button>
-//                 <button onClick={_HandleSelectTab.bind(this, 4)} className={`${tab === 4 ? "text-[#0F4F9E] border-[#0F4F9E] from-[#0F4F9E]/10" : "text-slate-400 hover:text-[#0F4F9E]/70 border-transparent" } xl:text-base text-xs bg-gradient-to-t border-b-[2px] xl:py-2 py-1 xl:px-4 px-3 font-medium`}>Chi 1 phần (1)</button>
-//                 <button onClick={_HandleSelectTab.bind(this, 5)} className={`${tab === 5 ? "text-[#0F4F9E] border-[#0F4F9E] from-[#0F4F9E]/10" : "text-slate-400 hover:text-[#0F4F9E]/70 border-transparent" } xl:text-base text-xs bg-gradient-to-t border-b-[2px] xl:py-2 py-1 xl:px-4 px-3 font-medium`}>Chưa chi (17)</button>
-//             </div>
-//             
-//         </div>
-//     )
-// })
 const BtnTacVu = React.memo((props) => {
     const [openTacvu, sOpenTacvu] = useState(false);
     const _ToggleModal = (e) => sOpenTacvu(e);
@@ -928,16 +912,17 @@ const BtnTacVu = React.memo((props) => {
         }
         })
     }
-    const handleClick = () => {
-        if (props?.status === "1") {
-            Toast.fire({
-                icon: 'error',
-                title: `${props.dataLang?.confirmed_cant_edit}`
-              })   
-        } else {
-          router.push(`/purchase_order/order/form?id=${props.id}`);
-        }
-      };
+      const handleClick = () => {
+        if(props?.status != "not_stocked"){
+          Toast.fire({
+            icon: 'error',
+            title: `${"Đơn đặt hàng đã có phiếu Nhập. Không thể sửa"}`
+          })  
+        } 
+          else {
+            router.push(`/purchase_order/order/form?id=${props.id}`);
+          }
+        };
     return(
         <div>
             <Popup

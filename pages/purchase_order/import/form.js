@@ -96,6 +96,7 @@ const Index = (props) => {
   }, (err, response) => {
       if(!err){
         var rResult = response.data;
+        console.log("rResult",rResult?.items?.map(e => e.note));
         const itemlast =  [{mathang: null}];
         const item = itemlast?.concat(rResult?.items?.map(e => ({
                       purchases_order_item_id: e?.item?.purchase_order_item_id, 
@@ -106,9 +107,9 @@ const Index = (props) => {
                       dongia: Number(e?.price),
                       chietkhau: Number(e?.discount_percent),
                       thue: {tax_rate: e?.tax_rate,value: e?.tax_id},
-                      donvitinh: e.items?.unit_name,
+                      donvitinh: e.item?.unit_name,
                       dongiasauck: Number(e?.price_after_discount),
-                      note: e?.note,
+                      ghichu: e?.note,
                       thanhtien: Number(e?.price_after_discount) * (1 + Number(e?.tax_rate)/100) * Number(e?.quantity)
                     })));
         sOption(item)
@@ -131,10 +132,10 @@ const Index = (props) => {
   }, []);
 
     const _ServerFetching =  () => {
-      Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
+      Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
           if(!err){
-              var {rResult} =  response.data
-              sDataBranch(rResult?.map(e =>({label: e.name, value:e.id})))       
+              var {isSuccess, result} =  response.data
+              sDataBranch(result?.map(e =>({label: e.name, value:e.id})))       
           }
       })
       Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
@@ -461,7 +462,6 @@ const Index = (props) => {
             option[index].thanhtien = Number(value?.e?.amount)
           }else{
       
-            console.log(sortedArr);
             // const newData= {id: Date.now(), mathang: value, dongiasauck: Number(value?.e?.price_after_discount), khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: Number(value?.e?.price), chietkhau: Number(value?.e?.discount_percent), thue: value ? [{label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e.tax_id, tax_rate: value?.e.tax_rate}] : thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
             const newData= {id: Date.now(), mathang: value, dongiasauck: Number(value?.e?.price_after_discount), khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: Number(value?.e?.price), chietkhau: Number(value?.e?.discount_percent), thue: thuetong ? thuetong : {label: value?.e.tax_name,value:Number(value?.e.tax_id), tax_rate:Number(value?.e.tax_rate)}, thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
             if (newData.chietkhau) {
@@ -666,7 +666,7 @@ const Index = (props) => {
     const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, purchases_order_item_id: e?.mathang?.e?.purchase_order_item_id, location_warehouses_id: e?.khohang?.value, quantity: Number(e?.soluong), price: e?.dongia, discount_percent:e?.chietkhau, tax_id:e?.thue?.value, note: e?.ghichu, id:e?.id}})
    
     let newDataOption = dataOption?.filter(e => e?.item !== undefined);
-       
+    
     const _ServerSending = () => {
           var formData = new FormData();
           formData.append("code", code)
@@ -779,7 +779,7 @@ const Index = (props) => {
                 <div className="flex justify-end items-center">
                     <button   
                     onClick={() => router.back()} 
-                    className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105">{"Quay lại"}</button>
+                    className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105">{dataLang?.import_comeback || "import_comeback"}</button>
                 </div>
             </div>
                 
@@ -897,7 +897,7 @@ const Index = (props) => {
                           {errSupplier && <label className="text-sm text-red-500">{dataLang?.purchase_order_errSupplier || "purchase_order_errSupplier"}</label>}
                         </div>
                         <div className='col-span-2 '>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">{"Đơn đặt hàng (P0)"} <span className="text-red-500">*</span></label>
+                          <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_the_orders || "import_the_orders"} <span className="text-red-500">*</span></label>
                           <Select 
                               options={dataThe_order}
                               onChange={_HandleChangeInput.bind(this, "theorder")}
@@ -906,7 +906,7 @@ const Index = (props) => {
                               noOptionsMessage={() => "Không có dữ liệu"}
                               closeMenuOnSelect={true}
                               hideSelectedOptions={false}
-                              placeholder={"Đơn đặt hàng (P0)"} 
+                              placeholder={dataLang?.import_the_orders || "import_the_orders"} 
                               className={`${errTheOrder ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
                               isSearchable={true}
                               // components={{ MultiValue }}
@@ -938,7 +938,7 @@ const Index = (props) => {
                               })
                           }}
                           />
-                          {errTheOrder && <label className="text-sm text-red-500">{"Vui lòng chọn đơn đặt hàng (PO)"}</label>}
+                          {errTheOrder && <label className="text-sm text-red-500">{dataLang?.import_err_theorder || "import_err_theorder"}</label>}
                         </div>
                     </div> 
               </div>

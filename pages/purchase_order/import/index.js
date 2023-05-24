@@ -37,6 +37,13 @@ import { useEffect } from 'react';
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: true,
+})
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -127,18 +134,12 @@ const Index = (props) => {
 
 
     const _ServerFetching_filter =  () =>{
-      Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
+      Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
       if(!err){
-          var {rResult} =  response.data
-          sListBr(rResult)
+          var {isSuccess, result} =  response.data
+          sListBr(result)
       }
     })
-      Axios("GET", `/api_web/Api_purchase_order/purchase_order/?csrf_protection=true`, {}, (err, response) => {
-        if(!err){
-            var {rResult} =  response.data
-            sListCode(rResult)
-        }
-      })
       Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
         if(!err){
             var db =  response.data.rResult
@@ -147,6 +148,19 @@ const Index = (props) => {
       })
       sOnFetching_filter(false)
    }
+
+   const _HandleSeachApi = (inputValue) => {
+    Axios("POST",`/api_web/Api_import/importCombobox/?csrf_protection=true`, {
+         data: {
+           term: inputValue,
+         },
+       }, (err, response) => {
+             if(!err){
+               var {isSuccess, result} = response?.data
+               sListCode(result)
+           }
+         }
+     )};
 
     useEffect(()=>{
       onFetching_filter && _ServerFetching_filter()
@@ -160,11 +174,14 @@ const Index = (props) => {
         router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query?.tab && sOnFetching_filter(true) || idBranch != null && sOnFetching(true) ||  valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true) || idSupplier != null && sOnFetching(true) || idCode != null && sOnFetching(true)
     }, [limit,router.query?.page, router.query?.tab,idBranch, valueDate.endDate, valueDate.startDate,idSupplier,idCode]);
 
-    const formatNumber = (number) => {
+     const formatNumber = (number) => {
       if (!number && number !== 0) return 0;
-      const integerPart = Math.floor(number)
-      return integerPart.toLocaleString("en")
-    }
+        const integerPart = Math.floor(number);
+        const decimalPart = number - integerPart;
+        const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
+        const roundedNumber = integerPart + roundedDecimalPart;
+        return roundedNumber.toLocaleString("en");
+    };
 
     const _HandleOnChangeKeySearch = ({target: {value}}) => {
       sKeySearch(value)
@@ -194,7 +211,7 @@ const Index = (props) => {
     }
 
     const listBr_filter = listBr ? listBr?.map(e =>({label: e.name, value: e.id})) : []
-    const listCode_filter = lisCode ? lisCode?.map(e =>({label: e.code, value: e.id})) : []
+    const listCode_filter = lisCode ? lisCode?.map(e =>({label: `${e.code}`,value:e.id})) : []
 
     const onchang_filter = (type, value)=>{
       if(type == "branch"){
@@ -280,6 +297,7 @@ const Index = (props) => {
               {title: `${dataLang?.import_payment_status || "import_payment_status"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
               {title: `${dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
               {title: `${dataLang?.import_branch || "import_branch"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+              {title: `${dataLang?.import_from_note || "import_from_note"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
           ],
           data: dataExcel?.map((e) =>
               [
@@ -291,9 +309,10 @@ const Index = (props) => {
                   {value: `${e?.total_price ? formatNumber(e?.total_price) : ""}`},
                   {value: `${e?.total_tax_price ? formatNumber(e?.total_tax_price) : ""}`},
                   {value: `${e?.total_amount ? formatNumber(e?.total_amount) : ""}`},
-                  {value: `${"Trạng thái thanh toán"}`},
+                  {value: `${e?.status === "0" ? "Chưa thanh toán":"" || e?.status === "1" ? "Thanh toán 1 phần":"" || e?.status === "2"? "Thanh toán đủ":""}`},
                   {value: `${e?.warehouseman_id === "0" ? "Chưa duyệt": "Đã duyệt"}`},
                   {value: `${e?.branch_name ? e?.branch_name :""}`},
+                  {value: `${e?.note ? e?.note :""}`},
                  
               ]    
           ),
@@ -331,7 +350,6 @@ const [browser, sBrowser] = useState("0")
   }
   }
 
-console.log(browser);
 
     return (
         <React.Fragment>
@@ -432,6 +450,7 @@ console.log(browser);
                           </div>
                           <div className='ml-1 col-span-1'>
                               <Select 
+                                  onInputChange={_HandleSeachApi.bind(this)}
                                   options={[{ value: '', label: dataLang?.purchase_order_vouchercode || "purchase_order_vouchercode", isDisabled: true }, ...listCode_filter]}
                                   onChange={onchang_filter.bind(this, "code")}
                                   value={idCode}
@@ -587,8 +606,8 @@ console.log(browser);
                           {(data?.map((e) => 
                                 <div className='grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 ' key={e.id.toString()}>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center'>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
-                                {/* <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6> */}
-                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'>{e?.code}</h6>
+                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
+                                {/* <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'>{e?.code}</h6> */}
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left'>{e.supplier_name}</h6>
                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center'>{<span className='font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200 min-w-[100px]'>{e?.purchase_order_code}</span>}</h6>
                                 {/* <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left flex gap-2 flex-wrap'>{e?.purchases?.map(e => {return (<span>{e.code}</span>)})}</h6> */}
@@ -599,9 +618,9 @@ console.log(browser);
                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-2 '>
                                     <div className='flex flex-wrap  gap-2 items-center justify-center'>
                                       {
-                                    e?.status === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{"Chưa thanh toán"}</span>||
-                                    e?.status === "1" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{"Thanh toán 1 phần"} {`(${e?.count})`}</span>||
-                                    e?.status === "2" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 2xl:text-sm xl:text-xs text-[8px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã thanh toán đủ"} {`(${e?.order_status?.count})`}</span>
+                                    e?.status === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{"Chưa chi"}</span>||
+                                    e?.status === "1" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{"chi 1 phần"} {`(${e?.count})`}</span>||
+                                    e?.status === "2" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 2xl:text-sm xl:text-xs text-[8px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã chi đủ"} {`(${e?.order_status?.count})`}</span>
                                       }
                                     </div>
                                   </h6>
@@ -613,7 +632,7 @@ console.log(browser);
                                 </h6> */}
                                 <h6 className=' 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center '>
                                   <div className=' '>
-                                      <label className="relative flex cursor-pointer items-center rounded-xl py-1 px-2 gap-1 bg-[#e0e7ff]"
+                                      <label className="relative flex cursor-pointer items-center rounded-lg py-1.5 px-4 gap-1 bg-[#e0e7ff]"
                                           htmlFor={e?.id} data-ripple-dark="true" > 
                                           <input type="checkbox" className="before:content[''] border-[#4f46e5] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border  transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 "
                                               id={e.id}
@@ -637,7 +656,7 @@ console.log(browser);
                                               </svg>
                                           </div>
                                           <div className='w-[80%]'>
-                                            <label htmlFor={e.id} className='font-normal 2xl:text-base xl:text-xs text-[8px] text-[#6366f1]'>{"Chưa duyệt"}</label>
+                                            <label htmlFor={e.id} className='font-normal 2xl:[16px] xl:text-xs text-[8px] text-[#6366f1]'>{"Chưa duyệt kho"}</label>
                                           </div>
                                       </label>
                                   </div>
@@ -783,6 +802,208 @@ const BtnTacVu = React.memo((props) => {
   )
 })
 
+const Popup_chitiet =(props)=>{
+  const scrollAreaRef = useRef(null);
+  const [open, sOpen] = useState(false);
+  const _ToggleModal = (e) => sOpen(e);
+  const [data,sData] =useState()
+  const [onFetching, sOnFetching] = useState(false);
 
+  useEffect(() => {
+    props?.id && sOnFetching(true) 
+  }, [open]);
+
+  const formatNumber = (number) => {
+    if (!number && number !== 0) return 0;
+      const integerPart = Math.floor(number);
+      const decimalPart = number - integerPart;
+      const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
+      const roundedNumber = integerPart + roundedDecimalPart;
+      return roundedNumber.toLocaleString("en");
+  };
+
+  const _ServerFetching_detailOrder = () =>{
+    Axios("GET", `/api_web/Api_import/import/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+    if(!err){
+        var db =  response.data
+
+        sData(db)
+    }
+    sOnFetching(false)
+  })
+  }
+
+  useEffect(() => {
+    onFetching && _ServerFetching_detailOrder()
+  }, [open]);
+
+  
+  const scrollableDiv = document.querySelector('.customsroll');
+  scrollableDiv?.addEventListener('wheel', (event) => {
+    const deltaY = event.deltaY;
+    const top = scrollableDiv.scrollTop;
+    const height = scrollableDiv.scrollHeight;
+    const offset = scrollableDiv.offsetHeight;
+    const isScrolledToTop = top === 0;
+    const isScrolledToBottom = top === height - offset;
+  
+    if ((deltaY < 0 && isScrolledToTop) || (deltaY > 0 && isScrolledToBottom)) {
+      event.preventDefault();
+    }
+  });
+ 
+
+return (
+<>
+ <PopupEdit   
+    title={props.dataLang?.import_detail_title || "import_detail_title"} 
+    button={props?.name} 
+    onClickOpen={_ToggleModal.bind(this, true)} 
+    open={open} onClose={_ToggleModal.bind(this,false)}
+    classNameBtn={props?.className} 
+  >
+  <div className='flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
+     
+  </div>  
+          {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[550px] xl:h-[750px] h-[700px] customsroll overflow-hidden  3xl:h-auto 2xl:scrollbar-thin 2xl:scrollbar-thumb-slate-300 2xl:scrollbar-track-slate-100">         */}
+          {/* <div className="mt-4 space-x-5 w-[999px]">         */}
+          {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[750px] xl:h-[750px] h-[700px] 2xl:max-h-[750px] max-h-[600px] 2xl:overflow-visible xl:overflow-y-auto overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">         */}
+          <div className=" space-x-5 2xl:w-[1100px] w-[999px]  2xl:h-auto xl:h-[680px] h-[650px] ">        
+          <div>
+           <div className='2xl:w-[1100px] w-[999px]'>
+             <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+             <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props.dataLang?.import_detail_info || "import_detail_info"}</h2>       
+              <div className='grid grid-cols-9  min-h-[170px] px-2'>
+                  <div className='col-span-3'>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_day_vouchers || "import_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_code_vouchers || "import_code_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.code}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_the_order || "import_the_order"}</h3><h3 className=' text-[13px]  text-center font-normal text-lime-500  rounded-xl py-1 px-3 max-w-[100px] min-w-[70px]  bg-lime-200 '>{data?.purchase_order_code}</h3></div>
+                  </div>
+
+                    <div className='col-span-3'>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_payment_status || "import_payment_status"}</h3>
+                          <div className='flex flex-wrap  gap-2 items-center justify-center'>
+                              {
+                            data?.status === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center text-[13px]'>{"Chưa thanh toán"}</span>||
+                            data?.status === "1" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center text-[13px]'>{"Thanh toán 1 phần"} {`(${e?.count})`}</span>||
+                            data?.status === "2" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã thanh toán đủ"} {`(${e?.order_status?.count})`}</span>
+                              }
+                          </div>
+                        </div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{"Duyệt thủ kkho"}</h3>
+                          <div className='flex flex-wrap  gap-2 items-center justify-center'>
+                              {
+                            data?.status === "0" && <span className=' font-normal text-[#3b82f6]  rounded-xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center text-[13px]'>{"Chưa duyệt kho"}</span>
+                            // data?.status === "1" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center text-[13px]'>{"Thanh toán 1 phần"} {`(${e?.count})`}</span>||
+                            // data?.status === "2" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã thanh toán đủ"} {`(${e?.order_status?.count})`}</span>
+                              }
+                          </div>
+                        </div>
+                        {/* <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{"Kho -  Vị trí kho"}</h3><h3 className=' text-[13px]  font-normal '>{`${data?.items?.map(e => {return e?.warehouse_name})+ ("-")+ data?.items?.map(e => {return e?.warehouse_code})}`}</h3></div> */}
+                    </div>
+                  <div className='col-span-3 '>
+                      {/* <div className='flex flex-wrap  gap-2 items-center justify-start'>
+                      {data?.status_pay === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{props.dataLang?.purchase_order_table_havent_spent_yet || "purchase_order_table_havent_spent_yet"}</span>||
+                        data?.status_pay === "1" &&  <span className=' font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{props.dataLang?.purchase_order_table_spend_one_part || "purchase_order_table_spend_one_part"}</span> ||
+                        data?.status_pay === "2" &&   <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_order_table_enough_spent || "purchase_order_table_enough_spent"}</span>
+                       }
+                      </div> */}
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_supplier || "import_supplier"}</h3><h3 className='text-[13px] font-normal'>{data?.supplier_name}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_branch || "import_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_from_note || "import_from_note"}</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div>
+                  </div>
+                  
+              </div>
+              <div className="pr-2 w-[100%] lx:w-[110%] ">
+                <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.import_detail_image || "import_detail_image"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_detail_items || "import_detail_items"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4> 
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"Kho - VTK"}</h4> 
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"ĐVT"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_quantity || "import_from_quantity"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_discount || "import_from_discount"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"ĐGSCK"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_tax || "import_from_tax"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_into_money || "import_into_money"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_note || "import_from_note"}</h4>
+                </div>
+                {onFetching ?
+                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                  : 
+                  data?.items?.length > 0 ? 
+                  (<>
+                       <ScrollArea     
+                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+                    <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">                       
+                      {(data?.items?.map((e) => 
+                        <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id?.toString()}>
+                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left">
+                          {e?.item?.images != null ? (<ModalImage   small={e?.item?.images} large={e?.item?.images} alt="Product Image"  className='custom-modal-image object-cover rounded w-[50px] h-[60px]' />):
+                                  <div className='w-[50px] h-[60px] object-cover  flex items-center justify-center rounded'>
+                                    <ModalImage small="/no_img.png" large="/no_img.png" className='w-full h-full rounded object-contain p-1' > </ModalImage>
+                                  </div>
+                          }
+                          </h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.item?.name}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-left break-words">{e?.item?.product_variation}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-left break-words">{`${e?.warehouse_name}-${e.location_name}`}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.unit_name}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.quantity)}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price)}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.discount_percent + "%"}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price_after_discount)}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.tax_rate) + "%"}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.amount)}</h6>                
+                                         
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.note != undefined ? e?.note : ""}</h6>                
+                        </div>
+                      ))}              
+                    </div>   
+                      </ScrollArea>                       
+                    </>
+                  )  : 
+                  (
+                    <div className=" max-w-[352px] mt-24 mx-auto" >
+                      <div className="text-center">
+                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">{props.dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
+                        <div className="flex items-center justify-around mt-6 ">
+                            {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+                        </div>
+                      </div>
+                    </div>
+                  )}    
+              </div>
+          <h2 className='font-normal p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
+              <div className="text-right mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+              <div className='col-span-7'>
+              </div>
+             <div className='col-span-2 space-y-2'>
+                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_total_amount || "import_detail_total_amount"}</h3></div>
+                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_discount || "import_detail_discount"}</h3></div>
+                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_affter_discount || "import_detail_affter_discount"}</h3></div>
+                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_tax_money || "import_detail_tax_money"}</h3></div>
+                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_into_money || "import_detail_into_money"}</h3></div>
+             </div>
+             <div className='col-span-3 space-y-2'>
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_discount)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price_after_discount)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_tax)}</h3></div>
+                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_amount)}</h3></div>
+             </div>
+          </div>   
+            </div>
+          </div>
+    
+     </div>
+  
+    </div>    
+  </PopupEdit>
+</>
+)
+}
 
 export default Index;
