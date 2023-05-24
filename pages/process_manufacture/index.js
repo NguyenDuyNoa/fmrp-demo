@@ -22,7 +22,7 @@ const Index = () => {
                     <h2 className='3xl:text-3xl 2xl:text-2xl xl:text-2xl lg:text-2xl text-xl font-medium'>Quy Trình Quản Lý Sản Xuất</h2>
                 </div>
 
-                <div className='3xl:h-[100%] 2xl:h-[100%] xl:h-[100%] lg:h-[84%] w-[100%] 3xl:px-[55px] 2xl:px-12 2xl:pt-1 lg:pt-2 relative border-2 border-slate-100 overflow-hidden flex-col flex'>
+                <div className='3xl:h-[100%] 2xl:h-[100%] xl:h-[100%] lg:h-[84%] w-[100%] 3xl:px-[55px] 3xl:py-10 2xl:px-12 2xl:py-4 lg:py-8 lg:px-10 relative border-2 border-slate-100 overflow-hidden flex-col flex'>
                     <div className='h-full w-full rounded-lg relative z-10 3xl:px-10 2xl:px-6 px-6 xl:space-y-1 lg:space-y-1 flex flex-row'>
                         <div class="basis-full">
                             <div className='3xl:w-[180px] 2xl:w-[100px] xl:w-[100px] lg:w-[80px] flex justify-center'>
@@ -365,7 +365,7 @@ const Index = () => {
                     <div className="3xl:bottom-[0%] bottom-[0%] 3xl:px-0 3xl:py-6 3xl:mx-0 2xl:px-0 2xl:py-6 2xl:mx-0 xl:px-4 xl:py-6 xl:mx-4 lg:px-0 lg:py-2 lg:mx-6 flex justify-start absolute">
                         <div className='flex space-x-3 '>
                             <Image alt="" src="/logo_1.png" width={64} height={20} className="select-none pointer-events-none object-contain w-auto h-auto" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
-                            <h6 className='2xl:font-[300] xl:font-[300] lg:font-[200]'  >Quy trình quản lí sản xuất</h6>
+                            <h6 className='2xl:font-[300] xl:font-[300] lg:font-[200]'>Quy trình quản lí sản xuất</h6>
                         </div>
 
                     </div>

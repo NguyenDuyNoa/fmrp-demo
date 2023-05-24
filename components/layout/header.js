@@ -82,18 +82,13 @@ const Header = () => {
             title: "Bán hàng",
             sub: [
                 {
-                    title: "Báo giá",
-                    // img: "/icon/header/banxuat/bh.png",
-                    link: "#"
-                }, {
-                    title: "Đơn hàng bán",
-                    // img: "/icon/header/banxuat/bh.png",
-                    link: "#"
-                }, {
-                    title: "Trả lại hàng bán",
-                    // img: "/icon/header/banxuat/bh.png",
-                    link: "#"
-                },
+                    // title: "Báo giá",
+                    items: [
+                        { name: "Báo giá", link: "/sales_export_product/priceQuote" },
+                        { name: "Đơn hàng bán", link: "/sales_export_product/salesOrder" },
+                        { name: "Trả lại hàng bán", link: "/sales_export_product/returnSales" },
+                    ]
+                }
             ]
         }, {
             title: "Giao hàng",
@@ -130,7 +125,11 @@ const Header = () => {
                     items: [
                         { name: "Yêu cầu mua hàng", link: '/purchase_order/purchases' },
                         { name: "Đơn đặt hàng", link: '/purchase_order/order' },
+<<<<<<< HEAD
                         { name: "Phiếu dịch vụ",link: '/purchase_order/serviceVoucher' }
+=======
+                        { name: "Phiếu dịch vụ", link: '/purchase_order/serviceVoucher' }
+>>>>>>> 3626e84c4e7cc1f5d0418b9995b21cebfa85ff80
                     ]
                 }
             ]

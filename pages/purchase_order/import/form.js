@@ -98,6 +98,7 @@ const Index = (props) => {
   }, (err, response) => {
       if(!err){
         var rResult = response.data;
+        console.log("rResult",rResult?.items?.map(e => e.note));
         const itemlast =  [{mathang: null}];
         const item = itemlast?.concat(rResult?.items?.map(e => ({
           purchases_order_item_id: e?.item?.purchase_order_item_id, 
