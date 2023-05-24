@@ -408,7 +408,7 @@ const Items = React.memo((props) => {
               <h6 className='xl:text-base text-xs px-2 col-span-2'>{props.data?.name}</h6>
               <h6 className='xl:text-base text-xs px-2 col-span-2 text-center'>{props.data?.level}</h6>
               <div className=' col-span-2 flex flex-wrap px-2'>
-                  {props.data?.branch.map(e => 
+                  {props.data?.branch?.map(e => 
                       <h6 key={e?.id.toString()} className='text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[300] rounded border border-[#0F4F9E] h-fit'>{e?.name}</h6>
                   )}
               </div>
