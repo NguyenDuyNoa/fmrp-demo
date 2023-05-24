@@ -159,19 +159,23 @@ const Form = (props) => {
                             return {...ce, amount: Number(value?.value)}
                         }else if(type === "locate"){
                             ce.locate = value;
-                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckSame(parentId, id, ce?.locate, ce?.lot, ce?.date);
-                            // (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id);
+                            e?.checkExpiry == "1" && (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckSameLot(parentId, id, ce?.locate, ce?.lot, ce?.date);
+                            e?.checkSerial == "1" && (ce?.locate !== null && ce?.serial !== null) && _HandleCheckSameSerial(parentId, id, ce?.locate, ce?.serial);
                             return {...ce}
                         }else if(type === "lot"){
                             ce.lot = value;
-                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckSame(parentId, id, ce?.locate, ce?.lot, ce?.date);
-                            // (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id);
+                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckSameLot(parentId, id, ce?.locate, ce?.lot, ce?.date);
                             return {...ce}
                         }else if(type === "date"){
                             ce.date = value;
-                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckSame(parentId, id, ce?.locate, ce?.lot, ce?.date);
-                            // (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id);
+                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckSameLot(parentId, id, ce?.locate, ce?.lot, ce?.date);
                             return {...ce}
+                        }else if(type === "serial"){
+                            ce.serial = value?.target.value;
+                            (ce?.locate !== null && ce?.serial !== null) && _HandleCheckSameSerial(parentId, id, ce?.locate, ce?.serial);
+                            setTimeout(() => {
+                                return {...ce}
+                            }, 3000);
                         }else if(type === "price"){
                             return {...ce, price: Number(value?.value)}
                         }
@@ -185,7 +189,7 @@ const Form = (props) => {
         sDataChoose([...newData])
     }
 
-    const _HandleCheckSame = (parentId, id, locate, lot, date) => {
+    const _HandleCheckSameLot = (parentId, id, locate, lot, date) => {
         setTimeout(() => {
             const newData = dataChoose.map(e => {
                 if(e.id === parentId){
@@ -198,7 +202,7 @@ const Form = (props) => {
                             return {...ce, locate: null, amount: null, lot: null, date: null, serial: null, quantity: null, price: null}
                         }
                         return ce;
-                    })
+                    }).filter(item => item.locate !== null)
                     return {...e, child: newChild}
                 }
                 return e;
@@ -221,7 +225,46 @@ const Form = (props) => {
                 return e;
             })
             sDataChoose([...newData1])
-        }, 1000);
+        }, 500);
+    }
+
+    const _HandleCheckSameSerial = (parentId, id, locate, serial) => {
+        setTimeout(() => {
+            const newData = dataChoose.map(e => {
+                if(e.id === parentId){
+                    const newChild = e.child?.map(ce => {
+                        if(ce.id !== id && ce.locate?.value === locate?.value && ce.serial === serial){
+                            Toast.fire({
+                                icon: 'error',
+                                title: `Trùng mặt hàng`
+                            }) 
+                            return {...ce, locate: null, amount: null, lot: null, date: null, serial: null, quantity: null, price: null}
+                        }
+                        return ce;
+                    }).filter(item => item.locate !== null)
+                    return {...e, child: newChild}
+                }
+                return e;
+            })
+            const parent = newData.find(item => item.id === parentId);
+            if(!parent) return null;
+            const child = parent.child.find(e => e.id === id)
+            if(!child) return null;
+            const check = parent.checkChild.find(e => e.locate === child.locate?.value && e.serial === child.serial)
+            const newData1 = newData.map(e => {
+                if(e.id === parentId){
+                    const newChild = e.child?.map(ce => {
+                        if(ce.id === id){
+                            return {...ce, quantity: check?.quantity || 0}
+                        }
+                        return ce;
+                    })
+                    return {...e, child: newChild}
+                }
+                return e;
+            })
+            sDataChoose([...newData1])
+        }, 500);
     }
 
     const _ServerSending = () => {
@@ -259,7 +302,7 @@ const Form = (props) => {
             if(!err){
                 var {isSuccess, message, items_error} = response.data;
                 if(isSuccess){
-                    router.back();
+                    // router.back();
                     Toast.fire({
                         icon: 'success',
                         title: `${dataLang[message]}`
@@ -299,20 +342,41 @@ const Form = (props) => {
     const _HandleSubmit = (e) => {
         e.preventDefault();
         const checkErrNullLocate = dataChoose.map(item => item.child.some(itemChild => itemChild.locate === null));
-        const checkErrNullLot = dataChoose.map(item => item.child.some(itemChild => itemChild.lot === null));
-        const checkErrNullDate = dataChoose.map(item => item.child.some(itemChild => itemChild.date === null));
+        // const checkErrNullLot = dataChoose.map(item => item.child.some(itemChild => itemChild.lot === null));
+        // const checkErrNullDate = dataChoose.map(item => item.child.some(itemChild => itemChild.date === null));
 
-        if(branch == null || warehouse == null || dataChoose.length == 0 || checkErrNullLocate[0] || checkErrNullLot[0] || checkErrNullDate[0]){
+        const hasDuplicates = () => {
+            const serialData = [];
+            return dataChoose
+                .flatMap(obj => obj.child)
+                .map(child => child.serial)
+                .filter(serial => serial !== null)
+                .some(serial => {
+                    if (serialData.includes(serial)) {
+                        return true;
+                    }
+                    serialData.push(serial);
+                    return false;
+                });
+        };
+        console.log(dataChoose);
+
+        if(branch == null || warehouse == null || dataChoose.length == 0 || checkErrNullLocate[0] || hasDuplicates()){
             branch == null && sErrBranch(true)
             warehouse == null && sErrWareHouse(true)
             dataChoose.length == 0 && sErrProduct(true)
             checkErrNullLocate && sErrNullLocate(true)
-            checkErrNullLot && sErrNullLot(true)
-            checkErrNullDate && sErrNullDate(true)
-            Toast.fire({
-                icon: 'error',
-                title: `${dataLang?.required_field_null}`
-            })
+            if(hasDuplicates()){
+                Toast.fire({
+                    icon: 'error',
+                    title: `Trùng Serial`
+                })
+            }else{
+                Toast.fire({
+                    icon: 'error',
+                    title: `${dataLang?.required_field_null}`
+                })
+            }
         }else{
             sErrBranch(false)
             sErrWareHouse(false)
@@ -575,14 +639,22 @@ const Form = (props) => {
                                                                 <IconCalendar size={22} className="absolute right-3 text-[#cccccc]" />
                                                             </div>
                                                         }
-                                                        {e?.checkSerial == "1" && <div>{ce.serial}</div>}
+                                                        {e?.checkSerial == "1" && 
+                                                            <div className='p-1.5 border flex flex-col justify-center h-full'>
+                                                                <input 
+                                                                    value={ce.serial}
+                                                                    onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
+                                                                    className="text-center py-1 px-2 font-medium w-full focus:outline-none border-b-2 border-gray-200"
+                                                                />
+                                                            </div>
+                                                        }
                                                         <div className='p-1.5 border flex flex-col justify-center h-full'>
                                                             <NumericFormat
                                                                 value={ce?.price}
                                                                 onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "price")}
                                                                 className="appearance-none text-right py-1 px-2 font-medium w-full focus:outline-none border-b-2 border-gray-200"
                                                                 thousandSeparator=","
-                                                                isAllowed={(values) => { const {floatValue} = values; return floatValue >= 0 }}       
+                                                                isAllowed={(values) => { const {floatValue} = values; return floatValue >= 0 }}    
                                                             />
                                                         </div>
                                                         <h6 className='text-center p-1.5 border flex flex-col justify-center h-full'>{ce.quantity}</h6>
@@ -592,7 +664,14 @@ const Form = (props) => {
                                                                 onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "amount")}
                                                                 className="appearance-none text-center py-1 px-2 font-medium w-full focus:outline-none border-b-2 border-gray-200"
                                                                 thousandSeparator=","
-                                                                isAllowed={(values) => { const {floatValue} = values; return floatValue >= 0 }}       
+                                                                isAllowed={(values) => { 
+                                                                    const {floatValue} = values; 
+                                                                    if(e?.checkSerial == "1"){
+                                                                        return floatValue >= 0 && floatValue < 2
+                                                                    }else{
+                                                                        return floatValue >= 0
+                                                                    }
+                                                                }}      
                                                             />
                                                         </div>
                                                         <h6 className='flex flex-col justify-center items-center p-1.5 border h-full'>{ce?.amount != null && Number(ce?.amount - ce?.quantity)?.toLocaleString()}</h6>
@@ -766,15 +845,20 @@ const Popup_Product = React.memo((props) => {
                             return {...ce, amount: Number(value?.value)}
                         }else if(type === "locate"){
                             ce.locate = value;
-                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id)
+                            e?.checkExpiry === "1" && (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id, "lot")
+                            e?.checkSerial === "1" && (ce?.locate !== null && ce?.serial !== null) && _HandleCheckChild(parentId, id, "serial")
                             return {...ce}
                         }else if(type === "lot"){
                             ce.lot = value;
-                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id)
+                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id, "lot")
                             return {...ce}
                         }else if(type === "date"){
                             ce.date = value;
-                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id)
+                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id, "lot")
+                            return {...ce}
+                        }else if(type === "serial"){
+                            ce.serial = value?.target.value;
+                            (ce?.locate !== null && ce?.serial !== null) && _HandleCheckChild(parentId, id, "serial")
                             return {...ce}
                         }
                     }
@@ -798,13 +882,19 @@ const Popup_Product = React.memo((props) => {
         sListAllProduct([...newData])
     }
 
-    const _HandleCheckChild = (parentId, id) => {
+    const _HandleCheckChild = (parentId, id, type) => {
         setTimeout(() => {
             const parent = listAllProduct.find(item => item.id === parentId);
             if(!parent) return null;
             const child = parent.child.find(e => e.id === id)
             if(!child) return null;
-            const check = parent.checkChild.find(e => e.locate === child.locate?.value && e.lot === child.lot?.value && e.date === moment(child.date).format("DD/MM/yyyy"))
+            const check = parent.checkChild.find(e => {
+                if(type === "lot"){
+                    e.locate === child.locate?.value && e.lot === child.lot?.value && e.date === moment(child.date).format("DD/MM/yyyy")
+                }else{
+                    e.locate === child.locate?.value && e.serial === child.serial
+                }
+            })
             const newData = listAllProduct.map(e => {
                 if(e.id === parentId){
                     const newChild = e.child?.map(ce => {
@@ -1045,46 +1135,7 @@ const Popup_Product = React.memo((props) => {
                                                                 {e?.checkSerial == "1" && 
                                                                     // serial
                                                                     <div className='px-1'>
-                                                                        {/* <Select 
-                                                                            options={dataPstWH}
-                                                                            value={ce.locate}
-                                                                            // onChange={_HandleChangeValue.bind(this, "branch")}
-                                                                            placeholder={"Vị trí kho"}
-                                                                            isClearable={true}
-                                                                            className={`border-transparent placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-sm`} 
-                                                                            isSearchable={true}
-                                                                            noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
-                                                                            menuPortalTarget={document.body}
-                                                                            onMenuOpen={handleMenuOpen}
-                                                                            style={{ border: "none", boxShadow: "none", outline: "none" }}
-                                                                            theme={(theme) => ({
-                                                                                ...theme,
-                                                                                colors: {
-                                                                                    ...theme.colors,
-                                                                                    primary25: '#EBF5FF',
-                                                                                    primary50: '#92BFF7',
-                                                                                    primary: '#0F4F9E',
-                                                                                },
-                                                                            })}
-                                                                            styles={{
-                                                                                placeholder: (base) => ({
-                                                                                    ...base,
-                                                                                    color: "#cbd5e1",
-                                                                                }),
-                                                                                menuPortal: (base) => ({
-                                                                                    ...base,
-                                                                                    zIndex: 9999,
-                                                                                    position: "absolute",
-                                                                                }),
-                                                                                control: (base,state) => ({
-                                                                                    ...base,
-                                                                                    boxShadow: 'none',
-                                                                                    ...(state.isFocused && {
-                                                                                        border: '0 0 0 1px #92BFF7',
-                                                                                    }),
-                                                                                })
-                                                                            }}
-                                                                        /> */}
+                                                                        <input value={ce?.serial} onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")} className="text-center py-1 px-2 font-medium w-full focus:outline-none border-b-2 border-gray-200" />
                                                                     </div>
                                                                 }
                                                                 <h6 className='px-1 self-center text-center'>{ce?.quantity}</h6>
@@ -1092,9 +1143,16 @@ const Popup_Product = React.memo((props) => {
                                                                     <NumericFormat
                                                                         value={ce?.amount}
                                                                         onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "amount")}
-                                                                        className="appearance-none text-center py-1 px-2 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
+                                                                        className="text-center py-1 px-2 font-medium w-20 focus:outline-none border-b-2 border-gray-200"
                                                                         thousandSeparator=","
-                                                                        isAllowed={(values) => { const {floatValue} = values; return floatValue >= 0 }}       
+                                                                        isAllowed={(values) => { 
+                                                                            const {floatValue} = values; 
+                                                                            if(e?.checkSerial == "1"){
+                                                                                return floatValue >= 0 && floatValue < 2
+                                                                            }else{
+                                                                                return floatValue >= 0
+                                                                            }
+                                                                        }}       
                                                                     />
                                                                 </div>
                                                                 <h6 className='px-1 self-center text-center'>{ce?.amount != null && Number(ce?.amount - ce?.quantity)?.toLocaleString()}</h6>

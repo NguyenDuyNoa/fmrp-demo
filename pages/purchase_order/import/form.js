@@ -3,14 +3,14 @@ import { useRouter } from 'next/router'
 import Head from 'next/head';
 import {_ServerInstance as Axios} from '/services/axios';
 import { v4 as uuidv4 } from 'uuid';
+import dynamic from 'next/dynamic';
+
 
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
-import dynamic from 'next/dynamic';
 import Select,{components,MenuListProps  } from 'react-select';
-
 
 import { Add, Trash as IconDelete,Image as IconImage, Minus} from "iconsax-react";
 import Swal from 'sweetalert2';
@@ -66,6 +66,9 @@ const Index = (props) => {
     const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
     sortedArr.unshift(option[0]);
 
+    //new
+    const [listData, sListData] = useState([]);
+
     const [idSupplier, sIdSupplier] = useState(null)
     const [idTheOrder, sIdTheOrder] = useState(null)
     const [idBranch, sIdBranch] = useState(null);
@@ -90,28 +93,26 @@ const Index = (props) => {
       router.query && sNote("")
   }, [router.query]);
 
-
   const _ServerFetchingDetail =  () => {
     Axios("GET", `/api_web/Api_import/import/${id}?csrf_protection=true`, {
   }, (err, response) => {
       if(!err){
         var rResult = response.data;
-        console.log("rResult",rResult?.items?.map(e => e.note));
         const itemlast =  [{mathang: null}];
         const item = itemlast?.concat(rResult?.items?.map(e => ({
-                      purchases_order_item_id: e?.item?.purchase_order_item_id, 
-                      id: e.id,
-                      mathang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,value:e.item?.id}, 
-                      khohang: {label: e?.location_name, value: e?.location_warehouses_id,warehouse_name:e?.warehouse_name},
-                      soluong: Number(e?.quantity), 
-                      dongia: Number(e?.price),
-                      chietkhau: Number(e?.discount_percent),
-                      thue: {tax_rate: e?.tax_rate,value: e?.tax_id},
-                      donvitinh: e.item?.unit_name,
-                      dongiasauck: Number(e?.price_after_discount),
-                      ghichu: e?.note,
-                      thanhtien: Number(e?.price_after_discount) * (1 + Number(e?.tax_rate)/100) * Number(e?.quantity)
-                    })));
+          purchases_order_item_id: e?.item?.purchase_order_item_id, 
+          id: e.id,
+          mathang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,value:e.item?.id}, 
+          khohang: {label: e?.location_name, value: e?.location_warehouses_id,warehouse_name:e?.warehouse_name},
+          soluong: Number(e?.quantity), 
+          dongia: Number(e?.price),
+          chietkhau: Number(e?.discount_percent),
+          thue: {tax_rate: e?.tax_rate,value: e?.tax_id},
+          donvitinh: e.item?.unit_name,
+          dongiasauck: Number(e?.price_after_discount),
+          ghichu: e?.note,
+          thanhtien: Number(e?.price_after_discount) * (1 + Number(e?.tax_rate)/100) * Number(e?.quantity)
+        })));
         sOption(item)
         sCode(rResult?.code)
         sIdBranch({label: rResult?.branch_name, value:rResult?.branch_id})
@@ -207,7 +208,7 @@ const Index = (props) => {
               sDataWarehouse([])
               sIdTheOrder(null)
               sIdSupplier(null)
-              sKhotong([])
+              sKhotong(null)
           }else{
             sIdBranch(value)
             sIdPurchases([])
@@ -239,7 +240,7 @@ const Index = (props) => {
           sIdBranch(value)
           sIdTheOrder(null)
           sIdSupplier(null)
-          sKhotong([])
+          sKhotong(null)
           if(value == null){
             sDataSupplier([])
             sDataThe_order([])
@@ -248,17 +249,48 @@ const Index = (props) => {
           sMathangAll(value)
           if(value?.length === 0){
             sOption([{id: Date.now(), mathang: null}])
+            //new
+            sListData([])
           }else if(value?.length > 0){
             const fakeData = [{id: Date.now(), mathang: null}]
             const data = fakeData?.concat(value?.map(e => ({id: uuidv4(), mathang: e, khohang: null, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.mathang?.e?.price ? Number(e?.mathang?.e?.price) : 1, chietkhau: e?.e?.discount_percent, dongiasauck: Number(e?.e?.price_after_discount),thue: {label:e?.e?.tax_name ,value :e?.e?.tax_rate, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
             sOption(data);
+            //new            
+            sListData(value?.map(e => ({id: uuidv4(), matHang: e, child: [{kho: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
           }
       }else if(type === "khotong"){
           sKhotong(value)
+          if(listData?.length > 0){
+            const newData = listData.map(e => {
+              const newChild = e?.child.map(ce => {
+                return {...ce, kho: value}
+              })
+              return {...e, child: newChild}
+            })
+            sListData(newData)
+          }
       }else if(type == "thuetong"){
         sThuetong(value)
+        if(listData?.length > 0){
+          const newData = listData.map(e => {
+            const newChild = e?.child.map(ce => {
+              return {...ce, tax: value}
+            })
+            return {...e, child: newChild}
+          })
+          sListData(newData)
+        }
       }else if(type == "chietkhautong"){
         sChietkhautong(value?.value)
+        if(listData?.length > 0){
+          const newData = listData.map(e => {
+            const newChild = e?.child.map(ce => {
+              return {...ce, chietKhau: value?.value}
+            })
+            return {...e, child: newChild}
+          })
+          sListData(newData)
+        }
       }
   }
 
@@ -318,12 +350,15 @@ const Index = (props) => {
        let checkErrValidate = checkErr?.filter(e => e?.item !== undefined);
 
       const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
-        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullLabel ){
+      const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
+      console.log(hasNullKho)
+
+        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho ){
           date == null && sErrDate(true)
           idSupplier == null && sErrSupplier(true)
           idBranch == null && sErrBranch(true)
           idTheOrder == null && sErrTheOrder(true)
-          hasNullLabel && sErrWarehouse(true) 
+          hasNullKho && sErrWarehouse(true) 
             Toast.fire({
                 icon: 'error',
                 title: `${dataLang?.required_field_null}`
@@ -595,25 +630,29 @@ const Index = (props) => {
     
     const allItems = [...options]
 
-    const handleSelectAll = () => {
-      const fakeData = [{id: Date.now(), mathang: null}]
-      const data = fakeData?.concat(allItems?.map(e => ({id: uuidv4(), mathang: e, khohang: khotong ? khotong : e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.e?.price, chietkhau:chietkhautong ?  chietkhautong : e?.e?.discount_percent, dongiasauck:Number(e?.e?.price_after_discount), thue: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
-      sOption(data);
-      sMathangAll(data)
-    };
+  const _HandleSelectAll = () => {
+    const fakeData = [{id: Date.now(), mathang: null}]
+    const data = fakeData?.concat(allItems?.map(e => ({id: uuidv4(), mathang: e, khohang: khotong ? khotong : e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.e?.price, chietkhau:chietkhautong ?  chietkhautong : e?.e?.discount_percent, dongiasauck:Number(e?.e?.price_after_discount), thue: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
+    sOption(data);
+    sMathangAll(data)
+    //new
+    sListData(allItems?.map(e => ({id: uuidv4(), matHang: e, child: [{id: uuidv4(), kho: khotong ? khotong : null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
+  };
 
-    const handleDeselectAll = () => {
-      sMathangAll([])
-      sOption([{id: Date.now(), mathang: null}])
-    };
+  const _HandleDeleteAll = () => {
+    sMathangAll([])
+    sOption([{id: Date.now(), mathang: null}])
+    //new
+    sListData([])
+  };
 
     const MenuList = (props) => {
       return (
         <components.MenuList {...props}>
           {allItems?.length > 0 &&
           <div className='grid grid-cols-2 items-center  cursor-pointer'>
-            <div className='hover:bg-slate-200 p-2 col-span-1 text-center ' onClick={handleSelectAll}>Chọn tất cả</div>
-            <div className='hover:bg-slate-200 p-2 col-span-1 text-center' onClick={handleDeselectAll}>Bỏ chọn tất cả</div>
+            <div className='hover:bg-slate-200 p-2 col-span-1 text-center ' onClick={_HandleSelectAll.bind(this)}>Chọn tất cả</div>
+            <div className='hover:bg-slate-200 p-2 col-span-1 text-center' onClick={_HandleDeleteAll.bind(this)}>Bỏ chọn tất cả</div>
           </div>
           }
           {props.children}
@@ -624,7 +663,7 @@ const Index = (props) => {
 
     const formatNumber = (num) => {
       if (!num && num !== 0) return 0;
-      const roundedNum = parseFloat(num.toFixed(2));
+      const roundedNum = parseFloat(num?.toFixed(2));
       return roundedNum.toLocaleString("en", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
@@ -635,24 +674,65 @@ const Index = (props) => {
 
     const tinhTongTien = (option) => {
 
-      const tongTien = option.slice(1).reduce((accumulator, currentValue) => accumulator + currentValue?.dongia * currentValue?.soluong, 0);
+      // const tongTien = option.slice(1).reduce((accumulator, currentValue) => accumulator + currentValue?.dongia * currentValue?.soluong, 0);
+      // const tongTien = listData.map(e => e?.child?.reduce((accumulator, currentValue) => accumulator + currentValue?.price * currentValue?.amount, 0));
+      const tongTien = option?.reduce((accumulator, item) => {
+        const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+          const product = Number(childItem?.price) * Number(childItem?.amount);
+          return childAccumulator + product;
+        }, 0);
+        return accumulator + childTotal;
+      }, 0)
     
-      const tienChietKhau = option.slice(1).reduce((acc, item) => {
-        const chiTiet = item?.dongia * (item?.chietkhau/100) * item?.soluong;
-        return acc + chiTiet;
-      }, 0);
+      // const tienChietKhau = option.slice(1).reduce((acc, item) => {
+      //   const chiTiet = item?.dongia * (item?.chietkhau/100) * item?.soluong;
+      //   return acc + chiTiet;
+      // }, 0);
+
+      const tienChietKhau = option?.reduce((accumulator, item) => {
+        const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+          const product = Number(childItem?.price) * (Number(childItem?.chietKhau)/100) * Number(childItem?.amount);
+          return childAccumulator + product;
+        }, 0);
+        return accumulator + childTotal;
+      }, 0)
     
-      const tongTienSauCK = option.slice(1).reduce((acc, item) => {
-        const tienSauCK = item?.soluong * item?.dongiasauck;
-        return acc + tienSauCK;
-      }, 0);
+      // const tongTienSauCK = option.slice(1).reduce((acc, item) => {
+      //   const tienSauCK = item?.soluong * item?.dongiasauck;
+      //   return acc + tienSauCK;
+      // }, 0);
+
+      const tongTienSauCK = option?.reduce((accumulator, item) => {
+        const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+          const product = Number(childItem?.priceAfter) * Number(childItem?.amount);
+          return childAccumulator + product;
+        }, 0);
+        return accumulator + childTotal;
+      }, 0)
     
-      const tienThue = option.slice(1).reduce((acc, item) => {
-        const tienThueItem = item?.dongiasauck * (isNaN(item?.thue?.tax_rate) ? 0 : (item?.thue?.tax_rate/100)) * item?.soluong;
-        return acc + tienThueItem;
-      }, 0);
+      // const tienThue = option.slice(1).reduce((acc, item) => {
+      //   const tienThueItem = item?.dongiasauck * (isNaN(item?.thue?.tax_rate) ? 0 : (item?.thue?.tax_rate/100)) * item?.soluong;
+      //   return acc + tienThueItem;
+      // }, 0);
+
+      const tienThue = option?.reduce((accumulator, item) => {
+        const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+          const product = Number(childItem?.priceAfter) * (isNaN(childItem?.tax?.tax_rate) ? 0 : (Number(childItem?.tax?.tax_rate)/100)) * Number(childItem?.amount);
+          return childAccumulator + product;
+        }, 0);
+        return accumulator + childTotal;
+      }, 0)
     
-      const tongThanhTien = option.slice(1).reduce((acc, item) => acc + item?.thanhtien, 0);
+      // const tongThanhTien = option.slice(1).reduce((acc, item) => acc + item?.thanhtien, 0);
+
+      const tongThanhTien = option?.reduce((accumulator, item) => {
+        const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+          const product = Number(childItem?.priceAfter) * (1 + Number(childItem?.tax?.tax_rate)/100) * Number(childItem?.amount)
+          return childAccumulator + product;
+        }, 0);
+        return accumulator + childTotal;
+      }, 0)
+
       return { tongTien: tongTien || 0, tienChietKhau: tienChietKhau || 0, tongTienSauCK: tongTienSauCK || 0, tienThue: tienThue || 0, tongThanhTien: tongThanhTien || 0 };
     };
 
@@ -662,6 +742,11 @@ const Index = (props) => {
       const tongTien = tinhTongTien(option);
       setTongTienState(tongTien);
     }, [option])
+
+    useEffect(() => {
+      const tongTien = tinhTongTien(listData);
+      setTongTienState(tongTien);
+    }, [listData])
 
     const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, purchases_order_item_id: e?.mathang?.e?.purchase_order_item_id, location_warehouses_id: e?.khohang?.value, quantity: Number(e?.soluong), price: e?.dongia, discount_percent:e?.chietkhau, tax_id:e?.thue?.value, note: e?.ghichu, id:e?.id}})
    
@@ -675,17 +760,31 @@ const Index = (props) => {
           formData.append("suppliers_id", idSupplier.value)
           formData.append("id_order", idTheOrder.value)
           formData.append("note", note)
-          newDataOption.forEach((item, index) => {
-            formData.append(`items[${index}][item]`, item?.item);
-            formData.append(`items[${index}][price]`, item?.price);
-            formData.append(`items[${index}][purchase_order_item_id]`, item?.purchases_order_item_id != undefined ? item?.purchases_order_item_id : "");
-            formData.append(`items[${index}][id]`, router.query?.id ? item?.id : "");
-            formData.append(`items[${index}][quantity]`, item?.quantity.toString());
-            formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
-            formData.append(`items[${index}][discount_percent]`, item?.discount_percent);
-            formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
-            formData.append(`items[${index}][location_warehouses_id]`, item?.location_warehouses_id != undefined ? item?.location_warehouses_id : "");
-        });  
+          // newDataOption.forEach((item, index) => {
+          //   formData.append(`items[${index}][item]`, item?.item);
+          //   formData.append(`items[${index}][price]`, item?.price);
+            // formData.append(`items[${index}][purchase_order_item_id]`, item?.purchases_order_item_id != undefined ? item?.purchases_order_item_id : "");
+          //   formData.append(`items[${index}][id]`, router.query?.id ? item?.id : "");
+          //   formData.append(`items[${index}][quantity]`, item?.quantity.toString());
+          //   formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
+          //   formData.append(`items[${index}][discount_percent]`, item?.discount_percent);
+          //   formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
+          //   formData.append(`items[${index}][location_warehouses_id]`, item?.location_warehouses_id != undefined ? item?.location_warehouses_id : "");
+          // });  
+          listData.forEach((item, index) => {
+            formData.append(`items[${index}][id]`, item?.id);
+            formData.append(`items[${index}][item]`, item?.matHang?.value);
+            formData.append(`items[${index}][purchase_order_item_id]`, item?.matHang?.e?.purchase_order_item_id);
+            item?.child?.forEach((childItem, childIndex) => {
+              formData.append(`items[${index}][child][${childIndex}][id]`, childItem?.id);
+              formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.amount);
+              formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note);
+              formData.append(`items[${index}][child][${childIndex}][tax_id]`, childItem?.tax?.value);
+              formData.append(`items[${index}][child][${childIndex}][price]`, childItem?.price);
+              formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.kho?.value);
+              formData.append(`items[${index}][child][${childIndex}][discount_percent]`, childItem?.chietKhau);
+            })
+          })
           Axios("POST", `${id ? `/api_web/Api_import/import/${id}?csrf_protection=true` : "/api_web/Api_import/import/?csrf_protection=true"}`, {
               data: formData,
               headers: {'Content-Type': 'multipart/form-data'}
@@ -708,6 +807,8 @@ const Index = (props) => {
                       sErrTheOrder(false)
                       sErrSupplier(false)
                       sOption([{id: Date.now(), mathang: null}])
+                      //new
+                      sListData([])
                       router.back()
                   }else {    
                     if(tongTienState.tongTien == 0){
@@ -733,34 +834,97 @@ const Index = (props) => {
         onSending && _ServerSending()
     }, [onSending]);
 
-    const [isExpanded, setIsExpanded] = useState(false);
 
+  //new
+  const _HandleAddChild = (parentId, value) => {
+    const newData = listData?.map(e => {
+      if(e?.id === parentId) {
+        const newChild = { id: uuidv4(), kho: khotong ? khotong : null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note };
+        return { ...e, child: [...e.child, newChild] };
+      }else {
+        return e;
+      }
+    })
+    sListData(newData)
+  }
 
-    const toggleExpand = () => {
-      setIsExpanded(!isExpanded);
-    };
+  const _HandleAddParent = (value) => {
+    const checkData = listData?.some(e => e?.matHang?.value === value?.value)
+    if(!checkData){
+      const newData = { id: Date.now(), matHang: value, child: [{id: uuidv4(), kho: khotong ? khotong : null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] }
+      sListData([...listData, newData]);
+    }else{
+      Toast.fire({
+        title: `${"Mặt hàng đã được chọn"}`,
+        icon: 'error',
+      })
+    }
+  }
 
-    const customStyles = {
-      control: (base, state) => ({
-        ...base,
-        // width: cutTomStyle || (state.isFocused && isExpanded) ? '200px' : '200px',
-        transition: 'width 0.5s',
-        border: state.isFocused && isExpanded ? '0 0 0 1px #92BFF7' : '0 0 0 1px #92BFF7',
-        // boxShadow: state.isFocused && isExpanded ? 'none' : 'none',
-        // '@media (max-width: 1536px)': {
-        //   width: '330px', 
-        // },
-        // '@media (min-width: 1280px)': {
-        //   width: '160px', 
-        // },
-      }),
-      menuPortal: (base) => ({
-        ...base,
-        zIndex: 9999, // Đặt giá trị z-index cao
-      }),
-    };
+  const _HandleDeleteChild = (parentId, childId) => {
+    const newData = listData.map(e => {
+        if(e.id === parentId){
+          const newChild = e.child?.filter(ce => ce?.id !== childId)
+          return {...e, child: newChild}
+        }
+        return e;
+    }).filter(e => e.child?.length > 0)
+    sListData([...newData])
+  }
 
-    
+  const _HandleChangeChild = (parentId, childId, type, value) => {
+    const newData = listData.map(e => {
+      if(e?.id === parentId){
+        const newChild = e?.child?.map(ce => {
+          if(ce?.id === childId){
+            if(type === "amount"){
+              return {...ce, amount: Number(value?.value)}
+            }else if(type === "increase"){
+              return {...ce, amount: Number(Number(ce?.amount) + 1)}
+            }else if(type === "decrease"){
+              return {...ce, amount: Number(Number(ce?.amount) - 1)}
+            }else if(type === "price"){
+              return {...ce, price: Number(value?.value)}
+            }else if(type === "chietKhau"){
+              return {...ce, chietKhau: Number(value?.value)}
+            }else if(type === "note"){
+              return {...ce, note: value?.target.value}
+            }else if(type === "kho"){
+              return {...ce, kho: value}
+            }else if(type === "tax"){
+              return {...ce, tax: value}
+            }
+          }else{
+            return ce;
+          }
+        })
+        return {...e, child: newChild}
+      }else{
+        return e;
+      }
+    })
+    sListData([...newData])
+  }
+
+  const _HandleChangeValue = (parentId, value) => {
+    const checkData = listData?.some(e => e?.matHang?.value === value?.value)
+    if(!checkData){
+      // const newData = { id: Date.now(), matHang: value, child: [{id: uuidv4(), kho: khotong ? khotong : null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] }
+      const newData = listData?.map(e => {
+        if(e?.id === parentId){
+          return {...e, matHang: value, child: [{id: uuidv4(), kho: khotong ? khotong : null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}]}
+        }else{
+          return e;
+        }
+      })
+      sListData([...newData]);
+    }else{
+      Toast.fire({
+        title: `${"Mặt hàng đã được chọn"}`,
+        icon: 'error',
+      })
+    }
+  }
 
   return (
     <React.Fragment>
@@ -995,7 +1159,7 @@ const Index = (props) => {
                                       <div className='flex gap-2'>
                                         <div className='flex items-center gap-2'>
                                           <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5>
-                                          <h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse ?? 0}</h5>
+                                          <h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse || 0}</h5>
                                         </div>
                                       </div>
                                     </div>
@@ -1094,7 +1258,6 @@ const Index = (props) => {
                           />     
                         </div>
               </div> 
-              <div className='pr-2'>
               <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10'>
                   <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-2    text-center    truncate font-[400]'>{dataLang?.import_from_items || "import_from_items"}</h4>
                   <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]'>{dataLang?.import_from_ware_loca || "import_from_ware_loca"}</h4>
@@ -1108,239 +1271,143 @@ const Index = (props) => {
                   <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_note || "import_from_note"}</h4>
                   <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_operation || "import_from_operation"}</h4>
               </div>     
-              </div>     
-            <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
-                <div className='pr-2'>
-                  <React.Fragment>
-                      <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]"> 
-                          {sortedArr.map((e,index) => 
-                            <div className='grid grid-cols-12 gap-1 py-1 ' key={e?.id}>
-                            <div className='col-span-2  z-[100] my-auto'>
-                           <Select 
-                            dangerouslySetInnerHTML={{__html: option.label}}
-                           options={options}
-                           onChange={_HandleChangeInputOption.bind(this, e?.id, "mathang",index)}
-                           value={e?.mathang}
-                           formatOptionLabel={(option) => (
-                          <div className='flex items-center  justify-between py-2'>
-                            <div className='flex items-center gap-2'>
-                              <div className='w-[40px] h-h-[60px]'>
-                              {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='object-cover rounded' />):
-                                    <div className=' object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]'>
-                                      <img src="/no_img.png" alt="Product Image"  className='object-cover rounded ' />
-                                  </div>
-                                  }
-                              </div>
-                              <div>
-                                <h3 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
-                                <div className='flex gap-2'>
-                                  <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]' >{option.e?.code}</h5>
-                                  <h5 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
-                                </div>
-                                <h5 className='text-gray-400 font-medium text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
-                              </div>
+              <div className="grid grid-cols-12 items-center gap-1 py-2">
+                <Select 
+                  options={options}
+                  value={null}
+                  onChange={_HandleAddParent.bind(this)}
+                  className="col-span-2 text-[13px]"
+                  placeholder="Mặt hàng"
+                  noOptionsMessage={() => "Không có dữ liệu"}
+                  menuPortalTarget={document.body}
+                  formatOptionLabel={(option) => (
+                    <div className='flex items-center  justify-between py-2'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-[40px] h-h-[60px]'>
+                        {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='object-cover rounded' />):
+                              <div className=' object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]'>
+                                <img src="/no_img.png" alt="Product Image"  className='object-cover rounded ' />
                             </div>
-                            <div className=''>
-                               <div className='text-right opacity-0'>{"0"}</div>
-                               <div className='flex gap-2'>
-                                 <div className='flex items-center gap-2'>
-                                   <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.qty_warehouse ?? 0}</h5>
-                                 </div>
-                                
-                                </div>
-                            </div>
-                          </div>
-                        )}
-                           placeholder={dataLang?.purchase_items || "purchase_items"} 
-                           hideSelectedOptions={false}
-                           className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20 mb-2" 
-                           isSearchable={true}
-                           noOptionsMessage={() => "Không có dữ liệu"}
-                           menuPortalTarget={document.body}
-                           style={{ border: "none", boxShadow: "none", outline: "none" }}
-                           theme={(theme) => ({
-                               ...theme,
-                               colors: {
-                                   ...theme.colors,
-                                   primary25: '#EBF5FF',
-                                   primary50: '#92BFF7',
-                                   primary: '#0F4F9E',
-                               },
-                           })}
-                           styles={{
-                             placeholder: (base) => ({
-                             ...base,
-                             color: "#cbd5e1",
-                             }),
-                             menuPortal: (base) => ({
-                              ...base,
-                              zIndex: 9999
-                            }), 
-                            control: (base, state) => ({
-                              ...base,
-                              ...(state.isFocused && {
-                                border: '0 0 0 1px #92BFF7',
-                                boxShadow: 'none'
-                              }),
-                            }),
-                         }}
-                         />
-                            </div>
-                            <div className='col-span-1  my-auto'>
-                           <Select 
-                           
-                          onChange={_HandleChangeInputOption.bind(this, e?.id,"khohang",index)}
-                          value={e?.khohang}
-                          formatOptionLabel={(option) => (
-                            <div className='z-[100]'>
-                                <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] z-[100]'>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
-                                <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] z-[100]'>{option?.label}</h2>
-                            </div>
-                            )}
-                             // Các props khác của Select
-                          onFocus={toggleExpand} // Xử lý khi người dùng nhấp vào để mở rộng menu
-                          onBlur={toggleExpand} // Xử lý khi người dùn
-                          options={warehouse}
-                          // isClearable
-                          placeholder={"Kho - vị trí kho"} 
-                           hideSelectedOptions={false}
-                           className={`${index != 0 && errWarehouse && e?.khohang?.length == 0 ? "border-red-500 bg-red-500 " : "border-transparent bg-[#ffffff]"} placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal outline-none border `} 
-                          //  className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] z-19 mb-2 2xl:w-[12.5vw]  xl:w-[12vw] w-[11vw]" 
-                           isSearchable={true}
-                           noOptionsMessage={() => "Không có dữ liệu"}
-                           menuPortalTarget={document.body}
-                           style={{ border: "none", boxShadow: "none", outline: "none" }}
-                           theme={(theme) => ({
-                               ...theme,
-                               colors: {
-                                   ...theme.colors,
-                                   primary25: '#EBF5FF',
-                                   primary50: '#92BFF7',
-                                   primary: '#0F4F9E',
-                               },
-                               
-                           })}
-                        //    styles={{
-                        //      placeholder: (base) => ({
-                        //      ...base,
-                        //      color: "#cbd5e1",
-                        //      }),
-                        //      menuPortal: (base) => ({
-                        //       ...base,
-                        //       zIndex: 9999,
-                        //       width: '200px', // Kích thước menu
-                        //     }), 
-                        //     control: (base, state) => ({
-                        //       ...base,
-                        //       width: state.isFocused && isExpanded ? '200px' : 'full', // Thay đổi độ rộng của input
-                        //       transition: 'width 0.5s',
-                        //       ...(state.isFocused && {
-                        //         border: '0 0 0 1px #92BFF7',
-                        //         boxShadow: 'none'
-                        //       }),
-                        //     }),
-                        //  }}
-                        // styles={customStyles}
-                         />
-                      {/* /    {index != 0 && errWarehouse ? <label className="text-sm text-red-500">{"Vui lòng chọn kho hàng"}</label>:""} */}
-                        </div>
-                         <div className='col-span-1 text-end flex items-center justify-end'>
-                           <h3 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] 2xl:pr-0 xl:pr-0 pr-1'>{e?.donvitinh}</h3>
-                        </div>
-                        <div className='col-span-1 flex items-center justify-center'>
-                           <div className="flex items-center justify-center">
-                               <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5 p-  bg-slate-200 rounded-full"
-                              onClick={() => handleDecrease(e?.id)}  disabled={index === 0} 
-                              ><Minus className='2xl:scale-100 xl:scale-100 scale-70' size="16"/></button>
-                              <NumericFormat
-                                  className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
-                                  onValueChange={_HandleChangeInputOption.bind(this, e?.id, "soluong",e)}
-                                value={e?.soluong || 1}
-                                allowNegative={false}
-                                disabled={index===0}
-                                // readOnly={index === 0 ? readOnlyFirst : false}
-                                decimalScale={0}
-                                isNumericString={true}  
-                                thousandSeparator=","
-                                isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
-                                />
-                                <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5 p-  bg-slate-200 rounded-full"
-                                onClick={() => handleIncrease(e.id)} disabled={index === 0}
-                                >
-                                  <Add className='2xl:scale-100 xl:scale-100 scale-70' size="16"/>
-                                </button>
-                              </div>
-                        </div>
-                        <div className='col-span-1 text-center flex items-center justify-center'>
-                          <NumericFormat
-                                value={e?.dongia}
-                                disabled={index===0}
-                                onValueChange={_HandleChangeInputOption.bind(this, e?.id, "dongia",index)}
-                                allowNegative={false}
-                                // readOnly={index === 0 ? readOnlyFirst : false}
-                                decimalScale={0}
-                                isNumericString={true}   
-                                className="appearance-none 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-medium 2xl:w-24 xl:w-[75px] w-[70px] focus:outline-none border-b-2 border-gray-200"
-                                thousandSeparator=","
-                            />
-                        </div>
-                        <div className='col-span-1 text-center flex items-center justify-center'>
-                          <NumericFormat
-                              value={e?.chietkhau}
-                              disabled={index===0}
-                              onValueChange={_HandleChangeInputOption.bind(this, e?.id, "chietkhau",index)}
-                              className="appearance-none 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-medium 2xl:w-24 xl:w-[75px] w-[70px] focus:outline-none border-b-2 border-gray-200"
-                              thousandSeparator=","
-                              allowNegative={false}
-                              // readOnly={index === 0 ? readOnlyFirst : false}
-                              // decimalScale={0}
-                              isNumericString={true}   
-                          />
-                        </div>
-                        <div className='col-span-1 text-right flex items-center justify-end'>
-                           <h3 className='px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{formatNumber(e?.dongiasauck)}</h3>
-                        </div>
-                        <div className='col-span-1 flex justify-center items-center'>
-                        <Select 
-                            options={index === 0 ? [] : taxOptions}
-                            onChange={_HandleChangeInputOption.bind(this, e?.id, "thue", index)}
-                            value={
-                              e?.thue
-                                ? (
-                                    taxOptions.find(item => item.value === e?.thue?.value)
-                                    ? {
-                                        label: taxOptions.find(item => item.value === e?.thue?.value)?.label,
-                                        value: e?.thue?.value,
-                                        tax_rate: e?.thue?.tax_rate
-                                      }
-                                    : e?.thue
-                                  )
-                                : null
                             }
-                            // value={e?.thue ? ( {label: taxOptions.find(item => item.value === e?.thue?.value)?.label, value: e?.thue?.value, tax_rate: e?.thue?.tax_rate}) : null}
-                            placeholder={dataLang?.import_from_tax || "import_from_tax"} 
-                            hideSelectedOptions={false}
+                        </div>
+                        <div>
+                          <h3 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
+                          <div className='flex gap-2'>
+                            <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]' >{option.e?.code}</h5>
+                            <h5 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
+                          </div>
+                          <h5 className='text-gray-400 font-medium text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
+                        </div>
+                      </div>
+                      <div className=''>
+                         <div className='text-right opacity-0'>{"0"}</div>
+                         <div className='flex gap-2'>
+                           <div className='flex items-center gap-2'>
+                             <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.qty_warehouse ?? 0}</h5>
+                           </div>
+                          
+                          </div>
+                      </div>
+                    </div>
+                  )}
+                  style={{ border: "none", boxShadow: "none", outline: "none" }}
+                  theme={(theme) => ({
+                    ...theme,
+                    colors: {
+                        ...theme.colors,
+                        primary25: '#EBF5FF',
+                        primary50: '#92BFF7',
+                        primary: '#0F4F9E',
+                    },
+                  })}
+                  styles={{
+                    placeholder: (base) => ({
+                    ...base,
+                    color: "#cbd5e1",
+                    }),
+                    menuPortal: (base) => ({
+                      ...base,
+                      zIndex: 9999
+                    }), 
+                    control: (base, state) => ({
+                      ...base,
+                      ...(state.isFocused && {
+                        border: '0 0 0 1px #92BFF7',
+                        boxShadow: 'none'
+                      }),
+                    }),
+                  }}
+                />
+                <Select placeholder="Kho - vị trí hàng" className='text-[13px]' isDisabled={true} />
+                <div />
+                <div className="flex items-center justify-center">
+                  <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5  bg-slate-200 rounded-full"><Minus className='2xl:scale-100 xl:scale-100 scale-70' size="16"/></button>
+                  <div className='border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-medium bg-slate-50 text-black'>1</div>
+                  <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5  bg-slate-200 rounded-full"><Add className='2xl:scale-100 xl:scale-100 scale-70' size="16"/></button>
+                </div>
+                <div className='justify-center flex'>
+                  <div className='border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-medium bg-slate-50 text-black'>1</div>
+                </div>
+                <div className='justify-center flex'>
+                  <div className='border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-4 px-2 font-medium bg-slate-50'></div>
+                </div>
+                <div className='text-right 2xl:text-[13px] xl:text-[13px] text-[12.5px] font-medium pr-3 text-black'>0</div>
+                <Select placeholder="% Thuế" className='text-[13px]' isDisabled={true} />
+                <div className='text-right 2xl:text-[13px] xl:text-[13px] text-[12.5px] font-medium pr-3 text-black'>1.00</div>
+                <input placeholder='Ghi chú' disabled className= "border-[#d0d5dd] disabled:bg-[#f2f2f2] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] p-1.5 border" />
+                <button title='Xóa' disabled className='disabled:opacity-50 transition w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center'>
+                  <IconDelete />
+                </button>
+              </div>
+              <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
+                <div className="min:h-[400px] h-[100%] max:h-[800px]"> 
+                  {listData?.map(e => 
+                    <div key={e?.id?.toString()} className='grid grid-cols-12 items-start'>
+                      <div className='col-span-2 border p-0.5 pb-1 h-full'>
+                        <div className='relative mr-5 mt-5'>
+                          <Select 
+                            options={options}
+                            value={e?.matHang} 
+                            className='' 
+                            onChange={_HandleChangeValue.bind(this, e?.id)}
+                            menuPortalTarget={document.body}
                             formatOptionLabel={(option) => (
-                              <div className='flex justify-start items-center gap-1 '>
-                                  <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option?.label}</h2>
-                                  <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{`(${option?.tax_rate})`}</h2>
+                              <div className='flex items-center  justify-between py-2'>
+                                <div className='flex items-center gap-2'>
+                                  <div className='w-[40px] h-h-[60px]'>
+                                  {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='object-cover rounded' />):
+                                        <div className=' object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]'>
+                                          <img src="/no_img.png" alt="Product Image"  className='object-cover rounded ' />
+                                      </div>
+                                      }
+                                  </div>
+                                  <div>
+                                    <h3 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
+                                    <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]' >{option.e?.code}</h5>
+                                    <h5 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
+                                    <h5 className='text-gray-400 font-medium text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
+                                  </div>
+                                </div>
+                                <div className=''>
+                                  <div className='text-right opacity-0'>{"0"}</div>
+                                  <div className='flex gap-2'>
+                                    <div className='flex items-center gap-2'>
+                                      <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.qty_warehouse ?? 0}</h5>
+                                    </div>
+                                    
+                                    </div>
+                                </div>
                               </div>
                             )}
-                            className={`  2xl:text-[12px] xl:text-[13px] text-[12.5px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
-                            isSearchable={true}
-                            noOptionsMessage={() => "Không có dữ liệu"}
-                            // dangerouslySetInnerHTML={{__html: option.label}}
-                            menuPortalTarget={document.body}
-                            closeMenuOnSelect={true}
                             style={{ border: "none", boxShadow: "none", outline: "none" }}
                             theme={(theme) => ({
-                                ...theme,
-                                colors: {
-                                    ...theme.colors,
-                                    primary25: '#EBF5FF',
-                                    primary50: '#92BFF7',
-                                    primary: '#0F4F9E',
-                                },
+                              ...theme,
+                              colors: {
+                                  ...theme.colors,
+                                  primary25: '#EBF5FF',
+                                  primary50: '#92BFF7',
+                                  primary: '#0F4F9E',
+                              },
                             })}
                             styles={{
                               placeholder: (base) => ({
@@ -1349,45 +1416,140 @@ const Index = (props) => {
                               }),
                               menuPortal: (base) => ({
                                 ...base,
-                                zIndex: 20
+                                zIndex: 9999
                               }), 
-                              control: (base,state) => ({
+                              control: (base, state) => ({
                                 ...base,
-                                boxShadow: 'none',
-                                padding:"2.7px",
-                              ...(state.isFocused && {
-                                border: '0 0 0 1px #92BFF7',
+                                ...(state.isFocused && {
+                                  border: '0 0 0 1px #92BFF7',
+                                  boxShadow: 'none'
+                                }),
                               }),
-                            })
-                          }}
+                            }}
                           />
+                          <button onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)} className='w-10 h-10 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-4 -right-4'><Add /></button>
                         </div>
-                        <div className='col-span-1 text-right flex items-center justify-end'>
-                           {/* <h3 className='px-2'>{formatNumber(e.thanhtien)}</h3> */}
-                           <h3 className='px-2 2xl:text-[13px] xl:text-[13px] text-[12.5px]'>{formatNumber(e?.thanhtien)}</h3>
-                        </div>
-                         <div className='col-span-1 flex items-center justify-center'>
+                      </div>
+                      <div className='col-span-10 grid grid-cols-10 items-center'>
+                        {e?.child?.map(ce =>
+                          <React.Fragment key={ce?.id?.toString()}>
+                            <div className='p-0.5 border flex flex-col justify-center h-full'>
+                              <Select 
+                                options={warehouse}
+                                value={ce?.kho} 
+                                onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "kho")}
+                                className={`${errWarehouse && ce?.kho == null ? "border-red-500" : "" } my-1 2xl:text-[12px] xl:text-[13px] text-[12.5px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal outline-none border`} 
+                                placeholder={"Kho - vị trí kho"} 
+                                menuPortalTarget={document.body}
+                                formatOptionLabel={(option) => (
+                                  <div className='z-[100]'>
+                                    <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] z-[100]'>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
+                                    <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] z-[100]'>{option?.label}</h2>
+                                  </div>
+                                )}
+                                style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                theme={(theme) => ({
+                                  ...theme,
+                                  colors: {
+                                      ...theme.colors,
+                                      primary25: '#EBF5FF',
+                                      primary50: '#92BFF7',
+                                      primary: '#0F4F9E',
+                                  },
+                                })}
+                              />
+                            </div>
+                            <div className='text-right border p-0.5 pr-2.5 h-full flex flex-col justify-center'>{ce?.donViTinh}</div>
+                            <div className="flex items-center justify-center border h-full p-0.5">
+                              <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5 bg-slate-200 rounded-full" onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "decrease")}><Minus className='2xl:scale-100 xl:scale-100 scale-70' size="16"/></button>
+                              <NumericFormat
+                                className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
+                                onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "amount")}
+                                value={ce?.amount || 1}
+                                allowNegative={false}
+                                decimalScale={0}
+                                isNumericString={true}  
+                                thousandSeparator=","
+                                isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
+                                />
+                              <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5 bg-slate-200 rounded-full" onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "increase")}><Add className='2xl:scale-100 xl:scale-100 scale-70' size="16"/></button>
+                            </div>
+                            <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
+                              <NumericFormat
+                                className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b-2 border-gray-200 h-fit"
+                                onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "price")}
+                                value={ce?.price}
+                                allowNegative={false}
+                                decimalScale={0}
+                                isNumericString={true}  
+                                thousandSeparator=","
+                                isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
+                              />
+                            </div>
+                            <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
+                              <NumericFormat
+                                className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
+                                onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "chietKhau")}
+                                value={ce?.chietKhau}
+                                allowNegative={false}
+                                decimalScale={0}
+                                isNumericString={true}  
+                                thousandSeparator=","
+                                isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
+                              />
+                            </div>
+                            {/* <div>{ce?.priceAfter}</div> */}
+                            <div className='col-span-1 text-right flex items-center justify-end border h-full p-0.5'>
+                              <h3 className='px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{formatNumber(Number(ce?.price) * ( 1 - Number(ce?.chietKhau)/100 ))}</h3>
+                            </div>
+                            <div className='border flex flex-col items-center p-0.5 h-full justify-center'>
+                              <Select 
+                                options={taxOptions}
+                                value={ce?.tax} 
+                                onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "tax")}
+                                placeholder={dataLang?.import_from_tax || "import_from_tax"} 
+                                className={`  2xl:text-[12px] xl:text-[13px] text-[12.5px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
+                                menuPortalTarget={document.body}
+                                style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                formatOptionLabel={(option) => (
+                                  <div className='flex justify-start items-center gap-1 '>
+                                    <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option?.label}</h2>
+                                    <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{`(${option?.tax_rate})`}</h2>
+                                  </div>
+                                )}
+                                theme={(theme) => ({
+                                  ...theme,
+                                  colors: {
+                                      ...theme.colors,
+                                      primary25: '#EBF5FF',
+                                      primary50: '#92BFF7',
+                                      primary: '#0F4F9E',
+                                  },
+                                })}
+                              />
+                            </div>
+                            {/* <div>{ce?.thanhTien}</div> */}
+                            <div className='text-right pr-3'>{formatNumber(Number(ce?.priceAfter) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
+                            {/* <div>{ce?.note}</div> */}
+                            <div className='col-span-1 flex items-center justify-center'>
                              <input
-                                 value={e?.ghichu}  
-                                 disabled={index === 0}              
-                                 onChange={_HandleChangeInputOption.bind(this, e?.id, "ghichu",index)}
-                                 name="optionEmail"     
+                                 value={ce?.note}  
+                                 onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "note")}
                                  placeholder='Ghi chú'                 
                                  type="text"
                                  className= "focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
                                /> 
-                         </div>
-                         <div className='col-span-1 flex items-center justify-center'>
-                           <button
-                            onClick={_HandleDelete.bind(this, e?.id)}
-                             type='button' title='Xóa' className='transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2'><IconDelete /></button>
-                         </div>
-                           </div>
-                          )} 
-                          </div>
-                  </React.Fragment>
+                            </div>
+                            <button title='Xóa' onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)} className='transition w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center'>
+                              <IconDelete />
+                            </button>
+                          </React.Fragment>
+                        )}
+                      </div>
+                    </div>  
+                  )}
                 </div>
-            </div>
+              </div>
             <div className='grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center'>
                     <div className='col-span-2  flex items-center gap-2'>
                           <h2>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h2>
@@ -1475,23 +1637,43 @@ const Index = (props) => {
                 </div>
                 <div className='flex justify-between '>
                      <div className='font-normal '><h3>{dataLang?.purchase_order_table_total ||"purchase_order_table_total" }</h3></div>
-                    <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tongTien)}</h3></div>
+                    <div className='font-normal'>
+                      <h3 className='text-blue-600'>
+                        {formatNumber(tongTienState.tongTien)}
+                      </h3>
+                    </div>
                 </div>
                 <div className='flex justify-between '>
                      <div className='font-normal'><h3>{dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}</h3></div>
-                    <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tienChietKhau)}</h3></div>
+                    <div className='font-normal'>
+                      <h3 className='text-blue-600'>
+                        {formatNumber(tongTienState.tienChietKhau)}
+                      </h3>
+                    </div>
                 </div>
                 <div className='flex justify-between '>
                      <div className='font-normal'><h3>{dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}</h3></div>
-                    <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tongTienSauCK)}</h3></div>
+                    <div className='font-normal'>
+                      <h3 className='text-blue-600'>
+                        {formatNumber(tongTienState.tongTienSauCK)}
+                      </h3>
+                    </div>
                 </div>
                 <div className='flex justify-between '>
                      <div className='font-normal'><h3>{dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}</h3></div>
-                    <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tienThue)}</h3></div>
+                    <div className='font-normal'>
+                      <h3 className='text-blue-600'>
+                        {formatNumber(tongTienState.tienThue)}
+                      </h3>
+                    </div>
                 </div>
                 <div className='flex justify-between '>
                      <div className='font-normal'><h3>{dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h3></div>
-                    <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tongThanhTien)}</h3></div>
+                    <div className='font-normal'>
+                      <h3 className='text-blue-600'>
+                        {formatNumber(tongTienState.tongThanhTien)}
+                      </h3>
+                    </div>
                 </div>
                 <div className='space-x-2'>
                 <button
