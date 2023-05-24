@@ -125,11 +125,7 @@ const Header = () => {
                     items: [
                         { name: "Yêu cầu mua hàng", link: '/purchase_order/purchases' },
                         { name: "Đơn đặt hàng", link: '/purchase_order/order' },
-<<<<<<< HEAD
                         { name: "Phiếu dịch vụ",link: '/purchase_order/serviceVoucher' }
-=======
-                        { name: "Phiếu dịch vụ", link: '/purchase_order/serviceVoucher' }
->>>>>>> 3626e84c4e7cc1f5d0418b9995b21cebfa85ff80
                     ]
                 }
             ]
