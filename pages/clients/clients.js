@@ -20,6 +20,7 @@ import moment from 'moment/moment';
 import Select,{components } from 'react-select';
 import Popup from 'reactjs-popup';
 import { data } from 'autoprefixer';
+import TabFilter from 'components/UI/TabFilter';
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet
@@ -258,10 +259,10 @@ const Index = (props) => {
                   </div>
                 </div>
               <div  className="flex space-x-3 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                     {listDs &&   listDs.map((e)=>{
+                     {listDs && listDs.map((e)=>{
                           return (
                            <div>
-                              <TabClient 
+                              <TabFilter
                                 style={{
                                   backgroundColor: e.color
                                 }}
@@ -270,7 +271,7 @@ const Index = (props) => {
                                 total={e.count} 
                                 active={e.id} 
                                 className={`${e.color ? "text-white" : "text-[#0F4F9E] bg-[#e2f0fe] "}`}
-                              >{e.name}</TabClient> 
+                              >{e.name}</TabFilter> 
                             </div>
                           )
                       })
@@ -449,17 +450,17 @@ const Index = (props) => {
     </React.Fragment>
     );
 }
-const TabClient = React.memo((props) => {
-    const router = useRouter();
-    return(
-      <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[220px] flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
-        {router.query?.tab === `${props.active}` && <LocationTick   size="20" color="white" />}
-        {props.children}
-        <span className={`${props?.total > 0 && "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"} `}>{props?.total > 0 && props?.total}</span>
-      </button>
+// const TabClient = React.memo((props) => {
+//     const router = useRouter();
+//     return(
+//       <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[220px] flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
+//         {router.query?.tab === `${props.active}` && <LocationTick   size="20" color="white" />}
+//         {props.children}
+//         <span className={`${props?.total > 0 && "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"} `}>{props?.total > 0 && props?.total}</span>
+//       </button>
 
-    )
-  })
+//     )
+//   })
 const Popup_dskh = (props) => {
       const dataLang = props.dataLang
       const scrollAreaRef = useRef(null);

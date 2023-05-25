@@ -22,7 +22,7 @@ const Index = () => {
                     <h2 className='3xl:text-3xl 2xl:text-2xl xl:text-2xl lg:text-2xl text-xl font-medium'>Quy Trình Quản Lý Sản Xuất</h2>
                 </div>
 
-                <div className='3xl:h-[100%] 2xl:h-[100%] xl:h-[100%] lg:h-[84%] w-[100%] 3xl:px-[55px] 3xl:py-10 2xl:px-12 2xl:py-4 lg:py-8 lg:px-10 relative border-2 border-slate-100 overflow-hidden flex-col flex'>
+                <div className='3xl:h-[100%] 2xl:h-[100%] xl:h-[100%] lg:h-[84%] w-[100%] 3xl:px-[55px] 3xl:py-10 2xl:px-12 2xl:py-1 lg:py-2 lg:px-10 relative border-2 border-slate-100 overflow-hidden flex-col flex'>
                     <div className='h-full w-full rounded-lg relative z-10 3xl:px-10 2xl:px-6 px-6 xl:space-y-1 lg:space-y-1 flex flex-row'>
                         <div class="basis-full">
                             <div className='3xl:w-[180px] 2xl:w-[100px] xl:w-[100px] lg:w-[80px] flex justify-center'>
@@ -192,7 +192,7 @@ const Index = () => {
                                                     Hết kho NVL
                                                 </div>
                                             </div>
-                                            <div className="flex flex-col items-center absolute 3xl:top-[520%] 3xl:left-[48%] 2xl:top-[470%] 2xl:left-[48%] xl:top-[470%] xl:left-[48%] lg:top-[520%] lg:left-[48%]">
+                                            <div className="flex flex-col items-center absolute 3xl:top-[520%] 3xl:left-[48%] 2xl:top-[470%] 2xl:left-[48%] xl:top-[460%] xl:left-[48%] lg:top-[520%] lg:left-[48%]">
                                                 <div className="3xl:w-[160px] 3xl:h-[50px] 2xl:w-[155px] 2xl:h-[60px] xl:w-[115px] xl:h-[54px] lg:w-[110px] lg:h-[50px] rounded-bl-[20px] border-[2px] border-[#B2B9C8] rounded-t-none rounded-r-none border-t-0 border-r-0 rounded ">
                                                     <IconRight
                                                         className="text-[#B2B9C8] absolute bottom-0 right-0 translate-x-[30%] translate-y-[45%] 3xl:scale-150 2xl:scale-110 xl:scale-95 lg:scale-90"

@@ -1,43 +1,35 @@
-import React, { useRef, useState } from 'react';
+import vi from "date-fns/locale/vi"
+import React, { useState } from 'react';
+import Select from 'react-select';
+import PopupDetail from './(PopupDetail)/PopupDetail';
+import BtnAction from '../../clients/BtnAction';
+import TabFilter from '../../../components/UI/TabFilter';
+import Pagination from '/components/UI/pagination';
+import Loading from "components/UI/loading";
+import Swal from "sweetalert2";
+import ReactExport from "react-data-export";
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
 import Link from 'next/link';
-import ModalImage from "react-modal-image";
-import 'react-datepicker/dist/react-datepicker.css';
-
-import {
-    Grid6 as IconExcel, Filter as IconFilter, Calendar as IconCalendar, SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-    TickCircle,
-    ArrowCircleDown
-} from "iconsax-react";
-import Select from 'react-select';
-import 'react-datepicker/dist/react-datepicker.css';
-import Datepicker from 'react-tailwindcss-datepicker'
-import DatePicker, { registerLocale } from "react-datepicker";
-import Popup from 'reactjs-popup';
 import moment from 'moment/moment';
-import vi from "date-fns/locale/vi"
-registerLocale("vi", vi);
-
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-
-import Loading from "components/UI/loading";
+import Datepicker from 'react-tailwindcss-datepicker'
+import { useRouter } from 'next/router';
+import { registerLocale } from "react-datepicker";
 import { _ServerInstance as Axios } from '/services/axios';
-import Pagination from '/components/UI/pagination';
-
-import Swal from "sweetalert2";
-
-import ReactExport from "react-data-export";
 import { useEffect } from 'react';
 import { debounce } from 'lodash';
-import PopupDetail from './popup_detail';
+import {
+    Grid6 as IconExcel,
+    SearchNormal1 as IconSearch,
+    TickCircle,
+
+} from "iconsax-react";
+import 'react-datepicker/dist/react-datepicker.css';
+import 'react-datepicker/dist/react-datepicker.css';
+registerLocale("vi", vi);
+
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
-
 
 const Toast = Swal.mixin({
     toast: true,
@@ -62,22 +54,20 @@ const Index = (props) => {
     const [listBr, sListBr] = useState([])
     const [listQuoteCode, sListQuoteCode] = useState([])
     const [listCustomer, sListCustomer] = useState([])
-    const [listOrderType, sListOrderType] = useState([])
     const [idBranch, sIdBranch] = useState(null);
     const [idQuoteCode, sIdQuoteCode] = useState(null);
     const [idCustomer, sIdCustomer] = useState(null);
-    const [idOrderType, sIdOrderType] = useState(null);
     const [listTabStatus, sListTabStatus] = useState()
     const [valueDate, sValueDate] = useState({
         startDate: null,
         endDate: null
     });
 
-    const [statusButton, sStatusButton] = useState(data.map(e => ({ status: e?.status })))
     const [active, sActive] = useState(null)
     const [onSending, sOnSending] = useState(null)
 
     const [dateRange, sDateRange] = useState([]);
+
     const formatDate = (date) => {
         const day = date?.getDate().toString().padStart(2, '0');
         const month = (date?.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-indexed
@@ -101,7 +91,6 @@ const Index = (props) => {
 
     const _ServerFetching = () => {
         const tabPage = router.query?.tab;
-        console.log("tabPage : ", tabPage)
         Axios("GET", `/api_web/Api_quotation/quotation/?csrf_protection=true`, {
             params: {
                 search: keySearch,
@@ -128,7 +117,7 @@ const Index = (props) => {
         })
     }
 
-    // fetch tab
+    // fetch tab filter
     const _ServerFetching_group = () => {
         Axios("GET", `/api_web/Api_quotation/filterBar?csrf_protection=true`, {
             params: {
@@ -171,17 +160,16 @@ const Index = (props) => {
 
     useEffect(() => {
         onFetching && _ServerFetching() || onFetching && _ServerFetching_group()
-        console.log('server fetching')
     }, [onFetching]);
     useEffect(() => {
-        console.log('server fetching filter')
         onFetching_filter && _ServerFetching_filter()
     }, [onFetching_filter])
     useEffect(() => {
-        router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query?.tab && sOnFetching_filter(true) || idBranch != null && sOnFetching(true) || idQuoteCode != null && sOnFetching(true) || idCustomer != null && sOnFetching(true) || idOrderType != null && sOnFetching(true) || valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)
-    }, [limit, router.query?.page, router.query?.tab, idBranch, idQuoteCode, idCustomer, idOrderType, valueDate.endDate, valueDate.startDate]);
+        router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query?.tab && sOnFetching_filter(true) || idBranch != null && sOnFetching(true) || idQuoteCode != null && sOnFetching(true) || idCustomer != null && sOnFetching(true) || valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)
+    }, [limit, router.query?.page, router.query?.tab, idBranch, idQuoteCode, idCustomer, valueDate.endDate, valueDate.startDate]);
 
     const listBr_filter = listBr ? listBr?.map(e => ({ label: e.name, value: e.id })) : []
+
     const listCode_filter = listQuoteCode ? listQuoteCode?.map(e => ({ label: e.reference_no, value: e.id })) : []
 
     const typeFunctions = {
@@ -192,17 +180,6 @@ const Index = (props) => {
     };
 
     const onchange_filter = (type, value) => {
-        console.log("check type filter : ", type)
-        console.log("check value filter : ", value)
-        // if (type == "branch") {
-        //     sIdBranch(value)
-        // } else if (type == "code") {
-        //     sIdQuoteCode(value)
-        // } else if (type == "customer") {
-        //     sIdCustomer(value)
-        // } else if (type == "date") {
-        //     sValueDate(value)
-        // }
         const updateFunction = typeFunctions[type];
         if (updateFunction) {
             updateFunction(value);
@@ -220,7 +197,7 @@ const Index = (props) => {
         })
     }
 
-    const _HandleOnChangeKeySearch = _.debounce(({ target: { value } }) => {
+    const _HandleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value)
         router.replace({
             pathname: router.route,
@@ -241,6 +218,47 @@ const Index = (props) => {
         return integerPart.toLocaleString("en")
     }
 
+    // excel
+    const multiDataSet = [
+        {
+            columns: [
+                { title: "ID", width: { wch: 4 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
+                { title: `${dataLang?.price_quote_date || "price_quote_date"}`, width: { wpx: 100 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
+                { title: `${dataLang?.price_quote_code || "price_quote_code"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
+                { title: `${dataLang?.price_quote_customer || "price_quote_customer"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
+                { title: `${dataLang?.price_quote_total || "price_quote_total"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
+                { title: `${dataLang?.price_quote_tax_money || "price_quote_tax_money"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
+                { title: `${dataLang?.price_quote_into_money || "price_quote_into_money"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
+                { title: `${dataLang?.price_quote_effective_date || "price_quote_effective_date"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
+                { title: `${dataLang?.price_quote_order_status || "price_quote_order_status"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
+                { title: `${dataLang?.price_quote_branch || "price_quote_branch"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
+                { title: `${dataLang?.price_quote_note || "price_quote_note"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
+            ],
+            data: dataExcel?.map((e) =>
+                [
+                    { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
+                    { value: `${e?.date ? e?.date : ""}` },
+                    { value: `${e?.reference_no ? e?.reference_no : ""}` },
+                    { value: `${e?.client_name ? e?.client_name : ""}` },
+                    // tiền chưa!
+                    { value: `${e?.total_price ? formatNumber(e?.total_price) : ""}` },
+                    { value: `${e?.total_tax_price ? formatNumber(e?.total_tax_price) : ""}` },
+                    { value: `${e?.total_amount ? formatNumber(e?.total_amount) : ""}` },
+
+                    { value: `${e?.validity ? e?.validity : ""}` },
+                    // order status chưa
+                    // {value: `${e?.import_status ? e?.import_status === "0" && "Chưa chi" || e?.import_status === "1" && "Chi 1 phần" ||  e?.import_status === "2"  &&"Đã chi đủ" : ""}`},
+                    { value: `${e?.status ? e?.status === "not_confirmed" && "Chưa duyệt" || e?.status === "confirmed" && "Đã duyệt" || e?.status === "no_confirmed" && "Không duyệt" || e?.status === 'ordered' && "Đã tạo đơn đặt hàng" : ""}` },
+
+                    { value: `${e?.branch_name ? e?.branch_name : ""}` },
+                    { value: `${e?.note ? e?.note : ""}` },
+
+                ]
+            ),
+        }
+    ];
+
+    // chuyen doi trang thai don bao gia
     const _ToggleStatus = (id) => {
         const index = data.findIndex(x => x.id === id);
 
@@ -294,46 +312,6 @@ const Index = (props) => {
         }
     }
 
-    // excel
-    const multiDataSet = [
-        {
-            columns: [
-                { title: "ID", width: { wch: 4 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.price_quote_date || "price_quote_date"}`, width: { wpx: 100 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.price_quote_code || "price_quote_code"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.price_quote_customer || "price_quote_customer"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.price_quote_total || "price_quote_total"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.price_quote_tax_money || "price_quote_tax_money"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.price_quote_into_money || "price_quote_into_money"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.price_quote_effective_date || "price_quote_effective_date"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.price_quote_order_status || "price_quote_order_status"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.price_quote_branch || "price_quote_branch"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.price_quote_note || "price_quote_note"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-            ],
-            data: dataExcel?.map((e) =>
-                [
-                    { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
-                    { value: `${e?.date ? e?.date : ""}` },
-                    { value: `${e?.reference_no ? e?.reference_no : ""}` },
-                    { value: `${e?.client_name ? e?.client_name : ""}` },
-                    // tiền chưa!
-                    { value: `${e?.total_price ? formatNumber(e?.total_price) : ""}` },
-                    { value: `${e?.total_tax_price ? formatNumber(e?.total_tax_price) : ""}` },
-                    { value: `${e?.total_amount ? formatNumber(e?.total_amount) : ""}` },
-
-                    { value: `${e?.validity ? e?.validity : ""}` },
-                    // order status chưa
-                    // {value: `${e?.import_status ? e?.import_status === "0" && "Chưa chi" || e?.import_status === "1" && "Chi 1 phần" ||  e?.import_status === "2"  &&"Đã chi đủ" : ""}`},
-                    { value: `${e?.status ? e?.status === "not_confirmed" && "Chưa duyệt" || e?.status === "confirmed" && "Đã duyệt" || e?.status === "no_confirmed" && "Không duyệt" || e?.status === 'ordered' && "Đã tạo đơn đặt hàng" : ""}` },
-
-                    { value: `${e?.branch_name ? e?.branch_name : ""}` },
-                    { value: `${e?.note ? e?.note : ""}` },
-
-                ]
-            ),
-        }
-    ];
-
     const _ServerPostStatus = (id, newStatus) => {
         const formData = new FormData();
 
@@ -359,18 +337,28 @@ const Index = (props) => {
             }
         })
     }
-    useEffect(() => {
-        active != null && sOnSending(true)
-    }, [active != null])
 
+    // search
+    const _HandleSeachApi = (inputValue) => {
+        Axios("POST", `/api_web/Api_quotation/quotationCombobox/?csrf_protection=true`, {
+            data: {
+                term: inputValue,
+            },
+        }, (err, response) => {
+            if (!err) {
+                var { result } = response?.data.data
+                sDataItems(result)
+            }
+        })
+    }
 
     return (
         <React.Fragment>
             <Head>
                 <title>{dataLang?.price_quote || "price_quote"} </title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
-                <div className="flex space-x-3 xl:text-xs text-[12px]">
+            <div className="2xl:pt-[92px] xl:pt-[74px] pt-[72px] 2xl:px-10 2xl:pb-10 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
+                <div className="flex space-x-1 xl:text-xs text-[12x]">
                     <h6 className="text-[#141522]/40">{dataLang?.price_quote || "price_quote"}</h6>
                     <span className="text-[#141522]/40">/</span>
                     <h6>{dataLang?.price_quote_list || "price_quote"}</h6>
@@ -383,15 +371,14 @@ const Index = (props) => {
                                 <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.price_quote || "price_quote"}</h2>
                                 <div className="flex justify-end items-center">
                                     <Link href="/sales_export_product/priceQuote/form" className='xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>{dataLang?.price_quote_btn_new || "price_quote_btn_new"}</Link>
-                                    {/* <Popup_dsncc  listBr={listBr}  listSelectCt={listSelectCt}  onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> */}
                                 </div>
                             </div>
 
-                            <div className="flex space-x-3 items-center h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            <div className="flex space-x-3 items-center h-[8vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 {listTabStatus && listTabStatus.map((e) => {
                                     return (
                                         <div>
-                                            <TabClient
+                                            <TabFilter
                                                 style={{
                                                     backgroundColor: "#e2f0fe"
                                                 }} dataLang={dataLang}
@@ -402,13 +389,13 @@ const Index = (props) => {
                                                 className={"text-[#0F4F9E]"}
                                             >
                                                 {dataLang[e?.name]}
-                                            </TabClient>
+                                            </TabFilter>
                                         </div>
                                     )
                                 })
                                 }
                             </div>
-                            <div className="space-y-2 2xl:h-[91%] h-[92%] overflow-hidden">
+                            <div className="space-y-2 3xl:h-[88%] 2xl:h-[80%] xl:h-[82%] h-[82%] overflow-hidden">
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded grid grid-cols-7  xl:p-3 p-2 gap-2">
                                         <div className='col-span-6'>
@@ -466,7 +453,7 @@ const Index = (props) => {
                                                 </div>
                                                 <div className='ml-1  col-span-1'>
                                                     <Select
-                                                        // onInputChange={_HandleSeachApi.bind(this)}
+                                                        onInputChange={_HandleSeachApi.bind(this)}
                                                         options={[{ value: '', label: dataLang?.price_quote_select_code || "price_quote_select_code", isDisabled: true }, ...listCode_filter]}
                                                         onChange={onchange_filter.bind(this, "code")}
                                                         value={idQuoteCode}
@@ -599,8 +586,8 @@ const Index = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="pr-2 w-[100%] lx:w-[120%] ">
+                                <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                    <div className="pr-2 w-[100%] lg:w-[100%] ">
                                         <div className="grid grid-cols-11 items-center sticky top-0 bg-white p-2 z-10">
                                             <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.price_quote_date || "price_quote_table_date"}</h4>
                                             <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.price_quote_code || "price_quote_table_code"}</h4>
@@ -623,67 +610,65 @@ const Index = (props) => {
                                                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
                                                             {(data?.map((e) =>
                                                                 <div className='grid grid-cols-11 items-center py-1.5 px-2 hover:bg-slate-100/40 ' key={e.id.toString()}>
-                                                                    <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center'>
+                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-center'>
                                                                         {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}
                                                                     </h6>
 
-                                                                    <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'>
+                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'>
                                                                         <PopupDetail dataLang={dataLang} className="text-left" name={e?.reference_no} id={e?.id} />
                                                                     </h6>
 
-                                                                    <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left '>
+                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-left '>
                                                                         {e.client_name}
                                                                     </h6>
 
-                                                                    <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>
+                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-right'>
                                                                         {formatNumber(e.total_price)}
                                                                     </h6>
 
-                                                                    <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>
+                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-right'>
                                                                         {formatNumber(e.total_tax_price)}
                                                                     </h6>
 
-                                                                    <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>
+                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-right'>
                                                                         {formatNumber(e.total_amount)}
                                                                     </h6>
 
-                                                                    <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center'>
+                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-center'>
                                                                         {e?.validity != null ? moment(e?.validity).format("DD/MM/YYYY") : ""}
                                                                     </h6>
 
                                                                     <h6 className='px-2 col-span-1 flex items-center justify-center text-center '>
-                                                                        {/* {e?.import_status === "not_stocked" && <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200'>{dataLang[e?.import_status]}</span> ||
-                                                                        e?.import_status === "stocked_part" && <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200'>{dataLang[e?.import_status]}</span> ||
-                                                                        e?.import_status === "stocked" && <span className='flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200'><TickCircle className='bg-lime-500 rounded-full ' color='white' size={15} />{dataLang[e?.import_status]}</span>
-                                                                    } */}
-                                                                        <h6 className='px-2 py-1 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer'>
+                                                                        <h6 className='px-2 py-1 3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer'>
                                                                             {
                                                                                 e?.status === "confirmed" &&
                                                                                 (
-                                                                                    <div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1 3xl:text-[14px] 2xl:text-[14px] xl:text-xs text-[8px]' onClick={() => _ToggleStatus(e?.id)}>
-                                                                                        Đã duyệt
-                                                                                        <TickCircle className='bg-lime-500 rounded-full' color='white' size={19} />
+                                                                                    <div className='3xl:w-40 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[88px] lg:h-4 border border-lime-500 px-2 py-1 rounded-xl text-lime-500 font-normal flex justify-center  items-center gap-1 3xl:text-[18px] 2xl:text-[14px] xl:text-xs text-[9px]' onClick={() => _ToggleStatus(e?.id)}>
+                                                                                        Đã Duyệt
+                                                                                        <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-4 xl:h-4 lg:w-3 lg:h-3 text-lime-500 bg-white border-lime-500 rounded-full" />
                                                                                     </div>
                                                                                 )
                                                                                 ||
                                                                                 e?.status === "not_confirmed" &&
                                                                                 (
-                                                                                    <div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1 3xl:text-[14px] 2xl:text-[14px] xl:text-xs text-[8px]' onClick={() => _ToggleStatus(e?.id)}>
-                                                                                        Chưa duyệt <TickCircle size={19} />
+                                                                                    <div className='3xl:w-40 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[88px] lg:h-4 border border-red-500 px-2 py-1 rounded-xl text-red-500  font-normal flex justify-center items-center gap-1 3xl:text-[18px] 2xl:text-[14px] xl:text-xs text-[8px]' onClick={() => _ToggleStatus(e?.id)}>
+                                                                                        Chưa Duyệt <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-4 xl:h-4 lg:w-3 lg:h-3" />
                                                                                     </div>
                                                                                 )
                                                                                 ||
                                                                                 e?.status === "no_confirmed" &&
                                                                                 (
-                                                                                    <div className='border border-[#0F4F9E] px-2 py-1 rounded text-[#0F4F9E]  font-normal flex justify-center items-center gap-1 3xl:text-[14px] 2xl:text-[14px] xl:text-xs text-[8px]' onClick={() => _ToggleStatus(e?.id)}>
-                                                                                        Không duyệt <TickCircle size={19} />
+                                                                                    <div className='3xl:w-40 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[88px] lg:h-4 rounded-xl border border-sky-500 px-2 py-1 text-sky-500  font-normal flex justify-center items-center gap-1 3xl:text-[17.5px] 2xl:text-[14px] xl:text-[11px] text-[8px]' onClick={() => _ToggleStatus(e?.id)}>
+                                                                                        Không Duyệt
+                                                                                        <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-4 xl:h-4 lg:w-3 lg:h-3 text-white bg-sky-500 border-sky-500 rounded-full" />
                                                                                     </div>
                                                                                 )
                                                                                 ||
                                                                                 e?.status === "ordered" &&
                                                                                 (
-                                                                                    <div className='border border-[#FF8C00] px-2 py-1 rounded text-[#FF8C00]  font-normal flex justify-center items-center gap-1 3xl:text-[14px] 2xl:text-[14px] xl:text-xs text-[8px] xl:max-w-[130px] max-w-[80px]' onClick={() => handleToggleOrdered(e?.id)}>
-                                                                                        Đã tạo đơn đặt hàng <TickCircle color='#FF8C00' size={33} />
+                                                                                    <div className='3xl:max-w-[160px] xl:max-w-[130px] max-w-[80px] relative 3xl:w-[160px] 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[94px] lg:h-6 text-white border border-[#FF8C00] rounded-xl bg-[#FF8C00] 3xl:text-left 3xl:px-3 3xl:py-6 3xl:pr-5 2xl:px-2 2xl:py-1  2xl:pr-5 xl:px-2 xl:py-4 xl:pr-7 lg:px-2 lg:py-2 lg:pr-5 lg:text-center font-normal flex justify-center items-center 3xl:text-[18px] 2xl:text-[14px] xl:text-[12px] text-[8px]' onClick={() => handleToggleOrdered(e?.id)}>
+                                                                                        <div className='3xl:max-w-[140px] lg:max-w-[94px]'>Đã tạo đơn đặt hàng</div>
+                                                                                        <TickCircle className=" absolute 3xl:top-[20%] 3lx:-right-[-5%] 2xl:top-[20%] 2lx:-right-[-5%] xl:top-[30%] xl:-right-[-5%] lg:top-[30%] lg:-right-[-5%] 3xl:w-5 3xl:h-5 2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 lg:w-3 lg:h-3 text-[#FF8C00] bg-white border-[#FF8C00] rounded-full" />
                                                                                     </div>
                                                                                 )
                                                                             }
@@ -691,19 +676,18 @@ const Index = (props) => {
 
                                                                     </h6>
 
-                                                                    <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left'>
+                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-left'>
                                                                         {e?.note}
                                                                     </h6>
 
-                                                                    <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1'>
-                                                                        <span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">
+                                                                    <h6 className='col-span-1 w-fit '>
+                                                                        <div className='3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px] text-[#086FFC] font-[300] px-2 py-0.5 border border-[#086FFC] bg-white rounded-[5.5px] uppercase'>
                                                                             {e?.branch_name}
-                                                                        </span>
+                                                                        </div>
                                                                     </h6>
 
                                                                     <div className='col-span-1 flex justify-center'>
-                                                                        <BtnTacVu onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} status={e?.status} id={e?.id} className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
-                                                                        {/* <button className='bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded xl:text-base text-xs'>Tác vụ</button> */}
+                                                                        <BtnAction onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} status={e?.status} id={e?.id} className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
                                                                     </div>
                                                                 </div>
 
@@ -716,7 +700,7 @@ const Index = (props) => {
                                                     <div className=" max-w-[352px] mt-24 mx-auto" >
                                                         <div className="text-center">
                                                             <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
-                                                            <h1 className="textx-[#141522] text-base opacity-90 font-medium">{dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
+                                                            <h1 className="textx-[#141522] text-base opacity-90 font-medium">{dataLang?.price_quote_table_item_not_found || "price_quote_table_item_not_found"}</h1>
                                                             <div className="flex items-center justify-around mt-6 ">
                                                             </div>
                                                         </div>
@@ -729,7 +713,7 @@ const Index = (props) => {
                         </div>
                         <div className='grid grid-cols-11 bg-gray-100 items-center'>
                             <div className='col-span-3 p-2 text-center'>
-                                <h3 className='uppercase font-normal 2xl:text-base xl:text-xs text-[8px]'>{dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}</h3>
+                                <h3 className='uppercase font-normal 2xl:text-base xl:text-xs text-[8px]'>{dataLang?.price_quote_total_outside || "price_quote_total_outside"}</h3>
                             </div>
                             <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap'>
                                 <h3 className='font-normal 2xl:text-base xl:text-xs text-[8px]'>{formatNumber(total?.total_price)}</h3>
@@ -759,108 +743,5 @@ const Index = (props) => {
         </React.Fragment >
     );
 }
-const TabClient = React.memo((props) => {
-    const router = useRouter();
-    // console.log("check prrops : ", props)
-    return (
-        <button style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[180px] flex gap-2 2xl:text-sm xl:text-sm text-xs items-center rounded-[5.5px] px-2 py-2 outline-none relative`}>
-            {router.query?.tab === `${props.active}` && <ArrowCircleDown size="20" color="#0F4F9E" />}
-            {props.children}
-            <span className={`${props?.total > 0 && "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00]  translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center 2xl:py-1 py-1"} `}>
-                {props?.total > 0 && props?.total}
-            </span>
-        </button>
-
-    )
-})
-
-const BtnTacVu = React.memo((props) => {
-    const [openTacvu, sOpenTacvu] = useState(false);
-    const _ToggleModal = (e) => sOpenTacvu(e);
-
-    const [openDetail, sOpenDetail] = useState(false);
-    const router = useRouter()
-
-    const _HandleDelete = (id) => {
-        Swal.fire({
-            title: `${props.dataLang?.aler_ask} `,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#296dc1',
-            cancelButtonColor: '#d33',
-            confirmButtonText: `${props.dataLang?.aler_yes} `,
-            cancelButtonText: `${props.dataLang?.aler_cancel} `
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Axios("DELETE", `/ api_web / Api_purchase_order / purchase_order / ${id}?csrf_protection = true`, {
-                }, (err, response) => {
-                    if (!err) {
-                        var { isSuccess, message } = response.data;
-                        if (isSuccess) {
-                            Toast.fire({
-                                icon: 'success',
-                                title: props.dataLang[message]
-                            })
-                            props.onRefresh && props.onRefresh()
-                        } else {
-                            Toast.fire({
-                                icon: 'error',
-                                title: props.dataLang[message]
-                            })
-                        }
-                    }
-                })
-            }
-        })
-    }
-    const handleClick = () => {
-        // if (props?.status != "not_stocked") {
-        //     Toast.fire({
-        //         icon: 'error',
-        //         title: `${"Đơn đặt hàng đã có phiếu Nhập. Không thể sửa"} `
-        //     })
-        // }
-        // else {
-        router.push(`/sales_export_product/priceQuote/form?id=${props.id}`);
-        // }
-    };
-
-    return (
-        <div>
-            <Popup
-                trigger={
-                    <button className={`flex space-x-1 items-center ` + props.className} >
-                        <span>
-                            {props.dataLang?.price_quote_action || "price_quote_action"}
-                        </span>
-                        <IconDown size={12} />
-                    </button>
-                }
-                arrow={false}
-                position="bottom right"
-                className={`dropdown-edit`}
-                keepTooltipInside={props.keepTooltipInside}
-                closeOnDocumentClick
-                nested
-                onOpen={_ToggleModal.bind(this, true)}
-                onClose={_ToggleModal.bind(this, false)}
-            >
-                <div className="w-auto rounded">
-                    <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                        <button
-                            onClick={handleClick}
-                            className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">
-                            {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
-                        </button>
-                        <button onClick={_HandleDelete.bind(this, props.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
-                            {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
-                        </button>
-                    </div>
-                </div>
-            </Popup>
-        </div>
-    )
-})
-
 
 export default Index;
