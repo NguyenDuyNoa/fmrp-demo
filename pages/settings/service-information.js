@@ -1,0 +1,332 @@
+import React, {useState} from "react";
+import Head from "next/head";
+
+import { ListBtn_Setting } from "./information";
+
+import {Money2 as IconMoney, Refresh as IconRefresh, Clock as IconClock} from "iconsax-react"
+
+const Index = (props) => {
+    const dataLang = props.dataLang;
+
+    const listPackage = [
+        {
+            id: 1,
+            title: "Hạn mức",
+            package: "Start Up",
+            team: "Không giới hạn",
+            schedule: "Không giới hạn",
+            member: "Không giới hạn",
+            capacity: 3213211,
+            expDate: "12/12/2023"
+        },{
+            id: 2,
+            title: "đang dùng",
+            package: "Start Up",
+            team: "2",
+            schedule: "",
+            member: "",
+            capacity: 168,
+            expDate: "12/12/2023"
+        }
+    ]
+
+    return ( 
+        <>
+            <Head>
+                <title>Thông tin dịch vụ FMRP</title>
+            </Head>
+            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 min-h-screen">
+                <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
+                    <h6 className="text-[#141522]/40">{dataLang?.branch_seting}</h6>
+                    <span className="text-[#141522]/40">/</span>
+                    <h6>Thông Tin Dịch Vụ FMRP</h6>
+                </div>
+                <div className="grid grid-cols-9 gap-5 h-[99%]">
+                    <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
+                        <ListBtn_Setting dataLang={dataLang} />
+                    </div>
+                    <div className="col-span-7">
+                        <h2 className="text-2xl text-[#52575E]">Thông Tin Dịch Vụ FMRP</h2>
+                        <h3 className='text-[15px] uppercase w-full p-3 rounded bg-[#ECF0F4] flex items-center space-x-3 mt-3'>Gói đang sử dụng</h3>
+                        <div className="grid grid-cols-7 py-3 mt-5 gap-5 border-b border-[#e7eaee]">
+                            <label className="col-start-2 uppercase text-[#667085] font-[400] text-center 2xl:text-base text-[13px]">gói</label>
+                            <label className="uppercase text-[#667085] font-[400] 2xl:text-base text-[13px]">team</label>
+                            <label className="uppercase text-[#667085] font-[400] 2xl:text-base text-[13px]">kế hoạch/team</label>
+                            <label className="uppercase text-[#667085] font-[400] 2xl:text-base text-[13px]">thành viên/team</label>
+                            <label className="uppercase text-[#667085] font-[400] text-right 2xl:text-base text-[13px]">dung lượng (mb)</label>
+                            <label className="uppercase text-[#667085] font-[400] 2xl:text-base text-[13px]">hạn sử dụng</label>
+                        </div>
+                        <div className="divide-y divide-[#e7eaee]">
+                            {listPackage?.map(e => 
+                                <div key={e?.id?.toString()} className="grid grid-cols-7 gap-5 py-3">
+                                    <label className="capitalize font-[400] pl-4">{e?.title}</label>
+                                    <div className="flex justify-center">
+                                        <label className="font-[400] w-fit px-3 py-0.5 border-2 border-[#5599EC] bg-[#EBF5FF] text-[#5599EC] rounded-lg">{e?.package}</label>
+                                    </div>
+                                    <label className=" font-[400]">{e?.team}</label>
+                                    <label className=" font-[400]">{e?.schedule?.length > 0 ? e?.schedule : "-"}</label>
+                                    <label className=" font-[400]">{e?.member?.length > 0 ? e?.schedule : "-"}</label>
+                                    <label className=" font-[400] text-right">{e?.capacity?.toLocaleString()}</label>
+                                    <label className=" font-[400] ">{e?.expDate}</label>
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex space-x-4 mt-4">
+                            <button className="px-5 py-3 rounded-md border border-[#d0d5dd] flex space-x-2">
+                                <IconClock />
+                                <span>Xem lịch sử gói sử dụng</span>
+                            </button>
+                            <button className="px-5 py-3 rounded-md border border-[#d0d5dd] flex space-x-2">
+                                <IconMoney />
+                                <span>Xem lịch sử thanh toán</span>
+                            </button>
+                            <button className="px-5 py-3 rounded-md border border-[#d0d5dd] flex space-x-2">
+                                <IconRefresh />
+                                <span>Gia hạn gói hiện tại</span>
+                            </button>
+                        </div>
+                        <h3 className='mt-5 text-[15px] uppercase w-full p-3 rounded bg-gradient-to-r from-[#1556D9] to-[#8FE8FA] text-white flex items-center space-x-3'>bảng giá</h3>
+                        <div className="mt-6 grid grid-cols-3">
+                            <PriceItem 
+                                title={<h4 className="text-white bg-[#5599EC] px-3.5 py-1.5 rounded-full w-fit">Start Up</h4>}
+                                price={"899.000"}
+                                minimum={"1 NĂM"}
+                                content1={
+                                    <ul className="mt-4 px-6 2xl:min-h-[150px] min-h-[200px]">
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> 5 người dùng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> 1 chi nhánh</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> 5 kho hàng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> 1 buổi training online</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Có chi phí khởi tạo</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Giải đáp qua tổng đài và kênh online</li>
+                                    </ul>
+                                }
+                                content2={
+                                    <ul className="mt-2">
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý sản xuất</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý kho hàng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý công nợ</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý nhập & trả hàng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý khách hàng, NCC</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý nhân sự & công việc</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý NVL, thành phẩm, BOM</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý mua hàng, đơn hàng, giao hàng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Báo cáo thống kê</li>
+                                        <li className="text-[#D0D5DD] pl-4">Module HRM</li>
+                                        <li className="text-[#D0D5DD] pl-4">Báo cáo Dashboard Power BI</li>
+                                    </ul>
+                                }
+                            />
+                            <PriceItem 
+                                title={<h4 className="text-white bg-[#0BAA2E] px-3.5 py-1.5 rounded-full w-fit">Professional</h4>}
+                                price={"1.200.000"}
+                                minimum={"6 THÁNG"}
+                                content1={
+                                    <ul className="mt-4 px-6 2xl:min-h-[150px] min-h-[200px]">
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> 20 người dùng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> 2 chi nhánh</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Không giới hạn kho hàng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> 2 buổi training online + 1 buổi trực tiếp</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Có chi phí khởi tạo</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Giải đáp qua tổng đài và kênh online</li>
+                                    </ul>
+                                }
+                                content2={
+                                    <ul className="mt-2">
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý sản xuất</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý kho hàng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý công nợ</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý nhập & trả hàng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý khách hàng, NCC</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý nhân sự & công việc</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý NVL, thành phẩm, BOM</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý mua hàng, đơn hàng, giao hàng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Báo cáo thống kê</li>
+                                        <li className="text-[#D0D5DD] pl-4">Module HRM</li>
+                                        <li className="text-[#D0D5DD] pl-4">Báo cáo Dashboard Power BI</li>
+                                    </ul>
+                                }
+                            />
+                            <PriceItem 
+                                title={<h4 className="text-white bg-[#FF8F0D] px-3.5 py-1.5 rounded-full w-fit">Premium</h4>}
+                                price={"1.600.000"}
+                                minimum={"6 THÁNG"}
+                                content1={
+                                    <ul className="mt-4 px-6 2xl:min-h-[150px] min-h-[200px]">
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> 50 người dùng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> 3 chi nhánh</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Không giới hạn kho hàng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> 1 buổi training online</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Có chi phí khởi tạo</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Giải đáp qua tổng đài và kênh online</li>
+                                    </ul>
+                                }
+                                content2={
+                                    <ul className="mt-2">
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý sản xuất</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý kho hàng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý công nợ</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý nhập & trả hàng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý khách hàng, NCC</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý nhân sự & công việc</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý NVL, thành phẩm, BOM</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Quản lý mua hàng, đơn hàng, giao hàng</li>
+                                        <li className="text-[#52575E]"><span className="text-[#25DAC5]">&#10004;</span> Báo cáo thống kê</li>
+                                        <li className="text-[#5599EC]">&#10004; Module HRM</li>
+                                        <li className="text-[#5599EC]">&#10004; Báo cáo Dashboard Power BI</li>
+                                    </ul>
+                                }
+                            />
+                        </div>
+                        <h3 className='text-[15px] uppercase w-full p-3 rounded bg-[#ECF0F4] flex items-center space-x-3 mt-5'>dịch vụ add-on</h3>
+                        <div className="my-6">
+                            <table className="border border-[#d0d5dd] border-collapse table-fixed w-full">
+                                <thead>
+                                    <tr>
+                                        <th className="border border-[#d0d5dd]"></th>
+                                        <th className="border border-[#d0d5dd] bg-[#E2F0FE] text-left 2xl:pl-5 pl-3 py-4">
+                                            <span className="bg-[#5599EC] text-white px-4 py-1.5 rounded-full font-[400]">Start Up</span>
+                                        </th>
+                                        <th className="border border-[#d0d5dd] bg-[#0BAA2E1F]/10 text-left 2xl:pl-5 pl-3 py-4">
+                                            <span className="bg-[#0BAA2E] text-white px-4 py-1.5 rounded-full font-[400]">Professional</span>
+                                        </th>
+                                        <th className="border border-[#d0d5dd] bg-[#FF8F0D1F]/10 text-left 2xl:pl-5 pl-3 py-4">
+                                            <span className="bg-[#FF8F0D] text-white px-4 py-1.5 rounded-full font-[400]">Premium</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td className="font-[400] border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5">Training online</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">1.000.000 VNĐ/buổi/2h</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">1.000.000 VNĐ/buổi/2h</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">1.000.000 VNĐ/buổi/2h</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="font-[400] border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5">Mua thêm User</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">100.000 VNĐ/user/tháng</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">100.000 VNĐ/user/tháng</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">100.000 VNĐ/user/tháng</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="font-[400] border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5">Mua thêm chi nhánh</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">499.000 VNĐ/tháng</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">499.000 VNĐ/tháng</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">499.000 VNĐ/tháng</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="font-[400] border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5">Module HRM</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">Trao đổi theo quy mô doanh nghiệp</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">Trao đổi theo quy mô doanh nghiệp</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">Trao đổi theo quy mô doanh nghiệp</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="font-[400] border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5">Phí gia hạn HRM</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">299.000 VNĐ/tháng</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">299.000 VNĐ/tháng</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">Không phí gia hạn</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="font-[400] border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5">Báo cáo DashboardPower BI</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">Trao đổi theo quy mô doanh nghiệp</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">Trao đổi theo quy mô doanh nghiệp</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">Trao đổi theo quy mô doanh nghiệp</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="font-[400] border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5">Phí gia hạn Dashboard Power BI</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">299.000 VNĐ/tháng</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">299.000 VNĐ/tháng</td>
+                                        <td className="font-[300] border border-[#d0d5dd] 2xl:pl-5 pl-3">Không phí gia hạn</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5">
+                                            <label className="font-[400]">Chi phí khảo sát</label>
+                                            <ul className="list-disc list-inside font-[300] 2xl:mb-0 mb-5">
+                                                <li>Trong vòng 30km</li>
+                                                <li>Ngoài vòng 30km từ FOSO</li>
+                                            </ul>
+                                        </td>
+                                        <td className="border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5 h-full ">
+                                            <ul className="list-disc list-inside font-[300] h-fit mt-5">
+                                                <li>Miễn phí</li>
+                                                <li>2.000.000 VNĐ + phí di chuyển</li>
+                                            </ul>
+                                        </td>
+                                        <td className="border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5 h-full ">
+                                            <ul className="list-disc list-inside font-[300] h-fit mt-5">
+                                                <li>Miễn phí</li>
+                                                <li>2.000.000 VNĐ + phí di chuyển</li>
+                                            </ul>
+                                        </td>
+                                        <td className="border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5 h-full ">
+                                            <ul className="list-disc list-inside font-[300] h-fit mt-5">
+                                                <li>Miễn phí</li>
+                                                <li>2.000.000 VNĐ + phí di chuyển</li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td className="border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5">
+                                            <label className="font-[400]">Đào tạo trực tiếp</label>
+                                            <ul className="list-disc list-inside font-[300] mb-5">
+                                                <li>Trong vòng 30km</li>
+                                                <li>Ngoài vòng 30km từ FOSO</li>
+                                            </ul>
+                                        </td>
+                                        <td className="border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5 h-full ">
+                                            <ul className="list-disc list-inside font-[300] h-fit mt-5">
+                                                <li>1.500.000 VNĐ/buổi/2h30p</li>
+                                                <li>1.500.000 VNĐ/buổi/2h30p + phí di chuyển</li>
+                                            </ul>
+                                        </td>
+                                        <td className="border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5 h-full ">
+                                            <ul className="list-disc list-inside font-[300] h-fit mt-5">
+                                                <li>1.500.000 VNĐ/buổi/2h30p</li>
+                                                <li>1.500.000 VNĐ/buổi/2h30p + phí di chuyển</li>
+                                            </ul>
+                                        </td>
+                                        <td className="border border-[#d0d5dd] 2xl:pl-5 pl-3 py-3.5 h-full ">
+                                            <ul className="list-disc list-inside font-[300] h-fit mt-5">
+                                                <li>1.500.000 VNĐ/buổi/2h30p</li>
+                                                <li>1.500.000 VNĐ/buổi/2h30p + phí di chuyển</li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+}
+
+const PriceItem = React.memo((props) => {
+    const [onHover, sOnHover] = useState(false);
+    const _OnHoverItem = (e) => sOnHover(e);
+
+    return(
+        <div onMouseLeave={_OnHoverItem.bind(this, false)} onMouseOver={_OnHoverItem.bind(this, true)} className={`${onHover ? "bg-[#48BDFF0F]/[0.06]" : "bg-white" } py-4 rounded-lg transition duration-200`}>
+            <div className="flex justify-center">
+                {props.title}
+            </div>
+            <h5 className="mt-3 text-2xl text-[#0F4F9E] justify-center font-bold flex items-start">{props.price}<span className="text-sm">/tháng</span></h5>
+            <div className={`${onHover ? "border-[#0F4F9E]" : "border-[#9295a4]" } w-full h-1 border-t border-dashed mt-3`} />
+            <h6 className="mt-4 text-[#52575E] font-[400] text-center">MUA TỐI THIỂU {props.minimum}</h6>
+            <div className={`${onHover ? "border-[#0F4F9E]" : "border-[#9295a4]" } w-full h-1 border-t border-dashed mt-4`} />
+            {props.content1}
+            <div className={`${onHover ? "border-[#0F4F9E]" : "border-[#9295a4]" } w-full h-1 border-t border-dashed mt-4`} />
+            <div className="mt-4 px-6">
+                <h6 className="text-[#5599EC] uppercase text-lg">tính năng phần mềm</h6>
+                {props.content2}
+            </div>
+            <div className={`${onHover ? "border-[#0F4F9E]" : "border-[#9295a4]" } w-full h-1 border-t border-dashed mt-5`} />
+            <div className="flex justify-center my-6">
+                <button className={`${onHover ? "border-transparent bg-[#0F4F9E] text-white" : "border-[#D0D5DD] bg-white text-[#344054]" } transition duration-200 w-[80%] py-3 border rounded-md`}>Mua ngay</button>
+            </div>
+        </div>
+    )
+})
+ 
+export default Index;

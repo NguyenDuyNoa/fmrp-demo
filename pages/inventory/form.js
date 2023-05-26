@@ -44,6 +44,7 @@ const Form = (props) => {
     
     const [onFetching, sOnFetching] = useState(false);
     const [onFetchingPstWH, sOnFetchingPstWH] = useState(false);
+    const [onFetchingWH, sOnFetchingWH] = useState(false);
     const [onSending, sOnSending] = useState(false);
 
     const [dataChoose, sDataChoose] = useState([]);
@@ -78,12 +79,12 @@ const Form = (props) => {
                sDataBranch(rResult.map(e =>({label: e.name, value: e.id})))
             }
         })
-        Axios("GET", "/api_web/api_warehouse/warehouse?filter[is_system]=2&csrf_protection=true", {}, (err, response) => {
-            if(!err){
-                var {rResult} =  response.data
-                sDataWareHouse(rResult.map(e =>({label: e.name, value: e.id})))
-            }
-        })
+        // Axios("GET", "/api_web/api_warehouse/warehouse?filter[is_system]=2&csrf_protection=true", {}, (err, response) => {
+        //     if(!err){
+        //         var {rResult} =  response.data
+        //         sDataWareHouse(rResult.map(e =>({label: e.name, value: e.id})))
+        //     }
+        // })
         sOnFetching(false)
     }
     
@@ -106,6 +107,24 @@ const Form = (props) => {
             sNote(value?.target.value)
         }
     }
+
+    const _ServerFetchingWH = () => {
+        Axios("GET", `api_web/api_warehouse/warehouse?csrf_protection=true&filter[is_system]=2&filter[branch_id]=${branch?.value}`, {}, (err, response) => {
+            if(!err){
+                var {rResult} =  response.data
+                sDataWareHouse(rResult.map(e =>({label: e.name, value: e.id})))
+            }
+            sOnFetchingWH(false)
+        })
+    }
+
+    useEffect(() => {
+        onFetchingWH && _ServerFetchingWH()
+    }, [onFetchingWH]);
+
+    useEffect(() => {
+        branch !== null && sOnFetchingWH(true) //chọn chi nhánh để Get data Kho hàng
+    }, [branch]);
 
     const _ServerFetchingPstWH = () => {
         Axios("GET", `/api_web/api_warehouse/LocationInWarehouse/${warehouse?.value}?csrf_protection=true`, {}, (err, response) =>{
@@ -330,10 +349,15 @@ const Form = (props) => {
             const updatedChild = parent.child.map((child) => {
                 const matchedItem = errData.find((item) => item.id_parent === parent.id && Number(item.id) === child.id);
                 if (matchedItem) {
-                    return { ...child, quantity: Number(matchedItem.check_quantity_stock)};
+                    return { ...child, quantity: isNaN(Number(matchedItem.check_quantity_stock)) ? 0 : Number(matchedItem.check_quantity_stock) };
                 }else{
                     return child;
                 }
+                // if(child?.status == 2){ //so luong thay doi
+                // }else if(child?.status == 3){ //trung serial
+                //     const matchedItem = errData.find((item) => item.id_parent === parent.id && Number(item.id) === child.id && item.serial === child.serial );
+                //     console.log(matchedItem);
+                // }
             });
             return { ...parent, child: updatedChild };
         })
@@ -342,13 +366,16 @@ const Form = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        const checkLotDate = dataChoose.some(item => item?.checkExpiry == "1")
-        const checkSerial = dataChoose.some(item => item?.checkSerial == "1")
+        const checkLotDate = dataChoose.some(item => item?.checkExpiry == "1");
+        const checkSerial = dataChoose.some(item => item?.checkSerial == "1");
 
         const checkErrNullLocate = dataChoose.map(item => item.child.some(itemChild => itemChild.locate === null));
         const checkErrNullLot = dataChoose.map(item => item.child.some(itemChild => itemChild.lot === null));
         const checkErrNullDate = dataChoose.map(item => item.child.some(itemChild => itemChild.date === null));
         const checkErrNullSerial = dataChoose.map(item => item.child.some(itemChild => itemChild.serial === null));
+        
+        const checkErrNullAmount = dataChoose.map(item => item.child.some(itemChild => itemChild.quantity === itemChild.amount && itemChild.amount === 0));
+        console.log(checkErrNullAmount);
 
         const hasDuplicates = () => {
             const serialData = [];
@@ -423,15 +450,15 @@ const Form = (props) => {
                                 </div>
                             </div>
                             <div className='space-y-1'>
-                                <label className="text-[#344054] text-sm mb-1 ">{"Kho hàng"} <span className="text-red-500">*</span></label>
+                                <label className="text-[#344054] text-sm mb-1 ">{"Chi nhánh"} <span className="text-red-500">*</span></label>
                                 <Select 
-                                    options={dataWareHouse}
-                                    value={warehouse}
-                                    onChange={_HandleChangeValue.bind(this, "warehouse")}
-                                    placeholder={"Chọn kho hàng"}
-                                    isDisabled={dataChoose.length > 0}
+                                    options={dataBranch}
+                                    value={branch}
+                                    onChange={_HandleChangeValue.bind(this, "branch")}
+                                    placeholder={dataLang?.client_list_filterbrand}
                                     isClearable={true}
-                                    className={`${errWareHouse ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full disabled:bg-slate-50 rounded text-[#52575E] outline-none border `} 
+                                    isDisabled={dataChoose.length > 0}
+                                    className={`${errBranch && branch == null ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] outline-none border `} 
                                     isSearchable={true}
                                     noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                     style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -460,14 +487,15 @@ const Form = (props) => {
                                 />
                             </div>
                             <div className='space-y-1'>
-                                <label className="text-[#344054] text-sm mb-1 ">{"Chi nhánh"} <span className="text-red-500">*</span></label>
+                                <label className="text-[#344054] text-sm mb-1 ">{"Kho hàng"} <span className="text-red-500">*</span></label>
                                 <Select 
-                                    options={dataBranch}
-                                    value={branch}
-                                    onChange={_HandleChangeValue.bind(this, "branch")}
-                                    placeholder={dataLang?.client_list_filterbrand}
+                                    options={dataWareHouse}
+                                    value={warehouse}
+                                    onChange={_HandleChangeValue.bind(this, "warehouse")}
+                                    placeholder={"Chọn kho hàng"}
+                                    isDisabled={dataChoose.length > 0}
                                     isClearable={true}
-                                    className={`${errBranch && branch == null ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] outline-none border `} 
+                                    className={`${errWareHouse ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full disabled:bg-slate-50 rounded text-[#52575E] outline-none border `} 
                                     isSearchable={true}
                                     noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                     style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -540,11 +568,11 @@ const Form = (props) => {
                                             </div>
                                             <div className={`${(e?.checkExpiry == "0" && e?.checkSerial == "0") ? "grid-cols-7" : (e?.checkExpiry == "1" ? "grid-cols-9" : "grid-cols-8") } col-span-5 grid`}>
                                                 {e.child?.map(ce => 
-                                                    <React.Fragment key={ce.id}>
+                                                    <React.Fragment key={ce?.id}>
                                                         <div className='p-1.5 border'>
                                                             <Select 
                                                                 options={dataPstWH}
-                                                                value={ce.locate}
+                                                                value={ce?.locate}
                                                                 onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "locate")}
                                                                 placeholder={"Vị trí kho"}
                                                                 isClearable={true}
@@ -589,7 +617,7 @@ const Form = (props) => {
                                                                 <CreatableSelect  
                                                                     placeholder={"Lot"}
                                                                     options={e?.dataLot}
-                                                                    value={ce.lot}
+                                                                    value={ce?.lot}
                                                                     onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
                                                                     isClearable={true}
                                                                     classNamePrefix="Select"
@@ -649,7 +677,7 @@ const Form = (props) => {
                                                         {e?.checkSerial == "1" && 
                                                             <div className='p-1.5 border flex flex-col justify-center h-full'>
                                                                 <input 
-                                                                    value={ce.serial}
+                                                                    value={ce?.serial}
                                                                     onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
                                                                     className={`${errNullSerial && (ce.serial === null || ce.serial === "") ? "border-red-500" : "border-gray-200" } text-center py-1 px-2 font-medium w-full focus:outline-none border-b-2 `}
                                                                 />
@@ -664,7 +692,7 @@ const Form = (props) => {
                                                                 isAllowed={(values) => { const {floatValue} = values; return floatValue >= 0 }}    
                                                             />
                                                         </div>
-                                                        <h6 className='text-center p-1.5 border flex flex-col justify-center h-full'>{ce.quantity}</h6>
+                                                        <h6 className='text-center p-1.5 border flex flex-col justify-center h-full'>{ce?.quantity}</h6>
                                                         <div className='p-1.5 border flex flex-col justify-center h-full'>
                                                             <NumericFormat
                                                                 value={ce?.amount}
@@ -684,7 +712,7 @@ const Form = (props) => {
                                                         <h6 className='flex flex-col justify-center items-center p-1.5 border h-full'>{ce?.amount != null && Number(ce?.amount - ce?.quantity)?.toLocaleString()}</h6>
                                                         <h6 className='p-1.5 border flex flex-col justify-center items-center h-full'>{ce?.amount != null && Number(ce?.amount * ce?.price)?.toLocaleString()}</h6>
                                                         <div className='flex flex-col justify-center items-center p-1.5 border'>
-                                                            <button onClick={_HandleDeleteChild.bind(this, e.id, ce.id)} title='Xóa' className='text-red-500 hover:text-red-600'><IconDelete /></button>
+                                                            <button onClick={_HandleDeleteChild.bind(this, e.id, ce?.id)} title='Xóa' className='text-red-500 hover:text-red-600'><IconDelete /></button>
                                                         </div>
                                                     </React.Fragment>
                                                 )}
@@ -843,40 +871,44 @@ const Popup_Product = React.memo((props) => {
         }
     }
 
-    const _HandleChangeChild = (parentId, id, type, value) => {
-        const newData = listAllProduct.map(e => {
-            if(e.id === parentId){
-                const newChild = e.child?.map(ce => {
-                    if(ce.id === id){
-                        if(type === "amount"){
-                            return {...ce, amount: Number(value?.value)}
-                        }else if(type === "locate"){
-                            ce.locate = value;
-                            e?.checkExpiry === "1" && (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id, "lot")
-                            e?.checkSerial === "1" && (ce?.locate !== null && ce?.serial !== null) && _HandleCheckChild(parentId, id, "serial")
-                            return {...ce}
-                        }else if(type === "lot"){
-                            ce.lot = value;
-                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id, "lot")
-                            return {...ce}
-                        }else if(type === "date"){
-                            ce.date = value;
-                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id, "lot")
-                            return {...ce}
-                        }else if(type === "serial"){
-                            ce.serial = value?.target.value;
-                            (ce?.locate !== null && ce?.serial !== null) && _HandleCheckChild(parentId, id, "serial")
-                            return {...ce}
-                        }
-                    }
-                    return ce;
-                })
-                return {...e, child: newChild}
-            }
-            return e
-        })
-        sListAllProduct([...newData])
-    }
+    // const _HandleChangeChild = (parentId, id, type, value) => {
+    //     const newData = listAllProduct.map(e => {
+    //         if(e.id === parentId){
+    //             const newChild = e.child?.map(ce => {
+    //                 if(ce.id === id){
+    //                     if(type === "amount"){
+    //                         return {...ce, amount: Number(value?.value)}
+    //                     }else if(type === "locate"){
+    //                         ce.locate = value;
+    //                         e?.checkExpiry === "1" && (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id, "lot")
+    //                         e?.checkSerial === "1" && (ce?.locate !== null && ce?.serial !== null) && _HandleCheckChild(parentId, id, "serial")
+    //                         return {...ce}
+    //                     }else if(type === "lot"){
+    //                         ce.lot = value;
+    //                         (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id, "lot")
+    //                         return {...ce}
+    //                     }else if(type === "date"){
+    //                         ce.date = value;
+    //                         (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckChild(parentId, id, "lot")
+    //                         return {...ce}
+    //                     }else if(type === "serial"){
+    //                         ce.serial = value?.target.value;
+    //                         setTimeout(() => {
+    //                             (ce?.locate !== null && ce?.serial !== null) && _HandleCheckChild(parentId, id, "serial")
+    //                         }, 1000);
+    //                         setTimeout(() => {
+    //                             return {...ce}
+    //                         }, 3000);
+    //                     }
+    //                 }
+    //                 return ce;
+    //             })
+    //             return {...e, child: newChild}
+    //         }
+    //         return e
+    //     })
+    //     sListAllProduct([...newData])
+    // }
     
     const _HandleDeleteChild = (parentId, id) => {
         const newData = listAllProduct.map(e => {
@@ -889,20 +921,99 @@ const Popup_Product = React.memo((props) => {
         sListAllProduct([...newData])
     }
 
-    const _HandleCheckChild = (parentId, id, type) => {
+    // const _HandleCheckChild = (parentId, id, type) => {
+    //     console.log(listAllProduct);
+    //     setTimeout(() => {
+    //         const parent = listAllProduct.find(item => item.id === parentId);
+    //         if(!parent) return null;
+    //         const child = parent.child.find(e => e.id === id)
+    //         if(!child) return null;
+    //         const check = parent.checkChild.find(e => {
+    //             if(type === "lot"){
+    //                 e.locate === child.locate?.value && e.lot === child.lot?.value && e.date === moment(child.date).format("DD/MM/yyyy")
+    //             }else{
+    //                 e.locate === child.locate?.value && e.serial === child.serial
+    //             }
+    //         })
+    //         const newData = listAllProduct.map(e => {
+    //             if(e.id === parentId){
+    //                 const newChild = e.child?.map(ce => {
+    //                     if(ce.id === id){
+    //                         return {...ce, quantity: check?.quantity || 0}
+    //                     }
+    //                     return ce;
+    //                 })
+    //                 return {...e, child: newChild}
+    //             }
+    //             return e;
+    //         })
+    //         sListAllProduct([...newData])
+    //     }, 500);
+    // }
+
+    const _HandleChangeChild = (parentId, id, type, value) => {
+        const newData = listAllProduct.map(e => {
+            if(e.id === parentId){
+                const newChild = e.child?.map(ce => {
+                    if(ce.id === id){
+                        if(type === "amount"){
+                            return {...ce, amount: Number(value?.value)}
+                        }else if(type === "locate"){
+                            ce.locate = value;
+                            e?.checkExpiry == "1" && (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckSameLot(parentId, id, ce?.locate, ce?.lot, ce?.date);
+                            e?.checkSerial == "1" && (ce?.locate !== null && ce?.serial !== null) && _HandleCheckSameSerial(parentId, id, ce?.locate, ce?.serial);
+                            return {...ce}
+                        }else if(type === "lot"){
+                            ce.lot = value;
+                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckSameLot(parentId, id, ce?.locate, ce?.lot, ce?.date);
+                            return {...ce}
+                        }else if(type === "date"){
+                            ce.date = value;
+                            (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckSameLot(parentId, id, ce?.locate, ce?.lot, ce?.date);
+                            return {...ce}
+                        }else if(type === "serial"){
+                            ce.serial = value?.target.value;
+                            (ce?.locate !== null && ce?.serial !== null) && _HandleCheckSameSerial(parentId, id, ce?.locate, ce?.serial);
+                            setTimeout(() => {
+                                return {...ce}
+                            }, 3000);
+                        }else if(type === "price"){
+                            return {...ce, price: Number(value?.value)}
+                        }
+                    }
+                    return ce;
+                })
+                return {...e, child: newChild}
+            }
+            return e
+        })
+        sListAllProduct([...newData])
+    }
+
+    const _HandleCheckSameLot = (parentId, id, locate, lot, date) => {
         setTimeout(() => {
-            const parent = listAllProduct.find(item => item.id === parentId);
+            const newData = listAllProduct.map(e => {
+                if(e.id === parentId){
+                    const newChild = e.child?.map(ce => {
+                        if(ce.id !== id && ce.locate?.value === locate?.value && ce.lot?.value === lot?.value && moment(ce.date).format("DD/MM/yyyy") == moment(date).format("DD/MM/yyyy")){
+                            Toast.fire({
+                                icon: 'error',
+                                title: `Trùng mặt hàng`
+                            }) 
+                            return {...ce, locate: null, amount: null, lot: null, date: null, serial: null, quantity: null, price: null}
+                        }
+                        return ce;
+                    }).filter(item => item.locate !== null)
+                    return {...e, child: newChild}
+                }
+                return e;
+            })
+            const parent = newData.find(item => item.id === parentId);
             if(!parent) return null;
             const child = parent.child.find(e => e.id === id)
             if(!child) return null;
-            const check = parent.checkChild.find(e => {
-                if(type === "lot"){
-                    e.locate === child.locate?.value && e.lot === child.lot?.value && e.date === moment(child.date).format("DD/MM/yyyy")
-                }else{
-                    e.locate === child.locate?.value && e.serial === child.serial
-                }
-            })
-            const newData = listAllProduct.map(e => {
+            const check = parent.checkChild.find(e => e.locate === child.locate?.value && e.lot === child.lot?.value && e.date === moment(child.date).format("DD/MM/yyyy"))
+            const newData1 = newData.map(e => {
                 if(e.id === parentId){
                     const newChild = e.child?.map(ce => {
                         if(ce.id === id){
@@ -914,7 +1025,46 @@ const Popup_Product = React.memo((props) => {
                 }
                 return e;
             })
-            sListAllProduct([...newData])
+            sListAllProduct([...newData1])
+        }, 500);
+    }
+
+    const _HandleCheckSameSerial = (parentId, id, locate, serial) => {
+        setTimeout(() => {
+            const newData = listAllProduct.map(e => {
+                if(e.id === parentId){
+                    const newChild = e.child?.map(ce => {
+                        if(ce.id !== id && ce.locate?.value === locate?.value && ce.serial === serial){
+                            Toast.fire({
+                                icon: 'error',
+                                title: `Trùng mặt hàng`
+                            }) 
+                            return {...ce, locate: null, amount: null, lot: null, date: null, serial: null, quantity: null, price: null}
+                        }
+                        return ce;
+                    }).filter(item => item.locate !== null)
+                    return {...e, child: newChild}
+                }
+                return e;
+            })
+            const parent = newData.find(item => item.id === parentId);
+            if(!parent) return null;
+            const child = parent.child.find(e => e.id === id)
+            if(!child) return null;
+            const check = parent.checkChild.find(e => e.locate === child.locate?.value && e.serial === child.serial)
+            const newData1 = newData.map(e => {
+                if(e.id === parentId){
+                    const newChild = e.child?.map(ce => {
+                        if(ce.id === id){
+                            return {...ce, quantity: check?.quantity || 0}
+                        }
+                        return ce;
+                    })
+                    return {...e, child: newChild}
+                }
+                return e;
+            })
+            sListAllProduct([...newData1])
         }, 500);
     }
 

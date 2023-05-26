@@ -46,7 +46,7 @@ const PopupDetail = (props) => {
     };
 
     const _ServerFetching_detailUser = () => {
-        Axios("GET", `http://192.168.1.178/FMRP/api_web/Api_quotation/quotation/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+        Axios("GET", `/api_web/Api_quotation/quotation/${props?.id}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 var db = response.data
                 sData(db)

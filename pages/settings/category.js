@@ -522,10 +522,10 @@ const Popup_danhmuc = (props) => {
 
     useEffect(() => {
       sErrInput(false)
-      sCosts_Code('')
-      sCosts_Branch([])
-      sCosts_Name('')
-      sIdCategory(null)
+      open && sCosts_Code(props.data?.code ? props.data?.code : "" )
+      open && sCosts_Name(props.data?.name ? props.data?.name : "" )
+      open && sCosts_Branch(props.data?.branch?.length > 0 ? props.data?.branch?.map(e => ({label: e.name, value: e.id})) : [] )
+      open && sIdCategory(props.data?.parent_id ? props.data?.parent_id : null )
       sErrcode(false)
       sErrName(false)
       sErrBranch(false)
@@ -538,6 +538,7 @@ const Popup_danhmuc = (props) => {
       sUnit(props.data?.unit ? props.data?.unit : "")
       open && sOnFetching(true);
     }, [open]);
+
 
     const _ServerSending = () => {
       const id =props.data?.id;
@@ -555,7 +556,7 @@ const Popup_danhmuc = (props) => {
         data.append('name', costs_name);
         data.append('parent_id', idCategory);
         costs_branch?.map((e, index) => {
-          data.append(`branch_id[[${index}]`, e?.value);
+          data.append(`branch_id[${index}]`, e?.value);
         })
       }
       Axios("POST", id ? 
@@ -637,10 +638,9 @@ const Popup_danhmuc = (props) => {
                 sDataBranch(result?.map(e =>({label: e.name, value:e.id})))       
             }
         })
-        Axios("GET", `${props.data?.id ? `/api_web/Api_cost/costCombobox/?csrf_protection=true` : "/api_web/Api_cost/costCombobox/?csrf_protection=true"}`, {}, (err, response) => {
+        Axios("GET", `${props.data?.id ? `/api_web/Api_cost/costCombobox/${props.data?.id}?csrf_protection=true` : "/api_web/Api_cost/costCombobox/?csrf_protection=true"}`, {}, (err, response) => {
           if(!err){
               var {rResult} = response.data;
-              console.log(rResult);
               sDataOption(rResult.map(e => ({label: e.name + " " + "(" + e.code + ")", value: e.id, level: e.level})))
           }
         })
