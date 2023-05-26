@@ -230,63 +230,6 @@ const Index = (props) => {
     }
 
 
-    const _ToggleStatus =  (id) => {
-        
-      Swal.fire({
-          title: `${"Thay đổi trạng thái"}`,
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#296dc1',
-          cancelButtonColor: '#d33',
-          confirmButtonText: `${dataLang?.aler_yes}`,
-          cancelButtonText:`${dataLang?.aler_cancel}`
-      }).then((result) => {
-          if (result.isConfirmed) {
-              // Xác định trạng thái mới
-              const index = data.findIndex(x => x.id === id);
-              const newStatus = data[index].status === "0" ? "1" : "0";
-              // Gửi yêu cầu cập nhật trạng thái lên server
-              _ServerSending(id, newStatus)
-              sActive(newStatus)
-              // Không cần cập nhật trạng thái trên giao diện ngay tại đây
-          }
-      });
-  };
-      const _ServerSending =  (id, newStatus) => {
-          // let id = status
-        Axios("POST",`${``}`, {
-              headers: {"Content-Type": "multipart/form-data"} 
-          }, (err, response) => {
-              if(!err){
-                  var {isSuccess, message} = response.data;  
-                  if(isSuccess){
-                      Toast.fire({
-                          icon: 'success',
-                          title: `${dataLang[message]}`
-                      })
-                    }
-                    else{
-                      Toast.fire({
-                        icon: 'error',
-                        title: `${dataLang[message]}`
-                    })
-                  }
-              }
-              sOnSending(false)
-              _ServerFetching()
-              // _ServerFetching_group()
-          })
-      }
-
-      // useEffect(() => {
-      //     onSending && _ServerSending()  
-      // }, [onSending]);
-      const [active ,sActive] = useState()
-      useEffect(()=>{
-        active != null && sOnSending(true)
-      },[active != null])
-
-
     const multiDataSet = [
       {
           columns: [
@@ -314,7 +257,7 @@ const Index = (props) => {
                   {value: `${e?.total_tax_price ? formatNumber(e?.total_tax_price) : ""}`},
                   {value: `${e?.total_amount ? formatNumber(e?.total_amount) : ""}`},
                   {value: `${e?.status === "0" ? "Chưa thanh toán":"" || e?.status === "1" ? "Thanh toán 1 phần":"" || e?.status === "2"? "Thanh toán đủ":""}`},
-                  {value: `${e?.warehouseman_id === "0" ? "Chưa duyệt": "Đã duyệt"}`},
+                  {value: `${e?.warehouseman_id === "0" ? "Chưa duyệt kho": "Đã duyệt kho"}`},
                   {value: `${e?.branch_name ? e?.branch_name :""}`},
                   {value: `${e?.note ? e?.note :""}`},
                  
@@ -322,9 +265,48 @@ const Index = (props) => {
           ),
       }
   ];
-const [browser, sBrowser] = useState("0")
-  const _HandleChangeInput = (type, value) =>{
-    if(type === "browser"){
+
+
+    const handleDelete = (event) => {
+      Swal.fire({
+        title: `${dataLang?.aler_ask}`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#296dc1',
+        cancelButtonColor: '#d33',
+        confirmButtonText: `${dataLang?.aler_yes}`,
+        cancelButtonText:`${dataLang?.aler_cancel}`
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const id = event;
+          Axios("DELETE", `/api_web/api_inventory/inventory/${id}`, {
+          }, (err, response) => {
+            if(!err){
+              var {isSuccess, message,data_export} = response.data
+              if(isSuccess){
+                Toast.fire({
+                  icon: 'success',
+                  title: dataLang[message]
+                })     
+              }else{
+                Toast.fire({
+                  icon: 'error',
+                  title: dataLang[message]
+                }) 
+                  if(data_export?.length > 0){
+                      sData_export(data_export)
+                  } 
+              }
+            }
+            _ServerFetching()
+          })     
+        }
+      })
+    }
+  const [data_export,sData_export] = useState([])
+  const [checkedWare, sCheckedWare] = useState({})
+  const _HandleChangeInput = (id, checkedUn, type, value) => {
+    if (type === "browser") {
       Swal.fire({
         title: `${"Thay đổi trạng thái"}`,
         icon: 'warning',
@@ -332,27 +314,55 @@ const [browser, sBrowser] = useState("0")
         confirmButtonColor: '#296dc1',
         cancelButtonColor: '#d33',
         confirmButtonText: `${dataLang?.aler_yes}`,
-        cancelButtonText:`${dataLang?.aler_cancel}`
-    }).then((result) => {
+        cancelButtonText: `${dataLang?.aler_cancel}`
+      }).then((result) => {
         if (result.isConfirmed) {
-           alert("Chức năng đang trong quá trình hoàn thiện, quay lại sau !")
+          const checked = value.target.checked;
+          const warehousemanId = value.target.value;
+          const dataChecked = {checked: checked, warehousemanId: warehousemanId, id: id, checkedpost: checkedUn};
+          sCheckedWare(dataChecked)
+        } 
+          sData([...data])
         }
-    });
-      // const name = value?.target.name;
-      // const id = value?.target.id;
-      // console.log(id);
-      // console.log(name);
-      // if (value?.target.checked) {
-      //     // Thêm giá trị và id vào mảng khi input được chọn
-      //     const updatedOptions = dataDepar && [...dataDepar, { name, id }];
-      //     sBrowser(updatedOptions);
-      // } else {
-      //     // Xóa giá trị và id khỏi mảng khi input được bỏ chọn
-      //     const updatedOptions = dataDepar?.filter(option => option.id !== id);
-      //     sBrowser(updatedOptions);
-      // }
-  }
-  }
+      )}
+  };
+  const _ServerSending =  () => {
+    var data = new FormData();
+    data.append('warehouseman_id', checkedWare?.checkedpost != "0" ?  checkedWare?.checkedpost : '' );   
+    data.append('id', checkedWare?.id);   
+    Axios("POST",`/api_web/api_import/ConfirmWarehous?csrf_protection=true`, {
+        data:data,
+        headers: {"Content-Type": "multipart/form-data"} 
+    }, (err, response) => {
+        if(!err){
+            var {isSuccess, message, data_export} = response.data;  
+            if(isSuccess){
+                Toast.fire({
+                    icon: 'success',
+                    title: `${dataLang[message]}`
+                })
+                setTimeout(() => {
+                  sOnFetching(true);
+                }, 300);
+              }else{
+                Toast.fire({
+                  icon: 'error',
+                  title: `${dataLang[message]}`
+              })
+              } if(data_export?.length > 0){
+                sData_export(data_export)
+            } 
+        }
+        sOnSending(false)
+    })
+    }
+  useEffect(() => {
+  onSending && _ServerSending()  
+  }, [onSending]);
+
+  useEffect(() =>{
+    checkedWare.id != null &&   sOnSending(true)
+  },[checkedWare.id != null])
 
 
     return (
@@ -360,7 +370,7 @@ const [browser, sBrowser] = useState("0")
             <Head>
                 <title>{dataLang?.import_title || "import_title"} </title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
+            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">{data_export.length > 0 && <Popup_status className="hidden" data_export={data_export} dataLang={dataLang}/>}
             <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
             <h6 className="text-[#141522]/40">{dataLang?.import_title || "import_title"}</h6>
             <span className="text-[#141522]/40">/</span>
@@ -634,35 +644,38 @@ const [browser, sBrowser] = useState("0")
                                      e?.warehouseman_id  === "2" &&   <span className='2xl:text-sm xl:text-xs text-[8px] flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã có xuất kho"}</span>
                                     }
                                 </h6> */}
-                                <h6 className=' 2xl:text-base xl:text-xs text-[8px] col-span-1'>
-                                  <div className='w-full cursor-pointer '>
-                                      <label className="relative flex cursor-pointer items-center justify-center  py-1.5  gap-1 bg-[#e0e7ff] rounded-lg "
-                                          htmlFor={e?.id} data-ripple-dark="true" > 
-                                          <input type="checkbox" className="before:content[''] border-[#4f46e5] peer relative h-[20px] w-[20px] cursor-pointer appearance-none rounded-md border  transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 "
-                                              id={e.id}
-                                              value={e.warehouseman_id}
-                                              // checked={dataDepar?.some((selectedOpt) => selectedOpt?.id === e?.id)}
-                                              onChange={_HandleChangeInput.bind(this, "browser")}/>
-                                          <div className="pointer-events-none absolute top-2/4 2xl:left-[12%] xl:left-[3%] left-[2%]  -translate-y-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                              <svg
-                                              xmlns="http://www.w3.org/2000/svg"
-                                              className="h-3.5 w-3.5"
-                                              viewBox="0 0 20 20"
-                                              fill="currentColor"
-                                              stroke="currentColor"
-                                              stroke-width="1"
-                                              >
-                                              <path
-                                                  fill-rule="evenodd"
-                                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                  clip-rule="evenodd"
-                                              ></path>
-                                              </svg>
-                                          </div>
-                                          <div className=''>
-                                            <label htmlFor={e.id} className='font-normal 2xl:text-[13px] xl:text-[12px] text-[10px] text-[#6366f1] cursor-pointer'>{"Chưa duyệt kho"}</label>
-                                          </div>
-                                      </label>
+                                <h6 className=' 2xl:text-base xl:text-xs text-[8px] col-span-1 cursor-pointer'>
+                                  <div className={`${e?.warehouseman_id == "0" ? "bg-[#eff6ff] " : "bg-lime-100"} rounded-md cursor-pointer` }>
+                                    <div className='flex items-center justify-center'>
+                                                              <label className="relative flex cursor-pointer items-center rounded-full p-2" htmlFor={e.id} data-ripple-dark="true" > 
+                                                                  <input
+                                                                      type="checkbox"
+                                                                      className={`${e?.warehouseman_id == "0" ? "checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500" : "checked:border-lime-500 checked:bg-lime-500 border-lime-500 checked:before:bg-limborder-lime-500"}before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border-gray-400 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
+                                                                      id={e.id}
+                                                                      value={e.warehouseman_id}
+                                                                      checked={e.warehouseman_id != "0" ? true : false}
+                                                                      onChange={_HandleChangeInput.bind(this, e?.id, e?.warehouseman_id, "browser")}
+                                                                  />
+                                                                  <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                      <svg
+                                                                          xmlns="http://www.w3.org/2000/svg"
+                                                                          className="h-3.5 w-3.5"
+                                                                          viewBox="0 0 20 20"
+                                                                          fill="currentColor"
+                                                                          stroke="currentColor"
+                                                                          stroke-width="1"
+                                                                      >
+                                                                      <path
+                                                                          fill-rule="evenodd"
+                                                                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                          clip-rule="evenodd"
+                                                                      ></path>
+                                                                      </svg>
+                                                                  </div>
+                                                                  
+                                                              </label>
+                                         <label htmlFor={e.id} className={`${e?.warehouseman_id == "0" ? "text-[#6366f1]" : "text-lime-500"}  text-sm font-medium cursor-pointer`}>{e?.warehouseman_id == "0" ? "Chưa duyệt kho" : "Đã duyệt kho"}</label>
+                                    </div>
                                   </div>
                                 </h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1'><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6> 
@@ -778,6 +791,9 @@ const BtnTacVu = React.memo((props) => {
   const handleClick = () => {
      router.push(`/purchase_order/import/form?id=${props.id}`);
     };
+
+
+  
 
 
   return(
@@ -897,9 +913,8 @@ return (
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{"Duyệt thủ kkho"}</h3>
                           <div className='flex flex-wrap  gap-2 items-center justify-center'>
                               {
-                            data?.status === "0" && <span className=' font-normal text-[#3b82f6]  rounded-xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center text-[13px]'>{"Chưa duyệt kho"}</span>
-                            // data?.status === "1" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center text-[13px]'>{"Thanh toán 1 phần"} {`(${e?.count})`}</span>||
-                            // data?.status === "2" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã thanh toán đủ"} {`(${e?.order_status?.count})`}</span>
+                            data?.warehouseman_id === "0" && <span className=' font-normal text-[#3b82f6]  rounded-xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center text-[13px]'>{"Chưa duyệt kho"}</span>||
+                            data?.warehouseman_id != "0" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã duyệt kho"}</span>
                               }
                           </div>
                         </div>
@@ -1007,6 +1022,140 @@ return (
     </div>    
   </PopupEdit>
 </>
+)
+}
+
+const Popup_status = (props) => {
+
+  const dataLang = props?.dataLang
+  const [onFetching, sOnFetching] = useState(false);
+  const [open, sOpen] = useState(false);
+  const [data,sData] = useState([])
+
+  const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+  const [dataProductExpiry, sDataProductExpiry] = useState({});
+  const [dataProductSerial, sDataProductSerial] = useState({});
+
+  const _ServerFetching =  () =>{
+    Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+      if(!err){
+          var data = response.data;
+          sDataMaterialExpiry(data.find(x => x.code == "material_expiry"));
+          sDataProductExpiry(data.find(x => x.code == "product_expiry"));
+          sDataProductSerial(data.find(x => x.code == "product_serial"));
+      }
+      sOnFetching(false)
+    })
+  }
+useEffect(() =>{
+  onFetching && _ServerFetching()
+},[onFetching])
+
+useEffect(() =>{
+  open && sOnFetching(true)
+},[open])
+  
+  useEffect(() => {
+    sOnFetching(true);
+    sData([]);
+    sOpen(false);
+    if (props?.data_export?.length > 0) {
+      sOnFetching(false);
+      sOpen(true);
+      sData(props?.data_export);
+    }
+  }, [props?.data_export]);
+
+return(
+  <PopupEdit  
+    title={props.dataLang?.inventory_votes || "inventory_votes"} 
+    open={open} 
+    onClose={() => sOpen(false)}
+    classNameBtn={props.className}
+  >
+    <div className="mt-4 space-x-5 w-[990px] h-auto">        
+    <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <div className="pr-2 ">
+                  <div className={`${dataProductSerial.is_enable == "1" ? 
+                    (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
+                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow  z-10`}>
+                              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{props.dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}</h4>
+                              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{props.dataLang?.inventory_vouchercode || "inventory_vouchercode"}</h4>
+                              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{props.dataLang?.inventory_inventory_slip || "inventory_inventory_slip"}</h4>
+                              {dataProductSerial.is_enable === "1" && (<h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Serial"}</h4>)}
+                          {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
+                            <>
+                              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Lot"}</h4>
+                              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}</h4>
+                            </> ):""}
+                            <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{"Mặt hàng"}</h4>
+                            <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{"kho -vị trí kho"}</h4>
+                            <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Số lượng"}</h4>
+                  </div>
+                  {onFetching ?
+                    <Loading className="h-50"color="#0f4f9e" /> 
+                    : 
+                    data?.length > 0 ? 
+                    (<>
+                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] mt-2 ">                       
+                        {(data?.map((e) => 
+                              <div className={`${dataProductSerial.is_enable == "1" ? 
+                              (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
+                              (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid hover:bg-slate-50`}>
+                              <h6 className='2xl:text-[12px] xl:text-[13px] text-[12px]  text-xs px-2 col-span-2 text-center'>{e?.date_coupon != null ? moment(e?.date_coupon).format("DD/MM/YYYY, HH:mm:ss") : ""}</h6>
+                              <h6 className='2xl:text-[12px] xl:text-[13px] text-[12px]  text-xs px-2 col-span-1 text-center  hover:font-normal cursor-pointer'>{e?.code_coupon}</h6>
+                              <h6 className='2xl:text-[12px] xl:text-[13px] text-[12px]  text-xs px-2 col-span-1 text-center  hover:font-normal cursor-pointer'>{dataLang[e?.type_text]}</h6>
+
+                              {dataProductSerial.is_enable === "1" ? (
+                                                <div className=" col-span-1 ">
+                                                  <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2  w-[full] text-left">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
+                                                </div>
+                                              ):""}
+                          {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
+                            <>
+                              <div className=" col-span-1  ">
+                                  <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2  w-[full] text-left">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
+                              </div>
+                              <div className=" col-span-1  ">
+                                  <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2  w-[full] text-center">{e.expiration_date ? moment(e.expiration_date).format("DD-MM-YYYY")   : "-"}</h6>                              
+                              </div>
+                            </>
+                             ):""}              
+                              <h6 className='2xl:text-[12px] xl:text-[13px] text-[12px]  text-xs px-2 col-span-2 text-center  hover:font-normal cursor-pointer'>
+                                <div className='grid grid-cols-3'>
+                                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px]  px-2  w-[full] col-span-1'>{e?.name}</h4>
+                                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px]  px-2  w-[full] col-span-2'>{e?.product_variation}</h4>
+                                </div>
+                              </h6>
+                              <h6 className='2xl:text-[12px] xl:text-[13px] text-[12px]  text-xs px-2 col-span-2 text-center  hover:font-normal cursor-pointer'>
+                                <div className='grid grid-cols-2 items-center'>
+                                <span className='col-span-1'>{e?.warehouse_name}</span>
+                                <span className='col-span-1'>{e?.local_name}</span>
+                                </div>
+                              </h6>
+                              <h6 className='2xl:text-[12px] xl:text-[13px] text-[12px]  text-xs px-2 col-span-1 text-center  hover:font-normal cursor-pointer'>
+                               {e?.quantity}
+                              </h6>
+                              </div>
+                        ))}              
+                      </div>                     
+                      </>
+                    )  : 
+                    (
+                      <div className=" max-w-[352px] mt-24 mx-auto" >
+                        <div className="text-center">
+                          <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+                          <h1 className="textx-[#141522] text-base opacity-90 font-medium">{dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
+                          <div className="flex items-center justify-around mt-6 ">
+                              {/* <Popup_dsncc onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+                          </div>
+                        </div>
+                      </div>
+                    )}    
+                </div>
+              </div>
+    </div>
+  </PopupEdit>
 )
 }
 
