@@ -54,8 +54,6 @@ const PopupDetail = (props) => {
             sOnFetching(false)
         })
     }
-    console.log(data)
-
     useEffect(() => {
         onFetching && _ServerFetching_detailUser()
     }, [open]);

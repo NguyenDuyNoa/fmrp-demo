@@ -2,7 +2,7 @@ import vi from "date-fns/locale/vi"
 import React, { useState } from 'react';
 import Select from 'react-select';
 import PopupDetail from './(PopupDetail)/PopupDetail';
-import BtnAction from '../../clients/BtnAction';
+import BtnAction from '../../../components/UI/BtnAction';
 import TabFilter from '../../../components/UI/TabFilter';
 import Pagination from '/components/UI/pagination';
 import Loading from "components/UI/loading";
@@ -357,24 +357,24 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.price_quote || "price_quote"} </title>
             </Head>
-            <div className="2xl:pt-[92px] xl:pt-[74px] pt-[72px] 2xl:px-10 2xl:pb-10 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
-                <div className="flex space-x-1 xl:text-xs text-[12x]">
+            <div className="3xl:pt-[92px] 2xl:pt-[92px] xl:pt-[78px] lg:pt-[76px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-10 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
+                <div className="flex space-x-1 3xl:text-xs 2xl:text-xs xl:text-[11px] lg:text-[11px]">
                     <h6 className="text-[#141522]/40">{dataLang?.price_quote || "price_quote"}</h6>
                     <span className="text-[#141522]/40">/</span>
-                    <h6>{dataLang?.price_quote_list || "price_quote"}</h6>
+                    <h6 >{dataLang?.price_quote_list || "price_quote"}</h6>
                 </div>
 
-                <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
+                <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
-                        <div className="space-y-3 h-[96%] overflow-hidden">
+                        <div className="space-y-1 h-[96%] overflow-hidden">
                             <div className='flex justify-between'>
-                                <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.price_quote || "price_quote"}</h2>
+                                <h2 className="xl:text-2xl text-xl text-[#52575E] capitalize">{dataLang?.price_quote || "price_quote"}</h2>
                                 <div className="flex justify-end items-center">
                                     <Link href="/sales_export_product/priceQuote/form" className='xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>{dataLang?.price_quote_btn_new || "price_quote_btn_new"}</Link>
                                 </div>
                             </div>
 
-                            <div className="flex space-x-3 items-center h-[8vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            <div className="flex space-x-3 items-center 3xl:h-[8vh] 2xl:h-[8vh] xl:h-[8vh] lg:h-[8vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 {listTabStatus && listTabStatus.map((e) => {
                                     return (
                                         <div>
@@ -395,16 +395,16 @@ const Index = (props) => {
                                 })
                                 }
                             </div>
-                            <div className="space-y-2 3xl:h-[88%] 2xl:h-[80%] xl:h-[82%] h-[82%] overflow-hidden">
-                                <div className="xl:space-y-3 space-y-2">
-                                    <div className="bg-slate-100 w-full rounded grid grid-cols-7  xl:p-3 p-2 gap-2">
+                            <div className="space-y-2 3xl:h-[92%] 2xl:h-[80%] xl:h-[86%] lg:h-[82%] overflow-hidden">
+                                <div className="xl:space-y-1 space-y-2">
+                                    <div className="bg-slate-100 w-full rounded grid grid-cols-7 xl:p-3 p-2 gap-2">
                                         <div className='col-span-6'>
                                             <div className='grid grid-cols-5'>
                                                 <div className='col-span-1'>
-                                                    <form className="flex items-center relative">
-                                                        <IconSearch size={20} className="absolute 2xl:left-3 z-10  text-[#cccccc] xl:left-[4%] left-[1%]" />
+                                                    <form className="flex items-center relative ">
+                                                        <IconSearch className="absolute 3xl:h-[20px] 2xl:h-[20px] xl:h-[19px] lg:h-[18px] 3xl:w-[20px] 2xl:w-[18px] xl:w-[19px] lg:w-[18px] z-10 3xl:left-[4%] 2xl:left-[4%] xl:left-[8%] lg:left-[10%] text-[#cccccc]" />
                                                         <input
-                                                            className=" relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  py-2.5 rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
+                                                            className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] 3xl:h-[40px] 2xl:h-[40px] xl:h-[38px] lg:h-[39px]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  xl:py-2.5 lg:py-[11px] rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-[199px] lg:w-[160px]  relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E] "
                                                             type="text"
                                                             onChange={_HandleOnChangeKeySearch.bind(this)}
                                                             placeholder={dataLang?.branch_search}
@@ -419,7 +419,7 @@ const Index = (props) => {
                                                         placeholder={dataLang?.price_quote_select_branch || "price_quote_select_branch"}
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px] z-20"
+                                                        className=" 3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full xl:h-full lg:h-[24px] 2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20 "
                                                         isSearchable={true}
                                                         noOptionsMessage={() => "Không có dữ liệu"}
                                                         // components={{ MultiValue }}
@@ -460,7 +460,7 @@ const Index = (props) => {
                                                         placeholder={dataLang?.price_quote_code || "price_quote_code"}
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px] z-20"
+                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full xl:h-full lg:h-[24px] 2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20"
                                                         isSearchable={true}
                                                         noOptionsMessage={() => "Không có dữ liệu"}
                                                         // components={{ MultiValue }}
@@ -500,7 +500,7 @@ const Index = (props) => {
                                                         placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px] z-20"
+                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full xl:h-full lg:h-[24px] 2xl:text-base xl:text-xs text-[10px]  rounded-md bg-white z-20"
                                                         isSearchable={true}
                                                         noOptionsMessage={() => "Không có dữ liệu"}
                                                         style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -551,8 +551,8 @@ const Index = (props) => {
                                                                 apply: "Áp dụng"
                                                             }
                                                         }}
-                                                        className="react-datepicker__input-container 2xl:placeholder:text-xs xl:placeholder:text-xs placeholder:text-[8px]"
-                                                        inputClassName="rounded-md w-full 2xl:p-2 xl:p-[11px] p-3 bg-white focus:outline-[#0F4F9E]  2xl:placeholder:text-xs xl:placeholder:text-xs placeholder:text-[8px] border-none  2xl:text-base xl:text-xs text-[10px]  focus:outline-none focus:ring-0 focus:border-transparent"
+                                                        className="react-datepicker__input-container"
+                                                        inputClassName="rounded-md w-full 2xl:p-2 xl:p-[11px] p-3 bg-white focus:outline-[#0F4F9E]  2xl:placeholder:text-xs xl:placeholder:text-[9px] lg:placeholder:text-[7.5px] border-none  2xl:text-base xl:text-xs text-[10px]  focus:outline-none focus:ring-0 focus:border-transparent"
                                                     />
 
                                                 </div>
@@ -564,15 +564,15 @@ const Index = (props) => {
                                                     {
                                                         dataExcel?.length > 0 && (
                                                             <ExcelFile filename="Danh sách báo giá" title="DSBG" element={
-                                                                <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
-                                                                    <IconExcel className='2xl:scale-100 xl:scale-100 scale-75' size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
+                                                                <button className='3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-1.5 xl:py-2 lg:py-2.5 3xl:text-xs 2xl:text-xs xl:text-[9px] lg:text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
+                                                                    <IconExcel className='3xl:scale-100 2xl:scale-100 xl:scale-100 lg:scale-75' size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
                                                                 <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
                                                             </ExcelFile>
                                                         )
                                                     }
                                                 </div>
                                                 <div>
-                                                    <div className="font-[300] text-slate-400 2xl:text-xs xl:text-sm text-[8px]">{dataLang?.display}</div>
+                                                    <div className="font-[300] text-slate-400 3xl:text-xs 2xl:text-xs xl:text-[10px] lg:text-[6px]">{dataLang?.display}</div>
                                                     <select className="outline-none  text-[10px] xl:text-xs 2xl:text-sm" onChange={(e) => sLimit(e.target.value)} value={limit}>
                                                         <option className='text-[10px] xl:text-xs 2xl:text-sm hidden' disabled>{limit == -1 ? "Tất cả" : limit}</option>
                                                         <option className='text-[10px] xl:text-xs 2xl:text-sm' value={15}>15</option>
@@ -667,7 +667,7 @@ const Index = (props) => {
                                                                                 e?.status === "ordered" &&
                                                                                 (
                                                                                     <div className='3xl:max-w-[160px] xl:max-w-[130px] max-w-[80px] relative 3xl:w-[160px] 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[94px] lg:h-6 text-white border border-[#FF8C00] rounded-xl bg-[#FF8C00] 3xl:text-left 3xl:px-3 3xl:py-6 3xl:pr-5 2xl:px-2 2xl:py-1  2xl:pr-5 xl:px-2 xl:py-4 xl:pr-7 lg:px-2 lg:py-2 lg:pr-5 lg:text-center font-normal flex justify-center items-center 3xl:text-[18px] 2xl:text-[14px] xl:text-[12px] text-[8px]' onClick={() => handleToggleOrdered(e?.id)}>
-                                                                                        <div className='3xl:max-w-[140px] lg:max-w-[94px]'>Đã tạo đơn đặt hàng</div>
+                                                                                        <div className='3xl:max-w-[140px] lg:max-w-[94px]'>Đã Tạo Đơn Đặt Hàng</div>
                                                                                         <TickCircle className=" absolute 3xl:top-[20%] 3lx:-right-[-5%] 2xl:top-[20%] 2lx:-right-[-5%] xl:top-[30%] xl:-right-[-5%] lg:top-[30%] lg:-right-[-5%] 3xl:w-5 3xl:h-5 2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 lg:w-3 lg:h-3 text-[#FF8C00] bg-white border-[#FF8C00] rounded-full" />
                                                                                     </div>
                                                                                 )
@@ -676,7 +676,7 @@ const Index = (props) => {
 
                                                                     </h6>
 
-                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-left'>
+                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-left h-60px truncate '>
                                                                         {e?.note}
                                                                     </h6>
 
@@ -726,9 +726,9 @@ const Index = (props) => {
                             </div>
                         </div>
                         {data?.length != 0 &&
-                            <div className='flex space-x-5 items-center'>
-                                <h6>{dataLang?.display} {totalItems?.iTotalDisplayRecords}</h6>
-                                {/* <h6>{dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among} {totalItems?.iTotalRecords} {dataLang?.ingredient}</h6> */}
+                            <div className='flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]'>
+                                {/* <h6>{dataLang?.display}  {totalItems?.iTotalDisplayRecords}</h6> */}
+                                <h6>Tổng cộng {totalItems?.iTotalDisplayRecords} phiếu báo giá</h6>
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(totalItems?.iTotalDisplayRecords)}
