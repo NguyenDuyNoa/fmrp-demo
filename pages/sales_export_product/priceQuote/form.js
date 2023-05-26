@@ -15,6 +15,7 @@ import { useEffect } from 'react';
 import { NumericFormat } from "react-number-format";
 import Link from 'next/link';
 import moment from 'moment/moment';
+import debounce from 'lodash/debounce';
 
 
 
@@ -43,10 +44,8 @@ const Index = (props) => {
   const [onSending, sOnSending] = useState(false);
   const [option, sOption] = useState([{ id: Date.now(), mathang: null, donvitinh: 1, soluong: 1, dongia: 1, chietkhau: 0, dongiasauck: 1, thue: 0, dgsauthue: 1, thanhtien: 1, note: "", price_quote_order_item_id: "" }]);
   const slicedArr = option.slice(1);
-  const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
+  const sortedArr = id ? slicedArr.sort((a, b) => a.id - b.id) : slicedArr.sort((a, b) => b.id - a.id);
   sortedArr.unshift(option[0]);
-
-  console.log('check option ', option)
 
   const [loai, sLoai] = useState("0");
   const [dataCustomer, sDataCustomer] = useState([])
@@ -91,7 +90,6 @@ const Index = (props) => {
     }, (err, response) => {
       if (!err) {
         var rResult = response.data;
-        console.log(rResult);
 
         const itemlast = [{ mathang: null }];
         const items = itemlast?.concat(rResult?.items?.map(e => ({
@@ -112,7 +110,6 @@ const Index = (props) => {
           thanhtien: Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity)
         })));
 
-        console.log("check items : ", items)
         sOption(items)
         sCode(rResult?.reference_no)
         sIdContactPerson(({ label: rResult?.contact_name, value: rResult.contact_id }))
@@ -139,7 +136,7 @@ const Index = (props) => {
 
   // onChange
   const _HandleChangeInput = (type, value) => {
-    if (type == "code") {
+    if (type === "code") {
       sCode(value.target.value)
     } else if (type === "date") {
       sSelectedDate(moment(value.target.value).format('YYYY-MM-DD HH:mm:ss'))
@@ -178,15 +175,14 @@ const Index = (props) => {
         sIdContactPerson(null)
         sOption([{ id: Date.now(), mathang: null, donvitinh: 1, soluong: 1, dongia: 1, chietkhau: 0, dongiasauck: 1, thue: 0, dgsauthue: 1, thanhtien: 1, note: "" }])
       }
-    } else if (type == "thuetong") {
+    } else if (type === "thuetong") {
       sThuetong(value)
-    } else if (type == "chietkhautong") {
+    } else if (type === "chietkhautong") {
       sChietkhautong(value?.value)
     }
   }
 
   useEffect(() => {
-    // if (thuetong == null && chietkhautong == null) return;
     if (thuetong == null) return;
     sOption(prevOption => {
       const newOption = [...prevOption];
@@ -195,33 +191,23 @@ const Index = (props) => {
       newOption.forEach((item, index) => {
         if (index === 0 || !item.id) return;
         const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
-        // const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
         const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
         item.thue = thuetong;
-        // item.chietkhau = chietkhautong;
-        // item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
         item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
       });
       return newOption;
     });
-    // }, [thuetong,chietkhautong]);
   }, [thuetong]);
 
   useEffect(() => {
-    // if (thuetong == null && chietkhautong == null) return;
     if (chietkhautong == null) return;
     sOption(prevOption => {
       const newOption = [...prevOption];
-      // const thueValue = thuetong?.tax_rate || 0;
       const thueValue = thuetong?.tax_rate != undefined ? thuetong?.tax_rate : 0
       const chietKhauValue = chietkhautong ? chietkhautong : 0;
       newOption.forEach((item, index) => {
         if (index === 0 || !item?.id) return;
         const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
-        // console.log("dongiasauchietkhau",dongiasauchietkhau);
-        // console.log("item?.dongiasauck",item?.dongiasauck);
-
-        // const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
         const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
         item.thue = thuetong;
         item.chietkhau = Number(chietkhautong);
@@ -297,10 +283,6 @@ const Index = (props) => {
     idBranch != null && sOnFetchingCustomer(true)
   }, [idBranch]);
 
-  // useEffect(() => {
-  //   idTheOrder == null && sIdCustomer(null)
-  // }, [idTheOrder]);
-
   useEffect(() => {
     idCustomer != null && sOnFetchingContactPerson(true)
   }, [idCustomer]);
@@ -309,7 +291,7 @@ const Index = (props) => {
   const _ServerFetching_Items = () => {
     Axios("GET", "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true", {
       params: {
-        "purchase_order_id": id ? id : ""
+        "price_quote_order_item_id": id ? id : ""
       }
     }, (err, response) => {
       if (!err) {
@@ -328,7 +310,7 @@ const Index = (props) => {
   const _ServerFetching_ItemsAll = () => {
     Axios("GET", "/api_web/Api_product/searchItemsVariant?csrf_protection=true", {
       params: {
-        "purchase_order_id": id
+        "price_quote_order_item_id": id
       }
     }, (err, response) => {
       if (!err) {
@@ -394,23 +376,19 @@ const Index = (props) => {
 
   // search
   const _HandleSeachApi = (inputValue) => {
-    if (loai === "0")
-      Axios("POST", `/api_web/Api_product/searchItemsVariant?csrf_protection=true`, {
-        data: {
-          term: inputValue,
-        },
-        params: {
-          "purchase_order_id": id
-        }
-      }, (err, response) => {
-        if (!err) {
-          var { result } = response?.data.data
-          sDataEditItems(result)
-        }
-      })
-    else {
-      return
-    }
+    Axios("POST", `/api_web/Api_product/searchItemsVariant?csrf_protection=true`, {
+      data: {
+        term: inputValue,
+      },
+      params: {
+        "price_quote_order_item_id": id
+      }
+    }, (err, response) => {
+      if (!err) {
+        var { result } = response?.data.data
+        sDataEditItems(result)
+      }
+    })
   }
 
   // format number
@@ -606,18 +584,36 @@ const Index = (props) => {
     return { tongTien: tongTien || 0, tienChietKhau: tienChietKhau || 0, tongTienSauCK: tongTienSauCK || 0, tienThue: tienThue || 0, tongThanhTien: tongThanhTien || 0 };
   };
 
-  const [tongTienState, setTongTienState] = useState({ tongTien: 0, tienChietKhau: 0, tongTienSauCK: 0, tienThue: 0, tongThanhTien: 0 });
+  const [tongTienState, setTongTienState] = useState({
+    tongTien: 0,
+    tienChietKhau: 0,
+    tongTienSauCK: 0,
+    tienThue: 0,
+    tongThanhTien: 0
+  });
 
   useEffect(() => {
     const tongTien = tinhTongTien(option);
     setTongTienState(tongTien);
   }, [option]);
 
-  const dataOption = sortedArr?.map(e => { return { item: e?.mathang?.value, quantity: Number(e?.soluong), price: e?.dongia, discount_percent: e?.chietkhau, tax_id: e?.thue?.value, purchases_item_id: e?.mathang?.e?.purchases_item_id, note: e?.note, id: e?.id, purchases_order_item_id: e?.purchases_order_item_id } })
+  const dataOption = sortedArr?.map(e => {
+    return {
+      item: e?.mathang?.value,
+      quantity: Number(e?.soluong),
+      price: e?.dongia,
+      discount_percent: e?.chietkhau,
+      tax_id: e?.thue?.value,
+      price_quote_item_id: e?.mathang?.e?.price_quote_item_id,
+      note: e?.note,
+      id: e?.id,
+      price_quote_order_item_id: e?.price_quote_order_item_id
+    }
+  })
 
   let newDataOption = dataOption?.filter(e => e?.item !== undefined);
 
-  // submit
+  // handle submit
   const _ServerSending = () => {
     var formData = new FormData();
     formData.append("reference_no", code)
@@ -625,9 +621,8 @@ const Index = (props) => {
     formData.append("validity", (moment(effectiveDate).format("YYYY-MM-DD")))
     formData.append("client_id", idCustomer?.value)
     formData.append("branch_id", idBranch?.value)
-    formData.append("contact_id", idContactPerson?.value)
+    formData.append("person_contact_id", idContactPerson?.value)
     formData.append("note", note)
-
     newDataOption.forEach((item, index) => {
       formData.append(`items[${index}][item]`, item?.item != undefined ? item?.item : "");
       formData.append(`items[${index}][quantity]`, item?.quantity.toString());
@@ -637,13 +632,14 @@ const Index = (props) => {
       formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
     });
 
-    Axios("POST", `${id ? `/api_web/Api_purchase_order/purchase_order/${id}?csrf_protection=true` : "/api_web/Api_quotation/quotation/?csrf_protection=true"}`, {
-      data: formData,
-      headers: { 'Content-Type': 'multipart/form-data' }
-    }, (err, response) => {
-      if (!err) {
+    if (tongTienState.tongTien > 0) {
+      Axios("POST", `${id ? `/api_web/Api_quotation/quotation/${id}?csrf_protection=true` : "/api_web/Api_quotation/quotation/?csrf_protection=true"}`, {
+        data: formData,
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }, (err, response) => {
         var { isSuccess, message } = response.data
-        if (isSuccess) {
+
+        if (response && response.data && isSuccess === true) {
           Toast.fire({
             icon: 'success',
             title: `${dataLang[message]}`
@@ -661,32 +657,29 @@ const Index = (props) => {
           sErrCustomer(false)
           sOption([{ id: Date.now(), mathang: null, donvitinh: "", soluong: 0, note: "" }])
           router.back()
-        } else {
-          if (tongTienState.tongTien == 0) {
-            Toast.fire({
-              icon: 'error',
-              title: `Chưa nhập thông tin mặt hàng`
-            })
-          }
-          else {
-            Toast.fire({
-              icon: 'error',
-              title: `${dataLang[message]}`
-            })
-          }
-
         }
-      }
+        if (response && response.data && isSuccess === false) {
+          Toast.fire({
+            icon: 'error',
+            title: `${dataLang[message]}`
+          })
+        }
+        sOnSending(false)
+      })
+    } else {
+      Toast.fire({
+        icon: 'error',
+        title: `Chưa nhập thông tin mặt hàng`
+      })
       sOnSending(false)
-    })
+    }
+
   }
 
   useEffect(() => {
     onSending && _ServerSending()
   }, [onSending]);
 
-  // console.log("check validate date: ", errDate)
-  // console.log("check validate effective date: ", errEffectiveDate)
 
   return (
     <React.Fragment>
@@ -948,7 +941,7 @@ const Index = (props) => {
                                     <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.code}</h5>
                                     <h5 className='font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
                                   </div>
-                                  <h5 className='text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]} {loai == "1" ? "-" : ""} {loai == "1" ? option.e?.purchases_code : ""} {loai == "1" ? "- Số lượng:" : ""} {loai == "1" ? option.e?.quantity_left : ""}</h5>
+                                  <h5 className='text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
                                 </div>
                               </div>
                               <div className=''>
@@ -962,7 +955,7 @@ const Index = (props) => {
                               </div>
                             </div>
                           )}
-                          placeholder={dataLang?.purchase_items || "purchase_items"}
+                          placeholder={dataLang?.price_quote_item || "price_quote_item"}
                           hideSelectedOptions={false}
                           className="rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2"
                           isSearchable={true}
@@ -1153,12 +1146,6 @@ const Index = (props) => {
                     <h2>{`(${option?.tax_rate})`}</h2>
                   </div>
                 )}
-                // formatOptionLabel={(option) => (
-                //   <div className='flex justify-start items-center gap-4 '>
-                //       <h2>{option?.e?.name}</h2>
-                //       <h2>{`(${option?.e?.tax_rate})`}</h2>
-                //   </div>
-                //   )}
                 placeholder={dataLang?.price_quote_tax || "price_quote_tax"}
                 hideSelectedOptions={false}
                 className={` "border-transparent placeholder:text-slate-300 w-[70%] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
@@ -1224,7 +1211,7 @@ const Index = (props) => {
               <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tongTien)}</h3></div>
             </div>
             <div className='flex justify-between '>
-              <div className='font-normal'><h3>{dataLang?.price_quote_discounty || "price_quote_discounty"}</h3></div>
+              <div className='font-normal'><h3>{dataLang?.price_quote_discount || "price_quote_discount"}</h3></div>
               <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tienChietKhau)}</h3></div>
             </div>
             <div className='flex justify-between '>
