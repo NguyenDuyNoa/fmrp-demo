@@ -128,11 +128,31 @@ const Index = (props) => {
   const _ServerFetchingDetailPage = () => {
     Axios("GET", `/api_web/Api_import/getImport/${id}?csrf_protection=true`, {}, (err, response) => {
       if(!err){
+        var rResult = response.data;
+        sCode(rResult?.code)
+        sIdBranch({label: rResult?.branch_name, value:rResult?.branch_id})
+        sIdSupplier({label: rResult?.supplier_name, value: rResult?.supplier_id})
+        sIdTheOrder({label: rResult?.purchase_order_code, value: rResult?.purchase_order_id})
+        sDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
+        sNote(rResult?.note)
+        sListData(rResult?.items.map(e => ({
+          id: e?.item?.id, 
+          matHang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,value:e.item?.id},
+          child: e?.child.map(ce => ({ 
+            id: Number(ce?.id),
+            kho: {label: ce?.location_name, value: ce?.location_warehouses_id, warehouse_name: ce?.warehouse_name}, 
+            donViTinh: e?.item?.unit_name, 
+            amount: Number(ce?.amount), 
+            price: Number(ce?.price), 
+            chietKhau: Number(ce?.discount_percent), 
+            tax: {tax_rate: ce?.tax_rate, value: ce?.tax_id, label: ce?.tax_name},
+            note: ce?.note
+          }))
+        })))
         
       }
     })
   }
-
 
   useEffect(() => {
     // onFetchingDetail && _ServerFetchingDetail()
@@ -363,7 +383,6 @@ const Index = (props) => {
 
       const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
-      console.log(hasNullKho)
 
         if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho ){
           date == null && sErrDate(true)
@@ -646,8 +665,9 @@ const Index = (props) => {
     const fakeData = [{id: Date.now(), mathang: null}]
     const data = fakeData?.concat(allItems?.map(e => ({id: uuidv4(), mathang: e, khohang: khotong ? khotong : e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.e?.price, chietkhau:chietkhautong ?  chietkhautong : e?.e?.discount_percent, dongiasauck:Number(e?.e?.price_after_discount), thue: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
     sOption(data);
-    sMathangAll(data)
+    // sMathangAll(data)
     //new
+    sMathangAll(allItems?.map(e => ({id: uuidv4(), matHang: e, child: [{id: uuidv4(), kho: khotong ? khotong : null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
     sListData(allItems?.map(e => ({id: uuidv4(), matHang: e, child: [{id: uuidv4(), kho: khotong ? khotong : null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
   };
 
@@ -789,7 +809,9 @@ const Index = (props) => {
             formData.append(`items[${index}][purchase_order_item_id]`, item?.matHang?.e?.purchase_order_item_id);
             item?.child?.forEach((childItem, childIndex) => {
               formData.append(`items[${index}][child][${childIndex}][id]`, childItem?.id);
+              {id && formData.append(`items[${index}][child][${childIndex}][row_id]`, typeof(childItem?.id) == "number" ? childItem?.id : 0)};
               formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.amount);
+              formData.append(`items[${index}][child][${childIndex}][unit_name]`, childItem?.donViTinh);
               formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note);
               formData.append(`items[${index}][child][${childIndex}][tax_id]`, childItem?.tax?.value);
               formData.append(`items[${index}][child][${childIndex}][price]`, childItem?.price);
@@ -1129,7 +1151,7 @@ const Index = (props) => {
                             options={allItems}
                             closeMenuOnSelect={false}
                             onChange={_HandleChangeInput.bind(this,  "mathangAll",)}
-                            value={mathangAll?.value ? mathangAll?.value : sortedArr?.map(e => e?.mathang)}
+                            value={mathangAll?.value ? mathangAll?.value : listData?.map(e => e?.matHang)}
                             isMulti
                             // components={{ Option: CustomOption,MenuList }}
                             components={{ MenuList,MultiValue }}
@@ -1541,7 +1563,7 @@ const Index = (props) => {
                               />
                             </div>
                             {/* <div>{ce?.thanhTien}</div> */}
-                            <div className='justify-center pr-3 border p-0.5 h-full flex flex-col items-end text-sm'>{formatNumber(Number(ce?.priceAfter) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
+                            <div className='justify-center pr-3 border p-0.5 h-full flex flex-col items-end text-sm'>{formatNumber((ce?.price * ( 1 - Number(ce?.chietKhau)/100 )) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
                             {/* <div>{ce?.note}</div> */}
                             <div className='col-span-1 flex items-center justify-center border h-full p-0.5'>
                              <input
@@ -1653,7 +1675,14 @@ const Index = (props) => {
                      <div className='font-normal '><h3>{dataLang?.purchase_order_table_total ||"purchase_order_table_total" }</h3></div>
                     <div className='font-normal'>
                       <h3 className='text-blue-600'>
-                        {formatNumber(tongTienState.tongTien)}
+                        {/* {formatNumber(tongTienState.tongTien)} */}
+                        {formatNumber(listData?.reduce((accumulator, item) => {
+                          const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                            const product = Number(childItem?.price) * Number(childItem?.amount);
+                            return childAccumulator + product;
+                          }, 0);
+                          return accumulator + childTotal;
+                        }, 0))}
                       </h3>
                     </div>
                 </div>
@@ -1661,7 +1690,14 @@ const Index = (props) => {
                      <div className='font-normal'><h3>{dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}</h3></div>
                     <div className='font-normal'>
                       <h3 className='text-blue-600'>
-                        {formatNumber(tongTienState.tienChietKhau)}
+                        {/* {formatNumber(tongTienState.tienChietKhau)} */}
+                        {formatNumber(listData?.reduce((accumulator, item) => {
+                          const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                            const product = Number(childItem?.price) * (Number(childItem?.chietKhau)/100) * Number(childItem?.amount);
+                            return childAccumulator + product;
+                          }, 0);
+                          return accumulator + childTotal;
+                        }, 0))}
                       </h3>
                     </div>
                 </div>
@@ -1669,7 +1705,14 @@ const Index = (props) => {
                      <div className='font-normal'><h3>{dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}</h3></div>
                     <div className='font-normal'>
                       <h3 className='text-blue-600'>
-                        {formatNumber(tongTienState.tongTienSauCK)}
+                        {/* {formatNumber(tongTienState.tongTienSauCK)} */}
+                        {formatNumber(listData?.reduce((accumulator, item) => {
+                          const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                            const product = Number(childItem?.price * ( 1 - childItem?.chietKhau/100 )) * Number(childItem?.amount);
+                            return childAccumulator + product;
+                          }, 0);
+                          return accumulator + childTotal;
+                        }, 0))}
                       </h3>
                     </div>
                 </div>
@@ -1677,7 +1720,14 @@ const Index = (props) => {
                      <div className='font-normal'><h3>{dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}</h3></div>
                     <div className='font-normal'>
                       <h3 className='text-blue-600'>
-                        {formatNumber(tongTienState.tienThue)}
+                        {/* {formatNumber(tongTienState.tienThue)} */}
+                        {formatNumber(listData?.reduce((accumulator, item) => {
+                          const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                            const product = Number(childItem?.price * ( 1 - childItem?.chietKhau/100 )) * (isNaN(childItem?.tax?.tax_rate) ? 0 : (Number(childItem?.tax?.tax_rate)/100)) * Number(childItem?.amount);
+                            return childAccumulator + product;
+                          }, 0);
+                          return accumulator + childTotal;
+                        }, 0))}
                       </h3>
                     </div>
                 </div>
@@ -1685,7 +1735,14 @@ const Index = (props) => {
                      <div className='font-normal'><h3>{dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h3></div>
                     <div className='font-normal'>
                       <h3 className='text-blue-600'>
-                        {formatNumber(tongTienState.tongThanhTien)}
+                        {/* {formatNumber(tongTienState.tongThanhTien)} */}
+                        {formatNumber(listData?.reduce((accumulator, item) => {
+                          const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                            const product = Number(childItem?.price * ( 1 - childItem?.chietKhau/100 )) * (1 + Number(childItem?.tax?.tax_rate)/100) * Number(childItem?.amount)
+                            return childAccumulator + product;
+                          }, 0);
+                          return accumulator + childTotal;
+                        }, 0))}
                       </h3>
                     </div>
                 </div>
