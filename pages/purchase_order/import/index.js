@@ -362,8 +362,10 @@ const Index = (props) => {
 
   useEffect(() =>{
     checkedWare.id != null &&   sOnSending(true)
+  },[checkedWare])
+  useEffect(() =>{
+    checkedWare.id != null &&   sOnSending(true)
   },[checkedWare.id != null])
-
 
     return (
         <React.Fragment>
