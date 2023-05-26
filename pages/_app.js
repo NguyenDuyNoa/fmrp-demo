@@ -199,117 +199,251 @@ const LoginPage = React.memo((props) => {
     }
   }
 
+  ///Đăng ký
+  const [isLogin, sIsLogin] = useState(true);
+  const _HandleIsLogin = (e) => sIsLogin(e);
+
+  const listMajor = [
+    {id: 1, title: "May mặc", img: "/register/may.svg"},
+    {id: 2, title: "Gỗ nội, ngoại thất", img: "/register/go.svg"},
+    {id: 3, title: "Cơ khí - chế tạo", img: "/register/cokhi.svg"},
+    {id: 4, title: "Điện máy", img: "/register/dien.svg"},
+    {id: 5, title: "Nông nghiệp", img: "/register/nong.svg"},
+    {id: 6, title: "Sản xuất giấy", img: "/register/giay.svg"},
+    {id: 7, title: "Thực phẩm", img: "/register/thit.svg"},
+    {id: 8, title: "Sản xuất nhựa", img: "/register/nhua.svg"},
+    {id: 9, title: "Ngành khác", img: "/register/khac.svg"},
+  ]
+
+  const [stepRegister, sStepRegister] = useState(0);
+  const _HandleSelectStep = (e) => sStepRegister(e);
+
+  const listPosition = [
+    {id: 1, title: "CEO / Founder / Chủ tịch"},
+    {id: 2, title: "Quản lý"},
+    {id: 3, title: "Nhân viên"},
+    {id: 4, title: "Vị trí khác"},
+  ]
+
   return(
-    <React.Fragment>
-      <Head>
-        <title>{dataLang?.auth_login || "auth_login"}</title>
-      </Head>
-      <div className="bg-[#EEF1F8]">
-        <div className="bg-[url('/Logo-BG.png')] relative bg-repeat-round h-screen w-screen flex flex-col justify-center items-center overflow-hidden">
-          <div className='flex justify-center space-x-20 w-full z-10'>
-            <div className='space-y-8'>
-              <div className='bg-white px-16 pt-20 pb-12 rounded-lg space-y-10 w-[600px]'>
-                <div className='space-y-3'>
-                  <h1 className="text-[#11315B] font-medium text-3xl text-center">{dataLang?.auth_login || "auth_login"}</h1>
-                  <div className='flex space-x-5 w-full'>
-                    <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ? "bg-[#E2F0FE] border-transparent text-[#11315B]" : "bg-white border-[#cccccc]"} px-5 py-3 rounded-md transition hover:scale-105 border w-full`}>{dataLang?.auth_version_official || "auth_version_official"}</button>
-                    <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ? "bg-[#E2F0FE] border-transparent text-[#11315B]" : "bg-white border-[#cccccc]"} px-5 py-3 rounded-md transition hover:scale-105 border w-full`}>{dataLang?.auth_version_test || "auth_version_test"}</button>
-                  </div>
-                </div>
-                <div className='space-y-3'>
-                  <input
-                    type="text"
-                    placeholder='Mã công ty'
-                    value={code}
-                    onChange={_HandleInputChange.bind(this, "code")}
-                    className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full'
-                  />
-                  <input
-                    type="text"
-                    placeholder={dataLang?.auth_user_name || "auth_user_name"}
-                    value={name}
-                    id="username"
-                    onChange={_HandleInputChange.bind(this, "name")}
-                    className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full'
-                  />
-                  <div className='relative flex flex-col justify-center'>
-                    <input
-                      type={typePassword ? "text" : "password"}
-                      placeholder={dataLang?.auth_password || "auth_password"}
-                      value={password}
-                      id="userpwd"
-                      onChange={_HandleInputChange.bind(this, "password")}
-                      className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 py-3 pl-5 pr-12 rounded-md w-full'
-                    />
-                    <button onClick={_TogglePassword.bind(this)} className='absolute right-3'>{typePassword ? <IconEyeSlash /> : <IconEye />}</button>
-                  </div>
-                  <div className='flex w-full justify-between'>
-                    <div className='flex items-center space-x-1.5'>
-                      <input type="checkbox" id="rememberMe" value={rememberMe} checked={rememberMe ? true : false} onChange={_ToggleRememberMe.bind(this)} />
-                      <label htmlFor="rememberMe">{dataLang?.auth_remember_login || "auth_remember_login"}</label>
+    <>
+      {isLogin ? 
+        <>
+          <Head>
+            <title>{dataLang?.auth_login || "auth_login"}</title>
+          </Head>
+          <div className="bg-[#EEF1F8]">
+            <div className="bg-[url('/Logo-BG.png')] relative bg-repeat-round h-screen w-screen flex flex-col justify-center items-center overflow-hidden">
+              <div className='flex justify-center space-x-20 w-full z-10'>
+                <div className='space-y-8'>
+                  <div className='bg-white px-16 pt-20 pb-12 rounded-lg space-y-10 w-[600px]'>
+                    <div className='space-y-3'>
+                      <h1 className="text-[#11315B] font-medium text-3xl text-center">{dataLang?.auth_login || "auth_login"}</h1>
+                      <div className='flex space-x-5 w-full'>
+                        <button onClick={_HandleSelectTab.bind(this, 0)} className={`${tab === 0 ? "bg-[#E2F0FE] border-transparent text-[#11315B]" : "bg-white border-[#cccccc]"} px-5 py-3 rounded-md transition hover:scale-105 border w-full`}>{dataLang?.auth_version_official || "auth_version_official"}</button>
+                        <button onClick={_HandleSelectTab.bind(this, 1)} className={`${tab === 1 ? "bg-[#E2F0FE] border-transparent text-[#11315B]" : "bg-white border-[#cccccc]"} px-5 py-3 rounded-md transition hover:scale-105 border w-full`}>{dataLang?.auth_version_test || "auth_version_test"}</button>
+                      </div>
                     </div>
-                    <button className='text-[#3276FA] text-sm'>{dataLang?.auth_forgot_password || "auth_forgot_password"}</button>
-                  </div>
-                </div>
-                <button onClick={_HandleSubmit.bind(this)} className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] btn-animation hover:scale-105">{dataLang?.auth_login || "auth_login"}</button>
-                <h4 className="text-center text-[#667085] text-sm font-light">FOSOSOFT © 2021</h4>
-              </div>
-              <div className='flex items-center space-x-6 justify-center'>
-                <a href="#" className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm">Cổng dịch vụ khách hàng</a>
-                <a href="#" className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm">User Pay</a>
-                <a href="#" className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm">FMRP Website</a>
-                <Popup
-                    trigger={<button className='text-[#344054] hover:text-[#0F4F9E]'><IconMore /></button>}
-                    closeOnDocumentClick
-                    arrow={false}
-                    position="right bottom"
-                    on={["hover"]}
-                    className={`dropdown-edit `}
-                >
-                    <div className="w-auto">
-                        <div className="bg-white p-0.5 rounded-t w-60">
-                            <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Tạo phím tắt trên màn hình</button>
-                            <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Yêu cầu Tư vấn qua điện thoại</button>
-                            <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Tối ưu hóa trình duyệt</button>
-                            <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Báo cáo lỗi</button>
-                            <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Điều khiển</button>
-                            <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Liên hệ</button>
+                    <div className='space-y-3'>
+                      <input
+                        type="text"
+                        placeholder='Mã công ty'
+                        value={code}
+                        onChange={_HandleInputChange.bind(this, "code")}
+                        className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full'
+                      />
+                      <input
+                        type="text"
+                        placeholder={dataLang?.auth_user_name || "auth_user_name"}
+                        value={name}
+                        id="username"
+                        onChange={_HandleInputChange.bind(this, "name")}
+                        className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full'
+                      />
+                      <div className='relative flex flex-col justify-center'>
+                        <input
+                          type={typePassword ? "text" : "password"}
+                          placeholder={dataLang?.auth_password || "auth_password"}
+                          value={password}
+                          id="userpwd"
+                          onChange={_HandleInputChange.bind(this, "password")}
+                          className='border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 py-3 pl-5 pr-12 rounded-md w-full'
+                        />
+                        <button onClick={_TogglePassword.bind(this)} className='absolute right-3'>{typePassword ? <IconEyeSlash /> : <IconEye />}</button>
+                      </div>
+                      <div className='flex w-full justify-between'>
+                        <div className='flex items-center space-x-1.5'>
+                          <input type="checkbox" id="rememberMe" value={rememberMe} checked={rememberMe ? true : false} onChange={_ToggleRememberMe.bind(this)} />
+                          <label htmlFor="rememberMe">{dataLang?.auth_remember_login || "auth_remember_login"}</label>
                         </div>
+                        <button className='text-[#3276FA] text-sm'>{dataLang?.auth_forgot_password || "auth_forgot_password"}</button>
+                      </div>
                     </div>
-                </Popup>
-                {data.map((e) => <BtnLang key={e.label} {...e}/>)}
-              </div>
-            </div>
-            <div className='space-y-9'>
-              <div className='pointer-events-none select-none'>
-                <Image alt="" src="/logo_1.png" width={200} height={70} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
-              </div>
-              <div className='space-y-6'>
-                <h1 className="text-[#344054] font-medium text-xl">Trợ lý sản xuất</h1>
-                <div className='space-y-1'>
-                  <p className="text-[#667085] font-light text-[16px]">Giải pháp phần mềm cho doanh nghiệp</p>
-                  <p className="text-[#667085] font-light text-[16px]">
-                    Hotline:
-                    <span className="text-[#0F4F9E] font-normal ml-1">0901.13.6968</span>
-                  </p>
-                  <p className="text-[#667085] font-light text-[16px]">
-                    Tổng đài:
-                    <span className="text-[#0F4F9E] font-normal mx-1">028.7776.8880</span>
-                    (Phím 1 - BP. Tư Vấn - Phím 2 - BP. Kỹ Thuật)
-                  </p>
+                    <button onClick={_HandleSubmit.bind(this)} className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] btn-animation hover:scale-105">{dataLang?.auth_login || "auth_login"}</button>
+                    <div className='flex justify-center space-x-2'>
+                      <span className='font-[300] '>Bạn chưa có tài khoản?</span>
+                      <button onClick={_HandleIsLogin.bind(this, false)} className='text-[#5599EC]'>Đăng ký ngay</button>
+                    </div>
+                    <h4 className="text-center text-[#667085] text-sm font-light">FOSOSOFT © 2021</h4>
+                  </div>
+                  <div className='flex items-center space-x-6 justify-center'>
+                    <a href="#" className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm">Cổng dịch vụ khách hàng</a>
+                    <a href="#" className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm">User Pay</a>
+                    <a href="#" className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm">FMRP Website</a>
+                    <Popup
+                        trigger={<button className='text-[#344054] hover:text-[#0F4F9E]'><IconMore /></button>}
+                        closeOnDocumentClick
+                        arrow={false}
+                        position="right bottom"
+                        on={["hover"]}
+                        className={`dropdown-edit `}
+                    >
+                        <div className="w-auto">
+                            <div className="bg-white p-0.5 rounded-t w-60">
+                                <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Tạo phím tắt trên màn hình</button>
+                                <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Yêu cầu Tư vấn qua điện thoại</button>
+                                <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Tối ưu hóa trình duyệt</button>
+                                <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Báo cáo lỗi</button>
+                                <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Điều khiển</button>
+                                <button className='text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Liên hệ</button>
+                            </div>
+                        </div>
+                    </Popup>
+                    {data.map((e) => <BtnLang key={e.label} {...e}/>)}
+                  </div>
+                </div>
+                <div className='space-y-9'>
+                  <div className='pointer-events-none select-none'>
+                    <Image alt="" src="/logo_1.png" width={200} height={70} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                  </div>
+                  <div className='space-y-6'>
+                    <h1 className="text-[#344054] font-medium text-xl">Trợ lý sản xuất</h1>
+                    <div className='space-y-1'>
+                      <p className="text-[#667085] font-light text-[16px]">Giải pháp phần mềm cho doanh nghiệp</p>
+                      <p className="text-[#667085] font-light text-[16px]">
+                        Hotline:
+                        <span className="text-[#0F4F9E] font-normal ml-1">0901.13.6968</span>
+                      </p>
+                      <p className="text-[#667085] font-light text-[16px]">
+                        Tổng đài:
+                        <span className="text-[#0F4F9E] font-normal mx-1">028.7776.8880</span>
+                        (Phím 1 - BP. Tư Vấn - Phím 2 - BP. Kỹ Thuật)
+                      </p>
+                    </div>
+                  </div>
+                  <div className='pointer-events-none select-none'>
+                    <Image alt="" src="/qr.png" width={120} height={120} quality={100} className="object-contain w-auto h-auto " loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                  </div>
                 </div>
               </div>
-              <div className='pointer-events-none select-none'>
-                <Image alt="" src="/qr.png" width={120} height={120} quality={100} className="object-contain w-auto h-auto " loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+              <div className='absolute bottom-0 right-0 pointer-events-none select-none'>
+                <Image src="/Illust.png" alt="" width={500} height={500} quality={100} className="object-contain w-[500px] h-auto" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
               </div>
             </div>
           </div>
-          <div className='absolute bottom-0 right-0 pointer-events-none select-none'>
-            <Image src="/Illust.png" alt="" width={500} height={500} quality={100} className="object-contain w-[500px] h-auto" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+        </>
+        :
+        <>
+          <Head>
+            <title>Đăng ký</title>
+          </Head>
+          <div className='grid grid-cols-5 h-screen w-screen overflow-hidden'>
+            <div className='col-span-2 bg-[#11315B] h-screen relative'>
+              <Image src="/register/img.png" alt="background" width={828} height={1261} quality={100} className="object-contain w-full h-auto select-none pointer-events-none" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+              <div className='absolute bottom-[10%] left-[15%] z-[1]'>
+                <Image alt="logo" src="/logo.png" width={200} height={70} quality={100} className="object-contain w-auto h-[60px] select-none pointer-events-none" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                <h2 className='text-white text-2xl font-[600] mt-8'>Đăng ký tài khoản FMRP</h2>
+                <h6 className='text-white mt-3'>Hỗ trợ đăng ký: 01821 92 2312</h6>
+              </div>
+            </div>
+            <div className='col-span-3 bg-white h-full flex flex-col items-center 2xl:mt-8 mt-5'>
+              <h1 className='text-[#11315B] 2xl:text-4xl text-2xl font-[500]'>Đăng ký</h1>
+              <h3 className='2xl:mt-8 mt-4 text-[#667085] 2xl:text-lg'>{stepRegister == 0 ? "Bước 1/2: Lựa chọn ngành hàng của bạn" : "Bước 2/2: Nhập thông tin của bạn để đăng ký"}</h3>
+              <div className='3xl:w-[50%] 2xl:w-[50%] [@media(min-width:1440px)]:w-[50%] xl:w-[55%] mt-5'>
+                <div className='grid grid-cols-2 gap-1'>
+                  <div className='w-full h-1.5 rounded-full bg-[#3276FA]' />
+                  <div className='w-full h-1.5 rounded-full bg-[#F3F4F6] relative overflow-hidden'>
+                    <div className={`${stepRegister == 0 ? "w-0" : "w-full" } duration-300 bg-[#3276FA] transition-[width] h-full absolute`} />
+                  </div>
+                </div>
+                {stepRegister == 0 ?
+                  <div className='grid grid-cols-3 2xl:gap-5 gap-3 mt-5'>
+                    {listMajor.map(e => 
+                      <label key={e?.id?.toString()} htmlFor={`major ${e?.id}`} className='w-full h-full xl:aspect-w-1 aspect-w-[5] xl:aspect-h-1 aspect-h-[4] rounded-md border border-[#DDDDE2] relative'>
+                        <div className='w-full h-full flex flex-col items-center justify-between 2xl:p-5 p-3 select-none'>
+                          <input type="radio" id={`major ${e?.id}`} name="major register" className='2xl:w-5 w-3.5 2xl:h-5 h-3.5 accent-[#1847ED] peer relative z-[1]' />
+                          <Image alt={e?.title} src={e?.img} width={44} height={44} quality={80} className='w-auto 2xl:h-[44px] xl:h-[40px] h-[36px] object-contain relative z-[1]' />
+                          <label className='text-[#1760B9] relative z-[1] 2xl:text-base xl:text-sm [@media(min-width:1336px)]:text-[13px] text-[13px] text-center'>{e?.title}</label>
+                          <div className='w-full h-full peer-checked:bg-[#E2F0FE]/40 absolute top-0 left-0 transition duration-300 peer-checked:border border-[#C7DFFB] rounded-md' />
+                        </div>
+                      </label>
+                    )}
+                  </div>
+                  :
+                  <div className='2xl:space-y-5 space-y-2 2xl:mt-5 mt-3'>
+                    <div className='space-y-1'>
+                      <label className='2xl:text-base text-sm'>Họ và tên của bạn</label>
+                      <input type='text' name="name" placeholder='Nhập họ và tên của bạn' className='w-full border border-[#D0D5DD] p-3 outline-none focus:border-[#3276FA] rounded' />
+                    </div>
+                    <div className='space-y-1'>
+                      <label className='2xl:text-base text-sm'>Tên công ty</label>
+                      <input type='text' name="name" placeholder='Nhập tên công ty' className='w-full border border-[#D0D5DD] p-3 outline-none focus:border-[#3276FA] rounded' />
+                    </div>
+                    <div className='grid grid-cols-2 gap-5'>
+                      <div className='space-y-1'>
+                        <label className='2xl:text-base text-sm'>Email của bạn</label>
+                        <input type='text' name="email" placeholder='Nhập Email của bạn' className='w-full border border-[#D0D5DD] p-3 outline-none focus:border-[#3276FA] rounded' />
+                      </div>
+                      <div className='space-y-1'>
+                        <label className='2xl:text-base text-sm'>Số điện thoại</label>
+                        <input type='text' name="phone" placeholder='Nhập số điện thoại' className='w-full border border-[#D0D5DD] p-3 outline-none focus:border-[#3276FA] rounded' />
+                      </div>
+                      <div className='space-y-1'>
+                        <label className='2xl:text-base text-sm'>Tỉnh / Thành phố</label>
+                        <input type='text' name="phone" placeholder='Nhập tỉnh / Thành phố' className='w-full border border-[#D0D5DD] p-3 outline-none focus:border-[#3276FA] rounded' />
+                      </div>
+                      <div className='space-y-1'>
+                        <label className='2xl:text-base text-sm'>Mật khẩu</label>
+                        <input type='password' placeholder='Nhập mật khẩu' className='w-full border border-[#D0D5DD] p-3 outline-none focus:border-[#3276FA] rounded' />
+                      </div>
+                    </div>
+                    <div className='space-y-1.5'>
+                      <label className='2xl:text-base text-sm'>Vị trí công việc</label>
+                      <div className='flex flex-wrap'>
+                        {listPosition.map(e => 
+                          <div key={e?.id?.toString()} className='flex space-x-3 items-center mr-6 mb-1'>
+                            <input id={`posiiton ${e?.id}`} type="radio" name="position register" className='accent-[#1847ED] 2xl:scale-110' />
+                            <label htmlFor={`posiiton ${e?.id}`} className='text-[#52575E] 2xl:text-base text-sm'>{e?.title}</label>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className='grid grid-cols-2 gap-5'>
+                      <button className='w-full bg-[#E2F0FE] text-[#1760B9] rounded 2xl:text-base text-sm'>Nhập mã xác thực qua SMS</button>
+                      <input type='text' placeholder='Nhập mã xác thực' className='w-full border border-[#D0D5DD] p-3 outline-none focus:border-[#3276FA] rounded' />
+                    </div>
+                  </div>
+                }
+                {stepRegister == 0 ?
+                  <>
+                    <button onClick={_HandleSelectStep.bind(this, 1)} className='w-full py-4 text-center rounded bg bg-[#0F4F9E] text-white 2xl:mt-8 mt-5'>Tiếp theo</button>
+                    <div className='flex justify-center space-x-2 2xl:mt-5 mt-3'>
+                      <span className='font-[300] '>Bạn đã có tài khoản?</span>
+                      <button onClick={_HandleIsLogin.bind(this, true)} className='text-[#5599EC]'>Đăng nhập ngay</button>
+                    </div>
+                  </>
+                  :
+                  <>
+                    <button className='w-full 2xl:py-4 py-3 text-center rounded bg bg-[#0F4F9E] text-white 2xl:mt-8 mt-5'>Đăng ký</button>
+                    <button onClick={_HandleSelectStep.bind(this, 0)} className='w-full 2xl:py-4 py-3 text-center rounded bg bg-white text-[#667085] mt-3 border border-[#D0D5DD]'>Quay lại</button>
+                  </>
+                }
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </React.Fragment>
+        </>
+      }
+    </>
   )
 })
 
