@@ -461,9 +461,9 @@ const ItemsChild = React.memo((props) => {
                       <IconMinus className='mt-1.5' />
                   </div>
               }
-              <h6 className='xl:text-base text-xs col-span-3  '>{props.data?.code}</h6>
-              <h6 className='xl:text-base text-xs col-span-2   truncate'>{props.data?.name}</h6>
-              <h6 className='xl:text-base text-xs col-span-2  text-center truncate'>{props.data?.level}</h6>
+              <h6 className='xl:text-base text-xs col-span-3 px-[7px] '>{props.data?.code}</h6>
+              <h6 className='xl:text-base text-xs col-span-2 px-[7px]  truncate'>{props.data?.name}</h6>
+              <h6 className='xl:text-base text-xs col-span-2 px-[7px] text-center truncate'>{props.data?.level}</h6>
               <div className='col-span-2 flex flex-wrap '>
                   {props.data?.branch.map(e => 
                       <h6 key={e?.id.toString()} className='text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[300] rounded border border-[#0F4F9E] h-fit'>{e?.name}</h6>
