@@ -20,6 +20,15 @@ const Toast = Swal.mixin({
 
 const BtnAction = React.memo((props) => {
     const router = useRouter()
+
+    const [openAction, setOpenAction] = useState(false);
+    const [dataCompany, setDataCompany] = useState();
+    const [dataPriceQuote, setDataPriceQuote] = useState();
+    const _ToggleModal = (e) => {
+        console.log('check',e)
+        setOpenAction(e)
+
+    }
     const handleDelete = (id) => {
         if (props?.status !== 'ordered') {
             Swal.fire({
@@ -77,6 +86,37 @@ const BtnAction = React.memo((props) => {
         }
     };
 
+    const fetchDataSettingsCompany = async () => {
+        console.log('ok2')
+        if (props?.id && props?.type === 'price_quote') {
+            try {
+                await Axios("GET", `/api_web/Api_Setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+                    if (response && response.data) {
+                        let res = response.data.data
+                        setDataCompany(res)
+                    }
+                })
+                await Axios("GET", `/api_web/Api_quotation/quotation/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+                    console.log('response', response)
+                    if (response && response.data) {
+                        let db = response.data
+                        setDataPriceQuote(db)
+                    }
+                })
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    }
+
+    useEffect(() => {
+        openAction && fetchDataSettingsCompany()
+        console.log('ok')
+    }, [openAction])
+
+    console.log("dataPriceQuote btn:", dataPriceQuote)
+    console.log("dataCompany btn:", dataCompany)
+    console.log("openAction btn:", openAction)
     return (
         <div>
             <Popup
@@ -94,6 +134,9 @@ const BtnAction = React.memo((props) => {
                 keepTooltipInside={props.keepTooltipInside}
                 closeOnDocumentClick
                 nested
+                open={openAction}
+                onOpen={_ToggleModal.bind(this, true)}
+                onClose={_ToggleModal.bind(this, false)}
             >
                 <div className="w-auto rounded">
                     <div className="bg-white rounded-t flex flex-col overflow-hidden">
@@ -102,10 +145,15 @@ const BtnAction = React.memo((props) => {
                             className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">
                             {props?.dataLang?.btn_table_edit || "btn_table_edit"}
                         </button>
+                        <FilePDF
+                            props={props}
+                            openAction={openAction}
+                            dataCompany={dataCompany}
+                            dataPriceQuote={dataPriceQuote}
+                        />
                         <button onClick={() => handleDelete(props?.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
                             {props?.dataLang?.btn_table_delete || "btn_table_delete"}
                         </button>
-                        <FilePDF props={props} />
                     </div>
                 </div>
             </Popup>
