@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head';
 import { _ServerInstance as Axios } from '/services/axios';
+import { MdClear } from 'react-icons/md';
+import { BsCalendarEvent } from 'react-icons/bs';
 
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
@@ -14,9 +16,10 @@ import Swal from 'sweetalert2';
 import { useEffect } from 'react';
 import { NumericFormat } from "react-number-format";
 import Link from 'next/link';
-import moment from 'moment/moment';
+import moment from 'moment';
 import debounce from 'lodash/debounce';
-
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 
 const Toast = Swal.mixin({
@@ -47,7 +50,6 @@ const Index = (props) => {
   const sortedArr = id ? slicedArr.sort((a, b) => a.id - b.id) : slicedArr.sort((a, b) => b.id - a.id);
   sortedArr.unshift(option[0]);
 
-  const [loai, sLoai] = useState("0");
   const [dataCustomer, sDataCustomer] = useState([])
   const [dataPersonContact, sDataContactPerson] = useState([])
   const [dataEditItems, sDataEditItems] = useState([])
@@ -58,15 +60,16 @@ const Index = (props) => {
   const [note, sNote] = useState('')
   const [thuetong, sThuetong] = useState()
   const [chietkhautong, sChietkhautong] = useState(0)
-  const [selectedDate, sSelectedDate] = useState(moment().format('YYYY-MM-DD HH:mm:ss'));
+
+  const [startDate, sStartDate] = useState(new Date());
   const [effectiveDate, sEffectiveDate] = useState(null);
+
   const [idCustomer, sIdCustomer] = useState(null)
   const [idContactPerson, sIdContactPerson] = useState(null)
   const [idBranch, sIdBranch] = useState(null);
 
   const [errDate, sErrDate] = useState(false)
   const [errCustomer, sErrCustomer] = useState(false)
-  const [errContactPerson, sErrContactPerson] = useState(false)
   const [errEffectiveDate, sErrEffectiveDate] = useState(false)
   const [errBranch, sErrBranch] = useState(false)
 
@@ -76,15 +79,14 @@ const Index = (props) => {
   useEffect(() => {
     router.query && sErrDate(false)
     router.query && sErrCustomer(false)
-    router.query && sErrContactPerson(false)
     router.query && sErrEffectiveDate(false)
     router.query && sErrBranch(false)
-    router.query && sSelectedDate(moment().format('YYYY-MM-DD HH:mm:ss'))
+    router.query && sStartDate(new Date())
     router.query && sEffectiveDate(null)
     router.query && sNote("")
-  }, [router.query]);
+  }, [id, router.query]);
 
-  // edit
+  // Fetch edit
   const _ServerFetchingDetail = () => {
     Axios("GET", `/api_web/Api_quotation/quotation/${id}?csrf_protection=true`, {
     }, (err, response) => {
@@ -115,12 +117,11 @@ const Index = (props) => {
         sIdContactPerson(({ label: rResult?.contact_name, value: rResult.contact_id }))
         sIdBranch({ label: rResult?.branch_name, value: rResult?.branch_id })
         sIdCustomer(({ label: rResult?.client_name, value: rResult?.client_id }))
-        sSelectedDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
-        sEffectiveDate(moment(rResult?.validity).format('YYYY-MM-DD'))
+        sStartDate(moment(rResult?.date).toDate())
+        sEffectiveDate(moment(rResult?.validity).toDate())
         sOnFetchingItemsAll(rResult?.order_type === "0" ? true : false)
         sOnFetchingItems(rResult?.order_type === "1" ? true : false)
         sNote(rResult?.note)
-
       }
       sOnFetchingDetail(false)
     })
@@ -138,16 +139,12 @@ const Index = (props) => {
   const _HandleChangeInput = (type, value) => {
     if (type === "code") {
       sCode(value.target.value)
-    } else if (type === "date") {
-      sSelectedDate(moment(value.target.value).format('YYYY-MM-DD HH:mm:ss'))
     } else if (type === "customer" && value !== idCustomer) {
       sIdCustomer(value)
       sDataContactPerson([])
       sIdContactPerson(null)
     } else if (type === "contactPerson") {
       sIdContactPerson(value)
-    } else if (type === "effectiveDate") {
-      sEffectiveDate(value.target.value)
     } else if (type === "note") {
       sNote(value.target.value)
     } else if (type === "branch") {
@@ -205,6 +202,7 @@ const Index = (props) => {
       const newOption = [...prevOption];
       const thueValue = thuetong?.tax_rate != undefined ? thuetong?.tax_rate : 0
       const chietKhauValue = chietkhautong ? chietkhautong : 0;
+
       newOption.forEach((item, index) => {
         if (index === 0 || !item?.id) return;
         const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
@@ -341,8 +339,8 @@ const Index = (props) => {
   // submit
   const _HandleSubmit = (e) => {
     e.preventDefault();
-    if (selectedDate == null || idCustomer == null || effectiveDate == null || idBranch == null) {
-      selectedDate == null && sErrDate(true)
+    if (startDate == null || idCustomer == null || effectiveDate == null || idBranch == null) {
+      startDate == null && sErrDate(true)
       idCustomer?.value == null && sErrCustomer(true)
       idBranch?.value == null && sErrBranch(true)
       effectiveDate == null && sErrEffectiveDate(true)
@@ -360,13 +358,11 @@ const Index = (props) => {
 
   useEffect(() => {
     sErrDate(false)
-  }, [selectedDate != null]);
+  }, [startDate != null]);
   useEffect(() => {
     sErrCustomer(false)
   }, [idCustomer != null]);
-  // useEffect(() => {
-  //   sErrContactPerson(false)
-  // }, [idContactPerson != null]);
+
   useEffect(() => {
     sErrEffectiveDate(false)
   }, [effectiveDate != null]);
@@ -406,39 +402,6 @@ const Index = (props) => {
   const _HandleChangeInputOption = (id, type, index3, value) => {
     var index = option.findIndex(x => x.id === id);
     if (type == "mathang") {
-      // const hasSelectedOption = option.some((o) => o.mathang?.value === value.value);
-      // const hasSelectedOption = option.some((o) => o.mathang?.value === value.value && o.mathang?.purchases_code === value.mathang?.purchases_code);
-      // const hasSelectedOption = option.some((o) => o.mathang?.value === value.value && o.mathang?.e?.purchases_code === value.mathang?.e?.purchases_code);
-      //   if (hasSelectedOption) {
-      //     return Toast.fire({
-      //     title: `${"Mặt hàng này đã được chọn "}`,
-      //     icon: 'error',
-      //     confirmButtonColor: '#296dc1',
-      //     cancelButtonColor: '#d33',
-      //     confirmButtonText: `${dataLang?.aler_yes}`,
-      //     })
-      //   }
-      //   else {
-      //     if(option[index].mathang){
-      //       option[index].mathang = value
-      //       option[index].donvitinh =  value?.e?.unit_name
-      //       // option[index].thanhtien =  value?.e?.unit_name
-      //     }else{
-      //       const newData= {id: Date.now(), mathang: value, donvitinh:value?.e?.unit_name, soluong:1,dongia:1,chietkhau: chietkhautong ? chietkhautong : 0, dongiasauck:1, thue: thuetong ? thuetong : 0, dgsauthue:1, thanhtien:1, note:""}
-      //       if (newData.chietkhau) {
-      //         newData.dongiasauck *= (1 - Number(newData.chietkhau) / 100);
-      //       }
-      //       if(newData.thue?.e?.tax_rate == undefined){
-      //         const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
-      //         newData.thanhtien = Number(tien.toFixed(2));
-      //       } else { 
-      //         const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.e?.tax_rate)/100) * Number(newData.soluong);
-      //         newData.thanhtien = Number(tien.toFixed(2));
-      //       }
-
-      //       option.push(newData);
-      //     }
-      //   }
       if (option[index].mathang) {
         option[index].mathang = value
         option[index].donvitinh = value?.e?.unit_name
@@ -556,7 +519,6 @@ const Index = (props) => {
       })
     }
     const newOption = option.filter(x => x.id !== id); // loại bỏ phần tử cần xóa
-    const fakeDataId = newOption.dataId
     sOption(newOption); // cập nhật lại mảng
   }
 
@@ -612,12 +574,11 @@ const Index = (props) => {
   })
 
   let newDataOption = dataOption?.filter(e => e?.item !== undefined);
-
   // handle submit
   const _ServerSending = () => {
     var formData = new FormData();
     formData.append("reference_no", code)
-    formData.append("date", (moment(selectedDate).format("YYYY-MM-DD HH:mm:ss")))
+    formData.append("date", (moment(startDate).format("YYYY-MM-DD HH:mm:ss")))
     formData.append("validity", (moment(effectiveDate).format("YYYY-MM-DD")))
     formData.append("client_id", idCustomer?.value)
     formData.append("branch_id", idBranch?.value)
@@ -645,8 +606,8 @@ const Index = (props) => {
             title: `${dataLang[message]}`
           })
           sCode("")
-          sSelectedDate(new Date().toISOString().slice(0, 10))
-          sEffectiveDate(new Date().toISOString().slice(0, 10))
+          sStartDate(new Date())
+          sEffectiveDate(new Date())
           sIdContactPerson(null)
           sIdCustomer(null)
           sIdBranch(null)
@@ -680,6 +641,18 @@ const Index = (props) => {
     onSending && _ServerSending()
   }, [onSending]);
 
+  const handleClearDate = (type) => {
+    if (type === 'effectiveDate') {
+      sEffectiveDate(null)
+    }
+    if (type === 'startDate') {
+      sStartDate(new Date())
+    }
+  }
+
+  const handleTimeChange = (date) => {
+    sStartDate(date)
+  };
 
   return (
     <React.Fragment>
@@ -868,26 +841,51 @@ const Index = (props) => {
                   />
                 </div>
 
-                <div className='col-span-4'>
+                <div className='col-span-4 relative'>
                   <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.price_quote_date || "price_quote_date"} <span className="text-red-500">*</span></label>
-                  <input
-                    value={selectedDate}
-                    onChange={_HandleChangeInput.bind(this, "date")}
-                    name="fname"
-                    type="datetime-local"
-                    className={`${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                  <div className="custom-date-picker flex flex-row">
+                    <DatePicker
+                      blur
+                      fixedHeight
+                      showTimeSelect
+                      selected={startDate}
+                      onSelect={(date) => sStartDate(date)}
+                      onChange={(e) => handleTimeChange(e)}
+                      placeholderText="DD/MM/YYYY HH:mm:ss"
+                      dateFormat="dd/MM/yyyy h:mm:ss aa"
+                      timeInputLabel={'Time: '}
+                      placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                      className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                    />
+                    {startDate && (
+                      <>
+                        <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('startDate')} />
+                      </>
+                    )}
+                    <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                  </div>
                   {errDate && <label className="text-sm text-red-500">{dataLang?.price_quote_errDate || "price_quote_errDate"}</label>}
                 </div>
 
-                <div className='col-span-4'>
+                <div className='col-span-4 relative'>
                   <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.price_quote_effective_date || "price_quote_effective_date"} <span className="text-red-500">*</span></label>
-                  <input
-                    value={effectiveDate}
-                    onChange={_HandleChangeInput.bind(this, "effectiveDate")}
-                    name="fname"
-                    type="date"
-                    placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
-                    className={`${errEffectiveDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                  <div className="custom-date-picker flex flex-row">
+                    <DatePicker
+                      selected={effectiveDate}
+                      blur
+                      placeholderText="DD/MM/YYYY"
+                      dateFormat="dd/MM/yyyy"
+                      onSelect={(date) => sEffectiveDate(date)}
+                      placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                      className={`border ${errEffectiveDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
+                    />
+                    {effectiveDate && (
+                      <>
+                        <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('effectiveDate')} />
+                      </>
+                    )}
+                    <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                  </div>
                   {errEffectiveDate && <label className="text-sm text-red-500">{dataLang?.price_quote_effective_errDate || "price_quote_effective_errDate"}</label>}
                 </div>
 
@@ -898,12 +896,12 @@ const Index = (props) => {
           <h2 className='font-normal bg-[#ECF0F4] p-2  '>{dataLang?.price_quote_item_information || "price_quote_item_information"}</h2>
 
           <div className='pr-2'>
-            <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10'>
+            <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 '>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-3    text-left    truncate font-[400]'>{dataLang?.price_quote_item || "price_quote_item"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_from_unit || "price_quote_from_unit"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_quantity || "price_quote_quantity"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_unit_price || "price_quote_unit_price"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_discount || "price_quote_discount"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{`% ${dataLang?.price_quote_discount}` || "% price_quote_discount"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    font-[400]'>{dataLang?.price_quote_after_discount || "price_quote_after_discount"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_tax || "price_quote_tax"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]'>{dataLang?.price_quote_money_after_discount || "price_quote_money_after_discount"}</h4>
@@ -1057,7 +1055,7 @@ const Index = (props) => {
                               <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{`(${option?.tax_rate})`}</h2>
                             </div>
                           )}
-                          className={` "border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                          className={` "border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
                           isSearchable={true}
                           noOptionsMessage={() => "Không có dữ liệu"}
                           // dangerouslySetInnerHTML={{__html: option.label}}
@@ -1241,6 +1239,11 @@ const Index = (props) => {
     </React.Fragment>
   )
 }
+
+
+
+
+
 const MoreSelectedBadge = ({ items }) => {
   const style = {
     marginLeft: "auto",

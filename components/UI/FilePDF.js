@@ -1,51 +1,214 @@
 import React, { useState } from 'react';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
+import moment from 'moment';
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
-const FilePDF = ({ props }) => {
+const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
     const [url, setUrl] = useState(null)
-    var fs = require('fs');
 
-    // function to encode file data to base64 encoded string
-    const insertImageFromBase64 = (base64Image) => {
-        const imageContent = base64Image.replace('data:image/jpeg;base64,', '');
-        const imageData = Buffer.from(imageContent, 'base64');
-        return { image: imageData, fit: [150, 150], style: 'headerLogo' };
+    const uppercaseText = (text) => {
+        return { text: text.toUpperCase(), style: 'headerTable' };
     };
 
-    const docDefinition = {
+    // const totalQuantity = dataPriceQuote?.items?.reduce((accumulator, currentValue) => accumulator + parseInt(currentValue.quantity), 0)
+    const formatNumber = (number) => {
+        if (!number && number !== 0) return 0;
+        const integerPart = Math.floor(number)
+        return integerPart.toLocaleString("en")
+    }
 
+    // Ngày hiện tại
+    const currentDate = moment().format('[Ngày] DD [Tháng] MM [Năm] YYYY');
+
+    const docDefinition = {
+        pageOrientation: 'portrait',
         content: [
             {
                 columns: [
                     {
                         width: '30%',
                         stack: [
-                            { text: 'Công Ty TNHH FOSO', style: 'headerInfo' },
+                            {
+                                image: "logo",
+                                width: 100,
+                                height: 100,
+                                alignment: "left",
+                                margin: [0, -15, 0, 5],
+                                fit: [100, 100]
+                            },
                         ]
                     },
                     {
                         width: '70%',
                         stack: [
-                            { text: 'CÔNG TY TNHH FOSO', style: 'headerInfo' },
-                            { text: 'Địa chỉ : 69/1/3 Nguyễn Gia Trí, Phường 25, Quận Bình Thạnh, TP.HCM', style: 'headerInfoText' },
-                            { text: 'Điện thoại : 0796479974', style: 'headerInfoText' },
                             {
-                                columns: [
-                                    { text: 'Email : fososoft@gmail.com', style: 'headerInfoText', alignment: 'right', margin: [-10, 0] },
-                                    { text: 'Website : fososoft.com', style: 'headerInfoText', alignment: 'right' },
-                                ],
-                                alignment: 'right',
+                                text: `${dataCompany?.company_name}`,
+                                style: 'headerInfo'
                             },
-                        ]
+                            {
+                                text: dataCompany?.company_address ? `Địa chỉ : ${dataCompany?.company_address}` : '',
+                                style: 'headerInfoText'
+                            },
+                            {
+                                text: dataCompany?.company_phone_number ? `Số điện thoại: ${dataCompany?.company_phone_number}` : '',
+                                style: 'headerInfoText'
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: dataCompany?.company_email ? `Email: ${dataCompany?.company_email}` : '',
+                                        style: 'headerInfoText'
+                                    },
+                                    '    ',
+                                    {
+                                        text: dataCompany?.company_website ? `Website: ${dataCompany?.company_website}` : '',
+                                        style: 'headerInfoText'
+                                    },
+                                ],
+                                margin: [0, -4, 0, 0]
+
+                            }
+                        ],
+                        margin: [0, -20, 0, 5]
                     },
                 ],
                 columnGap: 10
             },
-        ],
+            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, color: '#e2e8f0' }] },
+            {
+                stack: [
+                    {
+                        text: props?.type === 'price_quote' ? 'BẢNG BÁO GIÁ' : '', style: 'contentTitle'
+                    },
+                    { text: props?.type === 'price_quote' ? `${moment(dataPriceQuote?.date).format("DD/MM/YYYY HH:mm:ss")}` : '', style: 'contentDate' },
+                ],
+            },
+            {
+                text: [
+                    { text: 'Số báo giá: ', inline: true, fontSize: 10 },
+                    { text: `${dataPriceQuote?.reference_no}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 10, 0, 2]
+            },
+            {
+                text: [
+                    { text: 'Khách hàng: ', inline: true, fontSize: 10 },
+                    { text: `${dataPriceQuote?.client_name}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 2]
+            },
+            {
+                text: [
+                    { text: 'Địa chỉ giao hàng: ', inline: true, fontSize: 10 },
+                    { text: '', bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 2]
+            },
+            {
+                text: [
+                    { text: 'Ghi chú: ', inline: true, fontSize: 10 },
+                    { text: `${dataPriceQuote?.note}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 10]
+            },
+            {
+                table: {
+                    widths: "100%",
+                    headerRows: 1,
+                    widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                    body: [
+                        // Header row
+                        [
+                            // uppercaseText('STT'),
+                            // uppercaseText('Mặt hàng'),
+                            // uppercaseText('ĐVT'),
+                            // uppercaseText('SL'),
+                            // uppercaseText('Đơn giá'),
+                            // uppercaseText('% CK'),
+                            // uppercaseText('ĐG sau CK'),
+                            // uppercaseText('Tổng cộng'),
+                            // uppercaseText('Ghi chú'),
+                            { text: 'STT', style: 'headerTable' },
+                            { text: 'MẶT HÀNG', style: 'headerTable', alignment: 'left' },
+                            { text: 'ĐVT', style: 'headerTable' },
+                            { text: 'SL', style: 'headerTable' },
+                            { text: 'ĐƠN GIÁ', style: 'headerTable' },
+                            { text: '% CK', style: 'headerTable' },
+                            { text: 'ĐG SAU CK', style: 'headerTable' },
+                            { text: 'TỔNG CỘNG', style: 'headerTable' },
+                            { text: 'GHI CHÚ', style: 'headerTable' }
 
+                        ],
+                        // Data rows
+                        ...dataPriceQuote && dataPriceQuote?.items.length > 0 ? dataPriceQuote?.items.map((item, index) => {
+                            return [
+                                { text: `${index + 1}`, alignment: 'center', fontSize: 10 },
+                                { text: item?.item?.name ? `${item?.item?.name}` : '', fontSize: 10 },
+                                { text: !item?.item?.unit_name ? `${item?.item?.unit_name}` : 'dsdsd', fontSize: 10 },
+                                { text: item?.quantity ? `${formatNumber(item?.quantity)}` : '', alignment: 'center', fontSize: 10 },
+                                { text: item?.price ? `${formatNumber(item?.price)}` : '', alignment: 'right', fontSize: 10 },
+                                { text: item?.discount_percent ? `${item?.discount_percent}` : '', alignment: 'center', fontSize: 10 },
+                                { text: item?.price_after_discount ? `${formatNumber(item?.price_after_discount)}` : '', alignment: 'right', fontSize: 10 },
+                                { text: item?.price_after_discount ? `${formatNumber(item?.price_after_discount * item?.quantity)}` : '', alignment: 'right', fontSize: 10 },
+                                { text: item?.note ? `${item?.note}` : '', fontSize: 10 },
+                            ];
+                        }) : '',
+                        // tableRows,
+                        [{ text: 'Tổng cộng', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(dataPriceQuote?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
+                        [{ text: 'Tiền thuế', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(dataPriceQuote?.total_tax_price)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
+                        [{ text: 'Thành tiền', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(dataPriceQuote?.total_amount)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
+                    ]
+                }
+            },
+            {
+                text: [
+                    { text: 'Thành tiền bằng chữ: ', inline: true, fontSize: 10, },
+                    { text: '', fontSize: 10 },
+                ],
+                margin: [0, 5, 0, 0]
+            },
+            {
+                columns: [
+                    {
+                        text: '',
+                        width: '50%',
+                    },
+                    {
+                        width: '50%',
+                        stack: [
+                            {
+                                text: currentDate,
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: 'Người Lập Phiếu',
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: '(Ký, ghi rõ họ tên)',
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                ],
+                columnGap: 2
+            },
+
+
+        ],
         styles: {
+            headerInfoTextWithMargin: {
+                fontSize: 12,
+                bold: true,
+                margin: [2, 0, 0, 0]
+            },
             headerLogo: {
                 alignment: 'left',
             },
@@ -53,33 +216,63 @@ const FilePDF = ({ props }) => {
                 alignment: 'right',
                 fontSize: 12,
                 bold: true,
-                color: 'red',
-                margin: [0, 3],
+                color: '#0F4F9E',
+                margin: [0, 1],
             },
             headerInfoText: {
                 alignment: 'right',
                 fontSize: 8,
                 italics: true,
                 color: 'black',
-                margin: [0, 2]
+                margin: [0, 2],
             },
-            header: {
-                fontSize: 22,
+            contentTitle: {
                 bold: true,
+                fontSize: 20,
+                alignment: 'center',
+                margin: [0, 10, 0, 2]
             },
-            anotherStyle: {
+            contentDate: {
                 italics: true,
-                alignment: 'right',
+                fontSize: 8,
+                alignment: 'center'
             },
+            headerTable: {
+                noWrap: true,
+                bold: true,
+                fillColor: '#0374D5',
+                color: 'white',
+                fontSize: 10,
+                alignment: 'center',
+
+            },
+            dateText: {
+                fontSize: 12,
+                bold: true,
+                margin: [0, 10, 0, 2]
+            },
+            signatureText: {
+                fontSize: 12,
+                margin: [0, 0, 0, 2]
+            }
         },
+        dontBreakRows: true,
+        images: {
+            logo: {
+                url: `${dataCompany?.company_logo}`
+            }
+        }
     };
+
     const handlePrintPdf = () => {
-        const pdfGenerator = pdfMake.createPdf(docDefinition);
-        console.log('check ', pdfGenerator)
-        pdfGenerator.open((blob) => {
-            const url = URL.createObjectURL(blob);
-            setUrl(url)
-        })
+        if (dataPriceQuote !== undefined && dataCompany !== undefined) {
+            const pdfGenerator = pdfMake.createPdf(docDefinition);
+            pdfGenerator.open((blob) => {
+                const url = URL.createObjectURL(blob);
+                setUrl(url)
+            })
+            setOpenAction(false)
+        }
     }
 
     return (

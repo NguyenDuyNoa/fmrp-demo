@@ -25,7 +25,6 @@ import {
 
 } from "iconsax-react";
 import 'react-datepicker/dist/react-datepicker.css';
-import 'react-datepicker/dist/react-datepicker.css';
 registerLocale("vi", vi);
 
 const ExcelFile = ReactExport.ExcelFile;
@@ -65,16 +64,10 @@ const Index = (props) => {
 
     const [active, sActive] = useState(null)
     const [onSending, sOnSending] = useState(null)
+    
+    
+    const [action, sAction] = useState('price_quote')
 
-    const [dateRange, sDateRange] = useState([]);
-
-    const formatDate = (date) => {
-        const day = date?.getDate().toString().padStart(2, '0');
-        const month = (date?.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-indexed
-        const year = date?.getFullYear();
-        return `${year}-${month}-${day}`;
-    };
-    const formattedDateRange = dateRange.map((date) => formatDate(date));
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -172,18 +165,19 @@ const Index = (props) => {
 
     const listCode_filter = listQuoteCode ? listQuoteCode?.map(e => ({ label: e.reference_no, value: e.id })) : []
 
-    const typeFunctions = {
+    const typeChange = {
         "branch": sIdBranch,
         "code": sIdQuoteCode,
         "customer": sIdCustomer,
         "date": sValueDate,
     };
 
-    const onchange_filter = (type, value) => {
-        const updateFunction = typeFunctions[type];
+    const onChangeFilter = (type, value) => {
+        const updateFunction = typeChange[type];
         if (updateFunction) {
             updateFunction(value);
         }
+        console.log(type, value)
 
     }
 
@@ -414,7 +408,7 @@ const Index = (props) => {
                                                 <div className='ml-1 col-span-1'>
                                                     <Select
                                                         options={[{ value: '', label: dataLang?.price_quote_branch || "price_quote_branch", isDisabled: true }, ...listBr_filter]}
-                                                        onChange={onchange_filter.bind(this, "branch")}
+                                                        onChange={onChangeFilter.bind(this, "branch")}
                                                         value={idBranch}
                                                         placeholder={dataLang?.price_quote_select_branch || "price_quote_select_branch"}
                                                         hideSelectedOptions={false}
@@ -455,7 +449,7 @@ const Index = (props) => {
                                                     <Select
                                                         onInputChange={_HandleSeachApi.bind(this)}
                                                         options={[{ value: '', label: dataLang?.price_quote_select_code || "price_quote_select_code", isDisabled: true }, ...listCode_filter]}
-                                                        onChange={onchange_filter.bind(this, "code")}
+                                                        onChange={onChangeFilter.bind(this, "code")}
                                                         value={idQuoteCode}
                                                         placeholder={dataLang?.price_quote_code || "price_quote_code"}
                                                         hideSelectedOptions={false}
@@ -495,7 +489,7 @@ const Index = (props) => {
                                                     <Select
                                                         //  options={listBr_filter}
                                                         options={[{ value: '', label: dataLang?.price_quote_select_customer || "price_quote_select_customer", isDisabled: true }, ...listCustomer]}
-                                                        onChange={onchange_filter.bind(this, "customer")}
+                                                        onChange={onChangeFilter.bind(this, "customer")}
                                                         value={idCustomer}
                                                         placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
                                                         hideSelectedOptions={false}
@@ -535,7 +529,7 @@ const Index = (props) => {
                                                         value={valueDate}
                                                         i18n={"vi"}
                                                         primaryColor={"blue"}
-                                                        onChange={onchange_filter.bind(this, "date")}
+                                                        onChange={onChangeFilter.bind(this, "date")}
                                                         showShortcuts={true}
                                                         displayFormat={"DD/MM/YYYY"}
                                                         configs={{
@@ -579,7 +573,6 @@ const Index = (props) => {
                                                         <option className='text-[10px] xl:text-xs 2xl:text-sm' value={20}>20</option>
                                                         <option className='text-[10px] xl:text-xs 2xl:text-sm' value={40}>40</option>
                                                         <option className='text-[10px] xl:text-xs 2xl:text-sm' value={60}>60</option>
-                                                        {/* <option value={-1}>Tất cả</option> */}
                                                     </select>
                                                 </div>
                                             </div>
@@ -643,7 +636,7 @@ const Index = (props) => {
                                                                             {
                                                                                 e?.status === "confirmed" &&
                                                                                 (
-                                                                                    <div className='3xl:w-40 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[88px] lg:h-4 border border-lime-500 px-2 py-1 rounded-xl text-lime-500 font-normal flex justify-center  items-center gap-1 3xl:text-[18px] 2xl:text-[14px] xl:text-xs text-[9px]' onClick={() => _ToggleStatus(e?.id)}>
+                                                                                    <div className='3xl:w-40 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[88px] lg:h-4 border border-lime-500 px-2 py-1 rounded-md text-lime-500 font-normal flex justify-center  items-center gap-1 3xl:text-[18px] 2xl:text-[14px] xl:text-xs text-[9px]' onClick={() => _ToggleStatus(e?.id)}>
                                                                                         Đã Duyệt
                                                                                         <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-4 xl:h-4 lg:w-3 lg:h-3 text-lime-500 bg-white border-lime-500 rounded-full" />
                                                                                     </div>
@@ -651,14 +644,14 @@ const Index = (props) => {
                                                                                 ||
                                                                                 e?.status === "not_confirmed" &&
                                                                                 (
-                                                                                    <div className='3xl:w-40 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[88px] lg:h-4 border border-red-500 px-2 py-1 rounded-xl text-red-500  font-normal flex justify-center items-center gap-1 3xl:text-[18px] 2xl:text-[14px] xl:text-xs text-[8px]' onClick={() => _ToggleStatus(e?.id)}>
+                                                                                    <div className='3xl:w-40 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[88px] lg:h-4 border border-red-500 px-2 py-1 rounded-md text-red-500  font-normal flex justify-center items-center gap-1 3xl:text-[18px] 2xl:text-[14px] xl:text-xs text-[8px]' onClick={() => _ToggleStatus(e?.id)}>
                                                                                         Chưa Duyệt <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-4 xl:h-4 lg:w-3 lg:h-3" />
                                                                                     </div>
                                                                                 )
                                                                                 ||
                                                                                 e?.status === "no_confirmed" &&
                                                                                 (
-                                                                                    <div className='3xl:w-40 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[88px] lg:h-4 rounded-xl border border-sky-500 px-2 py-1 text-sky-500  font-normal flex justify-center items-center gap-1 3xl:text-[17.5px] 2xl:text-[14px] xl:text-[11px] text-[8px]' onClick={() => _ToggleStatus(e?.id)}>
+                                                                                    <div className='3xl:w-40 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[88px] lg:h-4 rounded-md border border-sky-500 px-2 py-1 text-sky-500  font-normal flex justify-center items-center gap-1 3xl:text-[17.5px] 2xl:text-[14px] xl:text-[11px] text-[8px]' onClick={() => _ToggleStatus(e?.id)}>
                                                                                         Không Duyệt
                                                                                         <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-4 xl:h-4 lg:w-3 lg:h-3 text-white bg-sky-500 border-sky-500 rounded-full" />
                                                                                     </div>
@@ -666,7 +659,7 @@ const Index = (props) => {
                                                                                 ||
                                                                                 e?.status === "ordered" &&
                                                                                 (
-                                                                                    <div className='3xl:max-w-[160px] xl:max-w-[130px] max-w-[80px] relative 3xl:w-[160px] 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[94px] lg:h-6 text-white border border-[#FF8C00] rounded-xl bg-[#FF8C00] 3xl:text-left 3xl:px-3 3xl:py-6 3xl:pr-5 2xl:px-2 2xl:py-1  2xl:pr-5 xl:px-2 xl:py-4 xl:pr-7 lg:px-2 lg:py-2 lg:pr-5 lg:text-center font-normal flex justify-center items-center 3xl:text-[18px] 2xl:text-[14px] xl:text-[12px] text-[8px]' onClick={() => handleToggleOrdered(e?.id)}>
+                                                                                    <div className='3xl:max-w-[160px] xl:max-w-[130px] max-w-[80px] relative 3xl:w-[160px] 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[94px] lg:h-6 text-white border border-[#FF8C00] rounded-md bg-[#FF8C00] 3xl:text-left 3xl:px-3 3xl:py-6 3xl:pr-5 2xl:px-2 2xl:py-1  2xl:pr-5 xl:px-2 xl:py-4 xl:pr-7 lg:px-2 lg:py-2 lg:pr-5 lg:text-center font-normal flex justify-center items-center 3xl:text-[18px] 2xl:text-[14px] xl:text-[12px] text-[8px]' onClick={() => handleToggleOrdered(e?.id)}>
                                                                                         <div className='3xl:max-w-[140px] lg:max-w-[94px]'>Đã Tạo Đơn Đặt Hàng</div>
                                                                                         <TickCircle className=" absolute 3xl:top-[20%] 3lx:-right-[-5%] 2xl:top-[20%] 2lx:-right-[-5%] xl:top-[30%] xl:-right-[-5%] lg:top-[30%] lg:-right-[-5%] 3xl:w-5 3xl:h-5 2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 lg:w-3 lg:h-3 text-[#FF8C00] bg-white border-[#FF8C00] rounded-full" />
                                                                                     </div>
@@ -687,7 +680,14 @@ const Index = (props) => {
                                                                     </h6>
 
                                                                     <div className='col-span-1 flex justify-center'>
-                                                                        <BtnAction onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} status={e?.status} id={e?.id} className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
+                                                                        <BtnAction
+                                                                            onRefresh={_ServerFetching.bind(this)}
+                                                                            dataLang={dataLang}
+                                                                            status={e?.status}
+                                                                            id={e?.id}
+                                                                            type='price_quote'
+                                                                            className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
+                                                                        />
                                                                     </div>
                                                                 </div>
 
@@ -728,7 +728,7 @@ const Index = (props) => {
                         {data?.length != 0 &&
                             <div className='flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]'>
                                 {/* <h6>{dataLang?.display}  {totalItems?.iTotalDisplayRecords}</h6> */}
-                                <h6>Tổng cộng {totalItems?.iTotalDisplayRecords} phiếu báo giá</h6>
+                                <h6>{dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} phiếu báo giá</h6>
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(totalItems?.iTotalDisplayRecords)}
