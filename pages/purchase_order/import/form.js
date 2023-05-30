@@ -136,9 +136,7 @@ const Index = (props) => {
   })
 }
   const _ServerFetchingDetailPage = () => {
-    const checkThere = listData?.map(e => {return {type:  e.matHang.e?.text_type}})
-    const hasProducts = checkThere?.some(obj => obj.type === 'products');
-    const hasMaterial = checkThere?.some(obj => obj.type === 'material');
+  
     Axios("GET", `/api_web/Api_import/getImport/${id}?csrf_protection=true`, {}, (err, response) => {
       if(!err){
         var rResult = response.data;
@@ -153,7 +151,7 @@ const Index = (props) => {
           matHang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,value:e.item?.id},
           child: e?.child.map(ce => ({ 
             id: Number(ce?.id),
-            disabledDate: (hasMaterial && dataMaterialExpiry?.is_enable === "1" && false) || (hasMaterial  && dataMaterialExpiry?.is_enable === "0" && true) || (hasProducts  && dataProductExpiry?.is_enable === "1" && false) || (hasProducts && dataProductExpiry?.is_enable === "0" && true), 
+            disabledDate: (e?.item?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.item?.text_type === "material"  && dataMaterialExpiry?.is_enable === "0" && true) || (e?.item?.text_type === "products"  && dataProductExpiry?.is_enable === "1" && false) || (e?.item?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
             kho: {label: ce?.location_name, value: ce?.location_warehouses_id, warehouse_name: ce?.warehouse_name}, 
             serial: ce?.serial,
             lot: ce?.lot,
@@ -170,6 +168,7 @@ const Index = (props) => {
       }
     })
   }
+  console.log(listData);
 
   useEffect(() => {
     // onFetchingDetail && _ServerFetchingDetail()
