@@ -408,11 +408,13 @@ const Index = (props) => {
       const hasNullSerial = listData.some(item => item.child?.some(childItem => childItem.serial === ''));
       const hasNullDate = listData.some(item => item.child?.some(childItem => childItem.date === ''));
 
-      const checkThere = listData?.map(e => {
-        return {type:  e.matHang.e?.text_type}
-      })
+      const checkThere = listData?.map(e => {return {type:  e.matHang.e?.text_type}})
+      const hasProducts = checkThere?.some(obj => obj.type === 'products');
+      const hasMaterial = checkThere?.some(obj => obj.type === 'material');
+
+      // disabledDate: (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
       console.log(checkThere);
-        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || (dataProductSerial?.is_enable == "1" && checkThere?.map(e => e?.type == "product") && hasNullSerial) || (dataMaterialExpiry?.is_enable == "1" && checkThere?.map(e => e?.type == "material") && hasNullLot) || (dataProductExpiry?.is_enable == "1" && checkThere?.map(e => e?.type == "material") && hasNullDate) ){
+        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || (dataProductSerial?.is_enable == "1"  && hasNullSerial) || (hasMaterial && dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (hasProducts && dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
         // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho){
           date == null && sErrDate(true)
           idSupplier == null && sErrSupplier(true)
@@ -421,6 +423,7 @@ const Index = (props) => {
           hasNullKho && sErrWarehouse(true) 
           hasNullLot && sErrLot(true)
           hasNullSerial && sErrSerial(true)
+          console.log("hiii");
           hasNullDate && sErrDate(true)
             Toast.fire({
                 icon: 'error',
@@ -920,7 +923,15 @@ const Index = (props) => {
   const _HandleAddParent = (value) => {
     const checkData = listData?.some(e => e?.matHang?.value === value?.value)
     if(!checkData){
-      const newData = { id: Date.now(), matHang: value, child: [{id: uuidv4(), kho: khotong ? khotong : null, serial: '', lot: '', date: '', donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] }
+      const newData = { 
+        id: Date.now(), 
+        matHang: value, 
+        child: [{
+          id: uuidv4(), 
+          disabledDate: (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+          kho: khotong ? khotong : null, 
+          serial: '', lot: '', date: '', donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] 
+      }
       sListData([...listData, newData]);
     }else{
       Toast.fire({
@@ -929,6 +940,7 @@ const Index = (props) => {
       })
     }
   }
+
 
   const _HandleDeleteChild = (parentId, childId) => {
     const newData = listData.map(e => {
@@ -988,7 +1000,14 @@ const Index = (props) => {
       // const newData = { id: Date.now(), matHang: value, child: [{id: uuidv4(), kho: khotong ? khotong : null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] }
       const newData = listData?.map(e => {
         if(e?.id === parentId){
-          return {...e, matHang: value, child: [{id: uuidv4(), kho: khotong ? khotong : null, serial: '', lot: '', date: '', donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}]}
+          return {...e, 
+            matHang: value,
+            child: [
+              {id: uuidv4(),
+                 kho: khotong ? khotong : null,
+                  disabledDate: (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+                  serial: '', lot: '', date: '',
+                  donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}]}
         }else{
           return e;
         }
@@ -1018,6 +1037,8 @@ const Index = (props) => {
           }
       })
   }
+
+
      
 
   return (
@@ -1612,9 +1633,9 @@ const Index = (props) => {
                                   placeholder={"Kho - vị trí kho"} 
                                   menuPortalTarget={document.body}
                                   formatOptionLabel={(option) => (
-                                    <div className='z-[100]'>
-                                      <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] z-[100]'>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
-                                      <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] z-[100]'>{option?.label}</h2>
+                                    <div className='z-[999]'>
+                                      <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] z-[999]'>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
+                                      <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] z-[999]'>{option?.label}</h2>
                                     </div>
                                   )}
                                   style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -1638,11 +1659,6 @@ const Index = (props) => {
                                       className={`${e?.matHang?.e?.text_type === "products" && errSerial && ce?.serial ==="" ? "border-red-500 border" : "border-b border-gray-200" } rounded "appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
                                       onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
                                     />
-                                     {/* <input
-                                      value={ce?.serial}
-                                      className={`border-b border-gray-200 rounded "appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
-                                      onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
-                                    /> */}
                               </div>
                               </div>
                             ):""}
@@ -1655,23 +1671,15 @@ const Index = (props) => {
                                       disabled={e?.matHang?.e?.text_type != "material"}
                                       className={`${e?.matHang?.e?.text_type === "material" && errLot && ce?.lot === "" ? "border-red-500 border" : "border-b border-gray-200" } rounded "appearance-none focus:outline-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
                                       onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
-
                                     />
-                                    {/* <input
-                                      value={ce?.lot}
-                                      className={`border-b border-gray-200 rounded "appearance-none focus:outline-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
-                                      onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
-
-                                    /> */}
                               </div>
                               </div>
                               <div className=" col-span-1 ">
                               <div className="custom-date-picker flex justify-center border h-full p-0.5 flex-col items-center w-full">
                                   <input type='date'
                                       value={ce?.date}
-                                      disabled={e?.matHang?.e?.text_type != "material"}
-                                      className={`${e?.matHang?.e?.text_type === "material" && errDate && ce?.date === "" ? "border-red-500 border" : "border-b-2 border-gray-200"} rounded "appearance-none  text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-1 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-full  focus:outline-none "`}
-                                      // className={`border-b-2 border-gray-200 rounded "appearance-none  text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-1 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-full  focus:outline-none "`}
+                                      disabled={ce?.disabledDate}
+                                      className={`${ errDate && ce?.date === "" && !ce?.disabledDate ? "border-red-500 border" : "border-b-2 border-gray-200"} rounded "appearance-none  text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-1 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-full  focus:outline-none "`}
                                       onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "date")}
                                     />
                              </div>
@@ -1787,7 +1795,7 @@ const Index = (props) => {
                           />
                         </div> 
                       </div>
-                      <div className='col-span-2 flex items-center gap-2'>
+                      <div className='col-span-2 flex items-center gap-2 '>
                           <h2>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h2>  
                           <Select 
                             options={taxOptions}
@@ -1801,7 +1809,7 @@ const Index = (props) => {
                               )}
                             placeholder={dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"} 
                             hideSelectedOptions={false}
-                            className={` "border-transparent placeholder:text-slate-300 w-[70%] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
+                            className={` "border-transparent placeholder:text-slate-300 w-[70%] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
                            dangerouslySetInnerHTML={{__html: option.label}}
