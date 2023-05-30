@@ -116,7 +116,7 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
                 table: {
                     widths: "100%",
                     headerRows: 1,
-                    widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto'],
+                    widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
                     body: [
                         // Header row
                         [
@@ -145,9 +145,9 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
                             ];
                         }) : '',
                         // tableRows,
-                        [{ text: 'Tổng', bold: true, colSpan: 3, fontSize: 10 }, '', '', { text: `${formatNumber(dataPriceQuote?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 6, fontSize: 10 }, '', '', '', '', ''],
-                        [{ text: 'Tiền thuế', bold: true, colSpan: 3, fontSize: 10 }, '', '', { text: `${formatNumber(dataPriceQuote?.total_tax_price)}`, bold: true, alignment: 'right', colSpan: 6, fontSize: 10 }, '', '', '', '', ''],
-                        [{ text: 'Thành tiền', bold: true, colSpan: 3, fontSize: 10 }, '', '', { text: `${formatNumber(dataPriceQuote?.total_amount)}`, bold: true, alignment: 'right', colSpan: 6, fontSize: 10 }, '', '', '', '', ''],
+                        [{ text: 'Tổng', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(dataPriceQuote?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
+                        [{ text: 'Tiền thuế', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(dataPriceQuote?.total_tax_price)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
+                        [{ text: 'Thành tiền', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(dataPriceQuote?.total_amount)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
                     ]
                 }
             },
