@@ -455,6 +455,9 @@ useEffect(() => {
         }
         else {
             sErrWarehouse(false)
+            sErrLot(false)
+            sErrSerial(false)
+            sErrDate(false)
             sOnSending(true)
         }
       }
