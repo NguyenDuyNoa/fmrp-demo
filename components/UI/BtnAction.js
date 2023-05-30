@@ -111,12 +111,8 @@ const BtnAction = React.memo((props) => {
 
     useEffect(() => {
         openAction && fetchDataSettingsCompany()
-        console.log('ok')
     }, [openAction])
 
-    console.log("dataPriceQuote btn:", dataPriceQuote)
-    console.log("dataCompany btn:", dataCompany)
-    console.log("openAction btn:", openAction)
     return (
         <div>
             <Popup
@@ -148,6 +144,7 @@ const BtnAction = React.memo((props) => {
                         <FilePDF
                             props={props}
                             openAction={openAction}
+                            setOpenAction={setOpenAction}
                             dataCompany={dataCompany}
                             dataPriceQuote={dataPriceQuote}
                         />

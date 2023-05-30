@@ -202,6 +202,7 @@ const Index = (props) => {
       const newOption = [...prevOption];
       const thueValue = thuetong?.tax_rate != undefined ? thuetong?.tax_rate : 0
       const chietKhauValue = chietkhautong ? chietkhautong : 0;
+
       newOption.forEach((item, index) => {
         if (index === 0 || !item?.id) return;
         const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
@@ -518,7 +519,6 @@ const Index = (props) => {
       })
     }
     const newOption = option.filter(x => x.id !== id); // loại bỏ phần tử cần xóa
-    const fakeDataId = newOption.dataId
     sOption(newOption); // cập nhật lại mảng
   }
 
@@ -901,7 +901,7 @@ const Index = (props) => {
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_from_unit || "price_quote_from_unit"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_quantity || "price_quote_quantity"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_unit_price || "price_quote_unit_price"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_discount || "price_quote_discount"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{`% ${dataLang?.price_quote_discount}` || "% price_quote_discount"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    font-[400]'>{dataLang?.price_quote_after_discount || "price_quote_after_discount"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_tax || "price_quote_tax"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]'>{dataLang?.price_quote_money_after_discount || "price_quote_money_after_discount"}</h4>

@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
+import moment from 'moment';
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
-const FilePDF = ({ props, dataCompany, dataPriceQuote, openAction }) => {
-    console.log(props)
-    console.log("dataCompany: ", dataCompany)
-    console.log("dataPriceQuote: ", dataPriceQuote)
+const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
     const [url, setUrl] = useState(null)
 
     const uppercaseText = (text) => {
         return { text: text.toUpperCase(), style: 'headerTable' };
     };
+
+    // const totalQuantity = dataPriceQuote?.items?.reduce((accumulator, currentValue) => accumulator + parseInt(currentValue.quantity), 0)
+    const formatNumber = (number) => {
+        if (!number && number !== 0) return 0;
+        const integerPart = Math.floor(number)
+        return integerPart.toLocaleString("en")
+    }
+
+    // Ngày hiện tại
+    const currentDate = moment().format('[Ngày] DD [Tháng] MM [Năm] YYYY');
 
     const docDefinition = {
         pageOrientation: 'portrait',
@@ -67,99 +75,86 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, openAction }) => {
                 ],
                 columnGap: 10
             },
-            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, color: '#AAAAAA' }] },
-            // {
-            //     canvas: [
-            //       { type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1 }
-            //     ],
-            //     margin: [0, 10, 0, 0]
-            //   },
+            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, color: '#e2e8f0' }] },
             {
                 stack: [
-                    { text: props?.type === 'price_quote' ? 'BẢNG BÁO GIÁ' : '', style: 'contentTitle' },
-                    { text: props?.type === 'price_quote' ? `${dataPriceQuote?.date}` : '', style: 'contentDate' },
+                    {
+                        text: props?.type === 'price_quote' ? 'BẢNG BÁO GIÁ' : '', style: 'contentTitle'
+                    },
+                    { text: props?.type === 'price_quote' ? `${moment(dataPriceQuote?.date).format("DD/MM/YYYY HH:mm:ss")}` : '', style: 'contentDate' },
                 ],
             },
             {
                 text: [
                     { text: 'Số báo giá: ', inline: true, fontSize: 10 },
-                    { text: `${dataPriceQuote?.reference_no}`, bold: true, fontSize: 12 },
+                    { text: `${dataPriceQuote?.reference_no}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 10, 0, 2]
             },
             {
                 text: [
                     { text: 'Khách hàng: ', inline: true, fontSize: 10 },
-                    { text: `${dataPriceQuote?.client_name}`, bold: true, fontSize: 12 },
+                    { text: `${dataPriceQuote?.client_name}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 2]
             },
             {
                 text: [
                     { text: 'Địa chỉ giao hàng: ', inline: true, fontSize: 10 },
-                    { text: 'Chưa có', bold: true, fontSize: 12 },
+                    { text: '', bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 2]
             },
             {
                 text: [
                     { text: 'Ghi chú: ', inline: true, fontSize: 10 },
-                    { text: `${dataPriceQuote?.note}`, bold: true, fontSize: 12 },
+                    { text: `${dataPriceQuote?.note}`, bold: true, fontSize: 10 },
                 ],
-                margin: [0, 2, 0, 14]
+                margin: [0, 2, 0, 10]
             },
             {
                 table: {
                     widths: "100%",
                     headerRows: 1,
-                    widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
+                    widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto'],
                     body: [
                         // Header row
                         [
                             uppercaseText('STT'),
-                            uppercaseText('Mã hàng'),
-                            uppercaseText('Tên hàng'),
+                            uppercaseText('Mặt hàng'),
                             uppercaseText('ĐVT'),
-                            uppercaseText('Số lượng'),
+                            uppercaseText('SL'),
                             uppercaseText('Đơn giá'),
-                            uppercaseText('Thành tiền'),
+                            uppercaseText('% CK'),
+                            uppercaseText('ĐG sau CK'),
+                            uppercaseText('Tổng cộng'),
                             uppercaseText('Ghi chú'),
                         ],
-                        // [
-                        //     { text: `1`, alignment: 'center' },
-                        //     { text: 'Sản phẩm A Sản phẩm A sản phẩm A', noWrap: false },
-                        //     { text: 'Sản phẩm A Sản phẩm A, Sản phẩm A' },
-                        //     { text: 'Cái' },
-                        //     { text: '10', alignment: 'center' },
-                        //     { text: '10.00', alignment: 'center' },
-                        //     { text: '100.00', alignment: 'right' },
-                        //     { text: 'Ghi chú' },
-                        // ],
-
                         // Data rows
-                        ...dataPriceQuote?.items.map((item, index) => {
+                        ...dataPriceQuote && dataPriceQuote?.items.length > 0 ? dataPriceQuote?.items.map((item, index) => {
                             return [
-                                { text: `${index + 1}`, alignment: 'center' },
-                                { text: item?.item?.code ? `${item?.item?.code}` : '', noWrap: false },
-                                { text: item?.item?.name ? `${item?.item?.name}` : '' },
-                                { text: item?.item?.unit_name ? `${item?.item?.unit_name}` : '' },
-                                { text: item?.quantity ? `${item?.quantity}` : '', alignment: 'center' },
-                                { text: item?.price ? `${item?.price}` : '', alignment: 'center' },
-                                { text: item?.amount ? `${item?.amount}` : '', alignment: 'right' },
-                                { text: item?.note ? `${item?.note}` : '' },
+                                { text: `${index + 1}`, alignment: 'center', fontSize: 10 },
+                                { text: item?.item?.name ? `${item?.item?.name}` : '', fontSize: 10 },
+                                { text: item?.item?.unit_name ? `${item?.item?.unit_name}` : '', fontSize: 10 },
+                                { text: item?.quantity ? `${formatNumber(item?.quantity)}` : '', alignment: 'center', fontSize: 10 },
+                                { text: item?.price ? `${formatNumber(item?.price)}` : '', alignment: 'right', fontSize: 10 },
+                                { text: item?.discount_percent ? `${item?.discount_percent}` : '', alignment: 'center', fontSize: 10 },
+                                { text: item?.price_after_discount ? `${formatNumber(item?.price_after_discount)}` : '', alignment: 'right', fontSize: 10 },
+                                { text: item?.price_after_discount ? `${formatNumber(item?.price_after_discount * item?.quantity)}` : '', alignment: 'right', fontSize: 10 },
+                                { text: item?.note ? `${item?.note}` : '', fontSize: 10 },
                             ];
-                        }),
+                        }) : '',
                         // tableRows,
-                        [{ text: 'Tổng', bold: true, colSpan: 4 }, '', '', '', { text: '17', bold: true, alignment: 'center' }, '', { text: `${dataPriceQuote?.total_amount}`, bold: true, alignment: 'right' }, ''],
-                        [{ text: 'Tiền thuế', bold: true, colSpan: 4 }, '', '', '', { text: `${dataPriceQuote?.total_tax_price}`, bold: true, alignment: 'right', colSpan: 4 }, '', '', ''],
-                        [{ text: 'Thành tiền', bold: true, colSpan: 4 }, '', '', '', { text: `${dataPriceQuote?.total_amount}`, bold: true, alignment: 'right', colSpan: 4 }, '', '', ''],
+                        [{ text: 'Tổng', bold: true, colSpan: 3, fontSize: 10 }, '', '', { text: `${formatNumber(dataPriceQuote?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 6, fontSize: 10 }, '', '', '', '', ''],
+                        [{ text: 'Tiền thuế', bold: true, colSpan: 3, fontSize: 10 }, '', '', { text: `${formatNumber(dataPriceQuote?.total_tax_price)}`, bold: true, alignment: 'right', colSpan: 6, fontSize: 10 }, '', '', '', '', ''],
+                        [{ text: 'Thành tiền', bold: true, colSpan: 3, fontSize: 10 }, '', '', { text: `${formatNumber(dataPriceQuote?.total_amount)}`, bold: true, alignment: 'right', colSpan: 6, fontSize: 10 }, '', '', '', '', ''],
                     ]
                 }
             },
             {
                 text: [
-                    { text: 'Thành tiền bằng chữ: ', inline: true, fontSize: 11, },
-                    { text: 'Không', fontSize: 12 },
+                    { text: 'Thành tiền bằng chữ: ', inline: true, fontSize: 10, },
+                    { text: '', fontSize: 10 },
                 ],
                 margin: [0, 5, 0, 0]
             },
@@ -173,19 +168,22 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, openAction }) => {
                         width: '50%',
                         stack: [
                             {
-                                text: 'Ngày 28 tháng 05 năm 2023',
+                                text: currentDate,
                                 style: 'dateText',
                                 alignment: 'center',
+                                fontSize: 10
                             },
                             {
                                 text: 'Người Lập Phiếu',
                                 style: 'signatureText',
-                                alignment: 'center'
+                                alignment: 'center',
+                                fontSize: 10
                             },
                             {
                                 text: '(Ký, ghi rõ họ tên)',
                                 style: 'signatureText',
-                                alignment: 'center'
+                                alignment: 'center',
+                                fontSize: 10
                             }
                         ],
                     },
@@ -199,7 +197,7 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, openAction }) => {
             headerInfoTextWithMargin: {
                 fontSize: 12,
                 bold: true,
-                margin: [2, 0, 0, 0] // Đặt giá trị margin top thành 5
+                margin: [2, 0, 0, 0]
             },
             headerLogo: {
                 alignment: 'left',
@@ -234,35 +232,34 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, openAction }) => {
                 bold: true,
                 fillColor: '#0374D5',
                 color: 'white',
+                fontSize: 10
             },
             dateText: {
                 fontSize: 12,
                 bold: true,
-                margin: [0, 10, 0, 2] // Đặt margin bottom để tạo khoảng cách giữa các đoạn văn bản
+                margin: [0, 10, 0, 2]
             },
             signatureText: {
                 fontSize: 12,
-                margin: [0, 0, 0, 2] // Đặt margin bottom để tạo khoảng cách giữa các đoạn văn bản
+                margin: [0, 0, 0, 2]
             }
         },
         dontBreakRows: true,
-        // pageSize: { height: isStandard ? 432 : 288, width: 288 },
         images: {
             logo: {
                 url: `${dataCompany?.company_logo}`
-                // url: `https://demo.fososoft.com/FMRP/uploads/company/fmrpclient_fosocompany/logo-dark-1.png`
             }
         }
     };
 
     const handlePrintPdf = () => {
-        console.log('print')
         if (dataPriceQuote !== undefined && dataCompany !== undefined) {
             const pdfGenerator = pdfMake.createPdf(docDefinition);
             pdfGenerator.open((blob) => {
                 const url = URL.createObjectURL(blob);
                 setUrl(url)
             })
+            setOpenAction(false)
         }
     }
 
