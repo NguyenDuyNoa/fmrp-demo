@@ -120,22 +120,32 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
                     body: [
                         // Header row
                         [
-                            uppercaseText('STT'),
-                            uppercaseText('Mặt hàng'),
-                            uppercaseText('ĐVT'),
-                            uppercaseText('SL'),
-                            uppercaseText('Đơn giá'),
-                            uppercaseText('% CK'),
-                            uppercaseText('ĐG sau CK'),
-                            uppercaseText('Tổng cộng'),
-                            uppercaseText('Ghi chú'),
+                            // uppercaseText('STT'),
+                            // uppercaseText('Mặt hàng'),
+                            // uppercaseText('ĐVT'),
+                            // uppercaseText('SL'),
+                            // uppercaseText('Đơn giá'),
+                            // uppercaseText('% CK'),
+                            // uppercaseText('ĐG sau CK'),
+                            // uppercaseText('Tổng cộng'),
+                            // uppercaseText('Ghi chú'),
+                            { text: 'STT', style: 'headerTable' },
+                            { text: 'MẶT HÀNG', style: 'headerTable', alignment: 'left' },
+                            { text: 'ĐVT', style: 'headerTable' },
+                            { text: 'SL', style: 'headerTable' },
+                            { text: 'ĐƠN GIÁ', style: 'headerTable' },
+                            { text: '% CK', style: 'headerTable' },
+                            { text: 'ĐG SAU CK', style: 'headerTable' },
+                            { text: 'TỔNG CỘNG', style: 'headerTable' },
+                            { text: 'GHI CHÚ', style: 'headerTable' }
+
                         ],
                         // Data rows
                         ...dataPriceQuote && dataPriceQuote?.items.length > 0 ? dataPriceQuote?.items.map((item, index) => {
                             return [
                                 { text: `${index + 1}`, alignment: 'center', fontSize: 10 },
                                 { text: item?.item?.name ? `${item?.item?.name}` : '', fontSize: 10 },
-                                { text: item?.item?.unit_name ? `${item?.item?.unit_name}` : '', fontSize: 10 },
+                                { text: !item?.item?.unit_name ? `${item?.item?.unit_name}` : 'dsdsd', fontSize: 10 },
                                 { text: item?.quantity ? `${formatNumber(item?.quantity)}` : '', alignment: 'center', fontSize: 10 },
                                 { text: item?.price ? `${formatNumber(item?.price)}` : '', alignment: 'right', fontSize: 10 },
                                 { text: item?.discount_percent ? `${item?.discount_percent}` : '', alignment: 'center', fontSize: 10 },
@@ -145,7 +155,7 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
                             ];
                         }) : '',
                         // tableRows,
-                        [{ text: 'Tổng', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(dataPriceQuote?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
+                        [{ text: 'Tổng cộng', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(dataPriceQuote?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
                         [{ text: 'Tiền thuế', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(dataPriceQuote?.total_tax_price)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
                         [{ text: 'Thành tiền', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(dataPriceQuote?.total_amount)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
                     ]
@@ -232,7 +242,9 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
                 bold: true,
                 fillColor: '#0374D5',
                 color: 'white',
-                fontSize: 10
+                fontSize: 10,
+                alignment: 'center',
+
             },
             dateText: {
                 fontSize: 12,
