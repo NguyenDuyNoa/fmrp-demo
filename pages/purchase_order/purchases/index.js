@@ -610,7 +610,7 @@ const Index = (props) => {
                                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-2 flex  items-center '><h6 className=''>{e?.note}</h6></h6>
                                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center  '><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6>
                                                 <div className='pl-2 py-2.5 col-span-1 flex space-x-2 justify-center'>
-                                                    <BtnTacVu order={e?.order_status}  dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} status={e?.status} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] 2xl:text-base xl:text-xs text-[8px]" />
+                                                    <BtnTacVu order={e?.order_status} onRefreshGroup={_ServerFetching_group.bind(this)}  dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} status={e?.status} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] 2xl:text-base xl:text-xs text-[8px]" />
                                                 </div>
                                             </div>
                                         )}
@@ -684,6 +684,7 @@ const BtnTacVu = React.memo((props) => {
                     title: props.dataLang[message]
                   })     
                   props.onRefresh && props.onRefresh()
+                  props.onRefreshGroup && props.onRefreshGroup()
                 }else{
                     Toast.fire({
                         icon: 'error',
