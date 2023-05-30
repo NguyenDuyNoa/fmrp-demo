@@ -136,6 +136,9 @@ const Index = (props) => {
   })
 }
   const _ServerFetchingDetailPage = () => {
+    const checkThere = listData?.map(e => {return {type:  e.matHang.e?.text_type}})
+    const hasProducts = checkThere?.some(obj => obj.type === 'products');
+    const hasMaterial = checkThere?.some(obj => obj.type === 'material');
     Axios("GET", `/api_web/Api_import/getImport/${id}?csrf_protection=true`, {}, (err, response) => {
       if(!err){
         var rResult = response.data;
@@ -150,6 +153,7 @@ const Index = (props) => {
           matHang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,value:e.item?.id},
           child: e?.child.map(ce => ({ 
             id: Number(ce?.id),
+            disabledDate: (hasMaterial && dataMaterialExpiry?.is_enable === "1" && false) || (hasMaterial  && dataMaterialExpiry?.is_enable === "0" && true) || (hasProducts  && dataProductExpiry?.is_enable === "1" && false) || (hasProducts && dataProductExpiry?.is_enable === "0" && true), 
             kho: {label: ce?.location_name, value: ce?.location_warehouses_id, warehouse_name: ce?.warehouse_name}, 
             serial: ce?.serial,
             lot: ce?.lot,
@@ -911,7 +915,10 @@ const Index = (props) => {
   const _HandleAddChild = (parentId, value) => {
     const newData = listData?.map(e => {
       if(e?.id === parentId) {
-        const newChild = { id: uuidv4(), kho: khotong ? khotong : null, serial: '', lot: '', date: '', donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note };
+        const newChild = {
+          id: uuidv4(),
+          disabledDate: (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+           kho: khotong ? khotong : null, serial: '', lot: '', date: '', donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note };
         return { ...e, child: [...e.child, newChild] };
       }else {
         return e;
@@ -1666,10 +1673,16 @@ const Index = (props) => {
                             <>
                               <div className=" col-span-1 ">
                               <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
-                                    <input
+                                    {/* <input
                                       value={ce?.lot}
                                       disabled={e?.matHang?.e?.text_type != "material"}
                                       className={`${e?.matHang?.e?.text_type === "material" && errLot && ce?.lot === "" ? "border-red-500 border" : "border-b border-gray-200" } rounded "appearance-none focus:outline-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
+                                      onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
+                                    /> */}
+                                    <input
+                                      value={ce?.lot}
+                                      disabled={ce?.disabledDate}
+                                      className={`${errLot && ce?.lot === "" && !ce?.disabledDate ? "border-red-500 border" : "border-b border-gray-200" } rounded "appearance-none focus:outline-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
                                       onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
                                     />
                               </div>
@@ -1679,7 +1692,7 @@ const Index = (props) => {
                                   <input type='date'
                                       value={ce?.date}
                                       disabled={ce?.disabledDate}
-                                      className={`${ errDate && ce?.date === "" && !ce?.disabledDate ? "border-red-500 border" : "border-b-2 border-gray-200"} rounded "appearance-none  text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-1 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-full  focus:outline-none "`}
+                                      className={`${errDate && ce?.date === "" && !ce?.disabledDate ? "border-red-500 border" : "border-b-2 border-gray-200"} rounded "appearance-none  text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-1 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-full  focus:outline-none "`}
                                       onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "date")}
                                     />
                              </div>
