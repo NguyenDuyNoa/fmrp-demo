@@ -763,11 +763,10 @@ return (
                   <div className='col-span-2 mx-auto'>
                       <div className='my-4 font-medium text-[13px]'>{"Trạng thái nhập hàng"}</div>
                       <div className='flex flex-wrap  gap-2 items-center justify-start'>
-                      {
-                        data?.import_status  === "0" && <span className='text-[13px] font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{props.dataLang?.purchase_order_table_not_yet_entered || "purchase_order_table_not_yet_entered"}</span>||
-                        data?.import_status  === "1" &&  <span className='text-[13px] font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{props.dataLang?.purchase_order_table_enter_one_part || "purchase_order_table_enter_one_part"}</span> ||
-                        data?.import_status  === "2" &&   <span className='text-[13px] flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_order_table_enter_enough || "purchase_order_table_enter_enough"}</span>
-                       }
+                        {data?.import_status  === "not_stocked" && <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200'>{props.dataLang[data?.import_status]}</span>||
+                        data?.import_status  === "stocked_part" &&  <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200'>{props.dataLang[data?.import_status]}</span> ||
+                        data?.import_status  === "stocked" &&   <span className='flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200'><TickCircle className='bg-lime-500 rounded-full ' color='white' size={15}/>{props.dataLang[data?.import_status]}</span>
+                        }
                       </div>
                       <div className='my-4 font-medium text-[13px]'>{props.dataLang?.purchase_order_table_number || "purchase_order_table_number"}</div>
                       <div className='flex flex-wrap  gap-2 items-center justify-start text-[13px]'>

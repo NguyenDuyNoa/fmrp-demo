@@ -326,11 +326,11 @@ const Index = (props) => {
         }
       )}
   };
-  const _ServerSending =  () => {
+  const _ServerSending =  async () => {
     var data = new FormData();
     data.append('warehouseman_id', checkedWare?.checkedpost != "0" ?  checkedWare?.checkedpost : '' );   
     data.append('id', checkedWare?.id);   
-    Axios("POST",`/api_web/api_import/ConfirmWarehous?csrf_protection=true`, {
+  await  Axios("POST",`/api_web/api_import/ConfirmWarehous?csrf_protection=true`, {
         data:data,
         headers: {"Content-Type": "multipart/form-data"} 
     }, (err, response) => {
@@ -620,6 +620,7 @@ const Index = (props) => {
                       (<>
                           <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">                       
                           {(data?.map((e) => 
+                                // <div className='grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 ' key={e.id.toString()}>
                                 <div className='grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 ' key={e.id.toString()}>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center'>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
@@ -682,7 +683,7 @@ const Index = (props) => {
                                 </h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1'><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6> 
                                 <div className='col-span-1 flex justify-center'>
-                                    <BtnTacVu onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} warehouseman_id={e?.status} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
+                                    <BtnTacVu onRefresh={_ServerFetching.bind(this)} onRefreshGroup={_ServerFetching_group.bind(this)} dataLang={dataLang} warehouseman_id={e?.warehouseman_id} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
                                 </div>
                                 </div>
        
@@ -771,6 +772,7 @@ const BtnTacVu = React.memo((props) => {
           Axios("DELETE", `/api_web/Api_import/import/${id}?csrf_protection=true`, {
           }, (err, response) => {
             if(!err){
+              console.log(response.data);
               var {isSuccess, message} = response.data;
               if(isSuccess){
                 Toast.fire({
@@ -778,6 +780,7 @@ const BtnTacVu = React.memo((props) => {
                   title: props.dataLang[message]
                 })     
                 props.onRefresh && props.onRefresh()
+                props.onRefreshGroup && props.onRefreshGroup()
               }else{
                   Toast.fire({
                       icon: 'error',
@@ -790,10 +793,17 @@ const BtnTacVu = React.memo((props) => {
       })
   }
   
-  const handleClick = () => {
-     router.push(`/purchase_order/import/form?id=${props.id}`);
-    };
-
+    const handleClick = () => {
+      if(props?.warehouseman_id != "0"){
+        Toast.fire({
+          icon: 'error',
+          title: `${props.dataLang?.warehouse_confirmed_cant_edit}`
+        })  
+      } 
+        else {
+          router.push(`/purchase_order/import/form?id=${props.id}`);
+        }
+      };
 
   
 
@@ -856,7 +866,7 @@ const Popup_chitiet =(props)=>{
   }
 
   useEffect(() => {
-    onFetching && _ServerFetching_detailOrder()
+    onFetching && _ServerFetching_detailOrder() || onFetching && _ServerFetching()
   }, [open]);
 
   
@@ -874,6 +884,21 @@ const Popup_chitiet =(props)=>{
     }
   });
  
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+  const [dataProductExpiry, sDataProductExpiry] = useState({});
+  const [dataProductSerial, sDataProductSerial] = useState({});
+
+  const _ServerFetching =  () =>{
+    Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+      if(!err){
+          var data = response.data;
+          sDataMaterialExpiry(data.find(x => x.code == "material_expiry"));
+          sDataProductExpiry(data.find(x => x.code == "product_expiry"));
+          sDataProductSerial(data.find(x => x.code == "product_serial"));
+      }
+      sOnFetching(false)
+    })
+  }
 
 return (
 <>
@@ -936,19 +961,32 @@ return (
                   
               </div>
               <div className="pr-2 w-[100%] lx:w-[110%] ">
-                <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.import_detail_image || "import_detail_image"}</h4>
+                <div className={`${dataProductSerial.is_enable == "1" ? 
+                    (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
+                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow-lg  z-10`}>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_detail_image || "import_detail_image"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_detail_items || "import_detail_items"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4> 
+                
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"Kho - VTK"}</h4> 
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"ĐVT"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_quantity || "import_from_quantity"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_discount || "import_from_discount"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"ĐGSCK"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_tax || "import_from_tax"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_into_money || "import_into_money"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_note || "import_from_note"}</h4>
+                  {dataProductSerial.is_enable === "1" && (<h4 className="text-[12px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Serial"}</h4>)}
+                          {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
+                            <>
+                              <h4 className="text-[12px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Lot"}</h4>
+                              <h4 className="text-[12px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}</h4>
+                            </> ):""}
+                  <div className='col-span-5'>
+                    <div className='grid grid-cols-8 '>
+                      <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"ĐVT"}</h4>
+                      <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_quantity || "import_from_quantity"}</h4>
+                      <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
+                      <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"% CK"}</h4>
+                      <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"ĐGSCK"}</h4>
+                      <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_tax || "import_from_tax"}</h4>
+                      <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_into_money || "import_into_money"}</h4>
+                      <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_note || "import_from_note"}</h4>
+                    </div>
+                  </div>
                 </div>
                 {onFetching ?
                   <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
@@ -959,26 +997,47 @@ return (
                          className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
                     <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">                       
                       {(data?.items?.map((e) => 
-                        <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id?.toString()}>
-                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left">
+                        <div className={`${dataProductSerial.is_enable == "1" ? 
+                        (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
+                        (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid hover:bg-slate-50 `} key={e.id?.toString()}>
+                          <h6 className="text-[12.5px]   py-0.5 col-span-1 text-center">
                           {e?.item?.images != null ? (<ModalImage   small={e?.item?.images} large={e?.item?.images} alt="Product Image"  className='custom-modal-image object-cover rounded w-[50px] h-[60px]' />):
-                                  <div className='w-[50px] h-[60px] object-cover  flex items-center justify-center rounded'>
-                                    <ModalImage small="/no_img.png" large="/no_img.png" className='w-full h-full rounded object-contain p-1' > </ModalImage>
-                                  </div>
+                            <div className='w-[50px] h-[60px] object-cover  mx-auto'>
+                              <ModalImage small="/no_img.png" large="/no_img.png" className='w-full h-full rounded object-contain p-1' > </ModalImage>
+                            </div>
                           }
                           </h6>                
-                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.item?.name}</h6>                
-                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-left break-words">{e?.item?.product_variation}</h6>                
-                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-left break-words">{`${e?.warehouse_name}-${e.location_name}`}</h6>                
-                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.unit_name}</h6>                
-                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.quantity)}</h6>                
-                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price)}</h6>                
-                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.discount_percent + "%"}</h6>                
-                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price_after_discount)}</h6>                
-                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.tax_rate) + "%"}</h6>                
-                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.amount)}</h6>                
+                          <h6 className="text-[12.5px]  px-2 py-0.5 col-span-1 text-left">{e?.item?.name}</h6>                
+                          <h6 className="text-[12.5px]  px-2 py-0.5 col-span-1 text-left break-words">{e?.item?.product_variation}</h6>                
+                          <h6 className="text-[12.5px]  px-2 py-0.5 col-span-1 text-left break-words">{`${e?.warehouse_name}-${e.location_name}`}</h6>                
+                          {dataProductSerial.is_enable === "1" ? (
+                              <div className=" col-span-1">
+                                <h6 className="text-[12.5px]  px-2   w-[full] text-left ">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
+                              </div>
+                            ):""}
+                          {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
+                            <>
+                              <div className=" col-span-1 ">
+                                  <h6 className="text-[12.5px]  px-2   w-[full] text-left ">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
+                              </div>
+                              <div className=" col-span-1 ">
+                                  <h6 className="text-[12.5px]  px-2   w-[full] text-center ">{e.expiration_date ? moment(e.expiration_date).format("DD/MM/YYYY")   : "-"}</h6>                              
+                              </div>
+                            </>
+                             ):""}
+                          <div className='col-span-5'>
+                            <div className='grid grid-cols-8'>
+                              <div className="text-[12.5px]  px-2 py-0.5 col-span-1 text-center break-words">{e?.item?.unit_name}</div>                
+                              <div className="text-[12.5px]  px-2 py-0.5 col-span-1 text-center">{formatNumber(e?.quantity)}</div>                
+                              <div className="text-[12.5px]  px-2 py-0.5 col-span-1 text-center">{formatNumber(e?.price)}</div>                
+                              <div className="text-[12.5px]  px-2 py-0.5 col-span-1 text-center">{e?.discount_percent + "%"}</div>                
+                              <div className="text-[12.5px]  px-2 py-0.5 col-span-1 text-center">{formatNumber(e?.price_after_discount)}</div>                
+                              <div className="text-[12.5px]  px-2 py-0.5 col-span-1 text-center">{formatNumber(e?.tax_rate) + "%"}</div>                
+                              <div className="text-[12.5px]  px-2 py-0.5 col-span-1 text-center">{formatNumber(e?.amount)}</div>  
+                              <div className="text-[12.5px]  px-2 py-0.5 col-span-1 text-left">{e?.note != undefined ? e?.note : ""}</div>                
+                            </div>
+                          </div>              
                                          
-                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.note != undefined ? e?.note : ""}</h6>                
                         </div>
                       ))}              
                     </div>   

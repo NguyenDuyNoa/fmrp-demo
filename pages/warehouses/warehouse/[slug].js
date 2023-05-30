@@ -70,6 +70,7 @@ const Index = (props) => {
           sData(rResult)
           sTotalItem(output)
           sData_ex(rResult)
+          console.log(rResult);
       }
       sOnFetching(false)
     })
@@ -153,7 +154,7 @@ const Index = (props) => {
     }, 500);
   };
 
-const newResult = data_ex.map(item => {
+const newResult = data_ex?.map(item => {
   const detail = item.detail || [];
   return detail.map(detailItem => ({
     ...item,
@@ -196,6 +197,12 @@ const newResult = data_ex.map(item => {
         ),
     }
   ];
+
+  const formatNumber = (number) => {
+    if (!number && number !== 0) return 0;
+    const integerPart = Math.floor(number)
+    return integerPart.toLocaleString("en")
+  }
 
   return (
     <React.Fragment>
@@ -441,36 +448,36 @@ const newResult = data_ex.map(item => {
                                         <div className={`grid ${dataProductSerial.is_enable == "1" ? 
                                         (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-8" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-8" :"grid-cols-6" ) :
                                         (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-7" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-7" :" grid-cols-5") ) }`}>
-                                            <div className=" col-span-1 border-r">
-                                                <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-left border-b"> {e.location_name == null ? "-" : e.location_name}</h6>                              
+                                            <div className="col-span-1 border-r border-b">
+                                                <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-left "> {e.location_name == null ? "-" : e.location_name}</h6>                              
                                             </div>
-                                            <div className=" col-span-1 border-r">
-                                                <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-center border-b">{e.option_name_1 == null ? "-" : e.option_name_1}</h6>                              
+                                            <div className=" col-span-1 border-r border-b">
+                                                <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-center ">{e.option_name_1 == null ? "-" : e.option_name_1}</h6>                              
                                                                              
                                             </div>
-                                            <div className=" col-span-1 border-r">
-                                                <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-center border-b">{e.option_name_2 == null ? "-" : e.option_name_2}</h6>                              
+                                            <div className=" col-span-1 border-r border-b">
+                                                <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-center ">{e.option_name_2 == null ? "-" : e.option_name_2}</h6>                              
                                             </div>
                                             {dataProductSerial.is_enable === "1" ? (
-                                                <div className=" col-span-1 border-r">
-                                                  <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-left border-b">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
+                                                <div className=" col-span-1 border-r border-b">
+                                                  <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-left ">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
                                                 </div>
                                               ):""}
                                            {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
                                              <>
-                                                <div className=" col-span-1 border-r ">
-                                                    <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-left border-b">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
+                                                <div className=" col-span-1 border-r border-b ">
+                                                    <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-left ">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
                                                 </div>
-                                                <div className=" col-span-1 border-r ">
-                                                    <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-center border-b">{e.expiration_date ? moment(e.expiration_date).format("DD-MM-YYYY")   : "-"}</h6>                              
+                                                <div className=" col-span-1 border-r border-b ">
+                                                    <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-center ">{e.expiration_date ? moment(e.expiration_date).format("DD-MM-YYYY")   : "-"}</h6>                              
                                                 </div>
                                              </>
                                             ):""}
-                                            <div className=" col-span-1 border-r ">
-                                                <h6 className="xl:text-base text-sm  px-2 py-3  w-[full] text-red-500 font-medium text-center border-b">{e.quantity ? e.quantity : "-"}</h6>                              
+                                            <div className=" col-span-1 border-r border-b ">
+                                                <h6 className="xl:text-base text-sm  px-2 py-3  w-[full] text-red-500 font-medium text-center ">{e.quantity ? formatNumber(e?.quantity) : "-"}</h6>                              
                                             </div>
-                                            <div className=" col-span-1 ">
-                                                <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-right border-b">{e.amount ? e.amount : "-"}</h6>                              
+                                            <div className=" col-span-1 border-b">
+                                                <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-right ">{e.amount ? formatNumber(e?.amount) : "-"}</h6>                              
                                             </div>
                                         </div>
                                     )}
