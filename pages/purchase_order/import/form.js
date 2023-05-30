@@ -1627,9 +1627,14 @@ const Index = (props) => {
                               {dataProductSerial.is_enable === "1" ? (
                               <div className=" col-span-1">
                                  <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
-                                    <input
+                                    {/* <input
                                       value={ce?.serial}
                                       className={`${errSerial && ce?.serial ==="" ? "border-red-500 border" : "border-b border-gray-200" } rounded "appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
+                                      onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
+                                    /> */}
+                                     <input
+                                      value={ce?.serial}
+                                      className={`border-b border-gray-200 rounded "appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
                                       onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
                                     />
                               </div>
@@ -1639,9 +1644,15 @@ const Index = (props) => {
                             <>
                               <div className=" col-span-1 ">
                               <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
-                                    <input
+                                    {/* <input
                                       value={ce?.lot}
                                       className={`${errLot && ce?.lot === "" ? "border-red-500 border" : "border-b border-gray-200" } rounded "appearance-none focus:outline-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
+                                      onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
+
+                                    /> */}
+                                    <input
+                                      value={ce?.lot}
+                                      className={`border-b border-gray-200 rounded "appearance-none focus:outline-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
                                       onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
 
                                     />
@@ -1651,7 +1662,8 @@ const Index = (props) => {
                               <div className="custom-date-picker flex justify-center border h-full p-0.5 flex-col items-center w-full">
                                   <input type='date'
                                       value={ce?.date}
-                                      className={`${errDate && ce?.date === "" ? "border-red-500 border" : "border-b-2 border-gray-200"} rounded "appearance-none  text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-1 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-full  focus:outline-none "`}
+                                      // className={`${errDate && ce?.date === "" ? "border-red-500 border" : "border-b-2 border-gray-200"} rounded "appearance-none  text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-1 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-full  focus:outline-none "`}
+                                      className={`border-b-2 border-gray-200 rounded "appearance-none  text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-1 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-full  focus:outline-none "`}
                                       onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "date")}
                                     />
                              </div>
