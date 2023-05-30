@@ -193,6 +193,7 @@ const Index = (props) => {
     Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
       if(!err){
           var data = response.data;
+          console.log(data);
           sDataMaterialExpiry(data.find(x => x.code == "material_expiry"));
           sDataProductExpiry(data.find(x => x.code == "product_expiry"));
           sDataProductSerial(data.find(x => x.code == "product_serial"));
@@ -401,24 +402,26 @@ const Index = (props) => {
 
        const checkErr = sortedArr?.map(e => { return {item: e?.mathang?.value,location_warehouses_id: e?.khohang?.value}})
        let checkErrValidate = checkErr?.filter(e => e?.item !== undefined);
-
       const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
       const hasNullLot = listData.some(item => item.child?.some(childItem => childItem.lot === ''));
       const hasNullSerial = listData.some(item => item.child?.some(childItem => childItem.serial === ''));
       const hasNullDate = listData.some(item => item.child?.some(childItem => childItem.date === ''));
 
-
-        // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || (dataProductSerial?.is_enable == "1" && hasNullSerial) || (dataMaterialExpiry?.is_enable == "1" && hasNullLot) || (dataProductExpiry?.is_enable == "1" && hasNullDate) ){
-        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho){
+      const checkThere = listData?.map(e => {
+        return {type:  e.matHang.e?.text_type}
+      })
+      console.log(checkThere);
+        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || (dataProductSerial?.is_enable == "1" && checkThere?.map(e => e?.type == "product") && hasNullSerial) || (dataMaterialExpiry?.is_enable == "1" && checkThere?.map(e => e?.type == "material") && hasNullLot) || (dataProductExpiry?.is_enable == "1" && checkThere?.map(e => e?.type == "material") && hasNullDate) ){
+        // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho){
           date == null && sErrDate(true)
           idSupplier == null && sErrSupplier(true)
           idBranch == null && sErrBranch(true)
           idTheOrder == null && sErrTheOrder(true)
           hasNullKho && sErrWarehouse(true) 
-          // hasNullLot && sErrLot(true)
-          // hasNullSerial && sErrSerial(true)
-          // hasNullDate && sErrDate(true)
+          hasNullLot && sErrLot(true)
+          hasNullSerial && sErrSerial(true)
+          hasNullDate && sErrDate(true)
             Toast.fire({
                 icon: 'error',
                 title: `${dataLang?.required_field_null}`
@@ -980,6 +983,7 @@ const Index = (props) => {
 
   const _HandleChangeValue = (parentId, value) => {
     const checkData = listData?.some(e => e?.matHang?.value === value?.value)
+   
     if(!checkData){
       // const newData = { id: Date.now(), matHang: value, child: [{id: uuidv4(), kho: khotong ? khotong : null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] }
       const newData = listData?.map(e => {
@@ -1628,16 +1632,17 @@ const Index = (props) => {
                               {dataProductSerial.is_enable === "1" ? (
                               <div className=" col-span-1">
                                  <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
-                                    {/* <input
+                                    <input
                                       value={ce?.serial}
-                                      className={`${errSerial && ce?.serial ==="" ? "border-red-500 border" : "border-b border-gray-200" } rounded "appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
+                                      disabled={e?.matHang?.e?.text_type != "products"}
+                                      className={`${e?.matHang?.e?.text_type === "products" && errSerial && ce?.serial ==="" ? "border-red-500 border" : "border-b border-gray-200" } rounded "appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
                                       onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
-                                    /> */}
-                                     <input
+                                    />
+                                     {/* <input
                                       value={ce?.serial}
                                       className={`border-b border-gray-200 rounded "appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
                                       onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
-                                    />
+                                    /> */}
                               </div>
                               </div>
                             ):""}
@@ -1645,26 +1650,28 @@ const Index = (props) => {
                             <>
                               <div className=" col-span-1 ">
                               <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
-                                    {/* <input
+                                    <input
                                       value={ce?.lot}
-                                      className={`${errLot && ce?.lot === "" ? "border-red-500 border" : "border-b border-gray-200" } rounded "appearance-none focus:outline-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
+                                      disabled={e?.matHang?.e?.text_type != "material"}
+                                      className={`${e?.matHang?.e?.text_type === "material" && errLot && ce?.lot === "" ? "border-red-500 border" : "border-b border-gray-200" } rounded "appearance-none focus:outline-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
                                       onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
 
-                                    /> */}
-                                    <input
+                                    />
+                                    {/* <input
                                       value={ce?.lot}
                                       className={`border-b border-gray-200 rounded "appearance-none focus:outline-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
                                       onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
 
-                                    />
+                                    /> */}
                               </div>
                               </div>
                               <div className=" col-span-1 ">
                               <div className="custom-date-picker flex justify-center border h-full p-0.5 flex-col items-center w-full">
                                   <input type='date'
                                       value={ce?.date}
-                                      // className={`${errDate && ce?.date === "" ? "border-red-500 border" : "border-b-2 border-gray-200"} rounded "appearance-none  text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-1 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-full  focus:outline-none "`}
-                                      className={`border-b-2 border-gray-200 rounded "appearance-none  text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-1 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-full  focus:outline-none "`}
+                                      disabled={e?.matHang?.e?.text_type != "material"}
+                                      className={`${e?.matHang?.e?.text_type === "material" && errDate && ce?.date === "" ? "border-red-500 border" : "border-b-2 border-gray-200"} rounded "appearance-none  text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-1 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-full  focus:outline-none "`}
+                                      // className={`border-b-2 border-gray-200 rounded "appearance-none  text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-1 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-full  focus:outline-none "`}
                                       onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "date")}
                                     />
                              </div>
