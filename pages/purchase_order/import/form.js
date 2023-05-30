@@ -409,15 +409,16 @@ const Index = (props) => {
       const hasNullDate = listData.some(item => item.child?.some(childItem => childItem.date === ''));
 
 
-        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || (dataProductSerial?.is_enable == "1" && hasNullSerial) || (dataMaterialExpiry?.is_enable == "1" && hasNullLot) || (dataProductExpiry?.is_enable == "1" && hasNullDate) ){
+        // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || (dataProductSerial?.is_enable == "1" && hasNullSerial) || (dataMaterialExpiry?.is_enable == "1" && hasNullLot) || (dataProductExpiry?.is_enable == "1" && hasNullDate) ){
+        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho){
           date == null && sErrDate(true)
           idSupplier == null && sErrSupplier(true)
           idBranch == null && sErrBranch(true)
           idTheOrder == null && sErrTheOrder(true)
           hasNullKho && sErrWarehouse(true) 
-          hasNullLot && sErrLot(true)
-          hasNullSerial && sErrSerial(true)
-          hasNullDate && sErrDate(true)
+          // hasNullLot && sErrLot(true)
+          // hasNullSerial && sErrSerial(true)
+          // hasNullDate && sErrDate(true)
             Toast.fire({
                 icon: 'error',
                 title: `${dataLang?.required_field_null}`
