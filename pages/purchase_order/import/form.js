@@ -1503,7 +1503,7 @@ const _ServerFetching =  () => {
                     control: (base, state) => ({
                       ...base,
                       ...(state.isFocused && {
-                        border: '0 0 0 1px #92BFF7',
+                        border: 'none',
                         boxShadow: 'none'
                       }),
                     }),
@@ -1577,13 +1577,13 @@ const _ServerFetching =  () => {
                       <div className='col-span-1 justify-center flex items-center'>
                         <div className='border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-medium bg-slate-50'>0</div>
                       </div>
-                      <div className='col-span-1 text-right 2xl:text-[13px] xl:text-[13px] text-[12.5px] font-medium pr-3 text-black'>0</div>
-                      <div className='col-span-1'>
-                       <Select placeholder="% Thuế" className='text-[13px]' isDisabled={true} />
+                      <div className='col-span-1 text-right 2xl:text-[13px] xl:text-[13px] text-[12.5px] font-medium pr-3 text-black flex items-center justify-end'>0</div>
+                      <div className='col-span-1 flex items-center w-full'>
+                       <Select placeholder="% Thuế" className='text-[13px] w-full' isDisabled={true} />
                       </div>
-                      <div className='col-span-1 text-right 2xl:text-[13px] xl:text-[13px] text-[12.5px] font-medium pr-3 text-black'>1.00</div>
-                      <input placeholder='Ghi chú' disabled className= "border-[#d0d5dd] disabled:bg-[#f2f2f2] col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] p-1.5 border" />
-                      <button title='Xóa' disabled className='col-span-1 disabled:opacity-50 transition w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center'>
+                      <div className='col-span-1 text-right 2xl:text-[13px] xl:text-[13px] text-[12.5px] font-medium pr-3 text-black  flex items-center justify-end'>1.00</div>
+                      <input placeholder='Ghi chú' disabled className= " disabled:bg-gray-50 col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff]  p-1.5 " />
+                      <button title='Xóa' disabled className='col-span-1 disabled:opacity-50 transition w-full h-full bg-slate-100  rounded-[5.5px] text-red-500 flex flex-col justify-center items-center'>
                         <IconDelete />
                       </button>
                   </div>
