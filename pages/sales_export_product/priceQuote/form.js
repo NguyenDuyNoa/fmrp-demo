@@ -1043,16 +1043,15 @@ const Index = (props) => {
                           thousandSeparator=","
                           allowNegative={false}
                           isAllowed={(values) => {
-                            console.log(('valuess : ', values));
                             if (!values.value) return true;
                             const { floatValue } = values;
-                            if (floatValue > 999) {
+                            if (floatValue > 100) {
                               Toast.fire({
                                 icon: 'error',
-                                title: `Vui lòng nhập số % chiết khấu nhỏ hơn 999`
+                                title: `Vui lòng nhập số % chiết khấu nhỏ hơn 100`
                               })
                             }
-                            return floatValue < 999;
+                            return floatValue < 100;
                           }}
                           readOnly={index === 0 ? readOnlyFirst : false}
                           // decimalScale={0}
