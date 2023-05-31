@@ -66,10 +66,10 @@ const Index = (props) => {
     const [warehouse, sDataWarehouse] = useState([])
     const [dataTasxes, sDataTasxes] = useState([])
 
-    const [option, sOption] = useState([{id: Date.now(), mathang: null, serial: '', lot: '', date: '', khohang: null, donvitinh: "", soluong: 1, dongia: 1, thue: 0, thanhtien: 1, ghichu: ""}]);
-    const slicedArr = option.slice(1);
-    const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
-    sortedArr.unshift(option[0]);
+    // const [option, sOption] = useState([{id: Date.now(), mathang: null, serial: '', lot: '', date: '', khohang: null, donvitinh: "", soluong: 1, dongia: 1, thue: 0, thanhtien: 1, ghichu: ""}]);
+    // const slicedArr = option.slice(1);
+    // const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
+    // sortedArr.unshift(option[0]);
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
     const [dataProductExpiry, sDataProductExpiry] = useState({});
@@ -155,39 +155,38 @@ const _ServerFetching =  () => {
   sOnFetching(false)  
 }
 
-useEffect(() => {
-  onFetching && _ServerFetching() 
-}, [onFetching]);
+  useEffect(() => {
+    onFetching && _ServerFetching() 
+  }, [onFetching]);
 
-const _ServerFetchingCondition = () =>{
-  Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-    if(!err){
-        var data = response.data;
-        sDataMaterialExpiry(data.find(x => x.code == "material_expiry"));
-        sDataProductExpiry(data.find(x => x.code == "product_expiry"));
-        sDataProductSerial(data.find(x => x.code == "product_serial"));
-    }
-    sOnFetchingCondition(false)
-  })
-}
+  const _ServerFetchingCondition = () =>{
+    Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+      if(!err){
+          var data = response.data;
+          sDataMaterialExpiry(data.find(x => x.code == "material_expiry"));
+          sDataProductExpiry(data.find(x => x.code == "product_expiry"));
+          sDataProductSerial(data.find(x => x.code == "product_serial"));
+      }
+      sOnFetchingCondition(false)
+    })
+  }
 
   useEffect(() => {
-  onFetchingCondition && _ServerFetchingCondition() 
+    onFetchingCondition && _ServerFetchingCondition() 
   }, [onFetchingCondition]);
 
   useEffect(() => {
-  id && sOnFetchingCondition(true) 
+    id && sOnFetchingCondition(true) 
   }, []);
 
   useEffect(() => {
-  JSON.stringify(dataMaterialExpiry) === '{}' && JSON.stringify(dataProductExpiry) === '{}' && JSON.stringify(dataProductSerial) === '{}' && sOnFetchingCondition(true)
+    JSON.stringify(dataMaterialExpiry) === '{}' && JSON.stringify(dataProductExpiry) === '{}' && JSON.stringify(dataProductSerial) === '{}' && sOnFetchingCondition(true)
   }, [JSON.stringify(dataMaterialExpiry) === '{}', JSON.stringify(dataProductExpiry) === '{}', JSON.stringify(dataProductSerial) === '{}']);
 
   const _ServerFetchingDetailPage = () => {
   
 
   Axios("GET", `/api_web/Api_import/getImport/${id}?csrf_protection=true`, {}, (err, response) => {
-        
       if(!err){
         var rResult = response.data;
         console.log( dataProductExpiry?.is_enable === "0");
@@ -267,8 +266,8 @@ const _ServerFetchingCondition = () =>{
     },[])
 
     const _HandleChangeInput = (type, value) => {
-      if(option?.length > 1){
-        if(type ==="branch" || type === "supplier" || type === "theorder"){
+      if(listData?.length > 0){
+        if(type ==="branch" && idBranch != value || type === "supplier" && idSupplier != value || type === "theorder" && idTheOrder != value){
           Swal.fire({
             title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
             icon: 'warning',
@@ -279,16 +278,25 @@ const _ServerFetchingCondition = () =>{
             cancelButtonText:`${dataLang?.aler_cancel}`
         }).then((result) => {
           if (result.isConfirmed) {
-             sOption([{id: Date.now(), mathang: null}])
+            //  sOption([{id: Date.now(), mathang: null}])
               sDataItems([])
               sDataWarehouse([])
-              sIdTheOrder(null)
-              sIdSupplier(null)
+              if(type == "supplier"){
+                sIdSupplier(value)
+                sIdTheOrder(null)
+              }else if(type =="theorder"){
+                sIdTheOrder(value)
+                sIdSupplier({...idSupplier})
+              }
               sKhotong(null)
+              sListData([])
           }else{
-            sIdBranch(value)
-            sIdPurchases([])
-            sOption([{id: Date.now(), mathang: null, serial: '', lot: '', date: '', donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+            sIdTheOrder({...idTheOrder})
+            sIdSupplier({...idSupplier})
+            // sIdBranch(value)
+            // sIdPurchases(null)
+            sListData([...listData])
+            // sOption([{id: Date.now(), mathang: null, serial: '', lot: '', date: '', donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
           }
         })
         }
@@ -297,22 +305,25 @@ const _ServerFetchingCondition = () =>{
           sCode(value.target.value)
       }else if(type === "date"){
           sDate(moment(value.target.value).format('YYYY-MM-DD HH:mm:ss'))
-      }else if(type === "supplier"){
+      }else if(type === "supplier" && idSupplier != value){
+         if(listData.length === 0){
           sIdSupplier(value)
-          sOption([{id: Date.now(), mathang: null}])
+          // sOption([{id: Date.now(), mathang: null}])
           sMathangAll([])
           sDataItems([])
           sIdTheOrder(null)
           if(value == null){
             sDataThe_order([])
           }
+         }
       }else if(type === "theorder"){
-          sIdTheOrder(value)
-          if(value == null){ sDataItems([])
+          if(listData.length == 0){
+            sIdTheOrder(value)
+            if(value == null){ sDataItems([])}
           }
       }else if(type === "note"){
           sNote(value.target.value)
-      }else if(type == "branch"){
+      }else if(type == "branch" && idBranch != value){
           sIdBranch(value)
           sIdTheOrder(null)
           sIdSupplier(null)
@@ -324,15 +335,15 @@ const _ServerFetchingCondition = () =>{
       }else if(type == "mathangAll"){
           sMathangAll(value)
           if(value?.length === 0){
-            sOption([{id: Date.now(), mathang: null}])
+            // sOption([{id: Date.now(), mathang: null}])
             //new
             sListData([])
           }else if(value?.length > 0){
-            const fakeData = [{id: Date.now(), mathang: null}]
-            const data = fakeData?.concat(value?.map(e => ({id: uuidv4(),
-              disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-              mathang: e, khohang: null, serial: '', lot: '', date: '', donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.mathang?.e?.price ? Number(e?.mathang?.e?.price) : 1, chietkhau: e?.e?.discount_percent, dongiasauck: Number(e?.e?.price_after_discount),thue: {label:e?.e?.tax_name ,value :e?.e?.tax_rate, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
-            sOption(data);
+            // const fakeData = [{id: Date.now(), mathang: null}]
+            // const data = fakeData?.concat(value?.map(e => ({id: uuidv4(),
+            //   disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+            //   mathang: e, khohang: null, serial: '', lot: '', date: '', donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.mathang?.e?.price ? Number(e?.mathang?.e?.price) : 1, chietkhau: e?.e?.discount_percent, dongiasauck: Number(e?.e?.price_after_discount),thue: {label:e?.e?.tax_name ,value :e?.e?.tax_rate, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
+            // sOption(data);
             //new          
             sListData(value?.map(e => ({id: uuidv4(), matHang: e, child: [{kho: null,
             disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
@@ -375,59 +386,59 @@ const _ServerFetchingCondition = () =>{
   }
 
   
-  useEffect(() => {
-        sOption(prevOption => {
-          const newOption = [...prevOption];
-          newOption.forEach((item, index) => {
-            if (index === 0 || !item?.id) return;
-            item.khohang = khotong
-          });
-          return newOption;
-        });
-  }, [khotong]);
+  // useEffect(() => {
+  //       sOption(prevOption => {
+  //         const newOption = [...prevOption];
+  //         newOption.forEach((item, index) => {
+  //           if (index === 0 || !item?.id) return;
+  //           item.khohang = khotong
+  //         });
+  //         return newOption;
+  //       });
+  // }, [khotong]);
 
 
-  useEffect(() => {
-    if (thuetong == null) return;
-    sOption(prevOption => {
-      const newOption = [...prevOption];
-      const thueValue = thuetong?.tax_rate || 0;
-      const chietKhauValue = chietkhautong || 0;
-      newOption.forEach((item, index) => {
-        if (index === 0 || !item?.id) return;
-        const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
-        const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
-        item.thue = thuetong;
-        item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
-      });
-      return newOption;
-    });
-  }, [thuetong]);
+  // useEffect(() => {
+  //   if (thuetong == null) return;
+  //   sOption(prevOption => {
+  //     const newOption = [...prevOption];
+  //     const thueValue = thuetong?.tax_rate || 0;
+  //     const chietKhauValue = chietkhautong || 0;
+  //     newOption.forEach((item, index) => {
+  //       if (index === 0 || !item?.id) return;
+  //       const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
+  //       const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
+  //       item.thue = thuetong;
+  //       item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
+  //     });
+  //     return newOption;
+  //   });
+  // }, [thuetong]);
 
-  useEffect(() => {
-    if (chietkhautong == null) return;
-    sOption(prevOption => {
-      const newOption = [...prevOption];
-      const thueValue = thuetong?.tax_rate != undefined ? thuetong?.tax_rate : 0
-      const chietKhauValue = chietkhautong ? chietkhautong : 0;
-      newOption.forEach((item, index) => {
-        if (index === 0 || !item?.id) return;
-        const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
-        const thanhTien =  dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
-        item.chietkhau = Number(chietkhautong);
-        item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
-        item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
-      });
-      return newOption;
-    });
-  }, [chietkhautong]);
+  // useEffect(() => {
+  //   if (chietkhautong == null) return;
+  //   sOption(prevOption => {
+  //     const newOption = [...prevOption];
+  //     const thueValue = thuetong?.tax_rate != undefined ? thuetong?.tax_rate : 0
+  //     const chietKhauValue = chietkhautong ? chietkhautong : 0;
+  //     newOption.forEach((item, index) => {
+  //       if (index === 0 || !item?.id) return;
+  //       const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
+  //       const thanhTien =  dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
+  //       item.chietkhau = Number(chietkhautong);
+  //       item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
+  //       item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
+  //     });
+  //     return newOption;
+  //   });
+  // }, [chietkhautong]);
 
 
     const _HandleSubmit = (e) => {
       e.preventDefault();
 
-       const checkErr = sortedArr?.map(e => { return {item: e?.mathang?.value,location_warehouses_id: e?.khohang?.value}})
-       let checkErrValidate = checkErr?.filter(e => e?.item !== undefined);
+      //  const checkErr = sortedArr?.map(e => { return {item: e?.mathang?.value,location_warehouses_id: e?.khohang?.value}})
+      //  let checkErrValidate = checkErr?.filter(e => e?.item !== undefined);
       const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
       const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => childItem.lot === ''));
@@ -435,8 +446,8 @@ const _ServerFetchingCondition = () =>{
       const hasNullDate = listData.some(item =>  item.child?.some(childItem => !childItem.disabledDate && childItem.date === ''));
 
       const checkThere = listData?.map(e => {return {type:  e.matHang.e?.text_type}})
-      const hasProducts = checkThere?.some(obj => obj.type === 'products');
-      const hasMaterial = checkThere?.some(obj => obj.type === 'material');
+      // const hasProducts = checkThere?.some(obj => obj.type === 'products');
+      // const hasMaterial = checkThere?.some(obj => obj.type === 'material');
 
         // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (hasMaterial && dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (hasProducts && dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
         if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
@@ -447,11 +458,8 @@ const _ServerFetchingCondition = () =>{
           idTheOrder == null && sErrTheOrder(true)
           hasNullKho && sErrWarehouse(true) 
           hasNullLot && sErrLot(true)
-          console.log("hasNullLot",hasNullLot);
           hasNullSerial && sErrSerial(true)
-          console.log("hasNullSerial",hasNullSerial);
           hasNullDate && sErrDate(true)
-          console.log("hasNullDate",hasNullDate);
             Toast.fire({
                 icon: 'error',
                 title: `${dataLang?.required_field_null}`
@@ -474,11 +482,6 @@ const _ServerFetchingCondition = () =>{
       sErrSupplier(false)
     }, [idSupplier != null]);
 
-    
-
-
-
-    
     useEffect(() => {
       sErrBranch(false)
     }, [idBranch != null]);
@@ -727,11 +730,11 @@ const _ServerFetchingCondition = () =>{
     const allItems = [...options]
 
   const _HandleSelectAll = () => {
-    const fakeData = [{id: Date.now(), mathang: null}]
-    const data = fakeData?.concat(allItems?.map(e => ({id: uuidv4(), mathang: e,
-      disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-      khohang: khotong ? khotong : e?.qty_warehouse, serial: '', lot: '', date: '', donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.e?.price, chietkhau:chietkhautong ?  chietkhautong : e?.e?.discount_percent, dongiasauck:Number(e?.e?.price_after_discount), thue: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
-    sOption(data);
+    // const fakeData = [{id: Date.now(), mathang: null}]
+    // const data = fakeData?.concat(allItems?.map(e => ({id: uuidv4(), mathang: e,
+    //   disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+    //   khohang: khotong ? khotong : e?.qty_warehouse, serial: '', lot: '', date: '', donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.e?.price, chietkhau:chietkhautong ?  chietkhautong : e?.e?.discount_percent, dongiasauck:Number(e?.e?.price_after_discount), thue: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
+    // sOption(data);
     // sMathangAll(data)
 
     //new
@@ -742,8 +745,8 @@ const _ServerFetchingCondition = () =>{
   };
 
   const _HandleDeleteAll = () => {
-    sMathangAll([])
-    sOption([{id: Date.now(), mathang: null}])
+    // sMathangAll([])
+    // sOption([{id: Date.now(), mathang: null}])
     //new
     sListData([])
   };
@@ -840,19 +843,19 @@ const _ServerFetchingCondition = () =>{
 
     const [tongTienState, setTongTienState] = useState({ tongTien: 0, tienChietKhau: 0, tongTienSauCK: 0, tienThue: 0, tongThanhTien: 0 });
     
-    useEffect(() => {
-      const tongTien = tinhTongTien(option);
-      setTongTienState(tongTien);
-    }, [option])
+    // useEffect(() => {
+    //   const tongTien = tinhTongTien(option);
+    //   setTongTienState(tongTien);
+    // }, [option])
 
     useEffect(() => {
       const tongTien = tinhTongTien(listData);
       setTongTienState(tongTien);
     }, [listData])
 
-    const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, purchases_order_item_id: e?.mathang?.e?.purchase_order_item_id, location_warehouses_id: e?.khohang?.value, quantity: Number(e?.soluong), price: e?.dongia, discount_percent:e?.chietkhau, tax_id:e?.thue?.value, note: e?.ghichu, id:e?.id}})
+    // const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, purchases_order_item_id: e?.mathang?.e?.purchase_order_item_id, location_warehouses_id: e?.khohang?.value, quantity: Number(e?.soluong), price: e?.dongia, discount_percent:e?.chietkhau, tax_id:e?.thue?.value, note: e?.ghichu, id:e?.id}})
    
-    let newDataOption = dataOption?.filter(e => e?.item !== undefined);
+    // let newDataOption = dataOption?.filter(e => e?.item !== undefined);
     
     const _ServerSending = () => {
           var formData = new FormData();
@@ -881,9 +884,9 @@ const _ServerFetchingCondition = () =>{
               formData.append(`items[${index}][child][${childIndex}][id]`, childItem?.id);
               {id && formData.append(`items[${index}][child][${childIndex}][row_id]`, typeof(childItem?.id) == "number" ? childItem?.id : 0)};
               formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.amount);
-              formData.append(`items[${index}][child][${childIndex}][serial]`, childItem?.serial);
-              formData.append(`items[${index}][child][${childIndex}][lot]`, childItem?.lot);
-              formData.append(`items[${index}][child][${childIndex}][expiration_date]`, childItem?.date);
+              formData.append(`items[${index}][child][${childIndex}][serial]`, childItem?.serial === null ? "" : childItem?.serial);
+              formData.append(`items[${index}][child][${childIndex}][lot]`, childItem?.lot === null ? "" : childItem?.lot);
+              formData.append(`items[${index}][child][${childIndex}][expiration_date]`, childItem?.date === null ? "" : childItem?.date);
               formData.append(`items[${index}][child][${childIndex}][unit_name]`, childItem?.donViTinh);
               formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note);
               formData.append(`items[${index}][child][${childIndex}][tax_id]`, childItem?.tax?.value);
@@ -913,7 +916,7 @@ const _ServerFetchingCondition = () =>{
                       sErrDate(false)
                       sErrTheOrder(false)
                       sErrSupplier(false)
-                      sOption([{id: Date.now(), mathang: null}])
+                      // sOption([{id: Date.now(), mathang: null}])
                       //new
                       sListData([])
                       router.back()
@@ -1378,7 +1381,7 @@ const _ServerFetchingCondition = () =>{
                             className={` "border-transparent placeholder:text-slate-300 2xl:text-[12px] xl:text-[13px] text-[12.5px]   z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
-                           dangerouslySetInnerHTML={{__html: option.label}}
+                          //  dangerouslySetInnerHTML={{__html: option.label}}
                             menuPortalTarget={document.body}
                             closeMenuOnSelect={true}
                             style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -1861,7 +1864,7 @@ const _ServerFetchingCondition = () =>{
                             className={` "border-transparent placeholder:text-slate-300 w-[70%] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
-                           dangerouslySetInnerHTML={{__html: option.label}}
+                          //  dangerouslySetInnerHTML={{__html: option.label}}
                             menuPortalTarget={document.body}
                             closeMenuOnSelect={true}
                             style={{ border: "none", boxShadow: "none", outline: "none" }}
