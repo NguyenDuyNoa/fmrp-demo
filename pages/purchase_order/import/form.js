@@ -439,7 +439,8 @@ const _ServerFetching =  () => {
 
       //  const checkErr = sortedArr?.map(e => { return {item: e?.mathang?.value,location_warehouses_id: e?.khohang?.value}})
       //  let checkErrValidate = checkErr?.filter(e => e?.item !== undefined);
-      const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
+      // const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
+      
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
       const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => childItem.lot === ''));
       const hasNullSerial = listData.some(item => item?.matHang.e?.text_type === "products" &&  item.child?.some(childItem => childItem.serial === ''));
