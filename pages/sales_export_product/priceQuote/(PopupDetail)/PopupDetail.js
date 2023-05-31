@@ -47,9 +47,8 @@ const PopupDetail = (props) => {
 
     const _ServerFetching_detailUser = () => {
         Axios("GET", `/api_web/Api_quotation/quotation/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            console.log(response.data)
-            if (response && response.data) {
-                var db = response.data
+            if (response && response?.data) {
+                var db = response?.data
                 console.log(db)
                 sData(db)
             }
@@ -162,26 +161,19 @@ const PopupDetail = (props) => {
                                                 {data?.branch_name}
                                             </h3>
                                         </div>
-                                        <div className='my-4 font-medium grid grid-cols-2'>
-                                            <h3 className='text-[13px]'>
-                                                {props.dataLang?.price_quote_note || "price_quote_note"}
-                                            </h3>
-                                            <h3 className='col-span-1 font-normal'>
-                                                {data?.note}
-                                            </h3>
-                                        </div>
+
                                     </div>
 
                                 </div>
                                 <div className="pr-2 w-[100%] lx:w-[110%] ">
-                                    <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
+                                    <div className="grid grid-cols-12 items-center sticky top-0 bg-slate-100 p-2 z-10">
                                         <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left whitespace-nowrap">
                                             {props.dataLang?.price_quote_image || "price_quote_image"}
                                         </h4>
                                         <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center items-center whitespace-nowrap">
                                             {props.dataLang?.price_quote_item || "price_quote_item"}
                                         </h4>
-                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">
+                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center whitespace-nowrap">
                                             {props.dataLang?.price_quote_variant || "price_quote_variant"}
                                         </h4>
                                         <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">
@@ -195,7 +187,7 @@ const PopupDetail = (props) => {
                                         <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center ">
                                             {props.dataLang?.price_quote_person || "price_quote_person"}
                                         </h4>
-                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center ">
+                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center ">
                                             {props.dataLang?.price_quote_after_discount || "price_quote_after_discount"}
                                         </h4>
                                         <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">
@@ -204,7 +196,7 @@ const PopupDetail = (props) => {
                                         <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">
                                             {props.dataLang?.price_quote_into_money || "price_quote_into_money"}
                                         </h4>
-                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">
+                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-normal">
                                             {props.dataLang?.price_quote_note || "price_quote_note"}
                                         </h4>
                                     </div>
@@ -217,7 +209,7 @@ const PopupDetail = (props) => {
                                                     className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden" speed={1} smoothScrolling={true}>
                                                     <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
                                                         {(data?.items?.map((e) =>
-                                                            <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id?.toString()}>
+                                                            <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40" key={e.id?.toString()}>
                                                                 <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left">
                                                                     {
                                                                         e?.item?.images != null
@@ -236,7 +228,7 @@ const PopupDetail = (props) => {
                                                                 <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-left">
                                                                     {e?.item?.name}
                                                                 </h6>
-                                                                <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-left break-words">
+                                                                <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-left break-words">
                                                                     {e?.item?.product_variation}
                                                                 </h6>
                                                                 <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
@@ -245,23 +237,22 @@ const PopupDetail = (props) => {
                                                                 <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">
                                                                     {formatNumber(e?.quantity)}
                                                                 </h6>
-                                                                <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">
+                                                                <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-right">
                                                                     {formatNumber(e?.price)}
                                                                 </h6>
                                                                 <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">
                                                                     {e?.discount_percent + "%"}
                                                                 </h6>
-                                                                <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-center">
+                                                                <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-right">
                                                                     {formatNumber(e?.price_after_discount)}
                                                                 </h6>
                                                                 <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">
                                                                     {formatNumber(e?.tax_rate) + "%"}
                                                                 </h6>
-                                                                <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">
+                                                                <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-right">
                                                                     {formatNumber(e?.amount)}
                                                                 </h6>
-
-                                                                <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-left">
+                                                                <h6 className="text-[12px] col-span-1 rounded-md text-left whitespace-normal">
                                                                     {e?.note != undefined ? e?.note : ""}
                                                                 </h6>
                                                             </div>
@@ -285,11 +276,19 @@ const PopupDetail = (props) => {
                                 <h2 className='font-normal p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>
                                 <div className="text-right mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
                                     <div className='col-span-7'>
+                                        <div className='font-medium grid grid-cols-7 text-left'>
+                                            <h3 className='text-[13px]'>
+                                                {props.dataLang?.price_quote_note || "price_quote_note"}
+                                            </h3>
+                                            <h3 className='col-span-5 font-normal border rounded-lg p-2'>
+                                                {data?.note}
+                                            </h3>
+                                        </div>
                                     </div>
                                     <div className='col-span-2 space-y-2'>
                                         <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.price_quote_total || "price_quote_total"}</h3></div>
-                                        <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.price_quote_discount || "price_quote_discount"}</h3></div>
-                                        <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.price_quote_money_after_discount || "price_quote_money_after_discount"}</h3></div>
+                                        <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.price_quote_total_discount || "price_quote_discount"}</h3></div>
+                                        <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.price_quote_total_money_after_discount || "price_quote_money_after_discount"}</h3></div>
                                         <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.price_quote_tax_money || "price_quote_tax_money"}</h3></div>
                                         <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.price_quote_into_money || "price_quote_into_money"}</h3></div>
                                     </div>
