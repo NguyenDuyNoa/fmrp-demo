@@ -209,7 +209,7 @@ const _ServerFetching =  () => {
             kho: {label: ce?.location_name, value: ce?.location_warehouses_id, warehouse_name: ce?.warehouse_name}, 
             serial: ce?.serial,
             lot: ce?.lot,
-            date: moment(ce?.expiration_date).toDate(),
+            date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
             donViTinh: e?.item?.unit_name, 
             amount: Number(ce?.quantity), 
             price: Number(ce?.price), 
@@ -1797,11 +1797,17 @@ console.log("hisaa",(dataProductExpiry?.is_enable == "1"  && hasNullDate));
                                             <DatePicker
                                               selected={ce?.date}
                                               blur
+                                              disabled={ce?.disabledDate}
                                               placeholderText="DD/MM/YYYY"
                                               dateFormat="dd/MM/yyyy"
                                               onSelect={(date) => _HandleChangeChild(e?.id, ce?.id, "date",date)}
                                               placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
-                                              className={`border ${errDateList && ce?.date == null && !ce?.disabledDate ?"border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
+                                              className={`border ${
+                                                errDateList && ce?.date == null && !ce?.disabledDate
+                                                  ? "border-red-500"
+                                                  : ce?.disabledDate ? "bg-gray-50" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                              } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
+                                              // className={`border ${errDateList && ce?.date == null && !ce?.disabledDate ?"border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
                                             />
                                             {effectiveDate && (
                                               <>
