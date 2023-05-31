@@ -4,6 +4,8 @@ import Head from 'next/head';
 import {_ServerInstance as Axios} from '/services/axios';
 import { v4 as uuidv4 } from 'uuid';
 import dynamic from 'next/dynamic';
+import Loading from "components/UI/loading";
+
 
 import { MdClear } from 'react-icons/md';
 import { BsCalendarEvent } from 'react-icons/bs';
@@ -169,17 +171,17 @@ const _ServerFetchingCondition = () =>{
   })
 }
 
-useEffect(() => {
+  useEffect(() => {
   onFetchingCondition && _ServerFetchingCondition() 
-}, [onFetchingCondition]);
+  }, [onFetchingCondition]);
 
-useEffect(() => {
+  useEffect(() => {
   id && sOnFetchingCondition(true) 
-}, []);
+  }, []);
 
-useEffect(() => {
+  useEffect(() => {
   JSON.stringify(dataMaterialExpiry) === '{}' && JSON.stringify(dataProductExpiry) === '{}' && JSON.stringify(dataProductSerial) === '{}' && sOnFetchingCondition(true)
-}, [JSON.stringify(dataMaterialExpiry) === '{}', JSON.stringify(dataProductExpiry) === '{}', JSON.stringify(dataProductSerial) === '{}']);
+  }, [JSON.stringify(dataMaterialExpiry) === '{}', JSON.stringify(dataProductExpiry) === '{}', JSON.stringify(dataProductSerial) === '{}']);
 
   const _ServerFetchingDetailPage = () => {
   
@@ -207,7 +209,6 @@ useEffect(() => {
             note: ce?.note
           }))
         })))
-        console.log("hiiiaaahahahaahsshsaâhahassahahsssshhhahahshhhhhhhhhahai");
         sCode(rResult?.code)
         sIdBranch({label: rResult?.branch_name, value:rResult?.branch_id})
         sIdSupplier({label: rResult?.supplier_name, value: rResult?.supplier_id})
@@ -429,16 +430,16 @@ useEffect(() => {
        let checkErrValidate = checkErr?.filter(e => e?.item !== undefined);
       const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
-      const hasNullLot = listData.some(item => item.child?.some(childItem => childItem.lot === ''));
-      const hasNullSerial = listData.some(item => item.child?.some(childItem => childItem.serial === ''));
-      const hasNullDate = listData.some(item => item.child?.some(childItem => childItem.date === ''));
+      const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => childItem.lot === ''));
+      const hasNullSerial = listData.some(item => item?.matHang.e?.text_type === "products" &&  item.child?.some(childItem => childItem.serial === ''));
+      const hasNullDate = listData.some(item =>  item.child?.some(childItem => !childItem.disabledDate && childItem.date === ''));
 
       const checkThere = listData?.map(e => {return {type:  e.matHang.e?.text_type}})
       const hasProducts = checkThere?.some(obj => obj.type === 'products');
       const hasMaterial = checkThere?.some(obj => obj.type === 'material');
 
-      // disabledDate: (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || (dataProductSerial?.is_enable == "1"  && hasNullSerial) || (hasMaterial && dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (hasProducts && dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
+        // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (hasMaterial && dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (hasProducts && dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
+        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
         // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho){
           date == null && sErrDate(true)
           idSupplier == null && sErrSupplier(true)
@@ -446,8 +447,11 @@ useEffect(() => {
           idTheOrder == null && sErrTheOrder(true)
           hasNullKho && sErrWarehouse(true) 
           hasNullLot && sErrLot(true)
+          console.log("hasNullLot",hasNullLot);
           hasNullSerial && sErrSerial(true)
+          console.log("hasNullSerial",hasNullSerial);
           hasNullDate && sErrDate(true)
+          console.log("hasNullDate",hasNullDate);
             Toast.fire({
                 icon: 'error',
                 title: `${dataLang?.required_field_null}`
@@ -1583,7 +1587,7 @@ useEffect(() => {
               </div>
               <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
                 <div className="min:h-[400px] h-[100%] max:h-[800px]"> 
-                  {onFetchingDetail ? <div>Loading</div>
+                  {onFetchingDetail ? <Loading className="h-60"color="#0f4f9e" />
                     :  
                     <>
                     {listData?.map(e => 
