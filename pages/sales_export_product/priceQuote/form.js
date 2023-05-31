@@ -902,7 +902,7 @@ const Index = (props) => {
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_from_unit || "price_quote_from_unit"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_quantity || "price_quote_quantity"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_unit_price || "price_quote_unit_price"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{`% ${dataLang?.price_quote_discount}` || "% price_quote_discount"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_rate_discount || "price_quote_rate_discount"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    font-[400]'>{dataLang?.price_quote_after_discount || "price_quote_after_discount"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_tax || "price_quote_tax"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]'>{dataLang?.price_quote_money_after_discount || "price_quote_money_after_discount"}</h4>
@@ -1043,16 +1043,15 @@ const Index = (props) => {
                           thousandSeparator=","
                           allowNegative={false}
                           isAllowed={(values) => {
-                            console.log(('valuess : ', values));
                             if (!values.value) return true;
                             const { floatValue } = values;
-                            if (floatValue > 999) {
+                            if (floatValue > 100) {
                               Toast.fire({
                                 icon: 'error',
-                                title: `Vui lòng nhập số % chiết khấu nhỏ hơn 999`
+                                title: `Vui lòng nhập số % chiết khấu nhỏ hơn 100`
                               })
                             }
-                            return floatValue < 999;
+                            return floatValue < 100;
                           }}
                           readOnly={index === 0 ? readOnlyFirst : false}
                           // decimalScale={0}
@@ -1140,7 +1139,7 @@ const Index = (props) => {
 
           <div className='grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center'>
             <div className='col-span-2  flex items-center gap-2'>
-              <h2>{dataLang?.price_quote_discount || "price_quote_discount"}</h2>
+              <h2>{dataLang?.price_quote_total_discount || "price_quote_total_discount"}</h2>
               <div className='col-span-1 text-center flex items-center justify-center'>
                 <NumericFormat
                   value={chietkhautong}
@@ -1228,11 +1227,11 @@ const Index = (props) => {
               <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tongTien)}</h3></div>
             </div>
             <div className='flex justify-between '>
-              <div className='font-normal'><h3>{dataLang?.price_quote_discount || "price_quote_discount"}</h3></div>
+              <div className='font-normal'><h3>{dataLang?.price_quote_total_discount || "price_quote_total_discount"}</h3></div>
               <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tienChietKhau)}</h3></div>
             </div>
             <div className='flex justify-between '>
-              <div className='font-normal'><h3>{dataLang?.price_quote_money_after_discount || "price_quote_money_after_discount"}</h3></div>
+              <div className='font-normal'><h3>{dataLang?.price_quote_total_money_after_discount || "price_quote_total_money_after_discount"}</h3></div>
               <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tongTienSauCK)}</h3></div>
             </div>
             <div className='flex justify-between '>
