@@ -798,7 +798,6 @@ const Popup_Product = React.memo((props) => {
     const _HandleChangeValue = (value) => {
         sProduct(value)
     }
-
     const _HandleInputChange = (inputValue) => {
         Axios("POST", "/api_web/api_product/searchItemsNoneVariant?csrf_protection=true", {
             data: {
@@ -836,10 +835,13 @@ const Popup_Product = React.memo((props) => {
             if(!err){
                 var {isSuccess} = response.data;
                 sListAllProduct(isSuccess?.result?.map(e => ({id: e.id, code: e.code, name: e.name, img: e.images, variant: e.product_variation, type: e.text_type, checkExpiry: e.expiry, checkSerial: e.serial, show: false, dataLot: e.lot_array?.map(e => ({label: e, value: e})), dataSerial: e.serial_array !== [null] ? e.serial_array?.map(e => ({label: e, value: e})) : [], child: [], checkChild: e.warehouse?.map(ce => ({amount: null, quantity: Number(ce.quantity), serial: ce.serial, lot: ce.lot, date: moment(ce.expiration_date).format("DD/MM/yyyy"), locate: ce.location_id}))})).filter(e => !props.dataChoose.some(ce => e.id === ce.id)))
+            console.log("isSuccess",isSuccess);
             }
             sOnSendingProduct(false)
         })
+
     }
+    console.log(listAllProduct);
 
     useEffect(() => {
         onSendingProduct && _ServerSendingProduct()
@@ -960,8 +962,10 @@ const Popup_Product = React.memo((props) => {
                             return {...ce, amount: Number(value?.value)}
                         }else if(type === "locate"){
                             ce.locate = value;
+                            console.log(listAllProduct);
                             e?.checkExpiry == "1" && (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckSameLot(parentId, id, ce?.locate, ce?.lot, ce?.date);
                             e?.checkSerial == "1" && (ce?.locate !== null && ce?.serial !== null) && _HandleCheckSameSerial(parentId, id, ce?.locate, ce?.serial);
+                            e?.checkExpiry == "0" && e?.checkSerial == "0" && _HandleCheckSame(parentId, id, ce?.locate);
                             return {...ce}
                         }else if(type === "lot"){
                             ce.lot = value;
@@ -1030,6 +1034,44 @@ const Popup_Product = React.memo((props) => {
     }
 
     const _HandleCheckSameSerial = (parentId, id, locate, serial) => {
+        setTimeout(() => {
+            const newData = listAllProduct.map(e => {
+                if(e.id === parentId){
+                    const newChild = e.child?.map(ce => {
+                        if(ce.id !== id && ce.locate?.value === locate?.value && ce.serial === serial){
+                            Toast.fire({
+                                icon: 'error',
+                                title: `Trùng mặt hàng`
+                            }) 
+                            return {...ce, locate: null, amount: null, lot: null, date: null, serial: null, quantity: null, price: null}
+                        }
+                        return ce;
+                    }).filter(item => item.locate !== null)
+                    return {...e, child: newChild}
+                }
+                return e;
+            })
+            const parent = newData.find(item => item.id === parentId);
+            if(!parent) return null;
+            const child = parent.child.find(e => e.id === id)
+            if(!child) return null;
+            const check = parent.checkChild.find(e => e.locate === child.locate?.value && e.serial === child.serial)
+            const newData1 = newData.map(e => {
+                if(e.id === parentId){
+                    const newChild = e.child?.map(ce => {
+                        if(ce.id === id){
+                            return {...ce, quantity: check?.quantity || 0}
+                        }
+                        return ce;
+                    })
+                    return {...e, child: newChild}
+                }
+                return e;
+            })
+            sListAllProduct([...newData1])
+        }, 500);
+    }
+    const _HandleCheckSame = (parentId, id, locate, serial) => {
         setTimeout(() => {
             const newData = listAllProduct.map(e => {
                 if(e.id === parentId){

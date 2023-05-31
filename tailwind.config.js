@@ -14,6 +14,10 @@ module.exports = {
       screens: {
         '3xl': '1600px',
       },
+      gridTemplateColumns:{
+        "13": 'repeat(13, minmax(0, 1fr))',
+        "26": 'repeat(26, minmax(0, 1fr))'
+      },
     },
   },
   plugins: [

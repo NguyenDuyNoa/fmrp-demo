@@ -4,8 +4,14 @@ import Head from 'next/head';
 import {_ServerInstance as Axios} from '/services/axios';
 import { v4 as uuidv4 } from 'uuid';
 import dynamic from 'next/dynamic';
+import Loading from "components/UI/loading";
 
 
+
+
+import { MdClear } from 'react-icons/md';
+import { BsCalendarEvent } from 'react-icons/bs';
+import DatePicker from 'react-datepicker';
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
@@ -41,6 +47,7 @@ const Index = (props) => {
 
     const [onFetching, sOnFetching] = useState(false);
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
+    const [onFetchingCondition, sOnFetchingCondition] = useState(false);
 
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
     const [onFetchingTheOrder, sOnFetchingTheOrder] = useState(false);
@@ -52,6 +59,11 @@ const Index = (props) => {
     const [chietkhautong, sChietkhautong] = useState(0)
  
     const [code, sCode] = useState('')
+
+    const [startDate, sStartDate] = useState(new Date());
+    const [effectiveDate, sEffectiveDate] = useState(null);
+
+
     const [note, sNote] = useState('')
     const [date, sDate] = useState(moment().format('YYYY-MM-DD HH:mm:ss'));
     const [dataSupplier, sDataSupplier] = useState([])
@@ -61,10 +73,14 @@ const Index = (props) => {
     const [warehouse, sDataWarehouse] = useState([])
     const [dataTasxes, sDataTasxes] = useState([])
 
-    const [option, sOption] = useState([{id: Date.now(), mathang: null, khohang: null, donvitinh: "", soluong: 1, dongia: 1, thue: 0, thanhtien: 1, ghichu: ""}]);
-    const slicedArr = option.slice(1);
-    const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
-    sortedArr.unshift(option[0]);
+    // const [option, sOption] = useState([{id: Date.now(), mathang: null, serial: '', lot: '', date: null, khohang: null, donvitinh: "", soluong: 1, dongia: 1, thue: 0, thanhtien: 1, ghichu: ""}]);
+    // const slicedArr = option.slice(1);
+    // const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
+    // sortedArr.unshift(option[0]);
+
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+    const [dataProductExpiry, sDataProductExpiry] = useState({});
+    const [dataProductSerial, sDataProductSerial] = useState({});
 
     //new
     const [listData, sListData] = useState([]);
@@ -75,9 +91,12 @@ const Index = (props) => {
     
     const [errSupplier, sErrSupplier] = useState(false)
     const [errDate, sErrDate] = useState(false)
+    const [errDateList, sErrDateList] = useState(false)
     const [errTheOrder, sErrTheOrder] = useState(false)
     const [errBranch, sErrBranch] = useState(false)
     const [errWarehouse, sErrWarehouse] = useState(false)
+    const [errLot, sErrLot] = useState(false)
+    const [errSerial, sErrSerial] = useState(false)
     const [mathangAll, sMathangAll] = useState([])
     const [khotong, sKhotong] = useState(null)
 
@@ -88,8 +107,12 @@ const Index = (props) => {
       router.query && sErrSupplier(false)
       router.query && sErrTheOrder(false)
       router.query && sErrBranch(false)
+      router.query && sErrSerial(false)
+      router.query && sErrLot(false)
+      router.query && sErrDateList(false)
+      router.query && sStartDate(new Date())
       // router.query && sErrWarehouse(false)
-      router.query && sDate(moment().format('YYYY-MM-DD HH:mm:ss'))
+      // router.query && sDate(moment().format('YYYY-MM-DD HH:mm:ss'))
       router.query && sNote("")
   }, [router.query]);
 
@@ -98,7 +121,6 @@ const Index = (props) => {
   }, (err, response) => {
       if(!err){
         var rResult = response.data;
-        console.log("rResult",rResult?.items?.map(e => e.note));
         const itemlast =  [{mathang: null}];
         const item = itemlast?.concat(rResult?.items?.map(e => ({
           purchases_order_item_id: e?.item?.purchase_order_item_id, 
@@ -125,35 +147,91 @@ const Index = (props) => {
       sOnFetchingDetail(false)
   })
 }
+
+const _ServerFetching =  () => {
+  Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
+      if(!err){
+          var {isSuccess, result} =  response.data
+          sDataBranch(result?.map(e =>({label: e.name, value:e.id})))       
+      }
+  })
+  Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
+    if(!err){
+        var {rResult} =  response.data
+        sDataTasxes(rResult?.map(e =>({label: e.name, value: e.id, tax_rate:e.tax_rate})))       
+    }
+})
+
+  sOnFetching(false)  
+}
+
+  useEffect(() => {
+    onFetching && _ServerFetching() 
+  }, [onFetching]);
+
+  const _ServerFetchingCondition = () =>{
+    Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+      if(!err){
+          var data = response.data;
+          sDataMaterialExpiry(data.find(x => x.code == "material_expiry"));
+          sDataProductExpiry(data.find(x => x.code == "product_expiry"));
+          sDataProductSerial(data.find(x => x.code == "product_serial"));
+      }
+      sOnFetchingCondition(false)
+    })
+  }
+
+  useEffect(() => {
+    onFetchingCondition && _ServerFetchingCondition() 
+  }, [onFetchingCondition]);
+
+  useEffect(() => {
+    id && sOnFetchingCondition(true) 
+  }, []);
+
+  useEffect(() => {
+    JSON.stringify(dataMaterialExpiry) === '{}' && JSON.stringify(dataProductExpiry) === '{}' && JSON.stringify(dataProductSerial) === '{}' && sOnFetchingCondition(true)
+  }, [JSON.stringify(dataMaterialExpiry) === '{}', JSON.stringify(dataProductExpiry) === '{}', JSON.stringify(dataProductSerial) === '{}']);
+
   const _ServerFetchingDetailPage = () => {
-    Axios("GET", `/api_web/Api_import/getImport/${id}?csrf_protection=true`, {}, (err, response) => {
+  
+
+  Axios("GET", `/api_web/Api_import/getImport/${id}?csrf_protection=true`, {}, (err, response) => {
       if(!err){
         var rResult = response.data;
-        sCode(rResult?.code)
-        sIdBranch({label: rResult?.branch_name, value:rResult?.branch_id})
-        sIdSupplier({label: rResult?.supplier_name, value: rResult?.supplier_id})
-        sIdTheOrder({label: rResult?.purchase_order_code, value: rResult?.purchase_order_id})
-        sDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
-        sNote(rResult?.note)
+        console.log(rResult);
         sListData(rResult?.items.map(e => ({
           id: e?.item?.id, 
           matHang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,value:e.item?.id},
           child: e?.child.map(ce => ({ 
             id: Number(ce?.id),
+            disabledDate: (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) || (e.item?.text_type == "material"  && dataMaterialExpiry?.is_enable == "0" && true) || (e.item?.text_type == "products"  && dataProductExpiry?.is_enable == "1" && false) || (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true), 
             kho: {label: ce?.location_name, value: ce?.location_warehouses_id, warehouse_name: ce?.warehouse_name}, 
+            serial: ce?.serial,
+            lot: ce?.lot,
+            date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
             donViTinh: e?.item?.unit_name, 
-            amount: Number(ce?.amount), 
+            amount: Number(ce?.quantity), 
             price: Number(ce?.price), 
             chietKhau: Number(ce?.discount_percent), 
             tax: {tax_rate: ce?.tax_rate, value: ce?.tax_id, label: ce?.tax_name},
             note: ce?.note
           }))
         })))
-        
+        sCode(rResult?.code)
+        sIdBranch({label: rResult?.branch_name, value:rResult?.branch_id})
+        sIdSupplier({label: rResult?.supplier_name, value: rResult?.supplier_id})
+        sIdTheOrder({label: rResult?.purchase_order_code, value: rResult?.purchase_order_id})
+        // sDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
+        sStartDate(moment(rResult?.date).toDate())
+        console.log(moment(rResult.date).toDate());
+        sNote(rResult?.note)
+        // console.log(moment(ce?.expiration_date).toDate());
       }
+      sOnFetchingDetail(false)
     })
   }
-
+  console.log(startDate);
   useEffect(() => {
     // onFetchingDetail && _ServerFetchingDetail()
     //new
@@ -161,32 +239,11 @@ const Index = (props) => {
   }, [onFetchingDetail]);
 
   useEffect(() => {
-    id && sOnFetchingDetail(true) 
-  }, []);
-
-    const _ServerFetching =  () => {
-      Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
-          if(!err){
-              var {isSuccess, result} =  response.data
-              sDataBranch(result?.map(e =>({label: e.name, value:e.id})))       
-          }
-      })
-      Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
-        if(!err){
-            var {rResult} =  response.data
-            sDataTasxes(rResult?.map(e =>({label: e.name, value: e.id, tax_rate:e.tax_rate})))       
-        }
-    })
-      sOnFetching(false)  
-  }
-
-    useEffect(() => {
-      onFetching && _ServerFetching() 
-    }, [onFetching]);
-
+    id && JSON.stringify(dataMaterialExpiry) !== '{}' && JSON.stringify(dataProductExpiry) !== '{}' && JSON.stringify(dataProductSerial) !== '{}' &&  sOnFetchingDetail(true) 
+  }, [JSON.stringify(dataMaterialExpiry) !== '{}' && JSON.stringify(dataProductExpiry) !== '{}' && JSON.stringify(dataProductSerial) !== '{}']);
 
     const _ServerFetching_TheOrder =  () => {
-      Axios("GET", "/api_web/Api_purchase_order/purchase_order_combobox/?csrf_protection=true", {
+      Axios("GET", "/api_web/Api_purchase_order/purchase_order_not_stock_combobox/?csrf_protection=true", {
         params:{
           "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
           "import_id": id ? id : ""
@@ -223,8 +280,8 @@ const Index = (props) => {
     },[])
 
     const _HandleChangeInput = (type, value) => {
-      if(option?.length > 1){
-        if(type ==="branch" || type === "supplier" || type === "theorder"){
+      if(listData?.length > 0){
+        if(type ==="branch" && idBranch != value || type === "supplier" && idSupplier != value || type === "theorder" && idTheOrder != value){
           Swal.fire({
             title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
             icon: 'warning',
@@ -235,16 +292,25 @@ const Index = (props) => {
             cancelButtonText:`${dataLang?.aler_cancel}`
         }).then((result) => {
           if (result.isConfirmed) {
-             sOption([{id: Date.now(), mathang: null}])
+            //  sOption([{id: Date.now(), mathang: null}])
               sDataItems([])
               sDataWarehouse([])
-              sIdTheOrder(null)
-              sIdSupplier(null)
+              if(type == "supplier"){
+                sIdSupplier(value)
+                sIdTheOrder(null)
+              }else if(type =="theorder"){
+                sIdTheOrder(value)
+                sIdSupplier({...idSupplier})
+              }
               sKhotong(null)
+              sListData([])
           }else{
-            sIdBranch(value)
-            sIdPurchases([])
-            sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+            sIdTheOrder({...idTheOrder})
+            sIdSupplier({...idSupplier})
+            // sIdBranch(value)
+            // sIdPurchases(null)
+            sListData([...listData])
+            // sOption([{id: Date.now(), mathang: null, serial: '', lot: '', date: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
           }
         })
         }
@@ -253,22 +319,25 @@ const Index = (props) => {
           sCode(value.target.value)
       }else if(type === "date"){
           sDate(moment(value.target.value).format('YYYY-MM-DD HH:mm:ss'))
-      }else if(type === "supplier"){
+      }else if(type === "supplier" && idSupplier != value){
+         if(listData.length === 0){
           sIdSupplier(value)
-          sOption([{id: Date.now(), mathang: null}])
+          // sOption([{id: Date.now(), mathang: null}])
           sMathangAll([])
           sDataItems([])
           sIdTheOrder(null)
           if(value == null){
             sDataThe_order([])
           }
+         }
       }else if(type === "theorder"){
-          sIdTheOrder(value)
-          if(value == null){ sDataItems([])
+          if(listData.length == 0){
+            sIdTheOrder(value)
+            if(value == null){ sDataItems([])}
           }
       }else if(type === "note"){
           sNote(value.target.value)
-      }else if(type == "branch"){
+      }else if(type == "branch" && idBranch != value){
           sIdBranch(value)
           sIdTheOrder(null)
           sIdSupplier(null)
@@ -280,15 +349,19 @@ const Index = (props) => {
       }else if(type == "mathangAll"){
           sMathangAll(value)
           if(value?.length === 0){
-            sOption([{id: Date.now(), mathang: null}])
+            // sOption([{id: Date.now(), mathang: null}])
             //new
             sListData([])
           }else if(value?.length > 0){
-            const fakeData = [{id: Date.now(), mathang: null}]
-            const data = fakeData?.concat(value?.map(e => ({id: uuidv4(), mathang: e, khohang: null, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.mathang?.e?.price ? Number(e?.mathang?.e?.price) : 1, chietkhau: e?.e?.discount_percent, dongiasauck: Number(e?.e?.price_after_discount),thue: {label:e?.e?.tax_name ,value :e?.e?.tax_rate, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
-            sOption(data);
-            //new            
-            sListData(value?.map(e => ({id: uuidv4(), matHang: e, child: [{kho: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
+            // const fakeData = [{id: Date.now(), mathang: null}]
+            // const data = fakeData?.concat(value?.map(e => ({id: uuidv4(),
+            //   disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+            //   mathang: e, khohang: null, serial: '', lot: '', date: null, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.mathang?.e?.price ? Number(e?.mathang?.e?.price) : 1, chietkhau: e?.e?.discount_percent, dongiasauck: Number(e?.e?.price_after_discount),thue: {label:e?.e?.tax_name ,value :e?.e?.tax_rate, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
+            // sOption(data);
+            //new          
+            sListData(value?.map(e => ({id: uuidv4(), matHang: e, child: [{kho: null,
+            disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+               serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
           }
       }else if(type === "khotong"){
           sKhotong(value)
@@ -327,69 +400,85 @@ const Index = (props) => {
   }
 
   
-  useEffect(() => {
-        sOption(prevOption => {
-          const newOption = [...prevOption];
-          newOption.forEach((item, index) => {
-            if (index === 0 || !item?.id) return;
-            item.khohang = khotong
-          });
-          return newOption;
-        });
-  }, [khotong]);
+  // useEffect(() => {
+  //       sOption(prevOption => {
+  //         const newOption = [...prevOption];
+  //         newOption.forEach((item, index) => {
+  //           if (index === 0 || !item?.id) return;
+  //           item.khohang = khotong
+  //         });
+  //         return newOption;
+  //       });
+  // }, [khotong]);
 
 
-  useEffect(() => {
-    if (thuetong == null) return;
-    sOption(prevOption => {
-      const newOption = [...prevOption];
-      const thueValue = thuetong?.tax_rate || 0;
-      const chietKhauValue = chietkhautong || 0;
-      newOption.forEach((item, index) => {
-        if (index === 0 || !item?.id) return;
-        const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
-        const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
-        item.thue = thuetong;
-        item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
-      });
-      return newOption;
-    });
-  }, [thuetong]);
+  // useEffect(() => {
+  //   if (thuetong == null) return;
+  //   sOption(prevOption => {
+  //     const newOption = [...prevOption];
+  //     const thueValue = thuetong?.tax_rate || 0;
+  //     const chietKhauValue = chietkhautong || 0;
+  //     newOption.forEach((item, index) => {
+  //       if (index === 0 || !item?.id) return;
+  //       const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
+  //       const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
+  //       item.thue = thuetong;
+  //       item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
+  //     });
+  //     return newOption;
+  //   });
+  // }, [thuetong]);
 
-  useEffect(() => {
-    if (chietkhautong == null) return;
-    sOption(prevOption => {
-      const newOption = [...prevOption];
-      const thueValue = thuetong?.tax_rate != undefined ? thuetong?.tax_rate : 0
-      const chietKhauValue = chietkhautong ? chietkhautong : 0;
-      newOption.forEach((item, index) => {
-        if (index === 0 || !item?.id) return;
-        const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
-        const thanhTien =  dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
-        item.chietkhau = Number(chietkhautong);
-        item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
-        item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
-      });
-      return newOption;
-    });
-  }, [chietkhautong]);
+  // useEffect(() => {
+  //   if (chietkhautong == null) return;
+  //   sOption(prevOption => {
+  //     const newOption = [...prevOption];
+  //     const thueValue = thuetong?.tax_rate != undefined ? thuetong?.tax_rate : 0
+  //     const chietKhauValue = chietkhautong ? chietkhautong : 0;
+  //     newOption.forEach((item, index) => {
+  //       if (index === 0 || !item?.id) return;
+  //       const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
+  //       const thanhTien =  dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
+  //       item.chietkhau = Number(chietkhautong);
+  //       item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
+  //       item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
+  //     });
+  //     return newOption;
+  //   });
+  // }, [chietkhautong]);
 
 
     const _HandleSubmit = (e) => {
       e.preventDefault();
+      //  const checkErr = sortedArr?.map(e => { return {item: e?.mathang?.value,location_warehouses_id: e?.khohang?.value}})
+      //  let checkErrValidate = checkErr?.filter(e => e?.item !== undefined);
+      // const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
 
-       const checkErr = sortedArr?.map(e => { return {item: e?.mathang?.value,location_warehouses_id: e?.khohang?.value}})
-       let checkErrValidate = checkErr?.filter(e => e?.item !== undefined);
-
-      const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
-
-        if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho ){
-          date == null && sErrDate(true)
+      const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => childItem.lot === ''));
+      const hasNullSerial = listData.some(item => item?.matHang.e?.text_type === "products" &&  item.child?.some(childItem => childItem.serial === ''));
+      const hasNullDate = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem =>  !childItem.disabledDate && childItem.date === null));
+     console.log("hasNullLot",hasNullLot);
+      // const checkThere = listData?.map(e => {return {type:  e.matHang.e?.text_type}})
+      // const hasProducts = checkThere?.some(obj => obj.type === 'products');
+      // const hasMaterial = checkThere?.some(obj => obj.type === 'material');
+      console.log("dataProductExpiry",dataProductExpiry);
+console.log("hisaa",(dataProductExpiry?.is_enable == "1"  && hasNullDate));
+        // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (hasMaterial && dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (hasProducts && dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
+        if(idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
+        // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho){
+          // date == null && sErrDate(true)
           idSupplier == null && sErrSupplier(true)
           idBranch == null && sErrBranch(true)
           idTheOrder == null && sErrTheOrder(true)
           hasNullKho && sErrWarehouse(true) 
+          hasNullLot && sErrLot(true)
+          hasNullSerial && sErrSerial(true)
+          hasNullDate && sErrDateList(true)
+          console.log(hasNullDate);
+          console.log("heeee",hasNullDate);
+          console.log("listData",listData);
+
             Toast.fire({
                 icon: 'error',
                 title: `${dataLang?.required_field_null}`
@@ -397,10 +486,12 @@ const Index = (props) => {
         }
         else {
             sErrWarehouse(false)
+            sErrLot(false)
+            sErrSerial(false)
+            sErrDateList(false)
             sOnSending(true)
         }
       }
-
     useEffect(() => {
       sErrDate(false)
     }, [date != null]);
@@ -409,11 +500,6 @@ const Index = (props) => {
       sErrSupplier(false)
     }, [idSupplier != null]);
 
- 
-
-
-
-    
     useEffect(() => {
       sErrBranch(false)
     }, [idBranch != null]);
@@ -662,18 +748,23 @@ const Index = (props) => {
     const allItems = [...options]
 
   const _HandleSelectAll = () => {
-    const fakeData = [{id: Date.now(), mathang: null}]
-    const data = fakeData?.concat(allItems?.map(e => ({id: uuidv4(), mathang: e, khohang: khotong ? khotong : e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.e?.price, chietkhau:chietkhautong ?  chietkhautong : e?.e?.discount_percent, dongiasauck:Number(e?.e?.price_after_discount), thue: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
-    sOption(data);
+    // const fakeData = [{id: Date.now(), mathang: null}]
+    // const data = fakeData?.concat(allItems?.map(e => ({id: uuidv4(), mathang: e,
+    //   disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+    //   khohang: khotong ? khotong : e?.qty_warehouse, serial: '', lot: '', date: null, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.e?.price, chietkhau:chietkhautong ?  chietkhautong : e?.e?.discount_percent, dongiasauck:Number(e?.e?.price_after_discount), thue: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
+    // sOption(data);
     // sMathangAll(data)
+
     //new
-    sMathangAll(allItems?.map(e => ({id: uuidv4(), matHang: e, child: [{id: uuidv4(), kho: khotong ? khotong : null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
-    sListData(allItems?.map(e => ({id: uuidv4(), matHang: e, child: [{id: uuidv4(), kho: khotong ? khotong : null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
+      sMathangAll(allItems?.map(e => ({id: uuidv4(), matHang: e, child: [{id: uuidv4(), disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+        kho: khotong ? khotong : null, serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
+      sListData(allItems?.map(e => ({id: uuidv4(), matHang: e, child: [{id: uuidv4(), disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+        kho: khotong ? khotong : null, serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
   };
 
   const _HandleDeleteAll = () => {
-    sMathangAll([])
-    sOption([{id: Date.now(), mathang: null}])
+    // sMathangAll([])
+    // sOption([{id: Date.now(), mathang: null}])
     //new
     sListData([])
   };
@@ -693,15 +784,19 @@ const Index = (props) => {
     };
 
 
-    const formatNumber = (num) => {
-      if (!num && num !== 0) return 0;
-      const roundedNum = parseFloat(num?.toFixed(2));
-      return roundedNum.toLocaleString("en", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-        useGrouping: true
-      });
-    };
+    // const formatNumber = (num) => {
+    //   if (!num && num !== 0) return 0;
+    //   const roundedNum = parseFloat(num?.toFixed(2));
+    //   return roundedNum.toLocaleString("en", {
+    //     minimumFractionDigits: 2,
+    //     maximumFractionDigits: 2,
+    //     useGrouping: true
+    //   });
+    // };
+    const formatNumber = (number) => {
+      const integerPart = Math.floor(number)
+      return integerPart.toLocaleString("en")
+    }
 
 
     const tinhTongTien = (option) => {
@@ -770,24 +865,37 @@ const Index = (props) => {
 
     const [tongTienState, setTongTienState] = useState({ tongTien: 0, tienChietKhau: 0, tongTienSauCK: 0, tienThue: 0, tongThanhTien: 0 });
     
-    useEffect(() => {
-      const tongTien = tinhTongTien(option);
-      setTongTienState(tongTien);
-    }, [option])
+    // useEffect(() => {
+    //   const tongTien = tinhTongTien(option);
+    //   setTongTienState(tongTien);
+    // }, [option])
 
     useEffect(() => {
       const tongTien = tinhTongTien(listData);
       setTongTienState(tongTien);
     }, [listData])
 
-    const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, purchases_order_item_id: e?.mathang?.e?.purchase_order_item_id, location_warehouses_id: e?.khohang?.value, quantity: Number(e?.soluong), price: e?.dongia, discount_percent:e?.chietkhau, tax_id:e?.thue?.value, note: e?.ghichu, id:e?.id}})
+    // const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, purchases_order_item_id: e?.mathang?.e?.purchase_order_item_id, location_warehouses_id: e?.khohang?.value, quantity: Number(e?.soluong), price: e?.dongia, discount_percent:e?.chietkhau, tax_id:e?.thue?.value, note: e?.ghichu, id:e?.id}})
    
-    let newDataOption = dataOption?.filter(e => e?.item !== undefined);
-    
+    // let newDataOption = dataOption?.filter(e => e?.item !== undefined);
+    const handleClearDate = (type) => {
+      if (type === 'effectiveDate') {
+        sEffectiveDate(null)
+      }
+      if (type === 'startDate') {
+        sStartDate(new Date())
+      }
+    }
+    const handleTimeChange = (date) => {
+      sStartDate(date)
+    };
+    console.log(startDate);
+
     const _ServerSending = () => {
           var formData = new FormData();
           formData.append("code", code)
-          formData.append("date", (moment(date).format("YYYY-MM-DD HH:mm:ss")))
+          // formData.append("date", (moment(date).format("YYYY-MM-DD HH:mm:ss")))
+          formData.append("date", (moment(startDate).format("YYYY-MM-DD HH:mm:ss")))
           formData.append("branch_id", idBranch.value)
           formData.append("suppliers_id", idSupplier.value)
           formData.append("id_order", idTheOrder.value)
@@ -811,6 +919,9 @@ const Index = (props) => {
               formData.append(`items[${index}][child][${childIndex}][id]`, childItem?.id);
               {id && formData.append(`items[${index}][child][${childIndex}][row_id]`, typeof(childItem?.id) == "number" ? childItem?.id : 0)};
               formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.amount);
+              formData.append(`items[${index}][child][${childIndex}][serial]`, childItem?.serial === null ? "" : childItem?.serial);
+              formData.append(`items[${index}][child][${childIndex}][lot]`, childItem?.lot === null ? "" : childItem?.lot);
+              formData.append(`items[${index}][child][${childIndex}][expiration_date]`, childItem?.date === null ? "" : moment(childItem?.date).format("YYYY-MM-DD HH:mm:ss"));
               formData.append(`items[${index}][child][${childIndex}][unit_name]`, childItem?.donViTinh);
               formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note);
               formData.append(`items[${index}][child][${childIndex}][tax_id]`, childItem?.tax?.value);
@@ -831,7 +942,7 @@ const Index = (props) => {
                           title: `${dataLang[message]}`
                       })
                       sCode("")
-                      sDate(new Date().toISOString().slice(0, 10))
+                      sStartDate(new Date)
                       sIdSupplier(null)
                       sIdBranch(null)
                       sIdTheOrder(null)
@@ -840,7 +951,7 @@ const Index = (props) => {
                       sErrDate(false)
                       sErrTheOrder(false)
                       sErrSupplier(false)
-                      sOption([{id: Date.now(), mathang: null}])
+                      // sOption([{id: Date.now(), mathang: null}])
                       //new
                       sListData([])
                       router.back()
@@ -873,7 +984,10 @@ const Index = (props) => {
   const _HandleAddChild = (parentId, value) => {
     const newData = listData?.map(e => {
       if(e?.id === parentId) {
-        const newChild = { id: uuidv4(), kho: khotong ? khotong : null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note };
+        const newChild = {
+          id: uuidv4(),
+          disabledDate: (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+           kho: khotong ? khotong : null, serial: '', lot: '', date: null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note };
         return { ...e, child: [...e.child, newChild] };
       }else {
         return e;
@@ -885,7 +999,15 @@ const Index = (props) => {
   const _HandleAddParent = (value) => {
     const checkData = listData?.some(e => e?.matHang?.value === value?.value)
     if(!checkData){
-      const newData = { id: Date.now(), matHang: value, child: [{id: uuidv4(), kho: khotong ? khotong : null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] }
+      const newData = { 
+        id: Date.now(), 
+        matHang: value, 
+        child: [{
+          id: uuidv4(), 
+          disabledDate: (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+          kho: khotong ? khotong : null, 
+          serial: '', lot: '', date: null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] 
+      }
       sListData([...listData, newData]);
     }else{
       Toast.fire({
@@ -894,6 +1016,7 @@ const Index = (props) => {
       })
     }
   }
+
 
   const _HandleDeleteChild = (parentId, childId) => {
     const newData = listData.map(e => {
@@ -927,6 +1050,13 @@ const Index = (props) => {
               return {...ce, kho: value}
             }else if(type === "tax"){
               return {...ce, tax: value}
+            }else if(type ==="serial"){
+              return {...ce, serial: value?.target.value}
+            }else if(type ==="lot"){
+              return {...ce, lot: value?.target.value}
+            }
+            else if(type ==="date"){
+              return {...ce, date: value}
             }
           }else{
             return ce;
@@ -942,11 +1072,19 @@ const Index = (props) => {
 
   const _HandleChangeValue = (parentId, value) => {
     const checkData = listData?.some(e => e?.matHang?.value === value?.value)
+   
     if(!checkData){
       // const newData = { id: Date.now(), matHang: value, child: [{id: uuidv4(), kho: khotong ? khotong : null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] }
       const newData = listData?.map(e => {
         if(e?.id === parentId){
-          return {...e, matHang: value, child: [{id: uuidv4(), kho: khotong ? khotong : null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}]}
+          return {...e, 
+            matHang: value,
+            child: [
+              {id: uuidv4(),
+                 kho: khotong ? khotong : null,
+                  disabledDate: (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+                  serial: '', lot: '', date: null,
+                  donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}]}
         }else{
           return e;
         }
@@ -959,6 +1097,26 @@ const Index = (props) => {
       })
     }
   }
+
+  const _HandleSeachApi = (inputValue) => {
+      Axios("POST", `/api_web/Api_purchase_order/purchase_order_not_stock_combobox/?csrf_protection=true`, {
+        data: {
+          term: inputValue,
+        },
+        params:{
+          "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
+          "import_id": id ? id : ""
+        }
+      }, (err, response) => {
+            if(!err){
+              var {result} = response?.data.data
+              sDataItems(result)
+          }
+      })
+  }
+
+  
+   console.log(listData);  
 
   return (
     <React.Fragment>
@@ -993,16 +1151,38 @@ const Index = (props) => {
                               name="fname"                      
                               type="text"
                               placeholder={dataLang?.purchase_order_system_default || "purchase_order_system_default"} 
-                              className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
+                              className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}/>
                         </div>
-                        <div className='col-span-2'>
+                        <div className='col-span-2 relative'>
                             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_day_vouchers || "import_day_vouchers"} <span className="text-red-500">*</span></label>
-                            <input
+                            {/* <input
                               value={date}    
                               onChange={_HandleChangeInput.bind(this, "date")}
                               name="fname"                      
                               type="datetime-local"
-                              className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
+                              className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/> */}
+                            <div className="custom-date-picker flex flex-row">
+                    <DatePicker
+                      blur
+                      fixedHeight
+                      showTimeSelect
+                      selected={startDate}
+                      onSelect={(date) => sStartDate(date)}
+                      onChange={(e) => handleTimeChange(e)}
+                      placeholderText="DD/MM/YYYY HH:mm:ss"
+                      dateFormat="dd/MM/yyyy h:mm:ss aa"
+                      timeInputLabel={'Time: '}
+                      placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                      className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                    />
+                    {startDate && (
+                      <>
+                        <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('startDate')} />
+                      </>
+                    )}
+                    <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                  </div>
+
                         </div>
                         <div className='col-span-2'>
                           <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_branch || "import_branch"} <span className="text-red-500">*</span></label>
@@ -1097,6 +1277,7 @@ const Index = (props) => {
                         <div className='col-span-2 '>
                           <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_the_orders || "import_the_orders"} <span className="text-red-500">*</span></label>
                           <Select 
+                              onInputChange={_HandleSeachApi.bind(this)}
                               options={dataThe_order}
                               onChange={_HandleChangeInput.bind(this, "theorder")}
                               value={idTheOrder}
@@ -1255,10 +1436,10 @@ const Index = (props) => {
                             isClearable
                             placeholder={dataLang?.import_click_house || "import_click_house"} 
                             hideSelectedOptions={false}
-                            className={` "border-transparent placeholder:text-slate-300 2xl:text-[12px] xl:text-[13px] text-[12.5px]   z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
+                            className={` "border-transparent placeholder:text-slate-300 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]   z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
-                           dangerouslySetInnerHTML={{__html: option.label}}
+                          //  dangerouslySetInnerHTML={{__html: option.label}}
                             menuPortalTarget={document.body}
                             closeMenuOnSelect={true}
                             style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -1293,24 +1474,37 @@ const Index = (props) => {
                         </div>
               </div> 
               <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10'>
-                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-2    text-center    truncate font-[400]'>{dataLang?.import_from_items || "import_from_items"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]'>{dataLang?.import_from_ware_loca || "import_from_ware_loca"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-right  truncate font-[400]'>{"ĐVT"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_quantity || "import_from_quantity"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_discount || "import_from_discount"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_tax || "import_from_tax"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_into_money || "import_into_money"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_note || "import_from_note"}</h4>
-                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_operation || "import_from_operation"}</h4>
+                  <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2 text-center truncate font-[400]'>{dataLang?.import_from_items || "import_from_items"}</h4>
+                  <div className='col-span-10'>
+                      <div className={`${dataProductSerial.is_enable == "1" ? 
+                    (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-13" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-[repeat(13_minmax(0_1fr))]" :"grid-cols-11" ) :
+                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10") ) } grid `}>
+                      <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]'>{dataLang?.import_from_ware_loca || "import_from_ware_loca"}</h4>
+                      {dataProductSerial.is_enable === "1" && (<h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Serial"}</h4>)}
+                          {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
+                            <>
+                              <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Lot"}</h4>
+                              <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}</h4>
+                            </> ):""}
+                      <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"ĐVT"}</h4>
+                      <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_quantity || "import_from_quantity"}</h4>
+                      <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
+                      <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_discount || "import_from_discount"}</h4>
+                      <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Đơn giá SCK"}</h4>
+                      <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_tax || "import_from_tax"}</h4>
+                      <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_into_money || "import_into_money"}</h4>
+                      <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_note || "import_from_note"}</h4>
+                      <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_operation || "import_from_operation"}</h4>
+                      </div>
+                    </div>       
               </div>     
               <div className="grid grid-cols-12 items-center gap-1 py-2">
+                <div className='col-span-2'>
                 <Select 
                   options={options}
                   value={null}
                   onChange={_HandleAddParent.bind(this)}
-                  className="col-span-2 text-[13px]"
+                  className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                   placeholder="Mặt hàng"
                   noOptionsMessage={() => "Không có dữ liệu"}
                   menuPortalTarget={document.body}
@@ -1318,19 +1512,19 @@ const Index = (props) => {
                     <div className='flex items-center  justify-between py-2'>
                       <div className='flex items-center gap-2'>
                         <div className='w-[40px] h-h-[60px]'>
-                        {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='object-cover rounded' />):
-                              <div className=' object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]'>
-                                <img src="/no_img.png" alt="Product Image"  className='object-cover rounded ' />
+                        {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='max-w-[30px] h-[40px] text-[8px] object-cover rounded' />):
+                              <div className=' w-[30px] h-[40px] object-cover  flex items-center justify-center rounded'>
+                                <img src="/no_img.png" alt="Product Image"  className='w-[30px] h-[30px] object-cover rounded' />
                             </div>
                             }
                         </div>
                         <div>
-                          <h3 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
+                          <h3 className='font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.name}</h3>
                           <div className='flex gap-2'>
-                            <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]' >{option.e?.code}</h5>
-                            <h5 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
+                            <h5 className='text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]' >{option.e?.code}</h5>
+                            <h5 className='font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.product_variation}</h5>
                           </div>
-                          <h5 className='text-gray-400 font-medium text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
+                          <h5 className='text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{dataLang[option.e?.text_type]}</h5>
                         </div>
                       </div>
                       <div className=''>
@@ -1366,224 +1560,361 @@ const Index = (props) => {
                     control: (base, state) => ({
                       ...base,
                       ...(state.isFocused && {
-                        border: '0 0 0 1px #92BFF7',
+                        border: 'none',
                         boxShadow: 'none'
                       }),
                     }),
                   }}
                 />
-                <Select placeholder="Kho - vị trí hàng" className='text-[13px]' isDisabled={true} />
-                <div />
-                <div className="flex items-center justify-center">
-                  <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5  bg-slate-200 rounded-full"><Minus className='2xl:scale-100 xl:scale-100 scale-70' size="16"/></button>
-                  <div className='border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-medium bg-slate-50 text-black'>1</div>
-                  <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5  bg-slate-200 rounded-full"><Add className='2xl:scale-100 xl:scale-100 scale-70' size="16"/></button>
                 </div>
-                <div className='justify-center flex'>
-                  <div className='border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-medium bg-slate-50 text-black'>1</div>
+                <div className='col-span-10'>
+                  <div className={`${dataProductSerial.is_enable == "1" ? 
+                    (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-13" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-[repeat(13_minmax(0_1fr))]" :"grid-cols-11" ) :
+                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10") ) } grid  divide-x border-t border-b `}>
+                    <div className='col-span-1'> <Select placeholder="Kho - vị trí hàng" className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]' isDisabled={true} /></div>
+                    {dataProductSerial.is_enable === "1" ? (
+                              <div className=" col-span-1 flex items-center">
+                                 <div className='flex justify-center   p-0.5 flex-col items-center'>
+                                    <NumericFormat
+                                      className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal  focus:outline-none border-b-2 border-gray-200"
+                                      allowNegative={false}
+                                      decimalScale={0}
+                                      isNumericString={true}  
+                                      thousandSeparator=","
+                                      disabled
+                                    />
+                              </div>
+                              </div>
+                            ):""}
+                          {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
+                            <>
+                              <div className=" col-span-1 flex items-center">
+                              <div className='flex justify-center   p-0.5 flex-col items-center'>
+                                    <NumericFormat
+                                      className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal w-[100%]  focus:outline-none border-b-2 border-gray-200"
+                                      allowNegative={false}
+                                      decimalScale={0}
+                                      isNumericString={true}  
+                                      thousandSeparator=","
+                                      disabled
+                                    />
+                              </div>
+                              </div>
+                              <div className=" col-span-1 flex items-center ">
+                              <div className="custom-date-picker flex flex-row ">
+                                <DatePicker
+                                  // selected={effectiveDate}
+                                  // blur
+                                  placeholderText="dd/mm/yyyy"
+                                  // dateFormat="dd/MM/yyyy"
+                                  // onSelect={(date) => sEffectiveDate(date)}
+                                  // placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                  disabled
+                                  className={`3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b placeholder:text-slate-300 w-full bg-gray-50 rounded text-[#52575E] font-light px-2 py-1.5 text-center outline-none cursor-pointer  `}
+                                />
+                                {/* {effectiveDate && (
+                                  <>
+                                    <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('effectiveDate')} />
+                                  </>
+                                )}
+                                <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" /> */}
+                             </div>
+                              </div>
+                            </>
+                             ):""}
+                      <div className='col-span-1'></div>
+                      <div className="col-span-1 flex items-center justify-center">
+                        {/* <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center3xl:p-0 2xl:p-0 xl:p-0 p-0  bg-slate-200 rounded-full"><Minus className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button> */}
+                        <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full" ><Minus className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
+                        <div className='text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b-2 border-gray-200'>1</div>
+                        <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"><Add className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
+                      </div>
+                      <div className='col-span-1 justify-center flex items-center'>
+                        <div className='border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50 text-black'>1</div>
+                      </div>
+                      <div className='col-span-1 justify-center flex items-center'>
+                        <div className='border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50'>0</div>
+                      </div>
+                      <div className='col-span-1 text-right 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black flex items-center justify-end'>0</div>
+                      <div className='col-span-1 flex items-center w-full'>
+                       <Select placeholder="% Thuế" className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full' isDisabled={true} />
+                      </div>
+                      <div className='col-span-1 text-right 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black  flex items-center justify-end'>1.00</div>
+                      <input placeholder='Ghi chú' disabled className= " disabled:bg-gray-50 col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 " />
+                      <button title='Xóa' disabled className='col-span-1 disabled:opacity-50 transition w-full h-full bg-slate-100  rounded-[5.5px] text-red-500 flex flex-col justify-center items-center'>
+                        <IconDelete />
+                      </button>
+                  </div>
                 </div>
-                <div className='justify-center flex'>
-                  <div className='border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-4 px-2 font-medium bg-slate-50'></div>
-                </div>
-                <div className='text-right 2xl:text-[13px] xl:text-[13px] text-[12.5px] font-medium pr-3 text-black'>0</div>
-                <Select placeholder="% Thuế" className='text-[13px]' isDisabled={true} />
-                <div className='text-right 2xl:text-[13px] xl:text-[13px] text-[12.5px] font-medium pr-3 text-black'>1.00</div>
-                <input placeholder='Ghi chú' disabled className= "border-[#d0d5dd] disabled:bg-[#f2f2f2] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] p-1.5 border" />
-                <button title='Xóa' disabled className='disabled:opacity-50 transition w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center'>
-                  <IconDelete />
-                </button>
               </div>
               <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
                 <div className="min:h-[400px] h-[100%] max:h-[800px]"> 
-                  {listData?.map(e => 
-                    <div key={e?.id?.toString()} className='grid grid-cols-12 items-start'>
-                      <div className='col-span-2 border p-0.5 pb-1 h-full'>
-                        <div className='relative mr-5 mt-5'>
-                          <Select 
-                            options={options}
-                            value={e?.matHang} 
-                            className='' 
-                            onChange={_HandleChangeValue.bind(this, e?.id)}
-                            menuPortalTarget={document.body}
-                            formatOptionLabel={(option) => (
-                              <div className='flex items-center  justify-between py-2'>
-                                <div className='flex items-center gap-2'>
-                                  <div className='w-[40px] h-h-[60px]'>
-                                  {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='object-cover rounded' />):
-                                        <div className=' object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]'>
-                                          <img src="/no_img.png" alt="Product Image"  className='object-cover rounded ' />
+                  {onFetchingDetail ? <Loading className="h-60"color="#0f4f9e" />
+                    :  
+                    <>
+                    {listData?.map(e => 
+                      <div key={e?.id?.toString()} className='grid grid-cols-12 items-start'>
+                        <div className='col-span-2 border p-0.5 pb-1 h-full'>
+                          <div className='relative mr-5 mt-5'>
+                            <Select 
+                              options={options}
+                              value={e?.matHang} 
+                              className='' 
+                              onChange={_HandleChangeValue.bind(this, e?.id)}
+                              menuPortalTarget={document.body}
+                              formatOptionLabel={(option) => (
+                                <div className='flex items-center  justify-between py-2'>
+                                  <div className='flex items-center gap-2'>
+                                    <div className='w-[40px] h-h-[60px]'>
+                                    {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='object-cover rounded' />):
+                                          <div className=' object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]'>
+                                            <img src="/no_img.png" alt="Product Image"  className='object-cover rounded ' />
+                                        </div>
+                                        }
+                                    </div>
+                                    <div>
+                                      <h3 className='font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.name}</h3>
+                                      <h5 className='text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]' >{option.e?.code}</h5>
+                                      <h5 className='font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.product_variation}</h5>
+                                      <h5 className='text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{dataLang[option.e?.text_type]}</h5>
+                                    </div>
+                                  </div>
+                                  <div className=''>
+                                    <div className='text-right opacity-0'>{"0"}</div>
+                                    <div className='flex gap-2'>
+                                      <div className='flex items-center gap-2'>
+                                        <h5 className='text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.qty_warehouse ?? 0}</h5>
                                       </div>
-                                      }
-                                  </div>
-                                  <div>
-                                    <h3 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
-                                    <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]' >{option.e?.code}</h5>
-                                    <h5 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
-                                    <h5 className='text-gray-400 font-medium text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
+                                      
+                                      </div>
                                   </div>
                                 </div>
-                                <div className=''>
-                                  <div className='text-right opacity-0'>{"0"}</div>
-                                  <div className='flex gap-2'>
-                                    <div className='flex items-center gap-2'>
-                                      <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.qty_warehouse ?? 0}</h5>
-                                    </div>
-                                    
-                                    </div>
-                                </div>
-                              </div>
-                            )}
-                            style={{ border: "none", boxShadow: "none", outline: "none" }}
-                            theme={(theme) => ({
-                              ...theme,
-                              colors: {
-                                  ...theme.colors,
-                                  primary25: '#EBF5FF',
-                                  primary50: '#92BFF7',
-                                  primary: '#0F4F9E',
-                              },
-                            })}
-                            styles={{
-                              placeholder: (base) => ({
-                              ...base,
-                              color: "#cbd5e1",
-                              }),
-                              menuPortal: (base) => ({
+                              )}
+                              style={{ border: "none", boxShadow: "none", outline: "none" }}
+                              theme={(theme) => ({
+                                ...theme,
+                                colors: {
+                                    ...theme.colors,
+                                    primary25: '#EBF5FF',
+                                    primary50: '#92BFF7',
+                                    primary: '#0F4F9E',
+                                },
+                              })}
+                              styles={{
+                                placeholder: (base) => ({
                                 ...base,
-                                zIndex: 9999
-                              }), 
-                              control: (base, state) => ({
-                                ...base,
-                                ...(state.isFocused && {
-                                  border: '0 0 0 1px #92BFF7',
-                                  boxShadow: 'none'
+                                color: "#cbd5e1",
                                 }),
-                              }),
-                            }}
-                          />
-                          <button onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)} className='w-10 h-10 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-4 -right-4'><Add /></button>
+                                menuPortal: (base) => ({
+                                  ...base,
+                                  zIndex: 9999
+                                }), 
+                                control: (base, state) => ({
+                                  ...base,
+                                  ...(state.isFocused && {
+                                    border: '0 0 0 1px #92BFF7',
+                                    boxShadow: 'none'
+                                  }),
+                                }),
+                              }}
+                            />
+                            <button onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)} className='w-10 h-10 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-4 -right-4'><Add /></button>
+                          </div>
                         </div>
-                      </div>
-                      <div className='col-span-10 grid grid-cols-10 items-center'>
-                        {e?.child?.map(ce =>
-                          <React.Fragment key={ce?.id?.toString()}>
-                            <div className='p-0.5 border flex flex-col justify-center h-full'>
-                              <Select 
-                                options={warehouse}
-                                value={ce?.kho} 
-                                onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "kho")}
-                                className={`${errWarehouse && ce?.kho == null ? "border-red-500" : "" } my-1 2xl:text-[12px] xl:text-[13px] text-[12.5px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal outline-none border`} 
-                                placeholder={"Kho - vị trí kho"} 
-                                menuPortalTarget={document.body}
-                                formatOptionLabel={(option) => (
-                                  <div className='z-[100]'>
-                                    <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] z-[100]'>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
-                                    <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] z-[100]'>{option?.label}</h2>
-                                  </div>
-                                )}
-                                style={{ border: "none", boxShadow: "none", outline: "none" }}
-                                theme={(theme) => ({
-                                  ...theme,
-                                  colors: {
-                                      ...theme.colors,
-                                      primary25: '#EBF5FF',
-                                      primary50: '#92BFF7',
-                                      primary: '#0F4F9E',
-                                  },
-                                })}
-                              />
-                            </div>
-                            <div className='text-right border p-0.5 pr-2.5 h-full flex flex-col justify-center'>{ce?.donViTinh}</div>
-                            <div className="flex items-center justify-center border h-full p-0.5">
-                              <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5 bg-slate-200 rounded-full" onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "decrease")}><Minus className='2xl:scale-100 xl:scale-100 scale-70' size="16"/></button>
-                              <NumericFormat
-                                className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
-                                onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "amount")}
-                                value={ce?.amount || 1}
-                                allowNegative={false}
-                                decimalScale={0}
-                                isNumericString={true}  
-                                thousandSeparator=","
-                                isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
-                                />
-                              <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5 bg-slate-200 rounded-full" onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "increase")}><Add className='2xl:scale-100 xl:scale-100 scale-70' size="16"/></button>
-                            </div>
-                            <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
-                              <NumericFormat
-                                className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b-2 border-gray-200 h-fit"
-                                onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "price")}
-                                value={ce?.price}
-                                allowNegative={false}
-                                decimalScale={0}
-                                isNumericString={true}  
-                                thousandSeparator=","
-                                isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
-                              />
-                            </div>
-                            <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
-                              <NumericFormat
-                                className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
-                                onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "chietKhau")}
-                                value={ce?.chietKhau}
-                                allowNegative={false}
-                                decimalScale={0}
-                                isNumericString={true}  
-                                thousandSeparator=","
-                                isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
-                              />
-                            </div>
-                            {/* <div>{ce?.priceAfter}</div> */}
-                            <div className='col-span-1 text-right flex items-center justify-end border h-full p-0.5'>
-                              <h3 className='px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{formatNumber(Number(ce?.price) * ( 1 - Number(ce?.chietKhau)/100 ))}</h3>
-                            </div>
-                            <div className='border flex flex-col items-center p-0.5 h-full justify-center'>
-                              <Select 
-                                options={taxOptions}
-                                value={ce?.tax} 
-                                onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "tax")}
-                                placeholder={dataLang?.import_from_tax || "import_from_tax"} 
-                                className={`  2xl:text-[12px] xl:text-[13px] text-[12.5px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
-                                menuPortalTarget={document.body}
-                                style={{ border: "none", boxShadow: "none", outline: "none" }}
-                                formatOptionLabel={(option) => (
-                                  <div className='flex justify-start items-center gap-1 '>
-                                    <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option?.label}</h2>
-                                    <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{`(${option?.tax_rate})`}</h2>
-                                  </div>
-                                )}
-                                theme={(theme) => ({
-                                  ...theme,
-                                  colors: {
-                                      ...theme.colors,
-                                      primary25: '#EBF5FF',
-                                      primary50: '#92BFF7',
-                                      primary: '#0F4F9E',
-                                  },
-                                })}
-                              />
-                            </div>
-                            {/* <div>{ce?.thanhTien}</div> */}
-                            <div className='justify-center pr-3 border p-0.5 h-full flex flex-col items-end text-sm'>{formatNumber((ce?.price * ( 1 - Number(ce?.chietKhau)/100 )) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
-                            {/* <div>{ce?.note}</div> */}
-                            <div className='col-span-1 flex items-center justify-center border h-full p-0.5'>
-                             <input
-                                 value={ce?.note}  
-                                 onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "note")}
-                                 placeholder='Ghi chú'                 
-                                 type="text"
-                                 className= "  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
-                               /> 
-                            </div>
-                            <div className='border h-full p-0.5 flex flex-col items-center justify-center'>
-                              <button title='Xóa' onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)} className=' text-red-500 flex flex-col justify-center items-center'>
-                                <IconDelete />
-                              </button>
-                            </div>
-                          </React.Fragment>
-                        )}
-                      </div>
-                    </div>  
-                  )}
+                        <div className='col-span-10  items-center'>
+                          <div className={`${dataProductSerial.is_enable == "1" ? 
+                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-13" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-[repeat(13_minmax(0_1fr))]" :"grid-cols-11" ) :
+                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10") ) } grid  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]`}>
+                            {e?.child?.map(ce =>
+                              <React.Fragment key={ce?.id?.toString()}>
+                                <div className='p-0.5 border flex flex-col justify-center h-full'>
+                                  <Select 
+                                    options={warehouse}
+                                    value={ce?.kho} 
+                                    onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "kho")}
+                                    className={`${errWarehouse && ce?.kho == null ? "border-red-500" : "" } my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal outline-none border`} 
+                                    placeholder={"Kho - vị trí kho"} 
+                                    menuPortalTarget={document.body}
+                                    formatOptionLabel={(option) => (
+                                      <div className='z-[999]'>
+                                        <h2 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]'>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
+                                        <h2 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]'>{option?.label}</h2>
+                                      </div>
+                                    )}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                          ...theme.colors,
+                                          primary25: '#EBF5FF',
+                                          primary50: '#92BFF7',
+                                          primary: '#0F4F9E',
+                                      },
+                                    })}
+                                  />
+                                </div>
+                                {dataProductSerial.is_enable === "1" ? (
+                                <div className=" col-span-1">
+                                  <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
+                                      <input
+                                        value={ce?.serial}
+                                        disabled={e?.matHang?.e?.text_type != "products"}
+                                        className={`${e?.matHang?.e?.text_type === "products" && errSerial && ce?.serial ==="" ? "border-red-500 border" : "border-b w-[100%] border-gray-200" } rounded "appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal   focus:outline-none"`}
+                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
+                                      />
+                                </div>
+                                </div>
+                              ):""}
+                            {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
+                              <>
+                                <div className=" col-span-1 ">
+                                <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
+                                      {/* <input
+                                        value={ce?.lot}
+                                        disabled={e?.matHang?.e?.text_type != "material"}
+                                        className={`${e?.matHang?.e?.text_type === "material" && errLot && ce?.lot === "" ? "border-red-500 border" : "border-b border-gray-200" } rounded "appearance-none focus:outline-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
+                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
+                                      /> */}
+                                      <input
+                                        value={ce?.lot}
+                                        disabled={ce?.disabledDate}
+                                        className={`${errLot && ce?.lot === "" && !ce?.disabledDate ? "border-red-500 border" : "border-b border-gray-200" } rounded w-[100%] "appearance-none focus:outline-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal    focus:outline-none"`}
+                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
+                                      />
+                                </div>
+                                </div>
+                            
+                                <div className=" col-span-1 ">
+                                <div className="custom-date-picker flex justify-center border h-full p-0.5 flex-col items-center w-full">
+                                    {/* <input type='date'
+                                        value={ce?.date}
+                                        disabled={ce?.disabledDate}
+                                        className={`${errDateList && ce?.date == "" && !ce?.disabledDate ? "border-red-500 border" : "border-b-2 border-gray-200"} w-[100%] rounded "appearance-none  text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-1 xl:px-1 p-0 font-normal   focus:outline-none "`}
+                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "date")}
+                                      /> */}
+                                       <div className='col-span-4 relative'>
+                                          <div className="custom-date-picker flex flex-row">
+                                            <DatePicker
+                                              selected={ce?.date}
+                                              blur
+                                              disabled={ce?.disabledDate}
+                                              placeholderText="DD/MM/YYYY"
+                                              dateFormat="dd/MM/yyyy"
+                                              onSelect={(date) => _HandleChangeChild(e?.id, ce?.id, "date",date)}
+                                              placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                              className={`border ${
+                                                errDateList && ce?.date == null && !ce?.disabledDate
+                                                  ? "border-red-500"
+                                                  : ce?.disabledDate ? "bg-gray-50" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                              } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
+                                              // className={`border ${errDateList && ce?.date == null && !ce?.disabledDate ?"border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
+                                            />
+                                            {effectiveDate && (
+                                              <>
+                                                <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('effectiveDate')} />
+                                              </>
+                                            )}
+                                            <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                                          </div>
+                                        </div>
+                              </div>
+                                </div>
+                              </>
+                              ):""}
+                                <div className='text-left border p-0.5 pr-2.5 h-full flex flex-col justify-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{ce?.donViTinh}</div>
+                                <div className="flex items-center justify-center border h-full p-0.5">
+                                  <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full" onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "decrease")}><Minus className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
+                                  <NumericFormat
+                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b-2 border-gray-200"
+                                    onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "amount")}
+                                    value={ce?.amount || 1}
+                                    allowNegative={false}
+                                    decimalScale={0}
+                                    isNumericString={true}  
+                                    thousandSeparator=","
+                                    isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
+                                    />
+                                  <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full" onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "increase")}><Add className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
+                                </div>
+                                <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
+                                  <NumericFormat
+                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b-2 border-gray-200 h-fit"
+                                    onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "price")}
+                                    value={ce?.price}
+                                    allowNegative={false}
+                                    decimalScale={0}
+                                    isNumericString={true}  
+                                    thousandSeparator=","
+                                    isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
+                                  />
+                                </div>
+                                <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
+                                  <NumericFormat
+                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
+                                    onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "chietKhau")}
+                                    value={ce?.chietKhau}
+                                    allowNegative={false}
+                                    decimalScale={0}
+                                    isNumericString={true}  
+                                    thousandSeparator=","
+                                    isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
+                                  />
+                                </div>
+                                {/* <div>{ce?.priceAfter}</div> */}
+                                <div className='col-span-1 text-right flex items-center justify-end border h-full p-0.5'>
+                                  <h3 className='px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{formatNumber(Number(ce?.price) * ( 1 - Number(ce?.chietKhau)/100 ))}</h3>
+                                </div>
+                                <div className='border flex flex-col items-center p-0.5 h-full justify-center'>
+                                  <Select 
+                                    options={taxOptions}
+                                    value={ce?.tax} 
+                                    onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "tax")}
+                                    placeholder={dataLang?.import_from_tax || "import_from_tax"} 
+                                    className={`  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
+                                    menuPortalTarget={document.body}
+                                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                    formatOptionLabel={(option) => (
+                                      <div className='flex justify-start items-center gap-1 '>
+                                        <h2 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option?.label}</h2>
+                                        <h2 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{`(${option?.tax_rate})`}</h2>
+                                      </div>
+                                    )}
+                                    theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                          ...theme.colors,
+                                          primary25: '#EBF5FF',
+                                          primary50: '#92BFF7',
+                                          primary: '#0F4F9E',
+                                      },
+                                    })}
+                                  />
+                                </div>
+                                {/* <div>{ce?.thanhTien}</div> */}
+                                <div className='justify-center pr-3 border p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{formatNumber((ce?.price * ( 1 - Number(ce?.chietKhau)/100 )) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
+                                {/* <div>{ce?.note}</div> */}
+                                <div className='col-span-1 flex items-center justify-center border h-full p-0.5'>
+                                <input
+                                    value={ce?.note}  
+                                    onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "note")}
+                                    placeholder='Ghi chú'                 
+                                    type="text"
+                                    className= "  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
+                                  /> 
+                                </div>
+                                <div className='border h-full p-0.5 flex flex-col items-center justify-center'>
+                                  <button title='Xóa' onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)} className=' text-red-500 flex flex-col justify-center items-center'>
+                                    <IconDelete />
+                                  </button>
+                                </div>
+                              </React.Fragment>
+                            )}
+                          </div>
+                        </div>
+                      </div>  
+                    )}
+                    </>
+                  }
                 </div>
               </div>
             <div className='grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center'>
@@ -1601,7 +1932,7 @@ const Index = (props) => {
                           />
                         </div> 
                       </div>
-                      <div className='col-span-2 flex items-center gap-2'>
+                      <div className='col-span-2 flex items-center gap-2 '>
                           <h2>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h2>  
                           <Select 
                             options={taxOptions}
@@ -1615,10 +1946,10 @@ const Index = (props) => {
                               )}
                             placeholder={dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"} 
                             hideSelectedOptions={false}
-                            className={` "border-transparent placeholder:text-slate-300 w-[70%] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
+                            className={` "border-transparent placeholder:text-slate-300 w-[70%] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
-                           dangerouslySetInnerHTML={{__html: option.label}}
+                          //  dangerouslySetInnerHTML={{__html: option.label}}
                             menuPortalTarget={document.body}
                             closeMenuOnSelect={true}
                             style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -1657,7 +1988,7 @@ const Index = (props) => {
         <h2 className='font-normal bg-[white]  p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]'>{dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"} </h2>  
         </div>
         <div className='grid grid-cols-12'>
-            <div className='col-span-10'>
+            <div className='col-span-9'>
                 <div className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_note || "purchase_order_note"}</div>
                   <textarea
                     value={note}       
@@ -1668,7 +1999,7 @@ const Index = (props) => {
                     className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-[40%] min-h-[220px] max-h-[220px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
                   />
             </div>
-            <div className="text-right mt-5 space-y-4 col-span-2 flex-col justify-between ">
+            <div className="text-right mt-5 space-y-4 col-span-3 flex-col justify-between ">
                 <div className='flex justify-between '>
                 </div>
                 <div className='flex justify-between '>

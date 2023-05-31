@@ -348,16 +348,19 @@ const Index = (props) => {
       //   sFetchingSuccess(false)
       // }, [fetchingSuccess]);
 
-      const formatNumber = (num) => {
-        if (!num && num !== 0) return 0;
-        const roundedNum = parseFloat(num.toFixed(2));
-        return roundedNum.toLocaleString("en", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-          useGrouping: true
-        });
-      };
-
+      // const formatNumber = (num) => {
+      //   if (!num && num !== 0) return 0;
+      //   const roundedNum = parseFloat(num.toFixed(2));
+      //   return roundedNum.toLocaleString("en", {
+      //     minimumFractionDigits: 2,
+      //     maximumFractionDigits: 2,
+      //     useGrouping: true
+      //   });
+      // };
+      const formatNumber = (number) => {
+        const integerPart = Math.floor(number)
+        return integerPart.toLocaleString("en")
+      }
 
   return (
     <React.Fragment>

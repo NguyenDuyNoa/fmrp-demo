@@ -188,13 +188,13 @@ useEffect(() => {
   return (
   <React.Fragment>
     <Head>
-        <title>{ router.query.tab === "units" && dataLang?.category_unit || router.query.tab === "stages" && dataLang?.settings_category_stages_title}</title>
+        <title>{ router.query.tab === "units" && dataLang?.category_unit || router.query.tab === "stages" && dataLang?.settings_category_stages_title || router.query.tab === "costs" && dataLang?.expense_costs || "expense_costs"}</title>
     </Head>
     <div className='px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen'>
         <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
             <h6 className='text-[#141522]/40'>{dataLang?.branch_seting}</h6>
             <span className='text-[#141522]/40'>/</span>
-            <h6>{ router.query.tab === "units" && dataLang?.category_unit || router.query.tab === "stages" && dataLang?.settings_category_stages_title}</h6>
+            <h6>{ router.query.tab === "units" && dataLang?.category_unit || router.query.tab === "stages" && dataLang?.settings_category_stages_title || router.query.tab === "costs" && dataLang?.expense_costs || "expense_costs"}</h6>
         </div>
         <div className='grid grid-cols-9 gap-5 h-[99%]'>
             <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
@@ -206,7 +206,7 @@ useEffect(() => {
                     <div className="flex space-x-3 items-center justify-start">
                         <button onClick={_HandleSelectTab.bind(this, "units")} className={`${router.query?.tab === "units" ? "text-[#0F4F9E] bg-[#e2f0fe]" : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"} rounded-lg px-4 py-2 outline-none`}>{dataLang?.category_unit}</button>
                         <button onClick={_HandleSelectTab.bind(this, "stages")} className={`${router.query?.tab === "stages" ? "text-[#0F4F9E] bg-[#e2f0fe]" : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"} rounded-lg px-4 py-2 outline-none`}>{dataLang?.settings_category_stages_title}</button>
-                        <button onClick={_HandleSelectTab.bind(this, "costs")} className={`${router.query?.tab === "costs" ? "text-[#0F4F9E] bg-[#e2f0fe]" : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"} rounded-lg px-4 py-2 outline-none`}>{"Loại chi phí"}</button>
+                        <button onClick={_HandleSelectTab.bind(this, "costs")} className={`${router.query?.tab === "costs" ? "text-[#0F4F9E] bg-[#e2f0fe]" : "hover:text-[#0F4F9E] hover:bg-[#e2f0fe]/30"} rounded-lg px-4 py-2 outline-none`}>{dataLang?.expense_costs || "expense_costs"}</button>
                     </div>
                     <div className="3xl:h-[65%] 2xl:h-[60%] xl:h-[55%] h-[57%] space-y-2">
                         <div className="flex justify-end">
@@ -259,10 +259,10 @@ useEffect(() => {
                                       {router.query?.tab === "costs" && 
                                         <React.Fragment>
                                             <h4 className="xl:text-[14px] px-2 text-[12px] col-span-1 text-[#667085] uppercase font-[300] text-center">{"#"}</h4>
-                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-3 text-[#667085] uppercase font-[300] text-left">{"Mã chi phí"}</h4>
-                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">{"Tên chi phí"}</h4>
-                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">{"Cấp"}</h4>
-                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">{"Chi nhánh"}</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-3 text-[#667085] uppercase font-[300] text-left">{dataLang?.expense_code || "expense_code"}</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-left">{dataLang?.expense_name || "expense_name"}</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">{dataLang?.expense_grant || "expense_grant"}</h4>
+                                            <h4 className="xl:text-[14px] px-2 text-[12px] col-span-2 text-[#667085] uppercase font-[300] text-center">{dataLang?.expense_branch || "expense_branch"}</h4>
                                         </React.Fragment>
                                     }
                                     <h4 className="xl:text-[14px] px-2 text-[12px] col-span-1 text-[#667085] uppercase font-[300] text-center">
@@ -439,7 +439,7 @@ const Items = React.memo((props) => {
 const ItemsChild = React.memo((props) => {
   return(
       <React.Fragment key={props.data?.id}>
-          <div className={`grid grid-cols-11 py-2.5 px-2 hover:bg-slate-100/40 `}>
+          <div className={`grid grid-cols-11 py-2.5  hover:bg-slate-100/40 `}>
               {props.data?.level == "3" && 
                   <div className='col-span-1 h-full flex justify-center items-center pl-24'>
                       <IconDown className='rotate-45' />
@@ -461,10 +461,10 @@ const ItemsChild = React.memo((props) => {
                       <IconMinus className='mt-1.5' />
                   </div>
               }
-              <h6 className='xl:text-base text-xs col-span-3 px-2 '>{props.data?.code}</h6>
-              <h6 className='xl:text-base text-xs col-span-2 px-2  truncate'>{props.data?.name}</h6>
-              <h6 className='xl:text-base text-xs col-span-2 px-2 text-center truncate'>{props.data?.level}</h6>
-              <div className='col-span-2 flex flex-wrap px-2'>
+              <h6 className='xl:text-base text-xs col-span-3 px-[7px] '>{props.data?.code}</h6>
+              <h6 className='xl:text-base text-xs col-span-2 px-[7px]  truncate'>{props.data?.name}</h6>
+              <h6 className='xl:text-base text-xs col-span-2 px-[7px] text-center truncate'>{props.data?.level}</h6>
+              <div className='col-span-2 flex flex-wrap '>
                   {props.data?.branch.map(e => 
                       <h6 key={e?.id.toString()} className='text-[15px] mr-1 mb-1 py-[1px] px-1.5 text-[#0F4F9E] font-[300] rounded border border-[#0F4F9E] h-fit'>{e?.name}</h6>
                   )}
@@ -718,7 +718,7 @@ const Popup_danhmuc = (props) => {
 
     return(
       <PopupEdit  
-        title={props.data?.id ? `${(tabPage === "units" && props.dataLang?.category_unit_edit) || (tabPage === "stages" && props.dataLang?.settings_category_stages_edit) || (tabPage === "costs" && "Sửa loại chi phí") }` : `${(tabPage === "units" && props.dataLang?.category_unit_add) || (tabPage === "stages" && props.dataLang?.settings_category_stages_add) || (tabPage === "costs" && "Tạo loại chi phí")}`} 
+        title={props.data?.id ? `${(tabPage === "units" && props.dataLang?.category_unit_edit) || (tabPage === "stages" && props.dataLang?.settings_category_stages_edit) || (tabPage === "costs" && props.dataLang?.expense_edit || "expense_edit") }` : `${(tabPage === "units" && props.dataLang?.category_unit_add) || (tabPage === "stages" && props.dataLang?.settings_category_stages_add) || (tabPage === "costs" && props.dataLang?.expense_add || "expense_add")}`} 
         button={props.data?.id ? <IconEdit/> : `${props.dataLang?.branch_popup_create_new}`} 
         onClickOpen={_ToggleModal.bind(this, true)} 
         open={open} onClose={_ToggleModal.bind(this,false)}
@@ -848,24 +848,24 @@ const Popup_danhmuc = (props) => {
                <React.Fragment>
                  <div className='py-4 space-y-5'>
                  <div className='space-y-1'>
-                    <label className="text-[#344054] font-normal text-base">{"Mã chi phí"} <span className='text-red-500'>*</span></label>
+                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.expense_code || "expense_code"} <span className='text-red-500'>*</span></label>
                     <input 
                     value={costs_code} onChange={_HandleChangeInput.bind(this, "costs_code")}
-                     type="text" placeholder={"Mã chi phí"} className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
-                    {errCode && <label className="text-sm text-red-500">{"Vui lòng chọn mã chi phí"}</label>}
+                     type="text" placeholder={props.dataLang?.expense_code || "expense_code"} className={`${errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                    {errCode && <label className="text-sm text-red-500">{props.dataLang?.expense_errCode || "expense_errCode"}</label>}
                 </div>
                  <div className='space-y-1'>
-                    <label className="text-[#344054] font-normal text-base">{"Tên chi phí"} <span className='text-red-500'>*</span></label>
+                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.expense_name || "expense_name"} <span className='text-red-500'>*</span></label>
                     <input 
                     value={costs_name} onChange={_HandleChangeInput.bind(this, "costs_name")}
-                     type="text" placeholder={"Tên chi phí"} className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
-                    {errName && <label className="text-sm text-red-500">{"Vui lòng nhập tên chi phí"}</label>}
+                     type="text" placeholder={props.dataLang?.expense_name || "expense_name"} className={`${errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`} />
+                    {errName && <label className="text-sm text-red-500">{props.dataLang?.expense_errName || "expense_errName"}</label>}
                 </div>
                 <div className='col-span-6 max-h-[65px] min-h-[65px]'>
-                            <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">{"Chi nhánh"} <span className="text-red-500">*</span></label>
+                            <label className="text-[#344054] font-normal text-base mb-1 ">{props.dataLang?.expense_branch || "expense_branch"} <span className="text-red-500">*</span></label>
                               <Select   
                                   closeMenuOnSelect={true}
-                                  placeholder={"Chi nhánh"}
+                                  placeholder={props.dataLang?.expense_branch || "expense_branch"}
                                   options={dataBranch}
                                   isSearchable={true}
                                   onChange={_HandleChangeInput.bind(this, "costs_branch")}
@@ -902,10 +902,10 @@ const Popup_danhmuc = (props) => {
                                 }}
                                 className={`${errBranch ? "border-red-500" : "border-transparent" } text-sm placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] mb-2 font-normal outline-none border `} 
                               />
-                                {errBranch && <label className="mb-2 text-sm text-red-500">{"Vui lòng chọn chi nhánh"}</label>}
+                                {errBranch && <label className="mb-2 text-sm text-red-500">{props.dataLang?.expense_errBranch || "expense_errBranch"}</label>}
                             </div>
                   <div className='space-y-1 mt-2'>
-                    <label className="text-[#344054] font-normal text-base">{"Nhóm cha"}</label>
+                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.expense_group || "expense_group"}</label>
                     <Select 
                         options={dataOption}
                         formatOptionLabel={CustomSelectOption}
