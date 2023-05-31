@@ -554,15 +554,19 @@ const Index = (props) => {
         //   return num.toLocaleString(undefined, {minimumFractionDigits: 2});
         // };
 
-        const formatNumber = (num) => {
-          if (!num && num !== 0) return 0;
-          const roundedNum = parseFloat(num.toFixed(2));
-          return roundedNum.toLocaleString("en", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-            useGrouping: true
-          });
-        };
+        // const formatNumber = (num) => {
+        //   if (!num && num !== 0) return 0;
+        //   const roundedNum = parseFloat(num.toFixed(2));
+        //   return roundedNum.toLocaleString("en", {
+        //     minimumFractionDigits: 2,
+        //     maximumFractionDigits: 2,
+        //     useGrouping: true
+        //   });
+        // };
+        const formatNumber = (number) => {
+          const integerPart = Math.floor(number)
+          return integerPart.toLocaleString("en")
+        }
 
          const _HandleChangeInputOption = (id, type,index3, value) => {
           var index = option.findIndex(x => x.id === id );
