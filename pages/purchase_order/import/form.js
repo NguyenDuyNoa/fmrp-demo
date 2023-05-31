@@ -440,7 +440,7 @@ const _ServerFetching =  () => {
       //  const checkErr = sortedArr?.map(e => { return {item: e?.mathang?.value,location_warehouses_id: e?.khohang?.value}})
       //  let checkErrValidate = checkErr?.filter(e => e?.item !== undefined);
       // const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
-      
+
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
       const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => childItem.lot === ''));
       const hasNullSerial = listData.some(item => item?.matHang.e?.text_type === "products" &&  item.child?.some(childItem => childItem.serial === ''));
@@ -1429,7 +1429,7 @@ const _ServerFetching =  () => {
                               <h4 className="text-[12px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Lot"}</h4>
                               <h4 className="text-[12px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}</h4>
                             </> ):""}
-                      <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-right  truncate font-[400]'>{"ĐVT"}</h4>
+                      <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"ĐVT"}</h4>
                       <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_quantity || "import_from_quantity"}</h4>
                       <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
                       <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_discount || "import_from_discount"}</h4>
@@ -1513,13 +1513,13 @@ const _ServerFetching =  () => {
                 <div className='col-span-10'>
                   <div className={`${dataProductSerial.is_enable == "1" ? 
                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-13" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-[repeat(13_minmax(0_1fr))]" :"grid-cols-11" ) :
-                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10") ) } grid `}>
+                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10") ) } grid  divide-x border-t border-b`}>
                     <div className='col-span-1'> <Select placeholder="Kho - vị trí hàng" className='text-[13px]' isDisabled={true} /></div>
                     {dataProductSerial.is_enable === "1" ? (
                               <div className=" col-span-1">
-                                 <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
+                                 <div className='flex justify-center   p-0.5 flex-col items-center'>
                                     <NumericFormat
-                                      className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
+                                      className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal  focus:outline-none border-b-2 border-gray-200"
                                       allowNegative={false}
                                       decimalScale={0}
                                       isNumericString={true}  
@@ -1532,9 +1532,9 @@ const _ServerFetching =  () => {
                           {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
                             <>
                               <div className=" col-span-1 ">
-                              <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
+                              <div className='flex justify-center   p-0.5 flex-col items-center'>
                                     <NumericFormat
-                                      className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
+                                      className="appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal w-[100%]  focus:outline-none border-b-2 border-gray-200"
                                       allowNegative={false}
                                       decimalScale={0}
                                       isNumericString={true}  
@@ -1544,16 +1544,16 @@ const _ServerFetching =  () => {
                               </div>
                               </div>
                               <div className=" col-span-1 ">
-                              <div className="custom-date-picker flex flex-row border">
+                              <div className="custom-date-picker flex flex-row ">
                                 <DatePicker
                                   // selected={effectiveDate}
                                   // blur
-                                  // placeholderText="DD/MM/YYYY"
+                                  placeholderText="dd/mm/yyyy"
                                   // dateFormat="dd/MM/yyyy"
                                   // onSelect={(date) => sEffectiveDate(date)}
                                   // placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
                                   disabled
-                                  className={`border border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
+                                  className={` border-b placeholder:text-slate-300 w-full bg-gray-50 rounded text-[#52575E] font-light px-2 py-1.5 text-center outline-none cursor-pointer  `}
                                 />
                                 {/* {effectiveDate && (
                                   <>
@@ -1571,11 +1571,11 @@ const _ServerFetching =  () => {
                         <div className='border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-medium bg-slate-50 text-black'>1</div>
                         <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 2xl:p-0.5 xl:p-0.5  bg-slate-200 rounded-full"><Add className='2xl:scale-100 xl:scale-100 scale-70' size="16"/></button>
                       </div>
-                      <div className='col-span-1 justify-center flex'>
+                      <div className='col-span-1 justify-center flex items-center'>
                         <div className='border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-medium bg-slate-50 text-black'>1</div>
                       </div>
-                      <div className='col-span-1 justify-center flex'>
-                        <div className='border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-4 px-2 font-medium bg-slate-50'></div>
+                      <div className='col-span-1 justify-center flex items-center'>
+                        <div className='border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 2xl:text-[13px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-medium bg-slate-50'>0</div>
                       </div>
                       <div className='col-span-1 text-right 2xl:text-[13px] xl:text-[13px] text-[12.5px] font-medium pr-3 text-black'>0</div>
                       <div className='col-span-1'>
@@ -1701,7 +1701,7 @@ const _ServerFetching =  () => {
                                       <input
                                         value={ce?.serial}
                                         disabled={e?.matHang?.e?.text_type != "products"}
-                                        className={`${e?.matHang?.e?.text_type === "products" && errSerial && ce?.serial ==="" ? "border-red-500 border" : "border-b border-gray-200" } rounded "appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
+                                        className={`${e?.matHang?.e?.text_type === "products" && errSerial && ce?.serial ==="" ? "border-red-500 border" : "border-b w-[100%] border-gray-200" } rounded "appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal   focus:outline-none"`}
                                         onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
                                       />
                                 </div>
@@ -1720,7 +1720,7 @@ const _ServerFetching =  () => {
                                       <input
                                         value={ce?.lot}
                                         disabled={ce?.disabledDate}
-                                        className={`${errLot && ce?.lot === "" && !ce?.disabledDate ? "border-red-500 border" : "border-b border-gray-200" } rounded "appearance-none focus:outline-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"`}
+                                        className={`${errLot && ce?.lot === "" && !ce?.disabledDate ? "border-red-500 border" : "border-b border-gray-200" } rounded w-[100%] "appearance-none focus:outline-none text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-2 xl:px-1 p-0 font-normal    focus:outline-none"`}
                                         onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
                                       />
                                 </div>
@@ -1730,7 +1730,7 @@ const _ServerFetching =  () => {
                                     <input type='date'
                                         value={ce?.date}
                                         disabled={ce?.disabledDate}
-                                        className={`${errDate && ce?.date === "" && !ce?.disabledDate ? "border-red-500 border" : "border-b-2 border-gray-200"} rounded "appearance-none  text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-1 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-full  focus:outline-none "`}
+                                        className={`${errDate && ce?.date === "" && !ce?.disabledDate ? "border-red-500 border" : "border-b-2 border-gray-200"} w-[100%] rounded "appearance-none  text-center 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 2xl:px-1 xl:px-1 p-0 font-normal   focus:outline-none "`}
                                         onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "date")}
                                       />
                               </div>
