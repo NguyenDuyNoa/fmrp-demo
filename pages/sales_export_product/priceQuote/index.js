@@ -364,7 +364,7 @@ const Index = (props) => {
                             <div className='flex justify-between'>
                                 <h2 className="xl:text-2xl text-xl text-[#52575E] capitalize">{dataLang?.price_quote || "price_quote"}</h2>
                                 <div className="flex justify-end items-center">
-                                    <Link href="/sales_export_product/priceQuote/form" className='xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>{dataLang?.price_quote_btn_new || "price_quote_btn_new"}</Link>
+                                    <Link href="/sales_export_product/priceQuote/form" className='xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>{dataLang?.btn_new || "btn_new"}</Link>
                                 </div>
                             </div>
 

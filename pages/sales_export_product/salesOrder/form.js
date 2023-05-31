@@ -54,8 +54,15 @@ const Index = (props) => {
 
   const [errDate, sErrDate] = useState(false)
   const [errCustomer, sErrCustomer] = useState(false)
+  const [errStaff, sErrStaff] = useState(false)
   const [errEffectiveDate, sErrEffectiveDate] = useState(false)
   const [errBranch, sErrBranch] = useState(false)
+
+  const [hidden, sHidden] = useState(false)
+  const [loai, sLoai] = useState("0");
+  const [idPurchases, sIdPurchases] = useState([])
+  const [errPurchase, sErrPurchase] = useState(false)
+  const [dataItems, sDataItems] = useState([])
 
   const [tongTienState, setTongTienState] = useState({
     tongTien: 0,
@@ -64,6 +71,7 @@ const Index = (props) => {
     tienThue: 0,
     tongThanhTien: 0
   });
+
 
   const readOnlyFirst = true;
 
@@ -84,7 +92,6 @@ const Index = (props) => {
     }, (err, response) => {
       if (!err) {
         var rResult = response.data;
-        console.log(rResult)
 
         const itemlast = [{ mathang: null }];
         const items = itemlast?.concat(rResult?.items?.map(e => ({
@@ -526,31 +533,26 @@ const Index = (props) => {
   const tinhTongTien = (option) => {
     const tongTien = option.slice(1).reduce((acc, item) => {
       const tongTien = acc + item?.dongia * item?.soluong
-      console.log('tongTien', tongTien);
       return acc + tongTien
     }, 0);
 
     const tienChietKhau = option.slice(1).reduce((acc, item) => {
       const tienChietKhau = item?.dongia * (item?.chietkhau / 100) * item?.soluong;
-      console.log('tienChietKhau', tienChietKhau);
       return acc + tienChietKhau;
     }, 0);
 
     const tongTienSauCK = option.slice(1).reduce((acc, item) => {
       const tienSauCK = item?.soluong * item?.dongiasauck;
-      console.log('tienSauCK', tienSauCK);
       return acc + tienSauCK;
     }, 0);
 
     const tienThue = option.slice(1).reduce((acc, item) => {
       const tienThueItem = item?.dongiasauck * (isNaN(item?.thue?.tax_rate) ? 0 : (item?.thue?.tax_rate / 100)) * item?.soluong;
-      console.log('tienThueItem', tienThueItem);
       return acc + tienThueItem;
     }, 0);
 
     const tongThanhTien = option.slice(1).reduce((acc, item) => {
       const tongThanhTien = item?.thanhtien
-      console.log('tongThanhTien', tongThanhTien);
       return acc + tongThanhTien
 
     }, 0);
@@ -577,7 +579,6 @@ const Index = (props) => {
   })
 
   let newDataOption = dataOption?.filter(e => e?.item !== undefined);
-  console.log("newDataOption", newDataOption)
   // handle submit
   const _ServerSending = () => {
     var formData = new FormData();
@@ -654,31 +655,135 @@ const Index = (props) => {
     }
   }
 
-  const handleTimeChange = (date) => {
-    sStartDate(date)
+  // code new
+  const fakeDataPurchases = idBranch != null ? dataPurchases.filter((x) => !hiddenOptions.includes(x.value)) : []
+
+  const optionsItem = dataItems?.map(e => ({ label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`, value: e.id, e }))
+  const allItems = [...options]
+
+  const _HandleSelectAll = () => {
+    const fakeData = [{ id: Date.now(), mathang: null }]
+    const data = fakeData?.concat(allItems?.map(e => ({ id: uuidv4(), mathang: e, khohang: khotong ? khotong : e?.qty_warehouse, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left) : 1, dongia: e?.e?.price, chietkhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, dongiasauck: Number(e?.e?.price_after_discount), thue: thuetong ? thuetong : { label: e?.e?.tax_name, value: e?.e?.tax_id, tax_rate: e?.e?.tax_rate }, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note })))
+    sOption(data);
+    // sMathangAll(data)
+    //new
+    sMathangAll(allItems?.map(e => ({ id: uuidv4(), matHang: e, child: [{ id: uuidv4(), kho: khotong ? khotong : null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : { label: e?.e?.tax_name, value: e?.e?.tax_id, tax_rate: e?.e?.tax_rate }, thanhTien: Number(e?.e?.amount), note: e?.e?.note }] })))
+    sListData(allItems?.map(e => ({ id: uuidv4(), matHang: e, child: [{ id: uuidv4(), kho: khotong ? khotong : null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : { label: e?.e?.tax_name, value: e?.e?.tax_id, tax_rate: e?.e?.tax_rate }, thanhTien: Number(e?.e?.amount), note: e?.e?.note }] })))
   };
+
+  const _HandleDeleteAll = () => {
+    sMathangAll([])
+    sOption([{ id: Date.now(), mathang: null }])
+    //new
+    sListData([])
+  };
+
+  const MenuList = (props) => {
+    return (
+      <components.MenuList {...props}>
+        {allItems?.length > 0 &&
+          <div className='grid grid-cols-2 items-center  cursor-pointer'>
+            <div className='hover:bg-slate-200 p-2 col-span-1 text-center ' onClick={_HandleSelectAll.bind(this)}>Chọn tất cả</div>
+            <div className='hover:bg-slate-200 p-2 col-span-1 text-center' onClick={_HandleDeleteAll.bind(this)}>Bỏ chọn tất cả</div>
+          </div>
+        }
+        {props.children}
+      </components.MenuList>
+    );
+  };
+
+  // render option item in formatGroupLabel Item
+  const selectItemsLabel = (option) => {
+    return (
+      <div className='flex items-center justify-between py-1'>
+        <div className='flex items-center gap-2 '>
+          <div>
+            {
+              option.e?.images !== null
+                ?
+                (
+                  <img src={option.e?.images} alt="Product Image" className='max-w-[30px] h-[40px] text-[8px] object-cover rounded' />
+                )
+                :
+                (
+                  <div className='w-[30px] h-[40px] object-cover  flex items-center justify-center rounded'>
+                    <img src="/no_img.png" alt="Product Image" className='w-[30px] h-[30px] object-cover rounded' />
+                  </div>
+                )
+            }
+          </div>
+
+          <div>
+            <h3 className='font-bold 3xl:text-[14px] 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>
+              {option.e?.name}
+            </h3>
+
+            <div className='flex gap-2'>
+              <h5 className='text-gray-400 font-normal 3xl:text-[14px] 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>
+                {option.e?.code}:
+              </h5>
+              <h5 className='font-normal 3xl:text-[14px] 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>
+                {option.e?.product_variation}
+              </h5>
+            </div>
+
+            <div className='flex flex-row gap-20'>
+              <h5 className='text-gray-400 font-normal 3xl:text-[14px] 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>
+                {dataLang[option.e?.text_type]}
+              </h5>
+
+              <div className='flex items-center gap-1'>
+                <h5 className='text-gray-400 font-normal 3xl:text-[14px] 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>
+                  {dataLang?.purchase_survive || "purchase_survive"}:
+                </h5>
+
+                <h5 className=' font-normal 3xl:text-[14px] 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>
+                  {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
+                </h5>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    )
+  }
+
+  // render option formatGroupLabel tax 
+  const taxRateLabel = (option) => {
+    return (
+      <div className='flex justify-start items-center gap-1 '>
+        <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option?.label}</h2>
+        <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{`(${option?.tax_rate})`}</h2>
+      </div>
+    )
+  }
+
+
 
   return (
     <React.Fragment>
       <Head>
-        <title>{id ? dataLang?.price_quote_edit_order || "price_quote_edit_order" : dataLang?.price_quote_add_order || "price_quote_add_order"}</title>
+        <title>{id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.sales_product_add_order || "sales_product_add_order"}</title>
       </Head>
       <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between'>
         <div className='h-[97%] space-y-3 overflow-hidden'>
 
           <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
             <h6 className='text-[#141522]/40'>
-              {dataLang?.price_quote || "price_quote"}
+              {dataLang?.sales_product_list || "sales_product_list"}
             </h6>
             <span className='text-[#141522]/40'>/</span>
             <h6>
-              {id ? dataLang?.price_quote_edit_order || "price_quote_edit_order" : dataLang?.price_quote_add_order || "price_quote_add_order"}
+              {id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.sales_product_add_order || "sales_product_add_order"}
             </h6>
           </div>
 
           <div className='flex justify-between items-center'>
             <h2 className='xl:text-2xl text-xl '>
-              {id ? dataLang?.price_quote_edit_order || "price_quote_edit_order" : dataLang?.price_quote_add_order || "price_quote_add_order"}
+              {id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.sales_product_add_order || "sales_product_add_order"}
             </h2>
             <div className="flex justify-end items-center">
               <button
@@ -690,15 +795,16 @@ const Index = (props) => {
             </div>
           </div>
 
+          {/* Thông tin chung */}
           <div className=' w-full rounded'>
             <div >
               <h2 className='font-normal bg-[#ECF0F4] p-2'>
                 {dataLang?.detail_general_information || "detail_general_information"}
               </h2>
               <div className="grid grid-cols-12 gap-3 items-center mt-2">
-                <div className='col-span-4'>
+                <div className='col-span-3'>
                   <label className="text-[#344054] font-normal text-sm mb-1 ">
-                    {dataLang?.price_quote_code || "price_quote_code"}
+                    {dataLang?.sales_product_code || "sales_product_code"}
                   </label>
                   <input
                     value={code}
@@ -710,7 +816,7 @@ const Index = (props) => {
                   />
                 </div>
 
-                <div className='col-span-4'>
+                <div className='col-span-3'>
                   <label className="text-[#344054] font-normal text-sm mb-1 ">
                     {dataLang?.branch || "branch"} <span className="text-red-500">*</span>
                   </label>
@@ -722,7 +828,7 @@ const Index = (props) => {
                     closeMenuOnSelect={true}
                     hideSelectedOptions={false}
                     placeholder={dataLang?.select_branch || "select_branch"}
-                    className={`${errBranch ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                    className={`${errBranch ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                     isSearchable={true}
                     components={{ MultiValue }}
                     style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -753,8 +859,8 @@ const Index = (props) => {
                   {errBranch && <label className="text-sm text-red-500">{dataLang?.price_quote_errSelect_table_branch || "price_quote_errSelect_table_branch"}</label>}
                 </div>
 
-                <div className='col-span-4'>
-                  <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.customer || "customer"} <span className="text-red-500">*</span></label>
+                <div className='col-span-3'>
+                  <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.customer || 'customer'} <span className="text-red-500">*</span></label>
                   <Select
                     options={dataCustomer}
                     onChange={_HandleChangeInput.bind(this, "customer")}
@@ -762,7 +868,7 @@ const Index = (props) => {
                     placeholder={dataLang?.select_customer || "select_customer"}
                     hideSelectedOptions={false}
                     isClearable={true}
-                    className={`${errCustomer ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                    className={`${errCustomer ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-fullbg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                     isSearchable={true}
                     noOptionsMessage={() => "Không có dữ liệu"}
                     menuPortalTarget={document.body}
@@ -799,7 +905,7 @@ const Index = (props) => {
                   {errCustomer && <label className="text-sm text-red-500">{dataLang?.price_quote_errSelect_customer || "price_quote_errSelect_customer"}</label>}
                 </div>
 
-                <div className='col-span-4'>
+                <div className='col-span-3'>
                   <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.contact_person || "contact_person"}</label>
                   <Select
                     options={dataPersonContact}
@@ -808,7 +914,7 @@ const Index = (props) => {
                     placeholder={dataLang?.select_contact_person || "select_contact_person"}
                     hideSelectedOptions={false}
                     isClearable={true}
-                    className={` placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border`}
+                    className={` placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border`}
                     isSearchable={true}
                     noOptionsMessage={() => "Không có dữ liệu"}
                     menuPortalTarget={document.body}
@@ -844,8 +950,8 @@ const Index = (props) => {
                   />
                 </div>
 
-                <div className='col-span-4 relative'>
-                  <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.price_quote_date || "price_quote_date"} <span className="text-red-500">*</span></label>
+                <div className='col-span-3'>
+                  <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.sales_product_date || "sales_product_date"} <span className="text-red-500">*</span></label>
                   <div className="custom-date-picker flex flex-row">
                     <DatePicker
                       blur
@@ -853,110 +959,267 @@ const Index = (props) => {
                       showTimeSelect
                       selected={startDate}
                       onSelect={(date) => sStartDate(date)}
-                      onChange={(e) => handleTimeChange(e)}
+                      onChange={(e) => sStartDate(e)}
                       placeholderText="DD/MM/YYYY HH:mm:ss"
                       dateFormat="dd/MM/yyyy h:mm:ss aa"
                       timeInputLabel={'Time: '}
-                      className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                      className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
                     />
                     {startDate && (
                       <>
-                        <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('startDate')} />
+                        <MdClear className="absolute translate-x-[2400%] translate-y-[4%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('startDate')} />
                       </>
                     )}
-                    <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                    <BsCalendarEvent className="absolute left-0 translate-x-[2850%] translate-y-[80%] text-[#CCCCCC] scale-110 cursor-pointer" />
                   </div>
                   {errDate && <label className="text-sm text-red-500">{dataLang?.price_quote_errDate || "price_quote_errDate"}</label>}
                 </div>
 
-                <div className='col-span-4 relative'>
-                  <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.price_quote_effective_date || "price_quote_effective_date"} <span className="text-red-500">*</span></label>
-                  <div className="custom-date-picker flex flex-row">
-                    <DatePicker
-                      selected={effectiveDate}
-                      blur
-                      placeholderText="DD/MM/YYYY"
-                      dateFormat="dd/MM/yyyy"
-                      onSelect={(date) => sEffectiveDate(date)}
-                      className={`border ${errEffectiveDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
-                    />
-                    {effectiveDate && (
-                      <>
-                        <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('effectiveDate')} />
-                      </>
-                    )}
-                    <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
-                  </div>
-                  {errEffectiveDate && <label className="text-sm text-red-500">{dataLang?.price_quote_effective_errDate || "price_quote_effective_errDate"}</label>}
+                <div className='col-span-3'>
+                  <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.sales_product_staff_in_charge || "sales_product_staff_in_charge"}  <span className="text-red-500">*</span></label>
+                  <Select
+                    options={dataPersonContact}
+                    onChange={_HandleChangeInput.bind(this, "contactPerson")}
+                    value={idContactPerson}
+                    placeholder={dataLang?.sales_product_select_staff_in_charge || "sales_product_select_staff_in_charge"}
+                    hideSelectedOptions={false}
+                    isClearable={true}
+                    className={`placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border`}
+                    isSearchable={true}
+                    noOptionsMessage={() => "Không có dữ liệu"}
+                    menuPortalTarget={document.body}
+                    closeMenuOnSelect={true}
+                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                    theme={(theme) => ({
+                      ...theme,
+                      colors: {
+                        ...theme.colors,
+                        primary25: '#EBF5FF',
+                        primary50: '#92BFF7',
+                        primary: '#0F4F9E',
+                      },
+                    })}
+                    styles={{
+                      placeholder: (base) => ({
+                        ...base,
+                        color: "#cbd5e1",
+                      }),
+                      menuPortal: (base) => ({
+                        ...base,
+                        zIndex: 20
+                      }),
+                      control: (base, state) => ({
+                        ...base,
+                        boxShadow: 'none',
+                        padding: "2.7px",
+                        ...(state.isFocused && {
+                          border: '0 0 0 1px #92BFF7',
+                        }),
+                      })
+                    }}
+                  />
+                  {errStaff && <label className="text-sm text-red-500">{dataLang?.sales_product_err_staff_in_charge || "sales_product_err_staff_in_charge"}</label>}
                 </div>
+
+                <div className='col-span-3'>
+                  <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.sales_product_order_type || "sales_product_order_type"} </label>
+                  <div className='flex items-center gap-5'>
+                    <div className="flex items-center ">
+                      <input onChange={_HandleChangeInput.bind(this, "loai")} id="default-radio-1" type="radio" value="0" checked={loai === "0" ? true : false} name="default-radio" className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                      <label for="default-radio-1" className="ml-2 cursor-pointer text-sm font-normal text-gray-900 dark:text-gray-300">{dataLang?.sales_product_new_order || "sales_product_new_order"}</label>
+                    </div>
+                    <div className="flex items-center">
+                      <input onChange={_HandleChangeInput.bind(this, "loai")} checked={loai === "1" ? true : false} id="default-radio-2" type="radio" value="1" name="default-radio" className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                      <label for="default-radio-2" className="ml-2 cursor-pointer text-sm font-normal text-gray-900 dark:text-gray-300">{dataLang?.sales_product_according_to_quotation || "sales_product_according_to_quotation"}</label>
+                    </div>
+                  </div>
+                </div>
+                {!hidden && (
+                  <div className='col-span-3'>
+                    <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.sales_product_quotation || "sales_product_quotation"} <span className="text-red-500">*</span></label>
+                    <Select
+                      options={fakeDataPurchases}
+                      onChange={_HandleChangeInput.bind(this, "purchases")}
+                      value={idPurchases}
+                      placeholder={dataLang?.sales_product_select_quotation || "sales_product_select_quotation"}
+                      hideSelectedOptions={false}
+                      isClearable={true}
+                      className={`${errPurchase ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                      isSearchable={true}
+                      noOptionsMessage={() => "Không có dữ liệu"}
+                      menuPortalTarget={document.body}
+                      isMulti
+                      style={{ border: "none", boxShadow: "none", outline: "none" }}
+                      theme={(theme) => ({
+                        ...theme,
+                        colors: {
+                          ...theme.colors,
+                          primary25: '#EBF5FF',
+                          primary50: '#92BFF7',
+                          primary: '#0F4F9E',
+                        },
+                      })}
+                      styles={{
+                        placeholder: (base) => ({
+                          ...base,
+                          color: "#cbd5e1",
+                        }),
+                        menuPortal: (base) => ({
+                          ...base,
+                          zIndex: 20
+                        }),
+                        control: (base, state) => ({
+                          ...base,
+                          boxShadow: 'none',
+                          padding: "2.7px",
+                          ...(state.isFocused && {
+                            border: '0 0 0 1px #92BFF7',
+                          }),
+                        })
+                      }}
+                    />
+                    {errPurchase && <label className="text-sm text-red-500">{dataLang?.purchase_order_errYCMH || "purchase_order_errYCMH"}</label>}
+                  </div>
+                )}
 
               </div>
             </div>
           </div>
 
-          <h2 className='font-normal bg-[#ECF0F4] p-2  '>{dataLang?.price_quote_item_information || "price_quote_item_information"}</h2>
+          {/* Thông tin mặt hàng */}
+          <h2 className='font-normal bg-[#ECF0F4] p-2  '>{dataLang?.item_information || "item_information"}</h2>
 
-          <div className='pr-2'>
-            <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 '>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-3    text-left    truncate font-[400]'>{dataLang?.price_quote_item || "price_quote_item"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_from_unit || "price_quote_from_unit"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_quantity || "price_quote_quantity"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_unit_price || "price_quote_unit_price"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{`% ${dataLang?.price_quote_discount}` || "% price_quote_discount"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    font-[400]'>{dataLang?.price_quote_after_discount || "price_quote_after_discount"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_tax || "price_quote_tax"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]'>{dataLang?.price_quote_money_after_discount || "price_quote_money_after_discount"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]'>{dataLang?.price_quote_note || "price_quote_note"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.price_quote_operations || "price_quote_operations"}</h4>
+          <div className='grid grid-cols-10'>
+            <div div className='col-span-2 my-auto'>
+              <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_click_items || "import_click_items"} </label>
+              <Select
+                options={allItems}
+                closeMenuOnSelect={false}
+                onChange={_HandleChangeInput.bind(this, "mathangAll",)}
+                // value={mathangAll?.value ? mathangAll?.value : listData?.map(e => e?.matHang)}
+                isMulti
+                // components={{ Option: CustomOption,MenuList }}
+                components={{ MenuList, MultiValue }}
+                formatOptionLabel={(option) => {
+                  if (option.value === "0") {
+                    return (
+                      <div className='text-gray-400 font-medium'>{option.label}</div>
+                    )
+                  }
+                  else if (option.value === null) {
+                    return (
+                      <div className='text-gray-400 font-medium'>{option.label}</div>
+                    )
+                  }
+                  else {
+                    return (
+                      <div className='flex items-center justify-between py-2'>
+                        <div className='flex items-center gap-2'>
+                          <div>
+                            {option.e?.images != null ? (
+                              <img src={option.e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />
+                            ) : (
+                              <div className='w-[50px] h-[60px] object-cover flex items-center justify-center rounded'>
+                                <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <h3 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
+                            <div className='flex gap-2'>
+                              <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.code}</h5>
+                              <h5 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
+                            </div>
+                            <h5 className='text-gray-400 font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
+                          </div>
+                        </div>
+                        <div className=''>
+                          <div className='text-right opacity-0'>{"0"}</div>
+                          <div className='flex gap-2'>
+                            <div className='flex items-center gap-2'>
+                              <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5>
+                              <h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse || 0}</h5>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  }
+                }}
+                // components={{ DropdownIndicator }}
+                placeholder={dataLang?.purchase_items || "purchase_items"}
+                hideSelectedOptions={false}
+                className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] "
+                isSearchable={true}
+                noOptionsMessage={() => "Không có dữ liệu"}
+                menuPortalTarget={document.body}
+                style={{ border: "none", boxShadow: "none", outline: "none" }}
+                theme={(theme) => ({
+                  ...theme,
+                  colors: {
+                    ...theme.colors,
+                    primary25: '#EBF5FF',
+                    primary50: '#92BFF7',
+                    primary: '#0F4F9E',
+                  },
+                })}
+                styles={{
+                  placeholder: (base) => ({
+                    ...base,
+                    color: "#cbd5e1",
+                  }),
+                  menuPortal: (base) => ({
+                    ...base,
+                    zIndex: 100
+                  }),
+                  control: (base, state) => ({
+                    ...base,
+                    boxShadow: 'none',
+                    padding: "2.7px",
+                    ...(state.isFocused && {
+                      border: '0 0 0 1px #92BFF7',
+                    }),
+                  })
+                }}
+              />
             </div>
           </div>
 
+
+          {/* Thông tin mặt hàng Header */}
+          <div className='pr-2'>
+            <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 '>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-2 text-left truncate font-[400]'>{dataLang?.sales_product_item || "sales_product_item"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{dataLang?.sales_product_from_unit || "sales_product_from_unit"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{dataLang?.sales_product_quantity || "sales_product_quantity"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{dataLang?.sales_product_unit_price || "sales_product_unit_price"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{`${dataLang?.sales_product_rate_discount}` || "sales_product_rate_discount"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-left    font-[400]'>{dataLang?.sales_product_after_discount || "sales_product_after_discount"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{dataLang?.sales_product_tax || "sales_product_tax"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-left    truncate font-[400]'>{dataLang?.sales_product_money_after_discount || "sales_product_money_after_discount"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-left truncate font-[400]'>{dataLang?.sales_product_item_date || "sales_product_item_date"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-left    truncate font-[400]'>{dataLang?.sales_product_note || "sales_product_note"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{dataLang?.sales_product_operations || "sales_product_operations"}</h4>
+            </div>
+          </div>
+          {/* Thông tin mặt hàng Mặt hàng */}
           <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
             <div className='pr-2'>
               <React.Fragment>
                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                   {sortedArr.map((e, index) =>
-                    <div className='grid grid-cols-12 gap-1 py-1 ' key={e?.id}>
-                      <div className='col-span-3 z-10 my-auto '>
+                    <div className='grid grid-cols-12 gap-1 py-1 items-center' key={e?.id}>
+                      <div className='col-span-2 '>
                         <Select
                           onInputChange={_HandleSeachApi.bind(this)}
                           dangerouslySetInnerHTML={{ __html: option.label }}
                           options={options}
                           onChange={_HandleChangeInputOption.bind(this, e?.id, "mathang", index)}
                           value={e?.mathang}
-                          formatOptionLabel={(option) => (
-                            <div className='flex items-center  justify-between py-2'>
-                              <div className='flex items-center gap-2'>
-                                <div>
-                                  {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />) :
-                                    <div className='w-[50px] h-[60px] object-cover  flex items-center justify-center rounded'>
-                                      <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
-                                    </div>
-                                  }
-                                </div>
-                                <div>
-                                  <h3 className='font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
-                                  <div className='flex gap-2'>
-                                    <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.code}</h5>
-                                    <h5 className='font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
-                                  </div>
-                                  <h5 className='text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
-                                </div>
-                              </div>
-                              <div className=''>
-                                <div className='text-right opacity-0'>{"0"}</div>
-                                <div className='flex gap-2'>
-                                  <div className='flex items-center gap-2'>
-                                    <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className=' font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}</h5>
-                                  </div>
-
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                          placeholder={dataLang?.price_quote_item || "price_quote_item"}
+                          formatOptionLabel={selectItemsLabel}
+                          placeholder={dataLang?.sales_product_select_item || "sales_product_select_item"}
                           hideSelectedOptions={false}
-                          className={`cursor-pointer rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2`}
+                          className={`cursor-pointer rounded-md bg-white  3xl:text-[12px] 2xl:text-[14px] xl:text-base text-[14.5px]`}
                           isSearchable={true}
                           noOptionsMessage={() => "Không có dữ liệu"}
                           menuPortalTarget={document.body}
@@ -989,6 +1252,7 @@ const Index = (props) => {
                           }}
                         />
                       </div>
+
                       <div className='col-span-1 text-center flex items-center justify-center'>
                         <h3 className={`${index === 0 ? 'cursor-default' : 'cursor-text'} 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}>
                           {e?.donvitinh}
@@ -1043,7 +1307,6 @@ const Index = (props) => {
                           thousandSeparator=","
                           allowNegative={false}
                           isAllowed={(values) => {
-                            console.log(('valuess : ', values));
                             if (!values.value) return true;
                             const { floatValue } = values;
                             if (floatValue > 999) {
@@ -1071,13 +1334,8 @@ const Index = (props) => {
                           placeholder={"% Thuế"}
                           isDisabled={index === 0 ? true : false}
                           hideSelectedOptions={false}
-                          formatOptionLabel={(option) => (
-                            <div className='flex justify-start items-center gap-1 '>
-                              <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option?.label}</h2>
-                              <h2 className='2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{`(${option?.tax_rate})`}</h2>
-                            </div>
-                          )}
-                          className={`border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                          formatOptionLabel={taxRateLabel}
+                          className={`border-transparent placeholder:text-slate-300 h-10 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
                           isSearchable={true}
                           noOptionsMessage={() => "Không có dữ liệu"}
                           menuPortalTarget={document.body}
@@ -1115,6 +1373,25 @@ const Index = (props) => {
                       <div className='col-span-1 text-right flex items-center justify-end'>
                         <h3 className={`${index === 0 ? 'cursor-default' : 'cursor-text'} px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}>{formatNumber(e?.thanhtien)}</h3>
                       </div>
+                      <div className='col-span-1 '>
+                        <div className="custom-date-picker flex flex-row relative">
+                          <DatePicker
+                            selected={effectiveDate}
+                            blur
+                            placeholderText="DD/MM/YYYY"
+                            dateFormat="dd/MM/yyyy"
+                            onSelect={(date) => sEffectiveDate(date)}
+                            className={`${errEffectiveDate && index !== 0 ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} 3xl:h-10 h-10 w-full 3xl:text-[12px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-2 outline-none cursor-pointer `}
+                          />
+                          {effectiveDate && (
+                            <>
+                              <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('effectiveDate')} />
+                            </>
+                          )}
+                          <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%]  text-[#CCCCCC] scale-110 cursor-pointer" />
+                        </div>
+                        {errEffectiveDate && index !== 0 && <label className="text-[12px] max-w-10px text-red-500">Vui lòng chọn ngày cần hàng!</label>}
+                      </div>
                       <div className='col-span-1 flex items-center justify-center'>
                         <input
                           value={e?.note}
@@ -1123,7 +1400,7 @@ const Index = (props) => {
                           placeholder='Ghi chú'
                           disabled={index === 0 ? true : false}
                           type="text"
-                          className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12.5px]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
+                          className="focus:border-[#92BFF7] border-[#d0d5dd] h-10 2xl:text-[12px] xl:text-[13px] text-[12.5px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none"
                         />
                       </div>
                       <div className='col-span-1 flex items-center justify-center'>
@@ -1140,7 +1417,7 @@ const Index = (props) => {
 
           <div className='grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center'>
             <div className='col-span-2  flex items-center gap-2'>
-              <h2>{dataLang?.price_quote_discount || "price_quote_discount"}</h2>
+              <h2>{dataLang?.sales_product_discount || "sales_product_discount"}</h2>
               <div className='col-span-1 text-center flex items-center justify-center'>
                 <NumericFormat
                   value={chietkhautong}
@@ -1154,7 +1431,7 @@ const Index = (props) => {
               </div>
             </div>
             <div className='col-span-2 flex items-center gap-2'>
-              <h2>{dataLang?.price_quote_tax || "price_quote_tax"}</h2>
+              <h2>{dataLang?.sales_product_tax || "sales_product_tax"}</h2>
               <Select
                 options={taxOptions}
                 onChange={_HandleChangeInput.bind(this, "thuetong")}
@@ -1165,9 +1442,9 @@ const Index = (props) => {
                     <h2>{`(${option?.tax_rate})`}</h2>
                   </div>
                 )}
-                placeholder={dataLang?.price_quote_tax || "price_quote_tax"}
+                placeholder={dataLang?.sales_product_tax || "sales_product_tax"}
                 hideSelectedOptions={false}
-                className={` "border-transparent placeholder:text-slate-300 w-[70%] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                className={` "border-transparent placeholder:text-slate-300 w-[70%] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
                 isSearchable={true}
                 noOptionsMessage={() => "Không có dữ liệu"}
                 dangerouslySetInnerHTML={{ __html: option.label }}
@@ -1203,6 +1480,26 @@ const Index = (props) => {
                 }}
               />
             </div>
+            <div className='col-span-3 flex items-center gap-2'>
+              <h2>{dataLang?.sales_product_item_date || "sales_product_item_date"}</h2>
+              <div className="custom-date-picker flex flex-row relative">
+                <DatePicker
+                  selected={effectiveDate}
+                  blur
+                  placeholderText="DD/MM/YYYY"
+                  dateFormat="dd/MM/yyyy"
+                  onSelect={(date) => sEffectiveDate(date)}
+                  className={`3xl:h-11 h-10 3xl:w-[210px] w-full 3xl:text-[12px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-2 outline-none cursor-pointer `}
+                />
+                {effectiveDate && (
+                  <>
+                    <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('effectiveDate')} />
+                  </>
+                )}
+                <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%]  text-[#CCCCCC] scale-110 cursor-pointer" />
+              </div>
+            </div>
+
           </div>
 
           <h2 className='font-normal bg-[white]  p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]'>{dataLang?.price_quote_total_outside || "price_quote_total_outside"} </h2>
@@ -1210,10 +1507,10 @@ const Index = (props) => {
 
         <div className='grid grid-cols-12'>
           <div className='col-span-9'>
-            <div className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.price_quote_note || "price_quote_note"}</div>
+            <div className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.sales_product_note || "sales_product_note"}</div>
             <textarea
               value={note}
-              placeholder={dataLang?.price_quote_note || "price_quote_note"}
+              placeholder={dataLang?.sales_product_note || "sales_product_note"}
               onChange={_HandleChangeInput.bind(this, "note")}
               name="fname"
               type="text"
@@ -1228,11 +1525,11 @@ const Index = (props) => {
               <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tongTien)}</h3></div>
             </div>
             <div className='flex justify-between '>
-              <div className='font-normal'><h3>{dataLang?.price_quote_discount || "price_quote_discount"}</h3></div>
+              <div className='font-normal'><h3>{dataLang?.sales_product_discount || "sales_product_discount"}</h3></div>
               <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tienChietKhau)}</h3></div>
             </div>
             <div className='flex justify-between '>
-              <div className='font-normal'><h3>{dataLang?.price_quote_money_after_discount || "price_quote_money_after_discount"}</h3></div>
+              <div className='font-normal'><h3>{dataLang?.sales_product_total_money_after_discount || "sales_product_total_money_after_discount"}</h3></div>
               <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.tongTienSauCK)}</h3></div>
             </div>
             <div className='flex justify-between '>

@@ -47,10 +47,9 @@ const PopupDetail = (props) => {
 
     const _ServerFetching_detailUser = () => {
         Axios("GET", `/api_web/Api_quotation/quotation/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-            console.log(response.data)
+           
             if (response && response.data) {
                 var db = response.data
-                console.log(db)
                 sData(db)
             }
             sOnFetching(false)
@@ -175,36 +174,36 @@ const PopupDetail = (props) => {
                                 </div>
                                 <div className="pr-2 w-[100%] lx:w-[110%] ">
                                     <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
-                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left whitespace-nowrap">
+                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">
                                             {props.dataLang?.price_quote_image || "price_quote_image"}
                                         </h4>
-                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center items-center whitespace-nowrap">
+                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">
                                             {props.dataLang?.price_quote_item || "price_quote_item"}
                                         </h4>
-                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">
+                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">
                                             {props.dataLang?.price_quote_variant || "price_quote_variant"}
                                         </h4>
-                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">
+                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">
                                             {props.dataLang?.price_quote_from_unit || "price_quote_from_unit"}</h4>
-                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">
+                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">
                                             {props.dataLang?.price_quote_quantity || "price_quote_quantity"}
                                         </h4>
-                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">
+                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">
                                             {props.dataLang?.price_quote_unit_price || "price_quote_unit_price"}
                                         </h4>
-                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center ">
+                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">
                                             {props.dataLang?.price_quote_person || "price_quote_person"}
                                         </h4>
-                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center ">
+                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">
                                             {props.dataLang?.price_quote_after_discount || "price_quote_after_discount"}
                                         </h4>
-                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">
+                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">
                                             {props.dataLang?.price_quote_tax || "price_quote_tax"}
                                         </h4>
-                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">
+                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">
                                             {props.dataLang?.price_quote_into_money || "price_quote_into_money"}
                                         </h4>
-                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">
+                                        <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">
                                             {props.dataLang?.price_quote_note || "price_quote_note"}
                                         </h4>
                                     </div>
@@ -297,7 +296,7 @@ const PopupDetail = (props) => {
                                         <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price)}</h3></div>
                                         <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_discount)}</h3></div>
                                         <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price_after_discount)}</h3></div>
-                                        <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_tax_price)}</h3></div>
+                                        <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_tax)}</h3></div>
                                         <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_amount)}</h3></div>
                                     </div>
                                 </div>
