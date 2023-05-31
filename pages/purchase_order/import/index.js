@@ -1034,8 +1034,8 @@ return (
                               <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]   py-0.5 col-span-1 text-right">{formatNumber(e?.price)}</div>                
                               <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]   py-0.5 col-span-1 text-right">{e?.discount_percent + "%"}</div>                
                               <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]   py-0.5 col-span-1 text-right">{formatNumber(e?.price_after_discount)}</div>                
-                              <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]   py-0.5 col-span-1 text-right mr-1">{formatNumber(e?.tax_rate) + "%"}</div>                
-                              <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]   py-0.5 col-span-1 text-right">{formatNumber(e?.amount)}</div>  
+                              <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]   py-0.5 col-span-1 text-center">{formatNumber(e?.tax_rate) + "%"}</div>                
+                              <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]   py-0.5 col-span-1 text-right mr-3.5">{formatNumber(e?.amount)}</div>  
                               <div className="3xl:text-[11px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]   py-0.5 col-span-1 text-left ml-3.5">{e?.note != undefined ? e?.note : ""}</div>                
                             </div>
                           </div>              
