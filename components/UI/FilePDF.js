@@ -151,7 +151,7 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
                             return [
                                 { text: `${index + 1}`, alignment: 'center', fontSize: 10 },
                                 { text: item?.item?.name ? `${item?.item?.name}` : '', fontSize: 10 },
-                                { text: !item?.item?.unit_name ? `${item?.item?.unit_name}` : 'dsdsd', fontSize: 10 },
+                                { text: item?.item?.unit_name ? `${item?.item?.unit_name}` : '', fontSize: 10 },
                                 { text: item?.quantity ? `${formatNumber(item?.quantity)}` : '', alignment: 'center', fontSize: 10 },
                                 { text: item?.price ? `${formatNumber(item?.price)}` : '', alignment: 'right', fontSize: 10 },
                                 { text: item?.discount_percent ? `${item?.discount_percent}` : '', alignment: 'center', fontSize: 10 },
