@@ -150,6 +150,12 @@ const Index = (props) => {
             sListSupplier(db?.map(e => ({label: e.name, value:e.id })))
         }
       })
+      Axios("GET", "/api_web/Api_import/importCombobox/?csrf_protection=true", {}, (err, response) => {
+        if(!err){
+          var {isSuccess, result} = response?.data
+               sListCode(result)
+        }
+      })
       sOnFetching_filter(false)
    }
 
@@ -468,7 +474,7 @@ const Index = (props) => {
                               <Select 
                                   onInputChange={_HandleSeachApi.bind(this)}
                                   options={[{ value: '', label: dataLang?.purchase_order_vouchercode || "purchase_order_vouchercode", isDisabled: true }, ...listCode_filter]}
-                                  onChange={onchang_filter.bind(this, "code")}
+                                  onChange={onchang_filter.bind(this,"code")}
                                   value={idCode}
                                   placeholder={dataLang?.purchase_order_table_code || "purchase_order_table_code"} 
                                   hideSelectedOptions={false}
