@@ -296,7 +296,7 @@ const Index = (props) => {
                               total={e.count} 
                               active={e.id} 
                               className={"text-[#0F4F9E] "}
-                            >{dataLang[e?.name]}</TabStatus> 
+                            >{dataLang[e?.name] || e?.name}</TabStatus> 
                           </div>
                           )
                       })

@@ -454,7 +454,7 @@ const _ServerFetching =  () => {
       const hasNullSerial = listData.some(item => item?.matHang.e?.text_type === "products" &&  item.child?.some(childItem => childItem.serial === ''));
       const hasNullDate = listData.some(item => item.child?.some(childItem =>  !childItem.disabledDate && childItem.date === null));
      
-      console.log("hasNullDate",hasNullDate);
+      // console.log("hasNullDate",hasNullDate);
       // const checkThere = listData?.map(e => {return {type:  e.matHang.e?.text_type}})
       // const hasProducts = checkThere?.some(obj => obj.type === 'products');
       // const hasMaterial = checkThere?.some(obj => obj.type === 'material');
@@ -739,7 +739,7 @@ const _ServerFetching =  () => {
     }
     const taxOptions = [{ label: "Miễn thuế", value: "0",   tax_rate: "0"}, ...dataTasxes]
     
-    
+    // console.log(taxOptions);
     const allItems = [...options]
 
   const _HandleSelectAll = () => {
@@ -751,10 +751,15 @@ const _ServerFetching =  () => {
     // sMathangAll(data)
 
     //new
-      sMathangAll(allItems?.map(e => ({id: uuidv4(), matHang: e, child: [{id: uuidv4(), disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-        kho: khotong ? khotong : null, serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
-      sListData(allItems?.map(e => ({id: uuidv4(), matHang: e, child: [{id: uuidv4(), disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-        kho: khotong ? khotong : null, serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
+      sMathangAll(allItems?.map(e => ({
+        id: uuidv4(), matHang: e,
+        child: [{id: uuidv4(),
+          disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+          kho: khotong ? khotong : null, serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
+      sListData(allItems?.map(e => ({id: uuidv4(), matHang: e,
+          child: [{id: uuidv4(),
+            disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+            kho: khotong ? khotong : null, serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
   };
 
   const _HandleDeleteAll = () => {
@@ -989,7 +994,6 @@ const _ServerFetching =  () => {
     })
     sListData(newData)
   }
-
   const _HandleAddParent = (value) => {
     const checkData = listData?.some(e => e?.matHang?.value === value?.value)
     if(!checkData){
@@ -1003,6 +1007,7 @@ const _ServerFetching =  () => {
           serial: '', lot: '', date: null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] 
       }
       sListData([...listData, newData]);
+      console.log(",newData",newData);
     }else{
       Toast.fire({
         title: `${"Mặt hàng đã được chọn"}`,
