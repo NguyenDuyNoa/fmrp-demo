@@ -204,8 +204,8 @@ const _ServerFetching =  () => {
             id: Number(ce?.id),
             disabledDate: (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) || (e.item?.text_type == "material"  && dataMaterialExpiry?.is_enable == "0" && true) || (e.item?.text_type == "products"  && dataProductExpiry?.is_enable == "1" && false) || (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true), 
             kho: {label: ce?.location_name, value: ce?.location_warehouses_id, warehouse_name: ce?.warehouse_name}, 
-            serial: ce?.serial,
-            lot: ce?.lot,
+            serial: ce?.serial == null ? "" : ce?.serial,
+            lot: ce?.lot == null ? "" : ce?.lot,
             date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
             donViTinh: e?.item?.unit_name, 
             amount: Number(ce?.quantity), 
@@ -450,20 +450,15 @@ const _ServerFetching =  () => {
       // const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
 
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
-      const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => childItem.lot === '' || childItem.lot == null));
       const hasNullSerial = listData.some(item => item?.matHang.e?.text_type === "products" && item.child?.some(childItem => childItem.serial === '' || childItem.serial == null));
+      // const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => (childItem.lot === '')));
+      const hasNullLot = listData.some(item => item.child?.some(childItem =>  !childItem.disabledDate && (childItem.lot === "" || childItem.lot == null)));
       const hasNullDate = listData.some(item => item.child?.some(childItem =>  !childItem.disabledDate && childItem.date === null));
      
-      console.log(hasNullSerial);
-      // console.log("hasNullDate",hasNullDate);
-      // const checkThere = listData?.map(e => {return {type:  e.matHang.e?.text_type}})
-      // const hasProducts = checkThere?.some(obj => obj.type === 'products');
-      // const hasMaterial = checkThere?.some(obj => obj.type === 'material');
-      // console.log("dataProductExpiry",dataProductExpiry);
+      console.log(listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => (childItem.lot === '' ))));
         // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (hasMaterial && dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (hasProducts && dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
-        if(idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || (dataProductSerial?.is_enable == "1"  && hasNullSerial) || (dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1")  && hasNullDate) ){
+        if(idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || (dataProductSerial?.is_enable == "1"  && hasNullSerial) || ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") &&  hasNullLot) || ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1")  && hasNullDate) ){
         // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho){
-          // date == null && sErrDate(true)
           idSupplier == null && sErrSupplier(true)
           idBranch == null && sErrBranch(true)
           idTheOrder == null && sErrTheOrder(true)
@@ -471,10 +466,6 @@ const _ServerFetching =  () => {
           hasNullLot && sErrLot(true)
           hasNullSerial && sErrSerial(true)
           hasNullDate && sErrDateList(true)
-          // console.log(hasNullDate);
-          // console.log("heeee",hasNullDate);
-          // console.log("listData",listData);
-
             Toast.fire({
                 icon: 'error',
                 title: `${dataLang?.required_field_null}`
@@ -1051,8 +1042,10 @@ const _ServerFetching =  () => {
             }else if(type === "tax"){
               return {...ce, tax: value}
             }else if(type ==="serial"){
+              console.log(value?.target.value);
               return {...ce, serial: value?.target.value}
             }else if(type ==="lot"){
+              console.log(value?.target.value);
               return {...ce, lot: value?.target.value}
             }
             else if(type ==="date"){
