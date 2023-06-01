@@ -1499,7 +1499,7 @@ return (
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_quantity || "serviceVoucher_quantity"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_unit_price || "serviceVoucher_unit_price"}</h4> 
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"% CK"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{"ĐGSCK"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{"Đơn giá SCK"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}</h4>

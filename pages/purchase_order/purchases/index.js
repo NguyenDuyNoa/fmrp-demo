@@ -851,11 +851,11 @@ const Popup_chitiet =(props)=>{
                             </h6>   
 
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.item?.name}</h6>                
-                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left break-words">{e?.item?.product_variation}</h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.product_variation}</h6>                
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.unit_name}</h6>                
-                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right">{formatNumber(e?.quantity)}</h6>                
-                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right ">{formatNumber(e?.quantity_create)}</h6>                
-                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right">{Number(e?.quantity_left) < 0 ? "Đặt dư" +" "+ formatNumber(Number(Math.abs(e?.quantity_left)))  : formatNumber(e?.quantity_left)}</h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.quantity)}</h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.quantity_create)}</h6>                
+                            <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-center">{Number(e?.quantity_left) < 0 ? "Đặt dư" +" "+ formatNumber(Number(Math.abs(e?.quantity_left)))  : formatNumber(e?.quantity_left)}</h6>                
                             <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.note}</h6>                
                           </div>
                         ))}              

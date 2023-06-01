@@ -788,7 +788,7 @@ return (
               </div>
               <div className="pr-2 w-[100%] lx:w-[110%] ">
                 <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_image || "purchase_image"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
@@ -818,11 +818,11 @@ return (
                           }
                           </h6>                
                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left">{e?.item?.name}</h6>                
-                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left break-words">{e?.item?.product_variation}</h6>                
-                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left break-words">{e?.item?.unit_name}</h6>                
-                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-right mr-1">{formatNumber(e?.quantity)}</h6>                
-                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-right">{formatNumber(e?.price)}</h6>                
-                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-right">{e?.discount_percent + "%"}</h6>                
+                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.product_variation}</h6>                
+                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.unit_name}</h6>                
+                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center mr-1">{formatNumber(e?.quantity)}</h6>                
+                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price)}</h6>                
+                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center">{e?.discount_percent + "%"}</h6>                
                           <h6 className="text-[13px]   py-0.5 col-span-2  rounded-md text-right">{formatNumber(e?.price_after_discount)}</h6>                
                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center ">{formatNumber(e?.tax_rate) + "%"}</h6>                
                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-right mr-3.5">{formatNumber(e?.amount)}</h6>                
