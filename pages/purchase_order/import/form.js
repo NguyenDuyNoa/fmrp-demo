@@ -1898,7 +1898,7 @@ const _ServerFetching =  () => {
                                   />
                                 </div>
                                 {/* <div>{ce?.thanhTien}</div> */}
-                                <div className='justify-center pr-3 border p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{formatNumber((ce?.price * ( 1 - Number(ce?.chietKhau)/100 )) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
+                                <div className='justify-center pr-1 border p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{formatNumber((ce?.price * ( 1 - Number(ce?.chietKhau)/100 )) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
                                 {/* <div>{ce?.note}</div> */}
                                 <div className='col-span-1 flex items-center justify-center border h-full p-0.5'>
                                 <input
