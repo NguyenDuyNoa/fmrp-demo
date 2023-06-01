@@ -1823,7 +1823,7 @@ const _ServerFetching =  () => {
                                 </div>
                               </>
                               ):""}
-                                <div className='text-left border p-0.5 pr-2.5 h-full flex flex-col justify-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{ce?.donViTinh}</div>
+                                <div className='text-center border p-0.5 pr-2.5 h-full flex flex-col justify-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{ce?.donViTinh}</div>
                                 <div className="flex items-center justify-center border h-full p-0.5">
                                   <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full" onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "decrease")}><Minus className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
                                   <NumericFormat
