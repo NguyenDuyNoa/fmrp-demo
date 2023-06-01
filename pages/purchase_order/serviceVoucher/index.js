@@ -949,15 +949,20 @@ const Popup_servie = (props) => {
     sOption(newOption); // cập nhật lại mảng
   }
 
-  const formatNumber = (num) => {
-    if (!num && num !== 0) return 0;
-    const roundedNum = parseFloat(num.toFixed(2));
-    return roundedNum.toLocaleString("en", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      useGrouping: true
-    });
-  };
+  // const formatNumber = (num) => {
+  //   if (!num && num !== 0) return 0;
+  //   const roundedNum = parseFloat(num.toFixed(2));
+  //   return roundedNum.toLocaleString("en", {
+  //     minimumFractionDigits: 2,
+  //     maximumFractionDigits: 2,
+  //     useGrouping: true
+  //   });
+  // };
+
+  const formatNumber = (number) => {
+    const integerPart = Math.floor(number)
+    return integerPart.toLocaleString("en")
+  }
 
   const tinhTongTien = (option) => {
 
@@ -1442,7 +1447,7 @@ const Popup_chitiet =(props)=>{
     const integerPart = Math.floor(number)
     return integerPart.toLocaleString("en")
   }
-  
+
   const _ServerFetching_detailUser = () =>{
     Axios("GET", `/api_web/Api_service/service/${props?.id}?csrf_protection=true`, {}, (err, response) => {
     if(!err){
