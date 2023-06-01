@@ -457,15 +457,16 @@ const _ServerFetching =  () => {
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
       const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => childItem.lot === ''));
       const hasNullSerial = listData.some(item => item?.matHang.e?.text_type === "products" &&  item.child?.some(childItem => childItem.serial === ''));
-      const hasNullDate = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem =>  !childItem.disabledDate && childItem.date === null));
-     console.log("hasNullLot",hasNullLot);
+      const hasNullDate = listData.some(item => item.child?.some(childItem =>  !childItem.disabledDate && childItem.date === null));
+     
+      console.log("hasNullDate",hasNullDate);
+     console.log(listData);
       // const checkThere = listData?.map(e => {return {type:  e.matHang.e?.text_type}})
       // const hasProducts = checkThere?.some(obj => obj.type === 'products');
       // const hasMaterial = checkThere?.some(obj => obj.type === 'material');
-      console.log("dataProductExpiry",dataProductExpiry);
-console.log("hisaa",(dataProductExpiry?.is_enable == "1"  && hasNullDate));
+      // console.log("dataProductExpiry",dataProductExpiry);
         // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (hasMaterial && dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (hasProducts && dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
-        if(idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
+        if(idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1")  && hasNullDate) ){
         // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho){
           // date == null && sErrDate(true)
           idSupplier == null && sErrSupplier(true)
@@ -475,9 +476,9 @@ console.log("hisaa",(dataProductExpiry?.is_enable == "1"  && hasNullDate));
           hasNullLot && sErrLot(true)
           hasNullSerial && sErrSerial(true)
           hasNullDate && sErrDateList(true)
-          console.log(hasNullDate);
-          console.log("heeee",hasNullDate);
-          console.log("listData",listData);
+          // console.log(hasNullDate);
+          // console.log("heeee",hasNullDate);
+          // console.log("listData",listData);
 
             Toast.fire({
                 icon: 'error',
@@ -489,7 +490,7 @@ console.log("hisaa",(dataProductExpiry?.is_enable == "1"  && hasNullDate));
             sErrLot(false)
             sErrSerial(false)
             sErrDateList(false)
-            sOnSending(true)
+            // sOnSending(true)
         }
       }
     useEffect(() => {
@@ -1778,7 +1779,15 @@ console.log("hisaa",(dataProductExpiry?.is_enable == "1"  && hasNullDate));
                                       <input
                                         value={ce?.lot}
                                         disabled={ce?.disabledDate}
-                                        className={`${errLot && ce?.lot === "" && !ce?.disabledDate ? "border-red-500 border" : "border-b border-gray-200" } rounded w-[100%] "appearance-none focus:outline-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal    focus:outline-none"`}
+                                        className={`border ${
+                                          ce?.disabledDate ? "bg-gray-50" : (errLot && ce?.lot == "" ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]" ) 
+                                          //  && !ce?.disabledDate
+                                          //   ? ""
+                                          //   : ce?.disabledDate ? "" : ""
+                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
+                                        // className={`border ${errDateList && ce?.date == null && !ce?.disabledDate ?"border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
+                                    
+                                        // className={`${errLot && ce?.lot === "" && !ce?.disabledDate ? "border-red-500 border" : "border-b border-gray-200" } rounded w-[100%] "appearance-none focus:outline-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal    focus:outline-none"`}
                                         onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "lot")}
                                       />
                                 </div>
@@ -1803,9 +1812,10 @@ console.log("hisaa",(dataProductExpiry?.is_enable == "1"  && hasNullDate));
                                               onSelect={(date) => _HandleChangeChild(e?.id, ce?.id, "date",date)}
                                               placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
                                               className={`border ${
-                                                errDateList && ce?.date == null && !ce?.disabledDate
-                                                  ? "border-red-500"
-                                                  : ce?.disabledDate ? "bg-gray-50" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                ce?.disabledDate ? "bg-gray-50" : (errDateList && ce?.date == null ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]" ) 
+                                                //  && !ce?.disabledDate
+                                                //   ? ""
+                                                //   : ce?.disabledDate ? "" : ""
                                               } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
                                               // className={`border ${errDateList && ce?.date == null && !ce?.disabledDate ?"border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
                                             />
