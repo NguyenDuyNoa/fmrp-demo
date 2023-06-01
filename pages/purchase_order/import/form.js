@@ -451,16 +451,17 @@ const _ServerFetching =  () => {
 
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
       const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => childItem.lot === ''));
-      const hasNullSerial = listData.some(item => item?.matHang.e?.text_type === "products" &&  item.child?.some(childItem => childItem.serial === ''));
+      const hasNullSerial = listData.some(item => item?.matHang.e?.text_type === "products" && item.child?.some(childItem => childItem.serial === '' || childItem.serial == null));
       const hasNullDate = listData.some(item => item.child?.some(childItem =>  !childItem.disabledDate && childItem.date === null));
      
+      console.log(hasNullSerial);
       // console.log("hasNullDate",hasNullDate);
       // const checkThere = listData?.map(e => {return {type:  e.matHang.e?.text_type}})
       // const hasProducts = checkThere?.some(obj => obj.type === 'products');
       // const hasMaterial = checkThere?.some(obj => obj.type === 'material');
       // console.log("dataProductExpiry",dataProductExpiry);
         // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (hasMaterial && dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (hasProducts && dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
-        if(idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1")  && hasNullDate) ){
+        if(idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || (dataProductSerial?.is_enable == "1"  && hasNullSerial) || (dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1")  && hasNullDate) ){
         // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho){
           // date == null && sErrDate(true)
           idSupplier == null && sErrSupplier(true)
@@ -1757,7 +1758,14 @@ const _ServerFetching =  () => {
                                       <input
                                         value={ce?.serial}
                                         disabled={e?.matHang?.e?.text_type != "products"}
-                                        className={`${e?.matHang?.e?.text_type === "products" && errSerial && ce?.serial ==="" ? "border-red-500 border" : "border-b w-[100%] border-gray-200" } rounded "appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal   focus:outline-none"`}
+                                        className={`border ${
+                                          e?.matHang?.e?.text_type != "products" ? "bg-gray-50" : (errSerial && (ce?.serial == "" || ce?.serial == null) ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] " ) 
+                                          //  && !ce?.disabledDate
+                                          //   ? ""
+                                          //   : ce?.disabledDate ? "" : ""
+                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
+                                        // className={`border ${errDateList && ce?.date == null && !ce?.disabledDate ?"border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
+                                        // className={`${e?.matHang?.e?.text_type === "products" && errSerial && ce?.serial ==="" ? "border-red-500 border" : "border-b w-[100%] border-gray-200" } rounded "appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal   focus:outline-none"`}
                                         onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
                                       />
                                 </div>
