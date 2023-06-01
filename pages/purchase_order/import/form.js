@@ -7,8 +7,6 @@ import dynamic from 'next/dynamic';
 import Loading from "components/UI/loading";
 
 
-
-
 import { MdClear } from 'react-icons/md';
 import { BsCalendarEvent } from 'react-icons/bs';
 import DatePicker from 'react-datepicker';
@@ -199,7 +197,6 @@ const _ServerFetching =  () => {
   Axios("GET", `/api_web/Api_import/getImport/${id}?csrf_protection=true`, {}, (err, response) => {
       if(!err){
         var rResult = response.data;
-        console.log(rResult);
         sListData(rResult?.items.map(e => ({
           id: e?.item?.id, 
           matHang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,value:e.item?.id},
@@ -224,14 +221,12 @@ const _ServerFetching =  () => {
         sIdTheOrder({label: rResult?.purchase_order_code, value: rResult?.purchase_order_id})
         // sDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
         sStartDate(moment(rResult?.date).toDate())
-        console.log(moment(rResult.date).toDate());
         sNote(rResult?.note)
         // console.log(moment(ce?.expiration_date).toDate());
       }
       sOnFetchingDetail(false)
     })
   }
-  console.log(startDate);
   useEffect(() => {
     // onFetchingDetail && _ServerFetchingDetail()
     //new
@@ -460,7 +455,6 @@ const _ServerFetching =  () => {
       const hasNullDate = listData.some(item => item.child?.some(childItem =>  !childItem.disabledDate && childItem.date === null));
      
       console.log("hasNullDate",hasNullDate);
-     console.log(listData);
       // const checkThere = listData?.map(e => {return {type:  e.matHang.e?.text_type}})
       // const hasProducts = checkThere?.some(obj => obj.type === 'products');
       // const hasMaterial = checkThere?.some(obj => obj.type === 'material');
@@ -490,7 +484,7 @@ const _ServerFetching =  () => {
             sErrLot(false)
             sErrSerial(false)
             sErrDateList(false)
-            // sOnSending(true)
+            sOnSending(true)
         }
       }
     useEffect(() => {
@@ -890,7 +884,6 @@ const _ServerFetching =  () => {
     const handleTimeChange = (date) => {
       sStartDate(date)
     };
-    console.log(startDate);
 
     const _ServerSending = () => {
           var formData = new FormData();
@@ -1116,8 +1109,7 @@ const _ServerFetching =  () => {
       })
   }
 
-  
-   console.log(listData);  
+    
 
   return (
     <React.Fragment>
@@ -1163,26 +1155,26 @@ const _ServerFetching =  () => {
                               type="datetime-local"
                               className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/> */}
                             <div className="custom-date-picker flex flex-row">
-                    <DatePicker
-                      blur
-                      fixedHeight
-                      showTimeSelect
-                      selected={startDate}
-                      onSelect={(date) => sStartDate(date)}
-                      onChange={(e) => handleTimeChange(e)}
-                      placeholderText="DD/MM/YYYY HH:mm:ss"
-                      dateFormat="dd/MM/yyyy h:mm:ss aa"
-                      timeInputLabel={'Time: '}
-                      placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
-                      className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
-                    />
-                    {startDate && (
-                      <>
-                        <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('startDate')} />
-                      </>
-                    )}
-                    <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
-                  </div>
+                              <DatePicker
+                                blur
+                                fixedHeight
+                                showTimeSelect
+                                selected={startDate}
+                                onSelect={(date) => sStartDate(date)}
+                                onChange={(e) => handleTimeChange(e)}
+                                placeholderText="DD/MM/YYYY HH:mm:ss"
+                                dateFormat="dd/MM/yyyy h:mm:ss aa"
+                                timeInputLabel={'Time: '}
+                                placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                              />
+                              {startDate && (
+                                <>
+                                  <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('startDate')} />
+                                </>
+                              )}
+                              <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                            </div>
 
                         </div>
                         <div className='col-span-2'>
