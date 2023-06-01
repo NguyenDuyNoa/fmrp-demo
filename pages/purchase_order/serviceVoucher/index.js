@@ -1433,12 +1433,16 @@ const Popup_chitiet =(props)=>{
     props?.id && sOnFetching(true) 
   }, [open]);
 
-  const formatNumber = num => {
-    if (!num && num !== 0) return 0;
-    const roundedNum = Number(num).toFixed(2);
-    return parseFloat(roundedNum).toLocaleString("en");
-  };
-
+  // const formatNumber = num => {
+  //   if (!num && num !== 0) return 0;
+  //   const roundedNum = Number(num).toFixed(2);
+  //   return parseFloat(roundedNum).toLocaleString("en");
+  // };
+  const formatNumber = (number) => {
+    const integerPart = Math.floor(number)
+    return integerPart.toLocaleString("en")
+  }
+  
   const _ServerFetching_detailUser = () =>{
     Axios("GET", `/api_web/Api_service/service/${props?.id}?csrf_protection=true`, {}, (err, response) => {
     if(!err){
