@@ -450,7 +450,7 @@ const _ServerFetching =  () => {
       // const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
 
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
-      const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => childItem.lot === ''));
+      const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => childItem.lot === '' || childItem.lot == null));
       const hasNullSerial = listData.some(item => item?.matHang.e?.text_type === "products" && item.child?.some(childItem => childItem.serial === '' || childItem.serial == null));
       const hasNullDate = listData.some(item => item.child?.some(childItem =>  !childItem.disabledDate && childItem.date === null));
      
@@ -1785,7 +1785,7 @@ const _ServerFetching =  () => {
                                         value={ce?.lot}
                                         disabled={ce?.disabledDate}
                                         className={`border ${
-                                          ce?.disabledDate ? "bg-gray-50" : (errLot && ce?.lot == "" ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]" ) 
+                                          ce?.disabledDate ? "bg-gray-50" : (errLot && (ce?.lot == "" || ce?.lot == null) ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]" ) 
                                           //  && !ce?.disabledDate
                                           //   ? ""
                                           //   : ce?.disabledDate ? "" : ""
