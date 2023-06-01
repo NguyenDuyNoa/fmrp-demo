@@ -1026,7 +1026,7 @@ return (
                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center mr-1">{formatNumber(e?.quantity)}</h6>                
                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center">{formatNumber(e?.price)}</h6>                
                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center">{e?.discount_percent + "%"}</h6>                
-                          <h6 className="text-[13px]   py-0.5 col-span-1 text-right">{formatNumber(e?.price_after_discount)}</h6>                
+                          <h6 className="text-[13px]   py-0.5 col-span-1 text-center">{formatNumber(e?.price_after_discount)}</h6>                
                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center">{formatNumber(e?.tax_rate) + "%"}</h6>                
                           <h6 className="text-[13px]   py-0.5 col-span-1 text-right ">{formatNumber(e?.amount)}</h6>  
                           <h6 className="text-[13px]   py-0.5 col-span-1 text-left ml-3.5">{e?.note != undefined ? e?.note : ""}</h6>                

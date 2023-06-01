@@ -1499,7 +1499,7 @@ return (
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_quantity || "serviceVoucher_quantity"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_unit_price || "serviceVoucher_unit_price"}</h4> 
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"% CK"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{"Đơn giá SCK"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}</h4>
@@ -1518,7 +1518,7 @@ return (
                           <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.quantity)}</h6>  
                           <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price)}</h6>                
                           <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.discount_percent + "%"}</h6>                
-                          <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-right">{formatNumber(e?.price_after_discount)}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-center">{formatNumber(e?.price_after_discount)}</h6>                
                           <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.tax_rate) + "%"}</h6>                
                           <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-right">{formatNumber(e?.amount)}</h6>                
                           <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-left">{e?.note != undefined ? e?.note : ""}</h6>                

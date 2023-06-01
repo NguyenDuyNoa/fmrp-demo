@@ -222,7 +222,6 @@ const _ServerFetching =  () => {
         // sDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
         sStartDate(moment(rResult?.date).toDate())
         sNote(rResult?.note)
-        // console.log(moment(ce?.expiration_date).toDate());
       }
       sOnFetchingDetail(false)
     })
@@ -445,17 +444,12 @@ const _ServerFetching =  () => {
 
     const _HandleSubmit = (e) => {
       e.preventDefault();
-      //  const checkErr = sortedArr?.map(e => { return {item: e?.mathang?.value,location_warehouses_id: e?.khohang?.value}})
-      //  let checkErrValidate = checkErr?.filter(e => e?.item !== undefined);
-      // const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
-
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
       const hasNullSerial = listData.some(item => item?.matHang.e?.text_type === "products" && item.child?.some(childItem => childItem.serial === '' || childItem.serial == null));
       // const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => (childItem.lot === '')));
       const hasNullLot = listData.some(item => item.child?.some(childItem =>  !childItem.disabledDate && (childItem.lot === "" || childItem.lot == null)));
       const hasNullDate = listData.some(item => item.child?.some(childItem =>  !childItem.disabledDate && childItem.date === null));
      
-      console.log(listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => (childItem.lot === '' ))));
         // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (hasMaterial && dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (hasProducts && dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
         if(idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || (dataProductSerial?.is_enable == "1"  && hasNullSerial) || ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") &&  hasNullLot) || ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1")  && hasNullDate) ){
         // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho){
@@ -731,7 +725,6 @@ const _ServerFetching =  () => {
     }
     const taxOptions = [{ label: "Miễn thuế", value: "0",   tax_rate: "0"}, ...dataTasxes]
     
-    // console.log(taxOptions);
     const allItems = [...options]
 
   const _HandleSelectAll = () => {
@@ -999,7 +992,6 @@ const _ServerFetching =  () => {
           serial: '', lot: '', date: null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] 
       }
       sListData([...listData, newData]);
-      console.log(",newData",newData);
     }else{
       Toast.fire({
         title: `${"Mặt hàng đã được chọn"}`,
@@ -1042,10 +1034,8 @@ const _ServerFetching =  () => {
             }else if(type === "tax"){
               return {...ce, tax: value}
             }else if(type ==="serial"){
-              console.log(value?.target.value);
               return {...ce, serial: value?.target.value}
             }else if(type ==="lot"){
-              console.log(value?.target.value);
               return {...ce, lot: value?.target.value}
             }
             else if(type ==="date"){
