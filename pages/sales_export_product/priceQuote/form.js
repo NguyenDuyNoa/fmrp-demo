@@ -1041,13 +1041,13 @@ const Index = (props) => {
                           isAllowed={(values) => {
                             if (!values.value) return true;
                             const { floatValue } = values;
-                            if (floatValue > 100) {
+                            if (floatValue >= 100) {
                               Toast.fire({
                                 icon: 'error',
-                                title: `Vui lòng nhập số % chiết khấu nhỏ hơn 100`
+                                title: `Vui lòng nhập số % chiết khấu nhỏ hơn 101`
                               })
                             }
-                            return floatValue < 100;
+                            return floatValue <= 100;
                           }}
                           readOnly={index === 0 ? readOnlyFirst : false}
                           // decimalScale={0}
@@ -1145,6 +1145,17 @@ const Index = (props) => {
                   allowNegative={false}
                   decimalScale={0}
                   isNumericString={true}
+                  isAllowed={(values) => {
+                    if (!values.value) return true;
+                    const { floatValue } = values;
+                    if (floatValue >= 100) {
+                      Toast.fire({
+                        icon: 'error',
+                        title: `Vui lòng nhập số % chiết khấu nhỏ hơn 101`
+                      })
+                    }
+                    return floatValue <= 100;
+                  }}
                 />
               </div>
             </div>
