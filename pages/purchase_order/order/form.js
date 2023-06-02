@@ -3,6 +3,9 @@ import { useRouter } from 'next/router'
 import Head from 'next/head';
 import {_ServerInstance as Axios} from '/services/axios';
 
+import { MdClear } from 'react-icons/md';
+import { BsCalendarEvent } from 'react-icons/bs';
+import DatePicker from 'react-datepicker';
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
@@ -25,6 +28,7 @@ const Toast = Swal.mixin({
   timer: 2000,
   timerProgressBar: true,
 })
+
 const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id
@@ -58,12 +62,21 @@ const Index = (props) => {
 
     const [dataId, sDataId] = useState([])
 
+    const [startDate, sStartDate] = useState(new Date());
+    const [effectiveDate, sEffectiveDate] = useState(null);
+
+    const [delivery_dateNew, sDelivery_dateNew] = useState(new Date());
+    const [effectiveDateNew, sEffectiveDateNew] = useState(null);
+
+
     const [code, sCode] = useState('')
     const [note, sNote] = useState('')
     const [thuetong, sThuetong] = useState()
     const [chietkhautong, sChietkhautong] = useState(0)
-    const [selectedDate, sSelectedDate] = useState(moment().format('YYYY-MM-DD HH:mm:ss'));
-    const [delivery_date, sDelivery_date] = useState(moment().format('YYYY-MM-DD'));
+
+    // const [selectedDate, sSelectedDate] = useState(moment().format('YYYY-MM-DD HH:mm:ss'));
+    // const [delivery_date, sDelivery_date] = useState(moment().format('YYYY-MM-DD'));
+
     const [idSupplier, sIdSupplier] = useState(null)
     const [idStaff, sIdStaff] = useState(null)
     const [idPurchases, sIdPurchases] = useState([])
@@ -85,9 +98,13 @@ const Index = (props) => {
         router.query && sErrDateDelivery(false)
         router.query && sErrPurchase(false)
         router.query && sErrBranch(false)
-        router.query && sSelectedDate(moment().format('YYYY-MM-DD HH:mm:ss'))
-        router.query && sDelivery_date(moment().format('YYYY-MM-DD'))
+        // router.query && sSelectedDate(moment().format('YYYY-MM-DD HH:mm:ss'))
+        // router.query && sDelivery_date(moment().format('YYYY-MM-DD'))
         router.query && sNote("")
+
+        router.query && sStartDate(new Date())
+        router.query && sDelivery_dateNew(new Date())
+
     }, [router.query]);
 
     const _ServerFetchingDetail =  () => {
@@ -103,8 +120,12 @@ const Index = (props) => {
           sIdStaff(({label: rResult?.staff_name, value: rResult.staff_id}))
           sIdBranch({label: rResult?.branch_name, value:rResult?.branch_id})
           sIdSupplier(({label: rResult?.supplier_name, value: rResult?.supplier_id}))
-          sSelectedDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
-          sDelivery_date(moment(rResult?.delivery_date).format('YYYY-MM-DD'))
+          // sSelectedDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
+          // sDelivery_date(moment(rResult?.delivery_date).format('YYYY-MM-DD'))
+
+          sStartDate(moment(rResult?.date).toDate())
+          sDelivery_dateNew(moment(rResult?.delivery_date).toDate())
+
           sLoai(rResult?.order_type)
           sIdPurchases(rResult?.purchases?.map(e => ({label: e.code, value:e.id})))
           sHidden(rResult?.order_type === "1" ? true : false)
@@ -157,6 +178,9 @@ const Index = (props) => {
             sIdStaff(value)
         }else if(type === "delivery_date"){
             sDelivery_date(moment(value.target.value).format('YYYY-MM-DD'))
+        }else if(type === "delivery_dateNew"){
+          console.log(value);
+          sDelivery_dateNew(value)
         }else if(type === "purchases"){
             if(option?.length > 1){
               Swal.fire({
@@ -176,16 +200,6 @@ const Index = (props) => {
             }else{
               sIdPurchases(value)
             }
-            // if(id){
-            //   sOption([...sortedArr])
-            // }else{
-            //   sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, note:""}])
-            // }
-            // if(value?.length > 0){
-            //   sOption([...sortedArr])
-            // }else{
-            //  sOption(id ? [...sortedArr] : [{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, note:""}])
-            // }
         }else if(type === "note"){
             sNote(value.target.value)
         }else if(type == "branch"){
@@ -215,48 +229,38 @@ const Index = (props) => {
             sIdStaff(null)
             sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, note:""}])
           }
-          
-            // if(value != null){
-            //   sOption([...sortedArr])
-            // }
-            // else{
-            //  sOption(id ? [...sortedArr] : [{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, note:""}])
-            // }
         }else if(type == "thuetong"){
            sThuetong(value)
         }else if(type == "chietkhautong"){
            sChietkhautong(value?.value)
         }
     }
-    // useEffect(() =>{
-    //   idBranch != null &&  idPurchases?.length == 0 && sOption([{id: Date.now(), mathang: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, note:""}])
-    // },[idBranch])
 
-      // useEffect(() => {
-      //   if (thuetong !== null || chietkhautong !== null) {
-      //     const newArray = option.map((item,index) => {
-      //       if (item.id) {
-      //         const thueValue = thuetong?.e?.tax_rate || 0;
-      //         const chietKhauValue = chietkhautong || 0;
-      //         const dongiasauchietkhau = item.dongia * (1 - chietKhauValue / 100)
-      //         const thanhTien = item.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
-      //         return {
-      //           ...item,
-      //           thue: thuetong,
-      //           chietkhau: chietkhautong,
-      //           dongiasauck: isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau,
-      //           thanhtien: isNaN(thanhTien) ? 0 : thanhTien,
-      //         };
-      //       } else {
-      //         return item;
-      //       }
-      //     });
-      //     sOption(newArray);
-      //   }
-      // }, [thuetong, chietkhautong]);
-      
+    const handleClearDate = (type) => {
+      if (type === 'effectiveDate') {
+        sEffectiveDate(null)
+      }
+      if (type === 'startDate') {
+        sStartDate(new Date())
+      }
+    }
+    const handleTimeChange = (date) => {
+      sStartDate(date)
+    };
+
+    const handleClearDateNew = (type) => {
+      if (type === 'effectiveDateNew') {
+        sEffectiveDateNew(null)
+      }
+      if (type === 'delivery_dateNew') {
+        console.log("hihihi");
+        sDelivery_dateNew(new Date())
+      }
+    }
+
+
+
       useEffect(() => {
-        // if (thuetong == null && chietkhautong == null) return;
         if (thuetong == null) return;
         sOption(prevOption => {
           const newOption = [...prevOption];
@@ -265,33 +269,23 @@ const Index = (props) => {
           newOption.forEach((item, index) => {
             if (index === 0 || !item.id) return;
             const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
-            // const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
             const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
             item.thue = thuetong;
-            // item.chietkhau = chietkhautong;
-            // item.dongiasauck = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
             item.thanhtien = isNaN(thanhTien) ? 0 : thanhTien;
           });
           return newOption;
         });
-      // }, [thuetong,chietkhautong]);
       }, [thuetong]);
 
       useEffect(() => {
-        // if (thuetong == null && chietkhautong == null) return;
         if (chietkhautong == null) return;
         sOption(prevOption => {
           const newOption = [...prevOption];
-          // const thueValue = thuetong?.tax_rate || 0;
           const thueValue = thuetong?.tax_rate != undefined ? thuetong?.tax_rate : 0
           const chietKhauValue = chietkhautong ? chietkhautong : 0;
           newOption.forEach((item, index) => {
             if (index === 0 || !item.id) return;
             const dongiasauchietkhau = item?.dongia * (1 - chietKhauValue / 100);
-// console.log("dongiasauchietkhau",dongiasauchietkhau);
-// console.log("item?.dongiasauck",item?.dongiasauck);
-
-            // const thanhTien = item?.dongiasauck * (1 + thueValue / 100) * item.soluong * (1 - chietKhauValue / 100);
             const thanhTien =  dongiasauchietkhau * (1 + thueValue / 100) * item.soluong
             item.thue = thuetong;
             item.chietkhau = Number(chietkhautong);
@@ -301,7 +295,6 @@ const Index = (props) => {
           return newOption;
         });
       }, [chietkhautong]);
-
 
     
       const _ServerFetching =  () => {
@@ -365,10 +358,6 @@ const Index = (props) => {
     useEffect(() => {
       idBranch != null && sOnFetchingSupplier(true)
     }, [idBranch]);
-  
-    // useEffect(() => {
-    //   idTheOrder == null && sIdSupplier(null)
-    // }, [idTheOrder]);
   
     useEffect(() => {
       idSupplier != null && sOnFetchingStaff(true)
@@ -475,12 +464,12 @@ const Index = (props) => {
               sOnSending(true)
           }
          }else{
-          if(selectedDate == null || idSupplier == null || idStaff == null || delivery_date == null || idBranch == null || idPurchases?.length == 0){
-            selectedDate == null && sErrDate(true)
+          if(idSupplier == null || idStaff == null || idBranch == null || idPurchases?.length == 0){
+            // selectedDate == null && sErrDate(true)
             idSupplier == null && sErrSupplier(true)
             idStaff == null && sErrStaff(true)
             idBranch == null && sErrBranch(true)
-            delivery_date == null && sErrDateDelivery(true)
+            // delivery_date == null && sErrDateDelivery(true)
             idPurchases?.length == 0 && sErrPurchase(true)
               Toast.fire({
                   icon: 'error',
@@ -493,18 +482,18 @@ const Index = (props) => {
          }
       }
 
-      useEffect(() => {
-        sErrDate(false)
-      }, [selectedDate != null]);
+      // useEffect(() => {
+      //   sErrDate(false)
+      // }, [selectedDate != null]);
       useEffect(() => {
         sErrSupplier(false)
       }, [idSupplier != null]);
       useEffect(() => {
         sErrStaff(false)
       }, [idStaff != null]);
-      useEffect(() => {
-        sErrDateDelivery(false)
-      }, [delivery_date != null]);
+      // useEffect(() => {
+      //   sErrDateDelivery(false)
+      // }, [delivery_date != null]);
       useEffect(() => {
         sErrBranch(false)
       }, [idBranch != null]);
@@ -530,39 +519,11 @@ const Index = (props) => {
           else{
             return
           }
-          // Axios("POST", `/api_web/Api_purchases/searchItemsVariant?csrf_protection=true`, {
-          //   data: {
-          //     term: inputValue,
-          //   },
-          //   params:{
-          //     "filter[purchases_id]":  idPurchases?.length > 0 ? idPurchases.map(e => e.value) : -1,
-          //     "purchase_order_id": id
-          //   }
-          // }, (err, response) => {
-          //       if(!err){
-          //         var {result} = response?.data.data
-          //         sDataItems(result)
-          //     }
-          // })
       }
          
          const hiddenOptions = idPurchases?.length > 3 ? idPurchases?.slice(0, 3) : [];
          const fakeDataPurchases = idBranch != null ? dataPurchases.filter((x) => !hiddenOptions.includes(x.value)) : []
          
-        //  const formatNumber = (num) => {
-        //   if (!num && num !== 0) return 0;
-        //   return num.toLocaleString(undefined, {minimumFractionDigits: 2});
-        // };
-
-        // const formatNumber = (num) => {
-        //   if (!num && num !== 0) return 0;
-        //   const roundedNum = parseFloat(num.toFixed(2));
-        //   return roundedNum.toLocaleString("en", {
-        //     minimumFractionDigits: 2,
-        //     maximumFractionDigits: 2,
-        //     useGrouping: true
-        //   });
-        // };
         const formatNumber = (number) => {
           const integerPart = Math.floor(number)
           return integerPart.toLocaleString("en")
@@ -571,39 +532,6 @@ const Index = (props) => {
          const _HandleChangeInputOption = (id, type,index3, value) => {
           var index = option.findIndex(x => x.id === id );
           if(type == "mathang"){
-            // const hasSelectedOption = option.some((o) => o.mathang?.value === value.value);
-            // const hasSelectedOption = option.some((o) => o.mathang?.value === value.value && o.mathang?.purchases_code === value.mathang?.purchases_code);
-            // const hasSelectedOption = option.some((o) => o.mathang?.value === value.value && o.mathang?.e?.purchases_code === value.mathang?.e?.purchases_code);
-            //   if (hasSelectedOption) {
-            //     return Toast.fire({
-            //     title: `${"Mặt hàng này đã được chọn "}`,
-            //     icon: 'error',
-            //     confirmButtonColor: '#296dc1',
-            //     cancelButtonColor: '#d33',
-            //     confirmButtonText: `${dataLang?.aler_yes}`,
-            //     })
-            //   }
-            //   else {
-            //     if(option[index].mathang){
-            //       option[index].mathang = value
-            //       option[index].donvitinh =  value?.e?.unit_name
-            //       // option[index].thanhtien =  value?.e?.unit_name
-            //     }else{
-            //       const newData= {id: Date.now(), mathang: value, donvitinh:value?.e?.unit_name, soluong:1,dongia:1,chietkhau: chietkhautong ? chietkhautong : 0, dongiasauck:1, thue: thuetong ? thuetong : 0, dgsauthue:1, thanhtien:1, note:""}
-            //       if (newData.chietkhau) {
-            //         newData.dongiasauck *= (1 - Number(newData.chietkhau) / 100);
-            //       }
-            //       if(newData.thue?.e?.tax_rate == undefined){
-            //         const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
-            //         newData.thanhtien = Number(tien.toFixed(2));
-            //       } else { 
-            //         const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.e?.tax_rate)/100) * Number(newData.soluong);
-            //         newData.thanhtien = Number(tien.toFixed(2));
-            //       }
-                  
-            //       option.push(newData);
-            //     }
-            //   }
                 if(option[index].mathang){
                   option[index].mathang = value
                   option[index].donvitinh =  value?.e?.unit_name
@@ -760,8 +688,8 @@ const Index = (props) => {
         const _ServerSending = () => {
           var formData = new FormData();
           formData.append("code", code)
-          formData.append("date", (moment(selectedDate).format("YYYY-MM-DD HH:mm:ss")))
-          formData.append("delivery_date", (moment(delivery_date).format("YYYY-MM-DD")))
+          formData.append("date", (moment(startDate).format("YYYY-MM-DD HH:mm:ss")))
+          formData.append("delivery_date", (moment(delivery_dateNew).format("YYYY-MM-DD")))
           formData.append("suppliers_id", idSupplier.value)
           formData.append("order_type ", loai)
           formData.append("branch_id", idBranch.value)
@@ -795,8 +723,10 @@ const Index = (props) => {
                           title: `${dataLang[message]}`
                       })
                       sCode("")
-                      sSelectedDate(new Date().toISOString().slice(0, 10))
-                      sDelivery_date(new Date().toISOString().slice(0, 10))
+                      // sSelectedDate(new Date().toISOString().slice(0, 10))
+                      // sDelivery_date(new Date().toISOString().slice(0, 10))
+                      sStartDate(new Date)
+                      sDelivery_dateNew(new Date)
                       sIdStaff(null)
                       sIdSupplier(null)
                       sIdBranch(null)
@@ -810,6 +740,7 @@ const Index = (props) => {
                       sErrSupplier(false)
                       sOption([{id: Date.now(), mathang: null, donvitinh:"", soluong:0, note:""}])
                       router.back()
+                      // console.log(router.back());
                   }else {
                     if(tongTienState.tongTien == 0){
                       Toast.fire({
@@ -833,11 +764,7 @@ const Index = (props) => {
         onSending && _ServerSending()
     }, [onSending]);
 
-//     const formatDate = (dateString) => {
-//   const date = moment(dateString, "YYYY-MM-DDTHH:mm:ss.SSSZ");
-//   const formattedDate = date.format("DD/MM/YYYY, HH:mm:ss");
-//   return formattedDate;
-// }
+
     return (
     <React.Fragment>
     <Head>
@@ -1005,27 +932,65 @@ const Index = (props) => {
                           />
                         {errStaff && <label className="text-sm text-red-500">{dataLang?.purchase_order_errStaff || "purchase_order_errStaff"}</label>}
                         </div>
-                        <div className='col-span-3'>
+                        <div className='col-span-3 relative'>
                             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"} <span className="text-red-500">*</span></label>
-                            <input
+                            <div className="custom-date-picker flex flex-row">
+                              <DatePicker
+                                blur
+                                fixedHeight
+                                showTimeSelect
+                                selected={startDate}
+                                onSelect={(date) => sStartDate(date)}
+                                onChange={(e) => handleTimeChange(e)}
+                                placeholderText="DD/MM/YYYY HH:mm:ss"
+                                dateFormat="dd/MM/yyyy h:mm:ss aa"
+                                timeInputLabel={'Time: '}
+                                placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                              />
+                              {startDate && (
+                                <>
+                                  <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('startDate')} />
+                                </>
+                              )}
+                              <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                            </div>
+
+                            {/* <input
                               value={selectedDate}    
                               onChange={_HandleChangeInput.bind(this, "date")}
                               name="fname"                      
                               type="datetime-local"
                               className={`${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
-                              {errDate && <label className="text-sm text-red-500">{dataLang?.purchase_err_Date || "purchase_err_Date"}</label>}
+                              {errDate && <label className="text-sm text-red-500">{dataLang?.purchase_err_Date || "purchase_err_Date"}</label>} */}
                         </div>
-                        <div className='col-span-3'>
+                        <div className='col-span-3 relative'>
                             <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"} <span className="text-red-500">*</span></label>
-                            <input
+                            {/* <input
                               value={delivery_date}              
                               onChange={_HandleChangeInput.bind(this, "delivery_date")}
                               name="fname"                      
                               type="date"
                               placeholder={dataLang?.purchase_order_system_default || "purchase_order_system_default"}
                               className={`${errDateDelivery ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
-                              {errDateDelivery && <label className="text-sm text-red-500">{"purchase_err_Date"}</label>}
+                              {errDateDelivery && <label className="text-sm text-red-500">{"purchase_err_Date"}</label>} */}
                           
+                            <div className="custom-date-picker flex flex-row">
+                                <DatePicker
+                                  selected={delivery_dateNew}
+                                  blur
+                                  placeholderText="DD/MM/YYYY"
+                                  dateFormat="dd/MM/yyyy"
+                                  onSelect={(date) => _HandleChangeInput("delivery_dateNew",date)}
+                                  placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                  className={`${ "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
+                                {delivery_dateNew && (
+                                  <>
+                                    <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDateNew('delivery_dateNew')} />
+                                  </>
+                                )}
+                                <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                              </div>
                         </div>
                         <div className='col-span-3'>
                           <label  className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"} </label>

@@ -7,8 +7,6 @@ import dynamic from 'next/dynamic';
 import Loading from "components/UI/loading";
 
 
-
-
 import { MdClear } from 'react-icons/md';
 import { BsCalendarEvent } from 'react-icons/bs';
 import DatePicker from 'react-datepicker';
@@ -199,7 +197,6 @@ const _ServerFetching =  () => {
   Axios("GET", `/api_web/Api_import/getImport/${id}?csrf_protection=true`, {}, (err, response) => {
       if(!err){
         var rResult = response.data;
-        console.log(rResult);
         sListData(rResult?.items.map(e => ({
           id: e?.item?.id, 
           matHang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,value:e.item?.id},
@@ -207,8 +204,8 @@ const _ServerFetching =  () => {
             id: Number(ce?.id),
             disabledDate: (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) || (e.item?.text_type == "material"  && dataMaterialExpiry?.is_enable == "0" && true) || (e.item?.text_type == "products"  && dataProductExpiry?.is_enable == "1" && false) || (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true), 
             kho: {label: ce?.location_name, value: ce?.location_warehouses_id, warehouse_name: ce?.warehouse_name}, 
-            serial: ce?.serial,
-            lot: ce?.lot,
+            serial: ce?.serial == null ? "" : ce?.serial,
+            lot: ce?.lot == null ? "" : ce?.lot,
             date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
             donViTinh: e?.item?.unit_name, 
             amount: Number(ce?.quantity), 
@@ -224,14 +221,11 @@ const _ServerFetching =  () => {
         sIdTheOrder({label: rResult?.purchase_order_code, value: rResult?.purchase_order_id})
         // sDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
         sStartDate(moment(rResult?.date).toDate())
-        console.log(moment(rResult.date).toDate());
         sNote(rResult?.note)
-        // console.log(moment(ce?.expiration_date).toDate());
       }
       sOnFetchingDetail(false)
     })
   }
-  console.log(startDate);
   useEffect(() => {
     // onFetchingDetail && _ServerFetchingDetail()
     //new
@@ -358,10 +352,28 @@ const _ServerFetching =  () => {
             //   disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
             //   mathang: e, khohang: null, serial: '', lot: '', date: null, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.mathang?.e?.price ? Number(e?.mathang?.e?.price) : 1, chietkhau: e?.e?.discount_percent, dongiasauck: Number(e?.e?.price_after_discount),thue: {label:e?.e?.tax_name ,value :e?.e?.tax_rate, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
             // sOption(data);
-            //new          
-            sListData(value?.map(e => ({id: uuidv4(), matHang: e, child: [{kho: null,
-            disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-               serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
+            //new      
+            // const newData = { 
+            //   id: Date.now(), 
+            //   matHang: value, 
+            //   child: [{
+            //     id: uuidv4(), 
+            //     disabledDate: (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+            //     kho: khotong ? khotong : null, 
+            //     serial: '', lot: '', date: null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] 
+            // }
+            // sListData(newData);
+            const newData = value?.map((e,index) => ({
+              id: uuidv4(), 
+              time: index,
+              matHang: e, 
+              child: [{
+                kho: null,
+                disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+                serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note
+              }]
+            }))
+            sListData(newData?.sort((a, b) => b.time - a.time));
           }
       }else if(type === "khotong"){
           sKhotong(value)
@@ -450,25 +462,15 @@ const _ServerFetching =  () => {
 
     const _HandleSubmit = (e) => {
       e.preventDefault();
-      //  const checkErr = sortedArr?.map(e => { return {item: e?.mathang?.value,location_warehouses_id: e?.khohang?.value}})
-      //  let checkErrValidate = checkErr?.filter(e => e?.item !== undefined);
-      // const hasNullLabel = checkErrValidate.some(item => item.location_warehouses_id === undefined);
-
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
-      const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => childItem.lot === ''));
-      const hasNullSerial = listData.some(item => item?.matHang.e?.text_type === "products" &&  item.child?.some(childItem => childItem.serial === ''));
+      const hasNullSerial = listData.some(item => item?.matHang.e?.text_type === "products" && item.child?.some(childItem => childItem.serial === '' || childItem.serial == null));
+      // const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => (childItem.lot === '')));
+      const hasNullLot = listData.some(item => item.child?.some(childItem =>  !childItem.disabledDate && (childItem.lot === "" || childItem.lot == null)));
       const hasNullDate = listData.some(item => item.child?.some(childItem =>  !childItem.disabledDate && childItem.date === null));
      
-      console.log("hasNullDate",hasNullDate);
-     console.log(listData);
-      // const checkThere = listData?.map(e => {return {type:  e.matHang.e?.text_type}})
-      // const hasProducts = checkThere?.some(obj => obj.type === 'products');
-      // const hasMaterial = checkThere?.some(obj => obj.type === 'material');
-      // console.log("dataProductExpiry",dataProductExpiry);
         // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (hasMaterial && dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || (hasProducts && dataProductExpiry?.is_enable == "1"  && hasNullDate) ){
-        if(idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || ( dataProductSerial?.is_enable == "1"  && hasNullSerial) || (dataMaterialExpiry?.is_enable == "1" &&  hasNullLot) || ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1")  && hasNullDate) ){
+        if(idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho || (dataProductSerial?.is_enable == "1"  && hasNullSerial) || ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") &&  hasNullLot) || ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1")  && hasNullDate) ){
         // if(date == null || idSupplier == null  || idBranch == null || idTheOrder == null || hasNullKho){
-          // date == null && sErrDate(true)
           idSupplier == null && sErrSupplier(true)
           idBranch == null && sErrBranch(true)
           idTheOrder == null && sErrTheOrder(true)
@@ -476,10 +478,6 @@ const _ServerFetching =  () => {
           hasNullLot && sErrLot(true)
           hasNullSerial && sErrSerial(true)
           hasNullDate && sErrDateList(true)
-          // console.log(hasNullDate);
-          // console.log("heeee",hasNullDate);
-          // console.log("listData",listData);
-
             Toast.fire({
                 icon: 'error',
                 title: `${dataLang?.required_field_null}`
@@ -490,7 +488,7 @@ const _ServerFetching =  () => {
             sErrLot(false)
             sErrSerial(false)
             sErrDateList(false)
-            // sOnSending(true)
+            sOnSending(true)
         }
       }
     useEffect(() => {
@@ -745,7 +743,6 @@ const _ServerFetching =  () => {
     }
     const taxOptions = [{ label: "Miễn thuế", value: "0",   tax_rate: "0"}, ...dataTasxes]
     
-    
     const allItems = [...options]
 
   const _HandleSelectAll = () => {
@@ -757,10 +754,15 @@ const _ServerFetching =  () => {
     // sMathangAll(data)
 
     //new
-      sMathangAll(allItems?.map(e => ({id: uuidv4(), matHang: e, child: [{id: uuidv4(), disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-        kho: khotong ? khotong : null, serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
-      sListData(allItems?.map(e => ({id: uuidv4(), matHang: e, child: [{id: uuidv4(), disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-        kho: khotong ? khotong : null, serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
+      sMathangAll(allItems?.map(e => ({
+        id: uuidv4(), matHang: e,
+        child: [{id: uuidv4(),
+          disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+          kho: khotong ? khotong : null, serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
+      sListData(allItems?.map(e => ({id: uuidv4(), matHang: e,
+          child: [{id: uuidv4(),
+            disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+            kho: khotong ? khotong : null, serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
   };
 
   const _HandleDeleteAll = () => {
@@ -890,7 +892,6 @@ const _ServerFetching =  () => {
     const handleTimeChange = (date) => {
       sStartDate(date)
     };
-    console.log(startDate);
 
     const _ServerSending = () => {
           var formData = new FormData();
@@ -996,7 +997,6 @@ const _ServerFetching =  () => {
     })
     sListData(newData)
   }
-
   const _HandleAddParent = (value) => {
     const checkData = listData?.some(e => e?.matHang?.value === value?.value)
     if(!checkData){
@@ -1009,7 +1009,7 @@ const _ServerFetching =  () => {
           kho: khotong ? khotong : null, 
           serial: '', lot: '', date: null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] 
       }
-      sListData([...listData, newData]);
+      sListData([newData,...listData]);
     }else{
       Toast.fire({
         title: `${"Mặt hàng đã được chọn"}`,
@@ -1116,8 +1116,7 @@ const _ServerFetching =  () => {
       })
   }
 
-  
-   console.log(listData);  
+    
 
   return (
     <React.Fragment>
@@ -1163,26 +1162,26 @@ const _ServerFetching =  () => {
                               type="datetime-local"
                               className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/> */}
                             <div className="custom-date-picker flex flex-row">
-                    <DatePicker
-                      blur
-                      fixedHeight
-                      showTimeSelect
-                      selected={startDate}
-                      onSelect={(date) => sStartDate(date)}
-                      onChange={(e) => handleTimeChange(e)}
-                      placeholderText="DD/MM/YYYY HH:mm:ss"
-                      dateFormat="dd/MM/yyyy h:mm:ss aa"
-                      timeInputLabel={'Time: '}
-                      placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
-                      className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
-                    />
-                    {startDate && (
-                      <>
-                        <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('startDate')} />
-                      </>
-                    )}
-                    <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
-                  </div>
+                              <DatePicker
+                                blur
+                                fixedHeight
+                                showTimeSelect
+                                selected={startDate}
+                                onSelect={(date) => sStartDate(date)}
+                                onChange={(e) => handleTimeChange(e)}
+                                placeholderText="DD/MM/YYYY HH:mm:ss"
+                                dateFormat="dd/MM/yyyy h:mm:ss aa"
+                                timeInputLabel={'Time: '}
+                                placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                              />
+                              {startDate && (
+                                <>
+                                  <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('startDate')} />
+                                </>
+                              )}
+                              <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                            </div>
 
                         </div>
                         <div className='col-span-2'>
@@ -1760,7 +1759,14 @@ const _ServerFetching =  () => {
                                       <input
                                         value={ce?.serial}
                                         disabled={e?.matHang?.e?.text_type != "products"}
-                                        className={`${e?.matHang?.e?.text_type === "products" && errSerial && ce?.serial ==="" ? "border-red-500 border" : "border-b w-[100%] border-gray-200" } rounded "appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal   focus:outline-none"`}
+                                        className={`border ${
+                                          e?.matHang?.e?.text_type != "products" ? "bg-gray-50" : (errSerial && (ce?.serial == "" || ce?.serial == null) ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] " ) 
+                                          //  && !ce?.disabledDate
+                                          //   ? ""
+                                          //   : ce?.disabledDate ? "" : ""
+                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
+                                        // className={`border ${errDateList && ce?.date == null && !ce?.disabledDate ?"border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer  `}
+                                        // className={`${e?.matHang?.e?.text_type === "products" && errSerial && ce?.serial ==="" ? "border-red-500 border" : "border-b w-[100%] border-gray-200" } rounded "appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal   focus:outline-none"`}
                                         onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
                                       />
                                 </div>
@@ -1780,7 +1786,7 @@ const _ServerFetching =  () => {
                                         value={ce?.lot}
                                         disabled={ce?.disabledDate}
                                         className={`border ${
-                                          ce?.disabledDate ? "bg-gray-50" : (errLot && ce?.lot == "" ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]" ) 
+                                          ce?.disabledDate ? "bg-gray-50" : (errLot && (ce?.lot == "" || ce?.lot == null) ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]" ) 
                                           //  && !ce?.disabledDate
                                           //   ? ""
                                           //   : ce?.disabledDate ? "" : ""
@@ -1831,7 +1837,7 @@ const _ServerFetching =  () => {
                                 </div>
                               </>
                               ):""}
-                                <div className='text-left border p-0.5 pr-2.5 h-full flex flex-col justify-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{ce?.donViTinh}</div>
+                                <div className='text-center border p-0.5 pr-2.5 h-full flex flex-col justify-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{ce?.donViTinh}</div>
                                 <div className="flex items-center justify-center border h-full p-0.5">
                                   <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full" onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "decrease")}><Minus className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
                                   <NumericFormat
@@ -1901,7 +1907,7 @@ const _ServerFetching =  () => {
                                   />
                                 </div>
                                 {/* <div>{ce?.thanhTien}</div> */}
-                                <div className='justify-center pr-3 border p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{formatNumber((ce?.price * ( 1 - Number(ce?.chietKhau)/100 )) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
+                                <div className='justify-center pr-1 border p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{formatNumber((ce?.price * ( 1 - Number(ce?.chietKhau)/100 )) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
                                 {/* <div>{ce?.note}</div> */}
                                 <div className='col-span-1 flex items-center justify-center border h-full p-0.5'>
                                 <input

@@ -18,6 +18,9 @@ import moment from 'moment/moment';
 import ModalImage from "react-modal-image";
 
 
+import { MdClear } from 'react-icons/md';
+import { BsCalendarEvent } from 'react-icons/bs';
+import DatePicker from 'react-datepicker';
 
 const Toast = Swal.mixin({
   toast: true,
@@ -50,6 +53,9 @@ const Index = (props) => {
     const [totalSoluong, setTotalSoluong] = useState(0)
     const [totalQty, setTotalQty] = useState(0)
 
+    const [startDate, sStartDate] = useState(new Date());
+    const [effectiveDate, sEffectiveDate] = useState(null);
+
     const [errName, sErrName] = useState(false);
     const [errCode, sErrCode] = useState(false);
     const [errDate, sErrDate] = useState(false);
@@ -64,11 +70,14 @@ const Index = (props) => {
       router.query && sNamePromis('Yêu cầu mua hàng (PR)')
       router.query && setSelectedDate(moment().format('YYYY-MM-DD HH:mm:ss'))
       router.query && sNote("")
+      router.query && sStartDate(new Date())
   }, [router.query]);
-  const [option, sOption] = useState([{id: Date.now(), mathang: null, donvitinh:"", soluong:0, ghichu:""}]);
+
+    const [option, sOption] = useState([{id: Date.now(), mathang: null, donvitinh:"", soluong:0, ghichu:""}]);
     const slicedArr = option.slice(1);
     const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
     sortedArr.unshift(option[0]);
+
     const _ServerFetching =  () => {
         Axios("GET", "/api_web/api_product/searchItemsVariant?csrf_protection=true", { 
         }, (err, response) => {
@@ -97,7 +106,8 @@ const Index = (props) => {
             var rResult = response.data;
           sCode(rResult?.code )
           sNamePromis(rResult?.name)
-          setSelectedDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
+          // setSelectedDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
+          sStartDate(moment(rResult?.date).toDate())
           sNote(rResult?.note)
           sIdBranch(({label: rResult?.branch_name, value:rResult?.branch_id}))
           const itemlast =  [{mathang: null}]
@@ -147,6 +157,19 @@ const Index = (props) => {
           sNote(value.target.value)
         }
       }
+
+      const handleClearDate = (type) => {
+        if (type === 'effectiveDate') {
+          sEffectiveDate(null)
+        }
+        if (type === 'startDate') {
+          sStartDate(new Date())
+        }
+      }
+      const handleTimeChange = (date) => {
+        sStartDate(date)
+      };
+
       // console.log(sortedArr);
       const _HandleChangeInputOption = (id, type,index3, value) => {
         var index = option.findIndex(x => x.id === id );
@@ -240,7 +263,7 @@ const Index = (props) => {
         var formData = new FormData();
         formData.append("code", code)
         formData.append("name", namePromis)
-        formData.append("date", (moment(selectedDate).format("YYYY-MM-DD HH:mm:ss")))
+        formData.append("date", (moment(startDate).format("YYYY-MM-DD HH:mm:ss")))
         formData.append("branch_id", branch_id)
         formData.append("note", note)
         newDataOption.forEach((item, index) => {
@@ -262,7 +285,8 @@ const Index = (props) => {
                     sCode("")
                     sNamePromis('Yêu cầu mua hàng (PR)')
                     // setSelectedDate(new Date().toISOString().slice(0, 10))
-                    setSelectedDate(moment().format('YYYY-MM-DD HH:mm:ss'))
+                    // setSelectedDate(moment().format('YYYY-MM-DD HH:mm:ss'))
+                    sStartDate(new Date)
                     sNote("")
                     sIdBranch(null)
                     sErrDate(false)
@@ -396,17 +420,37 @@ const Index = (props) => {
                             placeholder={dataLang?.purchase_err_Name_sytem || "purchase_err_Name_sytem"}
                             className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
                       </div>
-                      <div className='w-[24.5%]'>
+                      <div className='w-[24.5%] relative'>
                               <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">{dataLang?.purchase_day || "purchase_day"} <span className="text-red-500">*</span></label>
-                              <input
+                              {/* <input
                                 value={selectedDate}              
                                 onChange={_HandleChangeInput.bind(this, "date")}
                                 name="fname"                      
                                 type="datetime-local"
                                 placeholder={dataLang?.purchase_err_Name_sytem || "purchase_err_Name_sytem"}
                                 className={`${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}/>
-                                {errDate && <label className="text-sm text-red-500">{dataLang?.purchase_err_Date || "purchase_err_Date"}</label>}
-                            
+                                {errDate && <label className="text-sm text-red-500">{dataLang?.purchase_err_Date || "purchase_err_Date"}</label>} */}
+                              <div className="custom-date-picker flex flex-row">
+                              <DatePicker
+                                blur
+                                fixedHeight
+                                showTimeSelect
+                                selected={startDate}
+                                onSelect={(date) => sStartDate(date)}
+                                onChange={(e) => handleTimeChange(e)}
+                                placeholderText="DD/MM/YYYY HH:mm:ss"
+                                dateFormat="dd/MM/yyyy h:mm:ss aa"
+                                timeInputLabel={'Time: '}
+                                placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                              />
+                              {startDate && (
+                                <>
+                                  <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('startDate')} />
+                                </>
+                              )}
+                              <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                            </div>
                           </div>
                       <div className='w-[24.5%]'>
                           <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">{dataLang?.purchase_name || "purchase_name"}</label>
@@ -614,12 +658,12 @@ const Index = (props) => {
                   </React.Fragment>
                 </div>
             </div>
-            <h2 className='font-normal bg-[white] shadow-xl p-2 border-b border-b-[#a9b5c5] 2xl:text-[12px] xl:text-[13px] text-[13px]  border-t border-t-[#a9b5c5]'>{dataLang?.purchase_total || "purchase_total"} </h2>  
+            <h2 className='font-normal bg-[white] shadow-xl p-2 border-b border-b-[#a9b5c5] 2xl:text-[14px] xl:text-[13px] text-[13px]  border-t border-t-[#a9b5c5]'>{dataLang?.purchase_total || "purchase_total"} </h2>  
 
         </div>
         <div className='grid grid-cols-12'>
             <div className='col-span-9'>
-                        <div className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">{dataLang?.purchase_note || ""}</div>
+                        <div className="text-[#344054] font-normal 2xl:text-[14px] xl:text-[13px] text-[13px] mb-1 ">{dataLang?.purchase_note || ""}</div>
                           <textarea
                             value={note}       
                             placeholder={props.dataLang?.client_popup_note}         
@@ -631,16 +675,16 @@ const Index = (props) => {
             </div>
             <div className="text-right mt-5 space-y-4 col-span-3 flex-col justify-between ">
                 <div className='flex justify-between '>
-                  <div className='font-normal 2xl:text-[12px] xl:text-[13px] text-[13px]'><h3>{dataLang?.purchase_totalCount || "purchase_totalCount"}</h3></div>
-                  <div className='font-normal 2xl:text-[12px] xl:text-[13px] text-[13px]'><h3 className='text-blue-600'>{formatNumber(totalSoluong)}</h3></div>
+                  <div className='font-normal 2xl:text-[14px] xl:text-[13px] text-[13px]'><h3>{dataLang?.purchase_totalCount || "purchase_totalCount"}</h3></div>
+                  <div className='font-normal 2xl:text-[14px] xl:text-[13px] text-[13px]'><h3 className='text-blue-600'>{formatNumber(totalSoluong)}</h3></div>
                 </div>
                 <div className='flex justify-between '>
-                  <div className='font-normal 2xl:text-[12px] xl:text-[13px] text-[13px]'><h3>{dataLang?.purchase_totalItem || "purchase_totalItem"}</h3></div>
-                  <div className='font-normal 2xl:text-[12px] xl:text-[13px] text-[13px]'><h3 className='text-blue-600'>{formatNumber(totalQty)}</h3></div>
+                  <div className='font-normal 2xl:text-[14px] xl:text-[13px] text-[13px]'><h3>{dataLang?.purchase_totalItem || "purchase_totalItem"}</h3></div>
+                  <div className='font-normal 2xl:text-[14px] xl:text-[13px] text-[13px]'><h3 className='text-blue-600'>{formatNumber(totalQty)}</h3></div>
                 </div>
                 <div className='space-x-2'>
-                <button onClick={() => router.back()} className="button text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]">{dataLang?.purchase_back || "purchase_back"}</button>
-                  <button onClick={_HandleSubmit.bind(this)}  type="submit"className="button text-[#FFFFFF]  font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]">{dataLang?.purchase_save || "purchase_save"}</button>
+                <button onClick={() => router.back()} className="button text-[#344054] font-normal 2xl:text-[14px] xl:text-[13px] text-[13px] py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]">{dataLang?.purchase_back || "purchase_back"}</button>
+                  <button onClick={_HandleSubmit.bind(this)}  type="submit"className="button text-[#FFFFFF]  font-normal 2xl:text-[14px] xl:text-[13px] text-[13px] py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]">{dataLang?.purchase_save || "purchase_save"}</button>
                 </div>
             </div>
         </div>

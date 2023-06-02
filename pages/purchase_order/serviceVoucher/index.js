@@ -296,7 +296,7 @@ const Index = (props) => {
                               total={e.count} 
                               active={e.id} 
                               className={"text-[#0F4F9E] "}
-                            >{dataLang[e?.name]}</TabStatus> 
+                            >{dataLang[e?.name] || e?.name}</TabStatus> 
                           </div>
                           )
                       })
@@ -949,15 +949,20 @@ const Popup_servie = (props) => {
     sOption(newOption); // cập nhật lại mảng
   }
 
-  const formatNumber = (num) => {
-    if (!num && num !== 0) return 0;
-    const roundedNum = parseFloat(num.toFixed(2));
-    return roundedNum.toLocaleString("en", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      useGrouping: true
-    });
-  };
+  // const formatNumber = (num) => {
+  //   if (!num && num !== 0) return 0;
+  //   const roundedNum = parseFloat(num.toFixed(2));
+  //   return roundedNum.toLocaleString("en", {
+  //     minimumFractionDigits: 2,
+  //     maximumFractionDigits: 2,
+  //     useGrouping: true
+  //   });
+  // };
+
+  const formatNumber = (number) => {
+    const integerPart = Math.floor(number)
+    return integerPart.toLocaleString("en")
+  }
 
   const tinhTongTien = (option) => {
 
@@ -1433,11 +1438,15 @@ const Popup_chitiet =(props)=>{
     props?.id && sOnFetching(true) 
   }, [open]);
 
-  const formatNumber = num => {
-    if (!num && num !== 0) return 0;
-    const roundedNum = Number(num).toFixed(2);
-    return parseFloat(roundedNum).toLocaleString("en");
-  };
+  // const formatNumber = num => {
+  //   if (!num && num !== 0) return 0;
+  //   const roundedNum = Number(num).toFixed(2);
+  //   return parseFloat(roundedNum).toLocaleString("en");
+  // };
+  const formatNumber = (number) => {
+    const integerPart = Math.floor(number)
+    return integerPart.toLocaleString("en")
+  }
 
   const _ServerFetching_detailUser = () =>{
     Axios("GET", `/api_web/Api_service/service/${props?.id}?csrf_protection=true`, {}, (err, response) => {
@@ -1499,7 +1508,7 @@ return (
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_quantity || "serviceVoucher_quantity"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_unit_price || "serviceVoucher_unit_price"}</h4> 
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"% CK"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{"ĐGSCK"}</h4>
+                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}</h4>
                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}</h4>
@@ -1518,7 +1527,7 @@ return (
                           <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.quantity)}</h6>  
                           <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price)}</h6>                
                           <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.discount_percent + "%"}</h6>                
-                          <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-right">{formatNumber(e?.price_after_discount)}</h6>                
+                          <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-center">{formatNumber(e?.price_after_discount)}</h6>                
                           <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.tax_rate) + "%"}</h6>                
                           <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-right">{formatNumber(e?.amount)}</h6>                
                           <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-left">{e?.note != undefined ? e?.note : ""}</h6>                

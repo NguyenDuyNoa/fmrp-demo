@@ -24,5 +24,12 @@ module.exports = {
     require('@tailwindcss/line-clamp'),
     require('tailwind-scrollbar'),
     require('@tailwindcss/aspect-ratio'),
+    function ({ addUtilities }) {
+      addUtilities({
+        '.font-oblique': {
+          'font-style': 'oblique',
+        },
+      });
+    },
   ],
 }

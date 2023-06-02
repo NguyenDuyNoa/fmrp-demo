@@ -12,9 +12,11 @@ import Swal from 'sweetalert2'
 import {NumericFormat} from "react-number-format";
 import { v4 as uuidv4 } from 'uuid';
 
+import { MdClear } from 'react-icons/md';
+import { BsCalendarEvent } from 'react-icons/bs';
+import DatePicker from 'react-datepicker';
 
-
-import { Edit as IconEdit,  Grid6 as IconExcel, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User, ArrowCircleDown, Add  } from "iconsax-react";
+import { Edit as IconEdit,  Grid6 as IconExcel,  ArrowDown2 as IconDown, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User, ArrowCircleDown, Add  } from "iconsax-react";
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
 import Pagination from '/components/UI/pagination';
@@ -70,8 +72,59 @@ const Index = (props) => {
           query: { tab: router.query?.tab ? router.query?.tab : 0  }
       })
     }, []);
-     const _ServerFetching = () =>{}
- 
+    const _ServerFetching =  () => {
+      const tabPage = router.query?.tab;
+        Axios("GET", `/api_web/Api_expense_voucher/expenseVoucher/?csrf_protection=true`, {
+            params: {
+                search: keySearch,
+                limit: limit,  
+                page: router.query?.page || 1,  
+            }
+        }, (err, response) => {
+            if(!err){
+              console.log(response.data);
+                var {rResult, output, rTotal} =  response.data
+                sData(rResult)
+                sTotalItems(output)
+            }
+            sOnFetching(false)
+        })
+    }
+
+
+    const _HandleOnChangeKeySearch = ({target: {value}}) => {
+      sKeySearch(value)
+      router.replace({
+        pathname: router.route,
+        query: { 
+          tab: router.query?.tab,
+        }
+      });
+      setTimeout(() => {
+        if(!value){
+          sOnFetching(true)
+        }
+        sOnFetching(true)
+      }, 500);
+    };
+  
+    const paginate = pageNumber => {
+      router.push({
+        pathname: router.route,
+        query: { 
+          tab: router.query?.tab,
+          page: pageNumber 
+        }
+      })
+    }
+  
+      useEffect(() => {
+        onFetching && _ServerFetching()  
+        }, [onFetching]);
+  
+        useEffect(() => {
+          router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true))
+      }, [limit,router.query?.page, router.query?.tab]);
     return (
         <React.Fragment>
       <Head>
@@ -115,10 +168,10 @@ const Index = (props) => {
                      }
                 </div> */}
            
-              {/* <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">    
+              <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">    
                 <div className="xl:space-y-3 space-y-2">
                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
-                    <div className='flex gap-2'>
+                        <div className='flex gap-2'>
                           <form className="flex items-center relative">
                             <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
                             <input
@@ -131,9 +184,9 @@ const Index = (props) => {
                         <div className='ml-1 w-[23vw]'>
                             <Select 
                                 //  options={listBr_filter}
-                                 options={[{ value: '', label: 'Chọn chi nhánh', isDisabled: true }, ...listBr_filter]}
-                                 onChange={onchang_filterBr.bind(this, "branch")}
-                                 value={idBranch}
+                                //  options={[{ value: '', label: 'Chọn chi nhánh', isDisabled: true }, ...listBr_filter]}
+                                //  onChange={onchang_filterBr.bind(this, "branch")}
+                                //  value={idBranch}
                                  placeholder={dataLang?.client_list_filterbrand} 
                                 hideSelectedOptions={false}
                                 isMulti
@@ -174,15 +227,15 @@ const Index = (props) => {
                         </div>
                         
                         <div className="flex space-x-2 items-center">
-                     {
-                      data_ex?.length > 0 &&(
-                        <ExcelFile filename="Danh sách nhà cung cấp" title="Dsncc" element={
-                          <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
-                            <IconExcel size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
-                          <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
-                      </ExcelFile>
-                      )
-                     }
+                          {
+                            data_ex?.length > 0 &&(
+                              <ExcelFile filename="Danh sách nhà cung cấp" title="Dsncc" element={
+                                <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
+                                  <IconExcel size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
+                                <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
+                            </ExcelFile>
+                            )
+                          }
                      <label className="font-[300] text-slate-400">{dataLang?.display}</label>
                           <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
                             <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
@@ -197,44 +250,45 @@ const Index = (props) => {
                 </div>
                 <div className="min:h-[200px] h-[65%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%] lx:w-[110%] ">
-                    <div className="flex items-center sticky top-0 bg-white p-2 z-10">
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[13%] font-[300] text-left">{dataLang?.suppliers_supplier_code}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.suppliers_supplier_name}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-left">{dataLang?.suppliers_supplier_taxcode}</h4> 
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center">{dataLang?.suppliers_supplier_phone}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.suppliers_supplier_adress}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.suppliers_supplier_group}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">{dataLang?.client_list_brand}</h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center">{dataLang?.branch_popup_properties}</h4>
-                    </div>
+                    <div className="grid grid-cols-13 items-center sticky top-0 bg-white p-2 z-10 shadow">
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Ngày chứng từ"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Mã chứng từ"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Loại đối tượng"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Đối tượng"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Loại chứng từ"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Mã chứng từ"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"PTTT"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Loại chi phí"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Số tiền"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Người tạo"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Chi nhánh"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Ghi chú"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Tác vụ"}</h4>
+                      </div>
                     {onFetching ?
                       <Loading className="h-80"color="#0f4f9e" /> 
                       : 
                       data?.length > 0 ? 
-                      (<>
+                      (
+                      <>
                           <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">                       
                           {(data?.map((e) => 
-                            <div className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[13%]  rounded-md text-left">{e.code}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left text-[#0F4F9E] hover:font-normal"><Popup_chitiet dataLang={dataLang} className="text-left" name={e.name} id={e?.id}/></h6>           
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[10%]  rounded-md text-left">{e.tax_code}</h6>                
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[10%]  rounded-md text-center">{e.phone_number}</h6>                
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">{e.address}</h6>                
-               
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left flex justify-start flex-wrap ">
-                               
-                                  {e.supplier_group?.map(h=>{
-                                    return ( 
-                                      <span key={h.id} style={{ backgroundColor: "#e2f0fe"}} className={`text-[#0F4F9E]  mr-2 mb-1 w-fit xl:text-base text-xs px-2 rounded-md font-[300] py-0.5`}>{h.name}</span>
-                                      )})}
-                              
-                              </h6> 
-                               <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%] rounded-md text-left flex justify-start flex-wrap ">{e.branch?.map(i => (<span key={i.id} className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{i.name}</span>))}</h6>                  
-                              <div className="space-x-2 w-[10%] text-center">
-                                <Popup_dsncc listBr={listBr} listSelectCt={listSelectCt}   onRefresh={_ServerFetching.bind(this)} className="xl:text-base text-xs " listDs={listDs} dataLang={dataLang} name={e.name} representative={e.representative} code={e.code} tax_code={e.tax_code} phone_number={e.phone_number} 
-                                address={e.address} date_incorporation={e.date_incorporation} note={e.note} email={e.email} website={e.website} debt_limit={e.debt_limit}  city={e.city} district={e.district} ward={e.ward}   id={e?.id}  />
-                                <button onClick={()=>handleDelete(e.id)} className="xl:text-base text-xs "><IconDelete color="red"/></button>
-                              </div>
+                            <div className="grid grid-cols-13 items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.code}</h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.objects}</h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.objects}</h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.objects}</h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.objects}</h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.objects}</h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.objects}</h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right">{e?.objects}</h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.objects}</h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left"><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6>
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.note}</h6>
+                              <div className='col-span-1 flex justify-center'>
+                                    <BtnTacVu onRefresh={_ServerFetching.bind(this)} dataLang={dataLang}  id={e?.id}  className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
+                                </div>
                             </div>
                           ))}              
                         </div>                     
@@ -252,9 +306,9 @@ const Index = (props) => {
                       )}    
                   </div>
                 </div>
-              </div>      */}
+              </div>     
             </div>
-            {/* {data?.length != 0 &&
+            {data?.length != 0 &&
               <div className='flex space-x-5 items-center'>
                 <h6>{dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among} {totalItem?.iTotalRecords} {dataLang?.ingredient}</h6>
                 <Pagination 
@@ -264,7 +318,7 @@ const Index = (props) => {
                   currentPage={router.query?.page || 1}
                 />
               </div>                   
-            }  */}
+            } 
           </div>
         </div>
       </div>
@@ -284,7 +338,74 @@ const TabClient = React.memo((props) => {
     )
   })
 
+  const BtnTacVu = React.memo((props) => {
+    // const [open, sOpen] = useState(false);
+    const [openTacvu, sOpenTacvu] = useState(false);
+    const _ToggleModal = (e) => sOpenTacvu(e);
+  
+    const _HandleDelete = (id) => {
+      // Swal.fire({
+      //     title: `${props.dataLang?.aler_ask}`,
+      //     icon: 'warning',
+      //     showCancelButton: true,
+      //     confirmButtonColor: '#296dc1',
+      //     cancelButtonColor: '#d33',
+      //     confirmButtonText: `${props.dataLang?.aler_yes}`,
+      //     cancelButtonText:`${props.dataLang?.aler_cancel}`
+      // }).then((result) => {
+      //   if (result.isConfirmed) {
+      //     Axios("DELETE", `/api_web/Api_service/service/${id}?csrf_protection=true`, {
+      //     }, (err, response) => {
+      //       if(!err){
+      //         var {isSuccess, message} = response.data;
+      //         if(isSuccess){
+      //           Toast.fire({
+      //             icon: 'success',
+      //             title: props.dataLang[message]
+      //           })     
+      //           props.onRefresh && props.onRefresh()
+      //         }else{
+      //             Toast.fire({
+      //                 icon: 'error',
+      //                 title: props.dataLang[message]
+      //             }) 
+      //         }
+      //       }
+      //     })     
+      // }
+      // })
+  }
+  
+    return(
+        <div>
+            <Popup
+                trigger={<button type='button' className={`flex space-x-1 items-center ` + props.className } ><span>{props.dataLang?.purchase_action || "purchase_action"}</span><IconDown size={12} /></button>}
+                arrow={false}
+                position="bottom right"
+                className={`dropdown-edit `}
+                keepTooltipInside={props.keepTooltipInside}
+                closeOnDocumentClick
+                nested
+                onOpen={_ToggleModal.bind(this, true)}
+                onClose={_ToggleModal.bind(this, false)}
+                open={openTacvu}
+            >
+                <div className="w-auto rounded">
+                    <div className="bg-white rounded-t flex flex-col overflow-hidden">
+                        <Popup_dsncc onRefresh={props.onRefresh} dataLang={props.dataLang} id={props?.id} 
+                         className=" hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full 2xl:text-sm xl:text-sm text-[8px]">{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</Popup_dsncc>
+                        <button onClick={_HandleDelete.bind(this, props.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</button>
+                    </div>
+                </div>
+            </Popup>
+        </div>
+    )
+  })
+
 const Popup_dsncc = (props) => {
+
+      let id = props?.id
+
       const dataLang = props.dataLang
       const scrollAreaRef = useRef(null);
       const handleMenuOpen = () => {
@@ -311,7 +432,7 @@ const Popup_dsncc = (props) => {
       const [dataListCost, sDataListCost] = useState([])
     
       
-      const [date , sDate] = useState(moment().format('YYYY-MM-DD HH:mm:ss'));
+      const [date , sDate] = useState(new Date());
       const [code ,sCode] = useState(null)
       const [branch, sBranch] = useState(null)
       const [object, sObject] = useState(null)
@@ -342,9 +463,10 @@ const Popup_dsncc = (props) => {
       const [errService, sErrService] = useState(false)
       const [errCosts, sErrCosts] = useState(false)
       const [errSotien, sErrSotien] =useState(false)
+      const [errSmall, sErrSmall] =useState(false)
 
       useEffect(() =>{
-        open && sDate(moment().format('YYYY-MM-DD HH:mm:ss'));
+        open && sDate(new Date());
         open && sCode(null)
         open && sBranch(null)
         open && sObject(null)
@@ -355,6 +477,7 @@ const Popup_dsncc = (props) => {
         open && sMethod(null)
         open && sNote('')
         open && sNote('')
+        open && sErrSmall(false)
         open && sErrBranch(false)
         open && sErrObject(false)
         open && sErrListObject(false)
@@ -364,7 +487,10 @@ const Popup_dsncc = (props) => {
         open && sErrCosts(false)
         open && sErrSotien(false)
         open &&  sOption([{ id: Date.now(),chiphi: "",sotien: '',}]);
+
         open && sOnFetching(true)
+        open && sOnFetching_LisObject(false)
+        open && sData_ListObject([])
       },[open])
 
 
@@ -401,8 +527,8 @@ const Popup_dsncc = (props) => {
   },[open])
 
   //Danh sách đối tượng
-const _ServerFetching_LisObject =  () => {
-    Axios("GET", "/api_web/Api_expense_voucher/objectList/?csrf_protection=true",{
+const _ServerFetching_LisObject =  async  () => {
+  await Axios("GET", "/api_web/Api_expense_voucher/objectList/?csrf_protection=true",{
       params:{
         type: object?.value,
         "filter[branch_id]": branch?.value
@@ -421,8 +547,8 @@ const _ServerFetching_LisObject =  () => {
   },[onFetching_LisObject])
 
   useEffect(() =>{
-    object != null && sOnFetching_LisObject(true)
-  },[object])
+    branch != null && object != null && sOnFetching_LisObject(true)
+  },[object,branch])
 
 // Loại chứng từ
   const _ServerFetching_TypeOfDocument =  () => {
@@ -450,8 +576,8 @@ const _ServerFetching_LisObject =  () => {
 
 
   //Danh sách chứng từ
-  const _ServerFetching_ListTypeOfDocument =  () => {
-    Axios("GET", "/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true",{
+  const _ServerFetching_ListTypeOfDocument = () => {
+   Axios("GET", "/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true",{
       params:{
         type: object?.value,
         voucher_type: typeOfDocument?.value,
@@ -464,7 +590,7 @@ const _ServerFetching_LisObject =  () => {
             sDataListTypeofDoc(db?.map(e => ({label: e?.code, value: e?.id, money: e?.money})))  
         }
     })
-    sOnFetching_TypeOfDocument(false)  
+    sOnFetching_ListTypeOfDocument(false)  
   }
 
   useEffect(() =>{
@@ -472,8 +598,9 @@ const _ServerFetching_LisObject =  () => {
   },[onFetching_ListTypeOfDocument])
 
   useEffect(() =>{
-    branch != null && object != null && listObject != null && typeOfDocument != null && sOnFetching_ListTypeOfDocument(true)
-  },[branch,object, listObject, typeOfDocument])
+    // (branch != null && object != null && listObject != null && typeOfDocument != null) && sOnFetching_ListTypeOfDocument(true)
+      typeOfDocument != null && sOnFetching_ListTypeOfDocument(true)
+  },[typeOfDocument])
 
   const _HandleSeachApi = (inputValue) => {
       Axios("POST", `/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true`,{
@@ -493,7 +620,6 @@ const _ServerFetching_LisObject =  () => {
           }
       })
   }
-
 
    //Loại chi phí
    const _ServerFetching_ListCost=  () => {
@@ -518,31 +644,59 @@ const _ServerFetching_LisObject =  () => {
     branch != null  && sOnFetching_ListCost(true)
   },[branch])
 
+    // const formatNumber = (num) => {
+    //   if (!num && num !== 0) return 0;
+    //   const roundedNum = parseFloat(num.toFixed(2));
+    //   return roundedNum.toLocaleString("en", {
+    //     minimumFractionDigits: 2,
+    //     maximumFractionDigits: 2,
+    //     useGrouping: true
+    //   });
+    // };
+    const formatNumber = (number) => {
+      const integerPart = Math.floor(number)
+      return integerPart.toLocaleString("en")
+    }
 
       const _HandleChangeInput = (type, value) =>{
         if(type == "date"){
-            sDate(moment(value?.target.value).format('YYYY-MM-DD HH:mm:ss'))
+            sDate(value)
         }else if(type == "code"){
             sCode(value?.target?.value)
-        }else if(type == "branch"){
+        }
+       else if (type === 'clear') {
+        sDate(new Date())
+        }
+        else if(type == "branch" && branch != value){
             sBranch(value)
+            sData_ListObject([])
+            sListObject(null)
         }else if(type == "object" && object != value){
             sObject(value)
             sListObject(null)
+            sData_ListObject([])
+            sDataTypeofDoc([])
+            sTypeOfDocument(null)
         }else if(type == "listObject"){
             sListObject(value)
-        }else if(type == "typeOfDocument"){
+        }else if(type == "typeOfDocument" && typeOfDocument != value){
             sTypeOfDocument(value)
+            sDataListTypeofDoc([])
         }else if(type == "listTypeOfDocument"){
             sListTypeOfDocument(value)
-            if(value?.length == 0){
-              sPrice('')
-            }else if(value?.length > 0){
-              const totalMoney = value.reduce((total, item) => total + parseFloat(item.money), 0);
-              sPrice(formatNumber(totalMoney))
+            if (value && value.length > 0) {
+              const totalMoney = value.reduce((total, item) => total + parseFloat(item.money || 0), 0);
+              console.log(typeof totalMoney);
+              const formattedTotal = parseFloat(totalMoney);
+              sPrice(formattedTotal);
+            }else if (value && value.length == 0) {
+              sPrice('');
             }
         }else if(type == "price"){
-            sPrice(value?.value)
+          const priceChange = parseFloat(value?.target.value.replace(/,/g, ""));
+          if (!isNaN(priceChange)) {
+            sPrice(priceChange);
+          }
         }else if(type == "method"){
             sMethod(value)
         }else if(type == "note"){
@@ -550,11 +704,15 @@ const _ServerFetching_LisObject =  () => {
         }
       }
 
+      const handleTimeChange = (date) => {
+        sDate(date)
+      };
       const _HandleSubmit = (e) =>{
         e.preventDefault();
         const hasNullLabel = option.some(item => item.chiphi === '');
         const hasNullSotien = option.some(item => item.sotien === '');
-        if(branch == null || object == null || listObject == null || price == "" || method == null || hasNullLabel || hasNullSotien ){
+        const totalSotienErr = option.reduce((total, item) => total + item.sotien, 0);
+        if(branch == null || object == null || listObject == null || price == "" || method == null || hasNullLabel || hasNullSotien || (totalSotienErr < price)){
             branch == null && sErrBranch(true) 
             object == null && sErrObject(true) 
             listObject == null && sErrListObject(true) 
@@ -564,12 +722,13 @@ const _ServerFetching_LisObject =  () => {
             hasNullSotien && sErrSotien(true) 
             Toast.fire({
               icon: 'error',
-              title: `${props.dataLang?.required_field_null}`
+              title: `${totalSotienErr < price ? "Tổng số tiền chi phí nhỏ hơn số tiền ban đầu" : props.dataLang?.required_field_null}`
           })
           }else{
             sOnSending(true)
           }
       }
+      
       
       useEffect(() => {
         sErrBranch(false)
@@ -590,22 +749,9 @@ const _ServerFetching_LisObject =  () => {
       useEffect(() => {
         sErrMethod(false)
       }, [method != null]);
-    
-
       useEffect(() => {
-        if (price == null) return;
-        sOption(prevOption => {
-          const newOption = [...prevOption];
-          newOption.forEach((item, index) => {
-            if(index == 0){
-              item.sotien = price;
-            }else{
-              item.sotien = '';
-            }
-          });
-          return newOption;
-        });
-      }, [price]);
+        onSending && _ServerSending()
+      }, [onSending]);
 
       const _HandleChangeInputOption = (id, type, index3, value) => {
         var index = option.findIndex(x => x.id === id);
@@ -629,21 +775,18 @@ const _ServerFetching_LisObject =  () => {
           }
         }
         else if (type === "sotien") {
-          const sotienValue = Number(value?.value) || "";
-          const priceValue = Number(price) || "";
+          const sotienValue = parseFloat(value?.value) || "";
+          const priceValue = parseFloat(price)
           let totalSotien = sotienValue;
-        
           option.forEach((opt, optIndex) => {
             if (optIndex !== index) {
               totalSotien += Number(opt.sotien) || "";
             }
           });
-        
           if (totalSotien > priceValue) {
             option.forEach((opt, optIndex) => {
               option[optIndex].sotien = "";
             });
-        
             Toast.fire({
               title: 'Tổng giá trị số tiền vượt quá giá trị số tiền ban đầu',
               icon: 'error',
@@ -659,6 +802,7 @@ const _ServerFetching_LisObject =  () => {
         }
         sOption([...option])
       }
+
 
       const _HandleAddNew =  () => {
         sOption([...option, {id: uuidv4(), chiphi: '', sotien: ""}])
@@ -678,28 +822,42 @@ const _ServerFetching_LisObject =  () => {
           sOption(newOption); // cập nhật lại mảng
       }
 
-      const formatNumber = (num) => {
-        if (!num && num !== 0) return 0;
-        const roundedNum = parseFloat(num.toFixed(2));
-        return roundedNum.toLocaleString("en", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-          useGrouping: true
-        });
-      };
+     
 
         const allItems = [...dataListTypeofDoc]
+        // const handleSelectAll = () => {
+        //    sListTypeOfDocument(allItems)
+        //     setTimeout(() =>{
+        //       const totalMoney = allItems.reduce((total, item) => total + parseFloat(item.money), 0);
+        //       sPrice(formatNumber(totalMoney))
+        //     },1000)
+        // };
+    
+        // const handleDeselectAll = () => {
+        //   sListTypeOfDocument([])
+        //   sPrice('')
+        //   setTimeout(() =>{
+        //     sPrice('')
+        //   },1000)
+        // };
+    
         const handleSelectAll = () => {
-           sListTypeOfDocument(allItems)
-           const totalMoney = allItems.reduce((total, item) => total + parseFloat(item.money), 0);
-          sPrice(formatNumber(totalMoney))
+          sListTypeOfDocument(allItems);
+          Promise.resolve().then(() => {
+            const totalMoney = allItems.reduce((total, item) => total + parseFloat(item.money), 0);
+            return totalMoney
+          }).then((formattedTotal) => {
+            sPrice(formattedTotal);
+          });
         };
-    
         const handleDeselectAll = () => {
-          sListTypeOfDocument([])
-          sPrice('')
+          sListTypeOfDocument([]);
+          sPrice('');
+          Promise.resolve().then(() => {
+            sPrice('');
+          });
         };
-    
+
         const MenuList = (props) => {
           return (
             <components.MenuList {...props}>
@@ -715,12 +873,94 @@ const _ServerFetching_LisObject =  () => {
         };
     
 
+        useEffect(() => {
+          if (price == null) return;
+          sOption(prevOption => {
+            const newOption = [...prevOption];
+            newOption.forEach((item, index) => {
+              if(index == 0){
+                item.sotien = price;
+              }else{
+                item.sotien = '';
+              }
+            });
+            return newOption;
+          });
+        }, [price]);
+
+        const _ServerSending = () => {
+          var formData = new FormData();
+          formData.append("code", code == null ? "" : code)
+          formData.append("date", (moment(date).format("YYYY-MM-DD HH:mm:ss")))
+          formData.append("branch_id", branch.value)
+          formData.append("objects", object.value)
+          formData.append("objects_id", listObject.value)
+          formData.append("type_vouchers", typeOfDocument.value)
+          formData.append("total", price)
+          formData.append("payment_modes", method.value)
+          listTypeOfDocument?.forEach((e, index) =>{
+            formData.append(`voucher_id[${index}]`, e?.value);
+          })
+          formData.append("note", note)
+          sortedArr.forEach((item, index) => {
+            formData.append(`cost[${index}][id_costs]`, item?.chiphi ? item?.chiphi?.value : "");
+            formData.append(`cost[${index}][total]`, item?.sotien ? item?.sotien : "");
+          });  
+          Axios("POST", `${id ? `/api_web/Api_expense_voucher/expenseVoucher/${id}?csrf_protection=true` : "/api_web/Api_expense_voucher/expenseVoucher/?csrf_protection=true"}`, {
+              data: formData,
+              headers: {'Content-Type': 'multipart/form-data'}
+          }, (err, response) => {
+              if(!err){
+                  var {isSuccess, message} = response.data
+                  if(isSuccess){
+                      Toast.fire({
+                          icon: 'success',
+                          title: `${dataLang[message]}`
+                      })
+                      sDate(new Date())
+                      sCode("")
+                      sBranch(null)
+                      sMethod(null)
+                      sObject(null)
+                      sListObject(null)
+                      sTypeOfDocument(null)
+                      sListTypeOfDocument([])
+                      sPrice('')
+                      sNote("")
+                      sErrBranch(false)
+                      sErrMethod(false)
+                      sErrObject(false)
+                      sErrListObject(false)
+                      sErrPrice(false)
+                      sOption(
+                        [
+                          {
+                           id: Date.now(),
+                           chiphi: "",
+                           sotien: '',
+                          }
+                          ]
+                      )
+                      props.onRefresh && props.onRefresh()
+                      sOpen(false)
+                  }else {
+                    Toast.fire({
+                      icon: 'error',
+                      title: `${dataLang[message]}`
+                    })
+                  }
+              }
+              sOnSending(false)
+          })
+      }
+
+
 
   return(
       <>
       <PopupEdit   
         title={props.id ? `${"Sửa phiếu chi"}` : `${"Tạo phiếu chi"}`} 
-        button={props.id ? <IconEdit/> : `${props.dataLang?.branch_popup_create_new}`} 
+        button={props.id ? "Sửa phiếu" : `${props.dataLang?.branch_popup_create_new}`} 
         onClickOpen={_ToggleModal.bind(this, true)} 
         open={open} onClose={_ToggleModal.bind(this,false)}
         classNameBtn={props.className} 
@@ -731,29 +971,43 @@ const _ServerFetching_LisObject =  () => {
               <div className="w-[40vw]">
                   <form onSubmit={_HandleSubmit.bind(this)} className="">
                       <div className=''> 
-                        <div className="grid grid-cols-12 gap-2 items-center"> 
-                            <div className='col-span-6 max-h-[45px] min-h-[45px] mb-0.5 '>
+                        <div className="grid grid-cols-12 space-x-1 items-center"> 
+                            <div className='col-span-6 relative'>
                                 <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">{dataLang?.serviceVoucher_day_vouchers} </label>
-                                <input
-                                value={date}    
-                                onChange={_HandleChangeInput.bind(this, "date")}
-                                name="fname"                      
-                                type="datetime-local"
-                                className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] 2xl:text-[12px] xl:text-[13px] text-[12px] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none mb-2"
+                                 <div className="custom-date-picker flex flex-row " >
+                                <DatePicker
+                                  blur
+                                  fixedHeight
+                                  showTimeSelect
+                                  selected={date}
+                                  onSelect={(date) => _HandleChangeInput("date",date)}
+                                  onChange={(e) => _HandleChangeInput("date",e)}
+                                  placeholderText="DD/MM/YYYY HH:mm:ss"
+                                  dateFormat="dd/MM/yyyy h:mm:ss aa"
+                                  timeInputLabel={'Time: '}
+                                  placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                  className={`border focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                 />
+                              {date && (
+                                <>
+                                  <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => _HandleChangeInput('clear')} />
+                                </>
+                              )}
+                              <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                            </div>
                                 
                             </div>
-                            <div className='col-span-6 max-h-[45px] min-h-[45px] mb-0.5 '>
+                            <div className='col-span-6'>
                             <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">{dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}<span className="text-red-500">*</span></label>
                                 <input
                                     value={code}                
                                     onChange={_HandleChangeInput.bind(this, "code")}
                                     placeholder={"Mặc định theo hệ thống"}                     
                                     type="text"
-                                    className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none mb-2"
+                                    className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none "
                                     />
                             </div>
-                            <div className='col-span-6 max-h-[65px] min-h-[65px] mt-1 mb-1'>
+                            <div className='col-span-6'>
                             <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{"Chi nhánh"} <span className="text-red-500">*</span></label>
                               <Select   
                                   closeMenuOnSelect={true}
@@ -794,7 +1048,7 @@ const _ServerFetching_LisObject =  () => {
                               />
                                 {errBranch && <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{"Vui lòng chọn chi nhánh"}</label>}
                             </div>
-                            <div className='col-span-6 max-h-[65px] min-h-[65px] mt-1 mb-1'>
+                            <div className='col-span-6'>
                             <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{"Phương thức thanh toán"} <span className="text-red-500">*</span></label>
                               <Select   
                                   closeMenuOnSelect={true}
@@ -835,7 +1089,7 @@ const _ServerFetching_LisObject =  () => {
                               />
                                 {errMethod && <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{"Vui lòng chọn phương thức thanh toán"}</label>}
                             </div>
-                            <div className='col-span-6 max-h-[65px] min-h-[65px] mt-1 mb-1'>
+                            <div className='col-span-6'>
                             <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{"Đối tượng"} <span className="text-red-500">*</span></label>
                               <Select   
                                   closeMenuOnSelect={true}
@@ -876,7 +1130,7 @@ const _ServerFetching_LisObject =  () => {
                               />
                                 {errObject && <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{"Vui lòng nhập đối tượng"}</label>}
                             </div>
-                            <div className='col-span-6 max-h-[65px] min-h-[65px] mt-1 mb-1'>
+                            <div className='col-span-6'>
                             <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{"Danh sách đối tượng"} <span className="text-red-500">*</span></label>
                             {object?.value == "other" ?
                               <CreatableSelect  
@@ -966,7 +1220,7 @@ const _ServerFetching_LisObject =  () => {
                             }
                               {errListObject && <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{"Vui lòng chọn danh sách đối tượng"}</label>}
                             </div>
-                            <div className='col-span-6 max-h-[45px] min-h-[45px] '>
+                            <div className='col-span-6  '>
                             <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{"Loại chứng từ"}</label>
                               <Select   
                                   closeMenuOnSelect={true}
@@ -1006,10 +1260,10 @@ const _ServerFetching_LisObject =  () => {
                                 className={`border-transparent 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `} 
                               />
                             </div>
-                            <div className='col-span-6 max-h-[45px] min-h-[45px] '>
+                            <div className='col-span-6  '>
                             <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{"Danh sách chứng từ"}</label>
                               <Select   
-                                  closeMenuOnSelect={true}
+                                  closeMenuOnSelect={false}
                                   placeholder={"Danh sách chứng từ"}
                                    onInputChange={_HandleSeachApi.bind(this)}
                                   options={dataListTypeofDoc}
@@ -1049,11 +1303,11 @@ const _ServerFetching_LisObject =  () => {
                                 className={`border-transparent 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `} 
                               />
                             </div>
-                            <div className='col-span-6 max-h-[75px] min-h-[75px] mt-1'>
+                            <div className='col-span-6'>
                                <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{"Số tiền"} <span className="text-red-500">*</span></label>
                                 <NumericFormat
                                     value={price}
-                                    onValueChange={_HandleChangeInput.bind(this, "price")}
+                                    onChange={_HandleChangeInput.bind(this, "price")}
                                     allowNegative={false}
                                     placeholder='Số tiền'
                                     decimalScale={0}
@@ -1063,17 +1317,17 @@ const _ServerFetching_LisObject =  () => {
                                 />
                                 {errPrice && <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{"Vui lòng nhập số tiền"}</label>}
                             </div>
-                            <div className='col-span-6 max-h-[75px] min-h-[75px] mt-1'>
+                            <div className='col-span-6'>
                               <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">{"Ghi chú"}</label>
                                 <input
                                     value={note}                
                                     onChange={_HandleChangeInput.bind(this, "note")}
-                                    placeholder={"Mặc định theo hệ thống"}                     
+                                    placeholder={"Ghi chú"}                     
                                     type="text"
-                                    className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none mb-2"
+                                    className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none "
                                     />
                             </div>
-                            <h2 className='font-normal bg-[#ECF0F4] p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12'>{"Thông tin chi phí"}</h2>  
+                            <h2 className='font-normal bg-[#ECF0F4] p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12 mt-0.5'>{"Thông tin chi phí"}</h2>  
                             <div className='col-span-12 max-h-[140px] min-h-[140px] overflow-hidden '>
                                 <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10 min-h-50px max-h-[50px]'>
                                   <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-6    text-center  truncate font-[400] flex items-center gap-1'>
@@ -1135,7 +1389,7 @@ const _ServerFetching_LisObject =  () => {
                                                     allowNegative={false}
                                                     decimalScale={0}
                                                     isNumericString={true}   
-                                                    className={`${errSotien && e?.sotien === '' ? "border-b-red-500" : " border-gray-200"} border-b-2 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none `}
+                                                    className={`${errSotien && e?.sotien === '' ? "border-b-red-500" : " border-gray-200"} placeholder:text-[10px] border-b-2 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none `}
                                                     thousandSeparator=","
                                                 />
                                             </div>
