@@ -64,8 +64,8 @@ const Index = (props) => {
 
     const [active, sActive] = useState(null)
     const [onSending, sOnSending] = useState(null)
-    
-    
+
+
     const [action, sAction] = useState('price_quote')
 
 
@@ -347,26 +347,26 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{dataLang?.price_quote || "price_quote"} </title>
+                <title>{dataLang?.sales_product_list || "sales_product_list"} </title>
             </Head>
             <div className="3xl:pt-[92px] 2xl:pt-[92px] xl:pt-[78px] lg:pt-[76px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-10 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 <div className="flex space-x-1 3xl:text-xs 2xl:text-xs xl:text-[11px] lg:text-[11px]">
-                    <h6 className="text-[#141522]/40">{dataLang?.price_quote || "price_quote"}</h6>
+                    <h6 className="text-[#141522]/40">{dataLang?.sales_product_list || "sales_product_list"}</h6>
                     <span className="text-[#141522]/40">/</span>
-                    <h6 >{dataLang?.price_quote_list || "price_quote"}</h6>
+                    <h6 >{dataLang?.sales_product_list || "sales_product_list"}</h6>
                 </div>
 
                 <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-1 h-[96%] overflow-hidden">
                             <div className='flex justify-between'>
-                                <h2 className="xl:text-2xl text-xl text-[#52575E] capitalize">{dataLang?.price_quote || "price_quote"}</h2>
+                                <h2 className="xl:text-2xl text-xl text-[#52575E] capitalize">{dataLang?.sales_product_list || "sales_product_list"}</h2>
                                 <div className="flex justify-end items-center">
                                     <Link href="/sales_export_product/salesOrder/form" className='xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>{dataLang?.btn_new || "btn_new"}</Link>
                                 </div>
                             </div>
 
-                            <div className="flex space-x-3 items-center 3xl:h-[8vh] 2xl:h-[8vh] xl:h-[8vh] lg:h-[8vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            {/* <div className="flex space-x-3 items-center 3xl:h-[8vh] 2xl:h-[8vh] xl:h-[8vh] lg:h-[8vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 {listTabStatus && listTabStatus.map((e) => {
                                     return (
                                         <div>
@@ -707,9 +707,9 @@ const Index = (props) => {
                                         }
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
-                        <div className='grid grid-cols-11 bg-gray-100 items-center'>
+                        {/* <div className='grid grid-cols-11 bg-gray-100 items-center'>
                             <div className='col-span-3 p-2 text-center'>
                                 <h3 className='uppercase font-normal 2xl:text-base xl:text-xs text-[8px]'>{dataLang?.price_quote_total_outside || "price_quote_total_outside"}</h3>
                             </div>
@@ -723,9 +723,9 @@ const Index = (props) => {
                                 <h3 className='font-normal 2xl:text-base xl:text-xs text-[8px]'>{formatNumber(total?.total_amount)}</h3>
                             </div>
                         </div>
-                        {data?.length != 0 &&
+                        {
+                            data?.length != 0 &&
                             <div className='flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]'>
-                                {/* <h6>{dataLang?.display}  {totalItems?.iTotalDisplayRecords}</h6> */}
                                 <h6>{dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} phiếu báo giá</h6>
                                 <Pagination
                                     postsPerPage={limit}
@@ -734,7 +734,7 @@ const Index = (props) => {
                                     currentPage={router.query?.page || 1}
                                 />
                             </div>
-                        }
+                        } */}
                     </div>
                 </div>
             </div>

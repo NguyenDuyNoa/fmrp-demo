@@ -213,11 +213,7 @@ const Index = (props) => {
 
   // fetch items
   const _ServerFetching_Items = () => {
-    Axios("GET", "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true", {
-      params: {
-        "price_quote_order_item_id": id ? id : ""
-      }
-    }, (err, response) => {
+    Axios("GET", "/api_web/Api_purchases/searchItemsVariant?csrf_protection=true", {}, (err, response) => {
       if (!err) {
         var { result } = response.data.data
         sDataEditItems(result)
@@ -1252,15 +1248,10 @@ const Index = (props) => {
             </div>
           </div>
         </div>
-
       </div>
     </React.Fragment>
   )
 }
-
-
-
-
 
 const MoreSelectedBadge = ({ items }) => {
   const style = {
