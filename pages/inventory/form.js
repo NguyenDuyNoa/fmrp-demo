@@ -322,12 +322,12 @@ const Form = (props) => {
             if(!err){
                 var {isSuccess, message, items_error} = response.data;
                 if(isSuccess){
-                    // router.back();
                     Toast.fire({
                         icon: 'success',
                         title: `${dataLang[message]}`
                     })  
                     sErrData([])
+                    router.back();
                 }else{
                     Toast.fire({
                         icon: 'error',
