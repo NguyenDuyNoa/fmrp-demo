@@ -149,7 +149,6 @@ const Index = (props) => {
   }
 
 
-  console.log('option : ', option);
 
   // fetch chi nhanh
   const handleFetchingBranch = () => {
@@ -396,6 +395,7 @@ const Index = (props) => {
       e
     })
   })
+
   useEffect(() => {
     onFetchingDetail && _ServerFetchingDetail()
   }, [onFetchingDetail]);
@@ -598,6 +598,16 @@ const Index = (props) => {
               note: "",
               delivery_date: null
             }])
+
+            setCustomer(null)
+            setDataCustomer([])
+            setDataContactPerson([])
+            setContactPerson(null)
+            setDataStaffs([])
+            setStaff(null)
+            setDataQuotes([])
+            setQuote(null)
+
           }
         })
       }
@@ -667,13 +677,15 @@ const Index = (props) => {
             note: "",
             delivery_date: null
           }])
+
+
         }
       })
     }
     else if (type === "quote") {
       if (option?.length > 1) {
         Swal.fire({
-          title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó, bạn có muốn tiếp tục?"}`,
+          title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó, bạn có muốn tiếp tục 1?"}`,
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#296dc1',
@@ -697,6 +709,10 @@ const Index = (props) => {
               note: "",
               delivery_date: null
             }])
+
+            sOnFetchingItemsAll(true)
+            sOnFetchingItem(true)
+
           }
         })
       } else {
@@ -720,7 +736,6 @@ const Index = (props) => {
 
     else if (type == "itemAll") {
       setItemsAll(value)
-      console.log('value', value)
       if (value?.length === 0) {
         // setOption([{id: Date.now(), item: null}])
         //new
@@ -742,25 +757,25 @@ const Index = (props) => {
           delivery_date: null
         }]
 
-        console.log(newData.concat(value?.map(e => ({
-          id: uuidv4(),
-          item: {
-            e: e?.e,
-            label: e?.label,
-            value: e?.value,
-          },
-          unit: e?.e?.unit_name,
-          quantity: 1,
-          price: 1,
-          discount: 0,
-          price_after_discount: 1,
-          tax: 0,
-          price_after_tax: 1,
-          total_amount: 1,
-          note: "",
-          delivery_date: null
-        }
-        ))))
+        // console.log(newData.concat(value?.map(e => ({
+        //   id: uuidv4(),
+        //   item: {
+        //     e: e?.e,
+        //     label: e?.label,
+        //     value: e?.value,
+        //   },
+        //   unit: e?.e?.unit_name,
+        //   quantity: 1,
+        //   price: 1,
+        //   discount: 0,
+        //   price_after_discount: 1,
+        //   tax: 0,
+        //   price_after_tax: 1,
+        //   total_amount: 1,
+        //   note: "",
+        //   delivery_date: null
+        // }
+        // ))))
 
         let newArray = newData.concat(value?.map((e, index) => ({
           id: uuidv4(),
@@ -792,8 +807,6 @@ const Index = (props) => {
   // change items 
   const handleOnChangeInputOption = (id, type, value) => {
     var index = option.findIndex(x => x.id === id);
-
-
     if (type === "item") {
       if (option[index]?.item) {
         option[index].item = value
@@ -881,12 +894,16 @@ const Index = (props) => {
       option[index].note = value?.target?.value;
     }
     else if (type == "delivery_date") {
-
       option[index].delivery_date = value
     }
-    else if (type == "clearDeliveryDate") {
+    else if (type == "clear_delivery_date") {
       option[index].delivery_date = null
-
+      setDeliveryDate(null)
+    }
+    else if (type == "clearDeliveryDate") {
+      console.log('2');
+      setDeliveryDate(null)
+      // option[index].delivery_date = null
     }
 
     setOption([...option])
@@ -1130,6 +1147,7 @@ const Index = (props) => {
     }
   }
 
+
   // codeProduct new
   const hiddenOptions = quote?.length > 3 ? quote?.slice(0, 3) : [];
   const fakeDataQuotes = branch != null ? dataQuotes.filter((x) => !hiddenOptions.includes(x.value)) : []
@@ -1181,7 +1199,8 @@ const Index = (props) => {
   const MenuList = (props) => {
     return (
       <components.MenuList {...props}>
-        {allItems?.length > 0 &&
+        {
+          allItems?.length > 0 &&
           <div className='grid grid-cols-2 items-center  cursor-pointer'>
             <div className='hover:bg-slate-200 p-2 col-span-1 text-center ' onClick={_HandleSelectAll.bind(this)}>Chọn tất cả</div>
             <div className='hover:bg-slate-200 p-2 col-span-1 text-center' onClick={_HandleDeleteAll.bind(this)}>Bỏ chọn tất cả</div>
@@ -1838,13 +1857,13 @@ const Index = (props) => {
                           isAllowed={(values) => {
                             if (!values.value) return true;
                             const { floatValue } = values;
-                            if (floatValue > 999) {
+                            if (floatValue > 101) {
                               Toast.fire({
                                 icon: 'error',
-                                title: `Vui lòng nhập số % chiết khấu nhỏ hơn 999`
+                                title: `Vui lòng nhập số % chiết khấu nhỏ hơn 101`
                               })
                             }
-                            return floatValue < 999;
+                            return floatValue < 101;
                           }}
                           readOnly={index === 0 ? readOnlyFirst : false}
                           // decimalScale={0}
@@ -1927,7 +1946,7 @@ const Index = (props) => {
                             <>
                               <MdClear
                                 className="absolute right-0 3xl:-translate-x-[320%] 3xl:translate-y-[1%] lg:-translate-x-[200%] lg:translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] 3xl:scale-110 lg:scale-90 cursor-pointer"
-                                onClick={() => handleOnChangeInputOption(e?.id, 'clearDeliveryDate')}
+                                onClick={() => handleOnChangeInputOption(e?.id, 'clear_delivery_date')}
                               />
                             </>
                           )}
@@ -1967,6 +1986,17 @@ const Index = (props) => {
                   onValueChange={handleOnChangeInput.bind(this, "totaldiscount")}
                   className=" text-center py-1 px-2 bg-transparent font-normal w-20 focus:outline-none border-b-2 border-gray-300"
                   thousandSeparator=","
+                  isAllowed={(values) => {
+                    if (!values.value) return true;
+                    const { floatValue } = values;
+                    if (floatValue > 101) {
+                      Toast.fire({
+                        icon: 'error',
+                        title: `Vui lòng nhập số % chiết khấu nhỏ hơn 101`
+                      })
+                    }
+                    return floatValue < 101;
+                  }}
                   allowNegative={false}
                   decimalScale={0}
                   isNumericString={true}
@@ -1978,7 +2008,7 @@ const Index = (props) => {
               <Select
                 options={taxOptions}
                 onChange={(value) => handleOnChangeInput("total_tax", value)}
-                value={totalTax}
+                value={totalTax ? '' : ''}
                 formatOptionLabel={(option) => (
                   <div className='flex justify-start items-center gap-1 '>
                     <h2>{option?.label}</h2>
@@ -2027,17 +2057,21 @@ const Index = (props) => {
               <h2>{dataLang?.sales_product_item_date || "sales_product_item_date"}</h2>
               <div className="custom-date-picker flex flex-row relative">
                 <DatePicker
-                  selected={deliveryDate}
+                  selected={deliveryDate }
                   onChange={(date) => handleOnChangeInput("total_delivery_date", date)}
                   blur
                   placeholderText="DD/MM/YYYY"
                   dateFormat="dd/MM/yyyy"
                   onSelect={(date) => setDeliveryDate(date)}
                   className={`3xl:h-11 h-10 3xl:w-[210px] w-full 3xl:text-[16px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-2 outline-none cursor-pointer `}
+
                 />
                 {deliveryDate && (
                   <>
-                    <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('deliveryDate')} />
+                    <MdClear
+                      className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
+                      onClick={() => handleOnChangeInputOption('_', 'clearDeliveryDate')}
+                    />
                   </>
                 )}
                 <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%]  text-[#CCCCCC] scale-110 cursor-pointer" />
@@ -2116,12 +2150,13 @@ const MoreSelectedBadge = ({ items }) => {
   const label = `+ ${length}`;
 
   return (
-    <div style={style} title={title}>{label}</div>
+    // <div style={style} title={title}>{label}</div>
+    <div style={style} title={title}></div>
   );
 };
 
 const MultiValue = ({ index, getValue, ...props }) => {
-  const maxToShow = 2;
+  const maxToShow = 0;
   const overflow = getValue()
     .slice(maxToShow)
     .map((x) => x.label);
