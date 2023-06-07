@@ -1806,11 +1806,11 @@ const Index = (props) => {
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{dataLang?.sales_product_quantity || "sales_product_quantity"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{dataLang?.sales_product_unit_price || "sales_product_unit_price"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{`${dataLang?.sales_product_rate_discount}` || "sales_product_rate_discount"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-left    font-[400]'>{dataLang?.sales_product_after_discount || "sales_product_after_discount"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center    font-[400]'>{dataLang?.sales_product_after_discount || "sales_product_after_discount"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{dataLang?.sales_product_tax || "sales_product_tax"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-left    truncate font-[400]'>{dataLang?.sales_product_money_after_discount || "sales_product_money_after_discount"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-left truncate font-[400]'>{dataLang?.sales_product_item_date || "sales_product_item_date"}</h4>
-              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-left    truncate font-[400]'>{dataLang?.sales_product_note || "sales_product_note"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center    truncate font-[400]'>{dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center truncate font-[400]'>{dataLang?.sales_product_item_date || "sales_product_item_date"}</h4>
+              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center    truncate font-[400]'>{dataLang?.sales_product_note || "sales_product_note"}</h4>
               <h4 className='2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{dataLang?.sales_product_operations || "sales_product_operations"}</h4>
             </div>
           </div>
