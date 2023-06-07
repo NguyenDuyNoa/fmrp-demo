@@ -1552,13 +1552,13 @@ return (
               <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
               <div className='col-span-7'>
                   <div>
-                    <div className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">{"Ghi chú"}</div>
+                    <div className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">{props.dataLang?.purchase_note || "purchase_note"}</div>
                           <textarea
                             value={data?.note}
                             disabled
                             name="fname"                      
                             type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-[60%] min-h-[100px] max-h-[100px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
+                            className=" placeholder:text-slate-300 w-[60%] min-h-[100px] max-h-[100px] resize-none bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 outline-none "
                           />
                   </div>
               </div>

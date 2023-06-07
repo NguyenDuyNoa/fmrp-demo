@@ -1050,9 +1050,9 @@ return (
           <h2 className='font-normal p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
               <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
               <div className='col-span-7'>
-                  <h3 className='text-[13px]'>{props.dataLang?.import_from_note || "import_from_note"}</h3>
+                  <h3 className='text-[13px] p-1'>{props.dataLang?.import_from_note || "import_from_note"}</h3>
                 <textarea 
-                 className="focus:border-[#92BFF7] resize-none border-[#d0d5dd] placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 border outline-none "
+                 className="resize-none placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
                  disabled value={data?.note}/>
               </div>
              <div className='col-span-2 space-y-1 text-right'>
