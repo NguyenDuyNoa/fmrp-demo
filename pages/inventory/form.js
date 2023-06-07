@@ -10,7 +10,7 @@ import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
 
 import {
-    Calendar as IconCalendar, Add as IconAdd, Image as IconImage, ArrowDown2 as IconDown, Trash as IconDelete,
+    Calendar as IconCalendar, Add as IconAdd,SearchNormal1 as IconSearch, Image as IconImage, ArrowDown2 as IconDown, Trash as IconDelete,
     ArrowRotateLeft as IconLoad
 } from "iconsax-react";
 import DatePicker from "react-datepicker";
@@ -67,6 +67,15 @@ const Form = (props) => {
     const [errNullDate, sErrNullDate] = useState(false);
     const [errNullSerial, sErrNullSerial] = useState(false);
     const [errData, sErrData] = useState([]);
+
+    const [dataErr , sDataErr] = useState(false)
+
+    useEffect(() =>{
+        if(errData.length > 0){
+            sDataErr(true)
+        }
+    },[errData])
+
 
     const _ServerFetching = () => {
         Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {
@@ -322,12 +331,12 @@ const Form = (props) => {
             if(!err){
                 var {isSuccess, message, items_error} = response.data;
                 if(isSuccess){
-                    // router.back();
                     Toast.fire({
                         icon: 'success',
                         title: `${dataLang[message]}`
                     })  
                     sErrData([])
+                    router.back();
                 }else{
                     Toast.fire({
                         icon: 'error',
@@ -344,25 +353,55 @@ const Form = (props) => {
         onSending && _ServerSending()
     }, [onSending]);
 
-    useEffect(() => {
-        const updatedData = dataChoose.map((parent) => {
-            const updatedChild = parent.child.map((child) => {
-                const matchedItem = errData.find((item) => item.id_parent === parent.id && Number(item.id) === child.id);
-                if (matchedItem) {
-                    return { ...child, quantity: isNaN(Number(matchedItem.check_quantity_stock)) ? 0 : Number(matchedItem.check_quantity_stock) };
-                }else{
-                    return child;
-                }
-                // if(child?.status == 2){ //so luong thay doi
-                // }else if(child?.status == 3){ //trung serial
-                //     const matchedItem = errData.find((item) => item.id_parent === parent.id && Number(item.id) === child.id && item.serial === child.serial );
-                //     console.log(matchedItem);
-                // }
-            });
-            return { ...parent, child: updatedChild };
-        })
-        sDataChoose([...updatedData])
-    }, [errData]);
+    // useEffect(() => {
+    //     const updatedData = dataChoose.map((parent) => {
+    //         const updatedChild = parent.child.map((child) => {
+    //             const matchedItem = errData.find((item) => item.id_parent === parent.id && Number(item.id) === child.id);
+    //             if (matchedItem) {
+    //                 return { ...child, quantity: isNaN(Number(matchedItem.check_quantity_stock)) ? 0 : Number(matchedItem.check_quantity_stock) };
+    //             }else{
+    //                 return child;
+    //             }
+    //             // if(child?.status == 2){ //so luong thay doi
+    //             // }else if(child?.status == 3){ //trung serial
+    //             //     const matchedItem = errData.find((item) => item.id_parent === parent.id && Number(item.id) === child.id && item.serial === child.serial );
+    //             //     console.log(matchedItem);
+    //             // }
+    //         });
+    //         return { ...parent, child: updatedChild };
+    //     })
+    //     sDataChoose([...updatedData])
+    // }, [errData]);
+    // useEffect(() => {
+    //     if(errData.length > 0){
+    //         Swal.fire({
+    //             title: `${"Số lượng trong kho có sự thay đổi, bạn có muốn thay đổi không"}`,
+    //             icon: 'warning',
+    //             showCancelButton: true,
+    //             confirmButtonColor: '#296dc1',
+    //             cancelButtonColor: '#d33',
+    //             confirmButtonText: `${dataLang?.aler_yes}`,
+    //             cancelButtonText: `${dataLang?.aler_cancel}`
+    //           }).then((result) => {
+    //             if (result.isConfirmed) {
+    //               const updatedData = dataChoose.map((parent) => {
+    //                   const updatedChild = parent.child.map((child) => {
+    //                       const matchedItem = errData.find((item) => item.id_parent === parent.id && Number(item.id) === child.id);
+    //                       if (matchedItem) {
+    //                           return { ...child, quantity: isNaN(Number(matchedItem.check_quantity_stock)) ? 0 : Number(matchedItem.check_quantity_stock) };
+    //                       }else{
+    //                           return child;
+    //                       }
+    //                   });
+    //                   return { ...parent, child: updatedChild };
+    //               })
+    //               sDataChoose([...updatedData])
+    //             } 
+    //             }
+    //           )
+    //         }
+    // }, [errData]);
+    console.log("sDataChoose",dataChoose);
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
@@ -425,6 +464,7 @@ const Form = (props) => {
             <Head>
                 <title>Thêm phiếu kiểm kê kho</title>
             </Head>
+            {dataErr && <Popup_status dataErr={dataErr} dataChoose={dataChoose} dataLang={dataLang} errData={errData} setOpen={true} />}
             <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-5 space-y-2.5 flex flex-col justify-between'>
                 <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
                     <h6 className='text-[#141522]/40'>Kiểm kê kho</h6>
@@ -1378,5 +1418,82 @@ const Popup_Product = React.memo((props) => {
         </PopupEdit>
     )
 })
+
+
+const Popup_status = (props) => {
+
+    const dataLang = props?.dataLang
+    const [onFetching, sOnFetching] = useState(false);
+    const [open, sOpen] = useState(false);
+
+    const [data,sData] = useState([])
+    useEffect(()=>{
+        props.dataErr && sOpen(true)
+    },[props])
+    console.log("err", props?.errData);
+
+    const newDataChoose = props?.errData.map((errItem) => {
+        const matchingChild = props?.dataChoose.find((dataItem) => dataItem.child.some((childItem) => childItem.id.toString() === errItem.id));
+        return {
+          ...errItem,
+          name: matchingChild && matchingChild.name,
+        };
+      });
+      
+    console.log("newDataChoose",newDataChoose);
+  return(
+    <PopupEdit  
+      title={"Phiếu kiểm kê bị thay đổi về số lượng thực" +" "+ `${props?.errData?.map(e => {return moment(e?.date).format("DD/MM/YYYY")})}`} 
+      open={open} 
+      onClose={() => sOpen(false)}
+      classNameBtn={props.className}
+    >
+      <div className="mt-4 space-x-5 w-[990px] h-auto">        
+      <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                  <div className="pr-2 w-[100%] lx:w-[120%] ">
+                  <div className={`grid-cols-10 grid sticky top-0 bg-white shadow  z-10`}>
+                              <h4 className='text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{"Tên hàng"}</h4>
+                              <h4 className='text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{"Số lượng thay đổi"}</h4>
+                              <h4 className='text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{"Số lượng thực"}</h4>
+                              <h4 className='text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{"Chênh lệch"}</h4>
+                              <h4 className='text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{"Xử lý"}</h4>
+                  </div>
+                  {onFetching ?
+                    <Loading className="h-50"color="#0f4f9e" /> 
+                    : 
+                    newDataChoose?.length > 0 ? 
+                    (<>
+                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] mt-2 ">                       
+                        {(newDataChoose?.map((e) => 
+                              <div className={`grid-cols-10  grid hover:bg-slate-50`}>
+                                <h6 className='text-[13px]  px-2 col-span-2 text-center capitalize'>{e?.name}</h6>
+                                <h6 className='text-[13px]  px-2 col-span-2 text-center capitalize'>{e?.check_quantity_stock}</h6>
+                                <h6 className='text-[13px]  px-2 col-span-2 text-center capitalize'>{e?.quantity}</h6>
+                                <h6 className='text-[13px]  px-2 col-span-2 text-center capitalize'>{e?.quantity_net}</h6>
+                                {/* ///chưa làm */}
+                                <h6 className='text-[13px]  px-2 col-span-2 text-center capitalize'>{(e?.quantity - e?.check_quantity_stock) > 0 ? "Mặt hàng cần điều chỉnh " :""}</h6>
+                              </div>
+                        ))}              
+                      </div>                     
+                      </>
+                    )  : 
+                    (
+                      <div className=" max-w-[352px] mt-24 mx-auto" >
+                        <div className="text-center">
+                          <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+                          <h1 className="textx-[#141522] text-base opacity-90 font-medium">{props?.dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
+                          <div className="flex items-center justify-around mt-6 ">
+                              {/* <Popup_dsncc onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+                          </div>
+                        </div>
+                      </div>
+                    )}    
+                </div>
+            </div>
+      </div>
+    </PopupEdit>
+  )
+}
+
 
 export default Form;
