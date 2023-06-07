@@ -796,7 +796,6 @@ const Popup_chitiet =(props)=>{
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_day || "purchase_day"}</h3><h3 className='col-span-1 font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}</h3></div>
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_code || "purchase_code"}</h3><h3 className='col-span-1 font-normal'>{data?.code}</h3></div>
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_planNumber || "purchase_planNumber"}</h3><h3 className='col-span-1 font-normal'>{data?.reference_no}</h3></div>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_propnent || "purchase_propnent"}</h3><h3 className='col-span-1 font-normal'>{data?.user_create_name}</h3></div>
                     </div>
 
                     <div className='col-span-2 mx-auto'>
@@ -815,7 +814,7 @@ const Popup_chitiet =(props)=>{
                     <div className='col-span-3 '>
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_status || "purchase_status"}</h3><h3 className='col-span-1'>{data?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1'>{props.dataLang?.purchase_approved || "purchase_approved"} <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>{props.dataLang?.purchase_notapproved || "purchase_notapproved"} <TickCircle size={22}/></div>)}</h3></div>  
                         {/* <div className='my-4 font-medium grid grid-cols-2'>Tổng số lượng</div> */}
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_note || "purchase_note"}</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_propnent || "purchase_propnent"}</h3><h3 className='col-span-1 font-normal'>{data?.user_create_name}</h3></div>
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_branch || "purchase_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] col-span-1">{data?.branch_name}</h3></div>
                     </div>
                     
@@ -876,8 +875,12 @@ const Popup_chitiet =(props)=>{
                     )}    
                 </div>
             <h2 className='font-normal p-2  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
-                <div className="text-right mt-5  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10">
-                <div className='col-span-9'>
+              <div className=" mt-5  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10">
+                  <div className='col-span-9'>
+                    <h3 className='text-[13px] p-1'>{props.dataLang?.purchase_note || "import_from_note"}</h3>
+                  <textarea 
+                  className="resize-none placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
+                  disabled value={data?.note}/>
                 </div>
                <div className='col-span-3 space-y-2'>
                 <div className='flex justify-between '>

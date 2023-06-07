@@ -782,7 +782,6 @@ return (
                       </div> */}
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h3><h3 className='text-[13px] font-normal'>{data?.supplier_name}</h3></div>
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.purchase_order_note || "purchase_order_note"}</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div>
                   </div>
                   
               </div>
@@ -847,9 +846,13 @@ return (
                   )}    
               </div>
           <h2 className='font-normal p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
-              <div className="text-right mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+              <div className="mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
               <div className='col-span-7'>
-              </div>
+                    <h3 className='text-[13px] p-1'>{props.dataLang?.purchase_order_note || "purchase_order_note"}</h3>
+                    <textarea 
+                    className="resize-none placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
+                    disabled value={data?.note}/>
+                </div>
              <div className='col-span-2 space-y-2'>
                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3></div>
                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}</h3></div>
