@@ -23,38 +23,22 @@ const Index = (props) => {
   const router = useRouter();
   const id = router.query?.id
   const dataLang = props?.dataLang
-  const [onFetching, sOnFetching] = useState(false);
-  const [onFetchingItems, sOnFetchingItemsAll] = useState(false);
-  const [onFetchingItem, sOnFetchingItem] = useState(false);
-  const [onFetchingDetail, sOnFetchingDetail] = useState(false)
-  const [onFetchingCustomer, sOnFetchingCustomer] = useState(false)
-  const [onFetchingStaff, sOnFetchingStaff] = useState(false)
-  const [onFetchingQuote, sOnFetchingQuote] = useState(false)
-  const [onFetchingContactPerson, sOnFetchingContactPerson] = useState(false)
-  const [onSending, sOnSending] = useState(false);
-  const [option, setOption] = useState([{
-    id: Date.now(),
-    item: null,
-    unit: 1,
-    quantity: 1,
-    price: 1,
-    discount: 0,
-    price_after_discount: 1,
-    tax: 0,
-    price_after_tax: 1,
-    total_amount: 1,
-    note: "",
-    delivery_date: null
-  }]);
-  const slicedArr = option.slice(1);
-  const sortedArr = id ? slicedArr.sort((a, b) => a.id - b.id) : slicedArr.sort((a, b) => b.id - a.id);
-  sortedArr.unshift(option[0]);
+  const [onFetching, setOnFetching] = useState(false);
+  const [onFetchingItemsAll, setOnFetchingItemsAll] = useState(false);
+  const [onFetchingItem, setOnFetchingItem] = useState(false);
+  const [onFetchingDetail, setOnFetchingDetail] = useState(false)
+  const [onFetchingCustomer, setOnFetchingCustomer] = useState(false)
+  const [onFetchingStaff, setOnFetchingStaff] = useState(false)
+  const [onFetchingQuote, setOnFetchingQuote] = useState(false)
+  const [onFetchingContactPerson, setOnFetchingContactPerson] = useState(false)
+  const [onSending, setOnSending] = useState(false);
+  const [option, setOption] = useState([]);
 
   const [dataCustomer, setDataCustomer] = useState([])
   const [dataPersonContact, setDataContactPerson] = useState([])
   const [dataStaffs, setDataStaffs] = useState([])
   const [dataQuotes, setDataQuotes] = useState([])
-  const [dataEditItems, setDataEditItems] = useState([])
+  const [dataItems, setDataItems] = useState([])
   const [dataTasxes, setDataTasxes] = useState([])
   const [dataBranch, setDataBranch] = useState([])
 
@@ -81,10 +65,7 @@ const Index = (props) => {
 
   const [hidden, setHidden] = useState(false)
   const [typeOrder, setTypeOrder] = useState("0");
-  const [dataItems, sDataItems] = useState([])
   const [itemsAll, setItemsAll] = useState([])
-
-  const [listData, sListData] = useState([]);
 
   const [tongTienState, setTongTienState] = useState({
     totalPrice: 0,
@@ -93,10 +74,6 @@ const Index = (props) => {
     totalTax: 0,
     totalAmount: 0
   });
-
-
-  const readOnlyFirst = true;
-
 
   useEffect(() => {
     router.query && setErrDate(false)
@@ -111,13 +88,13 @@ const Index = (props) => {
 
   // Fetch edit
   const _ServerFetchingDetail = () => {
-    Axios("GET", `/api_web/Api_quotation/quotation/${id}?csrf_protection=true`, {
+    Axios("GET", `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`, {
     }, (err, response) => {
       if (!err) {
         var rResult = response.data;
+        console.log('ress edit :', rResult);
 
-        const itemlast = [{ item: null }];
-        const items = itemlast?.concat(rResult?.items?.map(e => ({
+        const items = rResult?.items?.map(e => ({
           price_quote_order_item_id: e?.id,
           id: e.id,
           item: {
@@ -125,30 +102,35 @@ const Index = (props) => {
             label: `${e.item?.item_name} <span style={{display: none}}>${e.item?.codeProduct + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
             value: e.item?.id
           },
-          quantity: Number(e?.quantity),
-          price: Number(e?.price),
-          discount: Number(e?.discount_percent),
+          quantity: +e?.quantity,
+          price: +e?.price,
+          discount: +e?.discount_percent,
           tax: { tax_rate: e?.tax_rate, value: e?.tax_id },
           unit: e.item?.unit_name,
-          price_after_discount: Number(e?.price_after_discount),
+          price_after_discount: +e?.price_after_discount,
           note: e?.note,
-          total_amount: Number(e?.price_after_discount) * (1 + Number(e?.tax_rate) / 100) * Number(e?.quantity)
-        })));
+          total_amount: (+e?.price_after_discount) * (1 + (+e?.tax_rate) / 100) * (+e?.quantity)
+        }));
+        console.log("item : ", items);
 
         setOption(items)
-        setCodeProduct(rResult?.reference_no)
-        setContactPerson(({ label: rResult?.contact_name, value: rResult?.contact_id }))
+        setCodeProduct(rResult?.code)
+        setContactPerson(rResult?.contact_name !== null && rResult?.contact_name !== '0' ? { label: rResult?.contact_name, value: rResult?.contact_id } : null)
         setBranch({ label: rResult?.branch_name, value: rResult?.branch_id })
-        setCustomer(({ label: rResult?.client_name, value: rResult?.client_id }))
+        setStaff({ label: rResult?.staff_name, value: rResult?.staff_id })
+        setCustomer({ label: rResult?.client_name, value: rResult?.client_id })
         setStartDate(moment(rResult?.date).toDate())
         setDeliveryDate(moment(rResult?.validity).toDate())
         setNote(rResult?.note)
+        if (rResult?.quote_id !== "0" && rResult?.quote_code !== null) {
+          setTypeOrder("1")
+          setHidden(true)
+          setQuote({ label: rResult?.quote_code, value: rResult?.quote_id })
+        }
       }
-      sOnFetchingDetail(false)
+      setOnFetchingDetail(false)
     })
   }
-
-
 
   // fetch chi nhanh
   const handleFetchingBranch = () => {
@@ -166,7 +148,7 @@ const Index = (props) => {
       }
     })
 
-    sOnFetching(false)
+    setOnFetching(false)
   }
 
   // fetch Customer
@@ -181,7 +163,7 @@ const Index = (props) => {
         setDataCustomer(db?.map(e => ({ label: e.name, value: e.id })))
       }
     })
-    sOnFetchingCustomer(false)
+    setOnFetchingCustomer(false)
   }
   // Contact person
   const handleFetchingContactPerson = () => {
@@ -195,7 +177,7 @@ const Index = (props) => {
         setDataContactPerson(rResult?.map(e => ({ label: e.full_name, value: e.id })))
       }
     })
-    sOnFetchingContactPerson(false)
+    setOnFetchingContactPerson(false)
   }
 
   // Staff
@@ -210,7 +192,7 @@ const Index = (props) => {
         setDataStaffs(rResult?.map(e => ({ label: e.name, value: e.staffid })))
       }
     })
-    sOnFetchingStaff(false)
+    setOnFetchingStaff(false)
   }
 
   // Quote
@@ -226,7 +208,7 @@ const Index = (props) => {
         setDataQuotes(rResult?.map(e => ({ label: e.reference_no, value: e.id })))
       }
     })
-    sOnFetchingQuote(false)
+    setOnFetchingQuote(false)
   }
 
   // fetch items
@@ -235,19 +217,19 @@ const Index = (props) => {
       Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
         if (!err) {
           var { result } = response.data.data
-          setDataEditItems(result)
+          setDataItems(result)
         }
       })
-      sOnFetchingItemsAll(false)
+      setOnFetchingItemsAll(false)
     }
     if (typeOrder === "0") {
       Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
         if (!err) {
           var { result } = response.data.data
-          setDataEditItems(result)
+          setDataItems(result)
         }
       })
-      sOnFetchingItemsAll(false)
+      setOnFetchingItemsAll(false)
 
     }
   }
@@ -262,19 +244,19 @@ const Index = (props) => {
         }, (err, response) => {
           if (!err) {
             var { result } = response.data.data
-            setDataEditItems(result)
+            setDataItems(result)
           }
         })
-        sOnFetchingItem(false)
+        setOnFetchingItem(false)
       }
       else {
         Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
           if (!err) {
             var { result } = response.data.data
-            setDataEditItems(result)
+            setDataItems(result)
           }
         })
-        sOnFetchingItem(false)
+        setOnFetchingItem(false)
 
       }
     }
@@ -282,10 +264,10 @@ const Index = (props) => {
       Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
         if (!err) {
           var { result } = response.data.data
-          setDataEditItems(result)
+          setDataItems(result)
         }
       })
-      sOnFetchingItem(false)
+      setOnFetchingItem(false)
 
     }
   }
@@ -296,59 +278,8 @@ const Index = (props) => {
   }, [onFetchingDetail]);
 
   useEffect(() => {
-    id && sOnFetchingDetail(true)
+    id && setOnFetchingDetail(true)
   }, []);
-
-  useEffect(() => {
-    if (totalTax == null) return;
-    setOption(prevOption => {
-      const newOption = [...prevOption];
-      const thueValue = totalTax?.tax_rate || 0;
-      const chietKhauValue = totalDiscount || 0;
-      newOption.forEach((item, index) => {
-        if (index === 0 || !item.id) return;
-        const dongiasauchietkhau = item?.price * (1 - chietKhauValue / 100);
-        const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.quantity
-        item.tax = totalTax;
-        item.total_amount = isNaN(thanhTien) ? 0 : thanhTien;
-      });
-      return newOption;
-    });
-  }, [totalTax]);
-
-  useEffect(() => {
-    if (deliveryDate == null) return;
-    setOption(prevOption => {
-      const newOption = [...prevOption];
-
-      newOption.forEach((item, index) => {
-        if (index === 0 || !item.id) return;
-        item.delivery_date = deliveryDate || null
-      });
-      return newOption;
-    });
-  }, [deliveryDate]);
-
-  useEffect(() => {
-    if (totalDiscount == null) return;
-    setOption(prevOption => {
-      const newOption = [...prevOption];
-      const thueValue = totalTax?.tax_rate != undefined ? totalTax?.tax_rate : 0
-      const chietKhauValue = totalDiscount ? totalDiscount : 0;
-
-      newOption.forEach((item, index) => {
-        if (index === 0 || !item?.id) return;
-        const dongiasauchietkhau = item?.price * (1 - chietKhauValue / 100);
-        const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.quantity
-        item.tax = totalTax;
-        item.discount = Number(totalDiscount);
-        item.price_after_discount = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
-        item.total_amount = isNaN(thanhTien) ? 0 : thanhTien;
-      });
-      return newOption;
-    });
-  }, [totalDiscount]);
-
 
   useEffect(() => {
     branch === null && setDataCustomer([]) || setCustomer(null) || setDataContactPerson([]) || setContactPerson(null) || setDataStaffs([]) || setStaff(null)
@@ -370,25 +301,25 @@ const Index = (props) => {
   }, [onFetchingContactPerson])
 
   useEffect(() => {
-    branch !== null && (sOnFetchingCustomer(true) || sOnFetchingStaff(true))
+    branch !== null && (setOnFetchingCustomer(true) || setOnFetchingStaff(true))
   }, [branch]);
 
   useEffect(() => {
-    customer !== null && (sOnFetchingContactPerson(true) || sOnFetchingQuote(true))
+    customer !== null && (setOnFetchingContactPerson(true) || setOnFetchingQuote(true))
   }, [customer]);
   useEffect(() => {
-    quote !== null && (sOnFetchingItem(true))
+    quote !== null && (setOnFetchingItem(true))
   }, [quote]);
 
   useEffect(() => {
-    onFetchingItems && handleFetchingItemsAll()
-  }, [onFetchingItems])
+    setOnFetchingItemsAll && handleFetchingItemsAll()
+  }, [setOnFetchingItemsAll])
 
   useEffect(() => {
     onFetchingItem && handleFetchingItem()
   }, [onFetchingItem]);
 
-  const options = dataEditItems?.map(e => {
+  const options = dataItems?.map(e => {
     return ({
       label: `${e.name} <span style={{display: none}}>${e.codeProduct}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
       value: e.id,
@@ -401,7 +332,7 @@ const Index = (props) => {
   }, [onFetchingDetail]);
 
   useEffect(() => {
-    id && sOnFetchingDetail(true)
+    id && setOnFetchingDetail(true)
   }, []);
 
   // tổng thay đổi
@@ -412,7 +343,6 @@ const Index = (props) => {
       const thueValue = totalTax?.tax_rate || 0;
       const chietKhauValue = totalDiscount || 0;
       newOption.forEach((item, index) => {
-        if (index === 0 || !item.id) return;
         const dongiasauchietkhau = item?.price * (1 - chietKhauValue / 100);
         const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.quantity
         item.tax = totalTax;
@@ -428,7 +358,6 @@ const Index = (props) => {
       const newOption = [...prevOption];
 
       newOption.forEach((item, index) => {
-        if (index === 0 || !item.id) return;
         item.delivery_date = deliveryDate || null
       });
       return newOption;
@@ -443,7 +372,6 @@ const Index = (props) => {
       const chietKhauValue = totalDiscount ? totalDiscount : 0;
 
       newOption.forEach((item, index) => {
-        if (index === 0 || !item?.id) return;
         const dongiasauchietkhau = item?.price * (1 - chietKhauValue / 100);
         const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.quantity
         item.tax = totalTax;
@@ -476,19 +404,19 @@ const Index = (props) => {
   }, [onFetchingContactPerson])
 
   useEffect(() => {
-    branch !== null && (sOnFetchingCustomer(true) || sOnFetchingStaff(true))
+    branch !== null && (setOnFetchingCustomer(true) || setOnFetchingStaff(true))
   }, [branch]);
 
   useEffect(() => {
-    customer !== null && (sOnFetchingContactPerson(true) || sOnFetchingQuote(true))
+    customer !== null && (setOnFetchingContactPerson(true) || setOnFetchingQuote(true))
   }, [customer]);
   useEffect(() => {
-    quote !== null && (sOnFetchingItem(true))
+    quote !== null && (setOnFetchingItem(true))
   }, [quote]);
 
   useEffect(() => {
-    onFetchingItems && handleFetchingItemsAll()
-  }, [onFetchingItems])
+    onFetchingItemsAll && handleFetchingItemsAll()
+  }, [onFetchingItemsAll])
 
   useEffect(() => {
     onFetchingItem && handleFetchingItem()
@@ -499,8 +427,8 @@ const Index = (props) => {
   }, [onFetching]);
 
   useEffect(() => {
-    router.query && sOnFetching(true)
-    router.query && sOnFetchingItemsAll(true)
+    router.query && setOnFetching(true)
+    router.query && setOnFetchingItemsAll(true)
   }, [router.query]);
 
   useEffect(() => {
@@ -534,7 +462,7 @@ const Index = (props) => {
       }, (err, response) => {
         if (!err) {
           var { result } = response?.data.data
-          setDataEditItems(result)
+          setDataItems(result)
         }
       })
 
@@ -543,7 +471,7 @@ const Index = (props) => {
       Axios("POST", `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`, {}, (err, response) => {
         if (!err) {
           var { result } = response?.data.data
-          setDataEditItems(result)
+          setDataItems(result)
         }
       })
     }
@@ -563,16 +491,41 @@ const Index = (props) => {
       setCodeProduct(value.target.value)
     }
     else if (type === "customer") {
-      setCustomer(value)
-      setDataContactPerson([])
-      setContactPerson(null)
-      setDataQuotes([])
-      setQuote(null)
+      if (option?.length >= 1) {
+        Swal.fire({
+          title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó, bạn có muốn tiếp tục ?"}`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#296dc1',
+          cancelButtonColor: '#d33',
+          confirmButtonText: `${dataLang?.aler_yes}`,
+          cancelButtonText: `${dataLang?.aler_cancel}`
+        }).then((result) => {
+          if (result.isConfirmed) {
+            setCustomer(value)
+            setDataContactPerson([])
+            setContactPerson(null)
+            setDataQuotes([])
+            setQuote(null)
+            setOption([])
 
-      sOnFetchingItem(true)
+            setOnFetchingItem(true)
+          }
+        })
+      } else {
+        setCustomer(value)
+        setDataContactPerson([])
+        setContactPerson(null)
+        setDataQuotes([])
+        setQuote(null)
+
+        setOnFetchingItem(true)
+      }
+
+
     }
     else if (type === "branch") {
-      if (sortedArr?.slice(1)?.length > 0) {
+      if (option?.length >= 1) {
         Swal.fire({
           title: `${"Mặt hàng đã chọn sẽ bị xóa, bạn có muốn tiếp tục?"}`,
           icon: 'warning',
@@ -584,21 +537,7 @@ const Index = (props) => {
         }).then((result) => {
           if (result.isConfirmed) {
             setBranch(value)
-            setOption([{
-              id: Date.now(),
-              item: null,
-              unit: 1,
-              quantity: 1,
-              unit_price: 1,
-              discount: 0,
-              price_after_discount: 1,
-              tax: 0,
-              price_after_tax: 1,
-              total_amount: 1,
-              note: "",
-              delivery_date: null
-            }])
-
+            setOption([])
             setCustomer(null)
             setDataCustomer([])
             setDataContactPerson([])
@@ -621,20 +560,7 @@ const Index = (props) => {
         setStaff(null)
         setDataQuotes([])
         setQuote(null)
-        setOption([{
-          id: Date.now(),
-          item: null,
-          unit: 1,
-          quantity: 1,
-          price: 1,
-          discount: 0,
-          price_after_discount: 1,
-          tax: 0,
-          price_after_tax: 1,
-          total_amount: 1,
-          note: "",
-          delivery_date: null
-        }])
+        setOption([])
       }
     }
     else if (type === "contactPerson") {
@@ -658,34 +584,21 @@ const Index = (props) => {
           setHidden(value.target.value === "1");
           setQuote(value.target.value === "0" ? null : quote);
 
-          sOnFetchingItem(value.target.value === "0" && true)
-          sOnFetchingItemsAll(value.target.value === "1" && true)
+          setOnFetchingItem(value.target.value === "0" && true)
+          setOnFetchingItemsAll(value.target.value === "1" && true)
 
           setTotalTax('')
           setTotalDiscount('')
-          setOption([{
-            id: Date.now(),
-            item: null,
-            unit: 1,
-            quantity: 1,
-            price: 1,
-            discount: 0,
-            price_after_discount: 1,
-            tax: 0,
-            price_after_tax: 1,
-            total_amount: 1,
-            note: "",
-            delivery_date: null
-          }])
+          setOption([])
 
 
         }
       })
     }
     else if (type === "quote") {
-      if (option?.length > 1) {
+      if (option?.length >= 1) {
         Swal.fire({
-          title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó, bạn có muốn tiếp tục 1?"}`,
+          title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó, bạn có muốn tiếp tục ?"}`,
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#296dc1',
@@ -695,29 +608,16 @@ const Index = (props) => {
         }).then((result) => {
           if (result.isConfirmed) {
             setQuote(value)
-            setOption([{
-              id: Date.now(),
-              item: null,
-              unit: 1,
-              quantity: 1,
-              price: 1,
-              discount: 0,
-              price_after_discount: 1,
-              tax: 0,
-              price_after_tax: 1,
-              total_amount: 1,
-              note: "",
-              delivery_date: null
-            }])
+            setOption([])
 
-            sOnFetchingItemsAll(true)
-            sOnFetchingItem(true)
+            setOnFetchingItemsAll(true)
+            setOnFetchingItem(true)
 
           }
         })
       } else {
         setQuote(value)
-        sOnFetchingItem(true)
+        setOnFetchingItem(true)
       }
 
     }
@@ -739,83 +639,78 @@ const Index = (props) => {
       if (value?.length === 0) {
         // setOption([{id: Date.now(), item: null}])
         //new
-        sListData([])
+        setOption([])
       } else if (value?.length > 0) {
-
-        const newData = [{
-          id: Date.now(),
-          item: null,
-          unit: null,
-          quantity: 1,
-          price: 1,
-          discount: totalDiscount ? totalDiscount : 0,
-          price_after_discount: 1,
-          tax: totalTax ? totalTax : 0,
-          price_after_tax: 1,
-          total_amount: 1,
-          note: "",
-          delivery_date: null
-        }]
-
-        // console.log(newData.concat(value?.map(e => ({
-        //   id: uuidv4(),
-        //   item: {
-        //     e: e?.e,
-        //     label: e?.label,
-        //     value: e?.value,
-        //   },
-        //   unit: e?.e?.unit_name,
-        //   quantity: 1,
-        //   price: 1,
-        //   discount: 0,
-        //   price_after_discount: 1,
-        //   tax: 0,
-        //   price_after_tax: 1,
-        //   total_amount: 1,
-        //   note: "",
-        //   delivery_date: null
-        // }
-        // ))))
-
-        let newArray = newData.concat(value?.map((e, index) => ({
-          id: uuidv4(),
-          item: {
-            e: e?.e,
-            label: e?.label,
-            value: e?.value,
-          },
-          unit: e?.e?.unit_name,
-          quantity: 1,
-          price: 1,
-          index: index,
-          discount: 0,
-          price_after_discount: 1,
-          tax: 0,
-          price_after_tax: 1,
-          total_amount: 1,
-          note: "",
-          delivery_date: null
+        if (typeOrder === "0") {
+          const newData = value?.map((e, index) => {
+            return ({
+              id: uuidv4(),
+              item: {
+                e: e?.e,
+                label: e?.label,
+                value: e?.value,
+              },
+              unit: e?.e?.unit_name,
+              quantity: 1,
+              sortIndex: index,
+              price: 1,
+              discount: 0,
+              price_after_discount: 1,
+              tax: 0,
+              price_after_tax: 1,
+              total_amount: 1,
+              note: "",
+              delivery_date: null
+            })
+          }).sort((a, b) => b.sortIndex - a.sortIndex)
+          setOption([...newData])
         }
-        ))).sort((a, b) => b.index - a.index)
+        if (typeOrder === "1" && quote !== null) {
+          const newData = value?.map((e, index) => {
 
-        setOption(newArray)
+            return ({
+              id: uuidv4(),
+              item: {
+                e: e?.e,
+                label: e?.label,
+                value: e?.value,
+              },
+              unit: e?.e?.unit_name,
+              quantity: e?.e?.quantity,
+              sortIndex: index,
+              price: e?.e?.price,
+              discount: e?.e?.discount_percent,
+              price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
+              tax: {
+                label: e?.e?.tax_name,
+                value: e?.e?.tax_id,
+                tax_rate: e?.e?.tax_rate
+              },
+              price_after_tax: (+e?.e?.price * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100)) * (1 + e?.e?.tax_rate / 100),
+              total_amount: (+e?.e?.price * (1 - +e?.e?.discount_percent / 100)) * (1 + (+e?.e?.tax_rate) / 100) * (+e?.e?.quantity),
+              note: e?.e?.note_item,
+              delivery_date: null
+            })
+          }).sort((a, b) => b.sortIndex - a.sortIndex)
+
+          setOption([...newData])
+        } else if (typeOrder === '1' && quote === null) {
+          Toast.fire({
+            icon: 'error',
+            title: `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng!`
+          })
+        }
 
       }
     }
   }
 
-  // change items 
-  const handleOnChangeInputOption = (id, type, value) => {
-    var index = option.findIndex(x => x.id === id);
-    if (type === "item") {
-      if (option[index]?.item) {
-        option[index].item = value
-        option[index].unit = value?.e?.unit_name
-        option[index].quantity = 1
-        option[index].total_amount = Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
-      } else {
+  const handleAddParent = (value) => {
+    const checkData = option?.some(e => e?.item?.value === value?.value)
+    if (!checkData) {
+      if (typeOrder === '0') {
         const newData = {
-          id: Date.now(),
+          id: uuidv4(),
           item: value,
           unit: value?.e?.unit_name,
           quantity: 1,
@@ -826,22 +721,55 @@ const Index = (props) => {
           price_after_tax: 1,
           total_amount: 1,
           note: "",
+          delivery_date: null,
+        }
+        setOption([newData, ...option]);
+
+      }
+      if (typeOrder === '1' && quote !== null) {
+        const newData = {
+          id: uuidv4(),
+          item: {
+            e: value?.e,
+            label: value?.label,
+            value: value?.value,
+          },
+          unit: value?.e?.unit_name,
+          quantity: value?.e?.quantity,
+          price: value?.e?.price,
+          discount: value?.e?.discount_percent,
+          price_after_discount: +value?.e?.price * (1 - +value?.e?.discount_percent / 100),
+          tax: {
+            label: value?.e?.tax_name,
+            value: value?.e?.tax_id,
+            tax_rate: value?.e?.tax_rate
+          },
+          price_after_tax: (+value?.e?.price * value?.e?.quantity * (1 - +value?.e?.discount_percent / 100)) * (1 + value?.e?.tax_rate / 100),
+          total_amount: (+value?.e?.price * (1 - +value?.e?.discount_percent / 100)) * (1 + (+value?.e?.tax_rate) / 100) * (+value?.e?.quantity),
+          note: value?.e?.note_item,
           delivery_date: null
         }
-        if (newData.discount) {
-          newData.price_after_discount *= (1 - Number(newData.discount) / 100);
-        }
-        if (newData.tax?.e?.tax_rate == undefined) {
-          const tien = Number(newData.price_after_discount) * (1 + Number(0) / 100) * Number(newData.quantity);
-          newData.total_amount = Number(tien.toFixed(2));
-        } else {
-          const tien = Number(newData.price_after_discount) * (1 + Number(newData.tax?.e?.tax_rate) / 100) * Number(newData.quantity);
-          newData.total_amount = Number(tien.toFixed(2));
-        }
-        option.push(newData);
+        setOption([newData, ...option]);
+      } else if (typeOrder === '1' && quote === null) {
+        Toast.fire({
+          icon: 'error',
+          title: `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng!`
+        })
       }
+
+    } else {
+      Toast.fire({
+        title: `${"Mặt hàng đã được chọn"}`,
+        icon: 'error',
+      })
     }
-    else if (type == "unit") {
+  }
+
+  // change items 
+  const handleOnChangeInputOption = (id, type, value) => {
+    var index = option.findIndex(x => x.id === id);
+
+    if (type == "unit") {
       option[index].unit = value.target?.value;
     }
     else if (type === "quantity") {
@@ -901,7 +829,6 @@ const Index = (props) => {
       setDeliveryDate(null)
     }
     else if (type == "clearDeliveryDate") {
-      console.log('2');
       setDeliveryDate(null)
       // option[index].delivery_date = null
     }
@@ -910,7 +837,8 @@ const Index = (props) => {
   }
   const handleIncrease = (id) => {
     const index = option.findIndex((x) => x.id === id);
-    const newQuantity = option[index].quantity + 1;
+    const newQuantity = +option[index].quantity + 1;
+
     option[index].quantity = newQuantity;
     if (option[index].tax?.tax_rate == undefined) {
       const tien = Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
@@ -946,8 +874,8 @@ const Index = (props) => {
       })
     }
   };
-  const _HandleDelete = (id) => {
-    if (id === option[0].id) {
+  const _HandleDelete = (id, type) => {
+    if (type === 'default') {
       return Toast.fire({
         title: `${"Mặc định hệ thống, không thể xóa!"}`,
         icon: 'error',
@@ -960,30 +888,70 @@ const Index = (props) => {
     setOption(newOption); // cập nhật lại mảng
   }
 
+  const _HandleChangeValue = (parentId, value) => {
+    const checkData = option?.some(e => e?.item?.value === value?.value)
+
+    if (!checkData) {
+      const newData = option?.map((e, index) => {
+        if (e?.id === parentId) {
+          return {
+            ...e,
+            id: uuidv4(),
+            item: {
+              e: value?.e,
+              label: value?.label,
+              value: value?.value,
+            },
+            unit: value.unit_name,
+            quantity: 1,
+            sortIndex: index,
+            price: 1,
+            discount: 0,
+            price_after_discount: 1,
+            tax: 0,
+            price_after_tax: 1,
+            total_amount: 1,
+            note: "",
+            delivery_date: null
+          }
+        }
+        else {
+          return e;
+        }
+      })
+      setOption([...newData]);
+    } else {
+      Toast.fire({
+        title: `${"Mặt hàng đã được chọn"}`,
+        icon: 'error',
+      })
+    }
+  }
+
   const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes]
 
   const tinhTongTien = (option) => {
-    const totalPrice = option.slice(1).reduce((acc, item) => {
-      const totalPrice = acc + item?.price * item?.quantity
+    const totalPrice = option.reduce((acc, item) => {
+      const totalPrice = item?.price * item?.quantity
       return acc + totalPrice
     }, 0);
 
-    const totalDiscountPrice = option.slice(1).reduce((acc, item) => {
+    const totalDiscountPrice = option.reduce((acc, item) => {
       const totalDiscountPrice = item?.price * (item?.discount / 100) * item?.quantity;
       return acc + totalDiscountPrice;
     }, 0);
 
-    const totalDiscountAfterPrice = option.slice(1).reduce((acc, item) => {
+    const totalDiscountAfterPrice = option.reduce((acc, item) => {
       const tienSauCK = item?.quantity * item?.price_after_discount;
       return acc + tienSauCK;
     }, 0);
 
-    const totalTax = option.slice(1).reduce((acc, item) => {
+    const totalTax = option.reduce((acc, item) => {
       const totalTaxIem = item?.price_after_discount * (isNaN(item?.tax?.tax_rate) ? 0 : (item?.tax?.tax_rate / 100)) * item?.quantity;
       return acc + totalTaxIem;
     }, 0);
 
-    const totalAmount = option.slice(1).reduce((acc, item) => {
+    const totalAmount = option.reduce((acc, item) => {
       const totalAmount = item?.total_amount
       return acc + totalAmount
 
@@ -995,7 +963,7 @@ const Index = (props) => {
     const totalPrice = tinhTongTien(option);
     setTongTienState(totalPrice);
   }, [option]);
-  const dataOption = sortedArr?.map(e => {
+  const dataOption = option?.map(e => {
     return {
       item: e?.item?.value,
       quantity: Number(e?.quantity),
@@ -1015,15 +983,15 @@ const Index = (props) => {
   // validate submit
   const handleSubmitValidate = (e) => {
     e.preventDefault();
-    let deliveryDateInOption = option.slice(1).some(e => e?.delivery_date === null)
+    let deliveryDateInOption = option.some(e => e?.delivery_date === null)
 
     if (typeOrder === '0') {
-      if (startDate == null || customer == null || branch == null || staff == null || deliveryDateInOption) {
+      if (startDate == null || customer == null || branch == null || staff == null || deliveryDateInOption === true) {
         startDate == null && setErrDate(true)
         customer?.value == null && sErrCustomer(true)
         branch?.value == null && setErrBranch(true)
         staff?.value == null && setErrStaff(true)
-        // deliveryDateInOption && setErrDeliveryDate(true)
+        deliveryDateInOption === true && setErrDeliveryDate(true)
         // deliveryDate == null && setErrDeliveryDate(true)
         Toast.fire({
           icon: 'error',
@@ -1031,15 +999,15 @@ const Index = (props) => {
         })
       }
       else {
-        sOnSending(true)
+        setOnSending(true)
       }
     } else if (typeOrder === '1') {
-      if (startDate == null || customer == null || branch == null || staff == null || deliveryDateInOption || quote == null) {
+      if (startDate == null || customer == null || branch == null || staff == null || deliveryDateInOption === true || quote == null) {
         startDate == null && setErrDate(true)
         customer?.value == null && sErrCustomer(true)
         branch?.value == null && setErrBranch(true)
         staff?.value == null && setErrStaff(true)
-        deliveryDateInOption == null && setErrDeliveryDate(true)
+        deliveryDateInOption === true && setErrDeliveryDate(true)
         quote?.value == null && setErrQuote(true)
         // deliveryDate == null && setErrDeliveryDate(true)
 
@@ -1049,32 +1017,27 @@ const Index = (props) => {
         })
       }
       else {
-        sOnSending(true)
+        setOnSending(true)
       }
 
     }
-
   }
+
   // handle submit
   const handleSubmit = () => {
     var formData = new FormData();
-    formData.append("reference_no", codeProduct)
+    formData.append("code", codeProduct)
     formData.append("date", (moment(startDate).format("YYYY-MM-DD HH:mm:ss")))
-    // formData.append("validity", (moment(deliveryDate).format("YYYY-MM-DD")))
     formData.append("branch_id", branch?.value)
     formData.append("client_id", customer?.value)
     formData.append("person_contact_id", contactPerson?.value)
     formData.append("staff_id", staff?.value)
     formData.append("note", note)
+    formData.append("quote_id", typeOrder === "1" ? quote?.value : "");
 
-    if (typeOrder === "1") {
-      formData.append("quote_item_id", quote?.value);
-    }
 
     newDataOption.forEach((item, index) => {
-      if (typeOrder === "1") {
-        formData.append(`items[${index}][quote_item_id]`, quote?.value)
-      }
+
       formData.append(`items[${index}][item]`, item?.item != undefined ? item?.item : "");
       formData.append(`items[${index}][quantity]`, item?.quantity.toString());
       formData.append(`items[${index}][price]`, item?.price);
@@ -1085,16 +1048,16 @@ const Index = (props) => {
     });
 
     if (tongTienState?.totalPrice > 0 && tongTienState?.totalDiscountPrice >= 0 && tongTienState?.totalDiscountAfterPrice > 0 && tongTienState?.totalTax >= 0 && tongTienState?.totalAmount > 0) {
-      Axios("POST", `${id ? `/api_web/Api_quotation/quotation/${id}?csrf_protection=true` : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true"}`, {
+      Axios("POST", `${id ? `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true` : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true"}`, {
         data: formData,
         headers: { 'Content-Type': 'multipart/form-data' }
       }, (err, response) => {
-        var { isSuccess, message } = response?.data
+        console.log('response', response);
 
-        if (response && response.data && isSuccess === true && router.isReady) {
+        if (response && response.data && response?.data?.isSuccess === true && router.isReady) {
           Toast.fire({
             icon: 'success',
-            title: `${dataLang[message]}`
+            title: `${dataLang[response?.data?.message]}`
           })
           setCodeProduct("")
           setStartDate(new Date())
@@ -1110,23 +1073,23 @@ const Index = (props) => {
           sErrCustomer(false)
           setErrStaff(false)
           setErrQuote(false)
-          setOption([{ id: Date.now(), item: null, unit: "", quantity: 0, note: "" }])
+          setOption([])
           router.push('/sales_export_product/salesOrder?tab=all')
         }
-        if (response && response.data && isSuccess === false) {
+        if (response && response.data && response?.data?.isSuccess === false) {
           Toast.fire({
             icon: 'error',
-            title: `${dataLang[message]}`
+            title: `${dataLang[response?.data?.message]}`
           })
         }
-        sOnSending(false)
+        setOnSending(false)
       })
     } else {
       Toast.fire({
         icon: 'error',
         title: newDataOption?.length === 0 ? `Chưa chọn thông tin mặt hàng!` : 'Tiền không được âm, vui lòng kiểm tra lại thông tin mặt hàng!'
       })
-      sOnSending(false)
+      setOnSending(false)
     }
 
   }
@@ -1136,9 +1099,6 @@ const Index = (props) => {
   }, [onSending]);
 
   const handleClearDate = (type, id,) => {
-
-    var index = option.findIndex(x => x.id === id);
-
     if (type === 'deliveryDate') {
       setDeliveryDate(null)
     }
@@ -1152,48 +1112,151 @@ const Index = (props) => {
   const hiddenOptions = quote?.length > 3 ? quote?.slice(0, 3) : [];
   const fakeDataQuotes = branch != null ? dataQuotes.filter((x) => !hiddenOptions.includes(x.value)) : []
 
-  const optionsItem = dataItems?.map(e => ({ label: `${e.name} <span style={{display: none}}>${e.codeProduct}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`, value: e.id, e }))
+  // const optionsItem = dataItems?.map(e => ({ label: `${e.name} <span style={{display: none}}>${e.codeProduct}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`, value: e.id, e }))
   const allItems = [...options]
 
   const _HandleSelectAll = () => {
-    const fakeData = [{ id: Date.now(), item: null }]
-    const data = fakeData?.concat(allItems?.map(e => ({
-      id: uuidv4(),
-      item: e,
-      khohang: khotong ? khotong : e?.qty_warehouse,
-      unit: e?.e?.unit_name,
-      quantity: idTheOrder != null ? Number(e?.e?.quantity_left) : 1,
-      price: e?.e?.price,
-      discount: totalDiscount ? totalDiscount : e?.e?.discount_percent,
-      price_after_discount: Number(e?.e?.price_after_discount),
-      tax: totalTax ? totalTax : {
-        label: e?.e?.tax_name,
-        value: e?.e?.tax_id, tax_rate: e?.e?.tax_rate
-      },
-      total_amount: Number(e?.e?.amount), ghichu: e?.e?.note
-    })))
-    setOption(data);
-    // sitemAll(data)
-    //new
-    setItemsAll(allItems?.map(e => ({
-      id: uuidv4(),
-      item: e?.e,
-      label: e?.label,
-      value: e?.value
-    })))
-    sListData(allItems?.map(e => ({
-      id: uuidv4(),
-      item: e?.e,
-      label: e?.label,
-      value: e?.value
-    })))
+    if (typeOrder === '0') {
+      const data = allItems?.map((e, index) => ({
+        id: uuidv4(),
+        item: {
+          e: e?.e,
+          label: e?.label,
+          value: e?.value,
+        },
+        unit: e?.e?.unit_name,
+        quantity: 1,
+        sortIndex: index,
+        price: 1,
+        discount: 0,
+        price_after_discount: 1,
+        tax: 0,
+        price_after_tax: 1,
+        total_amount: 1,
+        note: "",
+        delivery_date: null
+      }))
+
+      setOption(data);
+      //new
+      setItemsAll(allItems?.map((e, index) => ({
+        id: uuidv4(),
+        item: {
+          e: e?.e,
+          label: e?.label,
+          value: e?.value,
+        },
+        unit: e?.e?.unit_name,
+        quantity: 1,
+        sortIndex: index,
+        price: 1,
+        discount: 0,
+        price_after_discount: 1,
+        tax: 0,
+        price_after_tax: 1,
+        total_amount: 1,
+        note: "",
+        delivery_date: null
+      })))
+      setOption(allItems?.map((e, index) => ({
+        id: uuidv4(),
+        item: {
+          e: e?.e,
+          label: e?.label,
+          value: e?.value,
+        },
+        unit: e?.e?.unit_name,
+        quantity: 1,
+        sortIndex: index,
+        price: 1,
+        discount: 0,
+        price_after_discount: 1,
+        tax: 0,
+        price_after_tax: 1,
+        total_amount: 1,
+        note: "",
+        delivery_date: null
+      })))
+    }
+    if (typeOrder === '1' && quote !== null) {
+      const data = allItems?.map((e, index) => ({
+        id: uuidv4(),
+        item: {
+          e: e?.e,
+          label: e?.label,
+          value: e?.value,
+        },
+        unit: e?.e?.unit_name,
+        quantity: 1,
+        sortIndex: index,
+        price: 1,
+        discount: 0,
+        price_after_discount: 1,
+        tax: 0,
+        price_after_tax: 1,
+        total_amount: 1,
+        note: "",
+        delivery_date: null
+      }))
+      setOption(data);
+      //new
+      setItemsAll(allItems?.map((e, index) => ({
+        id: uuidv4(),
+        item: {
+          e: e?.e,
+          label: e?.label,
+          value: e?.value,
+        },
+        unit: e?.e?.unit_name,
+        quantity: e?.e?.quantity,
+        price: e?.e?.price,
+        discount: e?.e?.discount_percent,
+        price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
+        tax: {
+          label: e?.e?.tax_name,
+          value: e?.e?.tax_id,
+          tax_rate: e?.e?.tax_rate
+        },
+        price_after_tax: (+e?.e?.price * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100)) * (1 + e?.e?.tax_rate / 100),
+        total_amount: (+e?.e?.price * (1 - +e?.e?.discount_percent / 100)) * (1 + (+e?.e?.tax_rate) / 100) * (+e?.e?.quantity),
+        note: e?.e?.note_item,
+        delivery_date: null
+      })))
+      setOption(allItems?.map((e, index) => ({
+        id: uuidv4(),
+        item: {
+          e: e?.e,
+          label: e?.label,
+          value: e?.value,
+        },
+        unit: e?.e?.unit_name,
+        quantity: e?.e?.quantity,
+        price: e?.e?.price,
+        discount: e?.e?.discount_percent,
+        price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
+        tax: {
+          label: e?.e?.tax_name,
+          value: e?.e?.tax_id,
+          tax_rate: e?.e?.tax_rate
+        },
+        price_after_tax: (+e?.e?.price * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100)) * (1 + e?.e?.tax_rate / 100),
+        total_amount: (+e?.e?.price * (1 - +e?.e?.discount_percent / 100)) * (1 + (+e?.e?.tax_rate) / 100) * (+e?.e?.quantity),
+        note: e?.e?.note_item,
+        delivery_date: null
+      })))
+
+    } else if (typeOrder === '1' && quote === null) {
+      Toast.fire({
+        icon: 'error',
+        title: `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng!`
+      })
+    }
   };
 
   const _HandleDeleteAll = () => {
-    sitemAll([])
-    setOption([{ id: Date.now(), item: null }])
+    setItemsAll([])
+    setOption([])
     //new
-    sListData([])
   };
 
   const MenuList = (props) => {
@@ -1279,6 +1342,8 @@ const Index = (props) => {
       </div>
     )
   }
+
+  const sortedArr = id ? option.sort((a, b) => a.id - b.id) : option.sort((a, b) => b.id - a.id);
 
   return (
     <React.Fragment>
@@ -1373,7 +1438,7 @@ const Index = (props) => {
                       })
                     }}
                   />
-                  {errBranch && <label className="text-sm text-red-500">{dataLang?.price_quote_errSelect_table_branch || "price_quote_errSelect_table_branch"}</label>}
+                  {errBranch && <label className="text-sm text-red-500">{dataLang?.sales_product_err_branch || "sales_product_err_branch"}</label>}
                 </div>
 
                 <div className='col-span-3'>
@@ -1419,7 +1484,7 @@ const Index = (props) => {
                       })
                     }}
                   />
-                  {errCustomer && <label className="text-sm text-red-500">{dataLang?.price_quote_errSelect_customer || "price_quote_errSelect_customer"}</label>}
+                  {errCustomer && <label className="text-sm text-red-500">{dataLang?.sales_product_err_customer || "sales_product_err_customer"}</label>}
                 </div>
 
                 <div className='col-span-3'>
@@ -1587,7 +1652,7 @@ const Index = (props) => {
                       placeholder={dataLang?.sales_product_select_quotation || "sales_product_select_quotation"}
                       hideSelectedOptions={false}
                       isClearable={true}
-                      className={`${errQuote ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                      className={`${errQuote && quote === null ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                       isSearchable={true}
                       noOptionsMessage={() => "Không có dữ liệu"}
                       menuPortalTarget={document.body}
@@ -1620,7 +1685,7 @@ const Index = (props) => {
                         })
                       }}
                     />
-                    {errQuote && <label className="text-sm text-red-500">{dataLang?.sales_product_err_staff_in_charge || "sales_product_err_staff_in_charge"}</label>}
+                    {errQuote && quote === null && <label className="text-sm text-red-500">{dataLang?.sales_product_err_quote || "sales_product_err_quote"}</label>}
                   </div>
                 )}
 
@@ -1638,9 +1703,8 @@ const Index = (props) => {
                 onInputChange={_HandleSeachApi.bind(this)}
                 options={allItems}
                 closeMenuOnSelect={false}
-                onChange={handleOnChangeInput.bind(this, "itemAll")}
-                // value={itemsAll}
-                value={itemsAll?.value ? itemsAll?.value : sortedArr?.map(e => e?.item)}
+                onChange={(value) => handleOnChangeInput("itemAll", value)}
+                value={itemsAll?.value ? itemsAll?.value : option?.map(e => e?.item)}
                 isMulti
                 components={{ MenuList, MultiValue }}
                 formatOptionLabel={(option) => {
@@ -1755,140 +1819,115 @@ const Index = (props) => {
             <div className='pr-2'>
               <React.Fragment>
                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                  {sortedArr.map((e, index) =>
-                    <div className='grid grid-cols-12 gap-1 py-1 items-center' key={e?.id}>
-                      <div className='col-span-2 '>
-                        <Select
-                          onInputChange={_HandleSeachApi.bind(this)}
-                          dangerouslySetInnerHTML={{ __html: option.label }}
-                          options={options}
-                          onChange={(value) => handleOnChangeInputOption(e?.id, "item", value)}
-                          value={e?.item}
-                          formatOptionLabel={selectItemsLabel}
-                          placeholder={dataLang?.sales_product_select_item || "sales_product_select_item"}
-                          hideSelectedOptions={false}
-                          className={`cursor-pointer rounded-md bg-white  3xl:text-[12px] 2xl:text-[14px] xl:text-base text-[14.5px]`}
-                          isSearchable={true}
-                          noOptionsMessage={() => "Không có dữ liệu"}
-                          menuPortalTarget={document.body}
-                          style={{ border: "none", boxShadow: "none", outline: "none" }}
-                          theme={(theme) => ({
-                            ...theme,
-                            colors: {
-                              ...theme.colors,
-                              primary25: '#EBF5FF',
-                              primary50: '#92BFF7',
-                              primary: '#0F4F9E',
-                            },
-                          })}
-                          styles={{
-                            placeholder: (base) => ({
-                              ...base,
-                              color: "#cbd5e1",
+                  {/* phân chia,m */}
+                  <div className='grid grid-cols-12'>
+                    <div className='col-span-2 '>
+                      <Select
+                        onInputChange={_HandleSeachApi.bind(this)}
+                        dangerouslySetInnerHTML={{ __html: option.label }}
+                        options={options}
+                        onChange={(value) => handleAddParent(value)}
+                        value={null}
+                        formatOptionLabel={selectItemsLabel}
+                        placeholder={dataLang?.sales_product_select_item || "sales_product_select_item"}
+                        hideSelectedOptions={false}
+                        className={`cursor-pointer rounded-md bg-white  3xl:text-[12px] 2xl:text-[14px] xl:text-base text-[14.5px]`}
+                        isSearchable={true}
+                        noOptionsMessage={() => "Không có dữ liệu"}
+                        menuPortalTarget={document.body}
+                        style={{ border: "none", boxShadow: "none", outline: "none" }}
+                        theme={(theme) => ({
+                          ...theme,
+                          colors: {
+                            ...theme.colors,
+                            primary25: '#EBF5FF',
+                            primary50: '#92BFF7',
+                            primary: '#0F4F9E',
+                          },
+                        })}
+                        styles={{
+                          placeholder: (base) => ({
+                            ...base,
+                            color: "#cbd5e1",
+                          }),
+                          menuPortal: (base) => ({
+                            ...base,
+                            zIndex: 9999
+                          }),
+                          control: (base, state) => ({
+                            ...base,
+                            ...(state.isFocused && {
+                              border: '0 0 0 1px #92BFF7',
+                              boxShadow: 'none'
                             }),
-                            menuPortal: (base) => ({
-                              ...base,
-                              zIndex: 9999
-                            }),
-                            control: (base, state) => ({
-                              ...base,
-                              ...(state.isFocused && {
-                                border: '0 0 0 1px #92BFF7',
-                                boxShadow: 'none'
-                              }),
-                            }),
-                          }}
-                        />
-                      </div>
+                          }),
+                        }}
+                      />
+                    </div>
+
+                    <div className='grid col-span-10 grid-cols-10 gap-1 py-1 items-center'>
 
                       <div className='col-span-1 text-center flex items-center justify-center'>
-                        <h3 className={`${index === 0 ? 'cursor-default' : 'cursor-text'} 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}>
-                          {e?.unit}
+                        <h3 className={`cursor-default 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}>
+
                         </h3>
                       </div>
                       <div className='col-span-1 flex items-center justify-center'>
-                        <div className="flex items-center justify-center">
-                          <button
-                            disabled={index === 0}
-                            onClick={() => handleDecrease(e?.id)}
-                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                          >
-                            <Minus size="16" />
-                          </button>
-                          <NumericFormat
-                            className={`${index === 0 ? 'cursor-default' : 'cursor-text'} appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                            onValueChange={(value) => handleOnChangeInputOption(e?.id, "quantity", value)}
-                            value={e?.quantity || 1}
-                            thousandSeparator=","
-                            allowNegative={false}
-                            readOnly={index === 0 ? readOnlyFirst : false}
-                            decimalScale={0}
-                            isNumericString={true}
-                            isAllowed={(values) => { const { floatValue } = values; return floatValue > 0 }}
-                          />
-                          <button
-                            disabled={index === 0}
-                            onClick={() => handleIncrease(e.id)}
-                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                          >
-                            <Add size="16" />
-                          </button>
-                        </div>
-                      </div>
-                      <div className='col-span-1 text-center flex items-center justify-center'>
+                        <button
+                          disabled={true}
+                          className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                        >
+                          <Minus size="16" />
+                        </button>
                         <NumericFormat
-                          value={e?.price}
-                          onValueChange={(value) => handleOnChangeInputOption(e?.id, "price", value)}
+                          className={`cursor-default appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                          value={1}
+                          thousandSeparator=","
                           allowNegative={false}
-                          readOnly={index === 0 ? readOnlyFirst : false}
+                          readOnly={true}
                           decimalScale={0}
                           isNumericString={true}
-                          className={`${index === 0 ? 'cursor-default' : 'cursor-text'} appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
+                          isAllowed={(values) => { const { floatValue } = values; return floatValue > 0 }}
+                        />
+                        <button
+                          disabled={true}
+                          className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                        >
+                          <Add size="16" />
+                        </button>
+                      </div>
+                      <div className='col-span-1 text-center flex items-center justify-center'>
+                        <NumericFormat
+                          value={1}
+                          allowNegative={false}
+                          readOnly={true}
+                          decimalScale={0}
+                          isNumericString={true}
+                          className={`cursor-default appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
                           thousandSeparator=","
                         />
                       </div>
                       <div className='col-span-1 text-center flex items-center justify-center'>
                         <NumericFormat
-                          value={e?.discount}
-                          onValueChange={(value) => handleOnChangeInputOption(e?.id, "discount", value)}
-                          className={`${index === 0 ? 'cursor-default' : 'cursor-text'} appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200`}
+                          value={0}
+                          className={`cursor-default appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200`}
                           thousandSeparator=","
                           allowNegative={false}
-                          isAllowed={(values) => {
-                            if (!values.value) return true;
-                            const { floatValue } = values;
-                            if (floatValue > 101) {
-                              Toast.fire({
-                                icon: 'error',
-                                title: `Vui lòng nhập số % chiết khấu nhỏ hơn 101`
-                              })
-                            }
-                            return floatValue < 101;
-                          }}
-                          readOnly={index === 0 ? readOnlyFirst : false}
-                          // decimalScale={0}
+                          readOnly={true}
                           isNumericString={true}
                         />
                       </div>
-
                       <div className='col-span-1 text-right flex items-center justify-end'>
-                        <h3 className={`${index === 0 ? 'cursor-default' : 'cursor-text'} px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}>{formatNumber(e?.price_after_discount)}</h3>
+                        <h3 className={`cursor-default px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}>
+                          1
+                        </h3>
                       </div>
                       <div className='col-span-1 flex justify-center items-center'>
                         <Select
                           options={taxOptions}
-                          onChange={(value) => handleOnChangeInputOption(e?.id, "tax", value)}
-                          value={
-                            e?.tax ?
-                              {
-                                label: taxOptions.find(item => item.value === e?.tax?.value)?.label,
-                                value: e?.tax?.value, tax_rate: e?.tax?.tax_rate
-                              }
-                              :
-                              null
-                          }
+                          value={null}
                           placeholder={"% Thuế"}
-                          isDisabled={index === 0 ? true : false}
+                          isDisabled={true}
                           hideSelectedOptions={false}
                           formatOptionLabel={taxRateLabel}
                           className={`border-transparent placeholder:text-slate-300 h-10 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
@@ -1927,20 +1966,224 @@ const Index = (props) => {
                         />
                       </div>
                       <div className='col-span-1 text-right flex items-center justify-end'>
-                        <h3 className={`${index === 0 ? 'cursor-default' : 'cursor-text'} px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}>{formatNumber(e?.total_amount)}</h3>
+                        <h3 className={`cursor-default px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}>
+                          1
+                        </h3>
                       </div>
                       <div className='col-span-1 '>
                         <div className="custom-date-picker flex flex-row relative">
                           <DatePicker
-                            selected={(index !== 0 && e?.delivery_date ? e?.delivery_date : null) || (index !== 0 && deliveryDate ? deliveryDate : null)}
+                            selected={null}
                             blur
-                            disabled={index === 0 ? true : false}
+                            disabled={true}
+                            placeholderText="DD/MM/YYYY"
+                            dateFormat="dd/MM/yyyy"
+                            className={`bg-gray-100 3xl:h-10 h-10 w-full 3xl:text-[12px] 2xl:text-[10px] xl:text-[14px] lg:text-[14px] border placeholder:text-slate-300 rounded text-[#52575E] font-normal px-2 outline-none cursor-default `}
+                          />
+                          <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%]  text-[#CCCCCC] scale-110 cursor-default" />
+                        </div>
+                      </div>
+                      <div className='col-span-1 flex items-center justify-center'>
+                        <input
+                          value={null}
+                          name="optionEmail"
+                          placeholder='Ghi chú'
+                          disabled={true}
+                          type="text"
+                          className="focus:border-[#92BFF7] border-[#d0d5dd] h-10 2xl:text-[12px] xl:text-[13px] text-[12.5px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none"
+                        />
+                      </div>
+                      <div className='col-span-1 flex items-center justify-center'>
+                        <button
+                          onClick={() => _HandleDelete('default', 'default')}
+                          type='button' title='Xóa' className='transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2'><IconDelete /></button>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* phân chia  */}
+                  {sortedArr.map((e, index) =>
+                    <div className='grid grid-cols-12 gap-1 py-1 items-center' key={e?.id}>
+                      <div className='col-span-2 '>
+                        <Select
+                          onInputChange={_HandleSeachApi.bind(this)}
+                          dangerouslySetInnerHTML={{ __html: option.label }}
+                          options={options}
+                          onChange={(value) => _HandleChangeValue(e?.id, value)}
+                          value={e?.item}
+                          components={{ MenuList, MultiValue }}
+                          formatOptionLabel={selectItemsLabel}
+                          placeholder={dataLang?.sales_product_select_item || "sales_product_select_item"}
+                          hideSelectedOptions={false}
+                          className={`cursor-pointer rounded-md bg-white  3xl:text-[12px] 2xl:text-[14px] xl:text-base text-[14.5px]`}
+                          isSearchable={true}
+                          noOptionsMessage={() => "Không có dữ liệu"}
+                          menuPortalTarget={document.body}
+                          style={{ border: "none", boxShadow: "none", outline: "none" }}
+                          theme={(theme) => ({
+                            ...theme,
+                            colors: {
+                              ...theme.colors,
+                              primary25: '#EBF5FF',
+                              primary50: '#92BFF7',
+                              primary: '#0F4F9E',
+                            },
+                          })}
+                          styles={{
+                            placeholder: (base) => ({
+                              ...base,
+                              color: "#cbd5e1",
+                            }),
+                            menuPortal: (base) => ({
+                              ...base,
+                              zIndex: 9999
+                            }),
+                            control: (base, state) => ({
+                              ...base,
+                              ...(state.isFocused && {
+                                border: '0 0 0 1px #92BFF7',
+                                boxShadow: 'none'
+                              }),
+                            }),
+                          }}
+                        />
+                      </div>
+
+                      <div className='col-span-1 text-center flex items-center justify-center'>
+                        <h3 className={`'cursor-text 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}>
+                          {e?.unit}
+                        </h3>
+                      </div>
+                      <div className='col-span-1 flex items-center justify-center'>
+                        <div className="flex items-center justify-center">
+                          <button
+                            onClick={() => handleDecrease(e?.id)}
+                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                          >
+                            <Minus size="16" />
+                          </button>
+                          <NumericFormat
+                            className={`cursor-text appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                            onValueChange={(value) => handleOnChangeInputOption(e?.id, "quantity", value)}
+                            value={e?.quantity || 1}
+                            thousandSeparator=","
+                            allowNegative={false}
+                            decimalScale={0}
+                            isNumericString={true}
+                            isAllowed={(values) => { const { floatValue } = values; return floatValue > 0 }}
+                          />
+                          <button
+                            onClick={() => handleIncrease(e.id)}
+                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                          >
+                            <Add size="16" />
+                          </button>
+                        </div>
+                      </div>
+                      <div className='col-span-1 text-center flex items-center justify-center'>
+                        <NumericFormat
+                          value={e?.price}
+                          onValueChange={(value) => handleOnChangeInputOption(e?.id, "price", value)}
+                          allowNegative={false}
+                          decimalScale={0}
+                          isNumericString={true}
+                          className={`cursor-text appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
+                          thousandSeparator=","
+                        />
+                      </div>
+                      <div className='col-span-1 text-center flex items-center justify-center'>
+                        <NumericFormat
+                          value={e?.discount}
+                          onValueChange={(value) => handleOnChangeInputOption(e?.id, "discount", value)}
+                          className={`cursor-text appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200`}
+                          thousandSeparator=","
+                          allowNegative={false}
+                          isAllowed={(values) => {
+                            if (!values.value) return true;
+                            const { floatValue } = values;
+                            if (floatValue > 101) {
+                              Toast.fire({
+                                icon: 'error',
+                                title: `Vui lòng nhập số % chiết khấu nhỏ hơn 101`
+                              })
+                            }
+                            return floatValue < 101;
+                          }}
+                          // decimalScale={0}
+                          isNumericString={true}
+                        />
+                      </div>
+                      <div className='col-span-1 text-right flex items-center justify-end'>
+                        <h3 className={`cursor-text px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}>{formatNumber(e?.price_after_discount)}</h3>
+                      </div>
+                      <div className='col-span-1 flex justify-center items-center'>
+                        <Select
+                          options={taxOptions}
+                          onChange={(value) => handleOnChangeInputOption(e?.id, "tax", value)}
+                          value={
+                            e?.tax ?
+                              {
+                                label: taxOptions.find(item => item.value === e?.tax?.value)?.label,
+                                value: e?.tax?.value,
+                                tax_rate: e?.tax?.tax_rate
+                              }
+                              :
+                              null
+                          }
+                          placeholder={"% Thuế"}
+                          hideSelectedOptions={false}
+                          formatOptionLabel={taxRateLabel}
+                          className={`border-transparent placeholder:text-slate-300 h-10 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                          isSearchable={true}
+                          noOptionsMessage={() => "Không có dữ liệu"}
+                          menuPortalTarget={document.body}
+                          closeMenuOnSelect={true}
+                          style={{ border: "none", boxShadow: "none", outline: "none" }}
+                          theme={(theme) => ({
+                            ...theme,
+                            colors: {
+                              ...theme.colors,
+                              primary25: '#EBF5FF',
+                              primary50: '#92BFF7',
+                              primary: '#0F4F9E',
+                            },
+                          })}
+                          styles={{
+                            placeholder: (base) => ({
+                              ...base,
+                              color: "#cbd5e1",
+                            }),
+                            menuPortal: (base) => ({
+                              ...base,
+                              zIndex: 20
+                            }),
+                            control: (base, state) => ({
+                              ...base,
+                              boxShadow: 'none',
+                              padding: "2.7px",
+                              ...(state.isFocused && {
+                                border: '0 0 0 1px #92BFF7',
+                              }),
+                            })
+                          }}
+                        />
+                      </div>
+                      <div className='col-span-1 text-right flex items-center justify-end'>
+                        <h3 className={`cursor-text px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}>{formatNumber(e?.total_amount)}</h3>
+                      </div>
+                      <div className='col-span-1 '>
+                        <div className="custom-date-picker flex flex-row relative">
+                          <DatePicker
+                            selected={(e?.delivery_date ? e?.delivery_date : null)}
+                            // selected={(index !== 0 && e?.delivery_date ? e?.delivery_date : null) || (index !== 0 && deliveryDate ? deliveryDate : null)}
+                            blur
                             placeholderText="DD/MM/YYYY"
                             dateFormat="dd/MM/yyyy"
                             onSelect={(date) => handleOnChangeInputOption(e?.id, "delivery_date", date)}
                             onChange={(date) => handleOnChangeInputOption(e?.id, "delivery_date", date)}
                             // className={`${errDeliveryDate && index !== 0 ? "border-red-500 " : "focus:border-[#92BFF7] border-[#d0d5dd]"} 3xl:h-10 h-10 w-full 3xl:text-[12px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-2 outline-none cursor-pointer `}
-                            className={`${index === 0 ? 'bg-gray-100' : (!e?.delivery_date ? 'border-red-500' : 'focus:border-[#92BFF7] border-[#d0d5dd]')} 3xl:h-10 h-10 w-full 3xl:text-[12px] 2xl:text-[10px] xl:text-[14px] lg:text-[14px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-2 outline-none cursor-pointer `}
+                            className={`${(errDeliveryDate && e?.delivery_date === null) ? 'border-red-500' : 'focus:border-[#92BFF7] border-[#d0d5dd]'} 3xl:h-10 h-10 w-full 3xl:text-[12px] 2xl:text-[10px] xl:text-[14px] lg:text-[14px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-2 outline-none cursor-pointer `}
                           />
                           {e?.delivery_date && (
                             <>
@@ -1952,7 +2195,7 @@ const Index = (props) => {
                           )}
                           <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%]  text-[#CCCCCC] scale-110 cursor-pointer" />
                         </div>
-                        {!e?.delivery_date && index !== 0 && <label className="text-[12px] max-w-10px text-red-500">Vui lòng chọn ngày cần hàng!</label>}
+                        {(errDeliveryDate && e?.delivery_date === null) && <label className="text-[12px] max-w-10px text-red-500">Vui lòng chọn ngày cần hàng!</label>}
                       </div>
                       <div className='col-span-1 flex items-center justify-center'>
                         <input
@@ -1960,7 +2203,6 @@ const Index = (props) => {
                           onChange={(value) => handleOnChangeInputOption(e?.id, "note", value)}
                           name="optionEmail"
                           placeholder='Ghi chú'
-                          disabled={index === 0 ? true : false}
                           type="text"
                           className="focus:border-[#92BFF7] border-[#d0d5dd] h-10 2xl:text-[12px] xl:text-[13px] text-[12.5px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none"
                         />
@@ -2057,7 +2299,7 @@ const Index = (props) => {
               <h2>{dataLang?.sales_product_item_date || "sales_product_item_date"}</h2>
               <div className="custom-date-picker flex flex-row relative">
                 <DatePicker
-                  selected={deliveryDate }
+                  selected={deliveryDate}
                   onChange={(date) => handleOnChangeInput("total_delivery_date", date)}
                   blur
                   placeholderText="DD/MM/YYYY"
@@ -2111,11 +2353,11 @@ const Index = (props) => {
               <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.totalDiscountAfterPrice)}</h3></div>
             </div>
             <div className='flex justify-between '>
-              <div className='font-normal'><h3>{dataLang?.price_quote_tax_money || "price_quote_tax_money"}</h3></div>
+              <div className='font-normal'><h3>{dataLang?.sales_product_total_tax || "sales_product_total_tax"}</h3></div>
               <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.totalTax)}</h3></div>
             </div>
             <div className='flex justify-between '>
-              <div className='font-normal'><h3>{dataLang?.price_quote_into_money || "price_quote_into_money"}</h3></div>
+              <div className='font-normal'><h3>{dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}</h3></div>
               <div className='font-normal'><h3 className='text-blue-600'>{formatNumber(tongTienState.totalAmount)}</h3></div>
             </div>
             <div className='space-x-2'>
@@ -2151,12 +2393,13 @@ const MoreSelectedBadge = ({ items }) => {
 
   return (
     // <div style={style} title={title}>{label}</div>
-    <div style={style} title={title}></div>
+    <div style={style} title={title}>+ {length}</div>
   );
 };
 
 const MultiValue = ({ index, getValue, ...props }) => {
   const maxToShow = 0;
+
   const overflow = getValue()
     .slice(maxToShow)
     .map((x) => x.label);

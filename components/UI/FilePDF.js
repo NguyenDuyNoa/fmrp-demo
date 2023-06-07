@@ -150,7 +150,7 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
                         ...dataPriceQuote && dataPriceQuote?.items.length > 0 ? dataPriceQuote?.items.map((item, index) => {
                             return [
                                 { text: `${index + 1}`, alignment: 'center', fontSize: 10 },
-                                { text: item?.item?.name ? `${item?.item?.name}` : '', fontSize: 10 },
+                                { text: item?.item?.name && item?.item?.code ? `${item?.item?.name} (${item?.item?.code})` : '', fontSize: 10 },
                                 { text: item?.item?.unit_name ? `${item?.item?.unit_name}` : '', fontSize: 10 },
                                 { text: item?.quantity ? `${formatNumber(item?.quantity)}` : '', alignment: 'center', fontSize: 10 },
                                 { text: item?.price ? `${formatNumber(item?.price)}` : '', alignment: 'right', fontSize: 10 },
@@ -282,7 +282,7 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
             setOpenAction(false)
         }
     }
-
+    console.log('check : ', dataPriceQuote)
     return (
         <>
             <button onClick={handlePrintPdf} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>

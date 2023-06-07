@@ -25,69 +25,131 @@ const BtnAction = React.memo((props) => {
     const [dataCompany, setDataCompany] = useState();
     const [dataPriceQuote, setDataPriceQuote] = useState();
     const _ToggleModal = (e) => {
-        console.log('check',e)
         setOpenAction(e)
-
     }
     const handleDelete = (id) => {
-        if (props?.status !== 'ordered') {
-            Swal.fire({
-                title: `${props.dataLang?.aler_ask} `,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#296dc1',
-                cancelButtonColor: '#d33',
-                confirmButtonText: `${props.dataLang?.aler_yes} `,
-                cancelButtonText: `${props.dataLang?.aler_cancel} `
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Axios("DELETE", `/api_web/Api_quotation/quotation/${id}?csrf_protection=true`, {
-                    }, (err, response) => {
-                        if (response && response.data) {
-                            var { isSuccess, message } = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: 'success',
-                                    title: props.dataLang[message]
-                                })
-                                props.onRefresh && props.onRefresh()
+        if (props?.id && props?.type === 'price_quote') {
+            if (props?.status !== 'ordered') {
+                Swal.fire({
+                    title: `${props.dataLang?.aler_ask} `,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#296dc1',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: `${props.dataLang?.aler_yes} `,
+                    cancelButtonText: `${props.dataLang?.aler_cancel} `
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Axios("DELETE", `/api_web/Api_quotation/quotation/${id}?csrf_protection=true`, {
+                        }, (err, response) => {
+                            if (response && response.data) {
+                                var { isSuccess, message } = response.data;
+                                if (isSuccess) {
+                                    Toast.fire({
+                                        icon: 'success',
+                                        title: props.dataLang[message]
+                                    })
+                                    props.onRefresh && props.onRefresh()
+                                } else {
+                                    Toast.fire({
+                                        icon: 'error',
+                                        title: props.dataLang[message]
+                                    })
+                                }
                             } else {
                                 Toast.fire({
                                     icon: 'error',
-                                    title: props.dataLang[message]
+                                    title: `${props?.dataLang?.aler_delete_fail || 'aler_delete_fail'}`
                                 })
                             }
-                        } else {
-                            Toast.fire({
-                                icon: 'error',
-                                title: `${props?.dataLang?.aler_delete_fail || 'aler_delete_fail'}`
-                            })
-                        }
-                    })
-                }
-            })
+                        })
+                    }
+                })
+            }
+            if (props?.status === 'ordered') {
+                Toast.fire({
+                    icon: 'error',
+                    title: `${props?.dataLang?.po_imported_cant_delete || 'po_imported_cant_delete'} `
+                })
+            }
         }
-        if (props?.status === 'ordered') {
-            Toast.fire({
-                icon: 'error',
-                title: `${props?.dataLang?.po_imported_cant_delete || 'po_imported_cant_delete'} `
-            })
+        
+        if (props?.id && props?.type === 'sales_product') {
+            if (props?.status !== 'approved') {
+                Swal.fire({
+                    title: `${props.dataLang?.aler_ask} `,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#296dc1',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: `${props.dataLang?.aler_yes} `,
+                    cancelButtonText: `${props.dataLang?.aler_cancel} `
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Axios("DELETE", `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`, {
+                        }, (err, response) => {
+                            if (response && response.data) {
+                                var { isSuccess, message } = response.data;
+                                if (isSuccess) {
+                                    Toast.fire({
+                                        icon: 'success',
+                                        title: props.dataLang[message]
+                                    })
+                                    props.onRefresh && props.onRefresh()
+                                } else {
+                                    Toast.fire({
+                                        icon: 'error',
+                                        title: props.dataLang[message]
+                                    })
+                                }
+                            } else {
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: `${props?.dataLang?.aler_delete_fail || 'aler_delete_fail'}`
+                                })
+                            }
+                        })
+                    }
+                })
+            }
+            if (props?.status === 'approved') {
+                Toast.fire({
+                    icon: 'error',
+                    title: `${props?.dataLang?.sales_product_cant_delete || 'sales_product_cant_delete'} `
+                })
+            }
         }
     }
+
     const handleClick = () => {
-        if (props?.status === "ordered") {
-            Toast.fire({
-                icon: 'error',
-                title: `${props?.dataLang?.po_imported_cant_edit || 'po_imported_cant_edit'} `
-            })
+        if (props?.id && props?.type === 'price_quote') {
+            console.log('price');
+            if (props?.status === "ordered") {
+                Toast.fire({
+                    icon: 'error',
+                    title: `${props?.dataLang?.po_imported_cant_edit || 'po_imported_cant_edit'} `
+                })
+            }
+            else {
+                router.push(`/sales_export_product/priceQuote/form?id=${props.id}`);
+            }
         }
-        else {
-            router.push(`/sales_export_product/priceQuote/form?id=${props.id}`);
+        if (props?.id && props?.type === 'sales_product') {
+            console.log('sales');
+            if (props?.status === "approved") {
+                Toast.fire({
+                    icon: 'error',
+                    title: `${props?.dataLang?.sales_product_cant_edit || 'sales_product_cant_edit'} `
+                })
+            }
+            else {
+                router.push(`/sales_export_product/salesOrder/form?id=${props.id}`);
+            }
+
         }
     };
 
     const fetchDataSettingsCompany = async () => {
-        console.log('ok2')
         if (props?.id && props?.type === 'price_quote') {
             try {
                 await Axios("GET", `/api_web/Api_Setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
@@ -107,6 +169,9 @@ const BtnAction = React.memo((props) => {
                 console.log(err);
             }
         }
+        if (props?.id && props?.type === 'sales_product') {
+
+        }
     }
 
     useEffect(() => {
@@ -119,7 +184,7 @@ const BtnAction = React.memo((props) => {
                 trigger={
                     <button className={`flex space-x-1 items-center ` + props.className} >
                         <span>
-                            {props.dataLang?.price_quote_action || "price_quote_action"}
+                            {props.dataLang?.btn_action || "btn_action"}
                         </span>
                         <ArrowDown2 size={12} />
                     </button>
@@ -138,7 +203,8 @@ const BtnAction = React.memo((props) => {
                     <div className="bg-white rounded-t flex flex-col overflow-hidden">
                         <button
                             onClick={handleClick}
-                            className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">
+                            className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                        >
                             {props?.dataLang?.btn_table_edit || "btn_table_edit"}
                         </button>
                         <FilePDF
@@ -148,7 +214,10 @@ const BtnAction = React.memo((props) => {
                             dataCompany={dataCompany}
                             dataPriceQuote={dataPriceQuote}
                         />
-                        <button onClick={() => handleDelete(props?.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
+                        <button
+                            onClick={() => handleDelete(props?.id)}
+                            className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'
+                        >
                             {props?.dataLang?.btn_table_delete || "btn_table_delete"}
                         </button>
                     </div>

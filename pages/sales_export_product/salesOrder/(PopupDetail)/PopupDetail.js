@@ -287,7 +287,7 @@ const PopupDetail = (props) => {
                                     </div>
                                     <div className='col-span-2 space-y-2'>
                                         <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.price_quote_total || "price_quote_total"}</h3></div>
-                                        <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.price_quote_discount || "price_quote_discount"}</h3></div>
+                                        <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.price_quote_total_discount || "price_quote_total_discount"}</h3></div>
                                         <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.price_quote_money_after_discount || "price_quote_money_after_discount"}</h3></div>
                                         <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.price_quote_tax_money || "price_quote_tax_money"}</h3></div>
                                         <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.price_quote_into_money || "price_quote_into_money"}</h3></div>

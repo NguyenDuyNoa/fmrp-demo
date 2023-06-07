@@ -73,7 +73,7 @@ const PopupDetail = (props) => {
             event.preventDefault();
         }
     });
-
+    console.log(data)
     return (
         <>
             <PopupEdit

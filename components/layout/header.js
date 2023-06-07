@@ -125,7 +125,7 @@ const Header = () => {
                     items: [
                         { name: "Yêu cầu mua hàng", link: '/purchase_order/purchases' },
                         { name: "Đơn đặt hàng", link: '/purchase_order/order' },
-                        { name: "Phiếu dịch vụ",link: '/purchase_order/serviceVoucher' }
+                        { name: "Phiếu dịch vụ", link: '/purchase_order/serviceVoucher' }
                     ]
                 }
             ]
@@ -148,7 +148,7 @@ const Header = () => {
                     title: "Công nợ mua",
                     img: "/icon/header/muanhap/cnm.png",
                     items: [
-                        { name: "Phiếu chi", link: '/purchase_order/payment'},
+                        { name: "Phiếu chi", link: '/purchase_order/payment' },
                         { name: "Công nợ nhà cung cấp" },
                     ]
                 }
@@ -360,12 +360,12 @@ const Header = () => {
     ]
 
     return (
-        <header className="z-[999] w-full bg-[#0f4f9e] fixed top-0">
-            <div className="2xl:mx-10 mx-5 py-4">
+        <header className="z-40 w-full bg-[#0f4f9e] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12">
+            <div className="3xl:mx-10 2xl:mx-10 mx-5 3xl:py-4 2xl:py-3.5 xl:py-2.5 py-1.5">
                 <div className="flex justify-between items-center">
-                    <div className='flex 2xl:space-x-7 space-x-4 items-center'>
+                    <div className='flex 3xl:space-x-6 2xl:space-x-4 xl:space-x-4 space-x-2 items-center'>
                         <Link href="/">
-                            <Image alt="" src="/logo.png" width={100} height={45} quality={100} className="2xl:w-[100px] w-[70px] h-auto object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                            <Image alt="" src="/logo.png" width={100} height={45} quality={100} className="3xl:w-[110px] 2xl:w-[90px] xl:w-[70px] w-[70px] h-auto object-contain" loading="lazy" crossOrigin="anonymous" placeholder="blur" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                         </Link>
                         <Dropdown data={ListDanhMuc} position={"bottom left"} className="popover-bottom-left arrow-danhmuc ">Danh mục</Dropdown>
                         <Dropdown data={ListBanXuatHang} position={"bottom left"} className="popover-bottom-left arrow-banxuathang">Bán & Xuất hàng</Dropdown>
@@ -377,29 +377,29 @@ const Header = () => {
                             <div>+ Thêm</div>
                         </Dropdown>
                     </div>
-                    <div className='flex space-x-5 items-center'>
-                        <a href="#" title='Thông báo' className='hover:scale-105 transition'>
+                    <div className='flex 3xl:space-x-5 2xl:space-x-4 xl:space-x-3 lg:space-x-2  items-center'>
+                        <a href="#" title='Thông báo' className='hover:scale-105 transition 3xl:w-5 2xl:w-4 xl:w-3.5 lg:w-3 3xl:h-5 2xl:h-4 xl:h-3.5 lg:h-3  '>
                             <Image alt="" src="/icon/header/tb.png" width={18} height={18} quality={100} className="object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                         </a>
                         <form className="flex items-center relative">
-                            <div className='w-[18px] absolute left-3'>
+                            <div className='3xl:w-[18px] 2xl:w-[16px] xl:w-[14px] w-[14px] absolute left-3'>
                                 <Image alt="" src="/icon/header/timkiem.png" width={24} height={18} quality={100} className="w-auto h-auto object-contain" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                             </div>
                             <input
-                                className="placeholder:text-white/50 text-[#ffffff] relative bg-[#ffffff1a] hover:bg-[#ffffff25] focus:bg-[#ffffff25] outline-none pl-10 pr-5 py-2 rounded-md"
+                                className="3xl:w-64 2xl:w-60 xl:w-52 lg:w-44 3xl:h-10 2xl:h-9 xl:h-8 lg:h-7 3xl:placeholder:text-base 2xl:placeholder:text-[14px] xl:placeholder:text-[12px] lg:placeholder:text-[10px] placeholder:text-white/50 text-[#ffffff] relative bg-[#ffffff1a] hover:bg-[#ffffff25] focus:bg-[#ffffff25] outline-none pl-10 pr-5 py-2 rounded-md"
                                 type="text"
                                 placeholder="Tìm kiếm"
                             />
                         </form>
-                        <Link href="/settings" title='Cài đặt' className='hover:scale-105 transition'>
+                        <Link href="/settings" title='Cài đặt' className='3xl:scale-110 2xl:scale-100 xl:scale-90 lg:scale-75 transition'>
                             <Image alt="" src="/icon/header/extent.png" width={18} height={18} quality={100} className="object-contain min-w-[18px]" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                         </Link>
-                        <a href="#" title='Thông báo' className='hover:scale-105 transition relative '>
+                        <a href="#" title='Thông báo' className='3xl:scale-110 2xl:scale-100 xl:scale-90 lg:scale-75 transition relative  '>
                             <Image alt="" src="/icon/header/tb2.png" width={18} height={18} quality={100} className="object-contain min-w-[18px]" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
-                            <div className='text-[10px] bg-red-500 xl:h-4 xl:w-4 lg:h-4 lg:w-4 rounded-full absolute -top-[7px] -right-[7px] flex flex-col items-center justify-center text-white font-medium'>2</div>
+                            <div className='3xl:text-[9px] 2xl:text-[9px] xl:text-[9px] text-[9px] bg-red-500 3xl:h-3.5 3xl:w-3.5 2xl:h-3.5 2xl:w-3.5 xl:h-3.5 xl:w-3.5 lg:h-3.5 lg:w-3.5 rounded-full absolute top-0 right-0 3xl:translate-x-1 3xl:-translate-y-1 2xl:translate-x-1 2xl:-translate-y-1 xl:translate-x-1 xl:-translate-y-1 translate-x-1 -translate-y-1 flex flex-col items-center justify-center text-white font-medium'>2</div>
                         </a>
                         <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"}>
-                            <Image alt="" src="/icon/header/ques.png" width={18} height={18} quality={100} className="object-contain hover:scale-105 transition min-w-[18px]" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                            <Image alt="" src="/icon/header/ques.png" width={18} height={18} quality={100} className="object-contain 3xl:scale-110 2xl:scale-110 xl:scale-90 lg:scale-75 transition" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                         </Dropdown>
                         <DropdownAvatar />
                     </div>
