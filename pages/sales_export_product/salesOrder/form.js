@@ -11,6 +11,7 @@ import { Trash as IconDelete, Add, Minus } from "iconsax-react";
 import { _ServerInstance as Axios } from '/services/axios';
 import { NumericFormat } from "react-number-format";
 import { v4 as uuidv4 } from 'uuid';
+import Loading from 'components/UI/loading';
 
 const Toast = Swal.mixin({
   toast: true,
@@ -587,6 +588,7 @@ const Index = (props) => {
           setOnFetchingItem(value.target.value === "0" && true)
           setOnFetchingItemsAll(value.target.value === "1" && true)
 
+          // setDataItems([])
           setTotalTax('')
           setTotalDiscount('')
           setOption([])
@@ -666,6 +668,7 @@ const Index = (props) => {
           setOption([...newData])
         }
         if (typeOrder === "1" && quote !== null) {
+
           const newData = value?.map((e, index) => {
 
             return ({
@@ -1692,7 +1695,7 @@ const Index = (props) => {
               </div>
             </div>
           </div>
-
+          {/* fix */}
           {/* Thông tin mặt hàng */}
           <h2 className='font-normal bg-[#ECF0F4] p-2  '>{dataLang?.item_information || "item_information"}</h2>
 
@@ -1701,7 +1704,7 @@ const Index = (props) => {
               <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_click_items || "import_click_items"} </label>
               <Select
                 onInputChange={_HandleSeachApi.bind(this)}
-                options={allItems}
+                options={typeOrder === "1" && quote === null ? [] : allItems}
                 closeMenuOnSelect={false}
                 onChange={(value) => handleOnChangeInput("itemAll", value)}
                 value={itemsAll?.value ? itemsAll?.value : option?.map(e => e?.item)}
@@ -1720,41 +1723,47 @@ const Index = (props) => {
                   }
                   else {
                     return (
-                      <div className='flex items-center justify-between py-2'>
-                        <div className='flex items-center gap-2'>
-                          <div>
-                            {
-                              option.e?.images != null ?
-                                (
-                                  <img src={option.e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />
-                                ) :
-                                (
-                                  <div className='w-[50px] h-[60px] object-cover flex items-center justify-center rounded'>
-                                    <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
-                                  </div>
-                                )
-                            }
-                          </div>
-                          <div>
-                            <h3 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
-                            <div className='flex gap-2'>
-                              <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.codeProduct}</h5>
-                              <h5 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
-                            </div>
-                            <h5 className='text-gray-400 font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
-                          </div>
-                        </div>
-
-                        <div className=''>
-                          <div className='text-right opacity-0'>{"0"}</div>
-                          <div className='flex gap-2'>
+                      <>
+                        {dataItems === [] ?
+                          <Loading className="h-80" color="#0f4f9e" />
+                          :
+                          <div className='flex items-center justify-between py-2'>
                             <div className='flex items-center gap-2'>
-                              <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5>
-                              <h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse || 0}</h5>
+                              <div>
+                                {
+                                  option.e?.images != null ?
+                                    (
+                                      <img src={option.e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />
+                                    ) :
+                                    (
+                                      <div className='w-[50px] h-[60px] object-cover flex items-center justify-center rounded'>
+                                        <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
+                                      </div>
+                                    )
+                                }
+                              </div>
+                              <div>
+                                <h3 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
+                                <div className='flex gap-2'>
+                                  <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.codeProduct}</h5>
+                                  <h5 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
+                                </div>
+                                <h5 className='text-gray-400 font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
+                              </div>
+                            </div>
+
+                            <div className=''>
+                              <div className='text-right opacity-0'>{"0"}</div>
+                              <div className='flex gap-2'>
+                                <div className='flex items-center gap-2'>
+                                  <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5>
+                                  <h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse || 0}</h5>
+                                </div>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
+                        }
+                      </>
                     )
                   }
                 }}
