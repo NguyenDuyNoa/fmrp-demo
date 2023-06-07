@@ -435,7 +435,7 @@ const Index = (props) => {
       }, [router.query]);
 
       useEffect(() => {
-        idBranch != null && sOnFetchingItemsAll(true)
+        idBranch && sOnFetchingItemsAll(true)
       }, [idBranch]);
 
       useEffect(() => {
