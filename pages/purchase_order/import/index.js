@@ -110,7 +110,6 @@ const Index = (props) => {
                 sData(rResult)
                 sTotalItems(output)
                 sDataExcel(rResult)
-                sTotal(rTotal)
             }
             sOnFetching(false)
         })
@@ -607,17 +606,17 @@ const Index = (props) => {
                 <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%] lx:w-[120%] ">
                     <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10 shadow">
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_day_vouchers || "import_day_vouchers"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_code_vouchers || "import_code_vouchers"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_supplier || "import_supplier"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_the_order || "import_the_order"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_total_amount || "import_total_amount"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_tax_money || "import_tax_money"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_into_money || "import_into_money"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{dataLang?.import_payment_status || "import_payment_status"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_branch || "import_branch"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.import_action || "import_action"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_day_vouchers || "import_day_vouchers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_code_vouchers || "import_code_vouchers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_supplier || "import_supplier"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_the_order || "import_the_order"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_total_amount || "import_total_amount"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_tax_money || "import_tax_money"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_into_money || "import_into_money"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center whitespace-nowrap'>{dataLang?.import_payment_status || "import_payment_status"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_branch || "import_branch"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_action || "import_action"}</h4>
                     </div>
                     {onFetching ?
                       <Loading className="h-80"color="#0f4f9e" /> 
@@ -954,15 +953,8 @@ return (
                               }
                           </div>
                         </div>
-                        {/* <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{"Kho -  Vị trí kho"}</h3><h3 className=' text-[13px]  font-normal '>{`${data?.items?.map(e => {return e?.warehouse_name})+ ("-")+ data?.items?.map(e => {return e?.warehouse_code})}`}</h3></div> */}
                     </div>
                   <div className='col-span-3 '>
-                      {/* <div className='flex flex-wrap  gap-2 items-center justify-start'>
-                      {data?.status_pay === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{props.dataLang?.purchase_order_table_havent_spent_yet || "purchase_order_table_havent_spent_yet"}</span>||
-                        data?.status_pay === "1" &&  <span className=' font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{props.dataLang?.purchase_order_table_spend_one_part || "purchase_order_table_spend_one_part"}</span> ||
-                        data?.status_pay === "2" &&   <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_order_table_enough_spent || "purchase_order_table_enough_spent"}</span>
-                       }
-                      </div> */}
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_supplier || "import_supplier"}</h3><h3 className='text-[13px] font-normal'>{data?.supplier_name}</h3></div>
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_branch || "import_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3></div>
                   </div>
@@ -973,19 +965,19 @@ return (
                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow-lg  z-10`}> */}
                 <div className={`grid-cols-13  grid sticky top-0 bg-white shadow-lg  z-10`}>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_detail_image || "import_detail_image"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.import_detail_items || "import_detail_items"}
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_image || "import_detail_image"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_items || "import_detail_items"}
                   </h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4> 
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"Kho - VTK"}</h4> 
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"ĐVT"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_quantity || "import_from_quantity"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"% CK"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_tax || "import_from_tax"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_into_money || "import_into_money"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.import_from_note || "import_from_note"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4> 
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"Kho - VTK"}</h4> 
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"ĐVT"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_quantity || "import_from_quantity"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"% CK"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_tax || "import_from_tax"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_into_money || "import_into_money"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_note || "import_from_note"}</h4>
                 </div>
                 {onFetching ?
                   <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 

@@ -14,7 +14,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { MdClear } from 'react-icons/md';
 import { BsCalendarEvent } from 'react-icons/bs';
-import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import Datepicker from 'react-tailwindcss-datepicker'
+import DatePicker,{registerLocale } from "react-datepicker";
 
 import { Edit as IconEdit,  Grid6 as IconExcel,  ArrowDown2 as IconDown, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User, ArrowCircleDown, Add  } from "iconsax-react";
 import PopupEdit from "/components/UI/popup";
@@ -27,7 +29,7 @@ import Popup from 'reactjs-popup';
 import { data } from 'autoprefixer';
 import { useDispatch } from 'react-redux';
 import CreatableSelect from 'react-select/creatable';
-import { NULL } from 'sass';
+import { NULL, TRUE } from 'sass';
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet
@@ -40,7 +42,15 @@ const Toast = Swal.mixin({
   timerProgressBar: true,
 })
 
-
+const CustomSelectOption = ({value, label, level, code}) => (
+  <div className='flex space-x-2 truncate'>
+      {level == 1 && <span>--</span>}
+      {level == 2 && <span>----</span>}
+      {level == 3 && <span>------</span>}
+      {level == 4 && <span>--------</span>}
+      <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
+  </div>
+)
 
 const Index = (props) => {
 
@@ -52,13 +62,21 @@ const Index = (props) => {
     const [keySearch, sKeySearch] = useState("")
     const [limit, sLimit] = useState(15);
     const [totalItem, sTotalItems] = useState([]);
+    const [total, sTotal] = useState({})
 
     const [onFetching, sOnFetching] = useState(false);
+    const [onFetching_filter, sOnFetching_filter] = useState(false);
     const [data, sData] = useState({});
     const [data_ex, sData_ex] = useState([]);
-    const [listDs, sListDs] = useState()
+    const [dataMethod, sDataMethod] = useState([])
+    const [dataObject, sDataObject] = useState([])
 
-    const [listSelectCt, sListSelectCt] = useState()
+    const [listBr, sListBr]= useState([])
+    const [idBranch, sIdBranch] = useState(null);
+    const [idObject, sIdObject] = useState(null);
+    const [idMethod, sIdMethod] = useState(null);
+    const [valueDate, sValueDate] = useState({startDate: null, endDate:null
+    });
 
     const _HandleSelectTab = (e) => {
       router.push({
@@ -66,31 +84,75 @@ const Index = (props) => {
           query: { tab: e }
       })
     }
+
     useEffect(() => {
       router.push({
           pathname: router.route,    
           query: { tab: router.query?.tab ? router.query?.tab : 0  }
       })
     }, []);
+
     const _ServerFetching =  () => {
-      const tabPage = router.query?.tab;
         Axios("GET", `/api_web/Api_expense_voucher/expenseVoucher/?csrf_protection=true`, {
             params: {
-                search: keySearch,
                 limit: limit,  
                 page: router.query?.page || 1,  
+                "filter[branch_id]": idBranch != null ? idBranch.value : null ,
+                "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null ,
+                "filter[end_date]":valueDate?.endDate != null ? valueDate?.endDate : null ,
+                "filter[payment_mode]": idMethod != null ? idMethod.value : null,
+                "filter[objects]": idObject != null ? idObject.value : null,
+                "filter[search]": keySearch
             }
         }, (err, response) => {
             if(!err){
-              console.log(response.data);
                 var {rResult, output, rTotal} =  response.data
                 sData(rResult)
                 sTotalItems(output)
+                sData_ex(rResult)
+                sTotal(rTotal)
             }
             sOnFetching(false)
         })
     }
 
+    const _ServerFetching_filter =  () =>{
+      Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
+        if(!err){
+            var {isSuccess, result} =  response.data
+            sListBr(result?.map(e =>({label: e.name, value: e.id})))
+        }
+      })
+      Axios("GET", "/api_web/Api_payment_method/payment_method/?csrf_protection=true",{}, (err, response) => {
+        if(!err){
+            var {rResult} =  response.data
+            sDataMethod(rResult?.map(e => ({label: e?.name, value: e?.id})))
+        }
+      })
+      Axios("GET", "/api_web/Api_expense_voucher/object/?csrf_protection=true",{}, (err, response) => {
+        if(!err){
+          var data =  response.data
+          sDataObject(data?.map(e => ({label: dataLang[e?.name], value: e?.id})))
+        }
+      })
+      sOnFetching_filter(false)
+   }
+
+    useEffect(()=>{
+      onFetching_filter && _ServerFetching_filter()
+    },[onFetching_filter])
+
+  const onchang_filter = (type, value)=>{
+    if(type == "branch"){
+        sIdBranch(value)
+    }else if(type == "date"){
+      sValueDate(value)
+    }else if(type == "method"){
+      sIdMethod(value)
+    }else if(type == "object"){
+      sIdObject(value)
+    }
+  }
 
     const _HandleOnChangeKeySearch = ({target: {value}}) => {
       sKeySearch(value)
@@ -108,71 +170,133 @@ const Index = (props) => {
       }, 500);
     };
   
+    // const paginate = pageNumber => {
+    //   router.push({
+    //     pathname: router.route,
+    //     query: { 
+    //       tab: router.query?.tab,
+    //       page: pageNumber 
+    //     }
+    //   })
+    // }
+
     const paginate = pageNumber => {
+      const queryParams = { ...router.query, page: pageNumber };
       router.push({
         pathname: router.route,
-        query: { 
-          tab: router.query?.tab,
-          page: pageNumber 
-        }
-      })
-    }
+        query: queryParams
+      });
+    };
   
       useEffect(() => {
         onFetching && _ServerFetching()  
         }, [onFetching]);
-  
+
+      //   useEffect(() => {
+      //       router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query?.tab && sOnFetching_filter(true) || idBranch != null && sOnFetching(true) ||valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true) || idMethod != null && sOnFetching(true) || idObject != null && sOnFetching(true)
+      // }, [limit,router.query?.page, router.query?.tab, idBranch, valueDate.endDate, valueDate.startDate, idMethod, idObject]);
+      
         useEffect(() => {
-          router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true))
+            router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query?.tab && sOnFetching_filter(true) 
       }, [limit,router.query?.page, router.query?.tab]);
+      
+       useEffect(() =>  {
+        if(idBranch != null || valueDate.startDate != null && valueDate.endDate != null || idMethod != null || idObject != null){
+          router.push({
+              pathname: router.route,
+              query: {
+                  tab: router.query?.tab
+          }
+          })  
+          setTimeout(() => {
+            idBranch != null && sOnFetching(true) || valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true) || idMethod != null && sOnFetching(true) || idObject != null && sOnFetching(true)
+          }, 300);
+        }
+        else{
+          sOnFetching(true)
+        }
+        
+    }, [idBranch, valueDate.endDate, valueDate.startDate, idMethod, idObject]);
+
+    
+
+
+      const formatNumber = (number) => {
+        if (!number && number !== 0) return 0;
+          const integerPart = Math.floor(number);
+          const decimalPart = number - integerPart;
+          const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
+          const roundedNumber = integerPart + roundedDecimalPart;
+          return roundedNumber.toLocaleString("en");
+      };
+
+      const multiDataSet = [
+        {
+            columns: [
+                {title: "ID", width: {wch: 4}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.payment_date || "payment_date"}`, width: {wpx: 100}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.payment_code || "payment_code"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.payment_obType || "payment_obType"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.payment_ob || "payment_ob"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.payment_voucherCode || "payment_voucherCode"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.payment_TT_method || "payment_TT_method"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.payment_costs || "payment_costs"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.payment_creator || "payment_creator"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.payment_branch || "payment_branch"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+                {title: `${dataLang?.payment_note || "payment_note"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
+            ],
+          
+            data: data_ex?.map((e) =>
+                [
+                    {value: `${e?.id ? e.id : ""}`, style: {numFmt: "0"}},
+                    {value: `${e?.date ? e?.date : ""}`},
+                    {value: `${e?.code ? e?.code : ""}`},
+                    {value: `${e?.objects ? (dataLang[e.objects] !== undefined ? dataLang[e.objects] : "") : ""}`},
+                    {value: `${e?.object_text ? e?.object_text : ""}`},
+                    {value: `${e?.type_vouchers ? dataLang[e?.type_vouchers] != undefined ? dataLang[e?.type_vouchers] : "" : ""}`},
+                    {value: `${e?.voucher_code ? e?.voucher_code.join(', ') : ""}`},
+                    {value: `${e?.payment_mode_name ? e?.payment_mode_name : ""}`},
+                    {value: `${e?.cost_name   ? e?.cost_name?.join(', ') : ""}`},
+                    {value: `${e?.total ? formatNumber(e?.total) : ""}`},
+                    {value: `${e?.staff_name ? e?.staff_name : ""}`},
+                    {value: `${e?.branch_name ? e?.branch_name :""}`},
+                    {value: `${e?.note ? e?.note :""}`},
+                ]    
+            ),
+        }
+    ];
+
+
     return (
         <React.Fragment>
       <Head>
-        <title>{"Phiếu chi"}</title>
+        <title>{dataLang?.payment_title || "payment_title"}</title>
       </Head>
       <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
         <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-          <h6 className="text-[#141522]/40">{"Phiếu chi"}</h6>
+          <h6 className="text-[#141522]/40">{dataLang?.payment_title || "payment_title"}</h6>
           <span className="text-[#141522]/40">/</span>
-          <h6>{"Phiếu chi"}</h6>
+          <h6>{dataLang?.payment_title || "payment_title"}</h6>
         </div>
 
         <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
           <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
             <div className="space-y-3 h-[96%] overflow-hidden">
                 <div className='flex justify-between'>
-                    <h2 className="text-2xl text-[#52575E] capitalize">{"Phiếu chi"}</h2>
+                    <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.payment_title || "payment_title"}</h2>
                     <div className="flex justify-end items-center">
-                    <Popup_dsncc   onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
+                    <Popup_dspc   onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />
+                    
                   </div>
                 </div>
-                
-                
-              {/* <div  className="flex space-x-3 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                     {listDs &&   listDs.map((e)=>{
-                          return (
-                            <div>
-                            <TabClient 
-                              style={{
-                                backgroundColor: "#e2f0fe"
-                              }} dataLang={dataLang}
-                              key={e.id} 
-                              onClick={_HandleSelectTab.bind(this, `${e.id}`)} 
-                              total={e.count} 
-                              active={e.id} 
-                              className={"text-[#0F4F9E] "}
-                            >{dataLang[e?.name]}</TabClient> 
-                          </div>
-                          )
-                      })
-                     }
-                </div> */}
-           
               <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">    
                 <div className="xl:space-y-3 space-y-2">
-                    <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
-                        <div className='flex gap-2'>
-                          <form className="flex items-center relative">
+                    <div className="bg-slate-100 w-full rounded grid grid-cols-8 justify-between xl:p-3 p-2">
+                      <div className='col-span-7'>
+                        <div className='grid grid-cols-10 items-center space-x-1'>
+                          <form className="flex items-center relative col-span-2">
                             <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
                             <input
                                 className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-1.5 rounded-md w-[400px]"
@@ -181,89 +305,193 @@ const Index = (props) => {
                                 placeholder={dataLang?.branch_search}
                             />
                           </form>
-                        <div className='ml-1 w-[23vw]'>
-                            <Select 
-                                //  options={listBr_filter}
-                                //  options={[{ value: '', label: 'Chọn chi nhánh', isDisabled: true }, ...listBr_filter]}
-                                //  onChange={onchang_filterBr.bind(this, "branch")}
-                                //  value={idBranch}
-                                 placeholder={dataLang?.client_list_filterbrand} 
-                                hideSelectedOptions={false}
-                                isMulti
-                                isClearable={true}
-                               
-                                className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
-                                isSearchable={true}
-                                noOptionsMessage={() => "Không có dữ liệu"}
-                                components={{ MultiValue }}
-                                closeMenuOnSelect={false}
-                                style={{ border: "none", boxShadow: "none", outline: "none" }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: '#EBF5FF',
-                                        primary50: '#92BFF7',
-                                        primary: '#0F4F9E',
-                                    },
-                                })}
-                                styles={{
-                                  placeholder: (base) => ({
-                                  ...base,
-                                  color: "#cbd5e1",
-                                  }),
-                                  control: (base,state) => ({
+                          <div className=' col-span-2'>
+                              <Select 
+                                  options={[{ value: '', label: 'Chọn chi nhánh', isDisabled: true }, ...listBr]}
+                                  onChange={onchang_filter.bind(this, "branch")}
+                                  value={idBranch}
+                                  placeholder={dataLang?.client_list_filterbrand} 
+                                  hideSelectedOptions={false}
+                                  isClearable={true}
+                                  className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
+                                  isSearchable={true}
+                                  noOptionsMessage={() => "Không có dữ liệu"}
+                                  closeMenuOnSelect={true}
+                                  style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                  theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                          ...theme.colors,
+                                          primary25: '#EBF5FF',
+                                          primary50: '#92BFF7',
+                                          primary: '#0F4F9E',
+                                      },
+                                  })}
+                                  styles={{
+                                    placeholder: (base) => ({
                                     ...base,
-                                    border: 'none',
-                                    outline: 'none',
-                                    boxShadow: 'none',
-                                   ...(state.isFocused && {
-                                    boxShadow: '0 0 0 1.5px #0F4F9E',
-                                  }),
-                                 })
-                              }}
-                              />
+                                    color: "#cbd5e1",
+                                    }),
+                                    control: (base,state) => ({
+                                      ...base,
+                                      border: 'none',
+                                      outline: 'none',
+                                      boxShadow: 'none',
+                                    ...(state.isFocused && {
+                                      boxShadow: '0 0 0 1.5px #0F4F9E',
+                                    }),
+                                  })
+                                }}
+                                />
+                          </div>
+                          <div className=' col-span-2'>
+                              <Select 
+                                  options={[{ value: '', label: 'Chọn Phương thức TT', isDisabled: true }, ...dataMethod]}
+                                  onChange={onchang_filter.bind(this, "method")}
+                                  value={idMethod}
+                                  placeholder={"Phương thức TT"} 
+                                  hideSelectedOptions={false}
+                                  isClearable={true}
+                                  className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
+                                  isSearchable={true}
+                                  noOptionsMessage={() => "Không có dữ liệu"}
+                                  closeMenuOnSelect={true}
+                                  style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                  theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                          ...theme.colors,
+                                          primary25: '#EBF5FF',
+                                          primary50: '#92BFF7',
+                                          primary: '#0F4F9E',
+                                      },
+                                  })}
+                                  styles={{
+                                    placeholder: (base) => ({
+                                    ...base,
+                                    color: "#cbd5e1",
+                                    }),
+                                    control: (base,state) => ({
+                                      ...base,
+                                      border: 'none',
+                                      outline: 'none',
+                                      boxShadow: 'none',
+                                    ...(state.isFocused && {
+                                      boxShadow: '0 0 0 1.5px #0F4F9E',
+                                    }),
+                                  })
+                                }}
+                                />
+                          </div>
+                          <div className=' col-span-2'>
+                              <Select 
+                                  options={[{ value: '', label: 'Chọn đối tượng', isDisabled: true }, ...dataObject]}
+                                  onChange={onchang_filter.bind(this, "object")}
+                                  value={idObject}
+                                  placeholder={"Đối tượng"} 
+                                  hideSelectedOptions={false}
+                                  isClearable={true}
+                                  className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
+                                  isSearchable={true}
+                                  noOptionsMessage={() => "Không có dữ liệu"}
+                                  closeMenuOnSelect={true}
+                                  style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                  theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                          ...theme.colors,
+                                          primary25: '#EBF5FF',
+                                          primary50: '#92BFF7',
+                                          primary: '#0F4F9E',
+                                      },
+                                  })}
+                                  styles={{
+                                    placeholder: (base) => ({
+                                    ...base,
+                                    color: "#cbd5e1",
+                                    }),
+                                    control: (base,state) => ({
+                                      ...base,
+                                      border: 'none',
+                                      outline: 'none',
+                                      boxShadow: 'none',
+                                    ...(state.isFocused && {
+                                      boxShadow: '0 0 0 1.5px #0F4F9E',
+                                    }),
+                                  })
+                                }}
+                                />
+                          </div>
+                          <div className='z-20 col-span-2'>
+                            <Datepicker            
+                                    value={valueDate} 
+                                    i18n={"vi"} 
+                                    primaryColor={"blue"} 
+                                    onChange={onchang_filter.bind(this, "date")}
+                                    showShortcuts={true} 
+                                    displayFormat={"DD/MM/YYYY"} 
+                                    configs={{
+                                      shortcuts: {
+                                      today: "Hôm nay" ,
+                                      yesterday: "Hôm qua" ,
+                                      past: period => `${period}  ngày qua` ,
+                                      currentMonth: "Tháng này" ,
+                                      pastMonth: "Tháng trước" 
+                                      },
+                                      footer: {
+                                      cancel: "Từ bỏ" ,
+                                      apply: "Áp dụng" 
+                                      }
+                                      }} 
+                                    className="react-datepicker__input-container 2xl:placeholder:text-xs xl:placeholder:text-xs placeholder:text-[8px]"
+                                    inputClassName="rounded-md w-full 2xl:p-2 xl:p-[11px] p-3 bg-white focus:outline-[#0F4F9E]  2xl:placeholder:text-xs xl:placeholder:text-xs placeholder:text-[8px] border-none  2xl:text-base xl:text-xs text-[10px]  focus:outline-none focus:ring-0 focus:border-transparent"
+                                  />
+                          </div>
                         </div>
-                        </div>
-                        
-                        <div className="flex space-x-2 items-center">
-                          {
-                            data_ex?.length > 0 &&(
-                              <ExcelFile filename="Danh sách nhà cung cấp" title="Dsncc" element={
-                                <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
-                                  <IconExcel size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
-                                <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
-                            </ExcelFile>
-                            )
-                          }
-                     <label className="font-[300] text-slate-400">{dataLang?.display}</label>
-                          <select className="outline-none" onChange={(e) => sLimit(e.target.value)} value={limit}>
-                            <option disabled className="hidden">{limit == -1 ? "Tất cả": limit}</option>
-                            <option value={15}>15</option>
-                            <option value={20}>20</option>
-                            <option value={40}>40</option>
-                            <option value={60}>60</option>
-                            <option value={-1}>Tất cả</option>
-                          </select>
-                        </div>
+                      </div>
+                      <div className="col-span-1">
+                          <div className='flex justify-end items-center gap-2'>
+                             <div>
+                             {
+                              data_ex?.length > 0 &&(
+                                  <ExcelFile filename="Danh phiếu chi" title="DSPC" element={
+                                  <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
+                                      <IconExcel className='2xl:scale-100 xl:scale-100 scale-75' size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
+                                  <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
+                              </ExcelFile>
+                              )
+                              }
+                             </div>
+                            <div className=''>
+                                <div className="font-[300] text-slate-400 2xl:text-xs xl:text-sm text-[8px]">{dataLang?.display}</div>
+                                <select className="outline-none  text-[10px] xl:text-xs 2xl:text-sm" onChange={(e) => sLimit(e.target.value)} value={limit}>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm hidden' disabled>{limit == -1 ? "Tất cả": limit}</option>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm' value={15}>15</option>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm' value={20}>20</option>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm' value={40}>40</option>
+                                      <option className='text-[10px] xl:text-xs 2xl:text-sm' value={60}>60</option>
+                                  </select>
+                            </div>
+                          </div>
+                      </div>
                     </div>
                 </div>
-                <div className="min:h-[200px] h-[65%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <div className="min:h-[200px] h-[88%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%] lx:w-[110%] ">
                     <div className="grid grid-cols-13 items-center sticky top-0 bg-white p-2 z-10 shadow">
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Ngày chứng từ"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Mã chứng từ"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Loại đối tượng"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Đối tượng"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Loại chứng từ"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Mã chứng từ"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"PTTT"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Loại chi phí"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Số tiền"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Người tạo"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Chi nhánh"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Ghi chú"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Tác vụ"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_date || "payment_date"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_code || "payment_code"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_obType || "payment_obType"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_ob || "payment_ob"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_voucherCode || "payment_voucherCode"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{"PTTT"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_costs || "payment_costs"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_creator || "payment_creator"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_branch || "payment_branch"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_note || "payment_note"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_action || "payment_action"}</h4>
                       </div>
                     {onFetching ?
                       <Loading className="h-80"color="#0f4f9e" /> 
@@ -274,18 +502,36 @@ const Index = (props) => {
                           <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">                       
                           {(data?.map((e) => 
                             <div className="grid grid-cols-13 items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.code}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.objects}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.objects}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.objects}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.objects}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.objects}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.objects}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-right">{e?.objects}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.objects}</h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left"><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.note}</h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center text-[#0F4F9E]"><Popup_chitiet dataLang={dataLang} className="text-center" name={e?.code} id={e?.id}/></h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left ">{dataLang[e?.objects] || e?.objects}</h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left text-[#0F4F9E]"><Popup_chitiet dataLang={dataLang} className="text-center" name={e?.object_text} id={e?.id}/></h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center">{dataLang[e?.type_vouchers] || e?.type_vouchers}</h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center">
+                                {e?.voucher_code?.map((code, index) => (
+                                  <React.Fragment key={code}>
+                                    {code}
+                                    {index !== e.voucher_code.length - 1 && ', '}
+                                  </React.Fragment>
+                                ))}
+                              </h6>
+      
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.payment_mode_name}</h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left">
+                                {e?.cost_name?.map((code, index) => (
+                                    <React.Fragment key={code}>
+                                      {code}
+                                      {index !== e.cost_name.length - 1 && ', '}
+                                    </React.Fragment>
+                                  ))}
+                              </h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-right">{formatNumber(e?.total)}</h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left flex items-center space-x-1">
+                                  <img className='h-6 w-6 rounded-full' src={e?.profile_image ? e?.profile_image : '/user-placeholder.jpg'} alt=''></img>
+                                  <h6>{e?.staff_name}</h6>
+                              </h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left"><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.note}</h6>
                               <div className='col-span-1 flex justify-center'>
                                     <BtnTacVu onRefresh={_ServerFetching.bind(this)} dataLang={dataLang}  id={e?.id}  className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
                                 </div>
@@ -308,6 +554,14 @@ const Index = (props) => {
                 </div>
               </div>     
             </div>
+            <div className='grid grid-cols-13 bg-gray-100 items-center'>
+                    <div className='col-span-8 p-2 text-center'>
+                        <h3 className='uppercase font-normal 2xl:text-base xl:text-xs text-[8px]'>{dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}</h3>
+                    </div>  
+                    <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap'>
+                        <h3 className='font-normal 2xl:text-base xl:text-xs text-[8px]'>{formatNumber(total?.sum_total)}</h3>
+                    </div>  
+            </div>
             {data?.length != 0 &&
               <div className='flex space-x-5 items-center'>
                 <h6>{dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among} {totalItem?.iTotalRecords} {dataLang?.ingredient}</h6>
@@ -325,55 +579,41 @@ const Index = (props) => {
     </React.Fragment>
     );
 }
-const TabClient = React.memo((props) => {
-    const router = useRouter();
-    return(
-      <button  style={props.style} onClick={props.onClick} className={`${props.className} justify-center min-w-[220px] flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
-        {router.query?.tab === `${props.active}` && <ArrowCircleDown   size="20" color="#0F4F9E" />}
-        {props.children}
-        <span className={`${props?.total > 0 && "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"} `}>{props?.total > 0 && props?.total}</span>
-      </button>
-
-
-    )
-  })
 
   const BtnTacVu = React.memo((props) => {
-    // const [open, sOpen] = useState(false);
     const [openTacvu, sOpenTacvu] = useState(false);
     const _ToggleModal = (e) => sOpenTacvu(e);
-  
     const _HandleDelete = (id) => {
-      // Swal.fire({
-      //     title: `${props.dataLang?.aler_ask}`,
-      //     icon: 'warning',
-      //     showCancelButton: true,
-      //     confirmButtonColor: '#296dc1',
-      //     cancelButtonColor: '#d33',
-      //     confirmButtonText: `${props.dataLang?.aler_yes}`,
-      //     cancelButtonText:`${props.dataLang?.aler_cancel}`
-      // }).then((result) => {
-      //   if (result.isConfirmed) {
-      //     Axios("DELETE", `/api_web/Api_service/service/${id}?csrf_protection=true`, {
-      //     }, (err, response) => {
-      //       if(!err){
-      //         var {isSuccess, message} = response.data;
-      //         if(isSuccess){
-      //           Toast.fire({
-      //             icon: 'success',
-      //             title: props.dataLang[message]
-      //           })     
-      //           props.onRefresh && props.onRefresh()
-      //         }else{
-      //             Toast.fire({
-      //                 icon: 'error',
-      //                 title: props.dataLang[message]
-      //             }) 
-      //         }
-      //       }
-      //     })     
-      // }
-      // })
+      Swal.fire({
+          title: `${props.dataLang?.aler_ask}`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#296dc1',
+          cancelButtonColor: '#d33',
+          confirmButtonText: `${props.dataLang?.aler_yes}`,
+          cancelButtonText:`${props.dataLang?.aler_cancel}`
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Axios("DELETE", `/api_web/Api_expense_voucher/expenseVoucher/${id}?csrf_protection=true`, {
+          }, (err, response) => {
+            if(!err){
+              var {isSuccess, message} = response.data;
+              if(isSuccess){
+                Toast.fire({
+                  icon: 'success',
+                  title: props.dataLang[message]
+                })     
+                props.onRefresh && props.onRefresh()
+              }else{
+                  Toast.fire({
+                      icon: 'error',
+                      title: props.dataLang[message]
+                  }) 
+              }
+            }
+          })     
+      }
+    })
   }
   
     return(
@@ -392,8 +632,8 @@ const TabClient = React.memo((props) => {
             >
                 <div className="w-auto rounded">
                     <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                        <Popup_dsncc onRefresh={props.onRefresh} dataLang={props.dataLang} id={props?.id} 
-                         className=" hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full 2xl:text-sm xl:text-sm text-[8px]">{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</Popup_dsncc>
+                        <Popup_dspc onRefresh={props.onRefresh} dataLang={props.dataLang} id={props?.id} 
+                         className=" hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full 2xl:text-sm xl:text-sm text-[8px]">{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</Popup_dspc>
                         <button onClick={_HandleDelete.bind(this, props.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</button>
                     </div>
                 </div>
@@ -402,7 +642,7 @@ const TabClient = React.memo((props) => {
     )
   })
 
-const Popup_dsncc = (props) => {
+const Popup_dspc = (props) => {
 
       let id = props?.id
 
@@ -412,7 +652,6 @@ const Popup_dsncc = (props) => {
       const menuPortalTarget = scrollAreaRef.current;
           return { menuPortalTarget };
       };
-      
       const [open, sOpen] = useState(false);
       const _ToggleModal = (e) => sOpen(e);
 
@@ -423,6 +662,8 @@ const Popup_dsncc = (props) => {
       const [onFetching_ListTypeOfDocument, sOnFetching_ListTypeOfDocument] = useState(false);
       const [onFetching_ListCost, sOnFetching_ListCost] = useState(false)
 
+      const [onFetchingDetail, sOnFetchingDetail] = useState(false);
+
       const [dataBranch, sDataBranch] = useState([])
       const [dataObject, sDataObject] = useState([])
       const [dataList_Object, sData_ListObject] = useState([])
@@ -430,7 +671,6 @@ const Popup_dsncc = (props) => {
       const [dataTypeofDoc, sDataTypeofDoc] = useState([])
       const [dataListTypeofDoc, sDataListTypeofDoc] = useState([])
       const [dataListCost, sDataListCost] = useState([])
-    
       
       const [date , sDate] = useState(new Date());
       const [code ,sCode] = useState(null)
@@ -447,7 +687,7 @@ const Popup_dsncc = (props) => {
         {
          id: Date.now(),
          chiphi: "",
-         sotien: '',
+         sotien: null,
         }
         ]);
       const slicedArr = option.slice(1);
@@ -459,6 +699,7 @@ const Popup_dsncc = (props) => {
       const [errListObject, sErrListObject] = useState(false)
       const [errPrice, sErrPrice] = useState(false)
       const [errMethod, sErrMethod] = useState(false)
+      const [errListTypeDoc, sErrListTypeDoc] = useState(false)
 
       const [errService, sErrService] = useState(false)
       const [errCosts, sErrCosts] = useState(false)
@@ -481,18 +722,46 @@ const Popup_dsncc = (props) => {
         open && sErrBranch(false)
         open && sErrObject(false)
         open && sErrListObject(false)
+        open && sErrListTypeDoc(false)
         open && sErrPrice(false)
         open && sErrMethod(false)
         open && sErrService(false)
         open && sErrCosts(false)
         open && sErrSotien(false)
-        open &&  sOption([{ id: Date.now(),chiphi: "",sotien: '',}]);
+        open &&  sOption([{ id: Date.now(),chiphi: "",sotien: null}]);
 
         open && sOnFetching(true)
         open && sOnFetching_LisObject(false)
         open && sData_ListObject([])
+        open && sDataListCost([])
+        props?.id && sOnFetchingDetail(true)
       },[open])
 
+
+      const _ServerFetching_detail = async  () =>{
+      await  Axios("GET", `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+        if(!err){
+            var db =  response.data
+            sDate(moment(db?.date).toDate())
+            sCode(db?.code)
+            sBranch({label: db?.branch_name, value: db?.branch_id})
+            sMethod({label: db?.payment_mode_name, value: db?.payment_mode_id})
+            sObject({label: dataLang[db?.objects] || db?.objects, value: db?.objects})
+            sPrice(Number(db?.total))
+            sNote(db?.note)
+            sListObject(db?.objects === "other" ? {label: db?.object_text, value: db?.object_text} : {label: dataLang[db?.object_text] || db?.object_text, value: db?.objects_id})
+            // sTypeOfDocument(db?.type_vouchers ? {label: dataLang[db?.type_vouchers], value: dataLang[db?.type_vouchers]} : null)
+            sTypeOfDocument(db?.type_vouchers ? {label: dataLang[db?.type_vouchers], value: db?.type_vouchers} : null)
+            sListTypeOfDocument(db?.type_vouchers ? db?.voucher?.map(e => ({label: e?.code  , value: e?.id})) :[])
+            sOption(db?.detail?.map(e => ({id: e?.id, chiphi: {label: e?.costs_name, value: e?.id_costs}, sotien: Number(e?.total)})))
+        }
+        sOnFetchingDetail(false)
+      })
+    }
+
+      useEffect(() => {
+        onFetchingDetail && props?.id && _ServerFetching_detail()
+      }, [open]);
 
 
     // Chi nhánh, PTTT, Đối tượng
@@ -527,8 +796,10 @@ const Popup_dsncc = (props) => {
   },[open])
 
   //Danh sách đối tượng
-const _ServerFetching_LisObject =  async  () => {
-  await Axios("GET", "/api_web/Api_expense_voucher/objectList/?csrf_protection=true",{
+  //Api Danh sách đối tượng: truyền Đối tượng vào biến type, truyền Chi nhánh vào biến filter[branch_id]
+
+  const _ServerFetching_LisObject =  async () => {
+    await Axios("GET", "/api_web/Api_expense_voucher/objectList/?csrf_protection=true",{
       params:{
         type: object?.value,
         "filter[branch_id]": branch?.value
@@ -551,6 +822,8 @@ const _ServerFetching_LisObject =  async  () => {
   },[object,branch])
 
 // Loại chứng từ
+//Api Loại chứng từ: truyền Đối tượng vào biến type
+
   const _ServerFetching_TypeOfDocument =  () => {
     Axios("GET", "/api_web/Api_expense_voucher/voucher_type/?csrf_protection=true",{
       params:{
@@ -559,6 +832,7 @@ const _ServerFetching_LisObject =  async  () => {
     }, (err, response) => {
         if(!err){
             var db =  response.data
+            // sDataTypeofDoc(db?.map(e => ({label: dataLang[e?.name], value: dataLang[e?.id]})))  
             sDataTypeofDoc(db?.map(e => ({label: dataLang[e?.name], value: e?.id})))  
         }
     })
@@ -573,16 +847,17 @@ const _ServerFetching_LisObject =  async  () => {
     object != null && sOnFetching_TypeOfDocument(true)
   },[object])
 
-
-
   //Danh sách chứng từ
+  //Api Danh sách chứng từ: truyền Đối tượng vào biến type, truyền Loại chứng từ vào biến voucher_type, truyền Danh sách đối tượng vào object_id
+
   const _ServerFetching_ListTypeOfDocument = () => {
    Axios("GET", "/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true",{
       params:{
         type: object?.value,
         voucher_type: typeOfDocument?.value,
         object_id: listObject?.value,
-        "filter[branch_id]": branch?.value
+        "filter[branch_id]": branch?.value,
+        expense_voucher_id: id ? id : ""
       }
     }, (err, response) => {
         if(!err){
@@ -608,15 +883,16 @@ const _ServerFetching_LisObject =  async  () => {
           term: inputValue,
         },
         params:{
-          type: object?.value,
-          voucher_type: typeOfDocument?.value,
-          object_id: listObject?.value,
-          "filter[branch_id]": branch?.value
+          type: object?.value ? object?.value : null,
+          voucher_type: typeOfDocument?.value ? typeOfDocument?.value : null,
+          object_id: listObject?.value ? listObject?.value : null,
+          "filter[branch_id]": branch?.value ? branch?.value : null,
+          expense_voucher_id: id ? id : ""
         }
       }, (err, response) => {
             if(!err){
               var db =  response.data
-              sDataListTypeofDoc(db?.map(e => ({label: e?.code, value: e?.id,money: e?.money})))  
+              sDataListTypeofDoc(db?.map(e => ({label: e?.code, value: e?.id, money: e?.money})))  
           }
       })
   }
@@ -630,7 +906,7 @@ const _ServerFetching_LisObject =  async  () => {
     }, (err, response) => {
         if(!err){
             var {rResult} =  response.data
-            sDataListCost(rResult?.map(e => ({label: e?.name, value: e?.id})))  
+            sDataListCost(rResult.map(x => ({label: `${x.name }`, value: x.id, level: x.level, code: x.code, parent_id: x.parent_id})))
         }
     })
     sOnFetching_ListCost(false)  
@@ -644,33 +920,25 @@ const _ServerFetching_LisObject =  async  () => {
     branch != null  && sOnFetching_ListCost(true)
   },[branch])
 
-    // const formatNumber = (num) => {
-    //   if (!num && num !== 0) return 0;
-    //   const roundedNum = parseFloat(num.toFixed(2));
-    //   return roundedNum.toLocaleString("en", {
-    //     minimumFractionDigits: 2,
-    //     maximumFractionDigits: 2,
-    //     useGrouping: true
-    //   });
-    // };
-    const formatNumber = (number) => {
-      const integerPart = Math.floor(number)
-      return integerPart.toLocaleString("en")
-    }
-
       const _HandleChangeInput = (type, value) =>{
         if(type == "date"){
             sDate(value)
         }else if(type == "code"){
             sCode(value?.target?.value)
-        }
-       else if (type === 'clear') {
+        }else if (type === 'clear') {
         sDate(new Date())
-        }
-        else if(type == "branch" && branch != value){
+        }else if(type == "branch" && branch != value){
             sBranch(value)
             sData_ListObject([])
             sListObject(null)
+            sDataListCost([])
+            const updatedOptions = option.map((item) => {
+              return {
+                ...item,
+                chiphi: "",
+              };
+            });
+            sOption(updatedOptions);
         }else if(type == "object" && object != value){
             sObject(value)
             sListObject(null)
@@ -686,33 +954,70 @@ const _ServerFetching_LisObject =  async  () => {
             sListTypeOfDocument(value)
             if (value && value.length > 0) {
               const totalMoney = value.reduce((total, item) => total + parseFloat(item.money || 0), 0);
-              console.log(typeof totalMoney);
               const formattedTotal = parseFloat(totalMoney);
               sPrice(formattedTotal);
+              sOption((prevOption) => {
+                const newOption = prevOption.map((item, index) => {
+                  if (index === 0) {
+                    return { ...item, sotien: formattedTotal };
+                  } else {
+                    return { ...item, sotien: null };
+                  }
+                });
+                return newOption;
+              });
             }else if (value && value.length == 0) {
               sPrice('');
+              sOption((prevOption) => {
+                const newOption = prevOption.map((item, index) => {
+                  return { ...item, sotien: '' };
+                });
+                return newOption;
+              });
             }
         }else if(type == "price"){
           const priceChange = parseFloat(value?.target.value.replace(/,/g, ""));
           if (!isNaN(priceChange)) {
             sPrice(priceChange);
           }
+          sOption((prevOption) => {
+            const newOption = prevOption.map((item, index) => {
+              if (index === 0) {
+                return { ...item, sotien: priceChange };
+              } else {
+                return { ...item, sotien: null };
+              }
+            });
+            return newOption;
+          });
         }else if(type == "method"){
             sMethod(value)
         }else if(type == "note"){
             sNote(value?.target.value)
         }
       }
+      
+      // useEffect(() => {
+      //   if (price == null) return;
+      //   sOption(prevOption => {
+      //     const newOption = [...prevOption];
+      //     newOption.forEach((item, index) => {
+      //       if(index == 0){
+      //         item.sotien = price;
+      //       }else{
+      //         item.sotien = null;
+      //       }
+      //     });
+      //     return newOption;
+      //   });
+      // }, [price]);
 
-      const handleTimeChange = (date) => {
-        sDate(date)
-      };
       const _HandleSubmit = (e) =>{
         e.preventDefault();
         const hasNullLabel = option.some(item => item.chiphi === '');
-        const hasNullSotien = option.some(item => item.sotien === '');
+        const hasNullSotien = option.some(item => item.sotien === '' || item.sotien === null);
         const totalSotienErr = option.reduce((total, item) => total + item.sotien, 0);
-        if(branch == null || object == null || listObject == null || price == "" || method == null || hasNullLabel || hasNullSotien || (totalSotienErr < price)){
+        if(branch == null || object == null || listObject == null || price == "" || method == null || hasNullLabel || hasNullSotien || (totalSotienErr < price) || (typeOfDocument != null && listTypeOfDocument?.length == 0)){
             branch == null && sErrBranch(true) 
             object == null && sErrObject(true) 
             listObject == null && sErrListObject(true) 
@@ -720,6 +1025,7 @@ const _ServerFetching_LisObject =  async  () => {
             method == null && sErrMethod(true)
             hasNullLabel && sErrCosts(true) 
             hasNullSotien && sErrSotien(true) 
+            typeOfDocument != null && listTypeOfDocument?.length == 0 && sErrListTypeDoc(true)
             Toast.fire({
               icon: 'error',
               title: `${totalSotienErr < price ? "Tổng số tiền chi phí nhỏ hơn số tiền ban đầu" : props.dataLang?.required_field_null}`
@@ -729,7 +1035,6 @@ const _ServerFetching_LisObject =  async  () => {
           }
       }
       
-      
       useEffect(() => {
         sErrBranch(false)
       }, [branch != null]);
@@ -737,6 +1042,10 @@ const _ServerFetching_LisObject =  async  () => {
       useEffect(() => {
         sErrObject(false)
       }, [object != null]);
+      
+      useEffect(() => {
+         sErrListTypeDoc(false)
+      }, [typeOfDocument == null && listTypeOfDocument?.length > 0]);
 
       useEffect(() => {
         sErrListObject(false)
@@ -753,7 +1062,7 @@ const _ServerFetching_LisObject =  async  () => {
         onSending && _ServerSending()
       }, [onSending]);
 
-      const _HandleChangeInputOption = (id, type, index3, value) => {
+      const _HandleChangeInputOption = (id, type, value) => {
         var index = option.findIndex(x => x.id === id);
         if (type === "chiphi") {
           const hasSelectedOption = option.some((o) => o.chiphi === value);
@@ -768,44 +1077,36 @@ const _ServerFetching_LisObject =  async  () => {
             return; // Dừng xử lý tiếp theo nếu đã hiển thị thông báo lỗi
           } else {
             option[index].chiphi = value;
-            // if (index === option.length - 1) {
-            //   option.push({ id: uuidv4(), chiphi: '', sotien: null });
-            //   sOption([...option]);
-            // }
           }
         }
         else if (type === "sotien") {
-          const sotienValue = parseFloat(value?.value) || "";
-          const priceValue = parseFloat(price)
-          let totalSotien = sotienValue;
-          option.forEach((opt, optIndex) => {
-            if (optIndex !== index) {
-              totalSotien += Number(opt.sotien) || "";
+          option[index].sotien = parseFloat(value?.value);
+          const totalSotien = option.reduce((sum, opt) => sum + parseFloat(opt.sotien || 0), 0);
+            if (totalSotien > parseFloat(price)) {
+              option.forEach((opt, optIndex) => {
+                const currentValue = option[optIndex].sotien; // Lưu giá trị hiện tại
+                option[optIndex].sotien = '';
+                if (optIndex === index) {
+                  option[optIndex].sotien = currentValue; // Gán lại giá trị hiện tại
+                }
+              });
+              Toast.fire({
+                title: 'Tổng giá trị số tiền vượt quá giá trị số tiền ban đầu',
+                icon: 'error',
+                confirmButtonColor: '#296dc1',
+                cancelButtonColor: '#d33',
+                confirmButtonText: dataLang?.aler_yes,
+              });
             }
-          });
-          if (totalSotien > priceValue) {
-            option.forEach((opt, optIndex) => {
-              option[optIndex].sotien = "";
-            });
-            Toast.fire({
-              title: 'Tổng giá trị số tiền vượt quá giá trị số tiền ban đầu',
-              icon: 'error',
-              confirmButtonColor: '#296dc1',
-              cancelButtonColor: '#d33',
-              confirmButtonText: dataLang?.aler_yes,
-            });
-          } else {
-            option[index].sotien = sotienValue;
-          }
-        
-          sOption([...option]);
+            else {
+              option[index].sotien = parseFloat(value?.value);
+            }
         }
         sOption([...option])
       }
 
-
       const _HandleAddNew =  () => {
-        sOption([...option, {id: uuidv4(), chiphi: '', sotien: ""}])
+        sOption([...option, {id: uuidv4(), chiphi: '', sotien: null}])
       }
 
       const _HandleDelete =  (id) => {
@@ -822,42 +1123,70 @@ const _ServerFetching_LisObject =  async  () => {
           sOption(newOption); // cập nhật lại mảng
       }
 
-     
-
         const allItems = [...dataListTypeofDoc]
+
         // const handleSelectAll = () => {
-        //    sListTypeOfDocument(allItems)
-        //     setTimeout(() =>{
-        //       const totalMoney = allItems.reduce((total, item) => total + parseFloat(item.money), 0);
-        //       sPrice(formatNumber(totalMoney))
-        //     },1000)
+        //   sListTypeOfDocument(allItems);
+        //   Promise.resolve().then(() => {
+        //     const totalMoney = allItems.reduce((total, item) => {
+        //       if (!isNaN(parseFloat(item.money))) {
+        //         return total + parseFloat(item.money);
+        //       } else {
+        //         return total;
+        //       }
+        //     }, 0);
+        //     return totalMoney
+        //   }).then((formattedTotal) => {
+        //     sPrice(formattedTotal);
+        //   });
         // };
-    
-        // const handleDeselectAll = () => {
-        //   sListTypeOfDocument([])
-        //   sPrice('')
-        //   setTimeout(() =>{
-        //     sPrice('')
-        //   },1000)
-        // };
-    
+
+
         const handleSelectAll = () => {
           sListTypeOfDocument(allItems);
           Promise.resolve().then(() => {
-            const totalMoney = allItems.reduce((total, item) => total + parseFloat(item.money), 0);
-            return totalMoney
+            const totalMoney = allItems.reduce((total, item) => {
+              if (!isNaN(parseFloat(item.money))) {
+                return total + parseFloat(item.money);
+              } else {
+                return total;
+              }
+            }, 0);
+            return totalMoney;
           }).then((formattedTotal) => {
             sPrice(formattedTotal);
+            sOption((prevOption) => {
+              const newOption = prevOption.map((item, index) => {
+                if (index === 0) {
+                  return { ...item, sotien: formattedTotal };
+                } else {
+                  return { ...item, sotien: null };
+                }
+              });
+              return newOption;
+            });
           });
         };
+        // const handleDeselectAll = () => {
+        //   sListTypeOfDocument([]);
+        //   sPrice('');
+        //   Promise.resolve().then(() => {
+        //     sPrice('');
+        //   });
+        // };
         const handleDeselectAll = () => {
           sListTypeOfDocument([]);
           sPrice('');
-          Promise.resolve().then(() => {
-            sPrice('');
+          sOption((prevOption) => {
+            const newOption = prevOption.map((item) => {
+              return { ...item, sotien: null };
+            });
+            return newOption;
           });
         };
 
+
+        
         const MenuList = (props) => {
           return (
             <components.MenuList {...props}>
@@ -872,32 +1201,20 @@ const _ServerFetching_LisObject =  async  () => {
           );
         };
     
-
-        useEffect(() => {
-          if (price == null) return;
-          sOption(prevOption => {
-            const newOption = [...prevOption];
-            newOption.forEach((item, index) => {
-              if(index == 0){
-                item.sotien = price;
-              }else{
-                item.sotien = '';
-              }
-            });
-            return newOption;
-          });
-        }, [price]);
-
         const _ServerSending = () => {
           var formData = new FormData();
           formData.append("code", code == null ? "" : code)
           formData.append("date", (moment(date).format("YYYY-MM-DD HH:mm:ss")))
           formData.append("branch_id", branch.value)
           formData.append("objects", object.value)
-          formData.append("objects_id", listObject.value)
-          formData.append("type_vouchers", typeOfDocument.value)
+          formData.append("type_vouchers", typeOfDocument ? typeOfDocument.value : "")
           formData.append("total", price)
           formData.append("payment_modes", method.value)
+          if(object?.value == "other"){
+           formData.append("objects_text", listObject.value)
+          }else{
+          formData.append("objects_id", listObject.value)
+          }
           listTypeOfDocument?.forEach((e, index) =>{
             formData.append(`voucher_id[${index}]`, e?.value);
           })
@@ -932,15 +1249,7 @@ const _ServerFetching_LisObject =  async  () => {
                       sErrObject(false)
                       sErrListObject(false)
                       sErrPrice(false)
-                      sOption(
-                        [
-                          {
-                           id: Date.now(),
-                           chiphi: "",
-                           sotien: '',
-                          }
-                          ]
-                      )
+                      sOption([{id: Date.now(), chiphi: "", sotien: null,}])
                       props.onRefresh && props.onRefresh()
                       sOpen(false)
                   }else {
@@ -955,19 +1264,18 @@ const _ServerFetching_LisObject =  async  () => {
       }
 
 
-
   return(
       <>
       <PopupEdit   
-        title={props.id ? `${"Sửa phiếu chi"}` : `${"Tạo phiếu chi"}`} 
-        button={props.id ? "Sửa phiếu" : `${props.dataLang?.branch_popup_create_new}`} 
+        title={props.id ? `${props.dataLang?.payment_edit || "payment_edit"}` : `${props.dataLang?.payment_add || "payment_add"}`} 
+        button={props.id ? props.dataLang?.payment_editVotes || "payment_editVotes" : `${props.dataLang?.branch_popup_create_new}`} 
         onClickOpen={_ToggleModal.bind(this, true)} 
         open={open} onClose={_ToggleModal.bind(this,false)}
         classNameBtn={props.className} 
       >
       <div className='flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
       </div>
-      <h2 className='font-normal bg-[#ECF0F4] p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  '>{"Thông tin chung"}</h2>  
+      <h2 className='font-normal bg-[#ECF0F4] p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  '>{props.dataLang?.payment_general_information || "payment_general_information"}</h2>  
               <div className="w-[40vw]">
                   <form onSubmit={_HandleSubmit.bind(this)} className="">
                       <div className=''> 
@@ -975,30 +1283,29 @@ const _ServerFetching_LisObject =  async  () => {
                             <div className='col-span-6 relative'>
                                 <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">{dataLang?.serviceVoucher_day_vouchers} </label>
                                  <div className="custom-date-picker flex flex-row " >
-                                <DatePicker
-                                  blur
-                                  fixedHeight
-                                  showTimeSelect
-                                  selected={date}
-                                  onSelect={(date) => _HandleChangeInput("date",date)}
-                                  onChange={(e) => _HandleChangeInput("date",e)}
-                                  placeholderText="DD/MM/YYYY HH:mm:ss"
-                                  dateFormat="dd/MM/yyyy h:mm:ss aa"
-                                  timeInputLabel={'Time: '}
-                                  placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
-                                  className={`border focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
-                                />
-                              {date && (
-                                <>
-                                  <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => _HandleChangeInput('clear')} />
-                                </>
-                              )}
+                                  <DatePicker
+                                    blur
+                                    fixedHeight
+                                    showTimeSelect
+                                    selected={date}
+                                    onSelect={(date) => _HandleChangeInput("date",date)}
+                                    onChange={(e) => _HandleChangeInput("date",e)}
+                                    placeholderText="DD/MM/YYYY HH:mm:ss"
+                                    dateFormat="dd/MM/yyyy h:mm:ss aa"
+                                    timeInputLabel={'Time: '}
+                                    placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                    className={`border focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                  />
+                                  {date && (
+                                    <>
+                                      <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => _HandleChangeInput('clear')} />
+                                    </>
+                                  )}
                               <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
                             </div>
-                                
                             </div>
                             <div className='col-span-6'>
-                            <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">{dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}<span className="text-red-500">*</span></label>
+                              <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">{dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}<span className="text-red-500">*</span></label>
                                 <input
                                     value={code}                
                                     onChange={_HandleChangeInput.bind(this, "code")}
@@ -1008,10 +1315,10 @@ const _ServerFetching_LisObject =  async  () => {
                                     />
                             </div>
                             <div className='col-span-6'>
-                            <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{"Chi nhánh"} <span className="text-red-500">*</span></label>
+                             <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{props.dataLang?.payment_branch || "payment_branch"} <span className="text-red-500">*</span></label>
                               <Select   
                                   closeMenuOnSelect={true}
-                                  placeholder={"Chi nhánh"}
+                                  placeholder={props.dataLang?.payment_branch || "payment_branch"}
                                   options={dataBranch}
                                   isSearchable={true}
                                   onChange={_HandleChangeInput.bind(this, "branch")}
@@ -1046,13 +1353,13 @@ const _ServerFetching_LisObject =  async  () => {
                                 }}
                                 className={`${errBranch ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `} 
                               />
-                                {errBranch && <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{"Vui lòng chọn chi nhánh"}</label>}
+                                {errBranch && <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{props.dataLang?.payment_errBranch || "payment_errBranch"}</label>}
                             </div>
                             <div className='col-span-6'>
-                            <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{"Phương thức thanh toán"} <span className="text-red-500">*</span></label>
+                              <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{props.dataLang?.payment_method || "payment_method"} <span className="text-red-500">*</span></label>
                               <Select   
                                   closeMenuOnSelect={true}
-                                  placeholder={"Phương thức thanh toán"}
+                                  placeholder={props.dataLang?.payment_method || "payment_method"}
                                   options={dataMethod}
                                   isSearchable={true}
                                   onChange={_HandleChangeInput.bind(this, "method")}
@@ -1087,17 +1394,106 @@ const _ServerFetching_LisObject =  async  () => {
                                 }}
                                 className={`${errMethod ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `} 
                               />
-                                {errMethod && <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{"Vui lòng chọn phương thức thanh toán"}</label>}
+                                {errMethod && <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{props.dataLang?.payment_errMethod || "payment_errMethod"}</label>}
                             </div>
                             <div className='col-span-6'>
-                            <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{"Đối tượng"} <span className="text-red-500">*</span></label>
-                              <Select   
-                                  closeMenuOnSelect={true}
-                                  placeholder={"Đối tượng"}
-                                  options={dataObject}
+                              <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{props.dataLang?.payment_ob || "payment_ob"} <span className="text-red-500">*</span></label>
+                                <Select   
+                                    closeMenuOnSelect={true}
+                                    placeholder={props.dataLang?.payment_ob || "payment_ob"}
+                                    options={dataObject}
+                                    isSearchable={true}
+                                    onChange={_HandleChangeInput.bind(this, "object")}
+                                    value={object}
+                                    LoadingIndicator
+                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                    maxMenuHeight="200px"
+                                    isClearable={true} 
+                                    menuPortalTarget={document.body}
+                                    onMenuOpen={handleMenuOpen}
+                                    theme={(theme) => ({
+                                    ...theme,
+                                    colors: {
+                                        ...theme.colors,
+                                        primary25: '#EBF5FF',
+                                        primary50: '#92BFF7',
+                                        primary: '#0F4F9E',
+                                    },
+                                })}
+                                    styles={{
+                                      placeholder: (base) => ({
+                                      ...base,
+                                      color: "#cbd5e1",
+                                    
+                                      }),
+                                      menuPortal: (base) => ({
+                                          ...base,
+                                          zIndex: 9999,
+                                          position: "absolute", 
+                                        
+                                      }), 
+                                  }}
+                                  className={`${errObject ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `} 
+                                />
+                                {errObject && <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{props.dataLang?.payment_errOb || "payment_errOb"}</label>}
+                            </div>
+                            <div className='col-span-6'>
+                              <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{props.dataLang?.payment_listOb || "payment_listOb"} <span className="text-red-500">*</span></label>
+                              {object?.value == "other" ?
+                                <CreatableSelect  
+                                  options={dataList_Object}
+                                  placeholder={props.dataLang?.payment_listOb || "payment_listOb"}
+                                  onChange={_HandleChangeInput.bind(this, "listObject")}
+                                  isClearable={true}
+                                  value={listObject}
+                                  classNamePrefix="Select"
+                                  className={`${errListObject ? "border-red-500" : "border-transparent" } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `} 
                                   isSearchable={true}
-                                  onChange={_HandleChangeInput.bind(this, "object")}
-                                  value={object}
+                                  noOptionsMessage={() => `Chưa có gợi ý`}
+                                  formatCreateLabel={(value) => `Tạo "${value}"`}
+                                  menuPortalTarget={document.body}
+                                  onMenuOpen={handleMenuOpen}
+                                  style={{ border: "none", boxShadow: "none", outline: "none" }}
+                                  theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                          ...theme.colors,
+                                          primary25: '#EBF5FF',
+                                          primary50: '#92BFF7',
+                                          primary: '#0F4F9E',
+                                      },
+                                  })}
+                                  styles={{
+                                      placeholder: (base) => ({
+                                          ...base,
+                                          color: "#cbd5e1",
+                                      }),
+                                      menuPortal: (base) => ({
+                                          ...base,
+                                          zIndex: 9999,
+                                          position: "absolute",
+                                      }),
+                                      control: (base,state) => ({
+                                          ...base,
+                                          boxShadow: 'none',
+                                          ...(state.isFocused && {
+                                              border: '0 0 0 1px #92BFF7',
+                                          }),
+                                      }),
+                                      dropdownIndicator: base => ({
+                                          ...base,
+                                          display: 'none'
+                                      })                                                                                
+                                  }}
+                                />
+                                  :
+                                  <Select   
+                                  closeMenuOnSelect={true}
+                                  placeholder={props.dataLang?.payment_listOb || "payment_listOb"}
+                                  options={dataList_Object}
+                                  isSearchable={true}
+                                  onChange={_HandleChangeInput.bind(this, "listObject")}
+                                  value={listObject}
                                   LoadingIndicator
                                   noOptionsMessage={() => "Không có dữ liệu"}
                                   maxMenuHeight="200px"
@@ -1126,105 +1522,16 @@ const _ServerFetching_LisObject =  async  () => {
                                       
                                     }), 
                                 }}
-                                className={`${errObject ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `} 
-                              />
-                                {errObject && <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{"Vui lòng nhập đối tượng"}</label>}
-                            </div>
-                            <div className='col-span-6'>
-                            <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{"Danh sách đối tượng"} <span className="text-red-500">*</span></label>
-                            {object?.value == "other" ?
-                              <CreatableSelect  
-                                options={dataList_Object}
-                                placeholder={"Danh sách đối tượng"}
-                                onChange={_HandleChangeInput.bind(this, "listObject")}
-                                isClearable={true}
-                                classNamePrefix="Select"
-                                className={`${errListObject ? "border-red-500" : "border-transparent" } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `} 
-                                // className={`Select__custom removeDivide border-transparent placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`} 
-                                isSearchable={true}
-                                noOptionsMessage={() => `Chưa có gợi ý`}
-                                formatCreateLabel={(value) => `Tạo "${value}"`}
-                                menuPortalTarget={document.body}
-                                onMenuOpen={handleMenuOpen}
-                                style={{ border: "none", boxShadow: "none", outline: "none" }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: '#EBF5FF',
-                                        primary50: '#92BFF7',
-                                        primary: '#0F4F9E',
-                                    },
-                                })}
-                                styles={{
-                                    placeholder: (base) => ({
-                                        ...base,
-                                        color: "#cbd5e1",
-                                    }),
-                                    menuPortal: (base) => ({
-                                        ...base,
-                                        zIndex: 9999,
-                                        position: "absolute",
-                                    }),
-                                    control: (base,state) => ({
-                                        ...base,
-                                        boxShadow: 'none',
-                                        ...(state.isFocused && {
-                                            border: '0 0 0 1px #92BFF7',
-                                        }),
-                                    }),
-                                    dropdownIndicator: base => ({
-                                        ...base,
-                                        display: 'none'
-                                    })                                                                                
-                                }}
-                               />
-                              :
-                              <Select   
-                              closeMenuOnSelect={true}
-                              placeholder={"Danh sách đối tượng"}
-                              options={dataList_Object}
-                              isSearchable={true}
-                              onChange={_HandleChangeInput.bind(this, "listObject")}
-                              value={listObject}
-                              LoadingIndicator
-                              noOptionsMessage={() => "Không có dữ liệu"}
-                              maxMenuHeight="200px"
-                              isClearable={true} 
-                              menuPortalTarget={document.body}
-                              onMenuOpen={handleMenuOpen}
-                              theme={(theme) => ({
-                              ...theme,
-                              colors: {
-                                  ...theme.colors,
-                                  primary25: '#EBF5FF',
-                                  primary50: '#92BFF7',
-                                  primary: '#0F4F9E',
-                              },
-                          })}
-                              styles={{
-                                placeholder: (base) => ({
-                                ...base,
-                                color: "#cbd5e1",
-                              
-                                }),
-                                menuPortal: (base) => ({
-                                    ...base,
-                                    zIndex: 9999,
-                                    position: "absolute", 
-                                  
-                                }), 
-                            }}
-                              className={`${errObject ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `} 
-                              />
-                            }
-                              {errListObject && <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{"Vui lòng chọn danh sách đối tượng"}</label>}
+                                className={`${errListObject ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `} 
+                                />
+                              }
+                              {errListObject && <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{props.dataLang?.payment_errListOb || "payment_errListOb"}</label>}
                             </div>
                             <div className='col-span-6  '>
-                            <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{"Loại chứng từ"}</label>
-                              <Select   
+                             <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}</label>
+                               <Select   
                                   closeMenuOnSelect={true}
-                                  placeholder={"Loại chứng từ"}
+                                  placeholder={props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
                                   options={dataTypeofDoc}
                                   isSearchable={true}
                                   onChange={_HandleChangeInput.bind(this, "typeOfDocument")}
@@ -1261,10 +1568,10 @@ const _ServerFetching_LisObject =  async  () => {
                               />
                             </div>
                             <div className='col-span-6  '>
-                            <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{"Danh sách chứng từ"}</label>
+                             <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{props.dataLang?.payment_listOfDoc || "payment_listOfDoc"}</label>
                               <Select   
                                   closeMenuOnSelect={false}
-                                  placeholder={"Danh sách chứng từ"}
+                                  placeholder={props.dataLang?.payment_listOfDoc || "payment_listOfDoc"}
                                    onInputChange={_HandleSeachApi.bind(this)}
                                   options={dataListTypeofDoc}
                                   isSearchable={true}
@@ -1300,111 +1607,112 @@ const _ServerFetching_LisObject =  async  () => {
                                       
                                     }), 
                                 }}
-                                className={`border-transparent 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `} 
+                                className={`${(errListTypeDoc && typeOfDocument != null && listTypeOfDocument?.length == 0) ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `} 
                               />
+                                {(errListTypeDoc && typeOfDocument != null && listTypeOfDocument?.length == 0) && <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{"Vui lòng chọn danh sách chứng từ"}</label>}
                             </div>
                             <div className='col-span-6'>
-                               <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{"Số tiền"} <span className="text-red-500">*</span></label>
+                               <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"} <span className="text-red-500">*</span></label>
                                 <NumericFormat
                                     value={price}
                                     onChange={_HandleChangeInput.bind(this, "price")}
                                     allowNegative={false}
-                                    placeholder='Số tiền'
+                                    placeholder={props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
                                     decimalScale={0}
                                     isNumericString={true}   
                                     className={`${errPrice ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300" } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`} 
                                     thousandSeparator=","
                                 />
-                                {errPrice && <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{"Vui lòng nhập số tiền"}</label>}
+                                {errPrice && <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{props.dataLang?.payment_errAmount || "payment_errAmount"}</label>}
                             </div>
                             <div className='col-span-6'>
-                              <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">{"Ghi chú"}</label>
+                              <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">{props.dataLang?.payment_note || "payment_note"}</label>
                                 <input
                                     value={note}                
                                     onChange={_HandleChangeInput.bind(this, "note")}
-                                    placeholder={"Ghi chú"}                     
+                                    placeholder={props.dataLang?.payment_note || "payment_note"}                     
                                     type="text"
                                     className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none "
                                     />
                             </div>
-                            <h2 className='font-normal bg-[#ECF0F4] p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12 mt-0.5'>{"Thông tin chi phí"}</h2>  
+                            <h2 className='font-normal bg-[#ECF0F4] p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12 mt-0.5'>{props.dataLang?.payment_costInfo || "payment_costInfo"}</h2>  
                             <div className='col-span-12 max-h-[140px] min-h-[140px] overflow-hidden '>
                                 <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10 min-h-50px max-h-[50px]'>
                                   <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-6    text-center  truncate font-[400] flex items-center gap-1'>
                                     <button  type='button' onClick={_HandleAddNew.bind(this)} title='Thêm' className='transition hover:bg-red-100 hover:animate-pulse	 rounded-full bg-slate-200 flex flex-col justify-center items-center'><Add color='red' size={20} className=''/></button>         
-                                    {"Loại chi phí"}
+                                    {props.dataLang?.payment_costs || "payment_costs"}
                                   </h4>
-                                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-4    text-center  truncate font-[400]'>{"Số tiền"}</h4>
-                                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]'>{"Thao tác"}</h4>
+                                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-4    text-center  truncate font-[400]'>{props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}</h4>
+                                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]'>{props.dataLang?.payment_operation || "payment_operation"}</h4>
                               </div> 
                               <ScrollArea   ref={scrollAreaRef} className="min-h-[100px] max-h-[100px]  overflow-hidden"   speed={1}    smoothScrolling={true}>
                                 {sortedArr.map((e,index) => 
-                                                <div className='grid grid-cols-12 items-center gap-1 py-1 ' key={e?.id}>
-                                                <div className='col-span-6  my-auto '>
-                                                      <Select   
-                                                          closeMenuOnSelect={true}
-                                                          placeholder={"Chi phí"}
-                                                          options={dataListCost}
-                                                          isSearchable={true}
-                                                          onChange={_HandleChangeInputOption.bind(this, e?.id, "chiphi",index)}
-                                                          value={e?.chiphi}
-                                                          menuPlacement='top'
-                                                          LoadingIndicator
-                                                          noOptionsMessage={() => "Không có dữ liệu"}
-                                                          maxMenuHeight="145px"
-                                                          isClearable={true} 
-                                                          menuPortalTarget={document.body}
-                                                          onMenuOpen={handleMenuOpen}
-                                                          theme={(theme) => ({
-                                                          ...theme,
-                                                          colors: {
-                                                              ...theme.colors,
-                                                              primary25: '#EBF5FF',
-                                                              primary50: '#92BFF7',
-                                                              primary: '#0F4F9E',
-                                                          },
-                                                      })}
-                                                          styles={{
-                                                            placeholder: (base) => ({
-                                                            ...base,
-                                                            color: "#cbd5e1",
-                                                          
-                                                            }),
-                                                            menuPortal: (base) => ({
-                                                                ...base,
-                                                                zIndex: 9999,
-                                                                position: "absolute", 
-                                                              
-                                                            }), 
-                                                        }}
-                                                        className={`${errCosts && e?.chiphi === '' ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `} 
-                                                      />
-                                                </div>
-                                            <div className='col-span-4 text-center flex items-center justify-center'>
-                                              <NumericFormat
-                                                    value={e?.sotien}
-                                                    disabled={price == ''}
-                                                    placeholder={price == '' && "Vui lòng nhập số tiền ở trên"}
-                                                    onValueChange={_HandleChangeInputOption.bind(this, e?.id, "sotien",index)}
-                                                    allowNegative={false}
-                                                    decimalScale={0}
-                                                    isNumericString={true}   
-                                                    className={`${errSotien && e?.sotien === '' ? "border-b-red-500" : " border-gray-200"} placeholder:text-[10px] border-b-2 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none `}
-                                                    thousandSeparator=","
-                                                />
-                                            </div>
-                                            <div className='col-span-2 flex items-center justify-center'>
-                                              <button
-                                                onClick={_HandleDelete.bind(this, e?.id)}
-                                                type='button' title='Xóa' className='transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2'><IconDelete /></button>
-                                            </div>
-                                              </div>
+                                    <div className='grid grid-cols-12 items-center gap-1 py-1 ' key={e?.id}>
+                                      <div className='col-span-6  my-auto '>
+                                            <Select   
+                                                closeMenuOnSelect={true}
+                                                placeholder={props.dataLang?.payment_expense || "payment_expense"}
+                                                options={dataListCost}
+                                                isSearchable={true}
+                                                formatOptionLabel={CustomSelectOption}
+                                                onChange={_HandleChangeInputOption.bind(this, e?.id, "chiphi")}
+                                                value={e?.chiphi}
+                                                menuPlacement='top'
+                                                LoadingIndicator
+                                                noOptionsMessage={() => "Không có dữ liệu"}
+                                                maxMenuHeight="145px"
+                                                isClearable={true} 
+                                                menuPortalTarget={document.body}
+                                                onMenuOpen={handleMenuOpen}
+                                                theme={(theme) => ({
+                                                ...theme,
+                                                colors: {
+                                                    ...theme.colors,
+                                                    primary25: '#EBF5FF',
+                                                    primary50: '#92BFF7',
+                                                    primary: '#0F4F9E',
+                                                },
+                                            })}
+                                                styles={{
+                                                  placeholder: (base) => ({
+                                                  ...base,
+                                                  color: "#cbd5e1",
+                                                
+                                                  }),
+                                                  menuPortal: (base) => ({
+                                                      ...base,
+                                                      zIndex: 9999,
+                                                      position: "absolute", 
+                                                    
+                                                  }), 
+                                              }}
+                                              className={`${errCosts && e?.chiphi === '' ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] mb-2 font-normal outline-none border `} 
+                                            />
+                                      </div>
+                                      <div className='col-span-4 text-center flex items-center justify-center'>
+                                        <NumericFormat
+                                              value={e?.sotien}
+                                              disabled={price == ''}
+                                              placeholder={price == '' && props.dataLang?.payment_errAmountAbove || "payment_errAmountAbove"}
+                                              onValueChange={_HandleChangeInputOption.bind(this, e?.id, "sotien")}
+                                              allowNegative={false}
+                                              decimalScale={0}
+                                              isNumericString={true}   
+                                              className={`${errSotien && (e?.sotien === '' || e?.sotien === null) ? "border-b-red-500" : " border-gray-200"} placeholder:text-[10px] border-b-2 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none `}
+                                              thousandSeparator=","
+                                          />
+                                      </div>
+                                      <div className='col-span-2 flex items-center justify-center'>
+                                        <button
+                                          onClick={_HandleDelete.bind(this, e?.id)}
+                                          type='button' title='Xóa' className='transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2'><IconDelete /></button>
+                                      </div>
+                                  </div>
                                  )} 
                                 </ScrollArea>
                             </div>
                         </div>
                     </div>
-                   
                   <div className="text-right mt-1 space-x-2">
                     <button type='button' onClick={_ToggleModal.bind(this,false)} className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
                     >{props.dataLang?.branch_popup_exit}</button>
@@ -1420,79 +1728,167 @@ const _ServerFetching_LisObject =  async  () => {
       </>
     )
 }
-// const Popup_chitiet =(props)=>{
-//       const scrollAreaRef = useRef(null);
-//       const [open, sOpen] = useState(false);
-//       const _ToggleModal = (e) => sOpen(e);
-//       const [tab, sTab] = useState(0)
-//       const _HandleSelectTab = (e) => sTab(e)
-//       const [data,sData] =useState()
-//       const [onFetching, sOnFetching] = useState(false);
-//       useEffect(() => {
-//         props?.id && sOnFetching(true) 
-//       }, [open]);
-//       const _ServerFetching_detailUser = () =>{
-//         Axios("GET", `/api_web/api_supplier/supplier/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-//         if(!err){
-//             var db =  response.data
-//             sData(db)
-//         }
-//         sOnFetching(false)
-//       })
-//       }
-//       useEffect(() => {
-//         onFetching && _ServerFetching_detailUser()
-//       }, [open]);
 
-//   return (
-//     <>
-//      <PopupEdit   
-//         title={props.dataLang?.suppliers_supplier_detail} 
-//         button={props?.name} 
-//         onClickOpen={_ToggleModal.bind(this, true)} 
-//         open={open} onClose={_ToggleModal.bind(this,false)}
-//         classNameBtn={props?.className} 
-//       >
-//       <div className='flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
-//       </div>  
-//               <div className="mt-4 space-x-5 w-[930px] h-auto  ">        
-//                     <ScrollArea ref={scrollAreaRef}
-//                     className="h-[auto] overflow-hidden " 
-//                     speed={1} 
-//                     smoothScrolling={true}>
-//                       {onFetching ?
-//                       <Loading className="h-80"color="#0f4f9e" /> 
-//                       : data !="" &&(
-//                       <div className="flex gap-5 rounded-md ">
-//                         <div className='w-[50%] bg-slate-100/40 rounded-md'>
-//                           <div className='mb-4 h-[50px] flex justify-between items-center p-2'><span className='text-slate-400 text-sm w-[25%]'>{props.dataLang?.suppliers_supplier_code}:</span> <span className='font-normal capitalize'>{data?.code}</span></div>
-//                           <div className='mb-4 flex justify-between flex-wrap p-2'><span className='text-slate-400 text-sm      w-[30%]'>{props.dataLang?.suppliers_supplier_name}:</span> <span className='font-normal capitalize'>{data?.name}</span></div>
-//                           <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm   w-[25%]'>{props.dataLang?.suppliers_supplier_reper}:</span> <span className='font-normal capitalize'>{data?.representative}</span></div>
-//                           <div className='mb-4 flex justify-between  items-center p-2'><span className='text-slate-400 text-sm  w-[25%]'>{props.dataLang?.suppliers_supplier_email}:</span> <span className='font-normal capitalize'>{data?.email}</span></div>
-//                           <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm   w-[25%]'>{props.dataLang?.suppliers_supplier_phone}:</span> <span className='font-normal capitalize'>{data?.phone_number}</span></div>
-//                           <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm   w-[25%]'>{props.dataLang?.suppliers_supplier_taxcode}:</span> <span className='font-normal capitalize'>{data?.tax_code}</span></div>
-//                           <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm   w-[25%]'>{props.dataLang?.suppliers_supplier_adress}:</span> <span className='font-normal capitalize'>{data?.address}</span></div> 
-//                           <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm   w-[25%]'>{props.dataLang?.suppliers_supplier_note}: </span> <span className='font-medium capitalize'>{data?.note}</span></div>
-                         
-//                         </div>
-//                         <div className='w-[50%] bg-slate-100/40'>
-//                           <div className='mb-4 flex justify-between  p-2 items-center flex-wrap'><span className='text-slate-400 text-sm'>{props.dataLang?.client_list_brand}:</span> <span className='flex flex-wrap justify-between gap-1'>{data?.branch?.map(e=>{ return (<span key={e.id}  className='last:ml-0 font-normal capitalize mb-1  w-fit xl:text-base text-xs px-2 text-[#0F4F9E] border border-[#0F4F9E] rounded-[5.5px]'> {e.name}</span>)})}</span></div>
-//                           <div className='mb-4 justify-between  p-2 flex flex-wrap  '><span className='text-slate-400 text-sm '>{"Nhóm nhà cung cấp"}:</span> <span className=' flex flex-wrap  justify-start gap-1'>{data?.supplier_group?.map(h=>{ return (  <span key={h.id} style={{ backgroundColor: "#e2f0fe"}} className={`text-[#0F4F9E] mb-1   w-fit xl:text-base text-xs px-2 rounded-md font-[300] py-0.5`}>{h.name}</span>)})}</span></div>
-                          
-//                           <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.suppliers_supplier_debt}:</span> <span className='font-normal capitalize'>{data?.debt_limit}</span></div>
-//                           {/* <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_date}:</span> <span className='font-normal capitalize'>{moment(data?.date_create).format("DD/MM/YYYY")}</span></div> */}
-//                           <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.suppliers_supplier_city}:</span> <span className='font-normal capitalize'>{data?.city != "" ?(data?.city.type+" "+data?.city.name) :""}</span></div>                        
-//                           <div className='mb-4 flex justify-between p-2 items-center'><span className='text-slate-400 text-sm'>{props.dataLang?.suppliers_supplier_district}: </span><span className='font-normal capitalize'>{data?.district != "" ?(data?.district.type+" "+data?.district.name):""}</span>,<span  className='text-slate-400 text-sm'>{props.dataLang?.suppliers_supplier_wards}:</span><span className='font-normal capitalize'>{data?.ward != "" ? (data?.ward.type+" "+data?.ward.name) :""}</span></div>
-                         
-//                         </div>
-//                       </div>)
-//                       }
-//                     </ScrollArea>
-//         </div>    
-//       </PopupEdit>
-//     </>
-//   )
-// }
+const Popup_chitiet =(props)=>{
+  const scrollAreaRef = useRef(null);
+  const [open, sOpen] = useState(false);
+  const _ToggleModal = (e) => sOpen(e);
+  const [data,sData] =useState()
+  const [onFetching, sOnFetching] = useState(false);
+
+  useEffect(() => {
+    props?.id && sOnFetching(true) 
+  }, [open]);
+
+  const formatNumber = (number) => {
+    if (!number && number !== 0) return 0;
+      const integerPart = Math.floor(number);
+      const decimalPart = number - integerPart;
+      const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
+      const roundedNumber = integerPart + roundedDecimalPart;
+      return roundedNumber.toLocaleString("en");
+  };
+
+  const _ServerFetching_detailOrder = () =>{
+    Axios("GET", `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+    if(!err){
+        var db =  response.data
+        sData(db)
+    }
+    sOnFetching(false)
+  })
+  }
+
+  useEffect(() => {
+    onFetching && _ServerFetching_detailOrder() 
+  }, [open]);
+
+
+return (
+<>
+ <PopupEdit   
+    title={props.dataLang?.payment_detail  || "payment_detail"} 
+    button={props?.name} 
+    onClickOpen={_ToggleModal.bind(this, true)} 
+    open={open} onClose={_ToggleModal.bind(this,false)}
+    classNameBtn={props?.className} 
+  >
+  <div className='flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
+     
+  </div>  
+          <div className=" space-x-5 w-[900px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">        
+          <div>
+           <div className='w-[900px]'>
+             <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+             <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props.dataLang?.import_detail_info || "import_detail_info"}</h2>       
+              <div className='grid grid-cols-9  min-h-[130px] px-2'>
+                  <div className='col-span-3'>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_day_vouchers || "import_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.payment_code || "payment_code"}</h3><h3 className=' text-[13px]  font-normal'>{data?.code}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.payment_TT_method || "payment_TT_method"}</h3><h3 className=' text-[13px]  font-normal'>{data?.payment_mode_name}</h3></div>
+                  </div>
+                    <div className='col-span-3'>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.payment_obType || "payment_obType"}</h3>
+                          <div className='flex flex-wrap  gap-2 items-center justify-start'>
+                            <h3 className=' text-[13px]  font-normal'>{props.dataLang[data?.objects] || data?.objects}</h3>
+                          </div>
+                        </div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.payment_ob || "payment_ob"}</h3>
+                          <div className='flex flex-wrap  gap-2 items-center justify-start'>
+                            <h3 className=' text-[13px]  font-normal'>{data?.object_text}</h3>
+                          </div>
+                        </div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.payment_creator || "payment_creator"}</h3>
+                          <div className='flex flex-wrap  gap-2 items-center justify-start'>
+                                  <img className='h-6 w-6 rounded-full' src={data?.profile_image ? data?.profile_image : '/user-placeholder.jpg'} alt=''></img>
+                                  <h6>{data?.staff_name}</h6>
+                          </div>
+                        </div>
+                    </div>
+                    <div className='col-span-3'>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}</h3>
+                          <div className='flex flex-wrap  gap-2 items-center justify-start'>
+                            <h3 className=' text-[13px]  font-normal'>{props.dataLang[data?.type_vouchers] || data?.type_vouchers}</h3>
+                          </div>
+                        </div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.payment_voucherCode || "payment_voucherCode"}</h3>
+                          <div className='flex flex-wrap  gap-2 items-center justify-start'>
+                            {data?.voucher?.map((code, index) => (
+                                  <React.Fragment key={code?.id}>
+                                    {code.code}
+                                    {index !== data?.voucher.length - 1 && ', '}
+                                  </React.Fragment>
+                            ))}
+                          </div>
+                        </div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{"Chi nhánh"}</h3>
+                          <div className='flex flex-wrap  gap-2 items-center justify-start'>
+                             <h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3>
+                          </div>
+                        </div>
+                    </div>
+                  
+              </div>
+              <div className="pr-2 w-[100%] lx:w-[110%] ">
+                <div className={`grid-cols-3 grid sticky top-0 bg-white shadow-lg  z-10`}>
+                  <h4 className="text-[13px] col-span-2 px-2 text-[#667085] uppercase  font-[400] text-left">{props.dataLang?.payment_costs || "payment_costs"}</h4>
+                  <h4 className="text-[13px] col-span-1 px-1 text-[#667085] uppercase font-[400] text-center">{props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}</h4>
+                </div>
+                {onFetching ?
+                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                  : 
+                  data?.detail?.length > 0 ? 
+                  (<>
+                       <ScrollArea     
+                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+                    <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">                       
+                      {(data?.detail?.map((e) => 
+                        <div className="grid grid-cols-3 hover:bg-slate-50 items-center border-b" key={e.id?.toString()}>
+                          <h6 className="text-[13px] col-span-2  pl-2 py-2  text-left break-words">{e?.costs_name}</h6>                
+                          <h6 className="text-[13px] col-span-1 pl-2 py-2  text-center">{formatNumber(e?.total)}</h6>                
+                        </div>
+                      ))}              
+                    </div>   
+                      </ScrollArea>                       
+                    </>
+                  )  : 
+                  (
+                    <div className=" max-w-[352px] mt-24 mx-auto" >
+                      <div className="text-center">
+                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">{props.dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
+                        <div className="flex items-center justify-around mt-6 "></div>
+                      </div>
+                    </div>
+                  )}    
+              </div>
+             <h2 className='font-normal p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
+                <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+                  <div className='col-span-7'>
+                      <h3 className='text-[13px]'>{props.dataLang?.import_from_note || "import_from_note"}</h3>
+                    <textarea 
+                    className="focus:border-[#92BFF7] resize-none border-[#d0d5dd] placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 border outline-none "
+                    disabled value={data?.note}/>
+                  </div>
+                  <div className='col-span-2 space-y-1 text-right'>
+                        <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_total_amount || "import_detail_total_amount"}</h3></div>
+                  </div>
+                  <div className='col-span-3 space-y-1 text-right'>
+                        <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total)}</h3></div>
+                  </div>
+              </div>   
+            </div>
+          </div>
+    
+     </div>
+  
+    </div>    
+  </PopupEdit>
+</>
+)
+}
+
+
 const MoreSelectedBadge = ({ items }) => {
   const style = {
       marginLeft: "auto",
