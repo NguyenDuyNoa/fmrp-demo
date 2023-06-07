@@ -1693,7 +1693,7 @@ const Popup_dspc = (props) => {
                                         <NumericFormat
                                               value={e?.sotien}
                                               disabled={price == ''}
-                                              placeholder={price == '' && props.dataLang?.payment_errAmountAbove || "payment_errAmountAbove"}
+                                              placeholder={price == '' && (props.dataLang?.payment_errAmountAbove || "payment_errAmountAbove")}
                                               onValueChange={_HandleChangeInputOption.bind(this, e?.id, "sotien")}
                                               allowNegative={false}
                                               decimalScale={0}
