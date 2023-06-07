@@ -424,6 +424,7 @@ const Index = (props) => {
         onFetching && _ServerFetching() 
       }, [onFetching]);
       useEffect(()=>{
+     
         onFetchingPurcher && _ServerFetching_Purcher() 
       },[onFetchingPurcher])
       
@@ -432,6 +433,10 @@ const Index = (props) => {
           router.query && sOnFetching(true) 
           router.query && sOnFetchingItemsAll(true) 
       }, [router.query]);
+
+      useEffect(() => {
+        idBranch != null && sOnFetchingItemsAll(true)
+      }, [idBranch]);
 
       useEffect(() => {
         idBranch != null && sOnFetchingPurcher(true)

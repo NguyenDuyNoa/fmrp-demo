@@ -1867,7 +1867,7 @@ return (
                   <div className='col-span-7'>
                       <h3 className='text-[13px]'>{props.dataLang?.import_from_note || "import_from_note"}</h3>
                     <textarea 
-                    className="focus:border-[#92BFF7] resize-none border-[#d0d5dd] placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 border outline-none "
+                    className=" resize-none  placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1  outline-none "
                     disabled value={data?.note}/>
                   </div>
                   <div className='col-span-2 space-y-1 text-right'>
