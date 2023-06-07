@@ -370,7 +370,17 @@ const _ServerFetching =  () => {
               child: [{
                 kho: null,
                 disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-                serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note
+                serial: '',
+                 lot: '',
+                  date: null,
+                   donViTinh: e?.e?.unit_name,
+                    amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price,
+                     chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent,
+                      priceAfter: Number(e?.e?.price_after_discount), 
+                      tax: thuetong ? thuetong : {label: e?.e?.tax_name, 
+                        value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate},
+                         thanhTien: Number(e?.e?.amount),
+                          note: e?.e?.note
               }]
             }))
             sListData(newData?.sort((a, b) => b.time - a.time));
@@ -756,13 +766,36 @@ const _ServerFetching =  () => {
     //new
       sMathangAll(allItems?.map(e => ({
         id: uuidv4(), matHang: e,
-        child: [{id: uuidv4(),
+        child: [{
+          id: uuidv4(),
           disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-          kho: khotong ? khotong : null, serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
+          kho: khotong ? khotong : null, 
+          serial: '', 
+          lot: '',
+           date: null,
+            donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, 
+            chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent,
+             priceAfter: Number(e?.e?.price_after_discount),
+              tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, 
+              thanhTien: Number(e?.e?.amount),
+               note: e?.e?.note
+              }]})))
       sListData(allItems?.map(e => ({id: uuidv4(), matHang: e,
-          child: [{id: uuidv4(),
+          child: [{
+            id: uuidv4(),
             disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-            kho: khotong ? khotong : null, serial: '', lot: '', date: null, donViTinh: e?.e?.unit_name, amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price, chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, priceAfter: Number(e?.e?.price_after_discount), tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhTien: Number(e?.e?.amount), note: e?.e?.note}]})))
+            kho: khotong ? khotong : null, 
+            serial: '', 
+            lot: '', 
+            date: null, 
+            donViTinh: e?.e?.unit_name, 
+            amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price,
+             chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent, 
+             priceAfter: Number(e?.e?.price_after_discount),
+              tax: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, 
+              thanhTien: Number(e?.e?.amount), 
+              note: e?.e?.note
+            }]})))
   };
 
   const _HandleDeleteAll = () => {
@@ -1007,7 +1040,19 @@ const _ServerFetching =  () => {
           id: uuidv4(), 
           disabledDate: (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
           kho: khotong ? khotong : null, 
-          serial: '', lot: '', date: null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] 
+          serial: '', 
+          lot: '',
+           date: null,
+            donViTinh: value?.e?.unit_name, 
+            price: value?.e?.price,
+             amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent),
+              priceAfter: Number(value?.e?.price_after_discount), 
+              tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
+               value: value?.e?.tax_id, 
+               tax_rate: value?.e?.tax_rate},
+                thanhTien: Number(value?.e?.amount), 
+                note: value?.e?.note
+              }] 
       }
       sListData([newData,...listData]);
     }else{

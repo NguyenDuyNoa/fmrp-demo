@@ -84,7 +84,6 @@ const Index = (props) => {
     }, (err, response) => {
       if (!err) {
         var rResult = response.data;
-        console.log(rResult)
 
         const itemlast = [{ mathang: null }];
         const items = itemlast?.concat(rResult?.items?.map(e => ({
@@ -521,26 +520,22 @@ const Index = (props) => {
 
   const tinhTongTien = (option) => {
     const tongTien = option.slice(1).reduce((acc, item) => {
-      const tongTien = acc + item?.dongia * item?.soluong
-      console.log('tongTien', tongTien);
+      const tongTien = item?.dongia * item?.soluong
       return acc + tongTien
     }, 0);
 
     const tienChietKhau = option.slice(1).reduce((acc, item) => {
       const tienChietKhau = item?.dongia * (item?.chietkhau / 100) * item?.soluong;
-      console.log('tienChietKhau', tienChietKhau);
       return acc + tienChietKhau;
     }, 0);
 
     const tongTienSauCK = option.slice(1).reduce((acc, item) => {
       const tienSauCK = item?.soluong * item?.dongiasauck;
-      console.log('tienSauCK', tienSauCK);
       return acc + tienSauCK;
     }, 0);
 
     const tienThue = option.slice(1).reduce((acc, item) => {
       const tienThueItem = item?.dongiasauck * (isNaN(item?.thue?.tax_rate) ? 0 : (item?.thue?.tax_rate / 100)) * item?.soluong;
-      console.log('tienThueItem', tienThueItem);
       return acc + tienThueItem;
     }, 0);
 
