@@ -505,7 +505,7 @@ const Index = (props) => {
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center text-[#0F4F9E]"><Popup_chitiet dataLang={dataLang} className="text-center" name={e?.code} id={e?.id}/></h6>
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left ">{dataLang[e?.objects] || e?.objects}</h6>
-                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left text-[#0F4F9E]"><Popup_chitiet dataLang={dataLang} className="text-center" name={e?.object_text} id={e?.id}/></h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left text-[#0F4F9E]"><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.object_text} id={e?.id}/></h6>
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center">{dataLang[e?.type_vouchers] || e?.type_vouchers}</h6>
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center">
                                 {e?.voucher_code?.map((code, index) => (
