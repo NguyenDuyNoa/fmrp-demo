@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import moment from 'moment';
+import { upperCase } from 'lodash';
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
-const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
+const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
     const [url, setUrl] = useState(null)
 
-    const uppercaseText = (text, alignment) => {
-        return { text: text.toUpperCase(), style: 'headerTable', alignment: alignment };
+    // uppercase text header table
+    const uppercaseText = (text, style, alignment) => {
+        return { text: text.toUpperCase(), style: style, alignment: alignment };
     };
 
+    // format numberdocDefinitionPriceQuote
     const formatNumber = (number) => {
         if (!number && number !== 0) return 0;
         const integerPart = Math.floor(number)
@@ -21,7 +24,7 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
     const currentDate = moment().format('[Ngày] DD [Tháng] MM [Năm] YYYY');
 
     // In hoa chữ cái đầu 
-    const words = dataPriceQuote?.total_amount_word?.split(' ');
+    const words = data?.total_amount_word?.split(' ');
     const capitalizedWords = words?.map(word => {
         if (word.length > 0) {
             return word?.charAt(0)?.toUpperCase() + word?.slice(1);
@@ -32,10 +35,10 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
 
     const docDefinition = {
         info: {
-            title: `Báo Giá - ${dataPriceQuote?.reference_no}`,
+            title: `${props?.type === 'price_quote' && `Báo Giá - ${data?.reference_no}` || props?.type === 'sales_product' && `Đơn Hàng Bán - ${data?.code}`}`,
             author: 'Foso',
             subject: 'Quotation',
-            keywords: 'BBG',
+            keywords: 'PDF',
         },
         pageOrientation: 'portrait',
         content: [
@@ -94,22 +97,47 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
             {
                 stack: [
                     {
-                        text: props?.type === 'price_quote' ? 'BẢNG BÁO GIÁ' : '', style: 'contentTitle'
+                        text:
+                            props?.type === 'price_quote' && uppercaseText('bảng báo giá', 'contentTitle')
+                            ||
+                            props?.type === 'sales_product' && uppercaseText('đơn hàng bán', 'contentTitle')
                     },
-                    { text: props?.type === 'price_quote' ? `${moment(dataPriceQuote?.date).format("DD/MM/YYYY HH:mm:ss")}` : '', style: 'contentDate' },
+                    {
+                        text:
+                            props?.type === 'price_quote' && `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`
+                            ||
+                            props?.type === 'sales_product' && `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`,
+                        style: 'contentDate'
+                    },
                 ],
+                margin: [0, 8, 0, 0]
             },
             {
                 text: [
-                    { text: 'Số báo giá: ', inline: true, fontSize: 10 },
-                    { text: `${dataPriceQuote?.reference_no}`, bold: true, fontSize: 10 },
+                    {
+                        text:
+                            props?.type === 'price_quote' && 'Số báo giá: '
+                            ||
+                            props?.type === 'sales_product' && 'Số đơn hàng: ',
+                        inline: true,
+                        fontSize: 10
+                    },
+                    {
+                        text:
+                            props?.type === 'price_quote' && `${data?.reference_no}`
+                            ||
+                            props?.type === 'sales_product' && `${data?.code}`
+                        ,
+                        bold: true,
+                        fontSize: 10
+                    },
                 ],
                 margin: [0, 10, 0, 2]
             },
             {
                 text: [
                     { text: 'Khách hàng: ', inline: true, fontSize: 10 },
-                    { text: `${dataPriceQuote?.client_name}`, bold: true, fontSize: 10 },
+                    { text: `${data?.client_name}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 2]
             },
@@ -123,31 +151,31 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
             {
                 text: [
                     { text: 'Ghi chú: ', inline: true, fontSize: 10 },
-                    { text: `${dataPriceQuote?.note}`, bold: true, fontSize: 10 },
+                    { text: `${data?.note}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 10]
             },
             {
                 table: {
                     widths: "100%",
-                    headerRows: 1,
+                    headerRows: 0,
                     widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
                     body: [
                         // Header row
                         [
-                            uppercaseText('STT', 'center'),
-                            uppercaseText('MẶT HÀNG', 'left'),
-                            uppercaseText('ĐVT', 'center'),
-                            uppercaseText('SL', 'center'),
-                            uppercaseText('Đơn giá', 'center'),
-                            uppercaseText('% CK', 'center'),
-                            uppercaseText('ĐG sau CK', 'center'),
-                            uppercaseText('Tổng cộng', 'center'),
-                            uppercaseText('Ghi chú', 'center')
+                            uppercaseText('STT', 'headerTable', 'center'),
+                            uppercaseText('MẶT HÀNG', 'headerTable', 'left'),
+                            uppercaseText('ĐVT', 'headerTable', 'center'),
+                            uppercaseText('SL', 'headerTable', 'center'),
+                            uppercaseText('Đơn giá', 'headerTable', 'center'),
+                            uppercaseText('% CK', 'headerTable', 'center'),
+                            uppercaseText('ĐG sau CK', 'headerTable', 'center'),
+                            uppercaseText('Tổng cộng', 'headerTable', 'center'),
+                            uppercaseText('Ghi chú', 'headerTable', 'center')
 
                         ],
                         // Data rows
-                        ...dataPriceQuote && dataPriceQuote?.items.length > 0 ? dataPriceQuote?.items.map((item, index) => {
+                        ...data && data?.items.length > 0 ? data?.items.map((item, index) => {
                             return [
                                 { text: `${index + 1}`, alignment: 'center', fontSize: 10 },
                                 { text: item?.item?.name && item?.item?.code ? `${item?.item?.name} (${item?.item?.code})` : '', fontSize: 10 },
@@ -160,10 +188,10 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
                                 { text: item?.note ? `${item?.note}` : '', fontSize: 10 },
                             ];
                         }) : '',
-                        [{ text: 'Tổng cộng', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(dataPriceQuote?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
-                        [{ text: 'Tiền thuế', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(dataPriceQuote?.total_tax_price)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
-                        [{ text: 'Thành tiền', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(dataPriceQuote?.total_amount)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
-                    ]
+                        [{ text: 'Tổng cộng', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(data?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
+                        [{ text: 'Tiền thuế', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(data?.total_tax_price)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
+                        [{ text: 'Thành tiền', bold: true, colSpan: 2, fontSize: 10 }, '', { text: `${formatNumber(data?.total_amount)}`, bold: true, alignment: 'right', colSpan: 7, fontSize: 10 }, '', '', '', '', '', ''],
+                    ],
                 }
             },
             {
@@ -235,7 +263,7 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
                 bold: true,
                 fontSize: 20,
                 alignment: 'center',
-                margin: [0, 10, 0, 2]
+                margin: [0, 10, 0, 2],
             },
             contentDate: {
                 italics: true,
@@ -269,23 +297,19 @@ const FilePDF = ({ props, dataCompany, dataPriceQuote, setOpenAction }) => {
     };
 
     const handlePrintPdf = () => {
-        if (dataPriceQuote !== undefined && dataCompany !== undefined) {
+        if (data !== undefined && dataCompany !== undefined) {
             const pdfGenerator = pdfMake.createPdf(docDefinition);
             pdfGenerator.open((blob) => {
                 const url = URL.createObjectURL(blob);
                 setUrl(url)
             })
-
-
-
-
             setOpenAction(false)
         }
     }
-    console.log('check : ', dataPriceQuote)
+
     return (
         <>
-            <button onClick={handlePrintPdf} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
+            <button onClick={handlePrintPdf} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer 2xl:px-5 2xl:py-2.5 px-5 py-1.5 rounded w-full'>
                 {props?.dataLang?.btn_table_print || "btn_table_print"}
             </button>
         </>
