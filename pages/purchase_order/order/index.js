@@ -34,6 +34,7 @@ import Swal from "sweetalert2";
 
 import ReactExport from "react-data-export";
 import { useEffect } from 'react';
+import { data } from 'autoprefixer';
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -605,12 +606,12 @@ const Index = (props) => {
                                     }
                                 </h6> */}
                                 <h6 className='px-2 py-2.5  col-span-1 flex items-center justify-center text-center '>
-                                    {e?.import_status  === "not_stocked" && <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200'>{dataLang[e?.import_status]}</span>||
+                                    {e?.import_status  === "not_stocked" && <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200'>{dataLang[e?.import_status]} </span>||
                                      e?.import_status  === "stocked_part" &&  <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200'>{dataLang[e?.import_status]}</span> ||
                                      e?.import_status  === "stocked" &&   <span className='flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200'><TickCircle className='bg-lime-500 rounded-full ' color='white' size={15}/>{dataLang[e?.import_status]}</span>
                                     }
                                 </h6>
-                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left'>{e.note}</h6>
+                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left truncate '>{e.note}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1'><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6> 
                                 <div className='col-span-1 flex justify-center'>
                                     <BtnTacVu onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} status={e?.import_status} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
@@ -718,20 +719,7 @@ const Popup_chitiet =(props)=>{
   }, [open]);
 
   
-  const scrollableDiv = document.querySelector('.customsroll');
-  scrollableDiv?.addEventListener('wheel', (event) => {
-    const deltaY = event.deltaY;
-    const top = scrollableDiv.scrollTop;
-    const height = scrollableDiv.scrollHeight;
-    const offset = scrollableDiv.offsetHeight;
-    const isScrolledToTop = top === 0;
-    const isScrolledToBottom = top === height - offset;
   
-    if ((deltaY < 0 && isScrolledToTop) || (deltaY > 0 && isScrolledToBottom)) {
-      event.preventDefault();
-    }
-  });
- 
 return (
 <>
  <PopupEdit   
@@ -763,9 +751,9 @@ return (
                   <div className='col-span-2 mx-auto'>
                       <div className='my-4 font-medium text-[13px]'>{"Trạng thái nhập hàng"}</div>
                       <div className='flex flex-wrap  gap-2 items-center justify-start'>
-                        {data?.import_status  === "not_stocked" && <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200'>{props.dataLang[data?.import_status]}</span>||
-                        data?.import_status  === "stocked_part" &&  <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200'>{props.dataLang[data?.import_status]}</span> ||
-                        data?.import_status  === "stocked" &&   <span className='flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200'><TickCircle className='bg-lime-500 rounded-full ' color='white' size={15}/>{props.dataLang[data?.import_status]}</span>
+                        {data?.import_status  === "not_stocked" && <span className='flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200'>{props.dataLang[data?.import_status]}</span>||
+                        data?.import_status  === "stocked_part" &&  <span className='flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200'>{props.dataLang[data?.import_status]}</span> ||
+                        data?.import_status  === "stocked" &&   <span className='flex justify-center 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200'><TickCircle className='bg-lime-500 rounded-full ' color='white' size={15}/>{props.dataLang[data?.import_status]}</span>
                         }
                       </div>
                       <div className='my-4 font-medium text-[13px]'>{props.dataLang?.purchase_order_table_number || "purchase_order_table_number"}</div>
@@ -826,7 +814,7 @@ return (
                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center ">{formatNumber(e?.tax_rate) + "%"}</h6>                
                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-right mr-3.5">{formatNumber(e?.amount)}</h6>                
                                          
-                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left ml-3.5">{e?.note != undefined ? e?.note : ""}</h6>                
+                          <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left ml-3.5 ">{e?.note != undefined ? e?.note : ""}</h6>                
                         </div>
                       ))}              
                     </div>   
@@ -850,7 +838,7 @@ return (
               <div className='col-span-7'>
                     <h3 className='text-[13px] p-1'>{props.dataLang?.purchase_order_note || "purchase_order_note"}</h3>
                     <textarea 
-                    className="resize-none placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
+                    className="resize-none scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
                     disabled value={data?.note}/>
                 </div>
              <div className='col-span-2 space-y-2'>
@@ -881,11 +869,34 @@ return (
 
 
 const BtnTacVu = React.memo((props) => {
-    const [openTacvu, sOpenTacvu] = useState(false);
-    const _ToggleModal = (e) => sOpenTacvu(e);
+  const [openTacvu, sOpenTacvu] = useState(false);
+  const _ToggleModal = (e) => sOpenTacvu(e);
 
-    const [openDetail, sOpenDetail] = useState(false);
-    const router = useRouter()
+  const [open, sOpen] = useState(false);
+  const [openEdit, sOpenEdit] = useState(false);
+  const [onFetching, sOnFetching] = useState(false);
+  const [data, sData] = useState({})
+    
+
+    const _ServerFetching_ValidatePayment =  () =>{
+      Axios("GET", `/api_web/Api_purchase_order/paymentStatus/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+      if(!err){
+          var db =  response.data
+          sData(db)
+      }
+      sOnFetching(false)
+    })
+    }
+
+    useEffect(() => {
+      onFetching && _ServerFetching_ValidatePayment()
+    },[onFetching])
+
+    useEffect(() => {
+      props?.id && sOnFetching(true)
+    },[props?.id])
+
+    
 
     const _HandleDelete = (id) => {
         Swal.fire({
@@ -918,18 +929,21 @@ const BtnTacVu = React.memo((props) => {
             })     
         }
         })
-    }
-      const handleClick = () => {
-        if(props?.status != "not_stocked"){
-          Toast.fire({
-            icon: 'error',
-            title: `${"Đơn đặt hàng đã có phiếu Nhập. Không thể sửa"}`
-          })  
-        } 
-          else {
-            router.push(`/purchase_order/order/form?id=${props.id}`);
-          }
-        };
+      }
+    //   console.log("data",data);
+
+    //   const handleClick = () => {
+    //     if(props?.status != "not_stocked" || data?.status_pay != "not_spent"){
+    //       Toast.fire({
+    //         icon: 'error',
+    //         title: `${props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa" || data?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit")}`
+    //       })  
+    //       sStatus(true)
+    //     } 
+    //       else {
+    //         router.push(`/purchase_order/order/form?id=${props.id}`);
+    //       }
+    //     };
     return(
         <div>
             <Popup
@@ -942,13 +956,17 @@ const BtnTacVu = React.memo((props) => {
                 nested
                 onOpen={_ToggleModal.bind(this, true)}
                 onClose={_ToggleModal.bind(this, false)}
+                open={open || openEdit}
             >
                 <div className="w-auto rounded">
                     <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                        <button
-                         onClick={handleClick}
-                         className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</button>
-                        <button onClick={_HandleDelete.bind(this, props.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</button>
+                        {/* <button
+                          onClick={handleClick}
+                          className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                         >{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</button>
+                        <button onClick={_HandleDelete.bind(this, props.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</button> */}
+                      <Popup_TableValidateEdit status={props?.status} data={data} setOpen={sOpenEdit} isOpen={openEdit} dataLang={props?.dataLang} id={props?.id} className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"/>
+                      <Popup_TableValidateDelete onRefresh={props?.onRefresh} setOpen={sOpen} data={data}  isOpen={open} dataLang={props?.dataLang} id={props?.id} className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"/>
                     </div>
                 </div>
             </Popup>
@@ -956,34 +974,201 @@ const BtnTacVu = React.memo((props) => {
     )
 })
 
-// const BtnTacVu = React.memo((props) => {
-//     return(
-//         <div>
-//             <Popup
-//                 trigger={
-//                     <button className={`flex space-x-1 items-center ` + props.className } >
-//                         <span>Tác vụ</span>
-//                         <IconDown size={15} />
-//                     </button>
-//                 }
-//                 closeOnDocumentClick
-//                 arrow={false}
-//                 position="bottom right"
-//                 className={`dropdown-edit `}
-//             >
-//                 <div className="w-auto">
-//                     <div className="bg-white p-0.5 rounded-t w-52">
-//                         <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Export Excel</button>
-//                         <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Import Excel</button>
-//                         <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Import BOM</button>
-//                         <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Import công đoạn</button>
-//                         <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Thống kê và tìm kiếm</button>
-//                         <button className='text-sm hover:bg-slate-100 text-left w-full px-5 rounded py-2.5'>Xóa</button>
-//                     </div>
-//                 </div>
-//             </Popup>
-//         </div>
-//     )
-// })
+const Popup_TableValidateEdit =(props)=>{
+  const router = useRouter()
+  const [onFetching, sOnFetching] = useState(false);
+  const _ToggleModal = (e) => props.setOpen(e);
+  useEffect(()=>{
+    props.isOpen && handleClick()
+  },[props.isOpen])
+   const handleClick = () => {
+    if(props?.status != "not_stocked" || props?.data?.status_pay != "not_spent"){
+        Toast.fire({
+          icon: 'error',
+          title: `${props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa" || props?.data?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit")}`
+        })  
+      } 
+        else {
+          router.push(`/purchase_order/order/form?id=${props.id}`);
+        }
+      };
+  
+return (
+<>
+ <PopupEdit   
+    title={"Danh sách phiếu đã được chi"} 
+    button={"Sửa phiếu"} 
+    onClickOpen={_ToggleModal.bind(this, true)} 
+    open={props.isOpen && props.data?.payment_code?.length > 0}  
+    onClose={_ToggleModal.bind(this,false)}
+    classNameBtn={props?.className} 
+  >
+  <div className='flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
+  </div>  
+          <div className=" space-x-5 w-[400px]  h-500px ">        
+          <div>
+           <div className='w-[400px]'>
+             <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+             <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
+              <div className="w-[100%] lx:w-[110%] ">
+                <div className="grid grid-cols-12 sticky top-0 bg-slate-100  z-10">
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{"#"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-10 font-[400] text-center">{"Mã phiếu chi"}</h4>
+                </div>
+                {onFetching ?
+                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                  : 
+                  props.data?.payment_code?.length > 0 ? 
+                  (<>
+                       <ScrollArea     
+                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+                    <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">                       
+                      {(props.data?.payment_code?.map((e,index) => 
+                        <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id?.toString()}>
+                          <h6 className="text-[13px] px-2  py-0.5 col-span-2  rounded-md text-center ">{index + 1}</h6>                
+                          <h6 className="text-[13px]   py-0.5 col-span-10 rounded-md text-center ">{e}</h6>                
+                        </div>
+                      ))}              
+                    </div>   
+                      </ScrollArea>                       
+                    </>
+                  )  : 
+                  (
+                    <div className=" max-w-[352px] mt-24 mx-auto" >
+                      <div className="text-center">
+                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">{props.dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
+                        <div className="flex items-center justify-around mt-6 ">
+                            {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+                        </div>
+                      </div>
+                    </div>
+                  )}    
+              </div>
+             
+            </div>
+          </div>
+    
+     </div>
+  
+    </div>    
+  </PopupEdit>
+</>
+)
+}
+const Popup_TableValidateDelete =(props)=>{
+
+  const _ToggleModal = (e) => props.setOpen(e);
+  const [data,sData] =useState({})
+  const [onFetching, sOnFetching] = useState(false);
+  const [toggle, sToggle] = useState(false);
+  useEffect(()=>{
+    props.isOpen && _HandleDelete()
+  },[props.isOpen, props?.id])
+  const _HandleDelete = () => {
+    Swal.fire({
+        title: `${props.dataLang?.aler_ask}`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#296dc1',
+        cancelButtonColor: '#d33',
+        confirmButtonText: `${props.dataLang?.aler_yes}`,
+        cancelButtonText:`${props.dataLang?.aler_cancel}`
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Axios("DELETE", `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`, {
+        }, (err, response) => {
+          if(!err){
+            var {isSuccess, message} = response.data;
+            if(isSuccess){
+              Toast.fire({
+                icon: 'success',
+                title: props.dataLang[message]
+              })
+              sToggle(false)   
+              props.onRefresh && props.onRefresh()
+            }else{
+                Toast.fire({
+                    icon: 'error',
+                    title: props.dataLang[message]
+                }) 
+                sToggle(true)     
+            }
+          }
+        })     
+    }
+    })
+  }
+ 
+  
+ 
+
+  
+return (
+<>
+ <PopupEdit   
+    title={"Danh sách phiếu đã được chi"} 
+    button={"Xóa phiếu"} 
+    onClickOpen={_ToggleModal.bind(this, true)} 
+    open={toggle && (props.isOpen && props.data?.payment_code?.length > 0)}  
+     onClose={_ToggleModal.bind(this,false)}
+    classNameBtn={props?.className} 
+  >
+  <div className='flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
+     
+  </div>  
+  <div className=" space-x-5 w-[400px]  h-500px ">        
+          <div>
+           <div className='w-[400px]'>
+             <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+             <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
+              <div className="w-[100%] lx:w-[110%] ">
+                <div className="grid grid-cols-12 sticky top-0 bg-slate-100  z-10">
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{"#"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-10 font-[400] text-center">{"Mã phiếu chi"}</h4>
+                </div>
+                {onFetching ?
+                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                  : 
+                  props.data?.payment_code?.length > 0 ? 
+                  (<>
+                       <ScrollArea     
+                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+                    <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">                       
+                      {(props.data?.payment_code?.map((e,index) => 
+                        <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id?.toString()}>
+                          <h6 className="text-[13px] px-2  py-0.5 col-span-2  rounded-md text-center ">{index + 1}</h6>                
+                          <h6 className="text-[13px]   py-0.5 col-span-10 rounded-md text-center ">{e}</h6>                
+                        </div>
+                      ))}              
+                    </div>   
+                      </ScrollArea>                       
+                    </>
+                  )  : 
+                  (
+                    <div className=" max-w-[352px] mt-24 mx-auto" >
+                      <div className="text-center">
+                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">{props.dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
+                        <div className="flex items-center justify-around mt-6 ">
+                            {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+                        </div>
+                      </div>
+                    </div>
+                  )}    
+              </div>
+             
+            </div>
+          </div>
+    
+     </div>
+  
+    </div>   
+  </PopupEdit>
+</>
+)
+}
+
+
 
 export default Index;

@@ -176,10 +176,9 @@ const Index = (props) => {
             sIdSupplier(value)
         }else if(type === "staff"){
             sIdStaff(value)
-        }else if(type === "delivery_date"){
-            sDelivery_date(moment(value.target.value).format('YYYY-MM-DD'))
-        }else if(type === "delivery_dateNew"){
-          console.log(value);
+        // }else if(type === "delivery_date"){
+        //     sDelivery_date(moment(value.target.value).format('YYYY-MM-DD'))
+       }else if(type === "delivery_dateNew"){
           sDelivery_dateNew(value)
         }else if(type === "purchases"){
             if(option?.length > 1){
@@ -434,6 +433,7 @@ const Index = (props) => {
           router.query && sOnFetchingItemsAll(true) 
       }, [router.query]);
 
+      ///Đang lỗi
       useEffect(() => {
         idBranch && sOnFetchingItemsAll(true)
       }, [idBranch]);
@@ -453,12 +453,11 @@ const Index = (props) => {
       const _HandleSubmit = (e) => {
         e.preventDefault();
          if(loai == "0"){
-          if(selectedDate == null || idSupplier == null || idStaff == null || delivery_date == null || idBranch == null){
-            selectedDate == null && sErrDate(true)
+          if( idSupplier == null || idStaff == null  || idBranch == null){
             idSupplier == null && sErrSupplier(true)
             idStaff == null && sErrStaff(true)
             idBranch == null && sErrBranch(true)
-            delivery_date == null && sErrDateDelivery(true)
+             && sErrDateDelivery(true)
            
               Toast.fire({
                   icon: 'error',

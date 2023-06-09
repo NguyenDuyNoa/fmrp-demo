@@ -17,8 +17,9 @@ import { BsCalendarEvent } from 'react-icons/bs';
 import 'react-datepicker/dist/react-datepicker.css';
 import Datepicker from 'react-tailwindcss-datepicker'
 import DatePicker,{registerLocale } from "react-datepicker";
+import ModalImage from "react-modal-image";
 
-import { Edit as IconEdit,  Grid6 as IconExcel,  ArrowDown2 as IconDown, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User, ArrowCircleDown, Add  } from "iconsax-react";
+import { Edit as IconEdit,  Grid6 as IconExcel,  ArrowDown2 as IconDown,TickCircle, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User, ArrowCircleDown, Add  } from "iconsax-react";
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
 import Pagination from '/components/UI/pagination';
@@ -29,7 +30,7 @@ import Popup from 'reactjs-popup';
 import { data } from 'autoprefixer';
 import { useDispatch } from 'react-redux';
 import CreatableSelect from 'react-select/creatable';
-import { NULL, TRUE } from 'sass';
+import Popup_chitietThere from '../detailThere';
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet
@@ -313,7 +314,7 @@ const Index = (props) => {
                                   placeholder={dataLang?.client_list_filterbrand} 
                                   hideSelectedOptions={false}
                                   isClearable={true}
-                                  className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
+                                  className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full  2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20 " 
                                   isSearchable={true}
                                   noOptionsMessage={() => "Không có dữ liệu"}
                                   closeMenuOnSelect={true}
@@ -352,7 +353,7 @@ const Index = (props) => {
                                   placeholder={"Phương thức TT"} 
                                   hideSelectedOptions={false}
                                   isClearable={true}
-                                  className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
+                                  className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full  2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20 " 
                                   isSearchable={true}
                                   noOptionsMessage={() => "Không có dữ liệu"}
                                   closeMenuOnSelect={true}
@@ -391,7 +392,7 @@ const Index = (props) => {
                                   placeholder={"Đối tượng"} 
                                   hideSelectedOptions={false}
                                   isClearable={true}
-                                  className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
+                                  className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full  2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20 " 
                                   isSearchable={true}
                                   noOptionsMessage={() => "Không có dữ liệu"}
                                   closeMenuOnSelect={true}
@@ -504,18 +505,36 @@ const Index = (props) => {
                             <div className="grid grid-cols-13 items-center py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center text-[#0F4F9E]"><Popup_chitiet dataLang={dataLang} className="text-center" name={e?.code} id={e?.id}/></h6>
-                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left ">{dataLang[e?.objects] || e?.objects}</h6>
-                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left text-[#0F4F9E]"><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.object_text} id={e?.id}/></h6>
-                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center">{dataLang[e?.type_vouchers] || e?.type_vouchers}</h6>
-                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center">
-                                {e?.voucher_code?.map((code, index) => (
-                                  <React.Fragment key={code}>
-                                    {code}
-                                    {index !== e.voucher_code.length - 1 && ', '}
-                                  </React.Fragment>
+                              <h6 className='3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px]  col-span-1 flex items-center w-fit mx-auto'>
+                                  <div className='mx-auto'>
+                                    {
+                                      e?.objects === "client_group_client" && <span className='flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{dataLang[e?.objects] || e?.objects}</span>||
+                                      e?.objects === "supplier" && <span className=' flex items-center justify-center font-normal text-orange-500 rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-orange-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{dataLang[e?.objects] || e?.objects}</span>||
+                                      e?.objects === "other" && <span className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-lime-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{dataLang[e?.objects] || e?.objects}</span>
+                                    }
+                                  </div>
+                              </h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.object_text}</h6>
+                              <h6 className='3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px]  col-span-1 flex items-center w-fit mx-auto'>
+                                    <div className='mx-auto'>
+                                      {
+                                        e?.type_vouchers === "import" && <span className='flex items-center justify-center font-normal text-purple-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-purple-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{dataLang[e?.type_vouchers] || e?.type_vouchers}</span>||
+                                        e?.type_vouchers === "deposit" && <span className=' flex items-center justify-center font-normal text-cyan-500 rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-cyan-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{dataLang[e?.type_vouchers] || e?.type_vouchers}</span>||
+                                        e?.type_vouchers === "service" && <span className='flex items-center justify-center gap-1 font-normal text-red-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-rose-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{dataLang[e?.type_vouchers] || e?.type_vouchers}</span>
+                                      }
+                                    </div>
+                              </h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center text-[#0F4F9E]">
+                                {e?.voucher?.map((code, index) => (
+                                   <React.Fragment key={code.id}>
+                                      <Popup_chitietThere key={code?.id} dataLang={dataLang} className="text-left" type={code.voucher_type} id={code.id} name={code?.code} >
+                                        {code?.code}
+                                      </Popup_chitietThere>
+                                        {/* {index !== e.voucher.length - 1 && ', '} */}
+                                   </React.Fragment>
+                                      
                                 ))}
                               </h6>
-      
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.payment_mode_name}</h6>
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left">
                                 {e?.cost_name?.map((code, index) => (
@@ -527,14 +546,21 @@ const Index = (props) => {
                               </h6>
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-right">{formatNumber(e?.total)}</h6>
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left flex items-center space-x-1">
-                                  <img className='h-6 w-6 rounded-full' src={e?.profile_image ? e?.profile_image : '/user-placeholder.jpg'} alt=''></img>
-                                  <h6>{e?.staff_name}</h6>
+                                  <div className='relative'>
+                                     <img className='h-6 w-6 rounded-full ' src={e?.profile_image ? e?.profile_image : '/user-placeholder.jpg'} alt=''></img>
+                                     <span className="h-1.5 w-1.5 absolute bottom-1/2 left-1/2 translate-x-[100%]">
+                                          <span className="inline-flex relative rounded-full h-1.5 w-1.5 bg-lime-500">
+                                          <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span></span>
+                                        </span>
+                                  </div>
+                                  <h6 className="capitalize">{e?.staff_name}</h6>
                               </h6>
-                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left"><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6>
-                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left">{e?.note}</h6>
+                              {/* <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left"><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6> */}
+                              <h6 className="col-span-1 w-fit"><span className="3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{e?.branch_name}</span></h6>
+                              <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left truncate">{e?.note}</h6>
                               <div className='col-span-1 flex justify-center'>
                                     <BtnTacVu onRefresh={_ServerFetching.bind(this)} dataLang={dataLang}  id={e?.id}  className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
-                                </div>
+                              </div>
                             </div>
                           ))}              
                         </div>                     
@@ -750,7 +776,6 @@ const Popup_dspc = (props) => {
             sPrice(Number(db?.total))
             sNote(db?.note)
             sListObject(db?.objects === "other" ? {label: db?.object_text, value: db?.object_text} : {label: dataLang[db?.object_text] || db?.object_text, value: db?.objects_id})
-            // sTypeOfDocument(db?.type_vouchers ? {label: dataLang[db?.type_vouchers], value: dataLang[db?.type_vouchers]} : null)
             sTypeOfDocument(db?.type_vouchers ? {label: dataLang[db?.type_vouchers], value: db?.type_vouchers} : null)
             sListTypeOfDocument(db?.type_vouchers ? db?.voucher?.map(e => ({label: e?.code  , value: e?.id})) :[])
             sOption(db?.detail?.map(e => ({id: e?.id, chiphi: {label: e?.costs_name, value: e?.id_costs}, sotien: Number(e?.total)})))
@@ -975,22 +1000,68 @@ const Popup_dspc = (props) => {
                 return newOption;
               });
             }
-        }else if(type == "price"){
+        }else if (type === "price") {
+          let totalMoney = listTypeOfDocument.reduce((total, item) => total + parseFloat(item.money), 0);
           const priceChange = parseFloat(value?.target.value.replace(/,/g, ""));
+          let isExceedTotal = false; // Biến flag để kiểm tra trạng thái vượt quá giá trị
           if (!isNaN(priceChange)) {
-            sPrice(priceChange);
+            if (priceChange > totalMoney) {
+              // Giá nhập vượt quá tổng số tiền, trả về tổng ban đầu
+              Toast.fire({
+                icon: 'error',
+                title: 'Số tiền vượt quá tổng số tiền ban đầu',
+              });
+              sPrice(totalMoney);
+              isExceedTotal = true; // Đánh dấu trạng thái vượt quá giá trị
+            } else {
+              sPrice(priceChange);
+            }
           }
           sOption((prevOption) => {
-            const newOption = prevOption.map((item, index) => {
-              if (index === 0) {
-                return { ...item, sotien: priceChange };
-              } else {
-                return { ...item, sotien: null };
-              }
-            });
-            return newOption;
+            if (isExceedTotal) {
+              return prevOption.map((item, index) => {
+                if (index === 0) {
+                  return { ...item, sotien: totalMoney };
+                } else {
+                  return { ...item, sotien: null };
+                }
+              });
+            } else {
+              return prevOption.map((item, index) => {
+                if (index === 0) {
+                  return { ...item, sotien: priceChange };
+                } else {
+                  return { ...item, sotien: null };
+                }
+              });
+            }
           });
-        }else if(type == "method"){
+        
+          if (isExceedTotal) {
+            // Trở về giá trị ban đầu nếu cố tình nhập tiếp
+            sPrice(totalMoney);
+          }
+        }
+        
+        // else if(type == "price"){
+        //   const checkPriceType = listTypeOfDocument
+        //   console.log(checkPriceType);
+        //   const priceChange = parseFloat(value?.target.value.replace(/,/g, ""));
+        //   if (!isNaN(priceChange)) {
+        //     sPrice(priceChange);
+        //   }
+        //   sOption((prevOption) => {
+        //     const newOption = prevOption.map((item, index) => {
+        //       if (index === 0) {
+        //         return { ...item, sotien: priceChange };
+        //       } else {
+        //         return { ...item, sotien: null };
+        //       }
+        //     });
+        //     return newOption;
+        //   });
+        // }
+        else if(type == "method"){
             sMethod(value)
         }else if(type == "note"){
             sNote(value?.target.value)
@@ -1096,6 +1167,7 @@ const Popup_dspc = (props) => {
                 confirmButtonColor: '#296dc1',
                 cancelButtonColor: '#d33',
                 confirmButtonText: dataLang?.aler_yes,
+                timer: 3000
               });
             }
             else {
@@ -1305,7 +1377,7 @@ const Popup_dspc = (props) => {
                             </div>
                             </div>
                             <div className='col-span-6'>
-                              <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">{dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}<span className="text-red-500">*</span></label>
+                              <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">{dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}</label>
                                 <input
                                     value={code}                
                                     onChange={_HandleChangeInput.bind(this, "code")}
@@ -1619,7 +1691,19 @@ const Popup_dspc = (props) => {
                                     allowNegative={false}
                                     placeholder={props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
                                     decimalScale={0}
-                                    isNumericString={true}   
+                                    isNumericString={true} 
+                                    isAllowed={(values) => {
+                                      if (!values.value) return true;
+                                      const { floatValue } = values;
+                                      let totalMoney = listTypeOfDocument.reduce((total, item) => total + parseFloat(item.money), 0);
+                                      if (floatValue > totalMoney) {
+                                        Toast.fire({
+                                          icon: 'error',
+                                          title: `Vui lòng nhập số tiền nhỏ hơn hoặc bằng ${totalMoney.toLocaleString("en")}`
+                                        })
+                                      }
+                                      return floatValue <= totalMoney;
+                                    }}
                                     className={`${errPrice ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300" } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`} 
                                     thousandSeparator=","
                                 />
@@ -1697,6 +1781,17 @@ const Popup_dspc = (props) => {
                                               onValueChange={_HandleChangeInputOption.bind(this, e?.id, "sotien")}
                                               allowNegative={false}
                                               decimalScale={0}
+                                              isAllowed={(values) => {
+                                                if (!values.value) return true;
+                                                const { floatValue } = values;
+                                                if (floatValue > price) {
+                                                  Toast.fire({
+                                                    icon: 'error',
+                                                    title: `Vui lòng nhập số tiền nhỏ hơn hoặc bằng ${price.toLocaleString("en")}`
+                                                  })
+                                                }
+                                                return floatValue <= price;
+                                              }}
                                               isNumericString={true}   
                                               className={`${errSotien && (e?.sotien === '' || e?.sotien === null) ? "border-b-red-500" : " border-gray-200"} placeholder:text-[10px] border-b-2 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none `}
                                               thousandSeparator=","
@@ -1749,7 +1844,7 @@ const Popup_chitiet =(props)=>{
       return roundedNumber.toLocaleString("en");
   };
 
-  const _ServerFetching_detailOrder = () =>{
+  const _ServerFetching_detailThere = () =>{
     Axios("GET", `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`, {}, (err, response) => {
     if(!err){
         var db =  response.data
@@ -1760,7 +1855,7 @@ const Popup_chitiet =(props)=>{
   }
 
   useEffect(() => {
-    onFetching && _ServerFetching_detailOrder() 
+    onFetching && _ServerFetching_detailThere() 
   }, [open]);
 
 
@@ -1776,62 +1871,74 @@ return (
   <div className='flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
      
   </div>  
-          <div className=" space-x-5 w-[900px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">        
+          {/* <div className=" space-x-5 w-[530px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">         */}
+          <div className=" space-x-5 w-[530px] h-auto">        
           <div>
-           <div className='w-[900px]'>
+           <div className='w-[530px]'>
              <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
              <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props.dataLang?.import_detail_info || "import_detail_info"}</h2>       
-              <div className='grid grid-cols-9  min-h-[130px] px-2'>
-                  <div className='col-span-3'>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_day_vouchers || "import_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.payment_code || "payment_code"}</h3><h3 className=' text-[13px]  font-normal'>{data?.code}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.payment_TT_method || "payment_TT_method"}</h3><h3 className=' text-[13px]  font-normal'>{data?.payment_mode_name}</h3></div>
+              <div className='min-h-[130px] px-2 bg-gray-50 '>
+                  <div className='grid grid-cols-2 space-x-4'>
+                      <div className='col-span-1'>
+                          <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_day_vouchers || "import_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}</h3></div>
+                          
+                          <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.payment_creator || "payment_creator"}</h3>
+                              <div className='flex flex-wrap  gap-2 items-center justify-start relative'>
+                                  <div className='relative'>
+                                        <img className='h-6 w-6 rounded-full ' src={data?.profile_image ? data?.profile_image : '/user-placeholder.jpg'} alt=''></img>
+                                        <span className="h-1.5 w-1.5 absolute bottom-1/2 left-1/2 translate-x-[100%]">
+                                              <span className="inline-flex relative rounded-full h-1.5 w-1.5 bg-lime-500">
+                                              <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span></span>
+                                            </span>
+                                   </div>
+                                      <h6 className="capitalize">{data?.staff_name}</h6>
+                              </div>
+                            </div>
+                          <div className=' font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.payment_obType || "payment_obType"}</h3>
+                              {
+                                data?.objects === "client_group_client" && <span className='flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-1 bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{props.dataLang[data?.objects] || data?.objects}</span>||
+                                data?.objects === "supplier" && <span className=' flex items-center justify-center font-normal text-orange-500 rounded-xl py-1 px-1 bg-orange-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]  '>{props.dataLang[data?.objects] || data?.objects}</span>||
+                                data?.objects === "other" && <span className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-1 bg-lime-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{props.dataLang[data?.objects] || data?.objects}</span>
+                              }
+                          </div>
+                          <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}</h3>
+                              {
+                                data?.type_vouchers === "import" && <span className='flex items-center justify-center font-normal text-purple-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-purple-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{props.dataLang[data?.type_vouchers] || data?.type_vouchers}</span>||
+                                data?.type_vouchers === "deposit" && <span className=' flex items-center justify-center font-normal text-cyan-500 rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-cyan-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{props.dataLang[data?.type_vouchers] || data?.type_vouchers}</span>||
+                                data?.type_vouchers === "service" && <span className='flex items-center justify-center gap-1 font-normal text-red-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-rose-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{props.dataLang[data?.type_vouchers] || data?.type_vouchers}</span>
+                              }
+                            </div>
+                      </div>
+                        <div className='col-span-1 '>
+                          <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.payment_code || "payment_code"}</h3><h3 className=' text-[13px]  font-normal'>{data?.code}</h3></div>
+                          <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.payment_TT_method || "payment_TT_method"}</h3><h3 className=' text-[13px]  font-normal'>{data?.payment_mode_name}</h3></div>
+                          <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.payment_ob || "payment_ob"}</h3>
+                              <div className='flex flex-wrap  gap-2 items-center justify-start'>
+                                <h3 className=' text-[13px]  font-normal'>{data?.object_text}</h3>
+                              </div>
+                          </div>
+                          <div className=' font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{"Chi nhánh"}</h3>
+                            <h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3>
+                          </div>
+                        </div> 
+                        
                   </div>
-                    <div className='col-span-3'>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.payment_obType || "payment_obType"}</h3>
-                          <div className='flex flex-wrap  gap-2 items-center justify-start'>
-                            <h3 className=' text-[13px]  font-normal'>{props.dataLang[data?.objects] || data?.objects}</h3>
-                          </div>
+                  <div className='my-4 font-medium col-span-2 grid grid-cols-4 '>
+                    <h3 className=' text-[13px] col-span-1 '>{props.dataLang?.payment_voucherCode || "payment_voucherCode"}</h3>
+                        <div className='flex flex-wrap col-span-3 gap-2 items-center justify-start font-normal'>
+                          {data?.voucher?.map((code, index) => (
+                                <React.Fragment key={code?.id} >
+                                  {code.code}
+                                  {index !== data?.voucher.length - 1 && ', '}
+                                </React.Fragment>
+                          ))}
                         </div>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.payment_ob || "payment_ob"}</h3>
-                          <div className='flex flex-wrap  gap-2 items-center justify-start'>
-                            <h3 className=' text-[13px]  font-normal'>{data?.object_text}</h3>
-                          </div>
-                        </div>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.payment_creator || "payment_creator"}</h3>
-                          <div className='flex flex-wrap  gap-2 items-center justify-start'>
-                                  <img className='h-6 w-6 rounded-full' src={data?.profile_image ? data?.profile_image : '/user-placeholder.jpg'} alt=''></img>
-                                  <h6>{data?.staff_name}</h6>
-                          </div>
-                        </div>
-                    </div>
-                    <div className='col-span-3'>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}</h3>
-                          <div className='flex flex-wrap  gap-2 items-center justify-start'>
-                            <h3 className=' text-[13px]  font-normal'>{props.dataLang[data?.type_vouchers] || data?.type_vouchers}</h3>
-                          </div>
-                        </div>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.payment_voucherCode || "payment_voucherCode"}</h3>
-                          <div className='flex flex-wrap  gap-2 items-center justify-start'>
-                            {data?.voucher?.map((code, index) => (
-                                  <React.Fragment key={code?.id}>
-                                    {code.code}
-                                    {index !== data?.voucher.length - 1 && ', '}
-                                  </React.Fragment>
-                            ))}
-                          </div>
-                        </div>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{"Chi nhánh"}</h3>
-                          <div className='flex flex-wrap  gap-2 items-center justify-start'>
-                             <h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3>
-                          </div>
-                        </div>
-                    </div>
-                  
-              </div>
-              <div className="pr-2 w-[100%] lx:w-[110%] ">
-                <div className={`grid-cols-3 grid sticky top-0 bg-white shadow-lg  z-10`}>
-                  <h4 className="text-[13px] col-span-2 px-2 text-[#667085] uppercase  font-[400] text-left">{props.dataLang?.payment_costs || "payment_costs"}</h4>
+                  </div>  
+               </div>     
+             <h2 className='font-normal bg-[#ECF0F4]  p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12 mt-0.5'>{props.dataLang?.payment_costInfo || "payment_costInfo"}</h2>  
+              <div className=" w-[100%] lx:w-[110%] ">
+                <div className={`grid-cols-3 grid sticky top-0  shadow  z-10`}>
+                  <h4 className="text-[13px] col-span-2 px-2 text-[#667085] uppercase  font-[400] text-center">{props.dataLang?.payment_costs || "payment_costs"}</h4>
                   <h4 className="text-[13px] col-span-1 px-1 text-[#667085] uppercase font-[400] text-center">{props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}</h4>
                 </div>
                 {onFetching ?
@@ -1866,9 +1973,9 @@ return (
                 <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
                   <div className='col-span-7'>
                       <h3 className='text-[13px]'>{props.dataLang?.import_from_note || "import_from_note"}</h3>
-                    <textarea 
-                    className=" resize-none  placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1  outline-none "
-                    disabled value={data?.note}/>
+                      <textarea 
+                  className="resize-none scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[70px]  max-h-[70px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
+                  disabled value={data?.note}/>
                   </div>
                   <div className='col-span-2 space-y-1 text-right'>
                         <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_total_amount || "import_detail_total_amount"}</h3></div>
@@ -1886,8 +1993,484 @@ return (
   </PopupEdit>
 </>
 )
+
 }
 
+// const Popup_chitietThere =(props)=>{
+//   const scrollAreaRef = useRef(null);
+//   const [open, sOpen] = useState(false);
+//   const _ToggleModal = (e) => sOpen(e);
+//   const [data,sData] =useState()
+//   const [onFetching, sOnFetching] = useState(false);
+
+//   useEffect(() => {
+//     props?.id && sOnFetching(true) 
+//   }, [open]);
+
+//   const formatNumber = (number) => {
+//     if (!number && number !== 0) return 0;
+//       const integerPart = Math.floor(number);
+//       const decimalPart = number - integerPart;
+//       const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
+//       const roundedNumber = integerPart + roundedDecimalPart;
+//       return roundedNumber.toLocaleString("en");
+//   };
+
+//   const _ServerFetching_detailThere = async () =>{
+//    await Axios("GET", `${props?.type == "import" && `/api_web/Api_import/import/${props?.id}?csrf_protection=true` ||
+//                     props?.type == "service" && `/api_web/Api_service/service/${props?.id}?csrf_protection=true`||
+//                     props?.type =="deposit" && `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`} `, {}, (err, response) => {
+//     if(!err){
+//         var db =  response.data
+//         sData(db)
+//     }
+//     sOnFetching(false)
+//   })
+//   }
+
+//   useEffect(() => {
+//     onFetching && _ServerFetching_detailThere() || onFetching && _ServerFetching()
+//   }, [open]);
+
+  
+//   const scrollableDiv = document.querySelector('.customsroll');
+//   scrollableDiv?.addEventListener('wheel', (event) => {
+//     const deltaY = event.deltaY;
+//     const top = scrollableDiv.scrollTop;
+//     const height = scrollableDiv.scrollHeight;
+//     const offset = scrollableDiv.offsetHeight;
+//     const isScrolledToTop = top === 0;
+//     const isScrolledToBottom = top === height - offset;
+  
+//     if ((deltaY < 0 && isScrolledToTop) || (deltaY > 0 && isScrolledToBottom)) {
+//       event.preventDefault();
+//     }
+//   });
+ 
+//   const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+//   const [dataProductExpiry, sDataProductExpiry] = useState({});
+//   const [dataProductSerial, sDataProductSerial] = useState({});
+
+//   const _ServerFetching =  () =>{
+//     Axios("GET","/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+//       if(!err){
+//           var data = response.data;
+//           sDataMaterialExpiry(data.find(x => x.code == "material_expiry"));
+//           sDataProductExpiry(data.find(x => x.code == "product_expiry"));
+//           sDataProductSerial(data.find(x => x.code == "product_serial"));
+//       }
+//       sOnFetching(false)
+//     })
+//   }
+
+// return (
+// <>
+//  <PopupEdit   
+//     title={props?.type == "import" && (props.dataLang?.import_detail_title || "import_detail_title") ||  props?.type == "service" && (props.dataLang?.serviceVoucher_service_voucher_details || "serviceVoucher_service_voucher_details") || props?.type =="deposit" && (props.dataLang?.purchase_order_detail_title || "purchase_order_detail_title")} 
+//     button={props?.name} 
+//     onClickOpen={_ToggleModal.bind(this, true)} 
+//     open={open} onClose={_ToggleModal.bind(this,false)}
+//     classNameBtn={props?.className} 
+//   >
+//       <div className='flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]'> 
+//       </div>
+//       { props?.type == "import" &&
+//          (<div className=" space-x-5 3xl:w-[1250px] 2xl:w-[1100px] w-[1050px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">        
+//           <div>
+//            <div className='3xl:w-[1250px] 2xl:w-[1100px] w-[1050px]'>
+//              <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+//              <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props.dataLang?.import_detail_info || "import_detail_info"}</h2>       
+//               <div className='grid grid-cols-9  min-h-[130px] px-2'>
+//                   <div className='col-span-3'>
+//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_day_vouchers || "import_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}</h3></div>
+//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_code_vouchers || "import_code_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.code}</h3></div>
+//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_the_order || "import_the_order"}</h3><h3 className=' text-[13px]  text-center font-normal text-lime-500  rounded-xl py-1 px-3 max-w-[100px] min-w-[70px]  bg-lime-200 '>{data?.purchase_order_code}</h3></div>
+//                   </div>
+
+//                     <div className='col-span-3'>
+//                         <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_payment_status || "import_payment_status"}</h3>
+//                           <div className='flex flex-wrap  gap-2 items-center justify-center'>
+//                               {
+//                             data?.status === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center text-[13px]'>{"Chưa thanh toán"}</span>||
+//                             data?.status === "1" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center text-[13px]'>{"Thanh toán 1 phần"} {`(${e?.count})`}</span>||
+//                             data?.status === "2" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã thanh toán đủ"} {`(${e?.order_status?.count})`}</span>
+//                               }
+//                           </div>
+//                         </div>
+//                         <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_from_browse || "import_from_browse"}</h3>
+//                           <div className='flex flex-wrap  gap-2 items-center justify-center'>
+//                               {
+//                             data?.warehouseman_id === "0" && <span className=' font-normal text-[#3b82f6]  rounded-xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center text-[13px]'>{"Chưa duyệt kho"}</span>||
+//                             data?.warehouseman_id != "0" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã duyệt kho"}</span>
+//                               }
+//                           </div>
+//                         </div>
+//                     </div>
+//                   <div className='col-span-3 '>
+//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_supplier || "import_supplier"}</h3><h3 className='text-[13px] font-normal'>{data?.supplier_name}</h3></div>
+//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_branch || "import_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3></div>
+//                   </div>
+                  
+//               </div>
+//               <div className="pr-2 w-[100%] lx:w-[110%] ">
+//                 {/* <div className={`${dataProductSerial.is_enable == "1" ? 
+//                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
+//                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow-lg  z-10`}> */}
+//                 <div className={`grid-cols-13  grid sticky top-0 bg-white shadow-lg  z-10`}>
+//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_image || "import_detail_image"}</h4>
+//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_items || "import_detail_items"}
+//                   </h4>
+//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4> 
+//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"Kho - VTK"}</h4> 
+//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"ĐVT"}</h4>
+//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_quantity || "import_from_quantity"}</h4>
+//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
+//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"% CK"}</h4>
+//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
+//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_tax || "import_from_tax"}</h4>
+//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_into_money || "import_into_money"}</h4>
+//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_note || "import_from_note"}</h4>
+//                 </div>
+//                 {onFetching ?
+//                   <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+//                   : 
+//                   data?.items?.length > 0 ? 
+//                   (<>
+//                        <ScrollArea     
+//                          className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+//                     <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">                       
+//                       {(data?.items?.map((e) => 
+//                         // <div className={`${dataProductSerial.is_enable == "1" ? 
+//                         // (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
+//                         // (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid hover:bg-slate-50 `} key={e.id?.toString()}>
+//                         <div className="grid grid-cols-13 hover:bg-slate-50 items-center border-b" key={e.id?.toString()}>
+//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center">
+//                           {e?.item?.images != null ? (<ModalImage   small={e?.item?.images} large={e?.item?.images} alt="Product Image"  className='custom-modal-image object-cover rounded w-[50px] h-[60px] mx-auto' />):
+//                             <div className='w-[50px] h-[60px] object-cover  mx-auto'>
+//                               <ModalImage small="/no_img.png" large="/no_img.png" className='w-full h-full rounded object-contain p-1' > </ModalImage>
+//                             </div>
+//                           }
+//                           </h6>                
+//                           <h6 className="text-[13px]  px-2 py-0.5 col-span-2 text-left">{e?.item?.name}
+//                             <div className='flex-col items-center font-oblique flex-wrap'>
+//                               {dataProductSerial.is_enable === "1" ? (
+//                                   <div className="flex gap-0.5">
+//                                     <h6 className="text-[12px]">Serial:</h6><h6 className="text-[12px]  px-2   w-[full] text-left ">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
+//                                   </div>
+//                                 ):""}
+//                               {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
+//                                 <>
+//                                   <div className="flex gap-0.5">
+//                                     <h6  className="text-[12px]">Lot:</h6>  <h6 className="text-[12px]  px-2   w-[full] text-left ">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
+//                                   </div>
+//                                   <div className="flex gap-0.5">
+//                                   <h6  className="text-[12px]">Hạn sử dụng:</h6> <h6 className="text-[12px]  px-2   w-[full] text-center ">{e.expiration_date ? moment(e.expiration_date).format("DD/MM/YYYY")   : "-"}</h6>                              
+//                                   </div>
+//                                 </>
+//                                 ):""}
+//                             </div>
+//                           </h6>                
+//                           <h6 className="text-[13px]   px-2 py-0.5 col-span-1 text-center break-words">{e?.item?.product_variation}</h6>                
+//                           <h6 className="text-[13px]   px-2 py-0.5 col-span-1 text-left break-words">{`${e?.warehouse_name}-${e.location_name}`}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center break-words">{e?.item?.unit_name}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center mr-1">{formatNumber(e?.quantity)}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center">{formatNumber(e?.price)}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center">{e?.discount_percent + "%"}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center">{formatNumber(e?.price_after_discount)}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center">{formatNumber(e?.tax_rate) + "%"}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-right ">{formatNumber(e?.amount)}</h6>  
+//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-left ml-3.5">{e?.note != undefined ? e?.note : ""}</h6>                
+                                    
+//                         </div>
+//                       ))}              
+//                     </div>   
+//                       </ScrollArea>                       
+//                     </>
+//                   )  : 
+//                   (
+//                     <div className=" max-w-[352px] mt-24 mx-auto" >
+//                       <div className="text-center">
+//                         <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+//                         <h1 className="textx-[#141522] text-base opacity-90 font-medium">{props.dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
+//                         <div className="flex items-center justify-around mt-6 ">
+//                             {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+//                         </div>
+//                       </div>
+//                     </div>
+//                   )}    
+//               </div>
+//           <h2 className='font-normal p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
+//               <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+//               <div className='col-span-7'>
+//                   <h3 className='text-[13px] p-1'>{props.dataLang?.import_from_note || "import_from_note"}</h3>
+//                 <textarea 
+//                  className="resize-none placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
+//                  disabled value={data?.note}/>
+//               </div>
+//              <div className='col-span-2 space-y-1 text-right'>
+//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_total_amount || "import_detail_total_amount"}</h3></div>
+//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_discount || "import_detail_discount"}</h3></div>
+//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_affter_discount || "import_detail_affter_discount"}</h3></div>
+//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_tax_money || "import_detail_tax_money"}</h3></div>
+//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_into_money || "import_detail_into_money"}</h3></div>
+//              </div>
+//              <div className='col-span-3 space-y-1 text-right'>
+//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price)}</h3></div>
+//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_discount)}</h3></div>
+//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price_after_discount)}</h3></div>
+//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_tax)}</h3></div>
+//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_amount)}</h3></div>
+//              </div>
+//           </div>   
+//             </div>
+//           </div>
+    
+//      </div>
+  
+//         </div>)
+//         ||
+//         props?.type == "service" &&
+//          (<div className=" space-x-5 w-[999px]  2xl:h-auto xl:h-auto h-[650px] ">        
+//          <div>
+//           <div className='w-[999px]'>
+//             <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+//             <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
+//              <div className='grid grid-cols-8  min-h-[100px] px-2'>
+//                  <div className='col-span-3'>
+//                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.serviceVoucher_day_vouchers || "serviceVoucher_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}</h3></div>
+//                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}</h3><h3 className=' text-[13px]  font-normal'>{data?.code}</h3></div>
+//                  </div>
+//                  <div className='col-span-2 mx-auto'>
+//                      <div className='my-4 font-medium text-[13px]'>{props.dataLang?.serviceVoucher_status_of_spending || "serviceVoucher_status_of_spending"}</div>
+//                      <div className='flex flex-wrap  gap-2 items-center justify-start'>
+//                     <span className='text-[13px] font-normal text-sky-500 text-center  rounded-xl py-1 px-2 w-full  bg-sky-200'>{"Chưa chi"}</span>
+//                      {
+//                        // data?.import_status  === "0" && <span className='text-[13px] font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{props.dataLang?.purchase_order_table_not_yet_entered || "purchase_order_table_not_yet_entered"}</span>||
+//                        // data?.import_status  === "1" &&  <span className='text-[13px] font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{props.dataLang?.purchase_order_table_enter_one_part || "purchase_order_table_enter_one_part"}</span> ||
+//                        // data?.import_status  === "2" &&   <span className='text-[13px] flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_order_table_enter_enough || "purchase_order_table_enter_enough"}</span>
+//                       }
+//                      </div>
+//                  </div>
+//                  <div className='col-span-3 '>
+//                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3></div>
+//                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px] '>{props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h3><h3 className='text-[13px] font-normal '>{data?.supplier_name}</h3></div>
+//                  </div>
+                 
+//              </div>
+//              <div className=" w-[100%] lx:w-[110%] ">
+//                <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
+//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-left">{props.dataLang?.serviceVoucher_services_arising || "serviceVoucher_services_arising"}</h4>
+//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_quantity || "serviceVoucher_quantity"}</h4>
+//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_unit_price || "serviceVoucher_unit_price"}</h4> 
+//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"% CK"}</h4>
+//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
+//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}</h4>
+//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}</h4>
+//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}</h4>
+//                </div>
+//                {onFetching ?
+//                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+//                  : 
+//                  data?.item?.length > 0 ? 
+//                  (<>
+//                       <ScrollArea     
+//                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+//                    <div className="divide-y divide-slate-200 min:h-[300px] h-[100%] max:h-[400px]">                       
+//                      {(data?.item?.map((e) => 
+//                        <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id?.toString()}>
+//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-left">{e?.name}</h6>                
+//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.quantity)}</h6>  
+//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price)}</h6>                
+//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.discount_percent + "%"}</h6>                
+//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-center">{formatNumber(e?.price_after_discount)}</h6>                
+//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.tax_rate) + "%"}</h6>                
+//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-right">{formatNumber(e?.amount)}</h6>                
+//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-left">{e?.note != undefined ? e?.note : ""}</h6>                
+//                        </div>
+//                      ))}              
+//                    </div>   
+//                      </ScrollArea>                       
+//                    </>
+//                  )  : 
+//                  (
+//                    <div className=" max-w-[352px] mt-24 mx-auto" >
+//                      <div className="text-center">
+//                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+//                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">{props.dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
+//                        <div className="flex items-center justify-around mt-6 ">
+//                        </div>
+//                      </div>
+//                    </div>
+//                  )}    
+//              </div>
+//          <h2 className='font-normal p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
+//              <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+//              <div className='col-span-7'>
+//                  <div>
+//                    <div className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">{props.dataLang?.purchase_note || "purchase_note"}</div>
+//                          <textarea
+//                            value={data?.note}
+//                            disabled
+//                            name="fname"                      
+//                            type="text"
+//                            className=" placeholder:text-slate-300 w-[60%] min-h-[100px] max-h-[100px] resize-none bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 outline-none "
+//                          />
+//                  </div>
+//              </div>
+//             <div className='col-span-2 mt-2 space-y-2'>
+//                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3></div>
+//                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}</h3></div>
+//                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}</h3></div>
+//                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}</h3></div>
+//                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h3></div>
+//             </div>
+//             <div className='col-span-3 mt-2 space-y-2'>
+//                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price)}</h3></div>
+//                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_discount)}</h3></div>
+//                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price_after_discount)}</h3></div>
+//                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_tax_price)}</h3></div>
+//                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_amount)}</h3></div>
+//             </div>
+//          </div>   
+//            </div>
+//          </div>
+   
+//         </div>
+//         </div>)
+//         ||
+//         props?.type =="deposit" &&
+//           (<div className=" space-x-5 w-[999px]  2xl:h-auto xl:h-[680px] h-[650px] ">        
+//           <div>
+//           <div className='w-[999px]'>
+//             <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+//             <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
+//               <div className='grid grid-cols-8  min-h-[170px] px-2'>
+//                   <div className='col-span-3'>
+//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}</h3></div>
+//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"}</h3><h3 className=' text-[13px]  font-normal'>{data?.delivery_date != null ? moment(data?.delivery_date).format("DD/MM/YYYY") : ""}</h3></div>
+//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.purchase_order_detail_voucher_code || "purchase_order_detail_voucher_code"}</h3><h3 className=' text-[13px]  font-normal'>{data?.code}</h3></div>
+//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}</h3><h3 className=' text-[13px] font-normal'>{data?.order_type  == "0" ? (<span className='font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200'>Tạo mới</span>) : (<span className='font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200'>YCMH</span>)}</h3></div>
+//                   </div>
+
+//                   <div className='col-span-2 mx-auto'>
+//                       <div className='my-4 font-medium text-[13px]'>{"Trạng thái nhập hàng"}</div>
+//                       <div className='flex flex-wrap  gap-2 items-center justify-start'>
+//                         {data?.import_status  === "not_stocked" && <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200'>{props.dataLang[data?.import_status]}</span>||
+//                         data?.import_status  === "stocked_part" &&  <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200'>{props.dataLang[data?.import_status]}</span> ||
+//                         data?.import_status  === "stocked" &&   <span className='flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200'><TickCircle className='bg-lime-500 rounded-full ' color='white' size={15}/>{props.dataLang[data?.import_status]}</span>
+//                         }
+//                       </div>
+//                       <div className='my-4 font-medium text-[13px]'>{props.dataLang?.purchase_order_table_number || "purchase_order_table_number"}</div>
+//                       <div className='flex flex-wrap  gap-2 items-center justify-start text-[13px]'>
+//                           {data?.purchases?.reduce((acc, cur) => acc + (acc ? ', ' : '') + cur.code, '').split('').join('').replace(/^,/, '')}
+//                       </div>
+//                   </div>
+//                   <div className='col-span-3 '>
+//                       {/* <div className='flex flex-wrap  gap-2 items-center justify-start'>
+//                       {data?.status_pay === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{props.dataLang?.purchase_order_table_havent_spent_yet || "purchase_order_table_havent_spent_yet"}</span>||
+//                         data?.status_pay === "1" &&  <span className=' font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{props.dataLang?.purchase_order_table_spend_one_part || "purchase_order_table_spend_one_part"}</span> ||
+//                         data?.status_pay === "2" &&   <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_order_table_enough_spent || "purchase_order_table_enough_spent"}</span>
+//                       }
+//                       </div> */}
+//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h3><h3 className='text-[13px] font-normal'>{data?.supplier_name}</h3></div>
+//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3></div>
+//                   </div>
+                  
+//               </div>
+//               <div className="pr-2 w-[100%] lx:w-[110%] ">
+//                 <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
+//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
+//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
+//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
+//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
+//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
+//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
+//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
+//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
+//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
+//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
+//                 </div>
+//                 {onFetching ?
+//                   <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+//                   : 
+//                   data?.item?.length > 0 ? 
+//                   (<>
+//                       <ScrollArea     
+//                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+//                     <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">                       
+//                       {(data?.item?.map((e) => 
+//                         <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id?.toString()}>
+//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left">
+//                           {e?.item?.images != null ? (<ModalImage   small={e?.item?.images} large={e?.item?.images} alt="Product Image"  className='custom-modal-image object-cover rounded w-[50px] h-[60px]' />):
+//                                   <div className='w-[50px] h-[60px] object-cover  flex items-center justify-center rounded'>
+//                                     <ModalImage small="/no_img.png" large="/no_img.png" className='w-full h-full rounded object-contain p-1' > </ModalImage>
+//                                   </div>
+//                           }
+//                           </h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left">{e?.item?.name}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.product_variation}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.unit_name}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center mr-1">{formatNumber(e?.quantity)}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price)}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center">{e?.discount_percent + "%"}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-2  rounded-md text-center">{formatNumber(e?.price_after_discount)}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center ">{formatNumber(e?.tax_rate) + "%"}</h6>                
+//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-right mr-3.5">{formatNumber(e?.amount)}</h6>                
+                                        
+//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left ml-3.5">{e?.note != undefined ? e?.note : ""}</h6>                
+//                         </div>
+//                       ))}              
+//                     </div>   
+//                       </ScrollArea>                       
+//                     </>
+//                   )  : 
+//                   (
+//                     <div className=" max-w-[352px] mt-24 mx-auto" >
+//                       <div className="text-center">
+//                         <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+//                         <h1 className="textx-[#141522] text-base opacity-90 font-medium">{props.dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
+//                         <div className="flex items-center justify-around mt-6 ">
+//                             {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+//                         </div>
+//                       </div>
+//                     </div>
+//                   )}    
+//               </div>
+//           <h2 className='font-normal p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
+//               <div className="mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+//               <div className='col-span-7'>
+//                     <h3 className='text-[13px] p-1'>{props.dataLang?.purchase_order_note || "purchase_order_note"}</h3>
+//                     <textarea 
+//                     className="resize-none placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
+//                     disabled value={data?.note}/>
+//                 </div>
+//             <div className='col-span-2 space-y-2'>
+//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3></div>
+//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}</h3></div>
+//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}</h3></div>
+//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}</h3></div>
+//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h3></div>
+//             </div>
+//             <div className='col-span-3 space-y-2'>
+//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price)}</h3></div>
+//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_discount)}</h3></div>
+//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price_after_discount)}</h3></div>
+//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_tax)}</h3></div>
+//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_amount)}</h3></div>
+//             </div>
+//           </div>   
+//             </div>
+//           </div>
+
+//           </div>
+//           </div>)  
+//       }
+           
+//   </PopupEdit>
+// </>
+// )
+// }
 
 const MoreSelectedBadge = ({ items }) => {
   const style = {
