@@ -1,7 +1,8 @@
 import vi from "date-fns/locale/vi"
 import React, { useState } from 'react';
 import Select from 'react-select';
-import PopupDetail from './(PopupDetail)/PopupDetail';
+import PopupDetailQuote from '../priceQuote/(PopupDetail)/PopupDetailQuote';
+import PopupDetailProduct from './(PopupDetail)/PopupDetailProduct';
 import BtnAction from '../../../components/UI/BtnAction';
 import TabFilter from '../../../components/UI/TabFilter';
 import Pagination from '/components/UI/pagination';
@@ -42,6 +43,7 @@ const Toast = Swal.mixin({
 const Index = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const [dataExcel, sDataExcel] = useState([]);
     const [onFetching, sOnFetching] = useState(false);
@@ -77,42 +79,43 @@ const Index = (props) => {
 
     const _ServerFetching = () => {
         const tabPage = router.query?.tab;
-        console.log("router.query?.page :", router.query?.page);
+        setLoading(true)
+        console.log("router.query?.page : ", router.query?.page);
         Axios("GET", `/api_web/Api_sale_order/saleOrder/?csrf_protection=true`, {
             params: {
                 search: keySearch,
                 limit: limit,
                 page: router.query?.page || 1,
+                // page: keySearch || idQuoteCode != null || idCustomer || valueDate?.startDate != null && valueDate?.endDate ? 1 : router.query?.page || 1,
                 "filter[branch_id]": idBranch != null ? idBranch.value : null,
                 "filter[id]": idQuoteCode != null ? idQuoteCode?.value : null,
                 "filter[status_bar]": tabPage ?? null,
-                "filter[client_id]": idCustomer ? idCustomer.value : null,
+                "filter[client_id]": idCustomer != null ? idCustomer.value : null,
                 "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
                 "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
             }
         }, (err, response) => {
             if (!err && response && response.data) {
+                setLoading(false)
                 var { rResult, output, rTotal } = response.data
                 setData(rResult.map(e => ({ ...e, show: false })))
                 sTotalItems(output)
                 sDataExcel(rResult)
                 setTotal(rTotal)
+                sOnFetching(false)
             }
 
-            sOnFetching(false)
         })
     }
-    // console.log(data);
     // fetch tab filter
-    const _ServerFetching_group = () => {
-        Axios("GET", `/api_web/Api_sale_order/filterBar?csrf_protection=true`, {
+    const _ServerFetching_group = async () => {
+        await Axios("GET", `/api_web/Api_sale_order/filterBar?csrf_protection=true`, {
             params: {
                 limit: 0,
                 search: keySearch,
                 "filter[branch_id]": idBranch != null ? idBranch.value : null,
             }
         }, (err, response) => {
-            console.log('res : ', response);
             if (!err) {
                 var data = response.data
                 sListTabStatus(data)
@@ -122,21 +125,20 @@ const Index = (props) => {
     }
 
     // filter
-    const _ServerFetching_filter = () => {
-        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
+    const _ServerFetching_filter = async () => {
+        await Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 var { rResult } = response.data
                 sListBr(rResult)
             }
         })
-        Axios("GET", `/api_web/Api_sale_order/saleOrderCombobox?csrf_protection=true`, {}, (err, response) => {
+        await Axios("GET", `/api_web/Api_sale_order/saleOrderCombobox?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                console.log('response combobox: ', response);
                 var rResult = response.data.result
                 sListQuoteCode(rResult)
             }
         })
-        Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
+        await Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 var db = response.data.rResult
                 sListCustomer(db?.map(e => ({ label: e.name, value: e.id })))
@@ -153,18 +155,31 @@ const Index = (props) => {
         onFetching_filter && _ServerFetching_filter()
     }, [onFetching_filter])
 
+    // useEffect(() => {
+    //     router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query?.tab && sOnFetching_filter(true) || idBranch != null && sOnFetching(true) || idQuoteCode != null && sOnFetching(true) || idCustomer != null && sOnFetching(true) || valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)
+    // }, [limit, router.query?.page, router.query?.tab, idBranch, idQuoteCode, idCustomer, valueDate.endDate, valueDate.startDate]);
     useEffect(() => {
-        (idBranch != null || idQuoteCode != null || idCustomer != null || (valueDate.startDate != null && valueDate.endDate != null)) && router.push({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab
-            }
-        })
-        setTimeout(() => {
-            router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query?.tab && sOnFetching_filter(true) || idQuoteCode != null && sOnFetching(true) || idCustomer != null && sOnFetching(true) || valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)
-        }, 500);
+        router.query.tab && sOnFetching(true)  || router.query?.tab && sOnFetching_filter(true)
+    }, [limit, router.query?.page, router.query?.tab]);
 
-    }, [limit, router.query?.page, router.query?.tab, idBranch, idQuoteCode, idCustomer, valueDate.endDate, valueDate.startDate]);
+    useEffect(() => {
+        if (idBranch != null || valueDate.startDate != null && valueDate.endDate != null || idCustomer != null || idQuoteCode != null) {
+            router.push({
+                pathname: router.route,
+                query: {
+                    tab: router.query?.tab
+                }
+            })
+            setTimeout(() => {
+                idBranch != null && sOnFetching(true) || valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true) || idCustomer != null && sOnFetching(true) || idQuoteCode != null && sOnFetching(true) || (keySearch && sOnFetching(true))
+            }, 300)
+        }
+        else {
+            sOnFetching(true)
+        }
+
+
+    }, [limit, idBranch, idQuoteCode, idCustomer, valueDate.endDate, valueDate.startDate]);
 
     const listBr_filter = listBr ? listBr?.map(e => ({ label: e.name, value: e.id })) : []
 
@@ -185,7 +200,6 @@ const Index = (props) => {
     }
 
     const paginate = pageNumber => {
-        console.log('page');
         router.push({
             pathname: router.route,
             query: {
@@ -195,39 +209,17 @@ const Index = (props) => {
         })
     }
 
-    const handleOnChangeKeySearch = ({ target: { value } }) => {
+    const handleOnChangeKeySearch = debounce(({ target: { value } }) => {
         sKeySearch(value)
-        console.log('seảch');
         router.replace({
             pathname: router.route,
             query: {
                 tab: router.query?.tab
             }
         });
-        setTimeout(() => {
-            if (!value) {
-                sOnFetching(true)
-            }
-            sOnFetching(true)
-        }, 500);
+        sOnFetching(true)
 
-    };
-    // const handleOnChangeKeySearch = debounce(({ target: { value } }) => {
-    //     sKeySearch(value)
-    //     console.log('seảch');
-    //     router.replace({
-    //         // pathname: router.route,
-    //         query: {
-    //             tab: router.query?.tab,
-    //             page: -1
-    //         }
-    //     });
-    //     if (!value) {
-    //         sOnFetching(true)
-    //     }
-    //     sOnFetching(true)
-
-    // }, 500);
+    }, 500)
 
     const formatNumber = (number) => {
         if (!number && number !== 0) return 0;
@@ -242,32 +234,32 @@ const Index = (props) => {
                 { title: `${dataLang?.sales_product_date || "sales_product_date"}`, width: { wpx: 100 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
                 { title: `${dataLang?.sales_product_code || "sales_product_code"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
                 { title: `${dataLang?.customer || "customer"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
+                { title: `${dataLang?.sales_product_type_order || "sales_product_type_order"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
+                { title: `${dataLang?.sales_product_quote || "sales_product_quote"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
                 { title: `${dataLang?.sales_product_total || "sales_product_total"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
                 { title: `${dataLang?.sales_product_staff_in_charge || "sales_product_staff_in_charge"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
                 { title: `${dataLang?.status_table || "status_table"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
                 { title: `${dataLang?.sales_product_order_process || "sales_product_order_process"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
                 { title: `${dataLang?.note || "note"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
                 { title: `${dataLang?.branch || "branch"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                // { title: `${dataLang?.sales_product_action || "sales_product_action"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
             ],
             data: dataExcel?.map((e) =>
                 [
                     { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                     { value: `${e?.date ? e?.date : ""}` },
-                    { value: `${e?.reference_no ? e?.reference_no : ""}` },
+                    { value: `${e?.code ? e?.code : ""}` },
                     { value: `${e?.client_name ? e?.client_name : ""}` },
-                    // tiền!
+                    { value: `${e?.quote_code !== null && e?.quote_id !== "0" ? "Phiếu báo giá" : "Tạo mới"}` },
+                    { value: `${e?.quote_code ? e?.quote_code : ""}` },
+
                     { value: `${e?.total_amount ? formatNumber(e?.total_amount) : 0}` },
                     { value: `${e?.staff_name ? e?.staff_name : ""}` },
                     { value: `${e?.status ? e?.status === "un_approved" && "Chưa duyệt" || e?.status === "approved" && "Đã duyệt" : ""}` },
 
                     { value: `${e?.process ? e?.process : ""}` },
-                    // order status chưa
-                    // {value: `${e?.import_status ? e?.import_status === "0" && "Chưa chi" || e?.import_status === "1" && "Chi 1 phần" ||  e?.import_status === "2"  &&"Đã chi đủ" : ""}`},
                     { value: `${e?.note ? e?.note : ""}` },
 
                     { value: `${e?.branch_name ? e?.branch_name : ""}` },
-                    // { value: `${e?.note ? e?.note : ""}` },
 
                 ]
             ),
@@ -307,17 +299,6 @@ const Index = (props) => {
         });
     };
 
-    const handleToggleOrdered = (id) => {
-        const index = data.findIndex(x => x.id === id);
-
-        if (data[index].status === 'ordered') {
-            Toast.fire({
-                icon: 'error',
-                title: `${dataLang?.no_change_status_when_order || 'no_change_status_when_order'}`
-            })
-        }
-    }
-
     const handlePostStatus = (id, newStatus) => {
         const formData = new FormData();
 
@@ -342,19 +323,6 @@ const Index = (props) => {
             }
         })
     }
-    // search
-    const _HandleSeachApi = (inputValue) => {
-        Axios("POST", `/api_web/Api_quotation/quotationCombobox/?csrf_protection=true`, {
-            data: {
-                term: inputValue,
-            },
-        }, (err, response) => {
-            if (!err) {
-                var { result } = response?.data.data
-                sDataItems(result)
-            }
-        })
-    }
 
     // toggle show process product
     const handleToggleShowProcessProduct = (id) => {
@@ -366,15 +334,14 @@ const Index = (props) => {
         })
         setData([...newData])
     }
-    console.log('data', data);
 
     return (
         <React.Fragment>
             <Head>
                 <title>{dataLang?.sales_product_list || "sales_product_list"} </title>
             </Head>
-            <div className="3xl:pt-[92px] 2xl:pt-[92px] xl:pt-[78px] lg:pt-[76px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-10 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
-                <div className="flex space-x-1 3xl:text-xs 2xl:text-xs xl:text-[11px] lg:text-[11px]">
+            <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
+                <div className="flex space-x-1 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                     <h6 className="text-[#141522]/40">{dataLang?.sales_product_list || "sales_product_list"}</h6>
                     <span className="text-[#141522]/40">/</span>
                     <h6 >{dataLang?.sales_product_list || "sales_product_list"}</h6>
@@ -382,55 +349,57 @@ const Index = (props) => {
 
                 <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
-                        <div className="space-y-1 h-[96%] overflow-hidden">
+                        <div className="space-y-0.5 h-[96%] overflow-hidden">
+
                             <div className='flex justify-between'>
-                                <h2 className="xl:text-2xl text-xl text-[#52575E] capitalize">{dataLang?.sales_product_list || "sales_product_list"}</h2>
+                                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">{dataLang?.sales_product_list || "sales_product_list"}</h2>
                                 <div className="flex justify-end items-center">
-                                    <Link href="/sales_export_product/salesOrder/form" className='xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>{dataLang?.btn_new || "btn_new"}</Link>
+                                    <Link href="/sales_export_product/salesOrder/form" className='3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>{dataLang?.btn_new || "btn_new"}</Link>
                                 </div>
                             </div>
 
-                            <div className="flex space-x-3 items-center 3xl:h-[8vh] 2xl:h-[8vh] xl:h-[8vh] lg:h-[8vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                {listTabStatus && listTabStatus.map((e) => {
-                                    return (
-                                        <div>
-                                            <TabFilter
-                                                style={{
-                                                    backgroundColor: "#e2f0fe"
-                                                }} dataLang={dataLang}
-                                                key={e?.id}
-                                                onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
-                                                total={e?.count}
-                                                active={e?.id}
-                                                className={"text-[#0F4F9E]"}
-                                            >
-                                                {dataLang[e?.name]}
-                                            </TabFilter>
-                                        </div>
-                                    )
-                                })
+                            <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                {
+                                    listTabStatus && listTabStatus.map((e) => {
+                                        return (
+                                            <div>
+                                                <TabFilter
+                                                    style={{
+                                                        backgroundColor: "#e2f0fe"
+                                                    }} dataLang={dataLang}
+                                                    key={e?.id}
+                                                    onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
+                                                    total={e?.count}
+                                                    active={e?.id}
+                                                    className={"text-[#0F4F9E]"}
+                                                >
+                                                    {dataLang[e?.name]}
+                                                </TabFilter>
+                                            </div>
+                                        )
+                                    })
                                 }
                             </div>
                             {/* table */}
-                            <div className="space-y-2 3xl:h-[92%] 2xl:h-[80%] xl:h-[86%] lg:h-[82%] overflow-hidden">
+                            <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
 
                                 {/* combobox search, excel */}
                                 <div className="xl:space-y-1 space-y-2">
-                                    <div className="bg-slate-100 w-full rounded grid grid-cols-7 xl:p-3 p-2 gap-2">
+                                    <div className="bg-slate-100 w-full rounded-t-lg grid grid-cols-7 2xl:xl:p-2 xl:p-1.5 p-1.5 ">
                                         <div className='col-span-6'>
-                                            <div className='grid grid-cols-5'>
+                                            <div className='grid grid-cols-5 gap-2'>
                                                 <div className='col-span-1'>
                                                     <form className="flex items-center relative ">
                                                         <IconSearch className="absolute 3xl:h-[20px] 2xl:h-[20px] xl:h-[19px] lg:h-[18px] 3xl:w-[20px] 2xl:w-[18px] xl:w-[19px] lg:w-[18px] z-10 3xl:left-[4%] 2xl:left-[4%] xl:left-[8%] lg:left-[10%] text-[#cccccc]" />
                                                         <input
-                                                            className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] 3xl:h-[40px] 2xl:h-[40px] xl:h-[38px] lg:h-[39px]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  xl:py-2.5 lg:py-[11px] rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-[199px] lg:w-[160px]  relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E] "
+                                                            className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  xl:py-2.5 lg:py-[11px] rounded 2xl:text-base text-xs xl:text-center text-center w-full  relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E] "
                                                             type="text"
                                                             onChange={(value) => handleOnChangeKeySearch(value)}
                                                             placeholder={dataLang?.branch_search}
                                                         />
                                                     </form>
                                                 </div>
-                                                <div className='ml-1 col-span-1'>
+                                                <div className='col-span-1'>
                                                     <Select
                                                         options={[{ value: '', label: dataLang?.select_branch || "select_branch", isDisabled: true }, ...listBr_filter]}
                                                         onChange={onChangeFilter.bind(this, "branch")}
@@ -438,7 +407,7 @@ const Index = (props) => {
                                                         placeholder={dataLang?.branch || "branch"}
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className=" 3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full xl:h-full lg:h-[24px] 2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20 "
+                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-xl bg-white z-20 "
                                                         isSearchable={true}
                                                         noOptionsMessage={() => "Không có dữ liệu"}
                                                         // components={{ MultiValue }}
@@ -470,19 +439,18 @@ const Index = (props) => {
                                                         }}
                                                     />
                                                 </div>
-                                                <div className='ml-1  col-span-1'>
+                                                <div className='col-span-1'>
                                                     <Select
-                                                        onInputChange={_HandleSeachApi.bind(this)}
+                                                        isLoading={listQuoteCode === [] ? true : false}
                                                         options={[{ value: '', label: dataLang?.sales_product_select_order || "sales_product_select_order", isDisabled: true }, ...listCode_filter]}
                                                         onChange={onChangeFilter.bind(this, "code")}
                                                         value={idQuoteCode}
                                                         placeholder={dataLang?.sales_product_code || "sales_product_code"}
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full xl:h-full lg:h-[24px] 2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20"
+                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
                                                         isSearchable={true}
                                                         noOptionsMessage={() => "Không có dữ liệu"}
-                                                        // components={{ MultiValue }}
                                                         style={{ border: "none", boxShadow: "none", outline: "none" }}
                                                         theme={(theme) => ({
                                                             ...theme,
@@ -510,7 +478,7 @@ const Index = (props) => {
                                                         }}
                                                     />
                                                 </div>
-                                                <div className='ml-1 col-span-1'>
+                                                <div className='col-span-1'>
                                                     <Select
                                                         options={[{ value: '', label: dataLang?.select_customer || "select_customer", isDisabled: true }, ...listCustomer]}
                                                         onChange={onChangeFilter.bind(this, "customer")}
@@ -518,7 +486,7 @@ const Index = (props) => {
                                                         placeholder={dataLang?.customer || "customer"}
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full xl:h-full lg:h-[24px] 2xl:text-base xl:text-xs text-[10px]  rounded-md bg-white z-20"
+                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
                                                         isSearchable={true}
                                                         noOptionsMessage={() => "Không có dữ liệu"}
                                                         style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -548,7 +516,7 @@ const Index = (props) => {
                                                         }}
                                                     />
                                                 </div>
-                                                <div className='z-20 ml-1 col-span-1'>
+                                                <div className='z-20 col-span-1'>
                                                     <Datepicker
                                                         value={valueDate}
                                                         i18n={"vi"}
@@ -570,7 +538,7 @@ const Index = (props) => {
                                                             }
                                                         }}
                                                         className="react-datepicker__input-container"
-                                                        inputClassName="rounded-md w-full 2xl:p-2 xl:p-[11px] p-3 bg-white focus:outline-[#0F4F9E]  2xl:placeholder:text-xs xl:placeholder:text-[9px] lg:placeholder:text-[7.5px] border-none  2xl:text-base xl:text-xs text-[10px]  focus:outline-none focus:ring-0 focus:border-transparent"
+                                                        inputClassName="rounded-md w-full 2xl:p-2 xl:p-[9px] py-[11px] xl:px-0 px-2 bg-white focus:outline-[#0F4F9E] 3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[10px] 3xl:placeholder:text-xs 2xl:placeholder:text-[13px] xl:placeholder:text-[10px] lg:placeholder:text-[8px] border-none focus:outline-none focus:ring-0 focus:border-transparent"
                                                     />
 
                                                 </div>
@@ -585,7 +553,7 @@ const Index = (props) => {
                                                                 filename="Danh sách đơn hàng bán"
                                                                 title="DSĐHB"
                                                                 element={
-                                                                    <button className='3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-1.5 xl:py-2 lg:py-2.5 3xl:text-xs 2xl:text-xs xl:text-[9px] lg:text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
+                                                                    <button className='3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-2 xl:py-2 lg:py-2.5 3xl:text-[15px] 2xl:text-[13px] xl:text-[12px] lg:text-[8px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
                                                                         <IconExcel className='3xl:scale-100 2xl:scale-100 xl:scale-100 lg:scale-75' size={18} />
                                                                         <span>
                                                                             {dataLang?.client_list_exportexcel}
@@ -617,22 +585,22 @@ const Index = (props) => {
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lg:w-[100%] ">
                                         <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10">
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.sales_product_date || "sales_product_date"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.sales_product_code || "sales_product_code"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.customer || "customer"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-left whitespace-nowrap'>{dataLang?.sales_product_date || "sales_product_date"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.sales_product_code || "sales_product_code"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.customer || "customer"}</h4>
 
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.sales_product_type_order || "sales_product_type_order"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.sales_product_quote || "sales_product_quote"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.sales_product_type_order || "sales_product_type_order"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.sales_product_quote || "sales_product_quote"}</h4>
 
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.sales_product_staff_in_charge || "sales_product_staff_in_charge"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.status_table || "status_table"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.sales_product_order_process || "sales_product_order_process"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.sales_product_note || "sales_product_note"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.branch || "branch"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.sales_product_action || "sales_product_action"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center whitespace-nowrap'>{dataLang?.sales_product_staff_in_charge || "sales_product_staff_in_charge"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.status_table || "status_table"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center whitespace-nowrap'>{dataLang?.sales_product_order_process || "sales_product_order_process"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.sales_product_note || "sales_product_note"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.branch || "branch"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.sales_product_action || "sales_product_action"}</h4>
                                         </div>
-                                        {onFetching ?
+                                        {loading ?
                                             <Loading className="h-80" color="#0f4f9e" />
                                             :
                                             data?.length > 0 ?
@@ -642,63 +610,64 @@ const Index = (props) => {
                                                             {(data?.map((e) =>
                                                                 <>
                                                                     <div className='relative grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40' key={e.id.toString()}>
-                                                                        <div className='transition hover:bg-green-600 hover:animate-pulse absolute scale-125 left-3 cursor-pointer bg-green-500 rounded-full text-white' onClick={() => handleToggleShowProcessProduct(e?.id)}>
+                                                                        <div className='transition hover:bg-green-600 hover:animate-pulse absolute 3xl:scale-125 2xl:scale-100 lg:scale-90 3xl:left-3 2xl:left-2 lg:left-1 cursor-pointer bg-green-500 rounded-full text-white' onClick={() => handleToggleShowProcessProduct(e?.id)}>
                                                                             <IoIosArrowDropright className={`${e.show ? 'rotate-90 ' : ''} `} />
                                                                         </div>
 
-                                                                        <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-center'>
+                                                                        <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center'>
                                                                             {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}
                                                                         </h6>
 
-                                                                        <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'>
-                                                                            <PopupDetail dataLang={dataLang} className="text-left" name={e?.code} id={e?.id} />
+                                                                        <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'>
+                                                                            <PopupDetailProduct dataLang={dataLang} className="text-left" name={e?.code ? e?.code : ""} id={e?.id} />
                                                                         </h6>
 
-                                                                        <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] col-span-1 text-left '>
+                                                                        <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] col-span-1 text-left '>
                                                                             {e?.client_name}
                                                                         </h6>
 
                                                                         {/* fix */}
-                                                                        <div className='3xl:text-[12px] 2xl:text-[14px] xl:text-xs text-[8px] w-28 mx-auto col-span-1 text-center'>
+                                                                        <div className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 text-center'>
                                                                             {
                                                                                 e?.quote_code !== null && e?.quote_id !== "0" ?
-                                                                                    <div className='border flex justify-center items-center rounded-2xl w-24 h-6 bg-lime-200 border-lime-200 text-lime-500'>
+                                                                                    <div className='border flex justify-center items-center rounded-2xl mx-auto 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-16 3xl:h-6 2xl:h-6 xl:h-6 lg:h-5 px-1 bg-lime-200 border-lime-200 text-lime-500'>
                                                                                         Phiếu báo giá
                                                                                     </div>
                                                                                     :
-                                                                                    <div className='border flex justify-center items-center rounded-2xl w-24 h-6 bg-red-200 border-red-200 text-red-500'>
+                                                                                    <div className='border flex justify-center items-center rounded-2xl mx-auto 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-16 3xl:h-6 2xl:h-6 xl:h-6 lg:h-5 px-1 bg-red-200 border-red-200 text-red-500'>
                                                                                         Tạo mới
                                                                                     </div>
                                                                             }
                                                                         </div>
-                                                                        <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer '>
-                                                                            <PopupDetail dataLang={dataLang} className="text-left" name={e?.quote_code ? e.quote_code : ""} id={e?.quote_id} />
+                                                                        <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer '>
+                                                                            <PopupDetailQuote dataLang={dataLang} className="text-left" name={e?.quote_code ? e.quote_code : ""} id={e?.quote_id} />
                                                                         </h6>
                                                                         {/* fix */}
 
-                                                                        <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-right'>
+                                                                        <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right'>
                                                                             {formatNumber(e.total_amount)}
                                                                         </h6>
 
-                                                                        <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-right'>
+                                                                        <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right'>
                                                                             {e.staff_name}
                                                                         </h6>
 
                                                                         <h6 className='px-2 col-span-1 flex items-center justify-center text-center '>
-                                                                            <h6 className='px-2 py-1 3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer'>
+                                                                            <h6 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer'>
                                                                                 {
                                                                                     e?.status === "approved" &&
                                                                                     (
-                                                                                        <div className='3xl:w-32 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[88px] lg:h-4 border-lime-500 text-lime-500 hover:bg-lime-500 hover:text-white hover:-translate-y-0.5 border px-2 py-1 rounded-md  font-normal flex justify-center  items-center gap-1 3xl:text-[14px] 2xl:text-[14px] xl:text-xs text-[9px]' onClick={() => toggleStatus(e?.id)}>
+                                                                                        <div className='3xl:text-[13px] 2xl:text-[12px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-24 2xl:h-8 xl:w-20 xl:h-8 lg:w-16 lg:h-6 border-lime-500 text-lime-500 hover:bg-lime-500 hover:text-white hover:-translate-y-0.5 border px-0.5 py-1 rounded-md  font-normal flex justify-center  items-center gap-1' onClick={() => toggleStatus(e?.id)}>
                                                                                             Đã Duyệt
-                                                                                            <TickCircle className=" text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-4 xl:h-4 lg:w-3 lg:h-3 rounded-full" />
+                                                                                            <TickCircle className=" text-right 3xl:w-4.5 3xl:h-4.5 2xl:w-3.5 2xl:h-3.5 xl:w-3 xl:h-3 lg:w-3 lg:h-3 rounded-full" />
                                                                                         </div>
                                                                                     )
                                                                                     ||
                                                                                     e?.status === "un_approved" &&
                                                                                     (
-                                                                                        <div className='3xl:w-32 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[88px] lg:h-4 hover:bg-red-500 hover:text-white hover:-translate-y-0.5 border border-red-500 px-2 py-1 rounded-md text-red-500  font-normal flex justify-center items-center gap-1 3xl:text-[14px] 2xl:text-[14px] xl:text-xs text-[8px]' onClick={() => toggleStatus(e?.id)}>
-                                                                                            Chưa Duyệt <TickCircle className=" text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-4 xl:h-4 lg:w-3 lg:h-3" />
+                                                                                        <div className='3xl:text-[13px] 2xl:text-[12px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-24 2xl:h-8 xl:w-20 xl:h-8 lg:w-16 lg:h-6 hover:bg-red-500 hover:text-white hover:-translate-y-0.5 border border-red-500 px-0.5 py-1 rounded-md text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => toggleStatus(e?.id)}>
+                                                                                            Chưa Duyệt
+                                                                                            <TickCircle className=" text-right 3xl:w-4.5 3xl:h-4.5 2xl:w-3.5 2xl:h-3.5 xl:w-3 xl:h-3 lg:w-3 lg:h-3" />
                                                                                         </div>
                                                                                     )
                                                                                 }
@@ -709,19 +678,19 @@ const Index = (props) => {
                                                                         <h6 className='px-2 col-span-1 flex flex-col items-center justify-center text-center '>
                                                                             <div className="flex items-center">
                                                                                 {/* <div className={`${item?.active === false ? `h-3 w-3 rounded-full bg-gray-400` : `h-3 w-3 rounded-full bg-green-500`} `} /> */}
-                                                                                <div className={`h-3 w-3 rounded-full bg-gray-400`} />
+                                                                                <div className={`3xl:h-3 3xl:w-3 2xl:h-2.5 2xl:w-2.5 xl:h-2 xl:w-2 h-2 w-2 rounded-full bg-gray-400`} />
                                                                             </div>
-                                                                            <div className="mt-2 w-24">
+                                                                            <div className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]  ">
                                                                                 Giữ kho
                                                                             </div>
                                                                         </h6>
 
-                                                                        <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-left h-60px truncate '>
+                                                                        <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-left h-60px truncate '>
                                                                             {e?.note}
                                                                         </h6>
 
                                                                         <h6 className='col-span-1 w-fit '>
-                                                                            <div className='3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px] text-[#086FFC] font-[300] px-2 py-0.5 border border-[#086FFC] bg-white rounded-[5.5px] uppercase'>
+                                                                            <div className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#086FFC] font-[300] px-1.5 py-0.5 border border-[#086FFC] bg-white rounded-[5.5px] uppercase'>
                                                                                 {e?.branch_name}
                                                                             </div>
                                                                         </h6>
@@ -733,7 +702,7 @@ const Index = (props) => {
                                                                                 status={e?.status}
                                                                                 id={e?.id}
                                                                                 type='sales_product'
-                                                                                className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
+                                                                                className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                                             />
                                                                         </div>
                                                                     </div>
@@ -741,12 +710,12 @@ const Index = (props) => {
                                                                     {
                                                                         e?.show &&
                                                                         (
-                                                                            <div className="items-center sm:flex pl-10 mb-8">
+                                                                            <div className="items-center flex pl-10 mb-8">
                                                                                 {
                                                                                     e?.process.map((item, i) => {
                                                                                         return (
                                                                                             <>
-                                                                                                <div className="relative mb-8 pt-4" key={`process-${i}`}>
+                                                                                                <div className="relative 3xl:mb-8 2xl:mb-7 xl:mb-5 mb-4 3xl:pt-4 2xl:pt-2 xl:pt-2 pt-1" key={`process-${i}`}>
                                                                                                     {
                                                                                                         item?.code
                                                                                                         &&
@@ -755,13 +724,13 @@ const Index = (props) => {
                                                                                                                 <div className={`${item?.active === false ? `h-3 w-3 rounded-full bg-gray-400` : `h-3 w-3 rounded-full bg-green-500`} `} />
                                                                                                                 {
                                                                                                                     item?.code !== 'delivery' ?
-                                                                                                                        <div className={`${item?.active === false ? `sm:flex w-40 bg-gray-200 h-0.5 dark:bg-gray-400` : `sm:flex w-40 bg-gray-200 h-0.5 dark:bg-green-500`}`} />
+                                                                                                                        <div className={`${item?.active === false ? `sm:flex xl:w-40 w-32 bg-gray-200 h-0.5 dark:bg-gray-400` : `sm:flex xl:w-40 w-32 bg-gray-200 h-0.5 dark:bg-green-500`}`} />
                                                                                                                         :
                                                                                                                         null
                                                                                                                 }
                                                                                                             </div>
                                                                                                             <div className="mt-2 w-24">
-                                                                                                                <div className="3xl:max-w-[180px] lg:max-w-[150px] mb-2 text-xs font-normal leading-none text-gray-400 dark:text-gray-500 absolute 3xl:translate-x-[-38%] 3xl:translate-y-[-10%] translate-x-[-30%] translate-y-[-20%]">
+                                                                                                                <div className="3xl:max-w-[180px] lg:max-w-[150px] mb-2 xl:text-xs text-[10px] font-normal leading-none text-gray-400 dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]">
                                                                                                                     {dataLang[item?.name]}
                                                                                                                 </div>
                                                                                                             </div>
@@ -770,7 +739,7 @@ const Index = (props) => {
                                                                                                     {
                                                                                                         item?.code === "keep_stock" || item?.code === "delivery"
                                                                                                             ?
-                                                                                                            <p className="3xl:max-w-[180px] lg:max-w-[150px] 3xl:text-[12px] lg:text-[12px] absolute left-0 3xl:translate-x-[-40%] 3xl:translate-y-[100%] translate-x-[-25%] translate-y-[-20%] p-0.5 border border-amber-600 text-amber-600 rounded-md font-normal">
+                                                                                                            <p className="3xl:max-w-[180px] 2xl:max-w-[150px] xl:max-w-[130px] max-w-[100px] 3xl:text-[12px] 2xl:text-[12px] xl:text-[10px] lg:text-[9px] absolute left-0 3xl:translate-x-[-40%] 2xl:translate-x-[-45%] xl:translate-x-[-45%] translate-x-[-45%] 3xl:translate-y-[100%] 2xl:translate-y-[120%] xl:translate-y-[110%] translate-y-[120%] p-0.5 border border-amber-600 text-amber-600 rounded-md font-normal">
                                                                                                                 Chưa giữ kho
                                                                                                             </p>
                                                                                                             :
@@ -779,7 +748,7 @@ const Index = (props) => {
                                                                                                     {
                                                                                                         item?.code == "production_plan" || item?.code == "produced_at_company" || item?.code == "import_warehouse" || item?.code == "delivery"
                                                                                                             ?
-                                                                                                            <p className="3xl:w-[200px] lg:max-w-[150px] 3xl:text-[12px] lg:text-[12px] absolute left-0 3xl:translate-x-[-25%] 3xl:translate-y-[50%] lg:translate-x-[-25%] lg:translate-y-[50%] font-normal">
+                                                                                                            <p className="3xl:w-[200px] 2xl:w-[200px] xl:w-[150px] w-[150px] 3xl:text-[12px] 2xl:text-[12px] xl:text-[10px] lg:text-[10px] absolute left-0 3xl:translate-x-[-25%] 2xl:translate-x-[-20%] xl:translate-x-[-25%] translate-x-[-25%] 3xl:translate-y-[50%] 2xl:translate-y-[60%] xl:translate-y-[60%] translate-y-[60%] font-normal">
                                                                                                                 KHSX-030623012
                                                                                                             </p>
                                                                                                             :
@@ -817,27 +786,27 @@ const Index = (props) => {
                         </div>
                         <div className='grid grid-cols-12 bg-gray-100 items-center'>
                             <div className='col-span-3 p-2 text-center'>
-                                <h3 className='uppercase font-normal 2xl:text-base xl:text-xs text-[8px]'>{dataLang?.total_outside || "total_outside"}</h3>
+                                <h3 className='uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]'>{dataLang?.total_outside || "total_outside"}</h3>
                             </div>
                             <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap'>
-                                <h3 className='font-normal 2xl:text-base xl:text-xs text-[8px]'></h3>
+                                <h3 className='font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]'></h3>
                             </div>
-                            <div className='col-span-2 text-right justify-end p-2 flex gap-2 flex-wrap '>
-                                <h3 className='font-normal 2xl:text-base xl:text-xs text-[8px]'>{formatNumber(total?.total_amount)}</h3>
+                            <div className='col-span-2 text-right justify-end pr-4 flex gap-2 flex-wrap '>
+                                <h3 className='font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]'>{formatNumber(total?.total_amount)}</h3>
                             </div>
                             <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap'>
-                                <h3 className='font-normal 2xl:text-base xl:text-xs text-[8px]'></h3>
+                                <h3 className='font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]'></h3>
                             </div>
                         </div>
                         {
                             data?.length != 0 &&
                             <div className='flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]'>
-                                <h6>{dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} phiếu báo giá</h6>
+                                <h6>{dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} đơn hàng bán</h6>
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                     paginate={paginate}
-                                    currentPage={router.query?.page || 1}
+                                    currentPage={router.query?.page ? router.query?.page : 1}
                                 />
                             </div>
                         }

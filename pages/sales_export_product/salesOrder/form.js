@@ -85,6 +85,9 @@ const Index = (props) => {
     router.query && setStartDate(new Date())
     router.query && setDeliveryDate(null)
     router.query && setNote("")
+
+    router.query && setOnFetching(true)
+    router.query && setOnFetchingItemsAll(true)
   }, [id, router.query]);
 
   // Fetch edit
@@ -110,7 +113,8 @@ const Index = (props) => {
           unit: e.item?.unit_name,
           price_after_discount: +e?.price_after_discount,
           note: e?.note,
-          total_amount: (+e?.price_after_discount) * (1 + (+e?.tax_rate) / 100) * (+e?.quantity)
+          total_amount: (+e?.price_after_discount) * (1 + (+e?.tax_rate) / 100) * (+e?.quantity),
+          delivery_date: moment(e?.delivery_date).toDate()
         }));
         console.log("item : ", items);
 
@@ -121,7 +125,7 @@ const Index = (props) => {
         setStaff({ label: rResult?.staff_name, value: rResult?.staff_id })
         setCustomer({ label: rResult?.client_name, value: rResult?.client_id })
         setStartDate(moment(rResult?.date).toDate())
-        setDeliveryDate(moment(rResult?.validity).toDate())
+        // setDeliveryDate(moment(rResult?.validity).toDate())
         setNote(rResult?.note)
         if (rResult?.quote_id !== "0" && rResult?.quote_code !== null) {
           setTypeOrder("1")
@@ -251,7 +255,7 @@ const Index = (props) => {
         setOnFetchingItem(false)
       }
       else {
-        Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
+        await Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
           if (!err) {
             var { result } = response.data.data
             setDataItems(result)
@@ -262,7 +266,7 @@ const Index = (props) => {
       }
     }
     else if (typeOrder === '0') {
-      Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
+      await Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
         if (!err) {
           var { result } = response.data.data
           setDataItems(result)
@@ -427,10 +431,10 @@ const Index = (props) => {
     onFetching && handleFetchingBranch()
   }, [onFetching]);
 
-  useEffect(() => {
-    router.query && setOnFetching(true)
-    router.query && setOnFetchingItemsAll(true)
-  }, [router.query]);
+  // useEffect(() => {
+  //   router.query && setOnFetching(true)
+  //   router.query && setOnFetchingItemsAll(true)
+  // }, [router.query]);
 
   useEffect(() => {
     setErrDate(false)
@@ -720,7 +724,7 @@ const Index = (props) => {
           price: 1,
           discount: totalDiscount ? totalDiscount : 0,
           price_after_discount: 1,
-          tax: totalTax ? totalTax : 0,
+          tax: null,
           price_after_tax: 1,
           total_amount: 1,
           note: "",
@@ -753,6 +757,7 @@ const Index = (props) => {
           delivery_date: null
         }
         setOption([newData, ...option]);
+
       } else if (typeOrder === '1' && quote === null) {
         Toast.fire({
           icon: 'error',
@@ -1027,7 +1032,7 @@ const Index = (props) => {
   }
 
   // handle submit
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     var formData = new FormData();
     formData.append("code", codeProduct)
     formData.append("date", (moment(startDate).format("YYYY-MM-DD HH:mm:ss")))
@@ -1051,7 +1056,7 @@ const Index = (props) => {
     });
 
     if (tongTienState?.totalPrice > 0 && tongTienState?.totalDiscountPrice >= 0 && tongTienState?.totalDiscountAfterPrice > 0 && tongTienState?.totalTax >= 0 && tongTienState?.totalAmount > 0) {
-      Axios("POST", `${id ? `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true` : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true"}`, {
+      await Axios("POST", `${id ? `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true` : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true"}`, {
         data: formData,
         headers: { 'Content-Type': 'multipart/form-data' }
       }, (err, response) => {
@@ -1069,6 +1074,7 @@ const Index = (props) => {
           setStaff(null)
           setCustomer(null)
           setBranch(null)
+          setErrQuote(null)
           setNote("")
           setErrBranch(false)
           setErrDate(false)
@@ -1078,6 +1084,7 @@ const Index = (props) => {
           setErrQuote(false)
           setOption([])
           router.push('/sales_export_product/salesOrder?tab=all')
+          console.log('1');
         }
         if (response && response.data && response?.data?.isSuccess === false) {
           Toast.fire({
@@ -1372,7 +1379,7 @@ const Index = (props) => {
             </h2>
             <div className="flex justify-end items-center">
               <button
-                onClick={() => router.back()}
+                onClick={() => router.push('/sales_export_product/salesOrder?tab=all')}
                 className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
               >
                 {dataLang?.btn_back || "btn_back"}
@@ -2308,7 +2315,7 @@ const Index = (props) => {
               <h2>{dataLang?.sales_product_item_date || "sales_product_item_date"}</h2>
               <div className="custom-date-picker flex flex-row relative">
                 <DatePicker
-                  selected={deliveryDate}
+                  selected={null}
                   onChange={(date) => handleOnChangeInput("total_delivery_date", date)}
                   blur
                   placeholderText="DD/MM/YYYY"
@@ -2317,14 +2324,14 @@ const Index = (props) => {
                   className={`3xl:h-11 h-10 3xl:w-[210px] w-full 3xl:text-[16px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-2 outline-none cursor-pointer `}
 
                 />
-                {deliveryDate && (
+                {/* {deliveryDate && (
                   <>
                     <MdClear
                       className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
                       onClick={() => handleOnChangeInputOption('_', 'clearDeliveryDate')}
                     />
                   </>
-                )}
+                )} */}
                 <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%]  text-[#CCCCCC] scale-110 cursor-pointer" />
               </div>
             </div>

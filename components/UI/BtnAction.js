@@ -23,7 +23,7 @@ const BtnAction = React.memo((props) => {
 
     const [openAction, setOpenAction] = useState(false);
     const [dataCompany, setDataCompany] = useState();
-    const [dataPriceQuote, setDataPriceQuote] = useState();
+    const [data, setData] = useState();
     const _ToggleModal = (e) => {
         setOpenAction(e)
     }
@@ -73,7 +73,7 @@ const BtnAction = React.memo((props) => {
                 })
             }
         }
-        
+
         if (props?.id && props?.type === 'sales_product') {
             if (props?.status !== 'approved') {
                 Swal.fire({
@@ -123,7 +123,6 @@ const BtnAction = React.memo((props) => {
 
     const handleClick = () => {
         if (props?.id && props?.type === 'price_quote') {
-            console.log('price');
             if (props?.status === "ordered") {
                 Toast.fire({
                     icon: 'error',
@@ -135,7 +134,6 @@ const BtnAction = React.memo((props) => {
             }
         }
         if (props?.id && props?.type === 'sales_product') {
-            console.log('sales');
             if (props?.status === "approved") {
                 Toast.fire({
                     icon: 'error',
@@ -150,7 +148,7 @@ const BtnAction = React.memo((props) => {
     };
 
     const fetchDataSettingsCompany = async () => {
-        if (props?.id && props?.type === 'price_quote') {
+        if (props?.id) {
             try {
                 await Axios("GET", `/api_web/Api_Setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
                     if (response && response.data) {
@@ -158,19 +156,35 @@ const BtnAction = React.memo((props) => {
                         setDataCompany(res)
                     }
                 })
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        if (props?.id && props?.type === 'price_quote') {
+            try {
                 await Axios("GET", `/api_web/Api_quotation/quotation/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-                    console.log('response', response)
                     if (response && response.data) {
                         let db = response.data
-                        setDataPriceQuote(db)
+                        setData(db)
                     }
                 })
             } catch (err) {
                 console.log(err);
             }
         }
-        if (props?.id && props?.type === 'sales_product') {
 
+        if (props?.id && props?.type === 'sales_product') {
+            try {
+                await Axios("GET", `/api_web/Api_sale_order/saleOrder/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+                    if (response && response.data) {
+                        let db = response.data
+                        setData(db)
+                    }
+                })
+            } catch (err) {
+                console.log(err);
+            }
         }
     }
 
@@ -200,10 +214,10 @@ const BtnAction = React.memo((props) => {
                 onClose={_ToggleModal.bind(this, false)}
             >
                 <div className="w-auto rounded">
-                    <div className="bg-white rounded-t flex flex-col overflow-hidden">
+                    <div className="bg-white rounded-b-xl flex flex-col overflow-hidden">
                         <button
                             onClick={handleClick}
-                            className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                            className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer 2xl:px-5 2xl:py-2.5 px-5 py-1.5 rounded w-full"
                         >
                             {props?.dataLang?.btn_table_edit || "btn_table_edit"}
                         </button>
@@ -212,11 +226,11 @@ const BtnAction = React.memo((props) => {
                             openAction={openAction}
                             setOpenAction={setOpenAction}
                             dataCompany={dataCompany}
-                            dataPriceQuote={dataPriceQuote}
+                            data={data}
                         />
                         <button
                             onClick={() => handleDelete(props?.id)}
-                            className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'
+                            className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer 2xl:px-5 2xl:py-2.5 px-5 py-1.5 rounded  w-full'
                         >
                             {props?.dataLang?.btn_table_delete || "btn_table_delete"}
                         </button>

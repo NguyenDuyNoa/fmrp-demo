@@ -391,15 +391,15 @@ const Header = () => {
                                 placeholder="Tìm kiếm"
                             />
                         </form>
-                        <Link href="/settings" title='Cài đặt' className='3xl:scale-110 2xl:scale-100 xl:scale-90 lg:scale-75 transition'>
+                        <Link href="/settings" title='Cài đặt' className='3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition'>
                             <Image alt="" src="/icon/header/extent.png" width={18} height={18} quality={100} className="object-contain min-w-[18px]" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                         </Link>
-                        <a href="#" title='Thông báo' className='3xl:scale-110 2xl:scale-100 xl:scale-90 lg:scale-75 transition relative  '>
+                        <a href="#" title='Thông báo' className='3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition relative  '>
                             <Image alt="" src="/icon/header/tb2.png" width={18} height={18} quality={100} className="object-contain min-w-[18px]" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                             <div className='3xl:text-[9px] 2xl:text-[9px] xl:text-[9px] text-[9px] bg-red-500 3xl:h-3.5 3xl:w-3.5 2xl:h-3.5 2xl:w-3.5 xl:h-3.5 xl:w-3.5 lg:h-3.5 lg:w-3.5 rounded-full absolute top-0 right-0 3xl:translate-x-1 3xl:-translate-y-1 2xl:translate-x-1 2xl:-translate-y-1 xl:translate-x-1 xl:-translate-y-1 translate-x-1 -translate-y-1 flex flex-col items-center justify-center text-white font-medium'>2</div>
                         </a>
                         <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"}>
-                            <Image alt="" src="/icon/header/ques.png" width={18} height={18} quality={100} className="object-contain 3xl:scale-110 2xl:scale-110 xl:scale-90 lg:scale-75 transition" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                            <Image alt="" src="/icon/header/ques.png" width={18} height={18} quality={100} className="object-contain 3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                         </Dropdown>
                         <DropdownAvatar />
                     </div>

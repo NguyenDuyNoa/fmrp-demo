@@ -1,7 +1,7 @@
 import vi from "date-fns/locale/vi"
 import React, { useState } from 'react';
 import Select from 'react-select';
-import PopupDetail from './(PopupDetail)/PopupDetail';
+import PopupDetailQuote from './(PopupDetail)/PopupDetailQuote';
 import BtnAction from '../../../components/UI/BtnAction';
 import TabFilter from '../../../components/UI/TabFilter';
 import Pagination from '/components/UI/pagination';
@@ -333,18 +333,6 @@ const Index = (props) => {
     }
 
     // search
-    const _HandleSeachApi = (inputValue) => {
-        Axios("POST", `/api_web/Api_quotation/quotationCombobox/?csrf_protection=true`, {
-            data: {
-                term: inputValue,
-            },
-        }, (err, response) => {
-            if (!err) {
-                var { result } = response?.data.data
-                sDataItems(result)
-            }
-        })
-    }
 
     return (
         <React.Fragment>
@@ -447,7 +435,6 @@ const Index = (props) => {
                                                 </div>
                                                 <div className='ml-1  col-span-1'>
                                                     <Select
-                                                        onInputChange={_HandleSeachApi.bind(this)}
                                                         options={[{ value: '', label: dataLang?.price_quote_select_code || "price_quote_select_code", isDisabled: true }, ...listCode_filter]}
                                                         onChange={onChangeFilter.bind(this, "code")}
                                                         value={idQuoteCode}
@@ -608,7 +595,7 @@ const Index = (props) => {
                                                                     </h6>
 
                                                                     <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'>
-                                                                        <PopupDetail dataLang={dataLang} className="text-left" name={e?.reference_no} id={e?.id} />
+                                                                        <PopupDetailQuote dataLang={dataLang} className="text-left" name={e?.reference_no} id={e?.id} />
                                                                     </h6>
 
                                                                     <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-left '>
