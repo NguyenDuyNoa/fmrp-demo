@@ -682,7 +682,7 @@ const Index = (props) => {
                                     </div>
                                   </div>
                                 </h6>
-                                <h6 className="col-span-1 w-fit px-1"><span className="3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-1 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{e?.branch_name}</span></h6>
+                                <h6 className="col-span-1 w-fit"><span className="ml-1 3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{e?.branch_name}</span></h6>
                                 <div className='col-span-1 flex justify-center'>
                                     <BtnTacVu onRefresh={_ServerFetching.bind(this)} onRefreshGroup={_ServerFetching_group.bind(this)} dataLang={dataLang} warehouseman_id={e?.warehouseman_id} status_pay={e?.status_pay} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
                                 </div>
@@ -805,7 +805,13 @@ const BtnTacVu = React.memo((props) => {
           router.push(`/purchase_order/import/form?id=${props.id}`);
         }
       };
+
   
+
+
+  
+
+
   return(
       <div>
           <Popup
@@ -946,7 +952,7 @@ return (
                     </div>
                   <div className='col-span-3 '>
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_supplier || "import_supplier"}</h3><h3 className='text-[13px] font-normal'>{data?.supplier_name}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_branch || "import_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_branch || "import_branch"}</h3><h3 className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase w-fit">{data?.branch_name}</h3></div>
                   </div>
                   
               </div>

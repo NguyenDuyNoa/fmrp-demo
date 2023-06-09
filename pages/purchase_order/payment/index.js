@@ -777,7 +777,8 @@ const Popup_dspc = (props) => {
             sNote(db?.note)
             sListObject(db?.objects === "other" ? {label: db?.object_text, value: db?.object_text} : {label: dataLang[db?.object_text] || db?.object_text, value: db?.objects_id})
             sTypeOfDocument(db?.type_vouchers ? {label: dataLang[db?.type_vouchers], value: db?.type_vouchers} : null)
-            sListTypeOfDocument(db?.type_vouchers ? db?.voucher?.map(e => ({label: e?.code  , value: e?.id})) :[])
+            sListTypeOfDocument(db?.type_vouchers ? db?.voucher?.map(e => ({label: e?.code  , value: e?.id, money: e?.money})) :[])
+            console.log("db?.type_vouchers",db?.voucher);
             sOption(db?.detail?.map(e => ({id: e?.id, chiphi: {label: e?.costs_name, value: e?.id_costs}, sotien: Number(e?.total)})))
         }
         sOnFetchingDetail(false)
@@ -1082,6 +1083,8 @@ const Popup_dspc = (props) => {
       //     return newOption;
       //   });
       // }, [price]);
+      console.log(price);
+
 
       const _HandleSubmit = (e) =>{
         e.preventDefault();
@@ -1695,6 +1698,7 @@ const Popup_dspc = (props) => {
                                     isAllowed={(values) => {
                                       if (!values.value) return true;
                                       const { floatValue } = values;
+                                     
                                       let totalMoney = listTypeOfDocument.reduce((total, item) => total + parseFloat(item.money), 0);
                                       if (floatValue > totalMoney) {
                                         Toast.fire({
@@ -1918,7 +1922,7 @@ return (
                               </div>
                           </div>
                           <div className=' font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{"Chi nhánh"}</h3>
-                            <h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3>
+                            <h3 className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase w-fit">{data?.branch_name}</h3>
                           </div>
                         </div> 
                         
