@@ -49,19 +49,19 @@ const Popup_chitietThere = (props) => {
     }, [open]);
   
     
-    const scrollableDiv = document.querySelector('.customsroll');
-      scrollableDiv?.addEventListener('wheel', (event) => {
-        const deltaY = event.deltaY;
-        const top = scrollableDiv.scrollTop;
-        const height = scrollableDiv.scrollHeight;
-        const offset = scrollableDiv.offsetHeight;
-        const isScrolledToTop = top === 0;
-        const isScrolledToBottom = top === height - offset;
+    // const scrollableDiv = document.querySelector('.customsroll');
+    //   scrollableDiv?.addEventListener('wheel', (event) => {
+    //     const deltaY = event.deltaY;
+    //     const top = scrollableDiv.scrollTop;
+    //     const height = scrollableDiv.scrollHeight;
+    //     const offset = scrollableDiv.offsetHeight;
+    //     const isScrolledToTop = top === 0;
+    //     const isScrolledToBottom = top === height - offset;
       
-        if ((deltaY < 0 && isScrolledToTop) || (deltaY > 0 && isScrolledToBottom)) {
-          event.preventDefault();
-        }
-    });
+    //     if ((deltaY < 0 && isScrolledToTop) || (deltaY > 0 && isScrolledToBottom)) {
+    //       event.preventDefault();
+    //     }
+    // });
    
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
     const [dataProductExpiry, sDataProductExpiry] = useState({});
