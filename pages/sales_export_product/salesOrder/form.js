@@ -1108,7 +1108,7 @@ const Index = (props) => {
     onSending && handleSubmit()
   }, [onSending]);
 
-  const handleClearDate = (type, id,) => {
+  const handleClearDate = (type, id) => {
     if (type === 'deliveryDate') {
       setDeliveryDate(null)
     }
@@ -1841,7 +1841,7 @@ const Index = (props) => {
                       <Select
                         onInputChange={_HandleSeachApi.bind(this)}
                         dangerouslySetInnerHTML={{ __html: option.label }}
-                        options={options}
+                        options={typeOrder === "1" && quote === null ? [] : options}
                         onChange={(value) => handleAddParent(value)}
                         value={null}
                         formatOptionLabel={selectItemsLabel}

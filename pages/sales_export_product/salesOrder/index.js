@@ -96,8 +96,8 @@ const Index = (props) => {
             }
         }, (err, response) => {
             if (!err && response && response.data) {
-                setLoading(false)
                 var { rResult, output, rTotal } = response.data
+                setLoading(false)
                 setData(rResult.map(e => ({ ...e, show: false })))
                 sTotalItems(output)
                 sDataExcel(rResult)
@@ -159,7 +159,7 @@ const Index = (props) => {
     //     router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query?.tab && sOnFetching_filter(true) || idBranch != null && sOnFetching(true) || idQuoteCode != null && sOnFetching(true) || idCustomer != null && sOnFetching(true) || valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)
     // }, [limit, router.query?.page, router.query?.tab, idBranch, idQuoteCode, idCustomer, valueDate.endDate, valueDate.startDate]);
     useEffect(() => {
-        router.query.tab && sOnFetching(true)  || router.query?.tab && sOnFetching_filter(true)
+        router.query.tab && sOnFetching(true) || router.query?.tab && sOnFetching_filter(true)
     }, [limit, router.query?.page, router.query?.tab]);
 
     useEffect(() => {
@@ -600,6 +600,7 @@ const Index = (props) => {
                                             <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.branch || "branch"}</h4>
                                             <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.sales_product_action || "sales_product_action"}</h4>
                                         </div>
+                                        {/* {loading ? */}
                                         {loading ?
                                             <Loading className="h-80" color="#0f4f9e" />
                                             :
