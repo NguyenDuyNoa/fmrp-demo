@@ -1282,7 +1282,7 @@ const _ServerFetching =  () => {
                             placeholder={dataLang?.import_supplier || "import_supplier"} 
                             hideSelectedOptions={false}
                             isClearable={true}
-                            className={`${errSupplier ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full z-[100] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
+                            className={`${errSupplier ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
                             // components={{ MultiValue }}
@@ -1371,7 +1371,7 @@ const _ServerFetching =  () => {
               <div className='font-normal col-span-12'>{dataLang?.import_item_information || "import_item_information"}</div>
             </div> 
             <div className='grid grid-cols-10 items-end gap-3'>
-                        <div div className='col-span-2  z-[100] my-auto'>
+                        <div div className='col-span-2   my-auto'>
                           <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_click_items || "import_click_items"} </label>
                            <Select 
                             options={allItems}

@@ -591,12 +591,12 @@ const Index = (props) => {
                                 data?.length > 0 ? (
                                     <div className="divide-y divide-slate-200"> 
                                         {data?.map((e) => 
-                                            <div key={e?.id.toString()} className='grid grid-cols-12 hover:bg-slate-50 relative'>
+                                            <div key={e?.id.toString()} className='grid grid-cols-12 items-center hover:bg-slate-50 relative'>
                                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center'>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6> 
                                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center  text-[#0F4F9e] font-medium cursor-pointer'><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
                                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center '>{e?.reference_no }</h6>
                                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center '>{e?.staff_create_name}</h6>
-                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer'>{e?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1 2xl:text-base xl:text-xs text-[8px]' onClick={() => _ToggleStatus(e?.id)}>Đã duyệt <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1 2xl:text-base xl:text-xs text-[8px]' onClick={() => _ToggleStatus(e?.id)}>Chưa duyệt <TickCircle size={22}/></div>)}</h6>
+                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer'>{e?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1 3xl:text-[16px] 2xl:text-[14px] xl:text-[10px] text-[8px] bg-gradient-to-l from-[#ecfccb]  via-transparent to-transparent btn-animation' onClick={() => _ToggleStatus(e?.id)}>Đã duyệt <TickCircle className='bg-lime-500 rounded-full ' color='white'  size={19} /></div>) : (<div className='border border-red-500 3xl:px-2 px-0 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1 3xl:text-[16px] 2xl:text-[13px] xl:text-[10px] text-[8px]  bg-gradient-to-l from-[#fee2e2]  via-transparent to-transparent btn-animation ' onClick={() => _ToggleStatus(e?.id)}>Chưa duyệt <TickCircle size={22}/></div>)}</h6>
                                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center '>{formatNumber(e?.total_item)}</h6>
                                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-2 flex items-center '>
                                                   <div className='mx-auto'>
@@ -607,7 +607,7 @@ const Index = (props) => {
                                                     }
                                                   </div>
                                                 </h6>
-                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-2 flex  items-center '><h6 className=''>{e?.note}</h6></h6>
+                                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-2 text-left truncate '>{e?.note}</h6>
                                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center  '><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6>
                                                 <div className='pl-2 py-2.5 col-span-1 flex space-x-2 justify-center'>
                                                     <BtnTacVu order={e?.order_status} onRefreshGroup={_ServerFetching_group.bind(this)}  dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} status={e?.status} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] 2xl:text-base xl:text-xs text-[8px]" />
@@ -812,7 +812,7 @@ const Popup_chitiet =(props)=>{
                         <div className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 max-w-[180px] my-2 text-center  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_enough || "purchase_enough"} (0)</div> */}
                     </div>
                     <div className='col-span-3 '>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_status || "purchase_status"}</h3><h3 className='col-span-1'>{data?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1'>{props.dataLang?.purchase_approved || "purchase_approved"} <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>{props.dataLang?.purchase_notapproved || "purchase_notapproved"} <TickCircle size={22}/></div>)}</h3></div>  
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_status || "purchase_status"}</h3><h3 className='col-span-1'>{data?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1'>{props.dataLang?.purchase_approved || "purchase_approved"} <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' >{props.dataLang?.purchase_notapproved || "purchase_notapproved"} <TickCircle size={22}/></div>)}</h3></div>  
                         {/* <div className='my-4 font-medium grid grid-cols-2'>Tổng số lượng</div> */}
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_propnent || "purchase_propnent"}</h3><h3 className='col-span-1 font-normal'>{data?.user_create_name}</h3></div>
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_branch || "purchase_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] col-span-1">{data?.branch_name}</h3></div>
@@ -879,7 +879,7 @@ const Popup_chitiet =(props)=>{
                   <div className='col-span-9'>
                     <h3 className='text-[13px] p-1'>{props.dataLang?.purchase_note || "import_from_note"}</h3>
                   <textarea 
-                  className="resize-none placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
+                  className="resize-none scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[70px]  max-h-[70px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
                   disabled value={data?.note}/>
                 </div>
                <div className='col-span-3 space-y-2'>

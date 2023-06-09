@@ -6,18 +6,22 @@ import Link from 'next/link';
 import ModalImage from "react-modal-image";
 import 'react-datepicker/dist/react-datepicker.css';
 import {NumericFormat} from "react-number-format";
-
 import {
     Grid6 as IconExcel, Filter as IconFilter, Calendar as IconCalendar, SearchNormal1 as IconSearch,
     ArrowDown2 as IconDown,
     ArrowCircleDown,
     Minus, Edit as IconEdit,
-    Add, Trash as IconDelete
+    Add, Trash as IconDelete, TickCircle
 } from "iconsax-react";
 import Select from 'react-select';
+
 import 'react-datepicker/dist/react-datepicker.css';
 import Datepicker from 'react-tailwindcss-datepicker'
+
 import DatePicker,{registerLocale } from "react-datepicker";
+import { MdClear } from 'react-icons/md';
+import { BsCalendarEvent } from 'react-icons/bs';
+
 import Popup from 'reactjs-popup';
 import moment from 'moment/moment';
 import vi from "date-fns/locale/vi"
@@ -478,20 +482,21 @@ const Index = (props) => {
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_price)}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_tax_price)}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_amount)}</h6>
-                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-2 '>
-                                    <div className='flex flex-wrap  gap-2 items-center justify-center'>
-                                    <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{"Chưa chi"}</span>
-                                      {/* {
-                                    e?.status === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{"Chưa thanh toán"}</span>||
-                                    e?.status === "1" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center 2xl:text-sm xl:text-xs text-[8px]'>{"Thanh toán 1 phần"} {`(${e?.count})`}</span>||
-                                    e?.status === "2" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 2xl:text-sm xl:text-xs text-[8px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã thanh toán đủ"} {`(${e?.order_status?.count})`}</span>
-                                      } */}
-                                    </div>
+                                <h6 className='3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px]  col-span-2 flex items-center w-fit mx-auto'>
+                                      <div className='mx-auto'>
+                                      {
+                                        e?.status_pay === "not_spent" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center text-[13px]'>{"Chưa chi"}</span>||
+                                        e?.status_pay === "spent_part" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center text-[13px]'>{"Chi 1 phần"} {`(${formatNumber(e?.amount_paid)})`}</span>||
+                                        e?.status_pay === "spent" && <span className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã chi đủ"}</span>
+                                          }
+                                        {/* <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[100px]  bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{"Chưa chi"}</span> */}
+
+                                      </div>
                                   </h6>
-                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left'>{e.note}</h6>
-                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1'><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6> 
+                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left truncate '>{e.note}</h6>
+                                <h6 className="col-span-1 w-fit"><span className="3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{e?.branch_name}</span></h6>
                                 <div className='col-span-1 flex justify-center'>
-                                    <BtnTacVu onRefresh={_ServerFetching.bind(this)} dataLang={dataLang}  id={e?.id}  className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
+                                    <BtnTacVu onRefresh={_ServerFetching.bind(this)} onRefreshGr={_ServerFetching_group.bind(this)} dataLang={dataLang} status_pay={e?.status_pay}  id={e?.id}  className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
                                 </div>
                                 </div>
        
@@ -574,6 +579,7 @@ const BtnTacVu = React.memo((props) => {
                 title: props.dataLang[message]
               })     
               props.onRefresh && props.onRefresh()
+              props.onRefreshGr && props.onRefreshGr()
             }else{
                 Toast.fire({
                     icon: 'error',
@@ -586,6 +592,17 @@ const BtnTacVu = React.memo((props) => {
     })
 }
 
+const handleClick = () => {
+  if(props?.status_pay != "not_spent"){
+    Toast.fire({
+      icon: 'error',
+      title: `${"Phiếu dịch vụ đã chi. Không thể sửa"}`
+    })  
+  } 
+    else {
+      // router.push(`/purchase_order/order/form?id=${props.id}`);
+    }
+  };
   return(
       <div>
           <Popup
@@ -602,7 +619,7 @@ const BtnTacVu = React.memo((props) => {
           >
               <div className="w-auto rounded">
                   <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                      <Popup_servie onRefresh={props.onRefresh} dataLang={props.dataLang} id={props?.id} 
+                      <Popup_servie status_pay={props?.status_pay}  onClick={handleClick} onRefresh={props.onRefresh} dataLang={props.dataLang} id={props?.id} 
                        className=" hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full 2xl:text-sm xl:text-sm text-[8px]">{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</Popup_servie>
                       <button onClick={_HandleDelete.bind(this, props.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</button>
                   </div>
@@ -612,7 +629,6 @@ const BtnTacVu = React.memo((props) => {
   )
 })
 const Popup_servie = (props) => {
-
   let id = props?.id
   const dataLang = props.dataLang
   const scrollAreaRef = useRef(null);
@@ -620,8 +636,21 @@ const Popup_servie = (props) => {
   const menuPortalTarget = scrollAreaRef.current;
       return { menuPortalTarget };
   };
+
   const [open, sOpen] = useState(false);
-  const _ToggleModal = (e) => sOpen(e);
+  const _HandleOpenModal = (e) => {
+    if(props?.status_pay != "not_spent"){
+      sOpen(false)
+      Toast.fire({
+        icon: 'error',
+        title: `${"Phiếu dịch vụ đã chi. Không thể sửa"}`
+      })  
+    }else{
+      sOpen(true)
+    }
+  };
+  const _HandleCloseModal = () => sOpen(false)
+
   const [onFetching, sOnFetching] = useState(false);
   const [onFetchingDetail, sOnFetchingDetail] = useState(false);
   const [onFetchingSupplier, sOnFetchingSupplier] = useState(false);
@@ -644,7 +673,7 @@ const Popup_servie = (props) => {
   const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
   sortedArr.unshift(option[0]);
   const [code , sCode] = useState(null)
-  const [date, sDate] = useState(moment().format('YYYY-MM-DD HH:mm:ss'));
+  const [date, sDate] = useState(new Date());
   const [valueBr, sValueBr] = useState(null)
   const [valueSupplier, sValueSupplier] = useState(null)
   const [note, sNote] = useState("")
@@ -662,7 +691,7 @@ const Popup_servie = (props) => {
   
 
   useEffect(() =>{
-    open && sDate(moment().format('YYYY-MM-DD HH:mm:ss'))
+    open && sDate(new Date())
     open && sCode('')
     open && sValueBr(null)
     open && sValueSupplier(null)
@@ -680,7 +709,7 @@ const Popup_servie = (props) => {
     Axios("GET", `/api_web/Api_service/service/${props?.id}?csrf_protection=true`, {}, (err, response) => {
     if(!err){
         var db =  response.data
-        sDate(moment(db?.date).format('YYYY-MM-DD HH:mm:ss'))
+        sDate(moment(db?.date).toDate())
         sCode(db?.code)
         sValueBr({label: db?.branch_name, value: db?.branch_id})
         sNote(db?.note)
@@ -751,8 +780,12 @@ const Popup_servie = (props) => {
 
     const _HandleChangeInput = (type, value) => {
       if(type === "date"){
-        sDate(moment(value?.target.value).format('YYYY-MM-DD HH:mm:ss'))
-      }else if(type === "code"){
+        sDate(value)
+      }
+     else if (type === 'clear') {
+        sDate(new Date())
+        }
+      else if(type === "code"){
         sCode(value?.target.value)
       }else if(type === "valueBr" && valueBr != value){
         sValueBr(value)
@@ -1022,7 +1055,7 @@ const Popup_servie = (props) => {
                     icon: 'success',
                     title: `${dataLang[message]}`
                 })
-                sDate(new Date().toISOString().slice(0, 10))
+                sDate(new Date())
                 sCode("")
                 sValueBr(null)
                 sValueSupplier(null)
@@ -1053,24 +1086,39 @@ return(
   <PopupEdit   
     title={props.id ? `${props.dataLang?.serviceVoucher_edit || "serviceVoucher_edit"}` : `${props.dataLang?.serviceVoucher_add || "serviceVoucher_add"}`} 
     button={props.id ? props.dataLang?.serviceVoucher_edit_votes || "serviceVoucher_edit_votes" : `${props.dataLang?.branch_popup_create_new}`} 
-    onClickOpen={_ToggleModal.bind(this, true)} 
-    open={open} onClose={_ToggleModal.bind(this,false)}
+    onClickOpen={_HandleOpenModal.bind(this)} 
+    open={open} 
+    onClose={_HandleCloseModal.bind(this)}
     classNameBtn={props.className} 
   >
           <div className="mt-4  max-w-[60vw] 2xl:max-w-[50vw] xl:max-w-[60vw]">
             <h2 className='font-normal bg-[#ECF0F4] 2xl:text-[12px] xl:text-[13px] text-[12px] p-1'>{dataLang?.serviceVoucher_general_information || "serviceVoucher_general_information"}</h2>       
               <form onSubmit={_HandleSubmit.bind(this)} className="">
                 <div className='max-w-[60vw] 2xl:max-w-[50vw] xl:max-w-[60vw] '> 
-                  <div className="grid grid-cols-4 gap-5 items-center"> 
-                    <div className='col-span-1 max-h-[70px] min-h-[70px]'>
+                  <div className="grid grid-cols-5 gap-5 items-center"> 
+                    <div className='col-span-2 max-h-[70px] min-h-[70px] relative'>
                             <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">{dataLang?.serviceVoucher_day_vouchers} </label>
-                            <input
-                              value={date}    
-                              onChange={_HandleChangeInput.bind(this, "date")}
-                              name="fname"                      
-                              type="datetime-local"
-                              className= "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] 2xl:text-[12px] xl:text-[13px] text-[12px] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none mb-2"
-                            />
+                            <div className="custom-date-picker flex flex-row " >
+                                  <DatePicker
+                                    blur
+                                    fixedHeight
+                                    showTimeSelect
+                                    selected={date}
+                                    onSelect={(date) => _HandleChangeInput("date",date)}
+                                    onChange={(e) => _HandleChangeInput("date",e)}
+                                    placeholderText="DD/MM/YYYY HH:mm:ss"
+                                    dateFormat="dd/MM/yyyy h:mm:ss aa"
+                                    timeInputLabel={'Time: '}
+                                    placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                    className={`border focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                  />
+                                  {date && (
+                                    <>
+                                      <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => _HandleChangeInput('clear')} />
+                                    </>
+                                  )}
+                              <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                            </div>
                             
                     </div>
                     <div className='col-span-1 max-h-[70px] min-h-[70px]'>
@@ -1411,7 +1459,7 @@ return(
                 <div className='space-x-2'>
                 <button
                 type='button'
-                 onClick={_ToggleModal.bind(this,false)} 
+                 onClick={_HandleCloseModal.bind(this)} 
                  className="button text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]">{dataLang?.purchase_order_purchase_back || "purchase_order_purchase_back"}</button>
                   <button 
                   onClick={_HandleSubmit.bind(this)} 
@@ -1487,14 +1535,13 @@ return (
                   </div>
                   <div className='col-span-2 mx-auto'>
                       <div className='my-4 font-medium text-[13px]'>{props.dataLang?.serviceVoucher_status_of_spending || "serviceVoucher_status_of_spending"}</div>
-                      <div className='flex flex-wrap  gap-2 items-center justify-start'>
-                     <span className='text-[13px] font-normal text-sky-500 text-center  rounded-xl py-1 px-2 w-full  bg-sky-200'>{"Chưa chi"}</span>
-                      {
-                        // data?.import_status  === "0" && <span className='text-[13px] font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{props.dataLang?.purchase_order_table_not_yet_entered || "purchase_order_table_not_yet_entered"}</span>||
-                        // data?.import_status  === "1" &&  <span className='text-[13px] font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{props.dataLang?.purchase_order_table_enter_one_part || "purchase_order_table_enter_one_part"}</span> ||
-                        // data?.import_status  === "2" &&   <span className='text-[13px] flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_order_table_enter_enough || "purchase_order_table_enter_enough"}</span>
-                       }
-                      </div>
+                      <div className='flex flex-wrap  gap-2 items-center justify-center'>
+                              {
+                            data?.status_pay === "not_spent" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center text-[13px]'>{"Chưa chi"}</span>||
+                            data?.status_pay === "spent_part" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center text-[13px]'>{"Chi 1 phần"} {`(${formatNumber(data?.amount_paid)})`}</span>||
+                            data?.status_pay === "spent" && <span className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã chi đủ"}</span>
+                              }
+                          </div>
                   </div>
                   <div className='col-span-3 '>
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3></div>
@@ -1558,7 +1605,7 @@ return (
                             disabled
                             name="fname"                      
                             type="text"
-                            className=" placeholder:text-slate-300 w-[60%] min-h-[100px] max-h-[100px] resize-none bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 outline-none "
+                            className=" placeholder:text-slate-300 w-[80%] scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 min-h-[100px] max-h-[100px] resize-none bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 outline-none "
                           />
                   </div>
               </div>
