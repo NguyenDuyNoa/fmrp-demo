@@ -639,12 +639,16 @@ const Popup_servie = (props) => {
 
   const [open, sOpen] = useState(false);
   const _HandleOpenModal = (e) => {
-    if(props?.status_pay != "not_spent"){
-      sOpen(false)
-      Toast.fire({
-        icon: 'error',
-        title: `${"Phiếu dịch vụ đã chi. Không thể sửa"}`
-      })  
+    if(id){
+      if(props?.status_pay != "not_spent"){
+        sOpen(false)
+        Toast.fire({
+          icon: 'error',
+          title: `${"Phiếu dịch vụ đã chi. Không thể sửa"}`
+        })  
+      }else{
+        sOpen(true)
+      }
     }else{
       sOpen(true)
     }
