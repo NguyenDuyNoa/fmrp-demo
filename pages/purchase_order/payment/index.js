@@ -984,7 +984,7 @@ const Popup_dspc = (props) => {
             sPrice('')
             sOption(prevOption =>{
               const newOption = prevOption.map((item, index) => {
-                return { ...item, sotien: null };
+                return { ...item, sotien: '' };
               });
               return newOption;
             })
@@ -995,6 +995,12 @@ const Popup_dspc = (props) => {
             sDataListTypeofDoc([])
             sListTypeOfDocument([])
             sPrice('')
+            sOption((prevOption) => {
+              const newOption = prevOption.map((item, index) => {
+                return { ...item, sotien: '' };
+              });
+              return newOption;
+            });
         }else if(type == "listTypeOfDocument"){
             sListTypeOfDocument(value)
             if (value && value.length > 0) {
@@ -1800,23 +1806,19 @@ const Popup_dspc = (props) => {
                                               decimalScale={0}
                                               isAllowed={(values) => {
                                                 if (!values.value) return true;
-                                                if(object?.value && listTypeOfDocument?.length > 0){
                                                   const { floatValue } = values;
                                                   if(object?.value != "other"){
-                                                  if (floatValue > price) {
-                                                    Toast.fire({
-                                                      icon: 'error',
-                                                      title: `${props.dataLang?.payment_errPlease || "payment_errPlease"} ${price.toLocaleString("en")}`
-                                                    })
+                                                    if (floatValue > price) {
+                                                      Toast.fire({
+                                                        icon: 'error',
+                                                        title: `${props.dataLang?.payment_errPlease || "payment_errPlease"} ${price.toLocaleString("en")}`
+                                                      })
+                                                    }
+                                                    return floatValue <= price;
                                                   }
-                                                  return floatValue <= price;
-                                                }
-                                                else{
-                                                  return true
-                                                }
-                                                }else{
-                                                  return true
-                                                }
+                                                  else{
+                                                    return true
+                                                  }
                                               }
                                             }
                                               isNumericString={true}   
