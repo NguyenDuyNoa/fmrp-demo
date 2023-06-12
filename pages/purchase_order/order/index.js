@@ -35,6 +35,7 @@ import Swal from "sweetalert2";
 import ReactExport from "react-data-export";
 import { useEffect } from 'react';
 import { data } from 'autoprefixer';
+import Popup_chitietThere from '../detailThere';
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -595,7 +596,21 @@ const Index = (props) => {
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left'>{e.supplier_name}</h6>
                                 <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center'>{e?.order_type  == "0" ? (<span className='font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200 2xl:text-xs xl:text-xs text-[8px] min-w-[80px]'>Tạo mới</span>) : (<span className='min-w-[80px] font-normal 2xl:text-xs xl:text-xs text-[8px] text-lime-500  rounded-xl py-1 px-3  bg-lime-200'>YCMH</span>)}</h6>
-                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left flex gap-2 flex-wrap'>{e?.purchases?.reduce((acc, cur) => acc + (acc ? ', ' : '') + cur.code, '').split('').join('').replace(/^,/, '')}</h6>
+                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left flex flex-wrap text-[#0F4F9E]'>
+                                {/* {e?.purchases?.reduce((acc, cur) => acc + (acc ? ', ' : '') + cur.code, '').split('').join('').replace(/^,/, '')} */}
+                                {e?.purchases?.map((purchase, index) => (
+                                  <React.Fragment key={purchase.id}>
+                                    {index !== 0 && ","}
+                                    <Popup_chitietThere
+                                      dataLang={dataLang}
+                                      className="text-left"
+                                      type={e?.order_type}
+                                      id={purchase.id}
+                                      name={purchase.code}
+                                    />
+                                  </React.Fragment>
+                                ))}
+                                </h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_price)}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_tax_price)}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_amount)}</h6>
@@ -735,7 +750,7 @@ return (
           {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[550px] xl:h-[750px] h-[700px] customsroll overflow-hidden  3xl:h-auto 2xl:scrollbar-thin 2xl:scrollbar-thumb-slate-300 2xl:scrollbar-track-slate-100">         */}
           {/* <div className="mt-4 space-x-5 w-[999px]">         */}
           {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[750px] xl:h-[750px] h-[700px] 2xl:max-h-[750px] max-h-[600px] 2xl:overflow-visible xl:overflow-y-auto overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">         */}
-          <div className=" space-x-5 w-[999px]  2xl:h-auto xl:h-[680px] h-[650px] ">        
+          <div className=" space-x-5 w-[999px] h-auto">        
           <div>
            <div className='w-[999px]'>
              <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
@@ -793,7 +808,7 @@ return (
                   data?.item?.length > 0 ? 
                   (<>
                        <ScrollArea     
-                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+                         className="min-h-[90px] max-h-[100px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
                     <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">                       
                       {(data?.item?.map((e) => 
                         <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id?.toString()}>
@@ -982,10 +997,10 @@ const Popup_TableValidateEdit =(props)=>{
     props.isOpen && handleClick()
   },[props.isOpen])
    const handleClick = () => {
-    if(props?.status != "not_stocked" || props?.data?.status_pay != "not_spent"){
+    if(props?.data?.status_pay != "not_spent"|| props?.status != "not_stocked"){
         Toast.fire({
           icon: 'error',
-          title: `${props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa" || props?.data?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit")}`
+          title: `${props?.data?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit") || props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa"}`
         })  
       } 
         else {

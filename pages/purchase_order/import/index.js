@@ -34,6 +34,7 @@ import Swal from "sweetalert2";
 
 import ReactExport from "react-data-export";
 import { useEffect } from 'react';
+import Popup_chitietThere from '../detailThere';
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -631,8 +632,19 @@ const Index = (props) => {
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer '><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left'>{e.supplier_name}</h6>
                                 <h6 className='3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px]  col-span-1 flex items-center w-fit mx-auto'>
+                                      
                                       <div className='mx-auto'>
-                                          <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-center'>{e?.purchase_order_code}</span>
+                                          <Popup_chitietThere
+                                            // className='font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-center i h-16 w-64 bg-gradient-to-br '
+                                            className='i py-1 px-2 bg-gradient-to-br font-normal text-lime-500 bg-lime-200 items-center rounded-full shadow-2xl cursor-pointer 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]  overflow-hidden transform hover:scale-110 transition duration-300 ease-out hover:bg-lime-500 hover:text-white'
+                                            // className='b animate-pulse i py-1 px-2  text-lime-500 bg-lime-200 items-center rounded-2xl shadow-2xl cursor-pointer overflow-hidden xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] transform hover:scale-x-110 hover:scale-y-105 transition duration-300 ease-out'
+                                            name={e?.purchase_order_code}
+                                            dataLang={dataLang}
+                                            id={e?.purchase_order_id}
+                                            type={"typePo"}
+                                            >
+                                          </Popup_chitietThere>
+                                          {/* <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-center'>{e?.purchase_order_code}</span> */}
                                       </div>
                                 </h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_price)}</h6>
