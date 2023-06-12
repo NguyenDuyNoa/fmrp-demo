@@ -1038,6 +1038,8 @@ const Popup_dspc = (props) => {
                   else {
                 }
                 sPrice(priceChange);
+              }else {
+                sPrice(priceChange)
               }
           }
           sOption((prevOption) => {
