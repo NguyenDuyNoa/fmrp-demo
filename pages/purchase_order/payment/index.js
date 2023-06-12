@@ -1949,7 +1949,7 @@ return (
                           </div>
                         </div> 
                   </div>
-                  <div className='my-4 font-medium col-span-2 grid grid-cols-4 '>
+                  <div className='mb-4 font-medium col-span-2 grid grid-cols-4 '>
                     <h3 className=' text-[13px] col-span-1 '>{props.dataLang?.payment_voucherCode || "payment_voucherCode"}</h3>
                         <div className='flex flex-wrap col-span-3 gap-2 items-center justify-start font-normal'>
                           {data?.voucher?.map((code, index) => (
