@@ -555,7 +555,7 @@ return (
                               </div>
                             </>
                              ):""}              
-                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right ">{e?.name_location}</h6>                
+                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-left ">{e?.name_location}</h6>                
                           <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{formatNumber(e?.quantity)}</h6>                
                           <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{formatNumber(e?.quantity_net)}</h6>                
                           <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{formatNumber(e?.quantity_diff)}</h6>                
