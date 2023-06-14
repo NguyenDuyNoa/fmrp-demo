@@ -443,7 +443,14 @@ const Popup_chitiet =(props)=>{
   //Thành tiền
   let amount = listQty?.reduce((acc, item) => acc + parseInt(item?.amount), 0);
 
-
+  const formatNumber = (number) => {
+    if (!number && number !== 0) return 0;
+      const integerPart = Math.floor(number);
+      const decimalPart = number - integerPart;
+      const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
+      const roundedNumber = integerPart + roundedDecimalPart;
+      return roundedNumber.toLocaleString("en");
+  };
 return (
 <>
  <PopupEdit   
@@ -466,7 +473,7 @@ return (
                   </div>
                   <div className='col-span-4 '>
                     <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_warehouse || "inventory_warehouse"}</h3><h3 className='col-span-1 font-normal'>{data?.warehouse_name}</h3></div>
-                    <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_total_item || "inventory_total_item"}</h3><h3 className='col-span-1 font-normal'>{data?.total_item}</h3></div>
+                    <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_total_item || "inventory_total_item"}</h3><h3 className='col-span-1 font-normal'>{formatNumber(data?.total_item)}</h3></div>
                     <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_status || "inventory_status"}</h3>
                       <h3 className='col-span-1 cursor-pointer'>
                         <Popup
@@ -532,7 +539,7 @@ return (
                           </div>
                           </h6>   
                           <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5  text-center break-words">{e?.item?.unit_name}</h6>
-                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{e?.price}</h6>  
+                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{formatNumber(e?.price)}</h6>  
                           {dataProductSerial.is_enable === "1" ? (
                                                 <div className=" col-span-1 ">
                                                   <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2  w-[full] text-left">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
@@ -549,11 +556,11 @@ return (
                             </>
                              ):""}              
                           <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right ">{e?.name_location}</h6>                
-                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{e?.quantity}</h6>                
-                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{e?.quantity_net}</h6>                
-                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{e?.quantity_diff}</h6>                
-                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{e?.amount}</h6>                
-                          <h6 className={`${e?.handling != "" ? "text-left 2xl:text-[12px] xl:text-[13px] text-[12px] px-2 py-0.5 col-span-1" : "text-right 2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1"}`}>{e?.handling != "" && props.dataLang[e?.handling]}{" "}{ Math.abs(e?.quantity_diff)}</h6>                
+                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{formatNumber(e?.quantity)}</h6>                
+                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{formatNumber(e?.quantity_net)}</h6>                
+                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{formatNumber(e?.quantity_diff)}</h6>                
+                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{formatNumber(e?.amount)}</h6>                
+                          <h6 className={`${e?.handling != "" ? "text-left 2xl:text-[12px] xl:text-[13px] text-[12px] px-2 py-0.5 col-span-1" : "text-right 2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1"}`}>{e?.handling != "" && props.dataLang[e?.handling]}{" "}{formatNumber(Math.abs(e?.quantity_diff))}</h6>                
                         </div>
                       ))}              
                     </div>   
@@ -579,19 +586,19 @@ return (
              <div className='col-span-3 space-y-2'>
               <div className='flex justify-between '>
                   <div className='font-normal'><h3 className='text-left'>{props.dataLang?.inventory_total_quantity_inventory || "inventory_total_quantity_inventory"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600 text-right'>{totalQuantity}</h3></div>
+                  <div className='font-normal'><h3 className='text-blue-600 text-right'>{formatNumber(totalQuantity)}</h3></div>
                 </div>
                 <div className='flex justify-between '>
                   <div className='font-normal'><h3 className='text-left'>{props.dataLang?.inventory_actual_total_amount || "inventory_actual_total_amount"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600 text-right'>{quantity_net}</h3></div>
+                  <div className='font-normal'><h3 className='text-blue-600 text-right'>{formatNumber(quantity_net)}</h3></div>
                 </div>  
                 <div className='flex justify-between '>
                   <div className='font-normal'><h3 className='text-left'>{props.dataLang?.inventory_total_amount_difference || "inventory_total_amount_difference"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600 text-right'>{quantity_diff}</h3></div>
+                  <div className='font-normal'><h3 className='text-blue-600 text-right'>{formatNumber(quantity_diff)}</h3></div>
                 </div>  
                 <div className='flex justify-between '>
                   <div className='font-normal'><h3 className='text-left'>{props.dataLang?.inventory_qty_into_money || "inventory_qty_into_money"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600 text-right'>{amount}</h3></div>
+                  <div className='font-normal'><h3 className='text-blue-600 text-right'>{formatNumber(amount)}</h3></div>
                 </div>  
              </div>
           </div>   
