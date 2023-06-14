@@ -62,10 +62,10 @@ const Index = (props) => {
         endDate: null
     });
 
-    const [active, sActive] = useState(null)
+    const [loading, setLoading] = useState(false)
     const [onSending, sOnSending] = useState(null)
-    
-    
+
+
     const [action, sAction] = useState('price_quote')
 
 
@@ -84,6 +84,7 @@ const Index = (props) => {
 
     const _ServerFetching = () => {
         const tabPage = router.query?.tab;
+        setLoading(true)
         Axios("GET", `/api_web/Api_quotation/quotation/?csrf_protection=true`, {
             params: {
                 search: keySearch,
@@ -104,6 +105,7 @@ const Index = (props) => {
                 sTotalItems(output)
                 sDataExcel(rResult)
                 sTotal(rTotal)
+                setLoading(false)
             }
 
             sOnFetching(false)
@@ -157,9 +159,30 @@ const Index = (props) => {
     useEffect(() => {
         onFetching_filter && _ServerFetching_filter()
     }, [onFetching_filter])
+
     useEffect(() => {
-        router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query?.tab && sOnFetching_filter(true) || idBranch != null && sOnFetching(true) || idQuoteCode != null && sOnFetching(true) || idCustomer != null && sOnFetching(true) || valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)
-    }, [limit, router.query?.page, router.query?.tab, idBranch, idQuoteCode, idCustomer, valueDate.endDate, valueDate.startDate]);
+        router.query.tab && sOnFetching(true) || router.query?.tab && sOnFetching_filter(true)
+    }, [limit, router.query?.page, router.query?.tab]);
+
+    useEffect(() => {
+        if (idBranch != null || valueDate.startDate != null && valueDate.endDate != null || idCustomer != null || idQuoteCode != null) {
+            router.push({
+                pathname: router.route,
+                query: {
+                    tab: router.query?.tab
+                }
+            })
+            setTimeout(() => {
+                idBranch != null && sOnFetching(true) && _ServerFetching_group() || idQuoteCode != null && sOnFetching(true) && _ServerFetching_group() || idCustomer != null && sOnFetching(true) && _ServerFetching_group() || valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true) && _ServerFetching_group() || (keySearch && sOnFetching(true) && _ServerFetching_group())
+            }, 300)
+        }
+        else {
+            sOnFetching(true)
+            _ServerFetching_group()
+        }
+
+
+    }, [limit, idBranch, idQuoteCode, idCustomer, valueDate.endDate, valueDate.startDate]);
 
     const listBr_filter = listBr ? listBr?.map(e => ({ label: e.name, value: e.id })) : []
 
@@ -284,13 +307,11 @@ const Index = (props) => {
                 }
 
                 _ServerPostStatus(id, newStatus);
-                sActive(newStatus);
             }
             if (result.isDenied) {
                 const newStatus = data[index].status === "no_confirmed" ? "not_confirmed" : "no_confirmed";
 
                 _ServerPostStatus(id, newStatus);
-                sActive(newStatus);
             }
         });
     };
@@ -339,8 +360,8 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.price_quote || "price_quote"} </title>
             </Head>
-            <div className="3xl:pt-[92px] 2xl:pt-[92px] xl:pt-[78px] lg:pt-[76px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-10 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
-                <div className="flex space-x-1 3xl:text-xs 2xl:text-xs xl:text-[11px] lg:text-[11px]">
+            <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
+                <div className="flex space-x-1 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                     <h6 className="text-[#141522]/40">{dataLang?.price_quote || "price_quote"}</h6>
                     <span className="text-[#141522]/40">/</span>
                     <h6 >{dataLang?.price_quote_list || "price_quote"}</h6>
@@ -348,52 +369,55 @@ const Index = (props) => {
 
                 <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
-                        <div className="space-y-1 h-[96%] overflow-hidden">
+                        <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className='flex justify-between'>
-                                <h2 className="xl:text-2xl text-xl text-[#52575E] capitalize">{dataLang?.price_quote || "price_quote"}</h2>
+                                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">{dataLang?.price_quote || "price_quote"}</h2>
                                 <div className="flex justify-end items-center">
-                                    <Link href="/sales_export_product/priceQuote/form" className='xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>{dataLang?.btn_new || "btn_new"}</Link>
+                                    <Link href="/sales_export_product/priceQuote/form" className='3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>
+                                        {dataLang?.btn_new || "btn_new"}
+                                    </Link>
                                 </div>
                             </div>
 
-                            <div className="flex space-x-3 items-center 3xl:h-[8vh] 2xl:h-[8vh] xl:h-[8vh] lg:h-[8vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                {listTabStatus && listTabStatus.map((e) => {
-                                    return (
-                                        <div>
-                                            <TabFilter
-                                                style={{
-                                                    backgroundColor: "#e2f0fe"
-                                                }} dataLang={dataLang}
-                                                key={e?.id}
-                                                onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
-                                                total={e?.count}
-                                                active={e?.id}
-                                                className={"text-[#0F4F9E]"}
-                                            >
-                                                {dataLang[e?.name]}
-                                            </TabFilter>
-                                        </div>
-                                    )
-                                })
+                            <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                {
+                                    listTabStatus && listTabStatus.map((e) => {
+                                        return (
+                                            <div>
+                                                <TabFilter
+                                                    style={{
+                                                        backgroundColor: "#e2f0fe"
+                                                    }} dataLang={dataLang}
+                                                    key={e?.id}
+                                                    onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
+                                                    total={e?.count}
+                                                    active={e?.id}
+                                                    className={"text-[#0F4F9E]"}
+                                                >
+                                                    {dataLang[e?.name]}
+                                                </TabFilter>
+                                            </div>
+                                        )
+                                    })
                                 }
                             </div>
-                            <div className="space-y-2 3xl:h-[92%] 2xl:h-[80%] xl:h-[86%] lg:h-[82%] overflow-hidden">
+                            <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
                                 <div className="xl:space-y-1 space-y-2">
-                                    <div className="bg-slate-100 w-full rounded grid grid-cols-7 xl:p-3 p-2 gap-2">
+                                    <div className="bg-slate-100 w-full rounded-t-lg grid grid-cols-7 2xl:xl:p-2 xl:p-1.5 p-1.5">
                                         <div className='col-span-6'>
-                                            <div className='grid grid-cols-5'>
+                                            <div className='grid grid-cols-5 gap-2'>
                                                 <div className='col-span-1'>
                                                     <form className="flex items-center relative ">
                                                         <IconSearch className="absolute 3xl:h-[20px] 2xl:h-[20px] xl:h-[19px] lg:h-[18px] 3xl:w-[20px] 2xl:w-[18px] xl:w-[19px] lg:w-[18px] z-10 3xl:left-[4%] 2xl:left-[4%] xl:left-[8%] lg:left-[10%] text-[#cccccc]" />
                                                         <input
-                                                            className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] 3xl:h-[40px] 2xl:h-[40px] xl:h-[38px] lg:h-[39px]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  xl:py-2.5 lg:py-[11px] rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-[199px] lg:w-[160px]  relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E] "
+                                                            className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  xl:py-2.5 lg:py-[11px] rounded 2xl:text-base text-xs xl:text-center text-center w-full  relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E] "
                                                             type="text"
                                                             onChange={_HandleOnChangeKeySearch.bind(this)}
                                                             placeholder={dataLang?.branch_search}
                                                         />
                                                     </form>
                                                 </div>
-                                                <div className='ml-1 col-span-1'>
+                                                <div className='col-span-1'>
                                                     <Select
                                                         options={[{ value: '', label: dataLang?.price_quote_branch || "price_quote_branch", isDisabled: true }, ...listBr_filter]}
                                                         onChange={onChangeFilter.bind(this, "branch")}
@@ -401,7 +425,7 @@ const Index = (props) => {
                                                         placeholder={dataLang?.price_quote_select_branch || "price_quote_select_branch"}
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className=" 3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full xl:h-full lg:h-[24px] 2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20 "
+                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-xl bg-white z-20"
                                                         isSearchable={true}
                                                         noOptionsMessage={() => "Không có dữ liệu"}
                                                         // components={{ MultiValue }}
@@ -433,7 +457,7 @@ const Index = (props) => {
                                                         }}
                                                     />
                                                 </div>
-                                                <div className='ml-1  col-span-1'>
+                                                <div className='col-span-1'>
                                                     <Select
                                                         options={[{ value: '', label: dataLang?.price_quote_select_code || "price_quote_select_code", isDisabled: true }, ...listCode_filter]}
                                                         onChange={onChangeFilter.bind(this, "code")}
@@ -441,7 +465,7 @@ const Index = (props) => {
                                                         placeholder={dataLang?.price_quote_code || "price_quote_code"}
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full xl:h-full lg:h-[24px] 2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20"
+                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
                                                         isSearchable={true}
                                                         noOptionsMessage={() => "Không có dữ liệu"}
                                                         // components={{ MultiValue }}
@@ -472,7 +496,7 @@ const Index = (props) => {
                                                         }}
                                                     />
                                                 </div>
-                                                <div className='ml-1 col-span-1'>
+                                                <div className='col-span-1'>
                                                     <Select
                                                         //  options={listBr_filter}
                                                         options={[{ value: '', label: dataLang?.price_quote_select_customer || "price_quote_select_customer", isDisabled: true }, ...listCustomer]}
@@ -481,7 +505,7 @@ const Index = (props) => {
                                                         placeholder={dataLang?.price_quote_customer || "price_quote_customer"}
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full xl:h-full lg:h-[24px] 2xl:text-base xl:text-xs text-[10px]  rounded-md bg-white z-20"
+                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
                                                         isSearchable={true}
                                                         noOptionsMessage={() => "Không có dữ liệu"}
                                                         style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -511,7 +535,7 @@ const Index = (props) => {
                                                         }}
                                                     />
                                                 </div>
-                                                <div className='z-20 ml-1 col-span-1'>
+                                                <div className='z-20 col-span-1'>
                                                     <Datepicker
                                                         value={valueDate}
                                                         i18n={"vi"}
@@ -533,7 +557,7 @@ const Index = (props) => {
                                                             }
                                                         }}
                                                         className="react-datepicker__input-container"
-                                                        inputClassName="rounded-md w-full 2xl:p-2 xl:p-[11px] p-3 bg-white focus:outline-[#0F4F9E]  2xl:placeholder:text-xs xl:placeholder:text-[9px] lg:placeholder:text-[7.5px] border-none  2xl:text-base xl:text-xs text-[10px]  focus:outline-none focus:ring-0 focus:border-transparent"
+                                                        inputClassName="rounded-md w-full 2xl:p-2 xl:p-[9px] py-[11px] xl:px-0 px-2 bg-white focus:outline-[#0F4F9E] 3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[10px] 3xl:placeholder:text-xs 2xl:placeholder:text-[13px] xl:placeholder:text-[10px] lg:placeholder:text-[8px] border-none focus:outline-none focus:ring-0 focus:border-transparent"
                                                     />
 
                                                 </div>
@@ -544,17 +568,27 @@ const Index = (props) => {
                                                 <div>
                                                     {
                                                         dataExcel?.length > 0 && (
-                                                            <ExcelFile filename="Danh sách báo giá" title="DSBG" element={
-                                                                <button className='3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-1.5 xl:py-2 lg:py-2.5 3xl:text-xs 2xl:text-xs xl:text-[9px] lg:text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
-                                                                    <IconExcel className='3xl:scale-100 2xl:scale-100 xl:scale-100 lg:scale-75' size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
+                                                            <ExcelFile
+                                                                filename="Danh sách báo giá"
+                                                                title="DSBG"
+                                                                element={
+                                                                    <button className='3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-2 xl:py-2 lg:py-2.5 3xl:text-[15px] 2xl:text-[13px] xl:text-[12px] lg:text-[8px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
+                                                                        <IconExcel className='3xl:scale-100 2xl:scale-100 xl:scale-100 lg:scale-75' size={18} />
+                                                                        <span>
+                                                                            {dataLang?.client_list_exportexcel}
+                                                                        </span>
+                                                                    </button>
+                                                                }>
                                                                 <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
                                                             </ExcelFile>
                                                         )
                                                     }
                                                 </div>
                                                 <div>
-                                                    <div className="font-[300] text-slate-400 3xl:text-xs 2xl:text-xs xl:text-[10px] lg:text-[6px]">{dataLang?.display}</div>
-                                                    <select className="outline-none  text-[10px] xl:text-xs 2xl:text-sm" onChange={(e) => sLimit(e.target.value)} value={limit}>
+                                                    <div className="font-[300] text-slate-400 3xl:text-xs 2xl:text-xs xl:text-[10px] lg:text-[6px]">
+                                                        {dataLang?.display}
+                                                    </div>
+                                                    <select className="outline-none text-[10px] xl:text-xs 2xl:text-sm" onChange={(e) => sLimit(e.target.value)} value={limit}>
                                                         <option className='text-[10px] xl:text-xs 2xl:text-sm hidden' disabled>{limit == -1 ? "Tất cả" : limit}</option>
                                                         <option className='text-[10px] xl:text-xs 2xl:text-sm' value={15}>15</option>
                                                         <option className='text-[10px] xl:text-xs 2xl:text-sm' value={20}>20</option>
@@ -568,20 +602,20 @@ const Index = (props) => {
                                 </div>
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lg:w-[100%] ">
-                                        <div className="grid grid-cols-11 items-center sticky top-0 bg-white p-2 z-10">
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.price_quote_date || "price_quote_table_date"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.price_quote_code || "price_quote_table_code"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.price_quote_customer || "price_quote_table_customer"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.price_quote_total || "price_quote_table_total"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.price_quote_tax_money || "price_quote_tax_money"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.price_quote_into_money || "price_quote_into_money"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.price_quote_effective_date || "price_quote_table_effective_date"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.price_quote_order_status || "price_quote_order_status"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.price_quote_note || "price_quote_note"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{dataLang?.price_quote_branch || "price_quote_branch"}</h4>
-                                            <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.price_quote_operations || "price_quote_operations"}</h4>
+                                        <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10">
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center whitespace-nowrap'>{dataLang?.price_quote_date || "price_quote_table_date"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.price_quote_code || "price_quote_table_code"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-2 font-[600] text-left'>{dataLang?.price_quote_customer || "price_quote_table_customer"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.price_quote_total || "price_quote_table_total"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.price_quote_tax_money || "price_quote_tax_money"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.price_quote_into_money || "price_quote_into_money"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.price_quote_effective_date || "price_quote_table_effective_date"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.price_quote_order_status || "price_quote_order_status"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-left'>{dataLang?.price_quote_note || "price_quote_note"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.price_quote_branch || "price_quote_branch"}</h4>
+                                            <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.price_quote_operations || "price_quote_operations"}</h4>
                                         </div>
-                                        {onFetching ?
+                                        {loading ?
                                             <Loading className="h-80" color="#0f4f9e" />
                                             :
                                             data?.length > 0 ?
@@ -589,66 +623,66 @@ const Index = (props) => {
                                                     <>
                                                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
                                                             {(data?.map((e) =>
-                                                                <div className='grid grid-cols-11 items-center py-1.5 px-2 hover:bg-slate-100/40 ' key={e.id.toString()}>
-                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-center'>
+                                                                <div className='relative grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40' key={e.id.toString()}>
+                                                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center'>
                                                                         {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}
                                                                     </h6>
 
-                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'>
+                                                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'>
                                                                         <PopupDetailQuote dataLang={dataLang} className="text-left" name={e?.reference_no} id={e?.id} />
                                                                     </h6>
 
-                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-left '>
+                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-2 text-left '>
                                                                         {e.client_name}
                                                                     </h6>
 
-                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-right'>
+                                                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right'>
                                                                         {formatNumber(e.total_price)}
                                                                     </h6>
 
-                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-right'>
+                                                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right '>
                                                                         {formatNumber(e.total_tax_price)}
                                                                     </h6>
 
-                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-right'>
+                                                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right'>
                                                                         {formatNumber(e.total_amount)}
                                                                     </h6>
 
-                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-center'>
+                                                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] col-span-1 text-center '>
                                                                         {e?.validity != null ? moment(e?.validity).format("DD/MM/YYYY") : ""}
                                                                     </h6>
 
                                                                     <h6 className='px-2 col-span-1 flex items-center justify-center text-center '>
-                                                                        <h6 className='px-2 py-1 3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer'>
+                                                                        <h6 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer'>
                                                                             {
                                                                                 e?.status === "confirmed" &&
                                                                                 (
-                                                                                    <div className='3xl:w-40 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[88px] lg:h-4 border border-lime-500 px-2 py-1 rounded-md text-lime-500 font-normal flex justify-center  items-center gap-1 3xl:text-[18px] 2xl:text-[14px] xl:text-xs text-[9px]' onClick={() => _ToggleStatus(e?.id)}>
+                                                                                    <div className='3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-lime-500 text-lime-500 hover:bg-lime-500 hover:text-white hover:-translate-y-0.5 border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>
                                                                                         Đã Duyệt
-                                                                                        <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-4 xl:h-4 lg:w-3 lg:h-3 text-lime-500 bg-white border-lime-500 rounded-full" />
+                                                                                        <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3 " />
                                                                                     </div>
                                                                                 )
                                                                                 ||
                                                                                 e?.status === "not_confirmed" &&
                                                                                 (
-                                                                                    <div className='3xl:w-40 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[88px] lg:h-4 border border-red-500 px-2 py-1 rounded-md text-red-500  font-normal flex justify-center items-center gap-1 3xl:text-[18px] 2xl:text-[14px] xl:text-xs text-[8px]' onClick={() => _ToggleStatus(e?.id)}>
-                                                                                        Chưa Duyệt <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-4 xl:h-4 lg:w-3 lg:h-3" />
+                                                                                    <div className='3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 hover:bg-red-500 hover:text-white hover:-translate-y-0.5 border border-red-500 px-0.5 py-1 rounded-md text-red-500 font-normal flex justify-center items-center gap-1' onClick={() => _ToggleStatus(e?.id)}>
+                                                                                        Chưa Duyệt <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3" />
                                                                                     </div>
                                                                                 )
                                                                                 ||
                                                                                 e?.status === "no_confirmed" &&
                                                                                 (
-                                                                                    <div className='3xl:w-40 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[88px] lg:h-4 rounded-md border border-sky-500 px-2 py-1 text-sky-500  font-normal flex justify-center items-center gap-1 3xl:text-[17.5px] 2xl:text-[14px] xl:text-[11px] text-[8px]' onClick={() => _ToggleStatus(e?.id)}>
+                                                                                    <div className='3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-sky-500 text-sky-500 hover:bg-sky-500 hover:text-white hover:-translate-y-0.5 border px-0.5 py-1 rounded-md font-normal flex justify-center items-center gap-1 ' onClick={() => _ToggleStatus(e?.id)}>
                                                                                         Không Duyệt
-                                                                                        <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-4 xl:h-4 lg:w-3 lg:h-3 text-white bg-sky-500 border-sky-500 rounded-full" />
+                                                                                        <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3" />
                                                                                     </div>
                                                                                 )
                                                                                 ||
                                                                                 e?.status === "ordered" &&
                                                                                 (
-                                                                                    <div className='3xl:max-w-[160px] xl:max-w-[130px] max-w-[80px] relative 3xl:w-[160px] 3xl:h-10 2xl:w-32 2xl:h-8 xl:w-28 xl:h-6 lg:w-[94px] lg:h-6 text-white border border-[#FF8C00] rounded-md bg-[#FF8C00] 3xl:text-left 3xl:px-3 3xl:py-6 3xl:pr-5 2xl:px-2 2xl:py-1  2xl:pr-5 xl:px-2 xl:py-4 xl:pr-7 lg:px-2 lg:py-2 lg:pr-5 lg:text-center font-normal flex justify-center items-center 3xl:text-[18px] 2xl:text-[14px] xl:text-[12px] text-[8px]' onClick={() => handleToggleOrdered(e?.id)}>
-                                                                                        <div className='3xl:max-w-[140px] lg:max-w-[94px]'>Đã Tạo Đơn Đặt Hàng</div>
-                                                                                        <TickCircle className=" absolute 3xl:top-[20%] 3lx:-right-[-5%] 2xl:top-[20%] 2lx:-right-[-5%] xl:top-[30%] xl:-right-[-5%] lg:top-[30%] lg:-right-[-5%] 3xl:w-5 3xl:h-5 2xl:w-5 2xl:h-5 xl:w-4 xl:h-4 lg:w-3 lg:h-3 text-[#FF8C00] bg-white border-[#FF8C00] rounded-full" />
+                                                                                    <div className='3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-6 relative text-white border border-orange-400 rounded-md bg-orange-500 hover:bg-orange-600 text-left 3xl:px-3 3xl:py-5 3xl:pr-5 2xl:px-1 2xl:py-4 2xl:pr-5 xl:px-1 xl:py-3.5 xl:pr-4 lg:px-1 lg:py-2 lg:pr-3 font-normal flex justify-center items-center' onClick={() => handleToggleOrdered(e?.id)}>
+                                                                                        Đã Tạo Đơn Đặt Hàng
+                                                                                        <TickCircle className=" absolute 3xl:top-[30%] 3lx:-right-[-5%] 2xl:top-[25%] 2lx:-right-[-5%] xl:top-[25%] xl:-right-[-5%] lg:top-[30%] lg:-right-[-5%] 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4 xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3 text-white border-orange-400" />
                                                                                     </div>
                                                                                 )
                                                                             }
@@ -656,12 +690,12 @@ const Index = (props) => {
 
                                                                     </h6>
 
-                                                                    <h6 className='3xl:text-base 2xl:text-[14px] xl:text-xs text-[8px] px-2 col-span-1 text-left h-60px truncate '>
+                                                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-left h-60px truncate '>
                                                                         {e?.note}
                                                                     </h6>
 
                                                                     <h6 className='col-span-1 w-fit '>
-                                                                        <div className='3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px] text-[#086FFC] font-[300] px-2 py-0.5 border border-[#086FFC] bg-white rounded-[5.5px] uppercase'>
+                                                                        <div className='cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#086FFC] font-[300] px-1.5 py-0.5 border border-[#086FFC] bg-white rounded-[5.5px] uppercase'>
                                                                             {e?.branch_name}
                                                                         </div>
                                                                     </h6>
@@ -673,7 +707,7 @@ const Index = (props) => {
                                                                             status={e?.status}
                                                                             id={e?.id}
                                                                             type='price_quote'
-                                                                            className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
+                                                                            className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                                         />
                                                                     </div>
                                                                 </div>
@@ -698,18 +732,18 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div className='grid grid-cols-11 bg-gray-100 items-center'>
-                            <div className='col-span-3 p-2 text-center'>
-                                <h3 className='uppercase font-normal 2xl:text-base xl:text-xs text-[8px]'>{dataLang?.price_quote_total_outside || "price_quote_total_outside"}</h3>
+                        <div className='grid grid-cols-12 bg-gray-100 items-center'>
+                            <div className='col-span-4 p-2 text-left'>
+                                <h3 className='uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]'>{dataLang?.price_quote_total_outside || "price_quote_total_outside"}</h3>
                             </div>
                             <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap'>
-                                <h3 className='font-normal 2xl:text-base xl:text-xs text-[8px]'>{formatNumber(total?.total_price)}</h3>
+                                <h3 className='font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]'>{formatNumber(total?.total_price)}</h3>
                             </div>
                             <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap '>
-                                <h3 className='font-normal 2xl:text-base xl:text-xs text-[8px]'>{formatNumber(total?.total_tax_price)}</h3>
+                                <h3 className='font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]'>{formatNumber(total?.total_tax_price)}</h3>
                             </div>
                             <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap'>
-                                <h3 className='font-normal 2xl:text-base xl:text-xs text-[8px]'>{formatNumber(total?.total_amount)}</h3>
+                                <h3 className='font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]'>{formatNumber(total?.total_amount)}</h3>
                             </div>
                         </div>
                         {data?.length != 0 &&

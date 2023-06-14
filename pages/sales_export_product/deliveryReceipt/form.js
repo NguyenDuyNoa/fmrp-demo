@@ -6,12 +6,14 @@ import React, { useState, useEffect } from 'react'
 import Select, { components } from 'react-select';
 import { useRouter } from 'next/router'
 import { MdClear } from 'react-icons/md';
+import { AiFillPlusCircle } from 'react-icons/ai';
 import { BsCalendarEvent } from 'react-icons/bs';
 import { Trash as IconDelete, Add, Minus } from "iconsax-react";
 import { _ServerInstance as Axios } from '/services/axios';
 import { NumericFormat } from "react-number-format";
 import { v4 as uuidv4 } from 'uuid';
 import Loading from 'components/UI/loading';
+import PopupAddress from './(popupAddress)/PopupAddress';
 
 const Toast = Swal.mixin({
   toast: true,
@@ -30,6 +32,7 @@ const Index = (props) => {
   const [onFetchingDetail, setOnFetchingDetail] = useState(false)
   const [onFetchingCustomer, setOnFetchingCustomer] = useState(false)
   const [onFetchingStaff, setOnFetchingStaff] = useState(false)
+  const [onFetchingAddress, setOnFetchingAddress] = useState(false)
   const [onFetchingQuote, setOnFetchingQuote] = useState(false)
   const [onFetchingContactPerson, setOnFetchingContactPerson] = useState(false)
   const [onSending, setOnSending] = useState(false);
@@ -37,14 +40,15 @@ const Index = (props) => {
 
   const [dataCustomer, setDataCustomer] = useState([])
   const [dataPersonContact, setDataContactPerson] = useState([])
+  const [dataAddress, setDataAddress] = useState([])
   const [dataStaffs, setDataStaffs] = useState([])
-  const [dataQuotes, setDataQuotes] = useState([])
+  const [dataProductOrder, setDataProductOrder] = useState([])
   const [dataItems, setDataItems] = useState([])
   const [dataTasxes, setDataTasxes] = useState([])
   const [dataBranch, setDataBranch] = useState([])
 
   const [note, setNote] = useState('')
-  const [codeProduct, setCodeProduct] = useState('')
+  const [codeDelivery, setCodeProduct] = useState('')
   const [totalTax, setTotalTax] = useState()
   const [totalDiscount, setTotalDiscount] = useState(0)
 
@@ -53,8 +57,9 @@ const Index = (props) => {
 
   const [customer, setCustomer] = useState(null)
   const [contactPerson, setContactPerson] = useState(null)
+  const [address, setAddress] = useState(null)
   const [staff, setStaff] = useState(null)
-  const [quote, setQuote] = useState(null)
+  const [productOrder, setProductOrder] = useState(null)
   const [branch, setBranch] = useState(null);
 
   const [errDate, setErrDate] = useState(false)
@@ -62,9 +67,11 @@ const Index = (props) => {
   const [errStaff, setErrStaff] = useState(false)
   const [errQuote, setErrQuote] = useState(false)
   const [errDeliveryDate, setErrDeliveryDate] = useState(false)
+  const [errAddress, setErrAddress] = useState(false)
   const [errBranch, setErrBranch] = useState(false)
 
-  const [hidden, setHidden] = useState(false)
+  const [openPopupAddress, setOpenPopupAddress] = useState(false)
+
   const [typeOrder, setTypeOrder] = useState("0");
   const [itemsAll, setItemsAll] = useState([])
 
@@ -82,6 +89,7 @@ const Index = (props) => {
     router.query && setErrStaff(false)
     router.query && setErrDeliveryDate(false)
     router.query && setErrBranch(false)
+    router.query && setErrAddress(false)
     router.query && setStartDate(new Date())
     router.query && setDeliveryDate(null)
     router.query && setNote("")
@@ -96,14 +104,13 @@ const Index = (props) => {
     }, (err, response) => {
       if (!err) {
         var rResult = response.data;
-        console.log('ress edit :', rResult);
 
         const items = rResult?.items?.map(e => ({
           price_quote_order_item_id: e?.id,
           id: e.id,
           item: {
             e: e?.item,
-            label: `${e.item?.item_name} <span style={{display: none}}>${e.item?.codeProduct + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
+            label: `${e.item?.item_name} <span style={{display: none}}>${e.item?.codeDelivery + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,
             value: e.item?.id
           },
           quantity: +e?.quantity,
@@ -116,7 +123,6 @@ const Index = (props) => {
           total_amount: (+e?.price_after_discount) * (1 + (+e?.tax_rate) / 100) * (+e?.quantity),
           delivery_date: moment(e?.delivery_date).toDate()
         }));
-        console.log("item : ", items);
 
         setOption(items)
         setCodeProduct(rResult?.code)
@@ -128,9 +134,8 @@ const Index = (props) => {
         // setDeliveryDate(moment(rResult?.validity).toDate())
         setNote(rResult?.note)
         if (rResult?.quote_id !== "0" && rResult?.quote_code !== null) {
-          setTypeOrder("1")
-          setHidden(true)
-          setQuote({ label: rResult?.quote_code, value: rResult?.quote_id })
+          // setTypeOrder("1")
+          setProductOrder({ label: rResult?.quote_code, value: rResult?.quote_id })
         }
       }
       setOnFetchingDetail(false)
@@ -185,6 +190,22 @@ const Index = (props) => {
     setOnFetchingContactPerson(false)
   }
 
+  // Address
+  const handleFetchingAddress = () => {
+    var data = new FormData();
+    data.append('client_id', customer !== null ? +customer.value : null);
+
+    Axios("POST", `/api_web/api_delivery/GetShippingClient?csrf_protection=true`, {
+      data: data,
+      headers: { "Content-Type": "multipart/form-data" }
+    }, (err, response) => {
+      if (!err) {
+        var rResult = response?.data
+        setDataAddress(rResult?.map(e => ({ label: e.name, value: e.id })))
+      }
+    })
+    setOnFetchingAddress(false)
+  }
   // Staff
   const handleFetchingStaff = () => {
     Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {
@@ -200,91 +221,54 @@ const Index = (props) => {
     setOnFetchingStaff(false)
   }
 
-  // Quote
-  const handleFetchingQuote = () => {
-    Axios("GET", `/api_web/Api_quotation/quotationNotOrderedCombobox/?csrf_protection=true`, {
-      params: {
-        "filter[branch_id]": branch !== null ? +branch?.value : null,
-        "filter[client_id]": customer !== null ? +customer?.value : null
-      }
+  // Đơn hàng bán
+  const handleFetchingProductOrder = () => {
+    var data = new FormData();
+    data.append('branch_id', branch !== null ? +branch.value : null);
+    data.append('client_id', customer !== null ? +customer.value : null);
+
+    Axios("POST", `/api_web/api_delivery/searchOrdersToCustomer?csrf_protection=true`, {
+      data: data,
+      headers: { "Content-Type": "multipart/form-data" }
     }, (err, response) => {
       if (!err) {
-        var rResult = response?.data.result
-        setDataQuotes(rResult?.map(e => ({ label: e.reference_no, value: e.id })))
+        var rResult = response?.data.results
+        setDataProductOrder(rResult?.map(e => ({ label: e.text, value: e.id })))
       }
     })
     setOnFetchingQuote(false)
   }
 
   // fetch items
-  const handleFetchingItemsAll = () => {
-    if (typeOrder === "1") {
-      Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
-        if (!err) {
-          var { result } = response.data.data
-          setDataItems(result)
-        }
-      })
-      setOnFetchingItemsAll(false)
-    }
-    if (typeOrder === "0") {
-      Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
-        if (!err) {
-          var { result } = response.data.data
-          setDataItems(result)
-        }
-      })
-      setOnFetchingItemsAll(false)
+  // const handleFetchingItemsAll = () => {
 
-    }
-  }
+  //   Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
+  //     if (!err) {
+  //       var { result } = response.data.data
+  //       setDataItems(result)
+  //     }
+  //   })
+  //   setOnFetchingItemsAll(false)
+
+
+  // }
 
   const handleFetchingItem = async () => {
-    if (typeOrder === "1") {
-      if (quote && quote.value !== null) {
-        await Axios("POST", "/api_web/Api_quotation/searchItemsVariant/?csrf_protection=true", {
-          params: {
-            "filter[quote_id]": quote !== null ? +quote?.value : null,
-          }
-        }, (err, response) => {
-          if (!err) {
-            var { result } = response.data.data
-            setDataItems(result)
-          }
-        })
-        setOnFetchingItem(false)
+    await Axios("POST", "/api_web/api_delivery/searchItemsVariant/?csrf_protection=true", {
+      params: {
+        "filter[order_id]": productOrder !== null ? +productOrder.value : null
       }
-      else {
-        await Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
-          if (!err) {
-            var { result } = response.data.data
-            setDataItems(result)
-          }
-        })
-        setOnFetchingItem(false)
-
+    }, (err, response) => {
+      if (!err) {
+        var { result } = response.data.data
+        setDataItems(result)
       }
-    }
-    else if (typeOrder === '0') {
-      await Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
-        if (!err) {
-          var { result } = response.data.data
-          setDataItems(result)
-        }
-      })
-      setOnFetchingItem(false)
+    })
+    setOnFetchingItem(false)
 
-    }
+
   }
 
-
-  useEffect(() => {
-    onFetchingDetail && _ServerFetchingDetail()
-  }, [onFetchingDetail]);
-
-  useEffect(() => {
-    id && setOnFetchingDetail(true)
-  }, []);
 
   useEffect(() => {
     branch === null && setDataCustomer([]) || setCustomer(null) || setDataContactPerson([]) || setContactPerson(null) || setDataStaffs([]) || setStaff(null)
@@ -293,12 +277,17 @@ const Index = (props) => {
   useEffect(() => {
     onFetchingCustomer && handleFetchingCustomer()
   }, [onFetchingCustomer])
+
   useEffect(() => {
     onFetchingStaff && handleFetchingStaff()
   }, [onFetchingStaff])
 
   useEffect(() => {
-    onFetchingQuote && handleFetchingQuote()
+    onFetchingAddress && handleFetchingAddress()
+  }, [onFetchingAddress])
+
+  useEffect(() => {
+    onFetchingQuote && handleFetchingProductOrder()
   }, [onFetchingQuote])
 
   useEffect(() => {
@@ -310,23 +299,27 @@ const Index = (props) => {
   }, [branch]);
 
   useEffect(() => {
-    customer !== null && (setOnFetchingContactPerson(true) || setOnFetchingQuote(true))
+    customer !== null && (setOnFetchingContactPerson(true) || setOnFetchingQuote(true) || setOnFetchingAddress(true))
   }, [customer]);
   useEffect(() => {
-    quote !== null && (setOnFetchingItem(true))
-  }, [quote]);
+    productOrder !== null && (setOnFetchingItem(true))
+  }, [productOrder]);
 
-  useEffect(() => {
-    setOnFetchingItemsAll && handleFetchingItemsAll()
-  }, [setOnFetchingItemsAll])
+  // useEffect(() => {
+  //   onFetchingItemsAll && handleFetchingItemsAll()
+  // }, [onFetchingItemsAll])
 
   useEffect(() => {
     onFetchingItem && handleFetchingItem()
   }, [onFetchingItem]);
 
+  useEffect(() => {
+    onFetching && handleFetchingBranch()
+  }, [onFetching]);
+
   const options = dataItems?.map(e => {
     return ({
-      label: `${e.name} <span style={{display: none}}>${e.codeProduct}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+      label: `${e.name} <span style={{display: none}}>${e.codeDelivery}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
       value: e.id,
       e
     })
@@ -389,48 +382,6 @@ const Index = (props) => {
   }, [totalDiscount]);
 
 
-  useEffect(() => {
-    branch === null && setDataCustomer([]) || setCustomer(null) || setDataContactPerson([]) || setContactPerson(null) || setDataStaffs([]) || setStaff(null)
-  }, [])
-
-  useEffect(() => {
-    onFetchingCustomer && handleFetchingCustomer()
-  }, [onFetchingCustomer])
-  useEffect(() => {
-    onFetchingStaff && handleFetchingStaff()
-  }, [onFetchingStaff])
-
-  useEffect(() => {
-    onFetchingQuote && handleFetchingQuote()
-  }, [onFetchingQuote])
-
-  useEffect(() => {
-    onFetchingContactPerson && handleFetchingContactPerson()
-  }, [onFetchingContactPerson])
-
-  useEffect(() => {
-    branch !== null && (setOnFetchingCustomer(true) || setOnFetchingStaff(true))
-  }, [branch]);
-
-  useEffect(() => {
-    customer !== null && (setOnFetchingContactPerson(true) || setOnFetchingQuote(true))
-  }, [customer]);
-  useEffect(() => {
-    quote !== null && (setOnFetchingItem(true))
-  }, [quote]);
-
-  useEffect(() => {
-    onFetchingItemsAll && handleFetchingItemsAll()
-  }, [onFetchingItemsAll])
-
-  useEffect(() => {
-    onFetchingItem && handleFetchingItem()
-  }, [onFetchingItem]);
-
-  useEffect(() => {
-    onFetching && handleFetchingBranch()
-  }, [onFetching]);
-
   // useEffect(() => {
   //   router.query && setOnFetching(true)
   //   router.query && setOnFetchingItemsAll(true)
@@ -442,6 +393,9 @@ const Index = (props) => {
   useEffect(() => {
     sErrCustomer(false)
   }, [customer != null]);
+  useEffect(() => {
+    setErrAddress(false)
+  }, [address != null]);
 
   useEffect(() => {
     setErrDeliveryDate(false)
@@ -455,31 +409,18 @@ const Index = (props) => {
 
 
   // search api
-  const _HandleSeachApi = (inputValue) => {
-    if (typeOrder === "1" && quote && +quote.value) {
-      Axios("POST", `/api_web/Api_quotation/searchItemsVariant/?csrf_protection=true`, {
-        data: {
-          term: inputValue,
-        },
-        params: {
-          "filter[quote_id]": quote ? +quote?.value : null
-        }
-      }, (err, response) => {
-        if (!err) {
-          var { result } = response?.data.data
-          setDataItems(result)
-        }
-      })
-
-    }
-    if (typeOrder === "0") {
-      Axios("POST", `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`, {}, (err, response) => {
-        if (!err) {
-          var { result } = response?.data.data
-          setDataItems(result)
-        }
-      })
-    }
+  const _HandleSeachApi = async (inputValue) => {
+    await Axios("POST", "/api_web/api_delivery/searchItemsVariant/?csrf_protection=true", {
+      params: {
+        "filter[order_id]": productOrder !== null ? +productOrder.value : null
+      }
+    }, (err, response) => {
+      if (!err) {
+        var { result } = response.data.data
+        setDataItems(result)
+      }
+    })
+    setOnFetchingItem(false)
   }
 
   // format number
@@ -492,7 +433,7 @@ const Index = (props) => {
   // onChange
   const handleOnChangeInput = (type, value) => {
 
-    if (type === "codeProduct") {
+    if (type === "codeDelivery") {
       setCodeProduct(value.target.value)
     }
     else if (type === "customer") {
@@ -509,9 +450,11 @@ const Index = (props) => {
           if (result.isConfirmed) {
             setCustomer(value)
             setDataContactPerson([])
+            setDataAddress([])
+            setAddress(null)
             setContactPerson(null)
-            setDataQuotes([])
-            setQuote(null)
+            setDataProductOrder([])
+            setProductOrder(null)
             setOption([])
 
             setOnFetchingItem(true)
@@ -520,9 +463,11 @@ const Index = (props) => {
       } else {
         setCustomer(value)
         setDataContactPerson([])
+        setDataAddress([])
+        setAddress(null)
         setContactPerson(null)
-        setDataQuotes([])
-        setQuote(null)
+        setDataProductOrder([])
+        setProductOrder(null)
 
         setOnFetchingItem(true)
       }
@@ -546,11 +491,12 @@ const Index = (props) => {
             setCustomer(null)
             setDataCustomer([])
             setDataContactPerson([])
+            setDataAddress([])
             setContactPerson(null)
             setDataStaffs([])
             setStaff(null)
-            setDataQuotes([])
-            setQuote(null)
+            setDataProductOrder([])
+            setProductOrder(null)
 
           }
         })
@@ -560,48 +506,25 @@ const Index = (props) => {
         setCustomer(null)
         setDataCustomer([])
         setDataContactPerson([])
+        setDataAddress([])
         setContactPerson(null)
         setDataStaffs([])
         setStaff(null)
-        setDataQuotes([])
-        setQuote(null)
+        setDataProductOrder([])
+        setProductOrder(null)
         setOption([])
       }
     }
     else if (type === "contactPerson") {
       setContactPerson(value)
     }
+    else if (type === "address") {
+      setAddress(value)
+    }
     else if (type === "staff") {
       setStaff(value)
     }
-    else if (type === "typeOrder") {
-      Swal.fire({
-        title: `${"Mặt hàng đã chọn trước đó sẽ bị xóa, bạn có muốn tiếp tục?"}`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#296dc1',
-        cancelButtonColor: '#d33',
-        confirmButtonText: `${dataLang?.aler_yes}`,
-        cancelButtonText: `${dataLang?.aler_cancel}`
-      }).then((result) => {
-        if (result.isConfirmed) {
-          setTypeOrder(value.target.value);
-          setHidden(value.target.value === "1");
-          setQuote(value.target.value === "0" ? null : quote);
-
-          setOnFetchingItem(value.target.value === "0" && true)
-          setOnFetchingItemsAll(value.target.value === "1" && true)
-
-          // setDataItems([])
-          setTotalTax('')
-          setTotalDiscount('')
-          setOption([])
-
-
-        }
-      })
-    }
-    else if (type === "quote") {
+    else if (type === "productOrder") {
       if (option?.length >= 1) {
         Swal.fire({
           title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó, bạn có muốn tiếp tục ?"}`,
@@ -613,7 +536,7 @@ const Index = (props) => {
           cancelButtonText: `${dataLang?.aler_cancel}`
         }).then((result) => {
           if (result.isConfirmed) {
-            setQuote(value)
+            setProductOrder(value)
             setOption([])
 
             setOnFetchingItemsAll(true)
@@ -622,7 +545,7 @@ const Index = (props) => {
           }
         })
       } else {
-        setQuote(value)
+        setProductOrder(value)
         setOnFetchingItem(true)
       }
 
@@ -642,100 +565,47 @@ const Index = (props) => {
 
     else if (type == "itemAll") {
       setItemsAll(value)
+      console.log('item all : ', value);
       if (value?.length === 0) {
         // setOption([{id: Date.now(), item: null}])
         //new
         setOption([])
       } else if (value?.length > 0) {
-        if (typeOrder === "0") {
-          const newData = value?.map((e, index) => {
-            return ({
-              id: uuidv4(),
-              item: {
-                e: e?.e,
-                label: e?.label,
-                value: e?.value,
-              },
-              unit: e?.e?.unit_name,
-              quantity: 1,
-              sortIndex: index,
-              price: 1,
-              discount: 0,
-              price_after_discount: 1,
-              tax: 0,
-              price_after_tax: 1,
-              total_amount: 1,
-              note: "",
-              delivery_date: null
-            })
-          }).sort((a, b) => b.sortIndex - a.sortIndex)
-          setOption([...newData])
-        }
-        if (typeOrder === "1" && quote !== null) {
-
-          const newData = value?.map((e, index) => {
-
-            return ({
-              id: uuidv4(),
-              item: {
-                e: e?.e,
-                label: e?.label,
-                value: e?.value,
-              },
-              unit: e?.e?.unit_name,
-              quantity: e?.e?.quantity,
-              sortIndex: index,
-              price: e?.e?.price,
-              discount: e?.e?.discount_percent,
-              price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
-              tax: {
-                label: e?.e?.tax_name,
-                value: e?.e?.tax_id,
-                tax_rate: e?.e?.tax_rate
-              },
-              price_after_tax: (+e?.e?.price * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100)) * (1 + e?.e?.tax_rate / 100),
-              total_amount: (+e?.e?.price * (1 - +e?.e?.discount_percent / 100)) * (1 + (+e?.e?.tax_rate) / 100) * (+e?.e?.quantity),
-              note: e?.e?.note_item,
-              delivery_date: null
-            })
-          }).sort((a, b) => b.sortIndex - a.sortIndex)
-
-          setOption([...newData])
-        } else if (typeOrder === '1' && quote === null) {
-          Toast.fire({
-            icon: 'error',
-            title: `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng!`
+        const newData = value?.map((e, index) => {
+          return ({
+            id: uuidv4(),
+            item: {
+              e: e?.e,
+              label: e?.label,
+              value: e?.value,
+            },
+            unit: e?.e?.unit_name,
+            quantity: e?.e?.quantity,
+            sortIndex: index,
+            price: e?.e?.price,
+            discount: e?.e?.discount_percent_item,
+            price_after_discount: +e?.e?.price * (1 - (+e?.e?.discount_percent_item / 100)),
+            tax: {
+              label: e?.e?.tax_name,
+              value: e?.e?.tax_id_item,
+              tax_rate: e?.e?.tax_rate_item
+            },
+            price_after_tax: (+e?.e?.price * e?.e?.quantity * (1 - (+e?.e?.discount_percent_item / 100))) * (1 + (e?.e?.tax_rate_item / 100)),
+            total_amount: (+e?.e?.price * (1 - (+e?.e?.discount_percent_item / 100))) * (1 + (+e?.e?.tax_rate_item / 100)) * (+e?.e?.quantity),
+            note: e?.e?.note_item,
           })
-        }
-
+        }).sort((a, b) => b.sortIndex - a.sortIndex)
+        setOption([...newData])
       }
     }
   }
 
   const handleAddParent = (value) => {
+    console.log('value : ', value);
     const checkData = option?.some(e => e?.item?.value === value?.value)
     if (!checkData) {
-      if (typeOrder === '0') {
-        const newData = {
-          id: uuidv4(),
-          item: value,
-          unit: value?.e?.unit_name,
-          quantity: 1,
-          price: 1,
-          discount: totalDiscount ? totalDiscount : 0,
-          price_after_discount: 1,
-          tax: null,
-          price_after_tax: 1,
-          total_amount: 1,
-          note: "",
-          delivery_date: null,
-        }
-        setOption([newData, ...option]);
-
-      }
-      if (typeOrder === '1' && quote !== null) {
-        const newData = {
-          id: uuidv4(),
+      const newData = {
+        id: uuidv4(),
           item: {
             e: value?.e,
             label: value?.label,
@@ -744,27 +614,18 @@ const Index = (props) => {
           unit: value?.e?.unit_name,
           quantity: value?.e?.quantity,
           price: value?.e?.price,
-          discount: value?.e?.discount_percent,
-          price_after_discount: +value?.e?.price * (1 - +value?.e?.discount_percent / 100),
+          discount: value?.e?.discount_percent_item,
+          price_after_discount: +value?.e?.price * (1 - +value?.e?.discount_percent_item / 100),
           tax: {
             label: value?.e?.tax_name,
-            value: value?.e?.tax_id,
-            tax_rate: value?.e?.tax_rate
+            value: value?.e?.tax_id_item,
+            tax_rate: value?.e?.tax_rate_item
           },
-          price_after_tax: (+value?.e?.price * value?.e?.quantity * (1 - +value?.e?.discount_percent / 100)) * (1 + value?.e?.tax_rate / 100),
-          total_amount: (+value?.e?.price * (1 - +value?.e?.discount_percent / 100)) * (1 + (+value?.e?.tax_rate) / 100) * (+value?.e?.quantity),
+          price_after_tax: (+value?.e?.price * value?.e?.quantity * (1 - +value?.e?.discount_percent_item / 100)) * (1 + value?.e?.tax_rate_item / 100),
+          total_amount: (+value?.e?.price * (1 - +value?.e?.discount_percent_item / 100)) * (1 + (+value?.e?.tax_rate_item) / 100) * (+value?.e?.quantity),
           note: value?.e?.note_item,
-          delivery_date: null
-        }
-        setOption([newData, ...option]);
-
-      } else if (typeOrder === '1' && quote === null) {
-        Toast.fire({
-          icon: 'error',
-          title: `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng!`
-        })
       }
-
+      setOption([newData, ...option]);
     } else {
       Toast.fire({
         title: `${"Mặt hàng đã được chọn"}`,
@@ -993,55 +854,36 @@ const Index = (props) => {
     e.preventDefault();
     let deliveryDateInOption = option.some(e => e?.delivery_date === null)
 
-    if (typeOrder === '0') {
-      if (startDate == null || customer == null || branch == null || staff == null || deliveryDateInOption === true) {
-        startDate == null && setErrDate(true)
-        customer?.value == null && sErrCustomer(true)
-        branch?.value == null && setErrBranch(true)
-        staff?.value == null && setErrStaff(true)
-        deliveryDateInOption === true && setErrDeliveryDate(true)
-        // deliveryDate == null && setErrDeliveryDate(true)
-        Toast.fire({
-          icon: 'error',
-          title: `${dataLang?.required_field_null}`
-        })
-      }
-      else {
-        setOnSending(true)
-      }
-    } else if (typeOrder === '1') {
-      if (startDate == null || customer == null || branch == null || staff == null || deliveryDateInOption === true || quote == null) {
-        startDate == null && setErrDate(true)
-        customer?.value == null && sErrCustomer(true)
-        branch?.value == null && setErrBranch(true)
-        staff?.value == null && setErrStaff(true)
-        deliveryDateInOption === true && setErrDeliveryDate(true)
-        quote?.value == null && setErrQuote(true)
-        // deliveryDate == null && setErrDeliveryDate(true)
-
-        Toast.fire({
-          icon: 'error',
-          title: `${dataLang?.required_field_null}`
-        })
-      }
-      else {
-        setOnSending(true)
-      }
-
+    if (startDate == null || customer == null || branch == null || staff == null || deliveryDateInOption === true) {
+      startDate == null && setErrDate(true)
+      customer?.value == null && sErrCustomer(true)
+      branch?.value == null && setErrBranch(true)
+      address?.value == null && setErrAddress(true)
+      staff?.value == null && setErrStaff(true)
+      deliveryDateInOption === true && setErrDeliveryDate(true)
+      // deliveryDate == null && setErrDeliveryDate(true)
+      Toast.fire({
+        icon: 'error',
+        title: `${dataLang?.required_field_null}`
+      })
     }
+    else {
+      setOnSending(true)
+    }
+
   }
 
   // handle submit
   const handleSubmit = async () => {
     var formData = new FormData();
-    formData.append("code", codeProduct)
+    formData.append("code", codeDelivery)
     formData.append("date", (moment(startDate).format("YYYY-MM-DD HH:mm:ss")))
     formData.append("branch_id", branch?.value)
     formData.append("client_id", customer?.value)
     formData.append("person_contact_id", contactPerson?.value)
     formData.append("staff_id", staff?.value)
     formData.append("note", note)
-    formData.append("quote_id", typeOrder === "1" ? quote?.value : "");
+    formData.append("quote_id", productOrder?.value);
 
 
     newDataOption.forEach((item, index) => {
@@ -1077,6 +919,7 @@ const Index = (props) => {
           setErrQuote(null)
           setNote("")
           setErrBranch(false)
+          setErrAddress(false)
           setErrDate(false)
           setErrDeliveryDate(false)
           sErrCustomer(false)
@@ -1118,152 +961,87 @@ const Index = (props) => {
   }
 
 
-  // codeProduct new
-  const hiddenOptions = quote?.length > 3 ? quote?.slice(0, 3) : [];
-  const fakeDataQuotes = branch != null ? dataQuotes.filter((x) => !hiddenOptions.includes(x.value)) : []
+  // codeDelivery new
+  const hiddenOptions = productOrder?.length > 3 ? productOrder?.slice(0, 3) : [];
+  const fakeDataQuotes = branch != null ? dataProductOrder?.filter((x) => !hiddenOptions.includes(x.value)) : []
 
-  // const optionsItem = dataItems?.map(e => ({ label: `${e.name} <span style={{display: none}}>${e.codeProduct}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`, value: e.id, e }))
+  // const optionsItem = dataItems?.map(e => ({ label: `${e.name} <span style={{display: none}}>${e.codeDelivery}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`, value: e.id, e }))
   const allItems = [...options]
 
-  const _HandleSelectAll = () => {
-    if (typeOrder === '0') {
-      const data = allItems?.map((e, index) => ({
-        id: uuidv4(),
-        item: {
-          e: e?.e,
-          label: e?.label,
-          value: e?.value,
-        },
-        unit: e?.e?.unit_name,
-        quantity: 1,
-        sortIndex: index,
-        price: 1,
-        discount: 0,
-        price_after_discount: 1,
-        tax: 0,
-        price_after_tax: 1,
-        total_amount: 1,
-        note: "",
-        delivery_date: null
-      }))
+  const handleSelectAll = () => {
+    const data = allItems?.map((e, index) => ({
+      id: uuidv4(),
+      item: {
+        e: e?.e,
+        label: e?.label,
+        value: e?.value,
+      },
+      unit: e?.e?.unit_name,
+      quantity: e?.e?.quantity,
+      sortIndex: index,
+      price: e?.e?.price,
+      discount: e?.e?.discount_percent_item,
+      price_after_discount: +e?.e?.price * (1 - (+e?.e?.discount_percent_item / 100)),
+      tax: {
+        label: e?.e?.tax_name,
+        value: e?.e?.tax_id_item,
+        tax_rate: e?.e?.tax_rate_item
+      },
+      price_after_tax: (+e?.e?.price * e?.e?.quantity * (1 - (+e?.e?.discount_percent_item / 100))) * (1 + (e?.e?.tax_rate_item / 100)),
+      total_amount: (+e?.e?.price * (1 - (+e?.e?.discount_percent_item / 100))) * (1 + (+e?.e?.tax_rate_item / 100)) * (+e?.e?.quantity),
+      note: e?.e?.note_item,
+    }))
 
-      setOption(data);
-      //new
-      setItemsAll(allItems?.map((e, index) => ({
-        id: uuidv4(),
-        item: {
-          e: e?.e,
-          label: e?.label,
-          value: e?.value,
-        },
-        unit: e?.e?.unit_name,
-        quantity: 1,
-        sortIndex: index,
-        price: 1,
-        discount: 0,
-        price_after_discount: 1,
-        tax: 0,
-        price_after_tax: 1,
-        total_amount: 1,
-        note: "",
-        delivery_date: null
-      })))
-      setOption(allItems?.map((e, index) => ({
-        id: uuidv4(),
-        item: {
-          e: e?.e,
-          label: e?.label,
-          value: e?.value,
-        },
-        unit: e?.e?.unit_name,
-        quantity: 1,
-        sortIndex: index,
-        price: 1,
-        discount: 0,
-        price_after_discount: 1,
-        tax: 0,
-        price_after_tax: 1,
-        total_amount: 1,
-        note: "",
-        delivery_date: null
-      })))
-    }
-    if (typeOrder === '1' && quote !== null) {
-      const data = allItems?.map((e, index) => ({
-        id: uuidv4(),
-        item: {
-          e: e?.e,
-          label: e?.label,
-          value: e?.value,
-        },
-        unit: e?.e?.unit_name,
-        quantity: 1,
-        sortIndex: index,
-        price: 1,
-        discount: 0,
-        price_after_discount: 1,
-        tax: 0,
-        price_after_tax: 1,
-        total_amount: 1,
-        note: "",
-        delivery_date: null
-      }))
-      setOption(data);
-      //new
-      setItemsAll(allItems?.map((e, index) => ({
-        id: uuidv4(),
-        item: {
-          e: e?.e,
-          label: e?.label,
-          value: e?.value,
-        },
-        unit: e?.e?.unit_name,
-        quantity: e?.e?.quantity,
-        price: e?.e?.price,
-        discount: e?.e?.discount_percent,
-        price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
-        tax: {
-          label: e?.e?.tax_name,
-          value: e?.e?.tax_id,
-          tax_rate: e?.e?.tax_rate
-        },
-        price_after_tax: (+e?.e?.price * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100)) * (1 + e?.e?.tax_rate / 100),
-        total_amount: (+e?.e?.price * (1 - +e?.e?.discount_percent / 100)) * (1 + (+e?.e?.tax_rate) / 100) * (+e?.e?.quantity),
-        note: e?.e?.note_item,
-        delivery_date: null
-      })))
-      setOption(allItems?.map((e, index) => ({
-        id: uuidv4(),
-        item: {
-          e: e?.e,
-          label: e?.label,
-          value: e?.value,
-        },
-        unit: e?.e?.unit_name,
-        quantity: e?.e?.quantity,
-        price: e?.e?.price,
-        discount: e?.e?.discount_percent,
-        price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
-        tax: {
-          label: e?.e?.tax_name,
-          value: e?.e?.tax_id,
-          tax_rate: e?.e?.tax_rate
-        },
-        price_after_tax: (+e?.e?.price * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100)) * (1 + e?.e?.tax_rate / 100),
-        total_amount: (+e?.e?.price * (1 - +e?.e?.discount_percent / 100)) * (1 + (+e?.e?.tax_rate) / 100) * (+e?.e?.quantity),
-        note: e?.e?.note_item,
-        delivery_date: null
-      })))
+    setOption(data);
+    //new
+    setItemsAll(allItems?.map((e, index) => ({
+      id: uuidv4(),
+      item: {
+        e: e?.e,
+        label: e?.label,
+        value: e?.value,
+      },
+      unit: e?.e?.unit_name,
+      quantity: e?.e?.quantity,
+      sortIndex: index,
+      price: e?.e?.price,
+      discount: e?.e?.discount_percent_item,
+      price_after_discount: +e?.e?.price * (1 - (+e?.e?.discount_percent_item / 100)),
+      tax: {
+        label: e?.e?.tax_name,
+        value: e?.e?.tax_id_item,
+        tax_rate: e?.e?.tax_rate_item
+      },
+      price_after_tax: (+e?.e?.price * e?.e?.quantity * (1 - (+e?.e?.discount_percent_item / 100))) * (1 + (e?.e?.tax_rate_item / 100)),
+      total_amount: (+e?.e?.price * (1 - (+e?.e?.discount_percent_item / 100))) * (1 + (+e?.e?.tax_rate_item / 100)) * (+e?.e?.quantity),
+      note: e?.e?.note_item,
+    })))
+    setOption(allItems?.map((e, index) => ({
+      id: uuidv4(),
+      item: {
+        e: e?.e,
+        label: e?.label,
+        value: e?.value,
+      },
+      unit: e?.e?.unit_name,
+      quantity: e?.e?.quantity,
+      sortIndex: index,
+      price: e?.e?.price,
+      discount: e?.e?.discount_percent_item,
+      price_after_discount: +e?.e?.price * (1 - (+e?.e?.discount_percent_item / 100)),
+      tax: {
+        label: e?.e?.tax_name,
+        value: e?.e?.tax_id_item,
+        tax_rate: e?.e?.tax_rate_item
+      },
+      price_after_tax: (+e?.e?.price * e?.e?.quantity * (1 - (+e?.e?.discount_percent_item / 100))) * (1 + (e?.e?.tax_rate_item / 100)),
+      total_amount: (+e?.e?.price * (1 - (+e?.e?.discount_percent_item / 100))) * (1 + (+e?.e?.tax_rate_item / 100)) * (+e?.e?.quantity),
+      note: e?.e?.note_item,
+    })))
 
-    } else if (typeOrder === '1' && quote === null) {
-      Toast.fire({
-        icon: 'error',
-        title: `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng!`
-      })
-    }
   };
 
-  const _HandleDeleteAll = () => {
+  const handleDeleteAll = () => {
     setItemsAll([])
     setOption([])
     //new
@@ -1275,8 +1053,17 @@ const Index = (props) => {
         {
           allItems?.length > 0 &&
           <div className='grid grid-cols-2 items-center  cursor-pointer'>
-            <div className='hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px] ' onClick={_HandleSelectAll.bind(this)}>Chọn tất cả</div>
-            <div className='hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px]' onClick={_HandleDeleteAll.bind(this)}>Bỏ chọn tất cả</div>
+            <div
+              className='hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px] '
+              onClick={handleSelectAll.bind(this)}
+            >
+              Chọn tất cả
+            </div>
+            <div
+              className='hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px]'
+              onClick={handleDeleteAll.bind(this)}>
+              Bỏ chọn tất cả
+            </div>
           </div>
         }
         {props.children}
@@ -1284,7 +1071,64 @@ const Index = (props) => {
     );
   };
 
-  // render option item in formatGroupLabel Item
+  // label của chọn nhanh
+  const quickSelectItemsLabel = (option) => {
+    if (option.value === "0") {
+      return (
+        <div className='text-gray-400 font-medium'>{option.label}</div>
+      )
+    }
+    else if (option.value === null) {
+      return (
+        <div className='text-gray-400 font-medium'>{option.label}</div>
+      )
+    }
+    else {
+      return (
+        <>
+          {dataItems === [] ?
+            <Loading className="h-80" color="#0f4f9e" />
+            :
+            <div className='flex items-center justify-between py-2'>
+              <div className='flex items-center gap-2'>
+                <div>
+                  {
+                    option.e?.images != null ?
+                      (
+                        <img src={option.e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />
+                      ) :
+                      (
+                        <div className='w-[50px] h-[60px] object-cover flex items-center justify-center rounded'>
+                          <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
+                        </div>
+                      )
+                  }
+                </div>
+                <div>
+                  <h3 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
+                  <div className='flex'>
+                    <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.codeDelivery}</h5>
+                    <h5 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
+                  </div>
+                  <h5 className='text-gray-400 font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
+                </div>
+              </div>
+
+              <div className='text-right opacity-0'>{"0"}</div>
+              <div className='flex gap-2'>
+                <div className='flex items-center gap-2'>
+                  <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5>
+                  <h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse || 0}</h5>
+                </div>
+              </div>
+            </div>
+          }
+        </>
+      )
+    }
+  }
+
+  // label của chọn mặt hàng đơn lẻ
   const selectItemsLabel = (option) => {
     return (
       <div className='flex items-center justify-between'>
@@ -1312,7 +1156,7 @@ const Index = (props) => {
 
             <div className='flex 3xl:gap-2 2xl:gap-1 xl:gap-1 gap-1'>
               <h5 className='text-gray-400  3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]'>
-                {option.e?.codeProduct} :
+                {option.e?.codeDelivery} :
               </h5>
               <h5 className='3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]'>
                 {option.e?.product_variation}
@@ -1355,32 +1199,49 @@ const Index = (props) => {
 
   const sortedArr = id ? option.sort((a, b) => a.id - b.id) : option.sort((a, b) => b.id - a.id);
 
+  const handleOpenPopupAddress = () => {
+    setOpenPopupAddress(true)
+  }
+  const handleClosePopupAddress = () => {
+    setOpenPopupAddress(false)
+  }
+
+
+  const ClearIndicator = props => (
+    <components.ClearIndicator {...props}>
+      <MdClear
+        className="absolute top-0 left-0 3xl:translate-x-[2650%] 3xl:-translate-y-[2%] 2xl:translate-x-[2000%] 2xl:-translate-y-[5%] xl:translate-x-[1630%] xl:-translate-y-[4%] translate-x-[1250%] -translate-y-[6%] h-10 text-[#CCCCCC] hover:text-[#999999] 3xl:scale-125 2xl:scale-110 xl:scale-100 scale-90 cursor-pointer"
+        onClick={() => setAddress(null)}
+      />
+    </components.ClearIndicator>
+  );
+
   return (
     <React.Fragment className='overflow-hidden'>
       <Head>
-        <title>{id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.sales_product_add_order || "sales_product_add_order"}</title>
+        <title>{id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.delivery_receipt_add || "delivery_receipt_add"}</title>
       </Head>
       <div className='3xl:px-5 px-4 3xl:pt-[76px] 2xl:pt-[72px] xl:pt-16 pt-14 pb-3 3xl:space-y-1.5 space-y-1 flex flex-col justify-between'>
         <div className='h-[97%] 3xl:space-y-1 2xl:space-y-2 space-y-2 overflow-hidden'>
 
           <div className='flex space-x-1 3xl:text-[13px] 2xl:text-[12px] xl:text-[14.5px] text-[12px]'>
             <h6 className='text-[#141522]/40'>
-              {dataLang?.sales_product_list || "sales_product_list"}
+              {dataLang?.delivery_receipt_list || "delivery_receipt_list"}
             </h6>
             <span className='text-[#141522]/40'>/</span>
             <h6>
-              {id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.sales_product_add_order || "sales_product_add_order"}
+              {id ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit" : dataLang?.delivery_receipt_add || "delivery_receipt_add"}
             </h6>
           </div>
 
           <div className='flex justify-between items-center'>
-            <h2 className='3xl:text-[24px] 2xl:text-2xl xl:text-xl text-xl '>
-              {id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.sales_product_add_order || "sales_product_add_order"}
+            <h2 className='3xl:text-[24px] 2xl:text-2xl xl:text-xl text-xl'>
+              {id ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit" : dataLang?.delivery_receipt_add || "delivery_receipt_add"}
             </h2>
             <div className="flex justify-end items-center">
               <button
-                onClick={() => router.push('/sales_export_product/salesOrder?tab=all')}
-                className="xl:text-sm text-xs xl:px-5 px-3 3xl:py-1.5 2xl:py-2.5 xl:py-1.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
+                onClick={() => router.push('/sales_export_product/deliveryReceipt?tab=all')}
+                className=" xl:text-sm text-xs xl:px-5 px-3 3xl:py-1.5 2xl:py-2.5 xl:py-1.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
               >
                 {dataLang?.btn_back || "btn_back"}
               </button>
@@ -1396,15 +1257,15 @@ const Index = (props) => {
               <div className="grid grid-cols-12 gap-1 items-center">
                 <div className='col-span-3'>
                   <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px]">
-                    {dataLang?.sales_product_code || "sales_product_code"}
+                    {dataLang?.delivery_receipt_code || "delivery_receipt_code"}
                   </label>
                   <input
-                    value={codeProduct}
-                    onChange={handleOnChangeInput.bind(this, "codeProduct")}
+                    value={codeDelivery}
+                    onChange={(value) => handleOnChangeInput("codeDelivery", value)}
                     name="fname"
                     type="text"
                     placeholder={dataLang?.system_default || "system_default"}
-                    className={`3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] focus:border-[#0F4F9E] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
+                    className={`3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] focus:border-[#0F4F9E] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal 2xl:p-2 p-[9px] border outline-none`}
                   />
                 </div>
 
@@ -1414,7 +1275,7 @@ const Index = (props) => {
                   </label>
                   <Select
                     options={dataBranch}
-                    onChange={handleOnChangeInput.bind(this, "branch")}
+                    onChange={(value) => handleOnChangeInput("branch", value)}
                     value={branch}
                     isClearable={true}
                     closeMenuOnSelect={true}
@@ -1452,7 +1313,7 @@ const Index = (props) => {
                   <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">{dataLang?.customer || 'customer'} <span className="text-red-500">*</span></label>
                   <Select
                     options={dataCustomer}
-                    onChange={handleOnChangeInput.bind(this, "customer")}
+                    onChange={(value) => handleOnChangeInput("customer", value)}
                     value={customer}
                     placeholder={dataLang?.select_customer || "select_customer"}
                     hideSelectedOptions={false}
@@ -1495,7 +1356,7 @@ const Index = (props) => {
                   <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">{dataLang?.contact_person || "contact_person"}</label>
                   <Select
                     options={dataPersonContact}
-                    onChange={handleOnChangeInput.bind(this, "contactPerson")}
+                    onChange={(value) => handleOnChangeInput("contactPerson", value)}
                     value={contactPerson}
                     placeholder={dataLang?.select_contact_person || "select_contact_person"}
                     hideSelectedOptions={false}
@@ -1534,8 +1395,55 @@ const Index = (props) => {
                 </div>
 
                 <div className='col-span-3'>
-                  <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] mb-1 ">{dataLang?.sales_product_date || "sales_product_date"} <span className="text-red-500">*</span></label>
-                  <div className="custom-date-picker flex flex-row">
+                  <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">{dataLang?.address || "address"}</label>
+                  <div className='relative'>
+                    <Select
+                      options={dataAddress}
+                      onChange={(value) => handleOnChangeInput("address", value)}
+                      value={address}
+                      placeholder={dataLang?.select_address || "select_address"}
+                      hideSelectedOptions={false}
+                      isClearable={true}
+                      className={` rounded-md 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
+                      isSearchable={true}
+                      components={{ ClearIndicator }}
+                      noOptionsMessage={() => "Không có dữ liệu"}
+                      menuPortalTarget={document.body}
+                      closeMenuOnSelect={true}
+                      style={{ border: "none", boxShadow: "none", outline: "none" }}
+                      theme={(theme) => ({
+                        ...theme,
+                        colors: {
+                          ...theme.colors,
+                          primary25: '#EBF5FF',
+                          primary50: '#92BFF7',
+                          primary: '#0F4F9E',
+                        },
+                      })}
+                      styles={{
+                        placeholder: (base) => ({
+                          ...base,
+                          color: "#cbd5e1",
+                        }),
+                        menuPortal: (base) => ({
+                          ...base,
+                          zIndex: 20
+                        }),
+                        control: (base, state) => ({
+                          ...base,
+                          boxShadow: 'none',
+                          padding: "0.7px"
+                        })
+                      }}
+                    />
+                    <AiFillPlusCircle onClick={handleOpenPopupAddress} className='right-0 top-0 -translate-x-[300%] 3xl:translate-y-[80%] 2xl:translate-y-[70%] xl:translate-y-[70%] translate-y-[60%] 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 transition-shadow ease-in-out absolute ' />
+                    <PopupAddress dataLang={dataLang} clientId={customer?.value} handleFetchingAddress={handleFetchingAddress} openPopupAddress={openPopupAddress} handleClosePopupAddress={handleClosePopupAddress} className='hidden' />
+                  </div>
+                </div>
+
+                <div className='col-span-3'>
+                  <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] mb-1 ">{dataLang?.delivery_receipt_date || "delivery_receipt_date"} <span className="text-red-500">*</span></label>
+                  <div className="custom-date-picker flex flex-row relative">
                     <DatePicker
                       blur
                       fixedHeight
@@ -1546,25 +1454,27 @@ const Index = (props) => {
                       placeholderText="DD/MM/YYYY HH:mm:ss"
                       dateFormat="dd/MM/yyyy h:mm:ss aa"
                       timeInputLabel={'Time: '}
-                      className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer relative`}
+                      className={`border ${errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal 2xl:p-2 p-[9px] outline-none cursor-pointer `}
                     />
                     {startDate && (
                       <>
-                        <MdClear className="absolute 3xl:translate-x-[2600%] 3xl:-translate-y-[2%] translate-x-[2400%] translate-y-[4%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('startDate')} />
+                        <MdClear className="absolute 3xl:translate-x-[2600%] 3xl:-translate-y-[2%] 2xl:translate-x-[2000%] 2xl:-translate-y-[5%] xl:translate-x-[1630%] xl:-translate-y-[4%] translate-x-[1250%] -translate-y-[6%] h-10 text-[#CCCCCC] hover:text-[#999999] 2xl:scale-110 xl:scale-100 scale-90 cursor-pointer" onClick={() => handleClearDate('startDate')} />
                       </>
                     )}
-                    <BsCalendarEvent className="absolute left-0 3xl:translate-x-[2880%] 3xl:translate-y-[70%] translate-x-[2880%] translate-y-[80%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                    <BsCalendarEvent className="absolute left-0 3xl:translate-x-[2750%] 3xl:translate-y-[70%] 2xl:translate-x-[2180%] 2xl:translate-y-[60%] xl:translate-x-[1800%] xl:translate-y-[60%] translate-x-[1400%] translate-y-[60%] text-[#CCCCCC] 2xl:scale-110 xl:scale-100 scale-90 cursor-pointer" />
                   </div>
                   {errDate && <label className="text-sm text-red-500">{dataLang?.price_quote_errDate || "price_quote_errDate"}</label>}
                 </div>
 
                 <div className='col-span-3'>
-                  <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] mb-1 ">{dataLang?.sales_product_staff_in_charge || "sales_product_staff_in_charge"}  <span className="text-red-500">*</span></label>
+                  <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] mb-1 ">
+                    {dataLang?.staff || "staff"}  <span className="text-red-500">*</span>
+                  </label>
                   <Select
                     options={dataStaffs}
                     onChange={(value) => handleOnChangeInput("staff", value)}
                     value={staff}
-                    placeholder={dataLang?.sales_product_select_staff_in_charge || "sales_product_select_staff_in_charge"}
+                    placeholder={dataLang?.select_staff || "select_staff"}
                     hideSelectedOptions={false}
                     isClearable={true}
                     className={`${errStaff ? "border border-red-500 rounded-md" : ""} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
@@ -1601,90 +1511,51 @@ const Index = (props) => {
                   {errStaff && <label className="text-sm text-red-500">{dataLang?.sales_product_err_staff_in_charge || "sales_product_err_staff_in_charge"}</label>}
                 </div>
 
-                <div className='col-span-3 h-[68px] space-y-3'>
-                  <label className="text-[#344054] font-norma 3xl:text-sm 2xl:text-[13px] text-[13px] ">
-                    {dataLang?.sales_product_order_type || "sales_product_order_type"}
+                <div className='col-span-3'>
+                  <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] mb-1 ">
+                    {dataLang?.delivery_receipt_product_order || "delivery_receipt_product_order"} <span className="text-red-500">*</span>
                   </label>
-                  <div className='flex items-center gap-5'>
-                    <div className="flex items-center ">
-                      <input
-                        onChange={(value) => handleOnChangeInput("typeOrder", value)}
-                        id="default-radio-1"
-                        type="radio"
-                        value="0"
-                        checked={typeOrder === "0" ? true : false}
-                        name="default-radio"
-                        className="w-4 h-4 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <label
-                        for="default-radio-1"
-                        className="ml-2 cursor-pointer 2xl:text-sm xl:text-xs text-[11px] font-normal text-gray-900 dark:text-gray-300"
-                      >
-                        {dataLang?.sales_product_new_order || "sales_product_new_order"}
-                      </label>
-                    </div>
-                    <div className="flex items-center ">
-                      <input
-                        onChange={(value) => handleOnChangeInput("typeOrder", value)}
-                        checked={typeOrder === "1" ? true : false}
-                        id="default-radio-2"
-                        type="radio"
-                        value="1"
-                        name="default-radio"
-                        className="2xl:w-4 2xl:h-4 w-4 h-4 2xl:text-sm xl:text-[13px] text-[11px] cursor-pointer text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <label
-                        for="default-radio-2"
-                        className="ml-2 cursor-pointer 2xl:text-sm xl:text-xs text-[11px] font-normal text-gray-900 dark:text-gray-300"
-                      >
-                        {dataLang?.sales_product_according_to_quotation || "sales_product_according_to_quotation"}
-                      </label>
-                    </div>
-                  </div>
+                  <Select
+                    // options={fakeDataQuotes}
+                    options={dataProductOrder}
+                    onChange={(value) => handleOnChangeInput("productOrder", value)}
+                    value={productOrder}
+                    placeholder={dataLang?.delivery_receipt_select_product_order || "delivery_receipt_select_product_order"}
+                    hideSelectedOptions={false}
+                    isClearable={true}
+                    className={`${errQuote && productOrder === null ? "border border-red-500 rounded-md" : ""} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                    isSearchable={true}
+                    noOptionsMessage={() => "Không có dữ liệu"}
+                    menuPortalTarget={document.body}
+                    style={{ border: "none", boxShadow: "none", outline: "none" }}
+                    theme={(theme) => ({
+                      ...theme,
+                      colors: {
+                        ...theme.colors,
+                        primary25: '#EBF5FF',
+                        primary50: '#92BFF7',
+                        primary: '#0F4F9E',
+                      },
+                    })}
+                    styles={{
+                      placeholder: (base) => ({
+                        ...base,
+                        color: "#cbd5e1",
+                      }),
+                      menuPortal: (base) => ({
+                        ...base,
+                        zIndex: 20
+                      }),
+                      control: (base, state) => ({
+                        ...base,
+                        boxShadow: 'none',
+                        padding: "0.7px"
+                      })
+                    }}
+                  />
+                  {errQuote && productOrder === null && <label className="text-sm text-red-500">{dataLang?.sales_product_err_quote || "sales_product_err_quote"}</label>}
                 </div>
-                {hidden && (
-                  <div className='col-span-3'>
-                    <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] mb-1 ">{dataLang?.sales_product_quotation || "sales_product_quotation"} <span className="text-red-500">*</span> </label>
-                    <Select
-                      options={fakeDataQuotes}
-                      onChange={(value) => handleOnChangeInput("quote", value)}
-                      value={quote}
-                      placeholder={dataLang?.sales_product_select_quotation || "sales_product_select_quotation"}
-                      hideSelectedOptions={false}
-                      isClearable={true}
-                      className={`${errQuote && quote === null ? "border border-red-500 rounded-md" : ""} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
-                      isSearchable={true}
-                      noOptionsMessage={() => "Không có dữ liệu"}
-                      menuPortalTarget={document.body}
-                      style={{ border: "none", boxShadow: "none", outline: "none" }}
-                      theme={(theme) => ({
-                        ...theme,
-                        colors: {
-                          ...theme.colors,
-                          primary25: '#EBF5FF',
-                          primary50: '#92BFF7',
-                          primary: '#0F4F9E',
-                        },
-                      })}
-                      styles={{
-                        placeholder: (base) => ({
-                          ...base,
-                          color: "#cbd5e1",
-                        }),
-                        menuPortal: (base) => ({
-                          ...base,
-                          zIndex: 20
-                        }),
-                        control: (base, state) => ({
-                          ...base,
-                          boxShadow: 'none',
-                          padding: "0.7px"
-                        })
-                      }}
-                    />
-                    {errQuote && quote === null && <label className="text-sm text-red-500">{dataLang?.sales_product_err_quote || "sales_product_err_quote"}</label>}
-                  </div>
-                )}
+
 
               </div>
             </div>
@@ -1695,74 +1566,21 @@ const Index = (props) => {
             {dataLang?.item_information || "item_information"}
           </h2>
 
+          {/* Chọn nhanh  */}
           <div className='grid grid-cols-12'>
             <div div className='col-span-3'>
-              <label className="text-[#344054] font-normal 2xl:text-base text-[14px]">{dataLang?.import_click_items || "import_click_items"} </label>
+              <label className="text-[#344054] font-normal 2xl:text-base text-[14px]">
+                {dataLang?.import_click_items || "import_click_items"}
+              </label>
               <Select
-                onInputChange={_HandleSeachApi.bind(this)}
-                options={typeOrder === "1" && quote === null ? [] : allItems}
+                // onInputChange={_HandleSeachApi.bind(this)}
+                options={allItems}
                 closeMenuOnSelect={false}
                 onChange={(value) => handleOnChangeInput("itemAll", value)}
                 value={itemsAll?.value ? itemsAll?.value : option?.map(e => e?.item)}
                 isMulti
                 components={{ MenuList, MultiValue }}
-                formatOptionLabel={(option) => {
-                  if (option.value === "0") {
-                    return (
-                      <div className='text-gray-400 font-medium'>{option.label}</div>
-                    )
-                  }
-                  else if (option.value === null) {
-                    return (
-                      <div className='text-gray-400 font-medium'>{option.label}</div>
-                    )
-                  }
-                  else {
-                    return (
-                      <>
-                        {dataItems === [] ?
-                          <Loading className="h-80" color="#0f4f9e" />
-                          :
-                          <div className='flex items-center justify-between py-2'>
-                            <div className='flex items-center gap-2'>
-                              <div>
-                                {
-                                  option.e?.images != null ?
-                                    (
-                                      <img src={option.e?.images} alt="Product Image" style={{ width: "40px", height: "50px" }} className='object-cover rounded' />
-                                    ) :
-                                    (
-                                      <div className='w-[50px] h-[60px] object-cover flex items-center justify-center rounded'>
-                                        <img src="/no_img.png" alt="Product Image" style={{ width: "40px", height: "40px" }} className='object-cover rounded' />
-                                      </div>
-                                    )
-                                }
-                              </div>
-                              <div>
-                                <h3 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.name}</h3>
-                                <div className='flex gap-2'>
-                                  <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.codeProduct}</h5>
-                                  <h5 className='font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{option.e?.product_variation}</h5>
-                                </div>
-                                <h5 className='text-gray-400 font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang[option.e?.text_type]}</h5>
-                              </div>
-                            </div>
-
-                            <div className=''>
-                              <div className='text-right opacity-0'>{"0"}</div>
-                              <div className='flex gap-2'>
-                                <div className='flex items-center gap-2'>
-                                  <h5 className='text-gray-400 font-normal'>{dataLang?.purchase_survive || "purchase_survive"}:</h5>
-                                  <h5 className='text-[#0F4F9E] font-medium'>{option.e?.qty_warehouse || 0}</h5>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        }
-                      </>
-                    )
-                  }
-                }}
+                formatOptionLabel={quickSelectItemsLabel}
                 placeholder={dataLang?.purchase_items || "purchase_items"}
                 hideSelectedOptions={false}
                 className="rounded-md bg-white 3xl:text-[16px] 2xl:text-[10px] xl:text-[13px] text-[12.5px] "
@@ -1798,11 +1616,10 @@ const Index = (props) => {
             </div>
           </div>
 
-
           {/* Thông tin mặt hàng Header */}
           <div className='pr-2'>
             <div className='grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 '>
-              <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-2 text-left truncate font-[400]'>{dataLang?.sales_product_item || "sales_product_item"}</h4>
+              <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-3 text-left truncate font-[400]'>{dataLang?.sales_product_item || "sales_product_item"}</h4>
               <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{dataLang?.sales_product_from_unit || "sales_product_from_unit"}</h4>
               <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{dataLang?.sales_product_quantity || "sales_product_quantity"}</h4>
               <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{dataLang?.sales_product_unit_price || "sales_product_unit_price"}</h4>
@@ -1810,7 +1627,6 @@ const Index = (props) => {
               <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center    font-[400] whitespace-nowrap'>{dataLang?.sales_product_after_discount || "sales_product_after_discount"}</h4>
               <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{dataLang?.sales_product_tax || "sales_product_tax"}</h4>
               <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center    truncate font-[400]'>{dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}</h4>
-              <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center font-[400] whitespace-nowrap'>{dataLang?.sales_product_item_date || "sales_product_item_date"}</h4>
               <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center    truncate font-[400]'>{dataLang?.sales_product_note || "sales_product_note"}</h4>
               <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]'>{dataLang?.sales_product_operations || "sales_product_operations"}</h4>
             </div>
@@ -1821,11 +1637,11 @@ const Index = (props) => {
               <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                 {/* phân chia,m */}
                 <div className='grid grid-cols-12'>
-                  <div className='col-span-2 '>
+                  <div className='col-span-3 '>
                     <Select
-                      onInputChange={_HandleSeachApi.bind(this)}
+                      // onInputChange={_HandleSeachApi.bind(this)}
                       dangerouslySetInnerHTML={{ __html: option.label }}
-                      options={typeOrder === "1" && quote === null ? [] : options}
+                      options={options}
                       onChange={(value) => handleAddParent(value)}
                       value={null}
                       formatOptionLabel={selectItemsLabel}
@@ -1865,7 +1681,7 @@ const Index = (props) => {
                     />
                   </div>
 
-                  <div className='grid col-span-10 grid-cols-10 gap-1  items-center mb-1'>
+                  <div className='grid col-span-9 grid-cols-9 gap-1  items-center mb-1'>
 
                     <div className='col-span-1 text-center flex items-center justify-center'>
                       <h3 className={`cursor-default 3xl:text-[16px] 2xl:text-[14px] xl:text-[13px] text-[12px]`} />
@@ -1965,19 +1781,6 @@ const Index = (props) => {
                         1
                       </h3>
                     </div>
-                    <div className='col-span-1 '>
-                      <div className="custom-date-picker flex flex-row relative">
-                        <DatePicker
-                          selected={null}
-                          blur
-                          disabled={true}
-                          placeholderText="DD/MM/YYYY"
-                          dateFormat="dd/MM/yyyy"
-                          className={`bg-gray-100 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[7px] border placeholder:text-slate-300 rounded text-[#52575E] font-normal xl:px-1 px-0.5 outline-none cursor-default `}
-                        />
-                        <BsCalendarEvent className="absolute right-0 3xl:-translate-x-[75%] 3xl:translate-y-[70%] 2xl:-translate-x-[40%] 2xl:translate-y-[70%] xl:-translate-x-[30%] xl:translate-y-[70%] -translate-x-[10%] translate-y-[70%]  text-[#CCCCCC] 3xl:scale-110 2xl:scale-95 xl:scale-90 scale-75 cursor-default" />
-                      </div>
-                    </div>
                     <div className='col-span-1 flex items-center justify-center'>
                       <input
                         value={null}
@@ -2004,9 +1807,9 @@ const Index = (props) => {
                 {/* phân chia  */}
                 {sortedArr.map((e, index) =>
                   <div className='grid grid-cols-12 gap-1 py-1 items-center' key={e?.id}>
-                    <div className='col-span-2 '>
+                    <div className='col-span-3 '>
                       <Select
-                        onInputChange={_HandleSeachApi.bind(this)}
+                        // onInputChange={_HandleSeachApi.bind(this)}
                         dangerouslySetInnerHTML={{ __html: option.label }}
                         options={options}
                         onChange={(value) => _HandleChangeValue(e?.id, value)}
@@ -2169,29 +1972,6 @@ const Index = (props) => {
                     <div className='col-span-1 text-right flex items-center justify-end'>
                       <h3 className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[13px] xl:text-[12px] text-[11px]`}>{formatNumber(e?.total_amount)}</h3>
                     </div>
-                    <div className='col-span-1 '>
-                      <div className="custom-date-picker flex flex-row relative">
-                        <DatePicker
-                          selected={(e?.delivery_date ? e?.delivery_date : null)}
-                          blur
-                          placeholderText="DD/MM/YYYY"
-                          dateFormat="dd/MM/yyyy"
-                          onSelect={(date) => handleOnChangeInputOption(e?.id, "delivery_date", date)}
-                          onChange={(date) => handleOnChangeInputOption(e?.id, "delivery_date", date)}
-                          className={`${(errDeliveryDate && e?.delivery_date === null) ? 'border-red-500' : 'focus:border-[#92BFF7] border-[#d0d5dd]'} 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[8px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-0.5 outline-none cursor-pointer `}
-                        />
-                        {e?.delivery_date && (
-                          <>
-                            <MdClear
-                              className="absolute right-0 3xl:-translate-x-[320%] 3xl:translate-y-[1%] 2xl:-translate-x-[150%] 2xl:translate-y-[1%] xl:-translate-x-[140%] xl:translate-y-[1%] -translate-x-[90%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] 3xl:scale-110 xl:scale-90 scale-75 cursor-pointer"
-                              onClick={() => handleOnChangeInputOption(e?.id, 'clear_delivery_date')}
-                            />
-                          </>
-                        )}
-                        <BsCalendarEvent className="absolute right-0 3xl:-translate-x-[75%] 3xl:translate-y-[70%] 2xl:-translate-x-[40%] 2xl:translate-y-[70%] xl:-translate-x-[30%] xl:translate-y-[70%] -translate-x-[10%] translate-y-[70%] text-[#CCCCCC] 3xl:scale-110 2xl:scale-95 xl:scale-90 scale-75 cursor-pointer" />
-                      </div>
-                      {(errDeliveryDate && e?.delivery_date === null) && <label className="text-[12px] max-w-10px text-red-500">Vui lòng chọn ngày cần hàng!</label>}
-                    </div>
                     <div className='col-span-1 flex items-center justify-center'>
                       <input
                         value={e?.note}
@@ -2216,7 +1996,7 @@ const Index = (props) => {
           </div>
 
           <div className='grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center'>
-            <div className='col-span-3  flex items-center gap-2'>
+            <div className='col-span-2  flex items-center gap-2'>
               <h2 className='3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px]'>{dataLang?.sales_product_discount || "sales_product_discount"}</h2>
               <div className='col-span-1 text-center flex items-center justify-center'>
                 <NumericFormat
@@ -2241,7 +2021,7 @@ const Index = (props) => {
                 />
               </div>
             </div>
-            <div className='col-span-3 flex items-center gap-2'>
+            <div className='col-span-2 flex items-center gap-2'>
               <h2 className='3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px]'>{dataLang?.sales_product_tax || "sales_product_tax"}</h2>
               <Select
                 options={taxOptions}
@@ -2291,22 +2071,7 @@ const Index = (props) => {
                 }}
               />
             </div>
-            <div className='col-span-3 flex items-center gap-1'>
-              <h2 className='3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] whitespace-nowrap'>{dataLang?.sales_product_item_date || "sales_product_item_date"}</h2>
-              <div className="custom-date-picker flex flex-row relative">
-                <DatePicker
-                  selected={null}
-                  onChange={(date) => handleOnChangeInput("total_delivery_date", date)}
-                  blur
-                  placeholderText="DD/MM/YYYY"
-                  dateFormat="dd/MM/yyyy"
-                  onSelect={(date) => setDeliveryDate(date)}
-                  className={`3xl:h-11 h-10 3xl:w-[210px] w-full 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[11px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-2 outline-none cursor-pointer `}
 
-                />
-                <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%]  text-[#CCCCCC] scale-110 cursor-pointer" />
-              </div>
-            </div>
 
           </div>
 
