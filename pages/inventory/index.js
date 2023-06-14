@@ -346,8 +346,8 @@ const Index = (props) => {
                                      <span className='bg-[#0f4f9e] text-white rounded p-1.5 '>{e?.adjusted?.split('|||')?.map(item => item?.split('--')[1])?.map(e => e).join(", ")} </span>
                                     </Popup>
                                 </h6>
-                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1  flex items-center space-x-2'><img src={e?.staff_create_image}  width={30} height={30} className="object-cover rounded-[100%] text-left"></img>  <span className=''>{e?.staff_create_name} </span></h6>
-                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 text-center'><span className="mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-lg">{e?.branch_name}</span></h6>
+                                <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1  flex items-center space-x-2'><img src={e?.staff_create_image}  className="object-cover rounded-[100%] w-6 h-6 text-left"></img>  <span className=''>{e?.staff_create_name} </span></h6>
+                                <h6 className="col-span-1 w-fit"><span className="3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{e?.branch_name}</span></h6> 
                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-3 text-left'>{e?.note}</h6>
                                 <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 text-center'><button  onClick={()=> handleDelete(e.id)} className="xl:text-base text-xs "><IconDelete color="red"/></button></h6>
                           </div>
@@ -462,7 +462,7 @@ return (
                   <div className='col-span-4'>
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}</h3><h3 className='col-span-1 font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}</h3></div>
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_vouchercode || "inventory_vouchercode"}</h3><h3 className='col-span-1 font-normal'>{data?.code}</h3></div>
-                     <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_creator || "inventory_creator"}</h3><h3 className='flex items-center gap-1 col-span-1'><img src={data?.staff_create_image}  width={30} height={30} className="object-cover rounded-[100%] text-left"></img>  <span className='font-normal'>{data?.staff_create_name} </span></h3></div>
+                     <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_creator || "inventory_creator"}</h3><h3 className='flex items-center gap-1 col-span-1'><img src={data?.staff_create_image}   className="object-cover rounded-[100%] w-6 h-6 text-left"></img>  <span className='font-normal'>{data?.staff_create_name} </span></h3></div>
                   </div>
                   <div className='col-span-4 '>
                     <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_warehouse || "inventory_warehouse"}</h3><h3 className='col-span-1 font-normal'>{data?.warehouse_name}</h3></div>
@@ -480,7 +480,7 @@ return (
                   </div>
                   <div className='col-span-4 '>
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_note || "inventory_note"}</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_branch || "inventory_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] col-span-1">{data?.branch_name}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_branch || "inventory_branch"}</h3><h3 className="w-fit 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{data?.branch_name}</h3></div>
                   </div>
               </div>
               <div className="pr-2 w-[100%] lx:w-[110%] ">

@@ -961,7 +961,7 @@ const Popup_dskh = (props) => {
                   <form onSubmit={_HandleSubmit.bind(this)} className="">
                   {
                     tab === 0 &&(
-                      <ScrollArea ref={scrollAreaRef} className="h-[555px] overflow-hidden" speed={1} smoothScrolling={true}>
+                      <ScrollArea ref={scrollAreaRef} className="3xl:h-full 2xl:h-[470px] h-[400px] overflow-hidden" speed={1} smoothScrolling={true}>
                   <div className='w-[50vw]  p-2  '>         
                       <div className="flex flex-wrap justify-between "> 
                         <div className='w-[48%]'>

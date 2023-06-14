@@ -283,7 +283,7 @@ const Index = (props) => {
                 <div className='flex justify-between'>
                     <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.serviceVoucher_title_lits || "serviceVoucher_title_lits"}</h2>
                     <div className="flex justify-end items-center">
-                     <Popup_servie onRefresh={_ServerFetching.bind(this)} dataLang={dataLang}  className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>{dataLang?.serviceVoucher_create_new || "serviceVoucher_create_new"}</Popup_servie>
+                     <Popup_servie onRefreshGr={_ServerFetching_group.bind(this)} onRefresh={_ServerFetching.bind(this)} dataLang={dataLang}  className='xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>{dataLang?.serviceVoucher_create_new || "serviceVoucher_create_new"}</Popup_servie>
                    </div>
                 </div>
                 
@@ -456,17 +456,17 @@ const Index = (props) => {
                 </div>
                 <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%] lx:w-[120%] ">
-                    <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10 shadow">
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.serviceVoucher_day_vouchers || "serviceVoucher_day_vouchers"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{dataLang?.serviceVoucher_supplier || "serviceVoucher_supplier"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.serviceVoucher_total_amount || "serviceVoucher_total_amount"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.serviceVoucher_tax_money || "serviceVoucher_tax_money"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{dataLang?.serviceVoucher_status_of_spending || "serviceVoucher_status_of_spending"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.serviceVoucher_note || "serviceVoucher_note"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.serviceVoucher_branch || "serviceVoucher_branch"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.serviceVoucher_operation || "serviceVoucher_operation"}</h4>
+                    <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10 shadow-lg">
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center'>{dataLang?.serviceVoucher_day_vouchers || "serviceVoucher_day_vouchers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center'>{dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-2  text-center'>{dataLang?.serviceVoucher_supplier || "serviceVoucher_supplier"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center'>{dataLang?.serviceVoucher_total_amount || "serviceVoucher_total_amount"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center'>{dataLang?.serviceVoucher_tax_money || "serviceVoucher_tax_money"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center'>{dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-2  text-center'>{dataLang?.serviceVoucher_status_of_spending || "serviceVoucher_status_of_spending"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center'>{dataLang?.serviceVoucher_note || "serviceVoucher_note"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center'>{dataLang?.serviceVoucher_branch || "serviceVoucher_branch"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center'>{dataLang?.serviceVoucher_operation || "serviceVoucher_operation"}</h4>
                     </div>
                     {onFetching ?
                       <Loading className="h-80"color="#0f4f9e" /> 
@@ -619,7 +619,7 @@ const handleClick = () => {
           >
               <div className="w-auto rounded">
                   <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                      <Popup_servie status_pay={props?.status_pay}  onClick={handleClick} onRefresh={props.onRefresh} dataLang={props.dataLang} id={props?.id} 
+                      <Popup_servie status_pay={props?.status_pay} onRefreshGr={props.onRefreshGr}  onClick={handleClick} onRefresh={props.onRefresh} dataLang={props.dataLang} id={props?.id} 
                        className=" hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full 2xl:text-sm xl:text-sm text-[8px]">{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</Popup_servie>
                       <button onClick={_HandleDelete.bind(this, props.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</button>
                   </div>
@@ -1069,6 +1069,7 @@ const Popup_servie = (props) => {
                 sErrSupplier(false)
                 sOption([{id: Date.now(),idData:"", dichvu: "", soluong: 1, dongia: 0, chietkhau: 0, dongiasauck: 0, thue: 0, thanhtien:0}])
                 props.onRefresh && props.onRefresh()
+                props.onRefreshGr && props.onRefreshGr()
                 sOpen(false)
             }else {
               Toast.fire({
@@ -1554,15 +1555,15 @@ return (
                   
               </div>
               <div className=" w-[100%] lx:w-[110%] ">
-                <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-left">{props.dataLang?.serviceVoucher_services_arising || "serviceVoucher_services_arising"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_quantity || "serviceVoucher_quantity"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_unit_price || "serviceVoucher_unit_price"}</h4> 
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"% CK"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}</h4>
+                <div className="grid grid-cols-12 sticky top-0 bg-slate-50 shadow-lg p-2 z-10">
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-2  text-left">{props.dataLang?.serviceVoucher_services_arising || "serviceVoucher_services_arising"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.serviceVoucher_quantity || "serviceVoucher_quantity"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.serviceVoucher_unit_price || "serviceVoucher_unit_price"}</h4> 
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{"% CK"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-2  text-center">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-2  text-center">{props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-2  text-center">{props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}</h4>
                 </div>
                 {onFetching ?
                   <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 

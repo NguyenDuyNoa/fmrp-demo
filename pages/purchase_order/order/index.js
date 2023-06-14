@@ -569,20 +569,20 @@ const Index = (props) => {
                 </div>
                 <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%] lx:w-[120%] ">
-                    <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10">
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_dayvoucers || "purchase_order_table_dayvoucers"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_code || "purchase_order_table_code"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_number || "purchase_order_table_number"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_totalTax || "purchase_order_table_totalTax"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_intoMoney || "purchase_order_table_intoMoney"}</h4>
-                                {/* <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_statusOfSpending || "purchase_order_table_statusOfSpending"}</h4> */}
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_importStatus || "purchase_order_table_importStatus"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_note || "purchase_order_note"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}</h4>
+                    <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10 shadow-lg">
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center'>{dataLang?.purchase_order_table_dayvoucers || "purchase_order_table_dayvoucers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center'>{dataLang?.purchase_order_table_code || "purchase_order_table_code"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center'>{dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center'>{dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center'>{dataLang?.purchase_order_table_number || "purchase_order_table_number"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center'>{dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center'>{dataLang?.purchase_order_table_totalTax || "purchase_order_table_totalTax"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center'>{dataLang?.purchase_order_table_intoMoney || "purchase_order_table_intoMoney"}</h4>
+                                {/* <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center'>{dataLang?.purchase_order_table_statusOfSpending || "purchase_order_table_statusOfSpending"}</h4> */}
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center'>{dataLang?.purchase_order_table_importStatus || "purchase_order_table_importStatus"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center'>{dataLang?.purchase_order_note || "purchase_order_note"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1'>{dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center'>{dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}</h4>
                     </div>
                     {onFetching ?
                       <Loading className="h-80"color="#0f4f9e" /> 
@@ -789,18 +789,18 @@ return (
                   
               </div>
               <div className="pr-2 w-[100%] lx:w-[110%] ">
-                <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
-                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
+                <div className="grid grid-cols-12 sticky top-0 shadow-lg bg-slate-50 p-2 z-10">
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-2 text-center">{props.dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
+                  <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
                 </div>
                 {onFetching ?
                   <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 

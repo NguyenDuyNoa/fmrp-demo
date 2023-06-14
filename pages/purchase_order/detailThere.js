@@ -149,20 +149,20 @@ const Popup_chitietThere = (props) => {
                   {/* <div className={`${dataProductSerial.is_enable == "1" ? 
                       (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
                        (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow-lg  z-10`}> */}
-                  <div className={`grid-cols-13  grid sticky top-0 bg-white shadow-lg  z-10`}>
-                    <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_image || "import_detail_image"}</h4>
-                    <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_items || "import_detail_items"}
+                  <div className={`grid-cols-13  grid sticky top-0 bg-gray-50 shadow-lg  z-10`}>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_image || "import_detail_image"}</h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-400 uppercase  font-[500] col-span-2 text-center whitespace-nowrap">{props.dataLang?.import_detail_items || "import_detail_items"}
                     </h4>
-                    <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4> 
-                    <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"Kho - VTK"}</h4> 
-                    <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"ĐVT"}</h4>
-                    <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_quantity || "import_from_quantity"}</h4>
-                    <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
-                    <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"% CK"}</h4>
-                    <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
-                    <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_tax || "import_from_tax"}</h4>
-                    <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_into_money || "import_into_money"}</h4>
-                    <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_note || "import_from_note"}</h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4> 
+                    <h4 className="text-[13px] px-2 py-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{"Kho - VTK"}</h4> 
+                    <h4 className="text-[13px] px-2 py-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{"ĐVT"}</h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_quantity || "import_from_quantity"}</h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{"% CK"}</h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_tax || "import_from_tax"}</h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_into_money || "import_into_money"}</h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_note || "import_from_note"}</h4>
                   </div>
                   {onFetching ?
                     <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
@@ -293,14 +293,14 @@ const Popup_chitietThere = (props) => {
                }
                <div className=" w-[100%] lx:w-[110%] ">
                  <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
-                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-left">{props.dataLang?.serviceVoucher_services_arising || "serviceVoucher_services_arising"}</h4>
-                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_quantity || "serviceVoucher_quantity"}</h4>
-                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_unit_price || "serviceVoucher_unit_price"}</h4> 
-                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"% CK"}</h4>
-                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
-                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}</h4>
-                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}</h4>
-                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}</h4>
+                   <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-2  text-left">{props.dataLang?.serviceVoucher_services_arising || "serviceVoucher_services_arising"}</h4>
+                   <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.serviceVoucher_quantity || "serviceVoucher_quantity"}</h4>
+                   <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.serviceVoucher_unit_price || "serviceVoucher_unit_price"}</h4> 
+                   <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{"% CK"}</h4>
+                   <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-2  text-center">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
+                   <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}</h4>
+                   <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-2  text-center">{props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}</h4>
+                   <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-2  text-center">{props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}</h4>
                  </div>
                  {onFetching ?
                    <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
@@ -416,18 +416,18 @@ const Popup_chitietThere = (props) => {
                 }
 
                 <div className="pr-2 w-[100%] lx:w-[110%] ">
-                  <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
+                  <div className="grid grid-cols-12 sticky top-0 bg-slate-50 shadow-lg p-2 z-10">
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-2  text-center">{props.dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
                   </div>
                   {onFetching ?
                     <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
@@ -538,16 +538,16 @@ const Popup_chitietThere = (props) => {
                     </div>
                     
                 </div>
-                <div className="pr-2 w-[100%] lx:w-[110%] ">
-                  <div className="grid grid-cols-8 sticky top-0 bg-slate-100 p-2 z-10">
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_quantity_purchased || "purchase_quantity_purchased"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_reaining_amout || "purchase_reaining_amout"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_note || "purchase_note"}</h4>
+                <div className="pr-2 w-[100%] lx:w-[110%]">
+                  <div className="grid grid-cols-8 sticky top-0 bg-slate-50 shadow-lg p-2 z-10">
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_quantity_purchased || "purchase_quantity_purchased"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_reaining_amout || "purchase_reaining_amout"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_note || "purchase_note"}</h4>
                   </div>
                   {onFetching ?
                     <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
@@ -660,17 +660,17 @@ const Popup_chitietThere = (props) => {
                 </div>
                 <div className="pr-2 w-[100%] lx:w-[110%] ">
                   <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
-                    <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-2 text-center">{props.dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
+                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
                   </div>
                   {onFetching ?
                     <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 

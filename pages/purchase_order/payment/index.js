@@ -481,20 +481,20 @@ const Index = (props) => {
                 </div>
                 <div className="min:h-[200px] h-[88%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%] lx:w-[110%] ">
-                    <div className="grid grid-cols-13 items-center sticky top-0 bg-white p-2 z-10 shadow">
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_date || "payment_date"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_code || "payment_code"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_obType || "payment_obType"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_ob || "payment_ob"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_voucherCode || "payment_voucherCode"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{"PTTT"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_costs || "payment_costs"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_creator || "payment_creator"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_branch || "payment_branch"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_note || "payment_note"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_action || "payment_action"}</h4>
+                    <div className="grid grid-cols-13 items-center sticky top-0 bg-white p-2 z-10 shadow-lg">
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_date || "payment_date"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_code || "payment_code"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_obType || "payment_obType"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_ob || "payment_ob"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_voucherCode || "payment_voucherCode"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{"PTTT"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_costs || "payment_costs"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_creator || "payment_creator"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_branch || "payment_branch"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_note || "payment_note"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_action || "payment_action"}</h4>
                       </div>
                     {onFetching ?
                       <Loading className="h-80"color="#0f4f9e" /> 
@@ -1965,9 +1965,9 @@ return (
                </div>     
              <h2 className='font-normal bg-[#ECF0F4]  p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12 mt-0.5'>{props.dataLang?.payment_costInfo || "payment_costInfo"}</h2>  
               <div className=" w-[100%] lx:w-[110%] ">
-                <div className={`grid-cols-3 grid sticky top-0  shadow  z-10`}>
-                  <h4 className="text-[13px] col-span-2 px-2 text-[#667085] uppercase  font-[400] text-center">{props.dataLang?.payment_costs || "payment_costs"}</h4>
-                  <h4 className="text-[13px] col-span-1 px-1 text-[#667085] uppercase font-[400] text-center">{props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}</h4>
+                <div className={`grid-cols-3 grid sticky top-0  shadow-lg  z-10`}>
+                  <h4 className="text-[13px] col-span-2 px-2 py-1 text-gray-400 uppercase  font-[500] text-center">{props.dataLang?.payment_costs || "payment_costs"}</h4>
+                  <h4 className="text-[13px] col-span-1 px-1 py-1 text-gray-400 uppercase  font-[500] text-center">{props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}</h4>
                 </div>
                 {onFetching ?
                   <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
