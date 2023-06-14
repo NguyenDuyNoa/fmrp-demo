@@ -1,8 +1,8 @@
 import vi from "date-fns/locale/vi"
 import React, { useState } from 'react';
 import Select from 'react-select';
-import PopupDetailQuote from '../priceQuote/(PopupDetail)/PopupDetailQuote';
-import PopupDetailProduct from './(PopupDetail)/PopupDetailProduct';
+// import PopupDetailQuote from '../priceQuote/(PopupDetail)/PopupDetailQuote';
+// import PopupDetailProduct from './(PopupDetail)/PopupDetailProduct';
 import BtnAction from '../../../components/UI/BtnAction';
 import TabFilter from '../../../components/UI/TabFilter';
 import Pagination from '/components/UI/pagination';
@@ -338,13 +338,13 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{dataLang?.sales_product_list || "sales_product_list"} </title>
+                <title>{dataLang?.delivery_receipt_list || "delivery_receipt_list"} </title>
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 <div className="flex space-x-1 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                    <h6 className="text-[#141522]/40">{dataLang?.sales_product_list || "sales_product_list"}</h6>
+                    <h6 className="text-[#141522]/40">{dataLang?.delivery_receipt_list || "delivery_receipt_list"}</h6>
                     <span className="text-[#141522]/40">/</span>
-                    <h6 >{dataLang?.sales_product_list || "sales_product_list"}</h6>
+                    <h6 >{dataLang?.delivery_receipt_list || "delivery_receipt_list"}</h6>
                 </div>
 
                 <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
@@ -352,15 +352,15 @@ const Index = (props) => {
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
 
                             <div className='flex justify-between'>
-                                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">{dataLang?.sales_product_list || "sales_product_list"}</h2>
+                                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">{dataLang?.delivery_receipt_list || "delivery_receipt_list"}</h2>
                                 <div className="flex justify-end items-center">
-                                    <Link href="/sales_export_product/salesOrder/form" className='3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>
+                                    <Link href="/sales_export_product/deliveryReceipt/form" className='3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>
                                         {dataLang?.btn_new || "btn_new"}
                                     </Link>
                                 </div>
                             </div>
 
-                            <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            {/* <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 {
                                     listTabStatus && listTabStatus.map((e) => {
                                         return (
@@ -381,11 +381,10 @@ const Index = (props) => {
                                         )
                                     })
                                 }
-                            </div>
+                            </div> */}
                             {/* table */}
-                            <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
+                            {/* <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
 
-                                {/* combobox search, excel */}
                                 <div className="xl:space-y-1 space-y-2">
                                     <div className="bg-slate-100 w-full rounded-t-lg grid grid-cols-7 2xl:xl:p-2 xl:p-1.5 p-1.5 ">
                                         <div className='col-span-6'>
@@ -584,8 +583,6 @@ const Index = (props) => {
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* table */}
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lg:w-[100%] ">
                                         <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10">
@@ -604,7 +601,6 @@ const Index = (props) => {
                                             <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.branch || "branch"}</h4>
                                             <h4 className='3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center'>{dataLang?.sales_product_action || "sales_product_action"}</h4>
                                         </div>
-                                        {/* {loading ? */}
                                         {loading ?
                                             <Loading className="h-80" color="#0f4f9e" />
                                             :
@@ -624,14 +620,13 @@ const Index = (props) => {
                                                                         </h6>
 
                                                                         <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer'>
-                                                                            <PopupDetailProduct dataLang={dataLang} className="text-left" name={e?.code ? e?.code : ""} id={e?.id} />
+                                                                      
                                                                         </h6>
 
                                                                         <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] col-span-1 text-left '>
                                                                             {e?.client_name}
                                                                         </h6>
 
-                                                                        {/* fix */}
                                                                         <div className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 text-center'>
                                                                             {
                                                                                 e?.quote_code !== null && e?.quote_id !== "0" ?
@@ -645,9 +640,7 @@ const Index = (props) => {
                                                                             }
                                                                         </div>
                                                                         <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer '>
-                                                                            <PopupDetailQuote dataLang={dataLang} className="text-left" name={e?.quote_code ? e.quote_code : ""} id={e?.quote_id} />
                                                                         </h6>
-                                                                        {/* fix */}
 
                                                                         <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right'>
                                                                             {formatNumber(e.total_amount)}
@@ -682,7 +675,6 @@ const Index = (props) => {
 
                                                                         <h6 className='px-2 col-span-1 flex flex-col items-center justify-center text-center '>
                                                                             <div className="flex items-center">
-                                                                                {/* <div className={`${item?.active === false ? `h-3 w-3 rounded-full bg-gray-400` : `h-3 w-3 rounded-full bg-green-500`} `} /> */}
                                                                                 <div className={`3xl:h-3 3xl:w-3 2xl:h-2.5 2xl:w-2.5 xl:h-2 xl:w-2 h-2 w-2 rounded-full bg-gray-400`} />
                                                                             </div>
                                                                             <div className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]  ">
@@ -711,7 +703,6 @@ const Index = (props) => {
                                                                             />
                                                                         </div>
                                                                     </div>
-                                                                    {/* process product */}
                                                                     {
                                                                         e?.show &&
                                                                         (
@@ -787,9 +778,9 @@ const Index = (props) => {
                                         }
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
-                        <div className='grid grid-cols-12 bg-gray-100 items-center'>
+                        {/* <div className='grid grid-cols-12 bg-gray-100 items-center'>
                             <div className='col-span-3 p-2 text-center'>
                                 <h3 className='uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]'>{dataLang?.total_outside || "total_outside"}</h3>
                             </div>
@@ -814,7 +805,7 @@ const Index = (props) => {
                                     currentPage={router.query?.page ? router.query?.page : 1}
                                 />
                             </div>
-                        }
+                        } */}
                     </div>
                 </div>
             </div>

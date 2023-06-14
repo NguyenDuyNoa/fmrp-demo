@@ -123,10 +123,17 @@ const BtnAction = React.memo((props) => {
 
     const handleClick = () => {
         if (props?.id && props?.type === 'price_quote') {
+            console.log(props?.status);
             if (props?.status === "ordered") {
                 Toast.fire({
                     icon: 'error',
                     title: `${props?.dataLang?.po_imported_cant_edit || 'po_imported_cant_edit'} `
+                })
+            }
+            else if ( props?.status === "confirmed"){
+                Toast.fire({
+                    icon: 'error',
+                    title: `${props?.dataLang?.po_imported_cant_edit_with_confirm || 'po_imported_cant_edit_with_confirm'} `
                 })
             }
             else {

@@ -94,8 +94,11 @@ const Header = () => {
             title: "Giao hàng",
             sub: [
                 {
-                    title: "Phiếu xuất kho",
-                    link: "#"
+                    // title: "Phiếu giao hàng",
+                    // link: "#"
+                    items: [
+                        { name: "Phiếu giao hàng", link: "/sales_export_product/deliveryReceipt" }
+                    ]
                 }
             ]
         }, {
