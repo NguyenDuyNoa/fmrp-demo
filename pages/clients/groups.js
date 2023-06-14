@@ -156,7 +156,7 @@ const Index = (props) => {
                 {value: `${e.id}`, style: {numFmt: "0"}},
                 {value: `${e.name ? e.name : ""}`},
                 {value: `${e.color ? e.color : ""}`},
-                {value: `${e.branch ? e.branch?.map(i => i.name) : ""}`},
+                {value: `${e.branch ? e.branch?.map(i => i.name).join(", ") : ""}`},
             ]    
         ),
     }

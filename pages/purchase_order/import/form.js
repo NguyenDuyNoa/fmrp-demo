@@ -274,49 +274,90 @@ const _ServerFetching =  () => {
     },[])
 
     const _HandleChangeInput = (type, value) => {
-      if(listData?.length > 0){
-        if(type ==="branch" && idBranch != value || type === "supplier" && idSupplier != value || type === "theorder" && idTheOrder != value){
-          Swal.fire({
-            title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#296dc1',
-            cancelButtonColor: '#d33',
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText:`${dataLang?.aler_cancel}`
-        }).then((result) => {
-          if (result.isConfirmed) {
-            //  sOption([{id: Date.now(), mathang: null}])
-              sDataItems([])
-              sDataWarehouse([])
-              if(type == "supplier"){
-                sIdSupplier(value)
-                sIdTheOrder(null)
-              }else if(type =="theorder"){
-                sIdTheOrder(value)
-                sIdSupplier({...idSupplier})
-              }
-              sKhotong(null)
-              sListData([])
-          }else{
-            sIdTheOrder({...idTheOrder})
-            sIdSupplier({...idSupplier})
-            // sIdBranch(value)
-            // sIdPurchases(null)
-            sListData([...listData])
-            // sOption([{id: Date.now(), mathang: null, serial: '', lot: '', date: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
-          }
-        })
-        }
-      }
+      // if(listData?.length > 0){
+      //   if(type ==="branch" && idBranch != value || type === "supplier" && idSupplier != value || type === "theorder" && idTheOrder != value){
+      //     Swal.fire({
+      //       title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
+      //       icon: 'warning',
+      //       showCancelButton: true,
+      //       confirmButtonColor: '#296dc1',
+      //       cancelButtonColor: '#d33',
+      //       confirmButtonText: `${dataLang?.aler_yes}`,
+      //       cancelButtonText:`${dataLang?.aler_cancel}`
+      //   }).then((result) => {
+      //     if (result.isConfirmed) {
+      //       //  sOption([{id: Date.now(), mathang: null}])
+      //         sDataItems([])
+      //         sDataWarehouse([])
+      //         if(type == "branch"){
+      //           sIdBranch(value)
+      //           sIdTheOrder(null)
+      //           sIdSupplier(null)
+      //           sKhotong(null)
+      //           if(value == null){
+      //             sDataSupplier([])
+      //             sDataThe_order([])
+      //           }
+      //         }
+      //       else  if(type == "supplier"){
+      //           sIdSupplier(value)
+      //           sIdTheOrder(null)
+      //         }else if(type =="theorder"){
+      //           sIdTheOrder(value)
+      //           sIdSupplier({...idSupplier})
+      //         }
+      //         sKhotong(null)
+      //         sListData([])
+      //     }else{
+      //       sIdTheOrder({...idTheOrder})
+      //       sIdSupplier({...idSupplier})
+      //       // sIdBranch(value)
+      //       // sIdPurchases(null)
+      //       sListData([...listData])
+      //       // sOption([{id: Date.now(), mathang: null, serial: '', lot: '', date: null, donvitinh:1, soluong:1,dongia:1,chietkhau:0,dongiasauck:1, thue:0, dgsauthue:1, thanhtien:1, ghichu:""}])
+      //     }
+      //   })
+      //   }
+      // }
       if(type == "code"){
           sCode(value.target.value)
       }else if(type === "date"){
           sDate(moment(value.target.value).format('YYYY-MM-DD HH:mm:ss'))
       }else if(type === "supplier" && idSupplier != value){
-         if(listData.length === 0){
+        if(listData?.length > 0){
+          if(type ==="supplier" && idSupplier != value){
+            Swal.fire({
+              title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#296dc1',
+              cancelButtonColor: '#d33',
+              confirmButtonText: `${dataLang?.aler_yes}`,
+              cancelButtonText:`${dataLang?.aler_cancel}`
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  sDataItems([])
+                  sDataWarehouse([])
+                  sListData([])
+                  sIdSupplier(value)
+                  sIdTheOrder(null)
+              }else{
+                sIdSupplier({...idSupplier})
+              }
+            })
+          }
+        }
+        else{
+          sIdTheOrder(null)
+          sIdSupplier(null)
+          sKhotong(null)
+          if(value == null){
+            sDataSupplier([])
+            sDataThe_order([])
+          }
+        }
+        if(listData.length === 0){
           sIdSupplier(value)
-          // sOption([{id: Date.now(), mathang: null}])
           sMathangAll([])
           sDataItems([])
           sIdTheOrder(null)
@@ -325,63 +366,91 @@ const _ServerFetching =  () => {
           }
          }
       }else if(type === "theorder"){
-          if(listData.length == 0){
-            sIdTheOrder(value)
-            if(value == null){ sDataItems([])}
+        if(listData?.length > 0){
+          if(type ==="theorder" && idTheOrder != value){
+            Swal.fire({
+              title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#296dc1',
+              cancelButtonColor: '#d33',
+              confirmButtonText: `${dataLang?.aler_yes}`,
+              cancelButtonText:`${dataLang?.aler_cancel}`
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  sDataItems([])
+                  sDataWarehouse([])
+                  sListData([])
+                  sIdTheOrder(value)
+              }else{
+                sIdTheOrder({...idTheOrder})
+              }
+            })
           }
+        }
+        if(listData.length == 0){
+          sIdTheOrder(value)
+          if(value == null){ sDataItems([])}
+        }
       }else if(type === "note"){
           sNote(value.target.value)
       }else if(type == "branch" && idBranch != value){
-          sIdBranch(value)
-          sIdTheOrder(null)
-          sIdSupplier(null)
-          sKhotong(null)
-          if(value == null){
-            sDataSupplier([])
-            sDataThe_order([])
+         if(listData?.length > 0){
+            if(type ==="branch" && idBranch != value){
+              Swal.fire({
+                title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#296dc1',
+                cancelButtonColor: '#d33',
+                confirmButtonText: `${dataLang?.aler_yes}`,
+                cancelButtonText:`${dataLang?.aler_cancel}`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    sDataItems([])
+                    sDataWarehouse([])
+                    sListData([])
+                    sIdBranch(value)
+                }else{
+                  sIdBranch({...idBranch})
+                }
+              })
+            }
+          }else{
+            sIdBranch(value)
+            sIdTheOrder(null)
+            sIdSupplier(null)
+            sKhotong(null)
+            if(value == null){
+              sDataSupplier([])
+              sDataThe_order([])
+            }
           }
       }else if(type == "mathangAll"){
           sMathangAll(value)
           if(value?.length === 0){
-            // sOption([{id: Date.now(), mathang: null}])
             //new
             sListData([])
           }else if(value?.length > 0){
-            // const fakeData = [{id: Date.now(), mathang: null}]
-            // const data = fakeData?.concat(value?.map(e => ({id: uuidv4(),
-            //   disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-            //   mathang: e, khohang: null, serial: '', lot: '', date: null, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.mathang?.e?.price ? Number(e?.mathang?.e?.price) : 1, chietkhau: e?.e?.discount_percent, dongiasauck: Number(e?.e?.price_after_discount),thue: {label:e?.e?.tax_name ,value :e?.e?.tax_rate, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
-            // sOption(data);
-            //new      
-            // const newData = { 
-            //   id: Date.now(), 
-            //   matHang: value, 
-            //   child: [{
-            //     id: uuidv4(), 
-            //     disabledDate: (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-            //     kho: khotong ? khotong : null, 
-            //     serial: '', lot: '', date: null, donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}] 
-            // }
-            // sListData(newData);
             const newData = value?.map((e,index) => ({
               id: uuidv4(), 
               time: index,
               matHang: e, 
               child: [{
-                kho: null,
-                disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-                serial: '',
-                 lot: '',
-                  date: null,
-                   donViTinh: e?.e?.unit_name,
-                    amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price,
-                     chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent,
+                      kho: null,
+                      disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
+                      serial: '',
+                      lot: '',
+                      date: null,
+                      donViTinh: e?.e?.unit_name,
+                      amount: Number(e?.e?.quantity_left) || 1, price: e?.e?.price,
+                      chietKhau: chietkhautong ? chietkhautong : e?.e?.discount_percent,
                       priceAfter: Number(e?.e?.price_after_discount), 
                       tax: thuetong ? thuetong : {label: e?.e?.tax_name, 
-                        value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate},
-                         thanhTien: Number(e?.e?.amount),
-                          note: e?.e?.note
-              }]
+                           value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate},
+                           thanhTien: Number(e?.e?.amount),
+                           note: e?.e?.note
+                     }]
             }))
             sListData(newData?.sort((a, b) => b.time - a.time));
           }
@@ -594,174 +663,148 @@ const _ServerFetching =  () => {
 
 
 
-  const _HandleChangeInputOption = (id, type,index3, value) => {
-    var index = option.findIndex(x => x.id === id);
-    if(type == "mathang"){
-      //  const hasSelectedOption = option.some((o) => o.mathang?.value === value.value && o.mathang?.e?.purchases_code === value.mathang?.e?.purchases_code);
-      //     if (hasSelectedOption) {
-      //       Toast.fire({
-      //         title: `${"Mặt hàng đã được chọn"}`,
-      //         icon: 'error',
-      //         confirmButtonColor: '#296dc1',
-      //         cancelButtonColor: '#d33',
-      //         confirmButtonText: `${dataLang?.aler_yes}`,
-      //         })
-      //       return  
-      //     }
+  // const _HandleChangeInputOption = (id, type,index3, value) => {
+  //   var index = option.findIndex(x => x.id === id);
+  //   if(type == "mathang"){
+  //     //  const hasSelectedOption = option.some((o) => o.mathang?.value === value.value && o.mathang?.e?.purchases_code === value.mathang?.e?.purchases_code);
+  //     //     if (hasSelectedOption) {
+  //     //       Toast.fire({
+  //     //         title: `${"Mặt hàng đã được chọn"}`,
+  //     //         icon: 'error',
+  //     //         confirmButtonColor: '#296dc1',
+  //     //         cancelButtonColor: '#d33',
+  //     //         confirmButtonText: `${dataLang?.aler_yes}`,
+  //     //         })
+  //     //       return  
+  //     //     }
 
-      if(option[index]?.mathang){
+  //     if(option[index]?.mathang){
 
-            option[index].mathang = value
-            option[index].donvitinh =  value?.e?.unit_name
-            sMathangAll(null)
-            option[index].dongia = value?.e?.price
-            option[index].khohang =  khotong ? khotong : null
-            option[index].soluong =  idTheOrder != null ? Number(value?.e?.quantity_left) : 1
-            option[index].chietkhau = chietkhautong ? chietkhautong : Number(value?.e?.discount_percent)
-            option[index].dongiasauck = Number(value?.e?.price_after_discount)
-            option[index].thue =  thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}  
-            option[index].thanhtien = Number(value?.e?.amount)
-          }else{
+  //           option[index].mathang = value
+  //           option[index].donvitinh =  value?.e?.unit_name
+  //           sMathangAll(null)
+  //           option[index].dongia = value?.e?.price
+  //           option[index].khohang =  khotong ? khotong : null
+  //           option[index].soluong =  idTheOrder != null ? Number(value?.e?.quantity_left) : 1
+  //           option[index].chietkhau = chietkhautong ? chietkhautong : Number(value?.e?.discount_percent)
+  //           option[index].dongiasauck = Number(value?.e?.price_after_discount)
+  //           option[index].thue =  thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}  
+  //           option[index].thanhtien = Number(value?.e?.amount)
+  //         }else{
       
-            // const newData= {id: Date.now(), mathang: value, dongiasauck: Number(value?.e?.price_after_discount), khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: Number(value?.e?.price), chietkhau: Number(value?.e?.discount_percent), thue: value ? [{label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e.tax_id, tax_rate: value?.e.tax_rate}] : thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
-            const newData= {id: Date.now(), mathang: value, dongiasauck: Number(value?.e?.price_after_discount), khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: Number(value?.e?.price), chietkhau: Number(value?.e?.discount_percent), thue: thuetong ? thuetong : {label: value?.e.tax_name,value:Number(value?.e.tax_id), tax_rate:Number(value?.e.tax_rate)}, thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
-            if (newData.chietkhau) {
-              // newData.dongiasauck *=  (1 - Number(newData.chietkhau) / 100);
-              newData.dongiasauck = Number(newData.dongia) * (1 - Number(newData.chietkhau) / 100);
-            }
-            if(newData?.thue?.tax_rate == undefined){
-              const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
-              newData.thanhtien = Number(tien.toFixed(2));
-            }else { 
-              const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.tax_rate)/100) * Number(newData.soluong);
-              newData.thanhtien = Number(tien.toFixed(2));
-            }
-            sMathangAll(null)
-            option.push(newData);
-          }
-    }else if(type ==="khohang"){
-      option[index].khohang = value
-      sCustomStyle(value)
-    }
-    else if(type == "donvitinh"){
-      option[index].donvitinh = value.target?.value;
-    }else if (type === "soluong") {
-      option[index].soluong = Number(value?.value);
-      if(option[index].thue?.tax_rate == undefined){
-        const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-        option[index].thanhtien = Number(tien.toFixed(2));
-      }else{
-        const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-        option[index].thanhtien = Number(tien.toFixed(2));
-      }
-      // if(newData?.thue?.tax_rate == undefined){
-      //   const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
-      //   newData.thanhtien = Number(tien.toFixed(2));
-      // }else { 
-      //   const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.tax_rate)/100) * Number(newData.soluong);
-      //   newData.thanhtien = Number(tien.toFixed(2));
-      // }
-      sOption([...option]);
-    }else if(type == "dongia"){
-        option[index].dongia = Number(value.value)
-        option[index].dongiasauck = +option[index].dongia * (1 - option[index].chietkhau/100);
-        option[index].dongiasauck = +(Math.round(option[index].dongiasauck + 'e+2') + 'e-2');
-        if(option[index].thue?.tax_rate == undefined){
-          const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-          option[index].thanhtien = Number(tien.toFixed(2));
-        }else{
-          const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-          option[index].thanhtien = Number(tien.toFixed(2));
-        }
+  //           // const newData= {id: Date.now(), mathang: value, dongiasauck: Number(value?.e?.price_after_discount), khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: Number(value?.e?.price), chietkhau: Number(value?.e?.discount_percent), thue: value ? [{label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e.tax_id, tax_rate: value?.e.tax_rate}] : thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
+  //           const newData= {id: Date.now(), mathang: value, dongiasauck: Number(value?.e?.price_after_discount), khohang: khotong ? khotong : null, donvitinh: value?.e?.unit_name, soluong: idTheOrder != null ? Number(value?.e?.quantity_left) : 1, dongia: Number(value?.e?.price), chietkhau: Number(value?.e?.discount_percent), thue: thuetong ? thuetong : {label: value?.e.tax_name,value:Number(value?.e.tax_id), tax_rate:Number(value?.e.tax_rate)}, thuetong, thanhtien: value?.e?.amount, ghichu: value?.e?.note}
+  //           if (newData.chietkhau) {
+  //             // newData.dongiasauck *=  (1 - Number(newData.chietkhau) / 100);
+  //             newData.dongiasauck = Number(newData.dongia) * (1 - Number(newData.chietkhau) / 100);
+  //           }
+  //           if(newData?.thue?.tax_rate == undefined){
+  //             const tien = Number(newData.dongiasauck) * (1 + Number(0)/100) * Number(newData.soluong);
+  //             newData.thanhtien = Number(tien.toFixed(2));
+  //           }else { 
+  //             const tien = Number(newData.dongiasauck) * (1 + Number(newData.thue?.tax_rate)/100) * Number(newData.soluong);
+  //             newData.thanhtien = Number(tien.toFixed(2));
+  //           }
+  //           sMathangAll(null)
+  //           option.push(newData);
+  //         }
+  //   }else if(type ==="khohang"){
+  //     option[index].khohang = value
+  //     sCustomStyle(value)
+  //   }
+  //   else if(type == "donvitinh"){
+  //     option[index].donvitinh = value.target?.value;
+  //   }else if (type === "soluong") {
+  //     option[index].soluong = Number(value?.value);
+  //     if(option[index].thue?.tax_rate == undefined){
+  //       const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
+  //       option[index].thanhtien = Number(tien.toFixed(2));
+  //     }else{
+  //       const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
+  //       option[index].thanhtien = Number(tien.toFixed(2));
+  //     }
+  //     sOption([...option]);
+  //   }else if(type == "dongia"){
+  //       option[index].dongia = Number(value.value)
+  //       option[index].dongiasauck = +option[index].dongia * (1 - option[index].chietkhau/100);
+  //       option[index].dongiasauck = +(Math.round(option[index].dongiasauck + 'e+2') + 'e-2');
+  //       if(option[index].thue?.tax_rate == undefined){
+  //         const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
+  //         option[index].thanhtien = Number(tien.toFixed(2));
+  //       }else{
+  //         const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
+  //         option[index].thanhtien = Number(tien.toFixed(2));
+  //       }
 
-    }else if(type == "chietkhau"){
-        option[index].chietkhau = Number(value.value) 
-        option[index].dongiasauck = +option[index].dongia * (1 - option[index].chietkhau/100);
-        option[index].dongiasauck = +(Math.round(option[index].dongiasauck + 'e+2') + 'e-2');
-        if(option[index].thue?.tax_rate == undefined){
-          const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-          option[index].thanhtien = Number(tien.toFixed(2));
-        }else{
-          const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-          option[index].thanhtien = Number(tien.toFixed(2));
-        }
-    }else if(type == "thue"){
-        option[index].thue = value
-        if(option[index].thue?.tax_rate == undefined){
-          const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-          option[index].thanhtien = Number(tien.toFixed(2));
-        }else{
-          const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-          option[index].thanhtien = Number(tien.toFixed(2));
-        }
-    }else if(type == "ghichu"){
-        option[index].ghichu = value?.target?.value;
-    }
-    sOption([...option])
-  }
+  //   }else if(type == "chietkhau"){
+  //       option[index].chietkhau = Number(value.value) 
+  //       option[index].dongiasauck = +option[index].dongia * (1 - option[index].chietkhau/100);
+  //       option[index].dongiasauck = +(Math.round(option[index].dongiasauck + 'e+2') + 'e-2');
+  //       if(option[index].thue?.tax_rate == undefined){
+  //         const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
+  //         option[index].thanhtien = Number(tien.toFixed(2));
+  //       }else{
+  //         const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
+  //         option[index].thanhtien = Number(tien.toFixed(2));
+  //       }
+  //   }else if(type == "thue"){
+  //       option[index].thue = value
+  //       if(option[index].thue?.tax_rate == undefined){
+  //         const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
+  //         option[index].thanhtien = Number(tien.toFixed(2));
+  //       }else{
+  //         const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
+  //         option[index].thanhtien = Number(tien.toFixed(2));
+  //       }
+  //   }else if(type == "ghichu"){
+  //       option[index].ghichu = value?.target?.value;
+  //   }
+  //   sOption([...option])
+  // }
 
-  const handleIncrease = (id) => {
-    const index = option.findIndex((x) => x.id === id);
-    const newQuantity = option[index].soluong + 1;
-    option[index].soluong = newQuantity;
-    if(option[index].thue?.tax_rate == undefined){
-      const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-      option[index].thanhtien = Number(tien.toFixed(2));
-    }else{
-      const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-      option[index].thanhtien = Number(tien.toFixed(2));
-    }
-    sOption([...option]);
-  };
+  // const handleIncrease = (id) => {
+  //   const index = option.findIndex((x) => x.id === id);
+  //   const newQuantity = option[index].soluong + 1;
+  //   option[index].soluong = newQuantity;
+  //   if(option[index].thue?.tax_rate == undefined){
+  //     const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
+  //     option[index].thanhtien = Number(tien.toFixed(2));
+  //   }else{
+  //     const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
+  //     option[index].thanhtien = Number(tien.toFixed(2));
+  //   }
+  //   sOption([...option]);
+  // };
 
-  const handleDecrease = (id) => {
-    const index = option.findIndex((x) => x.id === id);
-    const newQuantity = option[index].soluong - 1;
-    if (newQuantity >= 1) { // chỉ giảm số lượng khi nó lớn hơn hoặc bằng 1
-      option[index].soluong = newQuantity;
-      if(option[index].thue?.tax_rate == undefined){
-        const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
-        option[index].thanhtien = Number(tien.toFixed(2));
-      }else{
-        const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
-        option[index].thanhtien = Number(tien.toFixed(2));
-      }
-      sOption([...option]);
-    }else{
-      return  Toast.fire({
-        title: `${"Số lượng tối thiểu"}`,
-        icon: 'error',
-        confirmButtonColor: '#296dc1',
-        cancelButtonColor: '#d33',
-        confirmButtonText: `${dataLang?.aler_yes}`,
-        })
-    }
-  };
+  // const handleDecrease = (id) => {
+  //   const index = option.findIndex((x) => x.id === id);
+  //   const newQuantity = option[index].soluong - 1;
+  //   if (newQuantity >= 1) { // chỉ giảm số lượng khi nó lớn hơn hoặc bằng 1
+  //     option[index].soluong = newQuantity;
+  //     if(option[index].thue?.tax_rate == undefined){
+  //       const tien = Number(option[index].dongiasauck) * (1 + Number(0)/100) * Number(option[index].soluong);
+  //       option[index].thanhtien = Number(tien.toFixed(2));
+  //     }else{
+  //       const tien = Number(option[index].dongiasauck) * (1 + Number(option[index].thue?.tax_rate)/100) * Number(option[index].soluong);
+  //       option[index].thanhtien = Number(tien.toFixed(2));
+  //     }
+  //     sOption([...option]);
+  //   }else{
+  //     return  Toast.fire({
+  //       title: `${"Số lượng tối thiểu"}`,
+  //       icon: 'error',
+  //       confirmButtonColor: '#296dc1',
+  //       cancelButtonColor: '#d33',
+  //       confirmButtonText: `${dataLang?.aler_yes}`,
+  //       })
+  //   }
+  // };
 
-    const _HandleDelete =  (id) => {
-    if (id === option[0].id) {
-      return Toast.fire({
-        title: `${"Mặc định hệ thống, không xóa"}`,
-        icon: 'error',
-        confirmButtonColor: '#296dc1',
-        cancelButtonColor: '#d33',
-        confirmButtonText: `${dataLang?.aler_yes}`,
-      })
-    }
-      const newOption = option.filter(x => x.id !== id); // loại bỏ phần tử cần xóa
-      sOption(newOption); // cập nhật lại mảng
-    }
     const taxOptions = [{ label: "Miễn thuế", value: "0",   tax_rate: "0"}, ...dataTasxes]
     
     const allItems = [...options]
 
   const _HandleSelectAll = () => {
-    // const fakeData = [{id: Date.now(), mathang: null}]
-    // const data = fakeData?.concat(allItems?.map(e => ({id: uuidv4(), mathang: e,
-    //   disabledDate: (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (e?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
-    //   khohang: khotong ? khotong : e?.qty_warehouse, serial: '', lot: '', date: null, donvitinh: e?.e?.unit_name, soluong: idTheOrder != null ? Number(e?.e?.quantity_left):1, dongia: e?.e?.price, chietkhau:chietkhautong ?  chietkhautong : e?.e?.discount_percent, dongiasauck:Number(e?.e?.price_after_discount), thue: thuetong ? thuetong : {label: e?.e?.tax_name, value:e?.e?.tax_id, tax_rate:e?.e?.tax_rate}, thanhtien: Number(e?.e?.amount), ghichu: e?.e?.note})))
-    // sOption(data);
-    // sMathangAll(data)
 
     //new
       sMathangAll(allItems?.map(e => ({
@@ -799,8 +842,6 @@ const _ServerFetching =  () => {
   };
 
   const _HandleDeleteAll = () => {
-    // sMathangAll([])
-    // sOption([{id: Date.now(), mathang: null}])
     //new
     sListData([])
   };
@@ -837,8 +878,6 @@ const _ServerFetching =  () => {
 
     const tinhTongTien = (option) => {
 
-      // const tongTien = option.slice(1).reduce((accumulator, currentValue) => accumulator + currentValue?.dongia * currentValue?.soluong, 0);
-      // const tongTien = listData.map(e => e?.child?.reduce((accumulator, currentValue) => accumulator + currentValue?.price * currentValue?.amount, 0));
       const tongTien = option?.reduce((accumulator, item) => {
         const childTotal = item.child?.reduce((childAccumulator, childItem) => {
           const product = Number(childItem?.price) * Number(childItem?.amount);
@@ -847,10 +886,6 @@ const _ServerFetching =  () => {
         return accumulator + childTotal;
       }, 0)
     
-      // const tienChietKhau = option.slice(1).reduce((acc, item) => {
-      //   const chiTiet = item?.dongia * (item?.chietkhau/100) * item?.soluong;
-      //   return acc + chiTiet;
-      // }, 0);
 
       const tienChietKhau = option?.reduce((accumulator, item) => {
         const childTotal = item.child?.reduce((childAccumulator, childItem) => {
@@ -860,10 +895,6 @@ const _ServerFetching =  () => {
         return accumulator + childTotal;
       }, 0)
     
-      // const tongTienSauCK = option.slice(1).reduce((acc, item) => {
-      //   const tienSauCK = item?.soluong * item?.dongiasauck;
-      //   return acc + tienSauCK;
-      // }, 0);
 
       const tongTienSauCK = option?.reduce((accumulator, item) => {
         const childTotal = item.child?.reduce((childAccumulator, childItem) => {
@@ -873,11 +904,6 @@ const _ServerFetching =  () => {
         return accumulator + childTotal;
       }, 0)
     
-      // const tienThue = option.slice(1).reduce((acc, item) => {
-      //   const tienThueItem = item?.dongiasauck * (isNaN(item?.thue?.tax_rate) ? 0 : (item?.thue?.tax_rate/100)) * item?.soluong;
-      //   return acc + tienThueItem;
-      // }, 0);
-
       const tienThue = option?.reduce((accumulator, item) => {
         const childTotal = item.child?.reduce((childAccumulator, childItem) => {
           const product = Number(childItem?.priceAfter) * (isNaN(childItem?.tax?.tax_rate) ? 0 : (Number(childItem?.tax?.tax_rate)/100)) * Number(childItem?.amount);
@@ -886,7 +912,6 @@ const _ServerFetching =  () => {
         return accumulator + childTotal;
       }, 0)
     
-      // const tongThanhTien = option.slice(1).reduce((acc, item) => acc + item?.thanhtien, 0);
 
       const tongThanhTien = option?.reduce((accumulator, item) => {
         const childTotal = item.child?.reduce((childAccumulator, childItem) => {
@@ -901,19 +926,11 @@ const _ServerFetching =  () => {
 
     const [tongTienState, setTongTienState] = useState({ tongTien: 0, tienChietKhau: 0, tongTienSauCK: 0, tienThue: 0, tongThanhTien: 0 });
     
-    // useEffect(() => {
-    //   const tongTien = tinhTongTien(option);
-    //   setTongTienState(tongTien);
-    // }, [option])
-
     useEffect(() => {
       const tongTien = tinhTongTien(listData);
       setTongTienState(tongTien);
     }, [listData])
 
-    // const dataOption = sortedArr?.map(e => { return {item: e?.mathang?.value, purchases_order_item_id: e?.mathang?.e?.purchase_order_item_id, location_warehouses_id: e?.khohang?.value, quantity: Number(e?.soluong), price: e?.dongia, discount_percent:e?.chietkhau, tax_id:e?.thue?.value, note: e?.ghichu, id:e?.id}})
-   
-    // let newDataOption = dataOption?.filter(e => e?.item !== undefined);
     const handleClearDate = (type) => {
       if (type === 'effectiveDate') {
         sEffectiveDate(null)
@@ -929,23 +946,11 @@ const _ServerFetching =  () => {
     const _ServerSending = () => {
           var formData = new FormData();
           formData.append("code", code)
-          // formData.append("date", (moment(date).format("YYYY-MM-DD HH:mm:ss")))
           formData.append("date", (moment(startDate).format("YYYY-MM-DD HH:mm:ss")))
           formData.append("branch_id", idBranch.value)
           formData.append("suppliers_id", idSupplier.value)
           formData.append("id_order", idTheOrder.value)
           formData.append("note", note)
-          // newDataOption.forEach((item, index) => {
-          //   formData.append(`items[${index}][item]`, item?.item);
-          //   formData.append(`items[${index}][price]`, item?.price);
-            // formData.append(`items[${index}][purchase_order_item_id]`, item?.purchases_order_item_id != undefined ? item?.purchases_order_item_id : "");
-          //   formData.append(`items[${index}][id]`, router.query?.id ? item?.id : "");
-          //   formData.append(`items[${index}][quantity]`, item?.quantity.toString());
-          //   formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
-          //   formData.append(`items[${index}][discount_percent]`, item?.discount_percent);
-          //   formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
-          //   formData.append(`items[${index}][location_warehouses_id]`, item?.location_warehouses_id != undefined ? item?.location_warehouses_id : "");
-          // });  
           listData.forEach((item, index) => {
             formData.append(`items[${index}][id]`, item?.id);
             formData.append(`items[${index}][item]`, item?.matHang?.value);
@@ -1126,8 +1131,9 @@ const _ServerFetching =  () => {
           return {...e, 
             matHang: value,
             child: [
-              {id: uuidv4(),
-                 kho: khotong ? khotong : null,
+                {
+                  id: uuidv4(),
+                  kho: khotong ? khotong : null,
                   disabledDate: (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) || (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true), 
                   serial: '', lot: '', date: null,
                   donViTinh: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, thanhTien: Number(value?.e?.amount), note: value?.e?.note}]}
@@ -1161,7 +1167,6 @@ const _ServerFetching =  () => {
       })
   }
 
-    
 
   return (
     <React.Fragment>
@@ -1605,7 +1610,7 @@ const _ServerFetching =  () => {
                     control: (base, state) => ({
                       ...base,
                       ...(state.isFocused && {
-                        border: 'none',
+                        border: '0 0 0 1px #92BFF7',
                         boxShadow: 'none'
                       }),
                     }),

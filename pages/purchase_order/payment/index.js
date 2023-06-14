@@ -297,18 +297,20 @@ const Index = (props) => {
                     <div className="bg-slate-100 w-full rounded grid grid-cols-8 justify-between xl:p-3 p-2">
                       <div className='col-span-7'>
                         <div className='grid grid-cols-10 items-center space-x-1'>
-                          <form className="flex items-center relative col-span-2">
-                            <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
-                            <input
-                                className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-1.5 rounded-md w-[400px]"
-                                type="text" 
-                                onChange={_HandleOnChangeKeySearch.bind(this)} 
-                                placeholder={dataLang?.branch_search}
-                            />
-                          </form>
-                          <div className=' col-span-2'>
+                          <div className='col-span-2'>
+                            <form className="flex items-center relative ">
+                                <IconSearch className="absolute 3xl:h-[20px] 2xl:h-[20px] xl:h-[19px] lg:h-[18px] 3xl:w-[20px] 2xl:w-[18px] xl:w-[19px] lg:w-[18px] z-10 3xl:left-[4%] 2xl:left-[4%] xl:left-[8%] lg:left-[10%] text-[#cccccc]" />
+                                <input
+                                    className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] 3xl:h-[40px] 2xl:h-[40px] xl:h-[38px] lg:h-[39px]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  xl:py-2.5 lg:py-[11px] rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-[199px] lg:w-[160px]  relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E] "
+                                    type="text"
+                                    onChange={_HandleOnChangeKeySearch.bind(this)}
+                                    placeholder={dataLang?.branch_search}
+                                />
+                            </form>
+                          </div>
+                          <div className='col-span-2'>
                               <Select 
-                                  options={[{ value: '', label: 'Chọn chi nhánh', isDisabled: true }, ...listBr]}
+                                  options={[{ value: '', label: dataLang?.payment_select_branch || "payment_select_branch", isDisabled: true }, ...listBr]}
                                   onChange={onchang_filter.bind(this, "branch")}
                                   value={idBranch}
                                   placeholder={dataLang?.client_list_filterbrand} 
@@ -347,10 +349,10 @@ const Index = (props) => {
                           </div>
                           <div className=' col-span-2'>
                               <Select 
-                                  options={[{ value: '', label: 'Chọn Phương thức TT', isDisabled: true }, ...dataMethod]}
+                                  options={[{ value: '', label: dataLang?.payment_TT_method || "payment_TT_method", isDisabled: true }, ...dataMethod]}
                                   onChange={onchang_filter.bind(this, "method")}
                                   value={idMethod}
-                                  placeholder={"Phương thức TT"} 
+                                  placeholder={dataLang?.payment_TT_method || "payment_TT_method"} 
                                   hideSelectedOptions={false}
                                   isClearable={true}
                                   className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full  2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20 " 
@@ -386,10 +388,10 @@ const Index = (props) => {
                           </div>
                           <div className=' col-span-2'>
                               <Select 
-                                  options={[{ value: '', label: 'Chọn đối tượng', isDisabled: true }, ...dataObject]}
+                                  options={[{ value: '', label: dataLang?.payment_select_ob || "payment_select_ob", isDisabled: true }, ...dataObject]}
                                   onChange={onchang_filter.bind(this, "object")}
                                   value={idObject}
-                                  placeholder={"Đối tượng"} 
+                                  placeholder={dataLang?.payment_ob || "payment_ob"} 
                                   hideSelectedOptions={false}
                                   isClearable={true}
                                   className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full  2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20 " 
@@ -479,20 +481,20 @@ const Index = (props) => {
                 </div>
                 <div className="min:h-[200px] h-[88%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%] lx:w-[110%] ">
-                    <div className="grid grid-cols-13 items-center sticky top-0 bg-white p-2 z-10 shadow">
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_date || "payment_date"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_code || "payment_code"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_obType || "payment_obType"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_ob || "payment_ob"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_voucherCode || "payment_voucherCode"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{"PTTT"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_costs || "payment_costs"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_creator || "payment_creator"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_branch || "payment_branch"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_note || "payment_note"}</h4>
-                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.payment_action || "payment_action"}</h4>
+                    <div className="grid grid-cols-13 items-center sticky top-0 bg-white p-2 z-10 shadow-lg">
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_date || "payment_date"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_code || "payment_code"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_obType || "payment_obType"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_ob || "payment_ob"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_voucherCode || "payment_voucherCode"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{"PTTT"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_costs || "payment_costs"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_creator || "payment_creator"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_branch || "payment_branch"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_note || "payment_note"}</h4>
+                                  <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.payment_action || "payment_action"}</h4>
                       </div>
                     {onFetching ?
                       <Loading className="h-80"color="#0f4f9e" /> 
@@ -547,11 +549,12 @@ const Index = (props) => {
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-right">{formatNumber(e?.total)}</h6>
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left flex items-center space-x-1">
                                   <div className='relative'>
-                                     <img className='h-6 w-6 rounded-full ' src={e?.profile_image ? e?.profile_image : '/user-placeholder.jpg'} alt=''></img>
-                                     <span className="h-1.5 w-1.5 absolute bottom-1/2 left-1/2 translate-x-[100%]">
-                                          <span className="inline-flex relative rounded-full h-1.5 w-1.5 bg-lime-500">
-                                          <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span></span>
-                                        </span>
+                                    <ModalImage small={e?.profile_image ? e?.profile_image : '/user-placeholder.jpg'} large={e?.profile_image ? e?.profile_image : '/user-placeholder.jpg'} className='h-6 w-6 rounded-full object-cover ' /> 
+                                     {/* <img className='h-6 w-6 rounded-full object-cover' src={e?.profile_image ? e?.profile_image : '/user-placeholder.jpg'} alt=''></img> */}
+                                      <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
+                                            <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
+                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span></span>
+                                      </span>
                                   </div>
                                   <h6 className="capitalize">{e?.staff_name}</h6>
                               </h6>
@@ -777,7 +780,7 @@ const Popup_dspc = (props) => {
             sNote(db?.note)
             sListObject(db?.objects === "other" ? {label: db?.object_text, value: db?.object_text} : {label: dataLang[db?.object_text] || db?.object_text, value: db?.objects_id})
             sTypeOfDocument(db?.type_vouchers ? {label: dataLang[db?.type_vouchers], value: db?.type_vouchers} : null)
-            sListTypeOfDocument(db?.type_vouchers ? db?.voucher?.map(e => ({label: e?.code  , value: e?.id})) :[])
+            sListTypeOfDocument(db?.type_vouchers ? db?.voucher?.map(e => ({label: e?.code  , value: e?.id, money: e?.money})) :[])
             sOption(db?.detail?.map(e => ({id: e?.id, chiphi: {label: e?.costs_name, value: e?.id_costs}, sotien: Number(e?.total)})))
         }
         sOnFetchingDetail(false)
@@ -945,6 +948,7 @@ const Popup_dspc = (props) => {
     branch != null  && sOnFetching_ListCost(true)
   },[branch])
 
+ 
       const _HandleChangeInput = (type, value) =>{
         if(type == "date"){
             sDate(value)
@@ -957,10 +961,15 @@ const Popup_dspc = (props) => {
             sData_ListObject([])
             sListObject(null)
             sDataListCost([])
+            sPrice('')
+            sListTypeOfDocument([])
+            sDataListTypeofDoc([])
+            sTypeOfDocument(null)
             const updatedOptions = option.map((item) => {
               return {
                 ...item,
                 chiphi: "",
+                sotien: ''
               };
             });
             sOption(updatedOptions);
@@ -970,52 +979,74 @@ const Popup_dspc = (props) => {
             sData_ListObject([])
             sDataTypeofDoc([])
             sTypeOfDocument(null)
+            sListTypeOfDocument([])
+            sDataListTypeofDoc([])
+            sPrice('')
+            sOption(prevOption =>{
+              const newOption = prevOption.map((item, index) => {
+                return { ...item, sotien: '' };
+              });
+              return newOption;
+            })
         }else if(type == "listObject"){
             sListObject(value)
         }else if(type == "typeOfDocument" && typeOfDocument != value){
             sTypeOfDocument(value)
             sDataListTypeofDoc([])
+            sListTypeOfDocument([])
+            sPrice('')
+            sOption((prevOption) => {
+              const newOption = prevOption.map((item, index) => {
+                return { ...item, sotien: '' };
+              });
+              return newOption;
+            });
         }else if(type == "listTypeOfDocument"){
             sListTypeOfDocument(value)
             if (value && value.length > 0) {
               const totalMoney = value.reduce((total, item) => total + parseFloat(item.money || 0), 0);
               const formattedTotal = parseFloat(totalMoney);
-              sPrice(formattedTotal);
-              sOption((prevOption) => {
-                const newOption = prevOption.map((item, index) => {
-                  if (index === 0) {
-                    return { ...item, sotien: formattedTotal };
-                  } else {
-                    return { ...item, sotien: null };
-                  }
+                sPrice(formattedTotal);
+                sOption((prevOption) => {
+                  const newOption = prevOption.map((item, index) => {
+                    if (index === 0) {
+                      return { ...item, sotien: formattedTotal };
+                    } else {
+                      return { ...item, sotien: null };
+                    }
+                  });
+                  return newOption;
                 });
-                return newOption;
-              });
             }else if (value && value.length == 0) {
-              sPrice('');
-              sOption((prevOption) => {
-                const newOption = prevOption.map((item, index) => {
-                  return { ...item, sotien: '' };
+                sPrice('');
+                sOption((prevOption) => {
+                  const newOption = prevOption.map((item, index) => {
+                    return { ...item, sotien: '' };
+                  });
+                  return newOption;
                 });
-                return newOption;
-              });
-            }
+              }
         }else if (type === "price") {
           let totalMoney = listTypeOfDocument.reduce((total, item) => total + parseFloat(item.money), 0);
           const priceChange = parseFloat(value?.target.value.replace(/,/g, ""));
           let isExceedTotal = false; // Biến flag để kiểm tra trạng thái vượt quá giá trị
           if (!isNaN(priceChange)) {
-            if (priceChange > totalMoney) {
-              // Giá nhập vượt quá tổng số tiền, trả về tổng ban đầu
-              Toast.fire({
-                icon: 'error',
-                title: 'Số tiền vượt quá tổng số tiền ban đầu',
-              });
-              sPrice(totalMoney);
-              isExceedTotal = true; // Đánh dấu trạng thái vượt quá giá trị
-            } else {
-              sPrice(priceChange);
-            }
+                if(listTypeOfDocument?.length > 0){
+                  if (priceChange > totalMoney) {
+                    // Giá nhập vượt quá tổng số tiền, trả về tổng ban đầu
+                      Toast.fire({
+                        icon: 'error',
+                        title: `${dataLang?.payment_err_aler || "payment_err_aler"}`,
+                      });
+                      sPrice(totalMoney);
+                      isExceedTotal = true; // Đánh dấu trạng thái vượt quá giá trị
+                    }
+                  else {
+                }
+                sPrice(priceChange);
+              }else {
+                sPrice(priceChange)
+              }
           }
           sOption((prevOption) => {
             if (isExceedTotal) {
@@ -1042,32 +1073,12 @@ const Popup_dspc = (props) => {
             sPrice(totalMoney);
           }
         }
-        
-        // else if(type == "price"){
-        //   const checkPriceType = listTypeOfDocument
-        //   console.log(checkPriceType);
-        //   const priceChange = parseFloat(value?.target.value.replace(/,/g, ""));
-        //   if (!isNaN(priceChange)) {
-        //     sPrice(priceChange);
-        //   }
-        //   sOption((prevOption) => {
-        //     const newOption = prevOption.map((item, index) => {
-        //       if (index === 0) {
-        //         return { ...item, sotien: priceChange };
-        //       } else {
-        //         return { ...item, sotien: null };
-        //       }
-        //     });
-        //     return newOption;
-        //   });
-        // }
         else if(type == "method"){
             sMethod(value)
         }else if(type == "note"){
             sNote(value?.target.value)
         }
       }
-      
       // useEffect(() => {
       //   if (price == null) return;
       //   sOption(prevOption => {
@@ -1082,6 +1093,7 @@ const Popup_dspc = (props) => {
       //     return newOption;
       //   });
       // }, [price]);
+
 
       const _HandleSubmit = (e) =>{
         e.preventDefault();
@@ -1099,7 +1111,7 @@ const Popup_dspc = (props) => {
             typeOfDocument != null && listTypeOfDocument?.length == 0 && sErrListTypeDoc(true)
             Toast.fire({
               icon: 'error',
-              title: `${totalSotienErr < price ? "Tổng số tiền chi phí nhỏ hơn số tiền ban đầu" : props.dataLang?.required_field_null}`
+              title: `${totalSotienErr < price ? props?.dataLang.payment_err_alerTotalThan || "payment_err_alerTotalThan" : props.dataLang?.required_field_null || "required_field_null"}`
           })
           }else{
             sOnSending(true)
@@ -1139,7 +1151,7 @@ const Popup_dspc = (props) => {
           const hasSelectedOption = option.some((o) => o.chiphi === value);
           if (hasSelectedOption) {
             Toast.fire({
-              title: 'Loại chi phí này đã được chọn',
+              title: `${props?.dataLang?.payment_err_alerselected || "payment_err_alerselected"}`,
               icon: 'error',
               confirmButtonColor: '#296dc1',
               cancelButtonColor: '#d33',
@@ -1162,7 +1174,7 @@ const Popup_dspc = (props) => {
                 }
               });
               Toast.fire({
-                title: 'Tổng giá trị số tiền vượt quá giá trị số tiền ban đầu',
+                title: `${props?.dataLang?.payment_err_alerExeeds || "payment_err_alerExeeds"}`,
                 icon: 'error',
                 confirmButtonColor: '#296dc1',
                 cancelButtonColor: '#d33',
@@ -1184,7 +1196,7 @@ const Popup_dspc = (props) => {
       const _HandleDelete =  (id) => {
         if (id === option[0].id) {
           return Toast.fire({
-            title: `${"Mặc định hệ thống, không xóa"}`,
+            title: `${props.dataLang?.payment_err_alerNotDelete || "payment_err_alerNotDelete"}`,
             icon: 'error',
             confirmButtonColor: '#296dc1',
             cancelButtonColor: '#d33',
@@ -1264,8 +1276,8 @@ const Popup_dspc = (props) => {
             <components.MenuList {...props}>
               {dataListTypeofDoc?.length > 0 &&
               <div className='grid grid-cols-2 items-center  cursor-pointer'>
-                <div className='hover:bg-slate-200 p-2 col-span-1 text-center text-xs ' onClick={handleSelectAll}>Chọn tất cả</div>
-                <div className='hover:bg-slate-200 p-2 col-span-1 text-center text-xs ' onClick={handleDeselectAll}>Bỏ chọn tất cả</div>
+                <div className='hover:bg-slate-200 p-2 col-span-1 text-center text-xs ' onClick={handleSelectAll}>{dataLang?.payment_selectAll || "payment_selectAll"}</div>
+                <div className='hover:bg-slate-200 p-2 col-span-1 text-center text-xs ' onClick={handleDeselectAll}>{dataLang?.payment_DeselectAll || "payment_DeselectAll"}</div>
               </div>
               }
               {props.children}
@@ -1345,7 +1357,7 @@ const Popup_dspc = (props) => {
         open={open} onClose={_ToggleModal.bind(this,false)}
         classNameBtn={props.className} 
       >
-      <div className='flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
+      <div className='flex items-center space-x-4 3xl:my-3 2xl:my-1 my-1 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
       </div>
       <h2 className='font-normal bg-[#ECF0F4] p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  '>{props.dataLang?.payment_general_information || "payment_general_information"}</h2>  
               <div className="w-[40vw]">
@@ -1357,6 +1369,7 @@ const Popup_dspc = (props) => {
                                  <div className="custom-date-picker flex flex-row " >
                                   <DatePicker
                                     blur
+                                    
                                     fixedHeight
                                     showTimeSelect
                                     selected={date}
@@ -1366,7 +1379,7 @@ const Popup_dspc = (props) => {
                                     dateFormat="dd/MM/yyyy h:mm:ss aa"
                                     timeInputLabel={'Time: '}
                                     placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
-                                    className={`border focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                    className={`border  focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                   />
                                   {date && (
                                     <>
@@ -1381,7 +1394,7 @@ const Popup_dspc = (props) => {
                                 <input
                                     value={code}                
                                     onChange={_HandleChangeInput.bind(this, "code")}
-                                    placeholder={"Mặc định theo hệ thống"}                     
+                                    placeholder={props.dataLang?.payment_systemDefaul || "payment_systemDefaul"}                     
                                     type="text"
                                     className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none "
                                     />
@@ -1681,30 +1694,40 @@ const Popup_dspc = (props) => {
                                 }}
                                 className={`${(errListTypeDoc && typeOfDocument != null && listTypeOfDocument?.length == 0) ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `} 
                               />
-                                {(errListTypeDoc && typeOfDocument != null && listTypeOfDocument?.length == 0) && <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{"Vui lòng chọn danh sách chứng từ"}</label>}
+                                {(errListTypeDoc && typeOfDocument != null && listTypeOfDocument?.length == 0) && <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{props.dataLang?.payment_errlistOfDoc || "payment_errlistOfDoc"}</label>}
                             </div>
                             <div className='col-span-6'>
                                <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">{props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"} <span className="text-red-500">*</span></label>
                                 <NumericFormat
                                     value={price}
+                                    disabled={object === null || listObject === null}
                                     onChange={_HandleChangeInput.bind(this, "price")}
                                     allowNegative={false}
-                                    placeholder={props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
+                                    placeholder={(object == null || listObject == null) && (props.dataLang?.payment_errObList || "payment_errObList") || object != null && props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
                                     decimalScale={0}
                                     isNumericString={true} 
                                     isAllowed={(values) => {
-                                      if (!values.value) return true;
-                                      const { floatValue } = values;
-                                      let totalMoney = listTypeOfDocument.reduce((total, item) => total + parseFloat(item.money), 0);
-                                      if (floatValue > totalMoney) {
-                                        Toast.fire({
-                                          icon: 'error',
-                                          title: `Vui lòng nhập số tiền nhỏ hơn hoặc bằng ${totalMoney.toLocaleString("en")}`
-                                        })
+                                          if (!values.value) return true;
+                                          const { floatValue } = values;
+                                         if(object?.value && listTypeOfDocument?.length > 0){
+                                          if(object?.value != "other"){
+                                            let totalMoney = listTypeOfDocument.reduce((total, item) => total + parseFloat(item.money), 0);
+                                            if (floatValue > totalMoney) {
+                                              Toast.fire({
+                                                icon: 'error',
+                                                title: `${props.dataLang?.payment_errPlease || "payment_errPlease"} ${totalMoney.toLocaleString("en")}`
+                                              })
+                                            }
+                                            return floatValue <= totalMoney;
+                                            }else{
+                                              return true
+                                          }
+                                        }else{
+                                          return true
+                                        }
                                       }
-                                      return floatValue <= totalMoney;
-                                    }}
-                                    className={`${errPrice ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300" } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`} 
+                                    }
+                                    className={`${errPrice ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300" } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`} 
                                     thousandSeparator=","
                                 />
                                 {errPrice && <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">{props.dataLang?.payment_errAmount || "payment_errAmount"}</label>}
@@ -1755,8 +1778,8 @@ const Popup_dspc = (props) => {
                                                     primary25: '#EBF5FF',
                                                     primary50: '#92BFF7',
                                                     primary: '#0F4F9E',
-                                                },
-                                            })}
+                                                  },
+                                                })}
                                                 styles={{
                                                   placeholder: (base) => ({
                                                   ...base,
@@ -1783,15 +1806,21 @@ const Popup_dspc = (props) => {
                                               decimalScale={0}
                                               isAllowed={(values) => {
                                                 if (!values.value) return true;
-                                                const { floatValue } = values;
-                                                if (floatValue > price) {
-                                                  Toast.fire({
-                                                    icon: 'error',
-                                                    title: `Vui lòng nhập số tiền nhỏ hơn hoặc bằng ${price.toLocaleString("en")}`
-                                                  })
-                                                }
-                                                return floatValue <= price;
-                                              }}
+                                                  const { floatValue } = values;
+                                                  if(object?.value != "other"){
+                                                    if (floatValue > price) {
+                                                      Toast.fire({
+                                                        icon: 'error',
+                                                        title: `${props.dataLang?.payment_errPlease || "payment_errPlease"} ${price.toLocaleString("en")}`
+                                                      })
+                                                    }
+                                                    return floatValue <= price;
+                                                  }
+                                                  else{
+                                                    return true
+                                                  }
+                                              }
+                                            }
                                               isNumericString={true}   
                                               className={`${errSotien && (e?.sotien === '' || e?.sotien === null) ? "border-b-red-500" : " border-gray-200"} placeholder:text-[10px] border-b-2 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none `}
                                               thousandSeparator=","
@@ -1881,15 +1910,15 @@ return (
                   <div className='grid grid-cols-2 space-x-4'>
                       <div className='col-span-1'>
                           <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_day_vouchers || "import_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}</h3></div>
-                          
-                          <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.payment_creator || "payment_creator"}</h3>
+                            <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.payment_creator || "payment_creator"}</h3>
                               <div className='flex flex-wrap  gap-2 items-center justify-start relative'>
                                   <div className='relative'>
-                                        <img className='h-6 w-6 rounded-full ' src={data?.profile_image ? data?.profile_image : '/user-placeholder.jpg'} alt=''></img>
+                                        <ModalImage small={data?.profile_image ? data?.profile_image : '/user-placeholder.jpg'} large={data?.profile_image ? data?.profile_image : '/user-placeholder.jpg'} className='h-6 w-6 rounded-full object-cover'/> 
+                                        {/* <img className='h-6 w-6 rounded-full object-cover' src={data?.profile_image ? data?.profile_image : '/user-placeholder.jpg'} alt=''></img> */}
                                         <span className="h-1.5 w-1.5 absolute bottom-1/2 left-1/2 translate-x-[100%]">
                                               <span className="inline-flex relative rounded-full h-1.5 w-1.5 bg-lime-500">
                                               <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span></span>
-                                            </span>
+                                        </span>
                                    </div>
                                       <h6 className="capitalize">{data?.staff_name}</h6>
                               </div>
@@ -1918,12 +1947,11 @@ return (
                               </div>
                           </div>
                           <div className=' font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{"Chi nhánh"}</h3>
-                            <h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3>
+                            <h3 className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase w-fit">{data?.branch_name}</h3>
                           </div>
                         </div> 
-                        
                   </div>
-                  <div className='my-4 font-medium col-span-2 grid grid-cols-4 '>
+                  <div className='mb-4 font-medium col-span-2 grid grid-cols-4 '>
                     <h3 className=' text-[13px] col-span-1 '>{props.dataLang?.payment_voucherCode || "payment_voucherCode"}</h3>
                         <div className='flex flex-wrap col-span-3 gap-2 items-center justify-start font-normal'>
                           {data?.voucher?.map((code, index) => (
@@ -1937,25 +1965,24 @@ return (
                </div>     
              <h2 className='font-normal bg-[#ECF0F4]  p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12 mt-0.5'>{props.dataLang?.payment_costInfo || "payment_costInfo"}</h2>  
               <div className=" w-[100%] lx:w-[110%] ">
-                <div className={`grid-cols-3 grid sticky top-0  shadow  z-10`}>
-                  <h4 className="text-[13px] col-span-2 px-2 text-[#667085] uppercase  font-[400] text-center">{props.dataLang?.payment_costs || "payment_costs"}</h4>
-                  <h4 className="text-[13px] col-span-1 px-1 text-[#667085] uppercase font-[400] text-center">{props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}</h4>
+                <div className={`grid-cols-3 grid sticky top-0  shadow-lg  z-10`}>
+                  <h4 className="text-[13px] col-span-2 px-2 py-1 text-gray-400 uppercase  font-[500] text-center">{props.dataLang?.payment_costs || "payment_costs"}</h4>
+                  <h4 className="text-[13px] col-span-1 px-1 py-1 text-gray-400 uppercase  font-[500] text-center">{props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}</h4>
                 </div>
                 {onFetching ?
-                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                  <Loading className="max-h-28" color="#0f4f9e" /> 
                   : 
                   data?.detail?.length > 0 ? 
                   (<>
-                       <ScrollArea     
-                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
-                    <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">                       
-                      {(data?.detail?.map((e) => 
-                        <div className="grid grid-cols-3 hover:bg-slate-50 items-center border-b" key={e.id?.toString()}>
-                          <h6 className="text-[13px] col-span-2  pl-2 py-2  text-left break-words">{e?.costs_name}</h6>                
-                          <h6 className="text-[13px] col-span-1 pl-2 py-2  text-center">{formatNumber(e?.total)}</h6>                
-                        </div>
-                      ))}              
-                    </div>   
+                       <ScrollArea className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+                          <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">                       
+                            {(data?.detail?.map((e) => 
+                              <div className="grid grid-cols-3 hover:bg-slate-50 items-center border-b" key={e.id?.toString()}>
+                                <h6 className="text-[13px] col-span-2  pl-2 py-2  text-left break-words">{e?.costs_name}</h6>                
+                                <h6 className="text-[13px] col-span-1 pl-2 py-2  text-center">{formatNumber(e?.total)}</h6>                
+                              </div>
+                            ))}              
+                          </div>   
                       </ScrollArea>                       
                     </>
                   )  : 
@@ -1963,7 +1990,7 @@ return (
                     <div className=" max-w-[352px] mt-24 mx-auto" >
                       <div className="text-center">
                         <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
-                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">{props.dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
+                          <h1 className="textx-[#141522] text-base opacity-90 font-medium">{props.dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
                         <div className="flex items-center justify-around mt-6 "></div>
                       </div>
                     </div>
@@ -1973,9 +2000,8 @@ return (
                 <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
                   <div className='col-span-7'>
                       <h3 className='text-[13px]'>{props.dataLang?.import_from_note || "import_from_note"}</h3>
-                      <textarea 
-                  className="resize-none scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[70px]  max-h-[70px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
-                  disabled value={data?.note}/>
+                      <textarea className="resize-none scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[70px]  max-h-[70px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
+                                disabled value={data?.note}/>
                   </div>
                   <div className='col-span-2 space-y-1 text-right'>
                         <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_total_amount || "import_detail_total_amount"}</h3></div>
@@ -1995,482 +2021,6 @@ return (
 )
 
 }
-
-// const Popup_chitietThere =(props)=>{
-//   const scrollAreaRef = useRef(null);
-//   const [open, sOpen] = useState(false);
-//   const _ToggleModal = (e) => sOpen(e);
-//   const [data,sData] =useState()
-//   const [onFetching, sOnFetching] = useState(false);
-
-//   useEffect(() => {
-//     props?.id && sOnFetching(true) 
-//   }, [open]);
-
-//   const formatNumber = (number) => {
-//     if (!number && number !== 0) return 0;
-//       const integerPart = Math.floor(number);
-//       const decimalPart = number - integerPart;
-//       const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-//       const roundedNumber = integerPart + roundedDecimalPart;
-//       return roundedNumber.toLocaleString("en");
-//   };
-
-//   const _ServerFetching_detailThere = async () =>{
-//    await Axios("GET", `${props?.type == "import" && `/api_web/Api_import/import/${props?.id}?csrf_protection=true` ||
-//                     props?.type == "service" && `/api_web/Api_service/service/${props?.id}?csrf_protection=true`||
-//                     props?.type =="deposit" && `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`} `, {}, (err, response) => {
-//     if(!err){
-//         var db =  response.data
-//         sData(db)
-//     }
-//     sOnFetching(false)
-//   })
-//   }
-
-//   useEffect(() => {
-//     onFetching && _ServerFetching_detailThere() || onFetching && _ServerFetching()
-//   }, [open]);
-
-  
-//   const scrollableDiv = document.querySelector('.customsroll');
-//   scrollableDiv?.addEventListener('wheel', (event) => {
-//     const deltaY = event.deltaY;
-//     const top = scrollableDiv.scrollTop;
-//     const height = scrollableDiv.scrollHeight;
-//     const offset = scrollableDiv.offsetHeight;
-//     const isScrolledToTop = top === 0;
-//     const isScrolledToBottom = top === height - offset;
-  
-//     if ((deltaY < 0 && isScrolledToTop) || (deltaY > 0 && isScrolledToBottom)) {
-//       event.preventDefault();
-//     }
-//   });
- 
-//   const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-//   const [dataProductExpiry, sDataProductExpiry] = useState({});
-//   const [dataProductSerial, sDataProductSerial] = useState({});
-
-//   const _ServerFetching =  () =>{
-//     Axios("GET","/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-//       if(!err){
-//           var data = response.data;
-//           sDataMaterialExpiry(data.find(x => x.code == "material_expiry"));
-//           sDataProductExpiry(data.find(x => x.code == "product_expiry"));
-//           sDataProductSerial(data.find(x => x.code == "product_serial"));
-//       }
-//       sOnFetching(false)
-//     })
-//   }
-
-// return (
-// <>
-//  <PopupEdit   
-//     title={props?.type == "import" && (props.dataLang?.import_detail_title || "import_detail_title") ||  props?.type == "service" && (props.dataLang?.serviceVoucher_service_voucher_details || "serviceVoucher_service_voucher_details") || props?.type =="deposit" && (props.dataLang?.purchase_order_detail_title || "purchase_order_detail_title")} 
-//     button={props?.name} 
-//     onClickOpen={_ToggleModal.bind(this, true)} 
-//     open={open} onClose={_ToggleModal.bind(this,false)}
-//     classNameBtn={props?.className} 
-//   >
-//       <div className='flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]'> 
-//       </div>
-//       { props?.type == "import" &&
-//          (<div className=" space-x-5 3xl:w-[1250px] 2xl:w-[1100px] w-[1050px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">        
-//           <div>
-//            <div className='3xl:w-[1250px] 2xl:w-[1100px] w-[1050px]'>
-//              <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-//              <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props.dataLang?.import_detail_info || "import_detail_info"}</h2>       
-//               <div className='grid grid-cols-9  min-h-[130px] px-2'>
-//                   <div className='col-span-3'>
-//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_day_vouchers || "import_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}</h3></div>
-//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_code_vouchers || "import_code_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.code}</h3></div>
-//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_the_order || "import_the_order"}</h3><h3 className=' text-[13px]  text-center font-normal text-lime-500  rounded-xl py-1 px-3 max-w-[100px] min-w-[70px]  bg-lime-200 '>{data?.purchase_order_code}</h3></div>
-//                   </div>
-
-//                     <div className='col-span-3'>
-//                         <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_payment_status || "import_payment_status"}</h3>
-//                           <div className='flex flex-wrap  gap-2 items-center justify-center'>
-//                               {
-//                             data?.status === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center text-[13px]'>{"Chưa thanh toán"}</span>||
-//                             data?.status === "1" && <span className=' font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center text-[13px]'>{"Thanh toán 1 phần"} {`(${e?.count})`}</span>||
-//                             data?.status === "2" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã thanh toán đủ"} {`(${e?.order_status?.count})`}</span>
-//                               }
-//                           </div>
-//                         </div>
-//                         <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_from_browse || "import_from_browse"}</h3>
-//                           <div className='flex flex-wrap  gap-2 items-center justify-center'>
-//                               {
-//                             data?.warehouseman_id === "0" && <span className=' font-normal text-[#3b82f6]  rounded-xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center text-[13px]'>{"Chưa duyệt kho"}</span>||
-//                             data?.warehouseman_id != "0" && <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã duyệt kho"}</span>
-//                               }
-//                           </div>
-//                         </div>
-//                     </div>
-//                   <div className='col-span-3 '>
-//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_supplier || "import_supplier"}</h3><h3 className='text-[13px] font-normal'>{data?.supplier_name}</h3></div>
-//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_branch || "import_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3></div>
-//                   </div>
-                  
-//               </div>
-//               <div className="pr-2 w-[100%] lx:w-[110%] ">
-//                 {/* <div className={`${dataProductSerial.is_enable == "1" ? 
-//                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
-//                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow-lg  z-10`}> */}
-//                 <div className={`grid-cols-13  grid sticky top-0 bg-white shadow-lg  z-10`}>
-//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_image || "import_detail_image"}</h4>
-//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_items || "import_detail_items"}
-//                   </h4>
-//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4> 
-//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"Kho - VTK"}</h4> 
-//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"ĐVT"}</h4>
-//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_quantity || "import_from_quantity"}</h4>
-//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
-//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"% CK"}</h4>
-//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
-//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_tax || "import_from_tax"}</h4>
-//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_into_money || "import_into_money"}</h4>
-//                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_note || "import_from_note"}</h4>
-//                 </div>
-//                 {onFetching ?
-//                   <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
-//                   : 
-//                   data?.items?.length > 0 ? 
-//                   (<>
-//                        <ScrollArea     
-//                          className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
-//                     <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">                       
-//                       {(data?.items?.map((e) => 
-//                         // <div className={`${dataProductSerial.is_enable == "1" ? 
-//                         // (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
-//                         // (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid hover:bg-slate-50 `} key={e.id?.toString()}>
-//                         <div className="grid grid-cols-13 hover:bg-slate-50 items-center border-b" key={e.id?.toString()}>
-//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center">
-//                           {e?.item?.images != null ? (<ModalImage   small={e?.item?.images} large={e?.item?.images} alt="Product Image"  className='custom-modal-image object-cover rounded w-[50px] h-[60px] mx-auto' />):
-//                             <div className='w-[50px] h-[60px] object-cover  mx-auto'>
-//                               <ModalImage small="/no_img.png" large="/no_img.png" className='w-full h-full rounded object-contain p-1' > </ModalImage>
-//                             </div>
-//                           }
-//                           </h6>                
-//                           <h6 className="text-[13px]  px-2 py-0.5 col-span-2 text-left">{e?.item?.name}
-//                             <div className='flex-col items-center font-oblique flex-wrap'>
-//                               {dataProductSerial.is_enable === "1" ? (
-//                                   <div className="flex gap-0.5">
-//                                     <h6 className="text-[12px]">Serial:</h6><h6 className="text-[12px]  px-2   w-[full] text-left ">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
-//                                   </div>
-//                                 ):""}
-//                               {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
-//                                 <>
-//                                   <div className="flex gap-0.5">
-//                                     <h6  className="text-[12px]">Lot:</h6>  <h6 className="text-[12px]  px-2   w-[full] text-left ">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
-//                                   </div>
-//                                   <div className="flex gap-0.5">
-//                                   <h6  className="text-[12px]">Hạn sử dụng:</h6> <h6 className="text-[12px]  px-2   w-[full] text-center ">{e.expiration_date ? moment(e.expiration_date).format("DD/MM/YYYY")   : "-"}</h6>                              
-//                                   </div>
-//                                 </>
-//                                 ):""}
-//                             </div>
-//                           </h6>                
-//                           <h6 className="text-[13px]   px-2 py-0.5 col-span-1 text-center break-words">{e?.item?.product_variation}</h6>                
-//                           <h6 className="text-[13px]   px-2 py-0.5 col-span-1 text-left break-words">{`${e?.warehouse_name}-${e.location_name}`}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center break-words">{e?.item?.unit_name}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center mr-1">{formatNumber(e?.quantity)}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center">{formatNumber(e?.price)}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center">{e?.discount_percent + "%"}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center">{formatNumber(e?.price_after_discount)}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-center">{formatNumber(e?.tax_rate) + "%"}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-right ">{formatNumber(e?.amount)}</h6>  
-//                           <h6 className="text-[13px]   py-0.5 col-span-1 text-left ml-3.5">{e?.note != undefined ? e?.note : ""}</h6>                
-                                    
-//                         </div>
-//                       ))}              
-//                     </div>   
-//                       </ScrollArea>                       
-//                     </>
-//                   )  : 
-//                   (
-//                     <div className=" max-w-[352px] mt-24 mx-auto" >
-//                       <div className="text-center">
-//                         <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
-//                         <h1 className="textx-[#141522] text-base opacity-90 font-medium">{props.dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
-//                         <div className="flex items-center justify-around mt-6 ">
-//                             {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-//                         </div>
-//                       </div>
-//                     </div>
-//                   )}    
-//               </div>
-//           <h2 className='font-normal p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
-//               <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
-//               <div className='col-span-7'>
-//                   <h3 className='text-[13px] p-1'>{props.dataLang?.import_from_note || "import_from_note"}</h3>
-//                 <textarea 
-//                  className="resize-none placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
-//                  disabled value={data?.note}/>
-//               </div>
-//              <div className='col-span-2 space-y-1 text-right'>
-//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_total_amount || "import_detail_total_amount"}</h3></div>
-//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_discount || "import_detail_discount"}</h3></div>
-//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_affter_discount || "import_detail_affter_discount"}</h3></div>
-//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_tax_money || "import_detail_tax_money"}</h3></div>
-//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_into_money || "import_detail_into_money"}</h3></div>
-//              </div>
-//              <div className='col-span-3 space-y-1 text-right'>
-//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price)}</h3></div>
-//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_discount)}</h3></div>
-//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price_after_discount)}</h3></div>
-//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_tax)}</h3></div>
-//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_amount)}</h3></div>
-//              </div>
-//           </div>   
-//             </div>
-//           </div>
-    
-//      </div>
-  
-//         </div>)
-//         ||
-//         props?.type == "service" &&
-//          (<div className=" space-x-5 w-[999px]  2xl:h-auto xl:h-auto h-[650px] ">        
-//          <div>
-//           <div className='w-[999px]'>
-//             <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-//             <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
-//              <div className='grid grid-cols-8  min-h-[100px] px-2'>
-//                  <div className='col-span-3'>
-//                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.serviceVoucher_day_vouchers || "serviceVoucher_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}</h3></div>
-//                      <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}</h3><h3 className=' text-[13px]  font-normal'>{data?.code}</h3></div>
-//                  </div>
-//                  <div className='col-span-2 mx-auto'>
-//                      <div className='my-4 font-medium text-[13px]'>{props.dataLang?.serviceVoucher_status_of_spending || "serviceVoucher_status_of_spending"}</div>
-//                      <div className='flex flex-wrap  gap-2 items-center justify-start'>
-//                     <span className='text-[13px] font-normal text-sky-500 text-center  rounded-xl py-1 px-2 w-full  bg-sky-200'>{"Chưa chi"}</span>
-//                      {
-//                        // data?.import_status  === "0" && <span className='text-[13px] font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{props.dataLang?.purchase_order_table_not_yet_entered || "purchase_order_table_not_yet_entered"}</span>||
-//                        // data?.import_status  === "1" &&  <span className='text-[13px] font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{props.dataLang?.purchase_order_table_enter_one_part || "purchase_order_table_enter_one_part"}</span> ||
-//                        // data?.import_status  === "2" &&   <span className='text-[13px] flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_order_table_enter_enough || "purchase_order_table_enter_enough"}</span>
-//                       }
-//                      </div>
-//                  </div>
-//                  <div className='col-span-3 '>
-//                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3></div>
-//                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px] '>{props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h3><h3 className='text-[13px] font-normal '>{data?.supplier_name}</h3></div>
-//                  </div>
-                 
-//              </div>
-//              <div className=" w-[100%] lx:w-[110%] ">
-//                <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
-//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-left">{props.dataLang?.serviceVoucher_services_arising || "serviceVoucher_services_arising"}</h4>
-//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_quantity || "serviceVoucher_quantity"}</h4>
-//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_unit_price || "serviceVoucher_unit_price"}</h4> 
-//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{"% CK"}</h4>
-//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
-//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}</h4>
-//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}</h4>
-//                  <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}</h4>
-//                </div>
-//                {onFetching ?
-//                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
-//                  : 
-//                  data?.item?.length > 0 ? 
-//                  (<>
-//                       <ScrollArea     
-//                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
-//                    <div className="divide-y divide-slate-200 min:h-[300px] h-[100%] max:h-[400px]">                       
-//                      {(data?.item?.map((e) => 
-//                        <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id?.toString()}>
-//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-left">{e?.name}</h6>                
-//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.quantity)}</h6>  
-//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price)}</h6>                
-//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{e?.discount_percent + "%"}</h6>                
-//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-center">{formatNumber(e?.price_after_discount)}</h6>                
-//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.tax_rate) + "%"}</h6>                
-//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-right">{formatNumber(e?.amount)}</h6>                
-//                          <h6 className="text-[13px]  px-2 py-0.5 col-span-2  rounded-md text-left">{e?.note != undefined ? e?.note : ""}</h6>                
-//                        </div>
-//                      ))}              
-//                    </div>   
-//                      </ScrollArea>                       
-//                    </>
-//                  )  : 
-//                  (
-//                    <div className=" max-w-[352px] mt-24 mx-auto" >
-//                      <div className="text-center">
-//                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
-//                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">{props.dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
-//                        <div className="flex items-center justify-around mt-6 ">
-//                        </div>
-//                      </div>
-//                    </div>
-//                  )}    
-//              </div>
-//          <h2 className='font-normal p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
-//              <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
-//              <div className='col-span-7'>
-//                  <div>
-//                    <div className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">{props.dataLang?.purchase_note || "purchase_note"}</div>
-//                          <textarea
-//                            value={data?.note}
-//                            disabled
-//                            name="fname"                      
-//                            type="text"
-//                            className=" placeholder:text-slate-300 w-[60%] min-h-[100px] max-h-[100px] resize-none bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 outline-none "
-//                          />
-//                  </div>
-//              </div>
-//             <div className='col-span-2 mt-2 space-y-2'>
-//                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3></div>
-//                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}</h3></div>
-//                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}</h3></div>
-//                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}</h3></div>
-//                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h3></div>
-//             </div>
-//             <div className='col-span-3 mt-2 space-y-2'>
-//                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price)}</h3></div>
-//                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_discount)}</h3></div>
-//                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price_after_discount)}</h3></div>
-//                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_tax_price)}</h3></div>
-//                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_amount)}</h3></div>
-//             </div>
-//          </div>   
-//            </div>
-//          </div>
-   
-//         </div>
-//         </div>)
-//         ||
-//         props?.type =="deposit" &&
-//           (<div className=" space-x-5 w-[999px]  2xl:h-auto xl:h-[680px] h-[650px] ">        
-//           <div>
-//           <div className='w-[999px]'>
-//             <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-//             <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
-//               <div className='grid grid-cols-8  min-h-[170px] px-2'>
-//                   <div className='col-span-3'>
-//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}</h3></div>
-//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.purchase_order_detail_delivery_date || "purchase_order_detail_delivery_date"}</h3><h3 className=' text-[13px]  font-normal'>{data?.delivery_date != null ? moment(data?.delivery_date).format("DD/MM/YYYY") : ""}</h3></div>
-//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.purchase_order_detail_voucher_code || "purchase_order_detail_voucher_code"}</h3><h3 className=' text-[13px]  font-normal'>{data?.code}</h3></div>
-//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}</h3><h3 className=' text-[13px] font-normal'>{data?.order_type  == "0" ? (<span className='font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200'>Tạo mới</span>) : (<span className='font-normal text-lime-500  rounded-xl py-1 px-3  bg-lime-200'>YCMH</span>)}</h3></div>
-//                   </div>
-
-//                   <div className='col-span-2 mx-auto'>
-//                       <div className='my-4 font-medium text-[13px]'>{"Trạng thái nhập hàng"}</div>
-//                       <div className='flex flex-wrap  gap-2 items-center justify-start'>
-//                         {data?.import_status  === "not_stocked" && <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200'>{props.dataLang[data?.import_status]}</span>||
-//                         data?.import_status  === "stocked_part" &&  <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200'>{props.dataLang[data?.import_status]}</span> ||
-//                         data?.import_status  === "stocked" &&   <span className='flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200'><TickCircle className='bg-lime-500 rounded-full ' color='white' size={15}/>{props.dataLang[data?.import_status]}</span>
-//                         }
-//                       </div>
-//                       <div className='my-4 font-medium text-[13px]'>{props.dataLang?.purchase_order_table_number || "purchase_order_table_number"}</div>
-//                       <div className='flex flex-wrap  gap-2 items-center justify-start text-[13px]'>
-//                           {data?.purchases?.reduce((acc, cur) => acc + (acc ? ', ' : '') + cur.code, '').split('').join('').replace(/^,/, '')}
-//                       </div>
-//                   </div>
-//                   <div className='col-span-3 '>
-//                       {/* <div className='flex flex-wrap  gap-2 items-center justify-start'>
-//                       {data?.status_pay === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{props.dataLang?.purchase_order_table_havent_spent_yet || "purchase_order_table_havent_spent_yet"}</span>||
-//                         data?.status_pay === "1" &&  <span className=' font-normal text-orange-500 rounded-xl py-1 px-2  bg-orange-200'>{props.dataLang?.purchase_order_table_spend_one_part || "purchase_order_table_spend_one_part"}</span> ||
-//                         data?.status_pay === "2" &&   <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{props.dataLang?.purchase_order_table_enough_spent || "purchase_order_table_enough_spent"}</span>
-//                       }
-//                       </div> */}
-//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}</h3><h3 className='text-[13px] font-normal'>{data?.supplier_name}</h3></div>
-//                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3></div>
-//                   </div>
-                  
-//               </div>
-//               <div className="pr-2 w-[100%] lx:w-[110%] ">
-//                 <div className="grid grid-cols-12 sticky top-0 bg-slate-100 p-2 z-10">
-//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
-//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
-//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
-//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
-//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
-//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}</h4>
-//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h4>
-//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.purchase_order_detail_after_discount || "purchase_order_detail_after_discount"}</h4>
-//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h4>
-//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h4>
-//                   <h4 className="text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
-//                 </div>
-//                 {onFetching ?
-//                   <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
-//                   : 
-//                   data?.item?.length > 0 ? 
-//                   (<>
-//                       <ScrollArea     
-//                         className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
-//                     <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">                       
-//                       {(data?.item?.map((e) => 
-//                         <div className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id?.toString()}>
-//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left">
-//                           {e?.item?.images != null ? (<ModalImage   small={e?.item?.images} large={e?.item?.images} alt="Product Image"  className='custom-modal-image object-cover rounded w-[50px] h-[60px]' />):
-//                                   <div className='w-[50px] h-[60px] object-cover  flex items-center justify-center rounded'>
-//                                     <ModalImage small="/no_img.png" large="/no_img.png" className='w-full h-full rounded object-contain p-1' > </ModalImage>
-//                                   </div>
-//                           }
-//                           </h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left">{e?.item?.name}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.product_variation}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center break-words">{e?.item?.unit_name}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center mr-1">{formatNumber(e?.quantity)}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center">{formatNumber(e?.price)}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center">{e?.discount_percent + "%"}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-2  rounded-md text-center">{formatNumber(e?.price_after_discount)}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-center ">{formatNumber(e?.tax_rate) + "%"}</h6>                
-//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-right mr-3.5">{formatNumber(e?.amount)}</h6>                
-                                        
-//                           <h6 className="text-[13px]   py-0.5 col-span-1  rounded-md text-left ml-3.5">{e?.note != undefined ? e?.note : ""}</h6>                
-//                         </div>
-//                       ))}              
-//                     </div>   
-//                       </ScrollArea>                       
-//                     </>
-//                   )  : 
-//                   (
-//                     <div className=" max-w-[352px] mt-24 mx-auto" >
-//                       <div className="text-center">
-//                         <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
-//                         <h1 className="textx-[#141522] text-base opacity-90 font-medium">{props.dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
-//                         <div className="flex items-center justify-around mt-6 ">
-//                             {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-//                         </div>
-//                       </div>
-//                     </div>
-//                   )}    
-//               </div>
-//           <h2 className='font-normal p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
-//               <div className="mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
-//               <div className='col-span-7'>
-//                     <h3 className='text-[13px] p-1'>{props.dataLang?.purchase_order_note || "purchase_order_note"}</h3>
-//                     <textarea 
-//                     className="resize-none placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
-//                     disabled value={data?.note}/>
-//                 </div>
-//             <div className='col-span-2 space-y-2'>
-//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3></div>
-//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}</h3></div>
-//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}</h3></div>
-//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}</h3></div>
-//                   <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}</h3></div>
-//             </div>
-//             <div className='col-span-3 space-y-2'>
-//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price)}</h3></div>
-//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_discount)}</h3></div>
-//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price_after_discount)}</h3></div>
-//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_tax)}</h3></div>
-//                   <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_amount)}</h3></div>
-//             </div>
-//           </div>   
-//             </div>
-//           </div>
-
-//           </div>
-//           </div>)  
-//       }
-           
-//   </PopupEdit>
-// </>
-// )
-// }
 
 const MoreSelectedBadge = ({ items }) => {
   const style = {

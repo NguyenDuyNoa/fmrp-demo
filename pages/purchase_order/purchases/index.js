@@ -574,17 +574,17 @@ const Index = (props) => {
                     </div>
                     <div className='min:h-[500px] 2xl:h-[76%] h-[70%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 tooltipBoundary'>
                         <div className='pr-2'>
-                            <div className='grid grid-cols-12 sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]'>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{dataLang?.purchase_day || "purchase_day"}</h4>   
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>{dataLang?.purchase_code || "purchase_code"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>{dataLang?.purchase_planNumber || "purchase_planNumber"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase  col-span-1 font-[300]'>{dataLang?.purchase_propnent || "purchase_propnent"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase  col-span-1 font-[300] text-center'>{dataLang?.purchase_status || "purchase_status"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase  col-span-1 text-center font-[300]'>{dataLang?.purchase_totalitem || "purchase_totalitem"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase text-center col-span-2 font-[300]'>{dataLang?.purchase_orderStatus || "purchase_orderStatus"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase text-left col-span-2 font-[300]'>{dataLang?.purchase_note || "purchase_note"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300]'>{dataLang?.purchase_branch || "purchase_branch"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase text-center  col-span-1 font-[300]'>{dataLang?.purchase_action || "purchase_action"}</h4>
+                            <div className='grid grid-cols-12 sticky top-0 bg-white p-2 z-10 shadow-lg'>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center'>{dataLang?.purchase_day || "purchase_day"}</h4>   
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500]  col-span-1 '>{dataLang?.purchase_code || "purchase_code"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500]  col-span-1 '>{dataLang?.purchase_planNumber || "purchase_planNumber"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500]  col-span-1 '>{dataLang?.purchase_propnent || "purchase_propnent"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500]  col-span-1  text-center'>{dataLang?.purchase_status || "purchase_status"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500]  col-span-1 text-center '>{dataLang?.purchase_totalitem || "purchase_totalitem"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] text-center col-span-2 '>{dataLang?.purchase_orderStatus || "purchase_orderStatus"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] text-left col-span-2 '>{dataLang?.purchase_note || "purchase_note"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 '>{dataLang?.purchase_branch || "purchase_branch"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] text-center  col-span-1 '>{dataLang?.purchase_action || "purchase_action"}</h4>
                             </div>
                             {onFetching ?
                                 <Loading className="h-80"color="#0f4f9e" /> :
@@ -608,7 +608,7 @@ const Index = (props) => {
                                                   </div>
                                                 </h6>
                                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-2 text-left truncate '>{e?.note}</h6>
-                                                <h6 className='px-2 py-2.5 2xl:text-base xl:text-xs text-[8px] col-span-1 flex items-center  '><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6>
+                                                <h6 className="col-span-1 w-fit"><span className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{e?.branch_name}</span></h6>
                                                 <div className='pl-2 py-2.5 col-span-1 flex space-x-2 justify-center'>
                                                     <BtnTacVu order={e?.order_status} onRefreshGroup={_ServerFetching_group.bind(this)}  dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} status={e?.status} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] 2xl:text-base xl:text-xs text-[8px]" />
                                                 </div>
@@ -815,28 +815,28 @@ const Popup_chitiet =(props)=>{
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_status || "purchase_status"}</h3><h3 className='col-span-1'>{data?.status == "1" ? (<div className='border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1'>{props.dataLang?.purchase_approved || "purchase_approved"} <TickCircle className='bg-lime-500 rounded-full' color='white'  size={19} /></div>) : (<div className='border border-red-500 px-2 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1' >{props.dataLang?.purchase_notapproved || "purchase_notapproved"} <TickCircle size={22}/></div>)}</h3></div>  
                         {/* <div className='my-4 font-medium grid grid-cols-2'>Tổng số lượng</div> */}
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_propnent || "purchase_propnent"}</h3><h3 className='col-span-1 font-normal'>{data?.user_create_name}</h3></div>
-                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_branch || "purchase_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] col-span-1">{data?.branch_name}</h3></div>
+                        <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.purchase_branch || "purchase_branch"}</h3><h3 className="3xl:items-center 3xl-text-[16px] w-fit 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{data?.branch_name}</h3></div>
                     </div>
                     
                 </div>
                 <div className="pr-2 w-[100%] lx:w-[110%] ">
-                  <div className="grid grid-cols-8 sticky top-0 bg-slate-100 p-2 z-10">
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_quantity_purchased || "purchase_quantity_purchased"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_reaining_amout || "purchase_reaining_amout"}</h4>
-                    <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.purchase_note || "purchase_note"}</h4>
+                  <div className="grid grid-cols-8 sticky top-0 bg-slate-50 shadow-lg p-2 z-10">
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-left">{props.dataLang?.purchase_image || "purchase_image"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_items || "purchase_items"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_variant || "purchase_variant"}</h4> 
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_unit || "purchase_unit"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_quantity_purchased || "purchase_quantity_purchased"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_reaining_amout || "purchase_reaining_amout"}</h4>
+                    <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_note || "purchase_note"}</h4>
                   </div>
                   {onFetching ?
-                    <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                    <Loading className="max-h-28"color="#0f4f9e" /> 
                     : 
                     data?.items?.length > 0 ? 
                     (<>
                          <ScrollArea     
-                           className="min-h-[90px] max-h-[200px] 2xl:max-h-[250px] overflow-hidden"  speed={1}  smoothScrolling={true}>
+                           className="min-h-[90px] max-h-[200px] 2xl:max-h-[166px] overflow-hidden"  speed={1}  smoothScrolling={true}>
                       <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">                       
                         {(data?.items?.map((e) => 
                           <div className="grid items-center grid-cols-8 py-1.5 px-2 hover:bg-slate-100/40 " key={e.id.toString()}>

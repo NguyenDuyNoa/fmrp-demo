@@ -34,6 +34,7 @@ import Swal from "sweetalert2";
 
 import ReactExport from "react-data-export";
 import { useEffect } from 'react';
+import Popup_chitietThere from '../detailThere';
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -606,17 +607,17 @@ const Index = (props) => {
                 <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%] lx:w-[120%] ">
                     <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10 shadow">
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_day_vouchers || "import_day_vouchers"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_code_vouchers || "import_code_vouchers"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_supplier || "import_supplier"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_the_order || "import_the_order"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_total_amount || "import_total_amount"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_tax_money || "import_tax_money"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_into_money || "import_into_money"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center whitespace-nowrap'>{dataLang?.import_payment_status || "import_payment_status"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_branch || "import_branch"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{dataLang?.import_action || "import_action"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_day_vouchers || "import_day_vouchers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_code_vouchers || "import_code_vouchers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_supplier || "import_supplier"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_the_order || "import_the_order"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_total_amount || "import_total_amount"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_tax_money || "import_tax_money"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_into_money || "import_into_money"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-2 text-center whitespace-nowrap'>{dataLang?.import_payment_status || "import_payment_status"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_branch || "import_branch"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_action || "import_action"}</h4>
                     </div>
                     {onFetching ?
                       <Loading className="h-80"color="#0f4f9e" /> 
@@ -631,8 +632,19 @@ const Index = (props) => {
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer '><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left'>{e.supplier_name}</h6>
                                 <h6 className='3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px]  col-span-1 flex items-center w-fit mx-auto'>
+                                      
                                       <div className='mx-auto'>
-                                          <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-center'>{e?.purchase_order_code}</span>
+                                          <Popup_chitietThere
+                                            // className='font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-center i h-16 w-64 bg-gradient-to-br '
+                                            className='i py-1 px-2 bg-gradient-to-br font-normal text-lime-500 bg-lime-200 items-center rounded-full shadow-2xl cursor-pointer 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]  overflow-hidden transform hover:scale-110 transition duration-300 ease-out hover:bg-lime-500 hover:text-white'
+                                            // className='b animate-pulse i py-1 px-2  text-lime-500 bg-lime-200 items-center rounded-2xl shadow-2xl cursor-pointer overflow-hidden xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] transform hover:scale-x-110 hover:scale-y-105 transition duration-300 ease-out'
+                                            name={e?.purchase_order_code}
+                                            dataLang={dataLang}
+                                            id={e?.purchase_order_id}
+                                            type={"typePo"}
+                                            >
+                                          </Popup_chitietThere>
+                                          {/* <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-center'>{e?.purchase_order_code}</span> */}
                                       </div>
                                 </h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_price)}</h6>
@@ -682,7 +694,7 @@ const Index = (props) => {
                                     </div>
                                   </div>
                                 </h6>
-                                <h6 className="col-span-1 w-fit px-1"><span className="3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-1 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{e?.branch_name}</span></h6>
+                                <h6 className="col-span-1 w-fit"><span className="ml-1 3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{e?.branch_name}</span></h6>
                                 <div className='col-span-1 flex justify-center'>
                                     <BtnTacVu onRefresh={_ServerFetching.bind(this)} onRefreshGroup={_ServerFetching_group.bind(this)} dataLang={dataLang} warehouseman_id={e?.warehouseman_id} status_pay={e?.status_pay} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
                                 </div>
@@ -805,7 +817,13 @@ const BtnTacVu = React.memo((props) => {
           router.push(`/purchase_order/import/form?id=${props.id}`);
         }
       };
+
   
+
+
+  
+
+
   return(
       <div>
           <Popup
@@ -946,7 +964,7 @@ return (
                     </div>
                   <div className='col-span-3 '>
                       <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_supplier || "import_supplier"}</h3><h3 className='text-[13px] font-normal'>{data?.supplier_name}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_branch || "import_branch"}</h3><h3 className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[400] py-0.5 border border-[#0F4F9E] rounded-[5.5px] text-[13px]">{data?.branch_name}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_branch || "import_branch"}</h3><h3 className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase w-fit">{data?.branch_name}</h3></div>
                   </div>
                   
               </div>
@@ -955,22 +973,22 @@ return (
                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow-lg  z-10`}> */}
                 <div className={`grid-cols-13  grid sticky top-0 bg-white shadow-lg  z-10`}>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_image || "import_detail_image"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_items || "import_detail_items"}
+                  <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_image || "import_detail_image"}</h4>
+                  <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-2 text-center whitespace-nowrap">{props.dataLang?.import_detail_items || "import_detail_items"}
                   </h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4> 
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"Kho - VTK"}</h4> 
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"ĐVT"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_quantity || "import_from_quantity"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{"% CK"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_tax || "import_from_tax"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_into_money || "import_into_money"}</h4>
-                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center whitespace-nowrap">{props.dataLang?.import_from_note || "import_from_note"}</h4>
+                  <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4> 
+                  <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{"Kho - VTK"}</h4> 
+                  <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{"ĐVT"}</h4>
+                  <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_quantity || "import_from_quantity"}</h4>
+                  <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
+                  <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{"% CK"}</h4>
+                  <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
+                  <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_tax || "import_from_tax"}</h4>
+                  <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_into_money || "import_into_money"}</h4>
+                  <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_note || "import_from_note"}</h4>
                 </div>
                 {onFetching ?
-                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                  <Loading className="max-h-28"color="#0f4f9e" /> 
                   : 
                   data?.items?.length > 0 ? 
                   (<>

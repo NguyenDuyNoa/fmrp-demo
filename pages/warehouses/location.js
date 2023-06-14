@@ -121,8 +121,9 @@ const Index = (props) => {
       })
     }
 
-    const [status, sStatus] = useState("")
+    const [status, sStatus] = useState("") 
     const [active,sActive] = useState("")
+
     const _ToggleStatus = (id) => {
      Swal.fire({
         title: `${"Thay đổi trạng thái"}`,
@@ -179,10 +180,10 @@ const Index = (props) => {
   useEffect(()=>{
      sOnSending(true)
   },[status])
-  useEffect(()=>{
-     sOnSending(true)
-  },[active])
 
+  useEffect(()=>{
+    sOnSending(true)
+  },[active])
 
     const paginate = pageNumber => {
       router.push({
