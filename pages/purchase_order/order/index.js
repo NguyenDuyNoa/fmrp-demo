@@ -803,7 +803,7 @@ return (
                   <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
                 </div>
                 {onFetching ?
-                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                  <Loading className="max-h-28"color="#0f4f9e" /> 
                   : 
                   data?.item?.length > 0 ? 
                   (<>
@@ -1031,7 +1031,7 @@ return (
                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-10 font-[400] text-center">{"Mã phiếu chi"}</h4>
                 </div>
                 {onFetching ?
-                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                  <Loading className="max-h-28"color="#0f4f9e" /> 
                   : 
                   props.data?.payment_code?.length > 0 ? 
                   (<>
@@ -1143,7 +1143,7 @@ return (
                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-10 font-[400] text-center">{"Mã phiếu chi"}</h4>
                 </div>
                 {onFetching ?
-                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                  <Loading className="max-h-28"color="#0f4f9e" /> 
                   : 
                   props.data?.payment_code?.length > 0 ? 
                   (<>

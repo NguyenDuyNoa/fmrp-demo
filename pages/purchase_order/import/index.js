@@ -988,7 +988,7 @@ return (
                   <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_note || "import_from_note"}</h4>
                 </div>
                 {onFetching ?
-                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                  <Loading className="max-h-28"color="#0f4f9e" /> 
                   : 
                   data?.items?.length > 0 ? 
                   (<>

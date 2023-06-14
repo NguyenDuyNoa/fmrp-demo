@@ -1970,7 +1970,7 @@ return (
                   <h4 className="text-[13px] col-span-1 px-1 py-1 text-gray-400 uppercase  font-[500] text-center">{props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}</h4>
                 </div>
                 {onFetching ?
-                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                  <Loading className="max-h-28" color="#0f4f9e" /> 
                   : 
                   data?.detail?.length > 0 ? 
                   (<>

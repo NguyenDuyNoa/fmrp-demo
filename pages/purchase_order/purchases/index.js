@@ -831,7 +831,7 @@ const Popup_chitiet =(props)=>{
                     <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_note || "purchase_note"}</h4>
                   </div>
                   {onFetching ?
-                    <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                    <Loading className="max-h-28"color="#0f4f9e" /> 
                     : 
                     data?.items?.length > 0 ? 
                     (<>

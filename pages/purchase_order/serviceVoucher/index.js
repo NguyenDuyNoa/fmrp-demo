@@ -1566,7 +1566,7 @@ return (
                   <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-2  text-center">{props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}</h4>
                 </div>
                 {onFetching ?
-                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                  <Loading className="max-h-28"color="#0f4f9e" /> 
                   : 
                   data?.item?.length > 0 ? 
                   (<>

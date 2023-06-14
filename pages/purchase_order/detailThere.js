@@ -111,7 +111,7 @@ const Popup_chitietThere = (props) => {
                <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props.dataLang?.import_detail_info || "import_detail_info"}</h2>       
                {onFetching ?
-                    <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> : data?.items  &&
+                    <Loading className="max-h-28" color="#0f4f9e" /> : data?.items  &&
                 <div className='grid grid-cols-9  min-h-[130px] px-2'>
                     <div className='col-span-3'>
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_day_vouchers || "import_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}</h3></div>
@@ -165,7 +165,7 @@ const Popup_chitietThere = (props) => {
                     <h4 className="text-[13px] px-2 py-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_note || "import_from_note"}</h4>
                   </div>
                   {onFetching ?
-                    <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                    <Loading className="max-h-28" color="#0f4f9e" /> 
                     : 
                     data?.items?.length > 0 ? 
                     (<>
@@ -268,7 +268,7 @@ const Popup_chitietThere = (props) => {
               <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
               <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
               {onFetching ? 
-                    <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> : data?.item  &&(
+                    <Loading className="max-h-28" color="#0f4f9e" /> : data?.item  &&(
                     <div className='grid grid-cols-8  min-h-[100px] px-2'>
                         <div className='col-span-3'>
                             <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.serviceVoucher_day_vouchers || "serviceVoucher_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}</h3></div>
@@ -303,7 +303,7 @@ const Popup_chitietThere = (props) => {
                    <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-2  text-center">{props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}</h4>
                  </div>
                  {onFetching ?
-                   <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                   <Loading className="max-h-28" color="#0f4f9e" /> 
                    : 
                    data?.item?.length > 0 ? 
                    (<>
@@ -379,7 +379,7 @@ const Popup_chitietThere = (props) => {
               <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
               <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props?.dataLang?.purchase_order_detail_general_informatione || "purchase_order_detail_general_informatione"}</h2>       
                 {onFetching ? 
-                    <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> : data?.item  &&
+                    <Loading className="max-h-28" color="#0f4f9e" /> : data?.item  &&
                 <div className='grid grid-cols-8  min-h-[170px] px-2'>
                     <div className='col-span-3'>
                         <div className='my-4 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.purchase_order_detail_day_vouchers || "purchase_order_detail_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY, HH:mm:ss") : ""}</h3></div>
@@ -430,7 +430,7 @@ const Popup_chitietThere = (props) => {
                     <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1  text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
                   </div>
                   {onFetching ?
-                    <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                    <Loading className="max-h-28" color="#0f4f9e" /> 
                     : 
                     data?.item?.length > 0 ? 
                     (<>
@@ -550,7 +550,7 @@ const Popup_chitietThere = (props) => {
                     <h4 className="xl:text-[14px] text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_note || "purchase_note"}</h4>
                   </div>
                   {onFetching ?
-                    <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                    <Loading className="max-h-28" color="#0f4f9e" /> 
                     : 
                     data?.items?.length > 0 ? 
                     (<>
@@ -673,7 +673,7 @@ const Popup_chitietThere = (props) => {
                     <h4 className="text-[12px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center">{props.dataLang?.purchase_order_note || "purchase_order_note"}</h4>
                   </div>
                   {onFetching ?
-                    <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                    <Loading className="max-h-28" color="#0f4f9e" /> 
                     : 
                     data?.item?.length > 0 ? 
                     (<>
