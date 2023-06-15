@@ -642,7 +642,7 @@ const Form = (props) => {
             sErrWareHouse(false)
             sErrProduct(false)
             sErrNullLocate(false)
-            // sOnSending(true)
+            sOnSending(true)
             
         }
     }
