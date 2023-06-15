@@ -574,8 +574,7 @@ const Form = (props) => {
         //     item.child.some(itemChild => itemChild.quantity === 0 || itemChild.quantity === null)
         // ))
         const ChildData = dataChoose?.map(e => e?.child)?.flatMap(e => e)
-        const checkErrNullQty = ChildData?.some(e => e?.quantity === null)
-          
+        const checkErrNullQty = ChildData?.some(e => e?.amount === null)
         const hasEmptyChild = dataChoose.some(item => item.child.length === 0);
       
         // const checkErrNullLocate = dataChoose.map(item => item.child.some(itemChild => itemChild.locate === null));
@@ -643,7 +642,7 @@ const Form = (props) => {
             sErrWareHouse(false)
             sErrProduct(false)
             sErrNullLocate(false)
-            sOnSending(true)
+            // sOnSending(true)
             
         }
     }
@@ -817,7 +816,7 @@ const Form = (props) => {
                                         <div key={e.id} className='grid grid-cols-6 items-start'>
                                             <div className='col-span-1 p-1.5 space-y-1 border h-full'>
                                                 <div className='flex justify-between space-x-2'>
-                                                    <div className='w-20 h-20 bg-gray-200 flex flex-col items-center justify-center rounded'><IconImage/></div>
+                                                    <div className='w-20 h-20 bg-gray-200 flex flex-col items-center justify-center rounded'> {e?.img ? <img src={e?.img} alt='' className='rounded'></img> :<IconImage/>}</div>
                                                     <button onClick={_HandleActionItem.bind(this, e.id, "add")} className='w-10 h-10 rounded bg-slate-50 hover:bg-slate-100 transition flex flex-col justify-center items-center '><IconAdd /></button>
                                                 </div>
                                                 <div>
