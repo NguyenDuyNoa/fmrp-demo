@@ -66,6 +66,7 @@ const Form = (props) => {
     const [errNullLot, sErrNullLot] = useState(false);
     const [errNullDate, sErrNullDate] = useState(false);
     const [errNullSerial, sErrNullSerial] = useState(false);
+    const [errNullQty, sErrNullQty] = useState(false);
     const [errData, sErrData] = useState([]);
 
     const [isSubmitted, sIsSubmitted] = useState(false);
@@ -243,7 +244,6 @@ const Form = (props) => {
         })
         sDataChoose([...newData])
     }
-
     const _HandleCheckSameLot = (parentId, id, locate, lot, date) => {
         setTimeout(() => {
             const newData = dataChoose.map(e => {
@@ -285,31 +285,42 @@ const Form = (props) => {
         }, 500);
     }
 
-    // const [loadingData, sLoadingData] = useState(false);
     const _HandleCheckSameSerial = (parentId, id, locate, serial) => {
         setTimeout(() => {
-            const newData = dataChoose.map(e => {
-                if(e.id === parentId){
-                    const checkData = e.child?.filter(ce => ce?.id !== id)?.some(item => item?.locate?.value === locate?.value && item.serial === serial);
-                    const newChild = e.child?.map(ce => {
-                        if(ce.id == id && checkData){
-                            Toast.fire({
-                                icon: 'error',
-                                title: `Trùng mặt hàng`
-                            }) 
-                            return {...ce, locate: null, amount: null, lot: null, date: null, serial: null, quantity: null, price: null}
-                        }
-                        return ce;
-                    }).filter(item => item.locate !== null)
-                    return {...e, child: newChild}
+            // const newData = dataChoose.map(e => {
+            //     if(e.id === parentId){
+            //         const checkData = e.child?.filter(ce => ce?.id !== id)?.some(item => item?.locate?.value === locate?.value && item.serial === serial);
+            //         const newChild = e.child?.map(ce => {
+            //             if(ce.id == id && checkData){
+            //                 Toast.fire({
+            //                     icon: 'error',
+            //                     title: `Trùng mặt hàng`
+            //                 }) 
+            //                 return {...ce, locate: null, amount: null, lot: null, date: null, serial: null, quantity: null, price: null}
+            //             }
+            //             return ce;
+            //         }).filter(item => item.locate !== null)
+            //         return {...e, child: newChild}
+            //     }
+            //     return e;
+            // })
+            const dataChild = dataChoose?.map(e => e?.child)?.flatMap(innerList => innerList)
+            const checkData = dataChild?.some(item => item?.serial === serial && item?.id !== id)
+
+            const newData = dataChoose?.map(e => {
+                if(e.id === parentId && checkData){
+                    Toast.fire({
+                        icon: 'error',
+                        title: `Trùng serial`
+                    }) 
+                    return {...e, child: e?.child?.filter(ce => ce?.id !== id)}
                 }
-                return e;
+                return e
+            // })?.filter(e => e.child.length > 0)
             })
-            // sLoadingData(true)
-            const parent = newData.find(item => item.id === parentId);
-            if(!parent) return null;
-            const child = parent.child.find(e => e.id === id) || null
-            const check = parent.checkChild.find(e => e.locate === child?.locate?.value && e.serial === child?.serial)
+            const parent = newData?.find(item => item.id === parentId) || null
+            const child = parent?.child.find(e => e.id === id) || null
+            const check = parent?.checkChild.find(e => e.locate === child?.locate?.value && e.serial === child?.serial)
             const newData1 = newData.map(e => {
                 if(e.id === parentId){
                     const newChild = e.child?.map(ce => {
@@ -478,7 +489,6 @@ const Form = (props) => {
             sOnSending(false)
         })
     }
-    console.log("dataErr",dataErr);
 
     useEffect(() => {
         onSending && _ServerSending()
@@ -560,34 +570,43 @@ const Form = (props) => {
             dataProductSerial?.is_enable === "1" && item.checkSerial === "1") &&
             item.child.some(itemChild => itemChild.serial === null)
         );
+
+        const checkErrNullQty = dataChoose.some(item =>(
+            item.child.some(itemChild => itemChild.quantity === 0 || itemChild.quantity === null)
+        ))
           
+        const hasEmptyChild = dataChoose.some(item => item.child.length === 0);
+      
         // const checkErrNullLocate = dataChoose.map(item => item.child.some(itemChild => itemChild.locate === null));
         // const checkErrNullLot = dataChoose.map(item => (item.child.some(itemChild => itemChild.lot === null));
         // const checkErrNullDate = dataChoose.map(item => item.child.some(itemChild => itemChild.date === null));
         // const checkErrNullSerial = dataChoose.map(item => item.child.some(itemChild => itemChild.serial === null));
         
         // const checkErrNullSerial = dataChoose.map(item => (dataProductSerial?.is_enable == "1"  && item.checkSerial == "1") && item.child.some(itemChild => itemChild.serial === null));
-        const checkErrNullAmount = dataChoose.map(item => item.child.some(itemChild => itemChild.quantity === itemChild.amount && itemChild.amount === 0));
-        const hasDuplicates = () => {
-            const serialData = [];
-            return dataChoose
-                .flatMap(obj => obj.child)
-                .map(child => child.serial)
-                .filter(serial => serial !== null)
-                .some(serial => {
-                    if (serialData.includes(serial)) {
-                        return true;
-                    }
-                    serialData.push(serial);
-                    return false;
-                });
-        };
-
+        // const checkErrNullAmount = dataChoose.map(item => item.child.some(itemChild => itemChild.quantity === itemChild.amount && itemChild.amount === 0) );
+        // const checkErrNullQty = dataChoose.some(item => item.child.some(itemChild => itemChild.quantity === itemChild.amount && itemChild.amount === 0) );
+        // const hasDuplicates = () => {
+        //     const serialData = [];
+        //     return dataChoose
+        //         .flatMap(obj => obj.child)
+        //         .map(child => child.serial)
+        //         .filter(serial => serial !== null)
+        //         .some(serial => {
+        //             if (serialData.includes(serial)) {
+        //                 return true;
+        //             }
+        //             serialData.push(serial);
+        //             return false;
+        //         });
+        // };
+        console.log(checkErrNullQty);
         if(branch == null || warehouse == null || dataChoose.length == 0 || checkErrNullLocate || 
             (dataProductSerial?.is_enable == "1"  && checkErrNullSerial) ||
             ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") &&  checkErrNullLot) || 
-            ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1")  && checkErrNullDate) ||
-            (checkSerial && hasDuplicates())){
+            ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1")  && checkErrNullDate) || hasEmptyChild  || checkErrNullQty
+            // (checkSerial && hasDuplicates())
+            )
+            {
         // if(branch == null || warehouse == null || dataChoose.length == 0 || checkErrNullLocate || (checkLotDate && checkErrNullLot) || (checkLotDate && checkErrNullDate) || (checkSerial && checkErrNullSerial) || (checkSerial && hasDuplicates()) ){
             branch == null && sErrBranch(true)
             warehouse == null && sErrWareHouse(true)
@@ -596,10 +615,22 @@ const Form = (props) => {
             checkErrNullLot && sErrNullLot(true)
             checkErrNullDate && sErrNullDate(true)
             checkErrNullSerial && sErrNullSerial(true)
-            if(hasDuplicates()){
+            checkErrNullQty && sErrNullQty(true)
+            // if(hasDuplicates()){
+            //     Toast.fire({
+            //         icon: 'error',
+            //         title: `Trùng Serial`
+            //     })
+            // }else{
+            //     Toast.fire({
+            //         icon: 'error',
+            //         title: `${dataLang?.required_field_null}`
+            //     })
+            // }
+            if(hasEmptyChild){
                 Toast.fire({
                     icon: 'error',
-                    title: `Trùng Serial`
+                    title: `Thêm thông tin mặt hàng`
                 })
             }else{
                 Toast.fire({
@@ -855,7 +886,7 @@ const Form = (props) => {
                                                                             disabled={e?.checkSerial == "0"}
                                                                             value={ce?.serial}
                                                                             onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
-                                                                            className={`${e?.checkSerial == "0" ? "border-transparent": errNullSerial && (ce.serial === null || ce.serial === "") ? "border-red-500" : "border-gray-200" } text-center py-1 px-2 font-medium w-full focus:outline-none border-b-2 `}
+                                                                            className={`${e?.checkSerial == "0" ? "border-transparent": errNullSerial && (ce.serial === null || ce.serial === "") ? "border-red-500" : "border-gray-200" } text-center py-1 px-1 font-medium w-full focus:outline-none border-b-2 `}
                                                                         />
                                                                         {(isSubmitted && duplicateIds.includes(ce.id)) && <span className='text-red-500 text-[12px]'>Serial đã tồn tại trong phần mềm</span>}
                                                                     </div>
@@ -1014,7 +1045,7 @@ const Form = (props) => {
                                                                     <NumericFormat
                                                                         value={ce?.amount}
                                                                         onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "amount")}
-                                                                        className="appearance-none text-center py-1 px-2 font-medium w-full focus:outline-none border-b-2 border-gray-200"
+                                                                        className={`${(errNullQty && ce?.amount == null)  ? "border-red-500 border-b-2" :" border-gray-200 border-b-2"}  appearance-none text-center py-1 px-2 font-medium w-full focus:outline-none  `}
                                                                         thousandSeparator=","
                                                                         isAllowed={(values) => { 
                                                                             const {floatValue} = values; 
@@ -1429,22 +1460,36 @@ const Popup_Product = React.memo((props) => {
     // }
     const _HandleCheckSameSerial = (parentId, id, locate, serial) => {
         setTimeout(() => {
-            const newData = listAllProduct.map(e => {
-                if(e.id === parentId){
-                    const checkData = e.child?.filter(ce => ce?.id !== id)?.some(item => item?.locate?.value === locate?.value && item.serial === serial);
-                    const newChild = e.child?.map(ce => {
-                        if(ce.id == id && checkData){
-                            Toast.fire({
-                                icon: 'error',
-                                title: `Trùng mặt hàng`
-                            }) 
-                            return {...ce, locate: null, amount: null, lot: null, date: null, serial: null, quantity: null, price: null}
-                        }
-                        return ce;
-                    }).filter(item => item.locate !== null)
-                    return {...e, child: newChild}
+            // const newData = listAllProduct.map(e => {
+            //     if(e.id === parentId){
+            //         const checkData = e.child?.filter(ce => ce?.id !== id)?.some(item => item?.locate?.value === locate?.value && item.serial === serial);
+            //         const newChild = e.child?.map(ce => {
+            //             if(ce.id == id && checkData){
+            //                 Toast.fire({
+            //                     icon: 'error',
+            //                     title: `Trùng mặt hàng`
+            //                 }) 
+            //                 return {...ce, locate: null, amount: null, lot: null, date: null, serial: null, quantity: null, price: null}
+            //             }
+            //             return ce;
+            //         }).filter(item => item.locate !== null)
+            //         return {...e, child: newChild}
+            //     }
+            //     return e;
+            // })
+            const dataChild = listAllProduct?.map(e => e?.child)?.flatMap(innerList => innerList)
+            const checkData = dataChild?.some(item => item?.serial === serial && item?.id !== id)
+
+            const newData = listAllProduct?.map(e => {
+                if(e.id === parentId && checkData){
+                    Toast.fire({
+                        icon: 'error',
+                        title: `Trùng serial`
+                    }) 
+                    return {...e, child: e?.child?.filter(ce => ce?.id !== id)}
                 }
-                return e;
+                return e
+            // })?.filter(e => e.child.length > 0)
             })
             // sLoadingData(true)
             const parent = newData.find(item => item.id === parentId);
@@ -1632,7 +1677,7 @@ const Popup_Product = React.memo((props) => {
                                             <div className='flex justify-between items-center pr-3'>
                                                 <div className='flex items-center space-x-3 w-full'>
                                                     {e.img != null ? 
-                                                        <Image src={e.img} alt="Product Image" height={52} width={52} quality={100} className="object-cover rounded w-auto h-auto" loading="lazy" crossOrigin="anonymous" placeholder='blur' blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                                                        <Image src={e.img} alt="Product Image" height={52} width={52} quality={100} className="object-cover rounded w-[56px] h-[56px]" loading="lazy" crossOrigin="anonymous" placeholder='blur' blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
                                                         :
                                                         <div className='w-14 h-14 bg-gray-200 flex flex-col items-center justify-center rounded'><IconImage/></div>
                                                     }
@@ -1774,7 +1819,7 @@ const Popup_Product = React.memo((props) => {
                                                                 {e?.checkSerial == "1" && 
                                                                     // serial
                                                                     <div className='px-1'>
-                                                                        <input value={ce?.serial} onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")} className="text-center py-1 px-2 font-medium w-full focus:outline-none border-b-2 border-gray-200" />
+                                                                        <input  value={ce?.serial} onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")} className="text-center py-1 px-2 font-medium w-full focus:outline-none border-b-2 border-gray-200" />
                                                                     </div>
                                                                 }
                                                                 <h6 className='px-1 self-center text-center'>{ce?.quantity}</h6>
