@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react'
 import Select, { components } from 'react-select';
 import { useRouter } from 'next/router'
 import { MdClear } from 'react-icons/md';
+import { BsThreeDots } from 'react-icons/bs';
 import { AiFillPlusCircle } from 'react-icons/ai';
 import { BsCalendarEvent } from 'react-icons/bs';
 import { Trash as IconDelete, Add, Minus } from "iconsax-react";
@@ -65,14 +66,13 @@ const Index = (props) => {
   const [errDate, setErrDate] = useState(false)
   const [errCustomer, sErrCustomer] = useState(false)
   const [errStaff, setErrStaff] = useState(false)
-  const [errQuote, setErrQuote] = useState(false)
-  const [errDeliveryDate, setErrDeliveryDate] = useState(false)
+  const [errProductOrder, setErrProductOrder] = useState(false)
   const [errAddress, setErrAddress] = useState(false)
   const [errBranch, setErrBranch] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const [openPopupAddress, setOpenPopupAddress] = useState(false)
 
-  const [typeOrder, setTypeOrder] = useState("0");
   const [itemsAll, setItemsAll] = useState([])
 
   const [tongTienState, setTongTienState] = useState({
@@ -87,7 +87,6 @@ const Index = (props) => {
     router.query && setErrDate(false)
     router.query && sErrCustomer(false)
     router.query && setErrStaff(false)
-    router.query && setErrDeliveryDate(false)
     router.query && setErrBranch(false)
     router.query && setErrAddress(false)
     router.query && setStartDate(new Date())
@@ -144,10 +143,12 @@ const Index = (props) => {
 
   // fetch chi nhanh
   const handleFetchingBranch = () => {
+    setLoading(true)
     Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
       if (!err) {
         var { rResult } = response.data
         setDataBranch(rResult?.map(e => ({ label: e.name, value: e.id })))
+        setLoading(false)
       }
     })
 
@@ -155,6 +156,7 @@ const Index = (props) => {
       if (!err) {
         var { rResult } = response.data
         setDataTasxes(rResult?.map(e => ({ label: e.name, value: e.id, tax_rate: e.tax_rate })))
+        setLoading(false)
       }
     })
 
@@ -163,6 +165,7 @@ const Index = (props) => {
 
   // fetch Customer
   const handleFetchingCustomer = () => {
+    setLoading(true)
     Axios("GET", `/api_web/api_client/client_option/?csrf_protection=true`, {
       params: {
         "filter[branch_id]": branch !== null ? branch?.value : null,
@@ -171,12 +174,14 @@ const Index = (props) => {
       if (!err) {
         var db = response.data.rResult
         setDataCustomer(db?.map(e => ({ label: e.name, value: e.id })))
+        setLoading(false)
       }
     })
     setOnFetchingCustomer(false)
   }
   // Contact person
   const handleFetchingContactPerson = () => {
+    setLoading(true)
     Axios("GET", `/api_web/api_client/contactCombobox/?csrf_protection=true`, {
       params: {
         "filter[client_id]": customer != null ? customer.value : null,
@@ -185,6 +190,7 @@ const Index = (props) => {
       if (!err) {
         var { rResult } = response.data
         setDataContactPerson(rResult?.map(e => ({ label: e.full_name, value: e.id })))
+        setLoading(false)
       }
     })
     setOnFetchingContactPerson(false)
@@ -192,6 +198,7 @@ const Index = (props) => {
 
   // Address
   const handleFetchingAddress = () => {
+    setLoading(true)
     var data = new FormData();
     data.append('client_id', customer !== null ? +customer.value : null);
 
@@ -202,12 +209,14 @@ const Index = (props) => {
       if (!err) {
         var rResult = response?.data
         setDataAddress(rResult?.map(e => ({ label: e.name, value: e.id })))
+        setLoading(false)
       }
     })
     setOnFetchingAddress(false)
   }
   // Staff
   const handleFetchingStaff = () => {
+    setLoading(true)
     Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {
       params: {
         "filter[branch_id]": branch !== null ? +branch?.value : null,
@@ -216,6 +225,7 @@ const Index = (props) => {
       if (!err) {
         var { rResult } = response?.data
         setDataStaffs(rResult?.map(e => ({ label: e.name, value: e.staffid })))
+        setLoading(false)
       }
     })
     setOnFetchingStaff(false)
@@ -223,6 +233,7 @@ const Index = (props) => {
 
   // Đơn hàng bán
   const handleFetchingProductOrder = () => {
+    setLoading(true)
     var data = new FormData();
     data.append('branch_id', branch !== null ? +branch.value : null);
     data.append('client_id', customer !== null ? +customer.value : null);
@@ -234,6 +245,7 @@ const Index = (props) => {
       if (!err) {
         var rResult = response?.data.results
         setDataProductOrder(rResult?.map(e => ({ label: e.text, value: e.id })))
+        setLoading(false)
       }
     })
     setOnFetchingQuote(false)
@@ -253,8 +265,8 @@ const Index = (props) => {
 
   // }
 
-  const handleFetchingItem = async () => {
-    await Axios("POST", "/api_web/api_delivery/searchItemsVariant/?csrf_protection=true", {
+  const handleFetchingItem = () => {
+    Axios("POST", "/api_web/api_delivery/searchItemsVariant/?csrf_protection=true", {
       params: {
         "filter[order_id]": productOrder !== null ? +productOrder.value : null
       }
@@ -265,8 +277,24 @@ const Index = (props) => {
       }
     })
     setOnFetchingItem(false)
+  }
 
-
+  // search api
+  const handleSearchApi = (inputValue) => {
+    Axios("POST", "/api_web/api_delivery/searchItemsVariant/?csrf_protection=true", {
+      data: {
+        term: inputValue,
+      },
+      params: {
+        "filter[order_id]": productOrder !== null ? +productOrder.value : null
+      }
+    }, (err, response) => {
+      if (!err) {
+        var { result } = response.data.data
+        setDataItems(result)
+      }
+    })
+    setOnFetchingItem(false)
   }
 
 
@@ -398,9 +426,6 @@ const Index = (props) => {
   }, [address != null]);
 
   useEffect(() => {
-    setErrDeliveryDate(false)
-  }, [deliveryDate != null]);
-  useEffect(() => {
     setErrBranch(false)
   }, [branch != null]);
   useEffect(() => {
@@ -408,20 +433,7 @@ const Index = (props) => {
   }, [staff != null])
 
 
-  // search api
-  const _HandleSeachApi = async (inputValue) => {
-    await Axios("POST", "/api_web/api_delivery/searchItemsVariant/?csrf_protection=true", {
-      params: {
-        "filter[order_id]": productOrder !== null ? +productOrder.value : null
-      }
-    }, (err, response) => {
-      if (!err) {
-        var { result } = response.data.data
-        setDataItems(result)
-      }
-    })
-    setOnFetchingItem(false)
-  }
+
 
   // format number
   const formatNumber = (number) => {
@@ -456,6 +468,7 @@ const Index = (props) => {
             setDataProductOrder([])
             setProductOrder(null)
             setOption([])
+            setErrProductOrder(false)
 
             setOnFetchingItem(true)
           }
@@ -468,6 +481,7 @@ const Index = (props) => {
         setContactPerson(null)
         setDataProductOrder([])
         setProductOrder(null)
+        setErrProductOrder(false)
 
         setOnFetchingItem(true)
       }
@@ -606,24 +620,24 @@ const Index = (props) => {
     if (!checkData) {
       const newData = {
         id: uuidv4(),
-          item: {
-            e: value?.e,
-            label: value?.label,
-            value: value?.value,
-          },
-          unit: value?.e?.unit_name,
-          quantity: value?.e?.quantity,
-          price: value?.e?.price,
-          discount: value?.e?.discount_percent_item,
-          price_after_discount: +value?.e?.price * (1 - +value?.e?.discount_percent_item / 100),
-          tax: {
-            label: value?.e?.tax_name,
-            value: value?.e?.tax_id_item,
-            tax_rate: value?.e?.tax_rate_item
-          },
-          price_after_tax: (+value?.e?.price * value?.e?.quantity * (1 - +value?.e?.discount_percent_item / 100)) * (1 + value?.e?.tax_rate_item / 100),
-          total_amount: (+value?.e?.price * (1 - +value?.e?.discount_percent_item / 100)) * (1 + (+value?.e?.tax_rate_item) / 100) * (+value?.e?.quantity),
-          note: value?.e?.note_item,
+        item: {
+          e: value?.e,
+          label: value?.label,
+          value: value?.value,
+        },
+        unit: value?.e?.unit_name,
+        quantity: value?.e?.quantity,
+        price: value?.e?.price,
+        discount: value?.e?.discount_percent_item,
+        price_after_discount: +value?.e?.price * (1 - +value?.e?.discount_percent_item / 100),
+        tax: {
+          label: value?.e?.tax_name,
+          value: value?.e?.tax_id_item,
+          tax_rate: value?.e?.tax_rate_item
+        },
+        price_after_tax: (+value?.e?.price * value?.e?.quantity * (1 - +value?.e?.discount_percent_item / 100)) * (1 + value?.e?.tax_rate_item / 100),
+        total_amount: (+value?.e?.price * (1 - +value?.e?.discount_percent_item / 100)) * (1 + (+value?.e?.tax_rate_item) / 100) * (+value?.e?.quantity),
+        note: value?.e?.note_item,
       }
       setOption([newData, ...option]);
     } else {
@@ -642,15 +656,23 @@ const Index = (props) => {
       option[index].unit = value.target?.value;
     }
     else if (type === "quantity") {
-      option[index].quantity = Number(value?.value);
-      if (option[index].tax?.tax_rate == undefined) {
-        const tien = Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
-        option[index].total_amount = Number(tien.toFixed(2));
-      } else {
-        const tien = Number(option[index].price_after_discount) * (1 + Number(option[index].tax?.tax_rate) / 100) * Number(option[index].quantity);
-        option[index].total_amount = Number(tien.toFixed(2));
+      console.log(value);
+      if (value?.floatValue > 0 && option[index].quantity > 0) {
+        option[index].quantity = Number(value?.value);
+        if (option[index].tax?.tax_rate == undefined) {
+          const tien = Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+          option[index].total_amount = Number(tien.toFixed(2));
+        } else {
+          const tien = Number(option[index].price_after_discount) * (1 + Number(option[index].tax?.tax_rate) / 100) * Number(option[index].quantity);
+          option[index].total_amount = Number(tien.toFixed(2));
+        }
+        setOption([...option]);
       }
-      setOption([...option]);
+
+      // bug so luong neu so luong la 1
+      if (value?.floatValue === 0 || value?.floatValue === 1 || option[index].quantity === 1) {
+        option[index].quantity = 1
+      }
     }
     else if (type == "price") {
       option[index].price = Number(value.value)
@@ -704,19 +726,42 @@ const Index = (props) => {
 
     setOption([...option])
   }
+
   const handleIncrease = (id) => {
     const index = option.findIndex((x) => x.id === id);
+    console.log('option[index] : ', option[index]);
+    console.log('option : ', option);
     const newQuantity = +option[index].quantity + 1;
 
-    option[index].quantity = newQuantity;
-    if (option[index].tax?.tax_rate == undefined) {
-      const tien = Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
-      option[index].total_amount = Number(tien.toFixed(2));
-    } else {
-      const tien = Number(option[index].price_after_discount) * (1 + Number(option[index].tax?.tax_rate) / 100) * Number(option[index].quantity);
-      option[index].total_amount = Number(tien.toFixed(2));
+
+    // option[index].quantity = newQuantity;
+    // if (option[index].tax?.tax_rate == undefined) {
+    //   const tien = Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+    //   option[index].total_amount = Number(tien.toFixed(2));
+    // } else {
+    //   const tien = Number(option[index].price_after_discount) * (1 + Number(option[index].tax?.tax_rate) / 100) * Number(option[index].quantity);
+    //   option[index].total_amount = Number(tien.toFixed(2));
+    // }
+    // setOption([...option]);
+
+    if (newQuantity <= (+option[index].item.e.quantity - +option[index].item.e.quantity_delivery)) {
+      option[index].quantity = newQuantity;
+      if (option[index].tax?.tax_rate == undefined) {
+        const tien = Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
+        option[index].total_amount = Number(tien.toFixed(2));
+      } else {
+        const tien = Number(option[index].price_after_discount) * (1 + Number(option[index].tax?.tax_rate) / 100) * Number(option[index].quantity);
+        option[index].total_amount = Number(tien.toFixed(2));
+      }
+      setOption([...option]);
+
     }
-    setOption([...option]);
+    if (newQuantity > (+option[index].item.e.quantity - +option[index].item.e.quantity_delivery)) {
+      Toast.fire({
+        title: `${"Vượt quá số lượng tồn"}`,
+        icon: 'error',
+      })
+    }
   };
 
   const handleDecrease = (id) => {
@@ -852,16 +897,14 @@ const Index = (props) => {
   // validate submit
   const handleSubmitValidate = (e) => {
     e.preventDefault();
-    let deliveryDateInOption = option.some(e => e?.delivery_date === null)
 
-    if (startDate == null || customer == null || branch == null || staff == null || deliveryDateInOption === true) {
+    if (startDate == null || customer == null || branch == null || staff == null || productOrder == null) {
       startDate == null && setErrDate(true)
       customer?.value == null && sErrCustomer(true)
       branch?.value == null && setErrBranch(true)
       address?.value == null && setErrAddress(true)
       staff?.value == null && setErrStaff(true)
-      deliveryDateInOption === true && setErrDeliveryDate(true)
-      // deliveryDate == null && setErrDeliveryDate(true)
+      productOrder?.value == null && setErrProductOrder(true)
       Toast.fire({
         icon: 'error',
         title: `${dataLang?.required_field_null}`
@@ -881,9 +924,10 @@ const Index = (props) => {
     formData.append("branch_id", branch?.value)
     formData.append("client_id", customer?.value)
     formData.append("person_contact_id", contactPerson?.value)
+    formData.append("address_id", address?.value)
     formData.append("staff_id", staff?.value)
+    formData.append("product_order_id", productOrder?.value);
     formData.append("note", note)
-    formData.append("quote_id", productOrder?.value);
 
 
     newDataOption.forEach((item, index) => {
@@ -894,11 +938,11 @@ const Index = (props) => {
       formData.append(`items[${index}][discount_percent]`, item?.discount_percent);
       formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
       formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
-      formData.append(`items[${index}][delivery_date]`, item?.delivery_date != undefined ? (moment(item?.delivery_date).format("YYYY-MM-DD HH:mm:ss")) : "");
+      // formData.append(`items[${index}][delivery_date]`, item?.delivery_date != undefined ? (moment(item?.delivery_date).format("YYYY-MM-DD HH:mm:ss")) : "");
     });
 
     if (tongTienState?.totalPrice > 0 && tongTienState?.totalDiscountPrice >= 0 && tongTienState?.totalDiscountAfterPrice > 0 && tongTienState?.totalTax >= 0 && tongTienState?.totalAmount > 0) {
-      await Axios("POST", `${id ? `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true` : "/api_web/Api_sale_order/saleOrder/?csrf_protection=true"}`, {
+      await Axios("POST", `${id ? `/api_web/api_delivery/AddDelivery/${id}?csrf_protection=true` : "/api_web/api_delivery/AddDelivery/?csrf_protection=true"}`, {
         data: formData,
         headers: { 'Content-Type': 'multipart/form-data' }
       }, (err, response) => {
@@ -916,15 +960,14 @@ const Index = (props) => {
           setStaff(null)
           setCustomer(null)
           setBranch(null)
-          setErrQuote(null)
+          setProductOrder(null)
           setNote("")
           setErrBranch(false)
           setErrAddress(false)
           setErrDate(false)
-          setErrDeliveryDate(false)
           sErrCustomer(false)
           setErrStaff(false)
-          setErrQuote(false)
+          setErrProductOrder(false)
           setOption([])
           router.push('/sales_export_product/salesOrder?tab=all')
           console.log('1');
@@ -1130,6 +1173,9 @@ const Index = (props) => {
 
   // label của chọn mặt hàng đơn lẻ
   const selectItemsLabel = (option) => {
+    console.log('option :',option);
+    let quantityUndelived = +option?.e?.quantity - +option?.e?.quantity_delivery
+
     return (
       <div className='flex items-center justify-between'>
         <div className='flex items-center '>
@@ -1163,18 +1209,38 @@ const Index = (props) => {
               </h5>
             </div>
 
-            <div className='flex flex-row 3xl:gap-8 2xl:gap-3 xl:gap-3 gap-1'>
-              <h5 className='text-gray-400 3xl:w-[90px] 2xl:min-w-[85px] xl:min-w-[55px] min-w-[45px] 3xl:text-[14px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
+            <div className='flex flex-row 3xl:gap-3 2xl:gap-3 xl:gap-3 gap-1'>
+              <h5 className='text-gray-400 3xl:w-[90px] 2xl:min-w-[85px] xl:min-w-[55px] min-w-[45px] 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
                 {dataLang[option.e?.text_type]}
               </h5>
 
-              <div className='flex items-center'>
-                <h5 className='text-gray-400 font-normal 3xl:text-[14px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
-                  {dataLang?.purchase_survive || "purchase_survive"} :
+              <div className='flex items-center gap-1'>
+                <h5 className='text-gray-400 font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
+                  {dataLang?.delivery_receipt_quantity_stock_order || "delivery_receipt_quantity_stock_order"}: 
                 </h5>
 
-                <h5 className=' font-normal 3xl:text-[14px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
-                  {option.e?.qty_warehouse ? option.e?.qty_warehouse : "0"}
+                <h5 className=' font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
+                  {option.e?.quantity ? option.e?.quantity : "0"}
+                </h5>
+              </div>
+
+              <div className='flex items-center'>
+                <h5 className='text-gray-400 font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
+                  {dataLang?.delivery_receipt_quantity_undelivered_order || "delivery_receipt_quantity_undelivered_order"} :
+                </h5>
+
+                <h5 className=' font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
+                  {quantityUndelived ? quantityUndelived : "0"}
+                </h5>
+              </div>
+
+              <div className='flex items-center'>
+                <h5 className='text-gray-400 font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
+                  {dataLang?.delivery_receipt_quantity_delivered_order || "delivery_receipt_quantity_delivered_order"} :
+                </h5>
+
+                <h5 className=' font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
+                  {option.e?.quantity_delivery ? option.e?.quantity_delivery : "0"}
                 </h5>
               </div>
 
@@ -1203,9 +1269,9 @@ const Index = (props) => {
     setOpenPopupAddress(true)
   }
   const handleClosePopupAddress = () => {
+    handleFetchingAddress()
     setOpenPopupAddress(false)
   }
-
 
   const ClearIndicator = props => (
     <components.ClearIndicator {...props}>
@@ -1215,9 +1281,23 @@ const Index = (props) => {
       />
     </components.ClearIndicator>
   );
+  const LoadingIndicator = props => (
+    <components.LoadingMessage {...props}>
+      <BsThreeDots
+        className="animate-pulse absolute top-0 left-0 3xl:translate-x-[2650%] 3xl:-translate-y-[2%] 2xl:translate-x-[2000%] 2xl:-translate-y-[5%] xl:translate-x-[1630%] xl:-translate-y-[4%] translate-x-[1250%] -translate-y-[6%] h-10 text-[#CCCCCC] hover:text-[#999999] 3xl:scale-150 2xl:scale-110 xl:scale-100 scale-90"
+      />
+    </components.LoadingMessage>
+  )
+  const SelectIndicator = props => (
+    <components.ValueContainer {...props}>
+      <BsThreeDots
+        className="animate-pulse absolute top-0 left-0 3xl:translate-x-[2650%] 3xl:-translate-y-[2%] 2xl:translate-x-[2000%] 2xl:-translate-y-[5%] xl:translate-x-[1630%] xl:-translate-y-[4%] translate-x-[1250%] -translate-y-[6%] h-10 text-[#CCCCCC] hover:text-[#999999] 3xl:scale-150 2xl:scale-110 xl:scale-100 scale-90"
+      />
+    </components.ValueContainer>
+  )
 
   return (
-    <React.Fragment className='overflow-hidden'>
+    <>
       <Head>
         <title>{id ? dataLang?.sales_product_edit_order || "sales_product_edit_order" : dataLang?.delivery_receipt_add || "delivery_receipt_add"}</title>
       </Head>
@@ -1276,6 +1356,7 @@ const Index = (props) => {
                   <Select
                     options={dataBranch}
                     onChange={(value) => handleOnChangeInput("branch", value)}
+                    isLoading={loading}
                     value={branch}
                     isClearable={true}
                     closeMenuOnSelect={true}
@@ -1306,14 +1387,17 @@ const Index = (props) => {
                       })
                     }}
                   />
-                  {errBranch && <label className="text-sm text-red-500">{dataLang?.sales_product_err_branch || "sales_product_err_branch"}</label>}
+                  {errBranch && <label className="text-sm text-red-500">{dataLang?.delivery_receipt_err_select_branch || "delivery_receipt_err_select_branch"}</label>}
                 </div>
 
                 <div className='col-span-3'>
-                  <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">{dataLang?.customer || 'customer'} <span className="text-red-500">*</span></label>
+                  <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
+                    {dataLang?.customer || 'customer'} <span className="text-red-500">*</span>
+                  </label>
                   <Select
                     options={dataCustomer}
                     onChange={(value) => handleOnChangeInput("customer", value)}
+                    isLoading={loading}
                     value={customer}
                     placeholder={dataLang?.select_customer || "select_customer"}
                     hideSelectedOptions={false}
@@ -1349,7 +1433,7 @@ const Index = (props) => {
                       })
                     }}
                   />
-                  {errCustomer && <label className="text-sm text-red-500">{dataLang?.sales_product_err_customer || "sales_product_err_customer"}</label>}
+                  {errCustomer && <label className="text-sm text-red-500">{dataLang?.delivery_receipt_err_select_customer || "delivery_receipt_err_select_customer"}</label>}
                 </div>
 
                 <div className='col-span-3'>
@@ -1357,6 +1441,7 @@ const Index = (props) => {
                   <Select
                     options={dataPersonContact}
                     onChange={(value) => handleOnChangeInput("contactPerson", value)}
+                    isLoading={loading}
                     value={contactPerson}
                     placeholder={dataLang?.select_contact_person || "select_contact_person"}
                     hideSelectedOptions={false}
@@ -1395,18 +1480,21 @@ const Index = (props) => {
                 </div>
 
                 <div className='col-span-3'>
-                  <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">{dataLang?.address || "address"}</label>
+                  <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
+                    {dataLang?.address || "address"} <span className="text-red-500">*</span>
+                  </label>
                   <div className='relative'>
                     <Select
                       options={dataAddress}
                       onChange={(value) => handleOnChangeInput("address", value)}
                       value={address}
+                      isLoading={loading}
                       placeholder={dataLang?.select_address || "select_address"}
                       hideSelectedOptions={false}
                       isClearable={true}
-                      className={` rounded-md 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
+                      className={`${errAddress ? "border border-red-500 rounded-md" : ""} rounded-md 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
                       isSearchable={true}
-                      components={{ ClearIndicator }}
+                      components={{ ClearIndicator, LoadingIndicator, SelectIndicator }}
                       noOptionsMessage={() => "Không có dữ liệu"}
                       menuPortalTarget={document.body}
                       closeMenuOnSelect={true}
@@ -1438,6 +1526,8 @@ const Index = (props) => {
                     />
                     <AiFillPlusCircle onClick={handleOpenPopupAddress} className='right-0 top-0 -translate-x-[300%] 3xl:translate-y-[80%] 2xl:translate-y-[70%] xl:translate-y-[70%] translate-y-[60%] 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 transition-shadow ease-in-out absolute ' />
                     <PopupAddress dataLang={dataLang} clientId={customer?.value} handleFetchingAddress={handleFetchingAddress} openPopupAddress={openPopupAddress} handleClosePopupAddress={handleClosePopupAddress} className='hidden' />
+                    {errAddress && <label className="text-sm text-red-500">{dataLang?.delivery_receipt_err_select_address || "delivery_receipt_err_select_address"}</label>}
+
                   </div>
                 </div>
 
@@ -1474,6 +1564,7 @@ const Index = (props) => {
                     options={dataStaffs}
                     onChange={(value) => handleOnChangeInput("staff", value)}
                     value={staff}
+                    isLoading={loading}
                     placeholder={dataLang?.select_staff || "select_staff"}
                     hideSelectedOptions={false}
                     isClearable={true}
@@ -1520,10 +1611,11 @@ const Index = (props) => {
                     options={dataProductOrder}
                     onChange={(value) => handleOnChangeInput("productOrder", value)}
                     value={productOrder}
+                    isLoading={loading}
                     placeholder={dataLang?.delivery_receipt_select_product_order || "delivery_receipt_select_product_order"}
                     hideSelectedOptions={false}
                     isClearable={true}
-                    className={`${errQuote && productOrder === null ? "border border-red-500 rounded-md" : ""} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                    className={`${errProductOrder && productOrder === null ? "border border-red-500 rounded-md" : ""} 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
                     isSearchable={true}
                     noOptionsMessage={() => "Không có dữ liệu"}
                     menuPortalTarget={document.body}
@@ -1553,7 +1645,7 @@ const Index = (props) => {
                       })
                     }}
                   />
-                  {errQuote && productOrder === null && <label className="text-sm text-red-500">{dataLang?.sales_product_err_quote || "sales_product_err_quote"}</label>}
+                  {errProductOrder && productOrder === null && <label className="text-sm text-red-500">{dataLang?.sales_product_err_quote || "sales_product_err_quote"}</label>}
                 </div>
 
 
@@ -1573,14 +1665,14 @@ const Index = (props) => {
                 {dataLang?.import_click_items || "import_click_items"}
               </label>
               <Select
-                // onInputChange={_HandleSeachApi.bind(this)}
-                options={allItems}
+                // onInputChange={(value) => handleSearchApi(value)}
+                options={productOrder ? allItems : []}
                 closeMenuOnSelect={false}
                 onChange={(value) => handleOnChangeInput("itemAll", value)}
                 value={itemsAll?.value ? itemsAll?.value : option?.map(e => e?.item)}
                 isMulti
                 components={{ MenuList, MultiValue }}
-                formatOptionLabel={quickSelectItemsLabel}
+                formatOptionLabel={(option) => quickSelectItemsLabel(option)}
                 placeholder={dataLang?.purchase_items || "purchase_items"}
                 hideSelectedOptions={false}
                 className="rounded-md bg-white 3xl:text-[16px] 2xl:text-[10px] xl:text-[13px] text-[12.5px] "
@@ -1635,13 +1727,13 @@ const Index = (props) => {
           <div className='3xl:h-[330px] h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
             <div className='pr-2'>
               <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                {/* phân chia,m */}
+                {/* phân chia */}
                 <div className='grid grid-cols-12'>
                   <div className='col-span-3 '>
                     <Select
-                      // onInputChange={_HandleSeachApi.bind(this)}
+                      // onInputChange={handleSearchApi.bind(this)}
                       dangerouslySetInnerHTML={{ __html: option.label }}
-                      options={options}
+                      options={productOrder ? options : []}
                       onChange={(value) => handleAddParent(value)}
                       value={null}
                       formatOptionLabel={selectItemsLabel}
@@ -1809,9 +1901,9 @@ const Index = (props) => {
                   <div className='grid grid-cols-12 gap-1 py-1 items-center' key={e?.id}>
                     <div className='col-span-3 '>
                       <Select
-                        // onInputChange={_HandleSeachApi.bind(this)}
+                        // onInputChange={handleSearchApi.bind(this)}
                         dangerouslySetInnerHTML={{ __html: option.label }}
-                        options={options}
+                        options={productOrder ? options : []}
                         onChange={(value) => _HandleChangeValue(e?.id, value)}
                         value={e?.item}
                         // components={{ MenuList, MultiValue }}
@@ -1868,12 +1960,31 @@ const Index = (props) => {
                         <NumericFormat
                           className={`cursor-text appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                           onValueChange={(value) => handleOnChangeInputOption(e?.id, "quantity", value)}
-                          value={e?.quantity || 1}
+                          value={e?.quantity}
                           thousandSeparator=","
                           allowNegative={false}
                           decimalScale={0}
                           isNumericString={true}
-                          isAllowed={(values) => { const { floatValue } = values; return floatValue > 0 }}
+                          isAllowed={(values) => {
+                            if (!values.value) return true;
+                            let { floatValue } = values;
+                            let count = +e?.item?.e?.quantity - +e?.item?.e?.quantity_delivery
+
+                            if (floatValue > count) {
+                              Toast.fire({
+                                icon: 'error',
+                                title: `Vui nhập số lượng nhỏ hơn hoặc bằng ${count}`
+                              })
+                            }
+                            else if (floatValue === 0) {
+                              Toast.fire({
+                                icon: 'error',
+                                title: `Vui nhập số lượng lớn hơn 0!`
+                              })
+                            }
+                            return (floatValue <= count);
+
+                          }}
                         />
                         <button
                           onClick={() => handleIncrease(e.id)}
@@ -2132,7 +2243,7 @@ const Index = (props) => {
         </div>
 
       </div>
-    </React.Fragment>
+    </>
   )
 }
 
