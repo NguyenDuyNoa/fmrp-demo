@@ -48,7 +48,6 @@ const Form = (props) => {
     const [onSending, sOnSending] = useState(false);
 
     const [dataChoose, sDataChoose] = useState([]);
-    
     const [dataBranch, sDataBranch] = useState([]);
     const [dataWareHouse, sDataWareHouse] = useState([]);
     const [dataPstWH, sDataPstWH] = useState([]);
@@ -571,9 +570,11 @@ const Form = (props) => {
             item.child.some(itemChild => itemChild.serial === null)
         );
 
-        const checkErrNullQty = dataChoose.some(item =>(
-            item.child.some(itemChild => itemChild.quantity === 0 || itemChild.quantity === null)
-        ))
+        // const checkErrNullQty = dataChoose.some(item =>(
+        //     item.child.some(itemChild => itemChild.quantity === 0 || itemChild.quantity === null)
+        // ))
+        const ChildData = dataChoose?.map(e => e?.child)?.flatMap(e => e)
+        const checkErrNullQty = ChildData?.some(e => e?.quantity === null)
           
         const hasEmptyChild = dataChoose.some(item => item.child.length === 0);
       
@@ -599,7 +600,6 @@ const Form = (props) => {
         //             return false;
         //         });
         // };
-        console.log(checkErrNullQty);
         if(branch == null || warehouse == null || dataChoose.length == 0 || checkErrNullLocate || 
             (dataProductSerial?.is_enable == "1"  && checkErrNullSerial) ||
             ((dataProductExpiry?.is_enable == "1" || dataMaterialExpiry?.is_enable == "1") &&  checkErrNullLot) || 
