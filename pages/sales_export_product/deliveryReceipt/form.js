@@ -898,7 +898,7 @@ const Index = (props) => {
   const handleSubmitValidate = (e) => {
     e.preventDefault();
 
-    if (startDate == null || customer == null || branch == null || staff == null || productOrder == null) {
+    if (startDate == null || customer == null || branch == null || staff == null || productOrder == null || address == null) {
       startDate == null && setErrDate(true)
       customer?.value == null && sErrCustomer(true)
       branch?.value == null && setErrBranch(true)
@@ -919,23 +919,23 @@ const Index = (props) => {
   // handle submit
   const handleSubmit = async () => {
     var formData = new FormData();
-    formData.append("code", codeDelivery)
-    formData.append("date", (moment(startDate).format("YYYY-MM-DD HH:mm:ss")))
-    formData.append("branch_id", branch?.value)
-    formData.append("client_id", customer?.value)
-    formData.append("person_contact_id", contactPerson?.value)
-    formData.append("address_id", address?.value)
-    formData.append("staff_id", staff?.value)
-    formData.append("product_order_id", productOrder?.value);
+    formData.append("code", codeDelivery ? codeDelivery : null)
+    formData.append("date", (moment(startDate).format("YYYY-MM-DD HH:mm:ss")) ? (moment(startDate).format("YYYY-MM-DD HH:mm:ss")) : null)
+    formData.append("branch_id", branch?.value ? branch?.value : null)
+    formData.append("client_id", customer?.value ? customer?.value : null)
+    formData.append("person_contact_id", contactPerson?.value ? contactPerson?.value : null)
+    formData.append("address_id", address?.value ? address?.value : null)
+    formData.append("staff_id", staff?.value ? staff?.value : null)
+    formData.append("product_order_id", productOrder?.value ? productOrder?.value : null);
     formData.append("note", note)
 
 
     newDataOption.forEach((item, index) => {
 
       formData.append(`items[${index}][item]`, item?.item != undefined ? item?.item : "");
-      formData.append(`items[${index}][quantity]`, item?.quantity.toString());
-      formData.append(`items[${index}][price]`, item?.price);
-      formData.append(`items[${index}][discount_percent]`, item?.discount_percent);
+      formData.append(`items[${index}][quantity]`, item?.quantity.toString() ? item?.quantity.toString() : "");
+      formData.append(`items[${index}][price]`, item?.price ? item?.price : "");
+      formData.append(`items[${index}][discount_percent]`, item?.discount_percent ? item?.discount_percent : "");
       formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
       formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
       // formData.append(`items[${index}][delivery_date]`, item?.delivery_date != undefined ? (moment(item?.delivery_date).format("YYYY-MM-DD HH:mm:ss")) : "");
@@ -1173,7 +1173,7 @@ const Index = (props) => {
 
   // label của chọn mặt hàng đơn lẻ
   const selectItemsLabel = (option) => {
-    console.log('option :',option);
+    console.log('option :', option);
     let quantityUndelived = +option?.e?.quantity - +option?.e?.quantity_delivery
 
     return (
@@ -1216,7 +1216,7 @@ const Index = (props) => {
 
               <div className='flex items-center gap-1'>
                 <h5 className='text-gray-400 font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
-                  {dataLang?.delivery_receipt_quantity_stock_order || "delivery_receipt_quantity_stock_order"}: 
+                  {dataLang?.delivery_receipt_quantity_stock_order || "delivery_receipt_quantity_stock_order"}:
                 </h5>
 
                 <h5 className=' font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
@@ -1226,7 +1226,7 @@ const Index = (props) => {
 
               <div className='flex items-center'>
                 <h5 className='text-gray-400 font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
-                  {dataLang?.delivery_receipt_quantity_undelivered_order || "delivery_receipt_quantity_undelivered_order"} :
+                  {dataLang?.delivery_receipt_quantity_undelivered_order || "delivery_receipt_quantity_undelivered_order"}:
                 </h5>
 
                 <h5 className=' font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
@@ -1236,7 +1236,7 @@ const Index = (props) => {
 
               <div className='flex items-center'>
                 <h5 className='text-gray-400 font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
-                  {dataLang?.delivery_receipt_quantity_delivered_order || "delivery_receipt_quantity_delivered_order"} :
+                  {dataLang?.delivery_receipt_quantity_delivered_order || "delivery_receipt_quantity_delivered_order"}:
                 </h5>
 
                 <h5 className=' font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]'>
