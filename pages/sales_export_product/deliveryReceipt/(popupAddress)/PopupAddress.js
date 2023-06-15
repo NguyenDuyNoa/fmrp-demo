@@ -7,6 +7,7 @@ import { _ServerInstance as Axios } from '/services/axios';
 import PhoneInput from "react-phone-input-2";
 import Swal from "sweetalert2";
 import 'react-phone-input-2/lib/style.css'
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 
 const Toast = Swal.mixin({
@@ -24,8 +25,12 @@ const PopupAddress = (props) => {
     const [errNamePerson, setErrNamePerson] = useState(false);
     const [errAddress, setErrAddress] = useState(false);
     const [errPhone, setErrPhone] = useState(false);
+    const [loading, setLoading] = useState(false)
 
     const handleOnChangeInput = (type, value) => {
+        if (namePerson !== "" || address !== "" || phone !== "") {
+            setLoading(false)
+        }
         if (type == "namePerson") {
             setNamePerson(value.target?.value)
             setErrNamePerson(false)
@@ -54,31 +59,35 @@ const PopupAddress = (props) => {
         data.append('name', namePerson);
         data.append('address', address);
         data.append('phone', phone);
-        Axios("POST", `/api_web/api_delivery/AddShippingClient?csrf_protection=true`, {
-            data: data,
-            headers: { "Content-Type": "multipart/form-data" }
-        }, (err, response) => {
-            if (!err) {
-                var { isSuccess, message } = response.data;
-                if (isSuccess) {
-                    Toast.fire({
-                        icon: 'success',
-                        title: `${props.dataLang[message]}`
-                    })
-                    setNamePerson("")
-                    setAddress("")
-                    setPhone("")
-                    props?.handleFetchingAddress()
-                    handleClosePopup()
-                    // props.onRefresh && props.onRefresh()
-                } else {
-                    Toast.fire({
-                        icon: 'error',
-                        title: `${props.dataLang[message]}`
-                    })
+        setLoading(true)
+        if (namePerson !== "" && address !== "" && phone !== "") {
+            Axios("POST", `/api_web/api_delivery/AddShippingClient?csrf_protection=true`, {
+                data: data,
+                headers: { "Content-Type": "multipart/form-data" }
+            }, (err, response) => {
+                if (!err) {
+                    var { isSuccess, message } = response.data;
+                    if (isSuccess) {
+                        Toast.fire({
+                            icon: 'success',
+                            title: `${props.dataLang[message]}`
+                        })
+                        setNamePerson("")
+                        setAddress("")
+                        setPhone("")
+                        setLoading(false)
+                        // props?.handleFetchingAddress()
+                        handleClosePopup()
+                        // props.onRefresh && props.onRefresh()
+                    } else {
+                        Toast.fire({
+                            icon: 'error',
+                            title: `${props.dataLang[message]}`
+                        })
+                    }
                 }
-            }
-        })
+            })
+        }
 
     }
 
@@ -89,12 +98,9 @@ const PopupAddress = (props) => {
         setErrNamePerson(false)
         setErrAddress(false)
         setErrPhone(false)
+        setLoading(false)
         props?.handleClosePopupAddress()
     }
-
-    useEffect(() => {
-        setErrNamePerson(false)
-    }, [namePerson.length > 0])
 
     return (
         <PopupEdit
@@ -160,7 +166,7 @@ const PopupAddress = (props) => {
                         />
                         {errPhone && <label className="text-sm text-red-500">{props.dataLang?.delivery_receipt_err_phone || "delivery_receipt_err_phone"}</label>}
                     </div>
-                    <div className="text-right mt-5 space-x-2">
+                    <div className="mt-5 space-x-2 flex flex-row justify-end">
                         <button
                             type="button"
                             onClick={handleClosePopup}
@@ -170,9 +176,14 @@ const PopupAddress = (props) => {
                         </button>
                         <button
                             type="submit"
-                            className="button  font-normal text-base py-2 px-4 rounded-lg bg-sky-400 hover:bg-sky-500 text-[#FFFFFF] transition-shadow"
+                            disabled={loading ? true : false}
+                            className={`${loading ? "disabled:opacity-75" : ""} button font-normal text-base py-2 px-4 rounded-lg bg-sky-400 hover:bg-sky-500 text-[#FFFFFF] transition-shadow flex justify-center items-center gap-2`}
+                        // className={`motion-reduce:hidden animate-spin button  font-normal text-base py-2 px-4 rounded-lg bg-sky-400 hover:bg-sky-500 text-[#FFFFFF] transition-shadow`}
                         >
-                            {props.dataLang?.btn_save || "btn_save"}
+                            <AiOutlineLoading3Quarters className={`${loading ? "motion-reduce:hidden animate-spin visible" : "hidden"}`} />
+                            <span>
+                                {props.dataLang?.btn_save || "btn_save"}
+                            </span>
                         </button>
                     </div>
                 </form>
