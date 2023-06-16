@@ -8,6 +8,12 @@ import {
     Grid6 as IconExcel, Filter as IconFilter, Calendar as IconCalendar, SearchNormal1 as IconSearch,
     ArrowDown2 as IconDown,Add as IconAdd, TickCircle, ArrowCircleDown,Image as IconImage
 } from "iconsax-react";
+
+import {BiEdit} from 'react-icons/bi'
+import {RiDeleteBin6Line} from 'react-icons/ri'
+import {VscFilePdf} from 'react-icons/vsc'
+
+
 import Select from 'react-select';
 import Popup from 'reactjs-popup';
 import { useRef } from 'react';
@@ -41,6 +47,7 @@ const Toast = Swal.mixin({
 })
 
 import ReactExport from "react-data-export";
+import FilePDF from '../FilePDF';
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -610,7 +617,7 @@ const Index = (props) => {
                                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-2 text-left truncate '>{e?.note}</h6>
                                                 <h6 className="col-span-1 w-fit"><span className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{e?.branch_name}</span></h6>
                                                 <div className='pl-2 py-2.5 col-span-1 flex space-x-2 justify-center'>
-                                                    <BtnTacVu order={e?.order_status} onRefreshGroup={_ServerFetching_group.bind(this)}  dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} status={e?.status} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] 2xl:text-base xl:text-xs text-[8px]" />
+                                                    <BtnTacVu type="purchases" order={e?.order_status} onRefreshGroup={_ServerFetching_group.bind(this)}  dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} status={e?.status} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] 2xl:text-base xl:text-xs text-[8px] hover:scale-x-105 hover:bg-slate-200 transition-all ease-in-out" />
                                                 </div>
                                             </div>
                                         )}
@@ -662,6 +669,11 @@ const BtnTacVu = React.memo((props) => {
 
     const [openDetail, sOpenDetail] = useState(false);
     const router = useRouter()
+
+    const [openAction, setOpenAction] = useState(false);
+    const [dataCompany, setDataCompany] = useState();
+    const [data, setData] = useState();
+
     const _HandleDelete = (id) => {
     
         Swal.fire({
@@ -713,6 +725,29 @@ const BtnTacVu = React.memo((props) => {
           router.push(`/purchase_order/purchases/form?id=${props.id}`);
         }
       };
+      
+      const fetchDataSettingsCompany = async () => {
+        if (props?.id) {
+          Axios("GET", `/api_web/Api_Setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+            if(!err){
+                    var {data} =  response.data
+                    setDataCompany(data)
+              }
+          })
+        }
+        if(props?.id){
+          Axios("GET", `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+            if(!err){
+              var db =  response.data
+              setData(db)
+            }
+          })
+        }
+    }
+    useEffect(() => {
+      openTacvu && fetchDataSettingsCompany()
+  }, [openTacvu])
+
     return(
         <div>
             <Popup
@@ -728,12 +763,28 @@ const BtnTacVu = React.memo((props) => {
                 // open={open || openDetail || openBom}
             >
                 <div className="w-auto rounded">
+                
                     <div className="bg-white rounded-t flex flex-col overflow-hidden">
                         {/* <Popup_GiaiDoan setOpen={sOpen} isOpen={open} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
                         <Popup_Bom setOpen={sOpenBom} isOpen={openBom} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
                         <Popup_ThanhPham onRefresh={props.onRefresh} dataProductExpiry={props.dataProductExpiry} dataLang={props.dataLang} id={props?.id} setOpen={sOpenDetail} isOpen={openDetail} className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full" /> */}
-                        <button onClick={handleClick}className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">{props.dataLang?.purchase_editVoites || "purchase_editVoites"}</button>
-                        <button onClick={_HandleDelete.bind(this, props.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_deleteVoites || "purchase_deleteVoites"}</button>
+                          <button onClick={handleClick} className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">
+                            <BiEdit size={20} className='group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md '/>
+                            <p className='group-hover:text-sky-500'>{props.dataLang?.purchase_editVoites || "purchase_editVoites"}</p>
+                          </button>
+                          <FilePDF 
+                              props={props}
+                              openAction={openTacvu}
+                              setOpenAction={sOpenTacvu}
+                              dataCompany={dataCompany}
+                              data={data}
+                              // type="purchases"
+                              />
+                             
+                         <button onClick={_HandleDelete.bind(this, props.id)} className='group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
+                            <RiDeleteBin6Line size={20} className='group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md '/>
+                            <p className='group-hover:text-[#f87171]'>{props.dataLang?.purchase_deleteVoites || "purchase_deleteVoites"}</p>
+                          </button>
                     </div>
                 </div>
             </Popup>

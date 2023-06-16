@@ -432,7 +432,7 @@ const newResult = data_ex?.map(item => {
                                         }</h6>                              
                                     </div>
                                     <div className=" col-span-1 border-r  border-b flex  items-center">
-                                        <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-left "><span className={`${e.item_type == "product" ? "text-lime-500  border-lime-500 " : " text-orange-500 border-orange-500"} border rounded py-1 px-1.5`}>{e.item_type ? dataLang?.product : ""}</span></h6>                              
+                                        <h6 className=" 3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] py-3  w-fit text-left "><span className={`${e.item_type == "product" ? "text-lime-500  border-lime-500 " : " text-orange-500 border-orange-500"} border rounded py-1 px-1.5 w-fit ml-1 3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px]`}>{e.item_type ? dataLang[e?.item_type] : ""}</span></h6>                              
                                     </div>
                                     <div className=" col-span-1 border-r  border-b flex  items-center">
                                         <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-left ">{e.item_code == null ? "-" : e.item_code}</h6>                              
@@ -469,7 +469,7 @@ const newResult = data_ex?.map(item => {
                                                     <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-left ">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
                                                 </div>
                                                 <div className=" col-span-1 border-r border-b ">
-                                                    <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-center ">{e.expiration_date ? moment(e.expiration_date).format("DD-MM-YYYY")   : "-"}</h6>                              
+                                                    <h6 className="xl:text-base text-xs  px-2 py-3  w-[full] text-center ">{e.expiration_date ? moment(e.expiration_date).format("DD/MM/YYYY")   : "-"}</h6>                              
                                                 </div>
                                              </>
                                             ):""}

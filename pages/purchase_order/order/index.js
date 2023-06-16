@@ -12,6 +12,11 @@ import {
     TickCircle,
     ArrowCircleDown
 } from "iconsax-react";
+
+import {BiEdit} from 'react-icons/bi'
+import {RiDeleteBin6Line} from 'react-icons/ri'
+import {VscFilePdf} from 'react-icons/vsc'
+
 import Select from 'react-select';
 import 'react-datepicker/dist/react-datepicker.css';
 import Datepicker from 'react-tailwindcss-datepicker'
@@ -36,6 +41,7 @@ import ReactExport from "react-data-export";
 import { useEffect } from 'react';
 import { data } from 'autoprefixer';
 import Popup_chitietThere from '../detailThere';
+import FilePDF from '../FilePDF';
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -629,7 +635,7 @@ const Index = (props) => {
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left truncate '>{e.note}</h6>
                                 <h6 className="col-span-1 w-fit"><span className="3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{e?.branch_name}</span></h6>
                                 <div className='col-span-1 flex justify-center'>
-                                    <BtnTacVu onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} status={e?.import_status} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
+                                    <BtnTacVu type="order" onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} status={e?.import_status} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
                                     {/* <button className='bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded xl:text-base text-xs'>Tác vụ</button> */}
                                 </div>
                                 </div>
@@ -891,7 +897,31 @@ const BtnTacVu = React.memo((props) => {
   const [openEdit, sOpenEdit] = useState(false);
   const [onFetching, sOnFetching] = useState(false);
   const [data, sData] = useState({})
-    
+
+  const [dataPDF, setData] = useState();
+  const [dataCompany, setDataCompany] = useState();
+
+    const fetchDataSettingsCompany = async () => {
+        if (props?.id) {
+          Axios("GET", `/api_web/Api_Setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+            if(!err){
+                    var {data} =  response.data
+                    setDataCompany(data)
+              }
+          })
+        }
+        if(props?.id){
+          Axios("GET", `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+            if(!err){
+              var db =  response.data
+              setData(db)
+            }
+          })
+        }
+    }
+    useEffect(() => {
+      openTacvu && fetchDataSettingsCompany()
+  }, [openTacvu])
 
     const _ServerFetching_ValidatePayment =  () =>{
       Axios("GET", `/api_web/Api_purchase_order/paymentStatus/${props?.id}?csrf_protection=true`, {}, (err, response) => {
@@ -980,8 +1010,22 @@ const BtnTacVu = React.memo((props) => {
                           className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
                          >{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</button>
                         <button onClick={_HandleDelete.bind(this, props.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</button> */}
-                      <Popup_TableValidateEdit status={props?.status} data={data} setOpen={sOpenEdit} isOpen={openEdit} dataLang={props?.dataLang} id={props?.id} className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"/>
-                      <Popup_TableValidateDelete onRefresh={props?.onRefresh} setOpen={sOpen} data={data}  isOpen={open} dataLang={props?.dataLang} id={props?.id} className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"/>
+                      <div className='group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
+                        <BiEdit size={20} className='group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md '/>
+                        <Popup_TableValidateEdit status={props?.status} data={data} setOpen={sOpenEdit} isOpen={openEdit} dataLang={props?.dataLang} id={props?.id} className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5 "/>
+                      </div>
+                      <FilePDF 
+                              props={props}
+                              openAction={openTacvu}
+                              setOpenAction={sOpenTacvu}
+                              dataCompany={dataCompany}
+                              data={dataPDF}
+                              />
+                      <div className='group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
+                        <RiDeleteBin6Line size={20} className='group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md '/>
+                        <Popup_TableValidateDelete onRefresh={props?.onRefresh} setOpen={sOpen} data={data}  isOpen={open} dataLang={props?.dataLang} id={props?.id} className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer rounded py-2.5"/>
+                      </div>
+                        
                     </div>
                 </div>
             </Popup>
