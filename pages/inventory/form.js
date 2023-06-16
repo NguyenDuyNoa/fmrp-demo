@@ -201,11 +201,14 @@ const Form = (props) => {
                 const newChild = e.child?.map(ce => {
                     if(ce.id === id){
                         if(type === "amount"){
-                            return {...ce, amount: Number(value?.value)}
+                            ce.amount = Number(value?.value)
+                            return {...ce}
+                            // return {...ce, amount: Number(value?.value)}
                         }else if(type === "locate"){
                             ce.locate = value;
                             e?.checkExpiry == "1" && (ce?.locate !== null && ce?.lot !== null && ce.date !== null) && _HandleCheckSameLot(parentId, id, ce?.locate, ce?.lot, ce?.date);
                             e?.checkSerial == "1" && (ce?.locate !== null && ce?.serial !== null) && _HandleCheckSameSerial(parentId, id, ce?.locate, ce?.serial);
+                            
                             // e?.checkSerial == "1" && (ce?.locate !== null && ce?.serial !== null) && _HandleCheckSameSerial(parentId, id, ce?.locate, ce?.serial);
                             // (e?.checkSerial == "1") && (ce?.locate !== null && ce?.serial !== null) && console.log("here 1")
                             // (e?.type == "material" || e?.type == "products") && e?.checkExpiry == "0"  && _HandleCheckSameSerial(parentId, id, ce?.locate, ce?.serial);
@@ -229,6 +232,7 @@ const Form = (props) => {
                                 e?.checkSerial == "1" && (ce?.locate !== null && ce?.serial !== null) && _HandleCheckSameSerial(parentId, id, ce?.locate, ce?.serial);
                             }, 1000);
                             setTimeout(() => {
+                                console.log(ce.amount);
                                 return {...ce}
                             }, 3000);
                         }else if(type === "price"){
@@ -272,7 +276,7 @@ const Form = (props) => {
                 if(e.id === parentId){
                     const newChild = e.child?.map(ce => {
                         if(ce.id === id){
-                            return {...ce, quantity: check?.quantity || 0}
+                            return {...ce, quantity: check?.quantity || 0,}
                         }
                         return ce;
                     })
@@ -303,6 +307,8 @@ const Form = (props) => {
             //     }
             //     return e;
             // })
+
+
             const dataChild = dataChoose?.map(e => e?.child)?.flatMap(innerList => innerList)
             const checkData = dataChild?.some(item => item?.serial === serial && item?.id !== id)
 
@@ -320,6 +326,7 @@ const Form = (props) => {
             const parent = newData?.find(item => item.id === parentId) || null
             const child = parent?.child.find(e => e.id === id) || null
             const check = parent?.checkChild.find(e => e.locate === child?.locate?.value && e.serial === child?.serial)
+           
             const newData1 = newData.map(e => {
                 if(e.id === parentId){
                     const newChild = e.child?.map(ce => {
@@ -332,7 +339,6 @@ const Form = (props) => {
                 }
                 return e;
             })
-            
             sDataChoose([...newData1])
         }, 1000);
     }
@@ -786,7 +792,7 @@ const Form = (props) => {
                         <h2 className='bg-slate-100 py-2 px-4 rounded'>Thông tin mặt hàng</h2>
                         {dataChoose.length > 0 &&
                             <>
-                                <div className='grid grid-cols-6 pt-3 pb-2'>
+                                <div className='grid grid-cols-6 pt-3 pb-2 shadow'>
                                     <h5 className='font-[300] text-slate-600 col-span-1 px-1.5'>Tên mặt hàng</h5>
                                     {/* <div className={`${(dataMaterialExpiry.is_enable == "0" && dataProductSerial.is_enable == "0") ? "grid-cols-7" : (dataProductExpiry.checkExpiry == "1" ? "grid-cols-9" : "grid-cols-8") } col-span-5 grid`}> */}
                                     <div className={`${dataProductSerial.is_enable == "1" ? 
@@ -813,30 +819,30 @@ const Form = (props) => {
                                 </div>
                                 <div className='2xl:max-h-[300px] max-h-[320px] overflow-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-slate-50'>
                                     {dataChoose.map(e => 
-                                        <div key={e.id} className='grid grid-cols-6 items-start'>
-                                            <div className='col-span-1 p-1.5 space-y-1 border h-full'>
-                                                <div className='flex justify-between space-x-2'>
-                                                    <div className='w-20 h-20 bg-gray-200 flex flex-col items-center justify-center rounded'> {e?.img ? <img src={e?.img} alt='' className='rounded'></img> :<IconImage/>}</div>
-                                                    <button onClick={_HandleActionItem.bind(this, e.id, "add")} className='w-10 h-10 rounded bg-slate-50 hover:bg-slate-100 transition flex flex-col justify-center items-center '><IconAdd /></button>
-                                                </div>
-                                                <div>
-                                                    <h3 className='font-medium'>{e.name}</h3>
-                                                    <h5 className='text-gray-400 font-[400] text-sm'>{e.code}</h5>
-                                                    <h5 className='text-[#0F4F9E] font-medium '>{e.variant}</h5>
-                                                    <h5 className='text-gray-400 font-medium text-xs'>{props.dataLang[e.type]}</h5>
-                                                </div>
+                                        <div key={e.id} className='grid grid-cols-6 items-start mt-3 '>
+                                            <div className='col-span-1 grid grid-cols-12 items-center p-1.5 space-y-1 border  h-full'>
+                                                    <div className='flex justify-between  col-span-3'>
+                                                        <div className='w-[60px] h-[60px] bg-gray-200 flex flex-col items-center justify-center rounded'> {e?.img ? <img src={e?.img} alt='' className='rounded'></img> :<IconImage/>}</div>
+                                                    </div>
+                                                    <div className='col-span-9 m-0 relative border rounded'>
+                                                        <h3 className='pl-1 font-medium 2xl:[14px] xl:text-xs text-[8px]'>{e.name}</h3>
+                                                        <h5 className='pl-1 text-gray-400 font-[400] 2xl:[14px] xl:text-xs text-[8px]'>{e.code}</h5>
+                                                        <h5 className='pl-1 text-[#0F4F9E] font-medium text-sm'>{e.variant}</h5>
+                                                        <h5 className='pl-1 text-gray-400 font-medium text-[10px]'>{props.dataLang[e.type]}</h5>
+                                                        <button onClick={_HandleActionItem.bind(this, e.id, "add")} className='w-8 h-8 rounded bg-slate-100 hover:bg-slate-200 absolute transition flex flex-col justify-center items-center -top-4 hover:rotate-45 right-1.5 hover:scale-105 hover:text-red-500 ease-in-out '><IconAdd /></button>
+                                                    </div>
                                             </div>
                                             {/* <div className={`${(e?.checkExpiry == "0" && e?.checkSerial == "0") ? "grid-cols-7" : (e?.checkExpiry == "1" ? "grid-cols-9" : "grid-cols-8") } col-span-5 grid`}> */}
                                             <div className={`${dataProductSerial.is_enable == "1" ? 
                                                             (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-10" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-[repeat(10_minmax(0_1fr))]" :"grid-cols-8" ) :
-                                                            (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-9" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-9" :"grid-cols-7") ) } grid col-span-5 items-center `}
+                                                            (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-9" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-9" :"grid-cols-7") ) } grid col-span-5  h-full items-center`}
                                             >
                                                 {/* {loadingData ? <h1 className='text-4xl font-bold'>Loading</h1> */}
                                                     {/* : */}
                                                     <>
                                                         {e.child?.map(ce => 
                                                             <React.Fragment key={ce?.id}>
-                                                                <div className='p-1.5 border'>
+                                                                <div className='p-1.5 border h-full flex items-center'>
                                                                     <Select 
                                                                         options={dataPstWH}
                                                                         value={ce?.locate}
@@ -880,7 +886,7 @@ const Form = (props) => {
                                                                     />
                                                                 </div>
                                                                 {dataProductSerial.is_enable === "1" ? (
-                                                                    <div className='p-1.5 border flex flex-col justify-center h-full'>
+                                                                    <div className='p-1.5 border h-full  flex flex-col justify-center '>
                                                                         <input 
                                                                             disabled={e?.checkSerial == "0"}
                                                                             value={ce?.serial}
@@ -892,7 +898,7 @@ const Form = (props) => {
                                                                 ):""}
                                                                 {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
                                                                     <>
-                                                                        <div className='p-1.5 border'>
+                                                                        <div className='p-1.5 border h-full flex items-center'>
                                                                             <CreatableSelect  
                                                                                 // disabled={e?.checkExpiry == "0"}
                                                                                 isDisabled={e?.checkExpiry == "0"}
@@ -942,14 +948,14 @@ const Form = (props) => {
                                                                                 }}
                                                                             />    
                                                                         </div>
-                                                                        <div className='relative flex items-center p-1.5 border'>
+                                                                        <div className='relative flex items-center p-1.5 border h-full'>
                                                                             <DatePicker 
                                                                                 disabled={e?.checkExpiry == "0"}
                                                                                 dateFormat="dd/MM/yyyy" 
                                                                                 placeholderText='date' 
                                                                                 selected={ce?.date}
                                                                                 onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "date")}
-                                                                                className={`${e?.checkExpiry == "0" ? "border-transparent": errNullDate && ce?.date == null ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} bg-transparent placeholder:text-slate-300 w-full rounded text-[#52575E] p-2 border outline-none text-[13px] relative`} 
+                                                                                className={`${e?.checkExpiry == "0" ? "border-gray-200": errNullDate && ce?.date == null ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} bg-transparent disabled:bg-gray-100  placeholder:text-slate-300 w-full  rounded text-[#52575E] p-2 border outline-none text-[13px] relative`} 
                                                                             />
                                                                             <IconCalendar size={22} className="absolute right-3 text-[#cccccc]" />
                                                                         </div>
@@ -958,7 +964,7 @@ const Form = (props) => {
                                                             
                                                                 
                                                                 {/* {e?.checkExpiry == "1" && 
-                                                                    <div className='p-1.5 border'>
+                                                                    <div className='p-1.5 border h-ful'>
                                                                         <CreatableSelect  
                                                                             placeholder={"Lot"}
                                                                             options={e?.dataLot}
@@ -1008,7 +1014,7 @@ const Form = (props) => {
                                                                     </div>
                                                                 }
                                                                 {e?.checkExpiry == "1" &&
-                                                                    <div className='relative flex items-center p-1.5 border'>
+                                                                    <div className='relative flex items-center p-1.5 border h-ful'>
                                                                         <DatePicker 
                                                                             dateFormat="dd/MM/yyyy" 
                                                                             placeholderText='date' 
@@ -1020,7 +1026,7 @@ const Form = (props) => {
                                                                     </div>
                                                                 }
                                                                 {e?.checkSerial == "1" && 
-                                                                    <div className='p-1.5 border flex flex-col justify-center h-full'>
+                                                                    <div className='p-1.5 border h-ful flex flex-col justify-center h-full'>
                                                                         <input 
                                                                             value={ce?.serial}
                                                                             onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "serial")}
@@ -1030,7 +1036,7 @@ const Form = (props) => {
                                                                             <span className='text-red-500'>Serial đã tồn tại trong kho</span>}
                                                                     </div>
                                                                 } */}
-                                                                <div className='p-1.5 border flex flex-col justify-center h-full'>
+                                                                <div className='p-1.5 border  flex flex-col justify-center h-full'>
                                                                     <NumericFormat
                                                                         value={ce?.price}
                                                                         onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "price")}
@@ -1040,7 +1046,7 @@ const Form = (props) => {
                                                                     />
                                                                 </div>
                                                                 <h6 className='text-center p-1.5 border flex flex-col justify-center h-full'>{ce?.quantity}</h6>
-                                                                <div className='p-1.5 border flex flex-col justify-center h-full'>
+                                                                <div className='p-1.5 border h-full  flex flex-col justify-center '>
                                                                     <NumericFormat
                                                                         value={ce?.amount}
                                                                         onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "amount")}
@@ -1056,9 +1062,9 @@ const Form = (props) => {
                                                                         }}      
                                                                     />
                                                                 </div>
-                                                                <h6 className='flex flex-col justify-center items-center p-1.5 border h-full'>{ce?.amount != null && Number(ce?.amount - ce?.quantity)?.toLocaleString()}</h6>
-                                                                <h6 className='p-1.5 border flex flex-col justify-center items-center h-full'>{ce?.amount != null && Number(ce?.amount * ce?.price)?.toLocaleString()}</h6>
-                                                                <div className='flex flex-col justify-center items-center p-1.5 border h-full'>
+                                                                <h6 className='flex flex-col justify-center items-center p-1.5 border h-full '>{ce?.amount != null && Number(ce?.amount - ce?.quantity)?.toLocaleString()}</h6>
+                                                                <h6 className='p-1.5 border h-full  flex flex-col justify-center items-center '>{ce?.amount != null && Number(ce?.amount * ce?.price)?.toLocaleString()}</h6>
+                                                                <div className='flex flex-col justify-center items-center p-1.5 border h-full '>
                                                                     <button onClick={_HandleDeleteChild.bind(this, e.id, ce?.id)} title='Xóa' className='text-red-500 hover:text-red-600'><IconDelete /></button>
                                                                 </div>
                                                             </React.Fragment>
