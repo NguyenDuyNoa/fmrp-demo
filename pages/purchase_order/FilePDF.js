@@ -34,9 +34,10 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
         return word;
     });
     const capitalizedTotalAmountWord = capitalizedWords?.join(' ');
+    ///YCMH
     const docDefinitionPurchases = {
         info: {
-            title: `${props?.type === 'purchases' && `Yêu cầu mua hàng - ${data?.code}` 
+            title: `${props?.type === 'purchases' && `${props.dataLang?.purchase_title || "purchase_title"} - ${data?.code}` 
             }`,
             author: 'Foso',
             subject: 'Quotation',
@@ -100,7 +101,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
                 stack: [
                     {
                         text:
-                            props?.type === 'purchases' && uppercaseText('Phiếu yêu cầu mua hàng', 'contentTitle')
+                            props?.type === 'purchases' && uppercaseText(`${props.dataLang?.purchase_title || "purchase_title"}`, 'contentTitle')
                     },
                     {
                         text:
@@ -115,7 +116,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
                 text: [
                     {
                         text:
-                            props?.type === 'purchases' && 'Mã chứng từ: '
+                            props?.type === 'purchases' && `${props.dataLang?.purchase_code + ": " || "purchase_code"}`
                             ,
                         inline: true,
                         fontSize: 10
@@ -132,14 +133,14 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
             },
             {
                 text: [
-                    { text: props?.type === 'purchases' ? 'Người đề nghị: ':"", inline: true, fontSize: 10 },
+                    { text: props?.type === 'purchases' ? `${props.dataLang?.purchase_propnent + ": " || "purchase_propnent"}`:"", inline: true, fontSize: 10 },
                     { text: props?.type === 'purchases' ?`${data?.user_create_name}`:"", bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 2]
             },
             {
                 text: [
-                    { text: props?.type === 'purchases' ? 'Số kế hoạch SX: ':"", inline: true, fontSize: 10 },
+                    { text: props?.type === 'purchases' ? `${props.dataLang?.purchase_planNumber + ": " || "purchase_planNumber"}`:"", inline: true, fontSize: 10 },
                     { text: props?.type === 'purchases' ?`${data?.reference_no != null ? data?.reference_no : ""}`:"", bold: true, fontSize: 10 },
                 ],
                 margin: [0, 0, 0, 2]
@@ -147,7 +148,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
 
             {
                 text: [
-                    { text: 'Ghi chú: ', inline: true, fontSize: 10 },
+                    { text: `${props.dataLang?.purchase_note + ": " || "purchase_note"}`, inline: true, fontSize: 10 },
                     { text: `${data?.note}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 10]
@@ -162,11 +163,11 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
                         // Header row
                             props?.type== "purchases" &&  [
                                 uppercaseText('STT', 'headerTable', 'center'),
-                                uppercaseText('MẶT HÀNG', 'headerTable', 'left'),
-                                uppercaseText('Biến thể', 'headerTable', 'center'),
-                                uppercaseText('Đơn vị tính', 'headerTable', 'center'),
-                                uppercaseText('Số lượng', 'headerTable', 'center'),
-                                uppercaseText('Ghi chú', 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.purchase_items || "purchase_items"}`, 'headerTable', 'left'),
+                                uppercaseText(`${props.dataLang?.purchase_variant || "purchase_variant"}`, 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.purchase_unit || "purchase_unit"}`, 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.purchase_quantity || "purchase_quantity"}`, 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.purchase_note || "purchase_note"}`, 'headerTable', 'center'),
                             ],
                         // Data rows
                       
@@ -175,14 +176,14 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
                                 { text: `${index + 1}`, alignment: 'center', fontSize: 10 },
                                 { text: item?.item?.name ? item?.item?.name : "" , fontSize: 10 },
                                 { text: item?.item?.product_variation ? `${item?.item?.product_variation}` : '', fontSize: 10 },
-                                { text: item?.item?.unit_name ? `${item?.item?.unit_name}` : '', fontSize: 10 },
+                                { text: item?.item?.unit_name ? `${item?.item?.unit_name}` : '',alignment: 'center', fontSize: 10 },
                                 { text: item?.quantity ? `${formatNumber(item?.quantity)}` : '', alignment: 'center', fontSize: 10 },
                                 { text: item?.note ? `${item?.note}` : '', fontSize: 10 },
                             ];
                         }) : '',
                         
-                        props?.type == "purchases" ? [{ text: 'Tổng số mặt hàng', bold: true, colSpan: 1, fontSize: 10 }, { text: `${formatNumber(data?.total_item)}`, bold: true, alignment: 'right', colSpan: 1, fontSize: 10 }, '', '','','']:['',''],
-                        props?.type == "purchases" ?  [{ text: 'Tổng số lượng', bold: true, colSpan: 4, fontSize: 10 }, '', '','',{ text: `${formatNumber(data?.total_item_quantity)}`, bold: true, alignment: 'right', colSpan: 1, fontSize: 10 },'']:['',''],
+                        props?.type == "purchases" ? [{ text: `${props.dataLang?.purchase_totalItem || "purchase_totalItem"}`, bold: true, colSpan: 1, fontSize: 10 }, { text: `${formatNumber(data?.total_item)}`, bold: true, alignment: 'right', colSpan: 1, fontSize: 10 }, '', '','','']:['',''],
+                        props?.type == "purchases" ?  [{ text: `${props.dataLang?.purchase_totalCount || "purchase_totalCount"}`, bold: true, colSpan: 4, fontSize: 10 }, '', '','',{ text: `${formatNumber(data?.total_item_quantity)}`, bold: true, alignment: 'right', colSpan: 1, fontSize: 10 },'']:['',''],
                     ],
                 }
             },
@@ -280,9 +281,10 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
             }
         },
     };
+    //ĐđH
     const docDefinitionOrder = {
         info: {
-            title: `${`Đơn đặt hàng PO - ${data?.code}` 
+            title: `${`${props.dataLang?.purchase_order || "purchase_order"} - ${data?.code}` 
             }`,
             author: 'Foso',
             subject: 'Quotation',
@@ -345,7 +347,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
             {
                 stack: [
                     {
-                        text:uppercaseText('Đơn đặt hàng (PO)', 'contentTitle')
+                        text:uppercaseText(`${props.dataLang?.purchase_order || "purchase_order"}`, 'contentTitle')
                     },
                     {
                         text: `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`,
@@ -357,7 +359,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
             {
                 text: [
                     {
-                        text: 'Mã chứng từ: ',
+                        text: `${props.dataLang?.purchase_order_table_code + ": " || "purchase_order_table_code"} `,
                         inline: true,
                         fontSize: 10
                     },
@@ -371,14 +373,14 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
             },
             {
                 text: [
-                    { text:  'Ngày chứng từ: ', inline: true, fontSize: 10},
+                    { text: `${props.dataLang?.purchase_order_table_dayvoucers + ": " || "purchase_order_table_dayvoucers"}`, inline: true, fontSize: 10},
                     { text: `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 2]
             },
             {
                 text: [
-                    { text:  'Ngày dự kiến giao hàng: ', inline: true, fontSize: 10 },
+                    { text:  `${props.dataLang?.purchase_order_detail_delivery_date + ": " || "purchase_order_detail_delivery_date"}`, inline: true, fontSize: 10 },
                     { text: `${moment(data?.delivery_date).format("DD/MM/YYYY HH:mm:ss")}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 0, 0, 2]
@@ -386,21 +388,21 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
 
             {
                 text: [
-                    { text: props?.type === 'order' ? 'Số yêu cầu mua hàng: ':"", inline: true, fontSize: 10 },
+                    { text: props?.type === 'order' ? `${props.dataLang?.purchase_order_table_number + ": " || "purchase_order_table_number"}`:"", inline: true, fontSize: 10 },
                     { text: props?.type === 'order' ?`${data?.purchases?.map(e => e.code).join(", ")}`:"", bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 2]
             },
             {
                 text: [
-                    { text: props?.type === 'order' ? 'Nhà cung cấp: ':"", inline: true, fontSize: 10 },
+                    { text: props?.type === 'order' ? `${props.dataLang?.purchase_order_table_supplier + ': ' || "purchase_order_table_supplier"}`:"", inline: true, fontSize: 10 },
                     { text: props?.type === 'order' ?`${data?.supplier_name}`:"", bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 2]
             },
             {
                 text: [
-                    { text: `${"Ghi chú:"} `, inline: true, fontSize: 10 },
+                    { text: `${props.dataLang?.purchase_order_note +": " || "purchase_order_note"} `, inline: true, fontSize: 10 },
                     { text: `${data?.note}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 10]
@@ -414,15 +416,15 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
                         // Header row
                             [
                                 uppercaseText('STT', 'headerTable', 'center'),
-                                uppercaseText('MẶT HÀNG', 'headerTable', 'left'),
+                                uppercaseText(`${props.dataLang?.purchase_items || "purchase_items"}`, 'headerTable', 'left'),
                                 uppercaseText('ĐVT', 'headerTable', 'center'),
                                 uppercaseText('SL', 'headerTable', 'center'),
-                                uppercaseText('Đơn giá', 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.purchase_order_detail_unit_price || "purchase_order_detail_unit_price"}`, 'headerTable', 'center'),
                                 uppercaseText('% CK', 'headerTable', 'center'),
                                 uppercaseText('% ĐGSCK', 'headerTable', 'center'),
-                                uppercaseText('% Thuế', 'headerTable', 'center'),
-                                uppercaseText('Thành tiền', 'headerTable', 'center'),
-                                uppercaseText('Ghi chú', 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}`, 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}`, 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.purchase_order_note || "purchase_order_note"}`, 'headerTable', 'center'),
                             ] ,
 
                         // Data rows
@@ -444,16 +446,258 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
                                 { text: item?.note ? `${item?.note}` : '', fontSize: 10 },
                             ];
                         }) : '',
-                        //   [{ text: 'Tổng tiền', bold: true, colSpan: 8, fontSize: 10 },'','','','','','','',{ text: `${formatNumber(data?.total_price)}`, bold: true, alignment: 'right', colSpan: 1, fontSize: 10 },''],
-                        //   [{ text: 'Tiền chiết khấu', bold: true, colSpan: 5, fontSize: 10 }, '', '','','',{ text: `${formatNumber(data?.total_discount)}`, bold: true, alignment: 'right', colSpan: 1, fontSize: 10 },'','','',''],
-                        //   [{ text: 'Tiền sau chiết khấu', bold: true, colSpan: 6, fontSize: 10 }, '', '','','','',{ text: `${formatNumber(data?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 1, fontSize: 10 },'','',''],
-                        //   [{ text: 'Tiền thuế', bold: true, colSpan: 7, fontSize: 10 }, '', '','','','','',{ text: `${formatNumber(data?.total_tax)}`, bold: true, alignment: 'right', colSpan: 1, fontSize: 10 },'',''],
-                        //   [{ text: 'Thành tiền', bold: true, colSpan: 8, fontSize: 10 }, '', '','','','','','',{ text: `${formatNumber(data?.total_amount)}`, bold: true, alignment: 'right', colSpan: 1, fontSize: 10 },''],
-                          [{ text: 'Tổng tiền', bold: true, colSpan: 5, fontSize: 10 }, '', '','','',{ text: `${formatNumber(data?.total_price)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
-                          [{ text: 'Tiền chiết khấu', bold: true, colSpan: 5, fontSize: 10 }, '', '','','',{ text: `${formatNumber(data?.total_discount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
-                          [{ text: 'Tiền sau chiết khấu', bold: true, colSpan: 5, fontSize: 10 }, '', '','','',{ text: `${formatNumber(data?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
-                          [{ text: 'Tiền thuế', bold: true, colSpan: 5, fontSize: 10 }, '', '','','',{ text: `${formatNumber(data?.total_tax)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
-                          [{ text: 'Thành tiền', bold: true, colSpan: 5, fontSize: 10 }, '', '','','',{ text: `${formatNumber(data?.total_amount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                          [{ text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}`, bold: true, colSpan: 5, fontSize: 10 }, '', '','','',{ text: `${formatNumber(data?.total_price)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                          [{ text: `${props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}`, bold: true, colSpan: 5, fontSize: 10 }, '', '','','',{ text: `${formatNumber(data?.total_discount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                          [{ text: `${props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}`, bold: true, colSpan: 5, fontSize: 10 }, '', '','','',{ text: `${formatNumber(data?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                          [{ text: `${props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}`, bold: true, colSpan: 5, fontSize: 10 }, '', '','','',{ text: `${formatNumber(data?.total_tax)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                          [{ text: `${props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}`, bold: true, colSpan: 5, fontSize: 10 }, '', '','','',{ text: `${formatNumber(data?.total_amount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                    ],
+                }
+            },
+            {
+                columns: [
+                    {
+                        text: '',
+                        width: '50%',
+                    },
+                    {
+                        width: '50%',
+                        stack: [
+                            {
+                                text: currentDate,
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: 'Người Lập Phiếu',
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: '(Ký, ghi rõ họ tên)',
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                ],
+                columnGap: 2
+            },
+
+
+        ],
+        styles: {
+            headerInfoTextWithMargin: {
+                fontSize: 12,
+                bold: true,
+                margin: [2, 0, 0, 0]
+            },
+            headerLogo: {
+                alignment: 'left',
+            },
+            headerInfo: {
+                alignment: 'right',
+                fontSize: 12,
+                bold: true,
+                color: '#0F4F9E',
+                margin: [0, 1],
+            },
+            headerInfoText: {
+                alignment: 'right',
+                fontSize: 8,
+                italics: true,
+                color: 'black',
+                margin: [0, 2],
+            },
+            contentTitle: {
+                bold: true,
+                fontSize: 20,
+                alignment: 'center',
+                margin: [0, 10, 0, 2],
+            },
+            contentDate: {
+                italics: true,
+                fontSize: 8,
+                alignment: 'center'
+            },
+            headerTable: {
+                noWrap: true,
+                bold: true,
+                fillColor: '#0374D5',
+                color: 'white',
+                fontSize: 10,
+                // alignment: 'center',
+            },
+            dateText: {
+                fontSize: 12,
+                bold: true,
+                margin: [0, 10, 0, 2]
+            },
+            signatureText: {
+                fontSize: 12,
+                margin: [0, 0, 0, 2]
+            }
+        },
+        dontBreakRows: true,
+        images: {
+            logo: {
+                url: `${dataCompany?.company_logo}`
+            }
+        },
+    };
+    //PDV
+    const docDefinitionServiceVoucher = {
+        info: {
+            title: `${`${props.dataLang?.serviceVoucher_title || "serviceVoucher_title"} - ${data?.code}` 
+            }`,
+            author: 'Foso',
+            subject: 'Quotation',
+            keywords: 'PDF',
+        },
+        pageOrientation: 'portrait',
+        content: [
+            {
+                columns: [
+                    {
+                        width: '30%',
+                        stack: [
+                            {
+                                image: "logo",
+                                width: 100,
+                                height: 100,
+                                alignment: "left",
+                                margin: [0, -15, 0, 5],
+                                fit: [100, 100]
+                            },
+                        ]
+                    },
+                    {
+                        width: '70%',
+                        stack: [
+                            {
+                                text: `${dataCompany?.company_name}`,
+                                style: 'headerInfo'
+                            },
+                            {
+                                text: dataCompany?.company_address ? `Địa chỉ : ${dataCompany?.company_address}` : '',
+                                style: 'headerInfoText'
+                            },
+                            {
+                                text: dataCompany?.company_phone_number ? `Số điện thoại: ${dataCompany?.company_phone_number}` : '',
+                                style: 'headerInfoText'
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: dataCompany?.company_email ? `Email: ${dataCompany?.company_email}` : '',
+                                        style: 'headerInfoText'
+                                    },
+                                    '    ',
+                                    {
+                                        text: dataCompany?.company_website ? `Website: ${dataCompany?.company_website}` : '',
+                                        style: 'headerInfoText'
+                                    },
+                                ],
+                                margin: [0, -4, 0, 0]
+
+                            }
+                        ],
+                        margin: [0, -20, 0, 5]
+                    },
+                ],
+                columnGap: 10
+            },
+            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, color: '#e2e8f0' }] },
+            {
+                stack: [
+                    {
+                        text:uppercaseText(`${props.dataLang?.serviceVoucher_title || "serviceVoucher_title"}`, 'contentTitle')
+                    },
+                    {
+                        text: `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`,
+                        style: 'contentDate'
+                    },
+                ],
+                margin: [0, 8, 0, 0]
+            },
+            {
+                text: [
+                    {
+                        text: `${props.dataLang?.serviceVoucher_voucher_code + ":" || "serviceVoucher_voucher_code" }`,
+                        inline: true,
+                        fontSize: 10
+                    },
+                    {
+                        text: `${data?.code}`,
+                        bold: true,
+                        fontSize: 10
+                    },
+                ],
+                margin: [0, 10, 0, 2]
+            },
+            {
+                text: [
+                    { text:  `${props.dataLang?.serviceVoucher_day_vouchers + ":" || "serviceVoucher_day_vouchers"}`, inline: true, fontSize: 10},
+                    { text: `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 2]
+            },
+
+            {
+                text: [
+                    { text: `${props.dataLang?.serviceVoucher_supplier + ":" || "serviceVoucher_supplier"}`, inline: true, fontSize: 10 },
+                    { text: `${data?.supplier_name}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 2]
+            },
+            {
+                text: [
+                    { text: `${props.dataLang?.serviceVoucher_note + ":" || "serviceVoucher_note"} `, inline: true, fontSize: 10 },
+                    { text: `${data?.note}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 10]
+            },
+            {
+                table: {
+                    widths: "100%",
+                    headerRows: 0,
+                    widths:  props?.type== "serviceVoucher" &&  ['auto',90,'auto','auto','auto','auto','auto','auto',75],
+                    body: [
+                        // Header row
+                            [
+                                uppercaseText('STT', 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.serviceVoucher_services_arising || "serviceVoucher_services_arising"}`, 'headerTable', 'left'),
+                                uppercaseText(`${props.dataLang?.serviceVoucher_quantity || "serviceVoucher_quantity"}`, 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.serviceVoucher_unit_price || "serviceVoucher_unit_price"}`, 'headerTable', 'center'),
+                                uppercaseText('% CK', 'headerTable', 'center'),
+                                uppercaseText('% ĐGSCK', 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}`, 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}`, 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}`, 'headerTable', 'center'),
+                            ] ,
+
+                        // Data rows
+                        ...data && props?.type== "serviceVoucher" && data?.item.length > 0 ? data?.item.map((item, index) => {
+                            return [
+                                { text: `${index + 1}`, alignment: 'center', fontSize: 10 },
+                                {text: item?.name ? item?.name : "" , fontSize: 10,},
+                                { text: item?.quantity ? `${formatNumber(item?.quantity)}` : '', alignment: 'center', fontSize: 10 },
+                                { text: item?.price ? `${formatNumber(item?.price)}` : '', alignment: 'right', fontSize: 10 },
+                                { text: item?.discount_percent ? `${item?.discount_percent +'%'}` : '', alignment: 'center', fontSize: 10 },
+                                { text: item?.price_after_discount ? `${formatNumber(item?.price_after_discount)}` : '', alignment: 'right', fontSize: 10 },
+                                { text: item?.tax_rate ? `${item?.tax_rate +'%'}` : '', alignment: 'center', fontSize: 10 },
+                                { text: item?.amount ? `${formatNumber(item?.amount)}` : '', alignment: 'right', fontSize: 10 },
+                                { text: item?.note ? `${item?.note}` : '', fontSize: 10 },
+                            ];
+                        }) : '',
+                          [{ text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}`, bold: true, colSpan: 4, fontSize: 10 },'', '','',{ text: `${formatNumber(data?.total_price)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                          [{ text: `${props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}`, bold: true, colSpan: 4, fontSize: 10 },'','','',{ text: `${formatNumber(data?.total_discount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                          [{ text: `${props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}`, bold: true, colSpan: 4, fontSize: 10 },'','','',{ text: `${formatNumber(data?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                          [{ text: `${props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}`, bold: true, colSpan: 4, fontSize: 10 },'','','',{ text: `${formatNumber(data?.total_tax)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                          [{ text: `${props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}`, bold: true, colSpan: 4, fontSize: 10 },'', '','',{ text: `${formatNumber(data?.total_amount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
                     ],
                 }
             },
@@ -552,7 +796,816 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
         },
     };
 
-    const handlePrintPdf = () => {
+    //Phiếu chi
+    // const docDefinitionPayment = {
+    //     info: {
+    //         title: `${`${props.dataLang?.payment_title || "payment_title"} - ${data?.code}` 
+    //         }`,
+    //         author: 'Foso',
+    //         subject: 'Quotation',
+    //         keywords: 'PDF',
+    //     },
+    //     pageOrientation: 'portrait',
+    //     content: [
+    //         {
+    //             columns: [
+    //                 {
+    //                     width: '30%',
+    //                     stack: [
+    //                         {
+    //                             image: "logo",
+    //                             width: 100,
+    //                             height: 100,
+    //                             alignment: "left",
+    //                             margin: [0, -15, 0, 5],
+    //                             fit: [100, 100]
+    //                         },
+    //                     ]
+    //                 },
+    //                 {
+    //                     width: '70%',
+    //                     stack: [
+    //                         {
+    //                             text: `${dataCompany?.company_name}`,
+    //                             style: 'headerInfo'
+    //                         },
+    //                         {
+    //                             text: dataCompany?.company_address ? `Địa chỉ : ${dataCompany?.company_address}` : '',
+    //                             style: 'headerInfoText'
+    //                         },
+    //                         {
+    //                             text: dataCompany?.company_phone_number ? `Số điện thoại: ${dataCompany?.company_phone_number}` : '',
+    //                             style: 'headerInfoText'
+    //                         },
+    //                         {
+    //                             text: [
+    //                                 {
+    //                                     text: dataCompany?.company_email ? `Email: ${dataCompany?.company_email}` : '',
+    //                                     style: 'headerInfoText'
+    //                                 },
+    //                                 '    ',
+    //                                 {
+    //                                     text: dataCompany?.company_website ? `Website: ${dataCompany?.company_website}` : '',
+    //                                     style: 'headerInfoText'
+    //                                 },
+    //                             ],
+    //                             margin: [0, -4, 0, 0]
+
+    //                         }
+    //                     ],
+    //                     margin: [0, -20, 0, 5]
+    //                 },
+    //             ],
+    //             columnGap: 10
+    //         },
+    //         { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, color: '#e2e8f0' }] },
+    //         {
+    //             stack: [
+    //                 {
+    //                     text:uppercaseText(`${props.dataLang?.payment_title || "payment_title"}`, 'contentTitle')
+    //                 },
+    //                 {
+    //                     text: `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`,
+    //                     style: 'contentDate'
+    //                 },
+    //             ],
+    //             margin: [0, 8, 0, 0]
+    //         },
+    //         {
+    //             text: [
+    //                 {
+    //                     text: `${props.dataLang?.payment_code + ":" || "payment_code" }`,
+    //                     inline: true,
+    //                     fontSize: 10
+    //                 },
+    //                 {
+    //                     text: `${data?.code}`,
+    //                     bold: true,
+    //                     fontSize: 10
+    //                 },
+    //             ],
+    //             margin: [0, 10, 0, 2]
+    //         },
+    //         {
+    //             text: [
+    //                 { text:  `${props.dataLang?.import_day_vouchers + ":" || "import_day_vouchers"}`, inline: true, fontSize: 10},
+    //                 { text: `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`, bold: true, fontSize: 10 },
+    //             ],
+    //             margin: [0, 2, 0, 2]
+    //         },
+
+    //         {
+    //             text: [
+    //                 { text: `${props.dataLang?.serviceVoucher_supplier + ":" || "serviceVoucher_supplier"}`, inline: true, fontSize: 10 },
+    //                 { text: `${data?.supplier_name}`, bold: true, fontSize: 10 },
+    //             ],
+    //             margin: [0, 2, 0, 2]
+    //         },
+    //         {
+    //             text: [
+    //                 { text: `${props.dataLang?.serviceVoucher_note + ":" || "serviceVoucher_note"} `, inline: true, fontSize: 10 },
+    //                 { text: `${data?.note}`, bold: true, fontSize: 10 },
+    //             ],
+    //             margin: [0, 2, 0, 10]
+    //         },
+    //         {
+    //             table: {
+    //                 widths: "100%",
+    //                 headerRows: 0,
+    //                 widths:  props?.type== "serviceVoucher" &&  ['auto',90,'auto','auto','auto','auto','auto','auto',75],
+    //                 body: [
+    //                     // Header row
+    //                         [
+    //                             uppercaseText('STT', 'headerTable', 'center'),
+    //                             uppercaseText(`${props.dataLang?.serviceVoucher_services_arising || "serviceVoucher_services_arising"}`, 'headerTable', 'left'),
+    //                             uppercaseText(`${props.dataLang?.serviceVoucher_quantity || "serviceVoucher_quantity"}`, 'headerTable', 'center'),
+    //                             uppercaseText(`${props.dataLang?.serviceVoucher_unit_price || "serviceVoucher_unit_price"}`, 'headerTable', 'center'),
+    //                             uppercaseText('% CK', 'headerTable', 'center'),
+    //                             uppercaseText('% ĐGSCK', 'headerTable', 'center'),
+    //                             uppercaseText(`${props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}`, 'headerTable', 'center'),
+    //                             uppercaseText(`${props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}`, 'headerTable', 'center'),
+    //                             uppercaseText(`${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}`, 'headerTable', 'center'),
+    //                         ] ,
+
+    //                     // Data rows
+    //                     ...data && props?.type== "serviceVoucher" && data?.item.length > 0 ? data?.item.map((item, index) => {
+    //                         return [
+    //                             { text: `${index + 1}`, alignment: 'center', fontSize: 10 },
+    //                             {text: item?.name ? item?.name : "" , fontSize: 10,},
+    //                             { text: item?.quantity ? `${formatNumber(item?.quantity)}` : '', alignment: 'center', fontSize: 10 },
+    //                             { text: item?.price ? `${formatNumber(item?.price)}` : '', alignment: 'right', fontSize: 10 },
+    //                             { text: item?.discount_percent ? `${item?.discount_percent +'%'}` : '', alignment: 'center', fontSize: 10 },
+    //                             { text: item?.price_after_discount ? `${formatNumber(item?.price_after_discount)}` : '', alignment: 'right', fontSize: 10 },
+    //                             { text: item?.tax_rate ? `${item?.tax_rate +'%'}` : '', alignment: 'center', fontSize: 10 },
+    //                             { text: item?.amount ? `${formatNumber(item?.amount)}` : '', alignment: 'right', fontSize: 10 },
+    //                             { text: item?.note ? `${item?.note}` : '', fontSize: 10 },
+    //                         ];
+    //                     }) : '',
+    //                       [{ text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}`, bold: true, colSpan: 4, fontSize: 10 },'', '','',{ text: `${formatNumber(data?.total_price)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+    //                       [{ text: `${props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}`, bold: true, colSpan: 4, fontSize: 10 },'','','',{ text: `${formatNumber(data?.total_discount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+    //                       [{ text: `${props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}`, bold: true, colSpan: 4, fontSize: 10 },'','','',{ text: `${formatNumber(data?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+    //                       [{ text: `${props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}`, bold: true, colSpan: 4, fontSize: 10 },'','','',{ text: `${formatNumber(data?.total_tax)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+    //                       [{ text: `${props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}`, bold: true, colSpan: 4, fontSize: 10 },'', '','',{ text: `${formatNumber(data?.total_amount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+    //                 ],
+    //             }
+    //         },
+    //         {
+    //             columns: [
+    //                 {
+    //                     text: '',
+    //                     width: '50%',
+    //                 },
+    //                 {
+    //                     width: '50%',
+    //                     stack: [
+    //                         {
+    //                             text: currentDate,
+    //                             style: 'dateText',
+    //                             alignment: 'center',
+    //                             fontSize: 10
+    //                         },
+    //                         {
+    //                             text: 'Người Lập Phiếu',
+    //                             style: 'signatureText',
+    //                             alignment: 'center',
+    //                             fontSize: 10
+    //                         },
+    //                         {
+    //                             text: '(Ký, ghi rõ họ tên)',
+    //                             style: 'signatureText',
+    //                             alignment: 'center',
+    //                             fontSize: 10
+    //                         }
+    //                     ],
+    //                 },
+    //             ],
+    //             columnGap: 2
+    //         },
+
+
+    //     ],
+    //     styles: {
+    //         headerInfoTextWithMargin: {
+    //             fontSize: 12,
+    //             bold: true,
+    //             margin: [2, 0, 0, 0]
+    //         },
+    //         headerLogo: {
+    //             alignment: 'left',
+    //         },
+    //         headerInfo: {
+    //             alignment: 'right',
+    //             fontSize: 12,
+    //             bold: true,
+    //             color: '#0F4F9E',
+    //             margin: [0, 1],
+    //         },
+    //         headerInfoText: {
+    //             alignment: 'right',
+    //             fontSize: 8,
+    //             italics: true,
+    //             color: 'black',
+    //             margin: [0, 2],
+    //         },
+    //         contentTitle: {
+    //             bold: true,
+    //             fontSize: 20,
+    //             alignment: 'center',
+    //             margin: [0, 10, 0, 2],
+    //         },
+    //         contentDate: {
+    //             italics: true,
+    //             fontSize: 8,
+    //             alignment: 'center'
+    //         },
+    //         headerTable: {
+    //             noWrap: true,
+    //             bold: true,
+    //             fillColor: '#0374D5',
+    //             color: 'white',
+    //             fontSize: 10,
+    //             // alignment: 'center',
+    //         },
+    //         dateText: {
+    //             fontSize: 12,
+    //             bold: true,
+    //             margin: [0, 10, 0, 2]
+    //         },
+    //         signatureText: {
+    //             fontSize: 12,
+    //             margin: [0, 0, 0, 2]
+    //         }
+    //     },
+    //     dontBreakRows: true,
+    //     images: {
+    //         logo: {
+    //             url: `${dataCompany?.company_logo}`
+    //         }
+    //     },
+    // };
+
+    // nhập hàng full
+    const docDefinitionImportFull = {
+        info: {
+            title: `${`${props.dataLang?.import_title || "import_title"} - ${data?.code}` 
+            }`,
+            author: 'Foso',
+            subject: 'Quotation',
+            keywords: 'PDF',
+        },
+        pageOrientation: 'portrait',
+        content: [
+            {
+                columns: [
+                    {
+                        width: '30%',
+                        stack: [
+                            {
+                                image: "logo",
+                                width: 100,
+                                height: 100,
+                                alignment: "left",
+                                margin: [0, -15, 0, 5],
+                                fit: [100, 100]
+                            },
+                        ]
+                    },
+                    {
+                        width: '70%',
+                        stack: [
+                            {
+                                text: `${dataCompany?.company_name}`,
+                                style: 'headerInfo'
+                            },
+                            {
+                                text: dataCompany?.company_address ? `Địa chỉ : ${dataCompany?.company_address}` : '',
+                                style: 'headerInfoText'
+                            },
+                            {
+                                text: dataCompany?.company_phone_number ? `Số điện thoại: ${dataCompany?.company_phone_number}` : '',
+                                style: 'headerInfoText'
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: dataCompany?.company_email ? `Email: ${dataCompany?.company_email}` : '',
+                                        style: 'headerInfoText'
+                                    },
+                                    '    ',
+                                    {
+                                        text: dataCompany?.company_website ? `Website: ${dataCompany?.company_website}` : '',
+                                        style: 'headerInfoText'
+                                    },
+                                ],
+                                margin: [0, -4, 0, 0]
+
+                            }
+                        ],
+                        margin: [0, -20, 0, 5]
+                    },
+                ],
+                columnGap: 10
+            },
+            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, color: '#e2e8f0' }] },
+            {
+                stack: [
+                    {
+                        text:uppercaseText(`${props.dataLang?.import_title || "import_title"}`, 'contentTitle')
+                    },
+                    {
+                        text: `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`,
+                        style: 'contentDate'
+                    },
+                ],
+                margin: [0, 8, 0, 0]
+            },
+            {
+                text: [
+                    {
+                        text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers" }`,
+                        inline: true,
+                        fontSize: 10
+                    },
+                    {
+                        text: `${data?.code}`,
+                        bold: true,
+                        fontSize: 10
+                    },
+                ],
+                margin: [0, 10, 0, 2]
+            },
+            {
+                text: [
+                    { text:  `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"}`, inline: true, fontSize: 10},
+                    { text: `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 2]
+            },
+
+            {
+                text: [
+                    { text: `${props.dataLang?.import_supplier + ": " || "import_supplier"}`, inline: true, fontSize: 10 },
+                    { text: `${data?.supplier_name}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 2]
+            },
+            {
+                text: [
+                    { text: `${props.dataLang?.serviceVoucher_note + ":" || "serviceVoucher_note"} `, inline: true, fontSize: 10 },
+                    { text: `${data?.note}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 10]
+            },
+            {
+                table: {
+                    widths: "100%",
+                    headerRows: 0,
+                    widths:  props?.type== "import" &&  ['auto',70,'auto','auto','auto','auto',55,'auto','auto',50],
+                    body: [
+                        // Header row
+                            [
+                                uppercaseText('STT', 'headerTable', 'center'),
+                                uppercaseText(`${"Mặt hàng"}`, 'headerTable', 'left'),
+                                uppercaseText(`${"ĐVT"}`, 'headerTable', 'center'),
+                                uppercaseText(`${"Số lượng"}`, 'headerTable', 'center'),
+                                uppercaseText(`${"Đơn giá"}`, 'headerTable', 'center'),
+                                uppercaseText('% CK', 'headerTable', 'center'),
+                                uppercaseText('% ĐGSCK', 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}`, 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}`, 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}`, 'headerTable', 'center'),
+                            ] ,
+
+                        // Data rows
+                        ...data && props?.type== "import" && data?.items.length > 0 ? data?.items.map((item, index) => {
+                            return [
+                                { text: `${index + 1}`, alignment: 'center', fontSize: 10},
+                                {
+                                    stack: [
+                                        { text: item?.item?.name ? item?.item?.name : "", fontSize: 10 },
+                                        { text: `Biến thể: ${item?.item?.product_variation}`, fontSize: 10 },
+                                        {
+                                            if: props.dataProductSerial?.is_enable === "1",
+                                            text: [
+                                              { text: "Serial: ", fontSize: 10,italics: true  },
+                                              { text: item.serial == null || item.serial == "" ? "-" : item.serial, fontSize: 10 ,italics: true }
+                                            ]
+                                        },
+                                        {
+                                            if: props.dataMaterialExpiry?.is_enable === "1" ||  props.dataProductExpiry?.is_enable === "1",
+                                            stack: [
+                                                {
+                                                  text: [
+                                                    { text: "Lot: ", fontSize: 10, italics: true },
+                                                    { text: item.lot == null || item.lot == "" ? "-" : item.lot, fontSize: 10, italics: true }
+                                                  ],
+                                                  fontSize: 10,
+                                                  margin: [0, 0, 5, 0]
+                                                },
+                                                {
+                                                  text: [
+                                                    { text: "Date: ", fontSize: 10, italics: true },
+                                                    { text: item.expiration_date ? moment(item.expiration_date).format("DD/MM/YYYY") : "-", fontSize: 10, italics: true }
+                                                  ],
+                                                  fontSize: 10,
+                                                  margin: [0, 0, 5, 0]
+                                                },
+                                            ]
+                                        },
+                                        { text: `Kho - vtk: ${item?.warehouse_name}`, fontSize: 10 },
+                                    ]
+                                },
+                                {text: item?.item?.unit_name ? item?.item?.unit_name : "" , fontSize: 10,},
+                                {text: item?.quantity ? item?.quantity : "" , fontSize: 10,alignment: 'center'},
+                                {text: item?.price ? formatNumber(item?.price) : "" , fontSize: 10,alignment: 'center'},
+                                {text: item?.discount_percent ? `${item?.discount_percent +'%'}` : '', alignment: 'center', fontSize: 10 },
+                                {text: item?.price_after_discount ? `${formatNumber(item?.price_after_discount)}` : '', alignment: 'right', fontSize: 10 },
+                                {text: item?.tax_rate ? `${item?.tax_rate +'%'}` : '', alignment: 'center', fontSize: 10 },
+                                {text: item?.amount ? `${formatNumber(item?.amount)}` : '', alignment: 'right', fontSize: 10 },
+                                {text: item?.note ? item?.note : "" , fontSize: 10,},
+                                
+                            ];
+                        }) : '',
+                          [{ text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}`, bold: true, colSpan: 5, fontSize: 10 },'', '','','',{ text: `${formatNumber(data?.total_price)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                          [{ text: `${props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}`, bold: true, colSpan: 5, fontSize: 10 },'','','','',{ text: `${formatNumber(data?.total_discount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                          [{ text: `${props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}`, bold: true, colSpan: 5, fontSize: 10 },'','','','',{ text: `${formatNumber(data?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                          [{ text: `${props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}`, bold: true, colSpan: 5, fontSize: 10 },'','','','',{ text: `${formatNumber(data?.total_tax)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                          [{ text: `${props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}`, bold: true, colSpan: 5, fontSize: 10 },'','','','',{ text: `${formatNumber(data?.total_amount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                    ],
+                }
+            },
+            {
+                columns: [
+                    {
+                        text: '',
+                        width: '50%',
+                    },
+                    {
+                        width: '50%',
+                        stack: [
+                            {
+                                text: currentDate,
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: 'Người Lập Phiếu',
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: '(Ký, ghi rõ họ tên)',
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                ],
+                columnGap: 2
+            },
+
+
+        ],
+        styles: {
+            headerInfoTextWithMargin: {
+                fontSize: 12,
+                bold: true,
+                margin: [2, 0, 0, 0]
+            },
+            headerLogo: {
+                alignment: 'left',
+            },
+            headerInfo: {
+                alignment: 'right',
+                fontSize: 12,
+                bold: true,
+                color: '#0F4F9E',
+                margin: [0, 1],
+            },
+            headerInfoText: {
+                alignment: 'right',
+                fontSize: 8,
+                italics: true,
+                color: 'black',
+                margin: [0, 2],
+            },
+            contentTitle: {
+                bold: true,
+                fontSize: 20,
+                alignment: 'center',
+                margin: [0, 10, 0, 2],
+            },
+            contentDate: {
+                italics: true,
+                fontSize: 8,
+                alignment: 'center'
+            },
+            headerTable: {
+                noWrap: true,
+                bold: true,
+                fillColor: '#0374D5',
+                color: 'white',
+                fontSize: 10,
+                // alignment: 'center',
+            },
+            dateText: {
+                fontSize: 12,
+                bold: true,
+                margin: [0, 10, 0, 2]
+            },
+            signatureText: {
+                fontSize: 12,
+                margin: [0, 0, 0, 2]
+            }
+        },
+        dontBreakRows: true,
+        images: {
+            logo: {
+                url: `${dataCompany?.company_logo}`
+            }
+        },
+    };
+
+    //nhập hàng not price
+    const docDefinitionImportNoPrice = {
+        info: {
+            title: `${`${props.dataLang?.import_title || "import_title"} - ${data?.code}` 
+            }`,
+            author: 'Foso',
+            subject: 'Quotation',
+            keywords: 'PDF',
+        },
+        pageOrientation: 'portrait',
+        content: [
+            {
+                columns: [
+                    {
+                        width: '30%',
+                        stack: [
+                            {
+                                image: "logo",
+                                width: 100,
+                                height: 100,
+                                alignment: "left",
+                                margin: [0, -15, 0, 5],
+                                fit: [100, 100]
+                            },
+                        ]
+                    },
+                    {
+                        width: '70%',
+                        stack: [
+                            {
+                                text: `${dataCompany?.company_name}`,
+                                style: 'headerInfo'
+                            },
+                            {
+                                text: dataCompany?.company_address ? `Địa chỉ : ${dataCompany?.company_address}` : '',
+                                style: 'headerInfoText'
+                            },
+                            {
+                                text: dataCompany?.company_phone_number ? `Số điện thoại: ${dataCompany?.company_phone_number}` : '',
+                                style: 'headerInfoText'
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: dataCompany?.company_email ? `Email: ${dataCompany?.company_email}` : '',
+                                        style: 'headerInfoText'
+                                    },
+                                    '    ',
+                                    {
+                                        text: dataCompany?.company_website ? `Website: ${dataCompany?.company_website}` : '',
+                                        style: 'headerInfoText'
+                                    },
+                                ],
+                                margin: [0, -4, 0, 0]
+
+                            }
+                        ],
+                        margin: [0, -20, 0, 5]
+                    },
+                ],
+                columnGap: 10
+            },
+            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, color: '#e2e8f0' }] },
+            {
+                stack: [
+                    {
+                        text:uppercaseText(`${props.dataLang?.import_title || "import_title"}`, 'contentTitle')
+                    },
+                    {
+                        text: `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`,
+                        style: 'contentDate'
+                    },
+                ],
+                margin: [0, 8, 0, 0]
+            },
+            {
+                text: [
+                    {
+                        text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers" }`,
+                        inline: true,
+                        fontSize: 10
+                    },
+                    {
+                        text: `${data?.code}`,
+                        bold: true,
+                        fontSize: 10
+                    },
+                ],
+                margin: [0, 10, 0, 2]
+            },
+            {
+                text: [
+                    { text:  `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"}`, inline: true, fontSize: 10},
+                    { text: `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 2]
+            },
+
+            {
+                text: [
+                    { text: `${props.dataLang?.import_supplier + ": " || "import_supplier"}`, inline: true, fontSize: 10 },
+                    { text: `${data?.supplier_name}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 2]
+            },
+            {
+                text: [
+                    { text: `${props.dataLang?.serviceVoucher_note + ":" || "serviceVoucher_note"} `, inline: true, fontSize: 10 },
+                    { text: `${data?.note}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 10]
+            },
+            {
+                table: {
+                    widths: "100%",
+                    headerRows: 0,
+                    widths:  props?.type== "import" &&  ['auto',200,'auto','auto','auto',100],
+                    body: [
+                        // Header row
+                            [
+                                uppercaseText('STT', 'headerTable', 'center'),
+                                uppercaseText(`${"Mặt hàng"}`, 'headerTable', 'left'),
+                                uppercaseText(`${"Kho - Vị trí kho"}`, 'headerTable', 'left'),
+                                uppercaseText(`${"ĐVT"}`, 'headerTable', 'center'),
+                                uppercaseText(`${"Số lượng"}`, 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}`, 'headerTable', 'center'),
+                            ] ,
+
+                        // Data rows
+                        ...data && props?.type== "import" && data?.items.length > 0 ? data?.items.map((item, index) => {
+                            return [
+                                { text: `${index + 1}`, alignment: 'center', fontSize: 10},
+                                {
+                                    stack: [
+                                        { text: item?.item?.name ? item?.item?.name : "", fontSize: 10 },
+                                        { text: `Biến thể: ${item?.item?.product_variation}`, fontSize: 10 },
+                                        {
+                                            if: props.dataProductSerial?.is_enable === "1",
+                                            text: [
+                                              { text: "Serial: ", fontSize: 10,italics: true  },
+                                              { text: item.serial == null || item.serial == "" ? "-" : item.serial, fontSize: 10 ,italics: true }
+                                            ]
+                                        },
+                                        {
+                                            if: props.dataMaterialExpiry?.is_enable === "1" ||  props.dataProductExpiry?.is_enable === "1",
+                                            stack: [
+                                                {
+                                                  text: [
+                                                    { text: "Lot: ", fontSize: 10, italics: true },
+                                                    { text: item.lot == null || item.lot == "" ? "-" : item.lot, fontSize: 10, italics: true }
+                                                  ],
+                                                  fontSize: 10,
+                                                  margin: [0, 0, 5, 0]
+                                                },
+                                                {
+                                                  text: [
+                                                    { text: "Date: ", fontSize: 10, italics: true },
+                                                    { text: item.expiration_date ? moment(item.expiration_date).format("DD/MM/YYYY") : "-", fontSize: 10, italics: true }
+                                                  ],
+                                                  fontSize: 10,
+                                                  margin: [0, 0, 5, 0]
+                                                },
+                                            ]
+                                        },
+                                    ]
+                                },
+                                { text: item?.warehouse_name ? item?.warehouse_name : "", fontSize: 10 },
+                                {text: item?.item?.unit_name ? item?.item?.unit_name : "" , fontSize: 10,},
+                                {text: item?.quantity ? item?.quantity : "" , fontSize: 10,alignment: 'center'},
+                                {text: item?.note ? item?.note : "" , fontSize: 10,},
+                                
+                            ];
+                        }) : '',
+                          [{ text: `${"Tổng mặt hàng"}`, bold: true, colSpan: 4, fontSize: 10 },'', '','',{ text: `${formatNumber(data?.items?.length)}`, bold: true, alignment: 'right', colSpan: 2, fontSize: 10 },''],
+                          [{ text: `${"Tổng số lượng"}`, bold: true, colSpan: 4, fontSize: 10 },'', '','',{ text: `${formatNumber(data?.items?.reduce((accumulator, item) => accumulator + parseInt(item.quantity), 0))}`, bold: true, alignment: 'right', colSpan: 2, fontSize: 10 },''],
+                        //   [{ text: `${"Tổng số lượng"}`, bold: true, colSpan: 5, fontSize: 10 },'', '','','',{ text: `${formatNumber(data?.total_price)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                          
+                    ],
+                }
+            },
+            {
+                columns: [
+                    {
+                        text: '',
+                        width: '50%',
+                    },
+                    {
+                        width: '50%',
+                        stack: [
+                            {
+                                text: currentDate,
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: 'Người Lập Phiếu',
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: '(Ký, ghi rõ họ tên)',
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                ],
+                columnGap: 2
+            },
+
+
+        ],
+        styles: {
+            headerInfoTextWithMargin: {
+                fontSize: 12,
+                bold: true,
+                margin: [2, 0, 0, 0]
+            },
+            headerLogo: {
+                alignment: 'left',
+            },
+            headerInfo: {
+                alignment: 'right',
+                fontSize: 12,
+                bold: true,
+                color: '#0F4F9E',
+                margin: [0, 1],
+            },
+            headerInfoText: {
+                alignment: 'right',
+                fontSize: 8,
+                italics: true,
+                color: 'black',
+                margin: [0, 2],
+            },
+            contentTitle: {
+                bold: true,
+                fontSize: 20,
+                alignment: 'center',
+                margin: [0, 10, 0, 2],
+            },
+            contentDate: {
+                italics: true,
+                fontSize: 8,
+                alignment: 'center'
+            },
+            headerTable: {
+                noWrap: true,
+                bold: true,
+                fillColor: '#0374D5',
+                color: 'white',
+                fontSize: 10,
+                // alignment: 'center',
+            },
+            dateText: {
+                fontSize: 12,
+                bold: true,
+                margin: [0, 10, 0, 2]
+            },
+            signatureText: {
+                fontSize: 12,
+                margin: [0, 0, 0, 2]
+            }
+        },
+        dontBreakRows: true,
+        images: {
+            logo: {
+                url: `${dataCompany?.company_logo}`
+            }
+        },
+    };
+
+    
+    const handlePrintPdf = (type) => {
         if (data !== undefined && dataCompany !== undefined && props?.type == "purchases") {
             const pdfGenerator = pdfMake.createPdf(docDefinitionPurchases);
             pdfGenerator.open((blob) => {
@@ -562,7 +1615,6 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
             setOpenAction(false)
         }
         if (data !== undefined && dataCompany !== undefined && props?.type == "order") {
-            console.log("1");
             const pdfGenerator = pdfMake.createPdf(docDefinitionOrder);
             pdfGenerator.open((blob) => {
                 const url = URL.createObjectURL(blob);
@@ -570,14 +1622,66 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
             })
             setOpenAction(false)
         }
+        if (data !== undefined && dataCompany !== undefined && props?.type == "serviceVoucher") {
+            const pdfGenerator = pdfMake.createPdf(docDefinitionServiceVoucher);
+            pdfGenerator.open((blob) => {
+                const url = URL.createObjectURL(blob);
+                setUrl(url)
+            })
+            setOpenAction(false)
+        }
+        // if (data !== undefined && dataCompany !== undefined && props?.type == "payment") {
+        //     const pdfGenerator = pdfMake.createPdf(docDefinitionPayment);
+        //     pdfGenerator.open((blob) => {
+        //         const url = URL.createObjectURL(blob);
+        //         setUrl(url)
+        //     })
+        //     setOpenAction(false)
+        // }
+        if (type == "fullStyle" && data !== undefined && dataCompany !== undefined && props?.type == "import") {
+            const pdfGenerator = pdfMake.createPdf(docDefinitionImportFull);
+            pdfGenerator.open((blob) => {
+                const url = URL.createObjectURL(blob);
+                setUrl(url)
+            })
+            setOpenAction(false)
+        }
+        if (type == "noprice" && data !== undefined && dataCompany !== undefined && props?.type == "import") {
+            const pdfGenerator = pdfMake.createPdf(docDefinitionImportNoPrice);
+            console.log(data);
+            pdfGenerator.open((blob) => {
+                const url = URL.createObjectURL(blob);
+                setUrl(url)
+            })
+            setOpenAction(false)
+        }
     }
-
     return (
         <>
-            <button onClick={handlePrintPdf} className='transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full'>
-                <VscFilePdf size={20} className='group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md ' />
-                <p className='group-hover:text-[#65a30d]'>{props?.dataLang?.btn_table_print || "btn_table_print"}</p>
-            </button>
+            {
+            props.type == "import" ? 
+             <>
+                <div className='flex justify-center items-center my-3'>
+                    <button onClick={handlePrintPdf.bind(this, "noprice")} className="relative inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
+                        <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                            In không giá
+                        </span>
+                    </button>
+                    <button onClick={handlePrintPdf.bind(this, "fullStyle")} className="relative inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800">
+                        <span className="relative px-8 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                            In có giá
+                        </span>
+                    </button>
+                </div>
+             </>
+            :
+              <>
+                <button onClick={handlePrintPdf} className='transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full'>
+                    <VscFilePdf size={20} className='group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md ' />
+                    <p className='group-hover:text-[#65a30d]'>{props?.dataLang?.btn_table_print || "btn_table_print"}</p>
+                </button>
+              </>
+            }
         </>
     );
 }

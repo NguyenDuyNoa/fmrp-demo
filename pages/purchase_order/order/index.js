@@ -627,9 +627,9 @@ const Index = (props) => {
                                     }
                                 </h6> */}
                                 <h6 className='px-2 py-2.5  col-span-1 flex items-center justify-center text-center '>
-                                    {e?.import_status  === "not_stocked" && <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200'>{dataLang[e?.import_status]} </span>||
-                                     e?.import_status  === "stocked_part" &&  <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200'>{dataLang[e?.import_status]}</span> ||
-                                     e?.import_status  === "stocked" &&   <span className='flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200'><TickCircle className='bg-lime-500 rounded-full ' color='white' size={15}/>{dataLang[e?.import_status]}</span>
+                                    {e?.import_status  === "not_stocked" && <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200'>{dataLang[e?.import_status] || e?.import_status} </span>||
+                                     e?.import_status  === "stocked_part" &&  <span className=' font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200'>{dataLang[e?.import_status] || e?.import_status}</span> ||
+                                     e?.import_status  === "stocked" &&   <span className='flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200'><TickCircle className='bg-lime-500 rounded-full ' color='white' size={15}/>{dataLang[e?.import_status] ||e?.import_status}</span>
                                     }
                                 </h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left truncate '>{e.note}</h6>
@@ -772,9 +772,9 @@ return (
                   <div className='col-span-2 mx-auto'>
                       <div className='my-4 font-medium text-[13px]'>{"Trạng thái nhập hàng"}</div>
                       <div className='flex flex-wrap  gap-2 items-center justify-start'>
-                        {data?.import_status  === "not_stocked" && <span className='flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200'>{props.dataLang[data?.import_status]}</span>||
-                        data?.import_status  === "stocked_part" &&  <span className='flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200'>{props.dataLang[data?.import_status]}</span> ||
-                        data?.import_status  === "stocked" &&   <span className='flex justify-center 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200'><TickCircle className='bg-lime-500 rounded-full ' color='white' size={15}/>{props.dataLang[data?.import_status]}</span>
+                        {data?.import_status  === "not_stocked" && <span className='flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200'>{props.dataLang[data?.import_status] || data?.import_status}</span>||
+                        data?.import_status  === "stocked_part" &&  <span className='flex justify-center items-center font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200'>{props.dataLang[data?.import_status] || data?.import_status}</span> ||
+                        data?.import_status  === "stocked" &&   <span className='flex justify-center 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200'><TickCircle className='bg-lime-500 rounded-full ' color='white' size={15}/>{props.dataLang[data?.import_status] || data?.import_status}</span>
                         }
                       </div>
                       <div className='my-4 font-medium text-[13px]'>{props.dataLang?.purchase_order_table_number || "purchase_order_table_number"}</div>

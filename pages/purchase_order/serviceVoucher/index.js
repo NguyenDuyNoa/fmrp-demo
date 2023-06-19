@@ -36,10 +36,14 @@ import Loading from "components/UI/loading";
 import {_ServerInstance as Axios} from '/services/axios';
 import Pagination from '/components/UI/pagination';
 
+import {BiEdit} from 'react-icons/bi'
+import {RiDeleteBin6Line} from 'react-icons/ri'
+
 import Swal from "sweetalert2";
 import { v4 as uuidv4 } from 'uuid';
 import ReactExport from "react-data-export";
 import { useEffect } from 'react';
+import FilePDF from '../FilePDF';
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -496,7 +500,7 @@ const Index = (props) => {
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left truncate '>{e.note}</h6>
                                 <h6 className="col-span-1 w-fit"><span className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{e?.branch_name}</span></h6>
                                 <div className='col-span-1 flex justify-center'>
-                                    <BtnTacVu onRefresh={_ServerFetching.bind(this)} onRefreshGr={_ServerFetching_group.bind(this)} dataLang={dataLang} status_pay={e?.status_pay}  id={e?.id}  className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
+                                    <BtnTacVu type="serviceVoucher" onRefresh={_ServerFetching.bind(this)} onRefreshGr={_ServerFetching_group.bind(this)} dataLang={dataLang} status_pay={e?.status_pay}  id={e?.id}  className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
                                 </div>
                                 </div>
        
@@ -557,6 +561,33 @@ const BtnTacVu = React.memo((props) => {
   // const [open, sOpen] = useState(false);
   const [openTacvu, sOpenTacvu] = useState(false);
   const _ToggleModal = (e) => sOpenTacvu(e);
+
+  const [dataPDF, setData] = useState();
+  const [dataCompany, setDataCompany] = useState();
+
+
+  const fetchDataSettingsCompany = async () => {
+    if (props?.id) {
+      await  Axios("GET", `/api_web/Api_Setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+          if(!err){
+                  var {data} =  response.data
+                  setDataCompany(data)
+            }
+        })
+    }
+    if(props?.id){
+      await  Axios("GET", `/api_web/Api_service/service/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+          if(!err){
+            var db =  response.data
+            setData(db)
+          }
+        })
+    }
+}
+  useEffect(() => {
+    openTacvu && fetchDataSettingsCompany()
+  }, [openTacvu])
+
 
   const _HandleDelete = (id) => {
     Swal.fire({
@@ -619,9 +650,22 @@ const handleClick = () => {
           >
               <div className="w-auto rounded">
                   <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                      <Popup_servie status_pay={props?.status_pay} onRefreshGr={props.onRefreshGr}  onClick={handleClick} onRefresh={props.onRefresh} dataLang={props.dataLang} id={props?.id} 
-                       className=" hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full 2xl:text-sm xl:text-sm text-[8px]">{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</Popup_servie>
-                      <button onClick={_HandleDelete.bind(this, props.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</button>
+                        <div className='group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded  w-full'>
+                          <BiEdit size={20} className='group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md '/>
+                            <Popup_servie status_pay={props?.status_pay} onRefreshGr={props.onRefreshGr}  onClick={handleClick} onRefresh={props.onRefresh} dataLang={props.dataLang} id={props?.id} 
+                            className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5">{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</Popup_servie>
+                        </div>
+                          <FilePDF 
+                                  props={props}
+                                  openAction={openTacvu}
+                                  setOpenAction={sOpenTacvu}
+                                  dataCompany={dataCompany}
+                                  data={dataPDF}
+                           />
+                          <button onClick={_HandleDelete.bind(this, props.id)} className='group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
+                              <RiDeleteBin6Line size={20} className='group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md '/>
+                              <p className='group-hover:text-[#f87171]'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</p>
+                          </button>
                   </div>
               </div>
           </Popup>
