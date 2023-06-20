@@ -20,6 +20,11 @@ import DatePicker,{registerLocale } from "react-datepicker";
 import ModalImage from "react-modal-image";
 
 import { Edit as IconEdit,  Grid6 as IconExcel,  ArrowDown2 as IconDown,TickCircle, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User, ArrowCircleDown, Add  } from "iconsax-react";
+
+import {BiEdit} from 'react-icons/bi'
+import {RiDeleteBin6Line} from 'react-icons/ri'
+import {VscFilePdf} from 'react-icons/vsc'
+
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
 import Pagination from '/components/UI/pagination';
@@ -31,6 +36,7 @@ import { data } from 'autoprefixer';
 import { useDispatch } from 'react-redux';
 import CreatableSelect from 'react-select/creatable';
 import Popup_chitietThere from '../detailThere';
+import FilePDF from '../FilePDF';
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet
@@ -562,7 +568,7 @@ const Index = (props) => {
                               <h6 className="col-span-1 w-fit"><span className="3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{e?.branch_name}</span></h6>
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left truncate">{e?.note}</h6>
                               <div className='col-span-1 flex justify-center'>
-                                    <BtnTacVu onRefresh={_ServerFetching.bind(this)} dataLang={dataLang}  id={e?.id}  className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
+                                    <BtnTacVu type="payment" onRefresh={_ServerFetching.bind(this)} dataLang={dataLang}  id={e?.id}  className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
                               </div>
                             </div>
                           ))}              
@@ -610,8 +616,35 @@ const Index = (props) => {
 }
 
   const BtnTacVu = React.memo((props) => {
+
     const [openTacvu, sOpenTacvu] = useState(false);
     const _ToggleModal = (e) => sOpenTacvu(e);
+
+    const [dataCompany, setDataCompany] = useState();
+    const [data, setData] = useState();
+
+     const fetchDataSettingsCompany = async () => {
+        if (props?.id) {
+          Axios("GET", `/api_web/Api_Setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+            if(!err){
+                    var {data} =  response.data
+                    setDataCompany(data)
+              }
+          })
+        }
+        if(props?.id){
+          Axios("GET", `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+            if(!err){
+              var db =  response.data
+              setData(db)
+            }
+          })
+        }
+    }
+    useEffect(() => {
+      openTacvu && fetchDataSettingsCompany()
+  }, [openTacvu])
+
     const _HandleDelete = (id) => {
       Swal.fire({
           title: `${props.dataLang?.aler_ask}`,
@@ -661,9 +694,22 @@ const Index = (props) => {
             >
                 <div className="w-auto rounded">
                     <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                        <Popup_dspc onRefresh={props.onRefresh} dataLang={props.dataLang} id={props?.id} 
-                         className=" hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full 2xl:text-sm xl:text-sm text-[8px]">{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</Popup_dspc>
-                        <button onClick={_HandleDelete.bind(this, props.id)} className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</button>
+                          <div className='group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 '>
+                            <BiEdit size={20} className='group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md '/>
+                            <Popup_dspc onRefresh={props.onRefresh} dataLang={props.dataLang} id={props?.id} 
+                            className=" 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded ">{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</Popup_dspc>
+                          </div>
+                          <FilePDF 
+                              props={props}
+                              openAction={openTacvu}
+                              setOpenAction={sOpenTacvu}
+                              dataCompany={dataCompany}
+                              data={data}
+                              />
+                            <button onClick={_HandleDelete.bind(this, props.id)} className='group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
+                              <RiDeleteBin6Line size={20} className='group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md '/>
+                              <p className='group-hover:text-[#f87171]'>{props.dataLang?.purchase_deleteVoites || "purchase_deleteVoites"}</p>
+                          </button>
                     </div>
                 </div>
             </Popup>

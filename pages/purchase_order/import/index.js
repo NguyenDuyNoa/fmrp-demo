@@ -929,8 +929,8 @@ const Popup_Pdf =(props)=>{
 return (
 <>
  <PopupEdit   
-    title={"Chọn loại in"} 
-    button={"In phiếu"} 
+    title={props.dataLang?.option_prin || "option_prin"} 
+    button={props.dataLang?.btn_table_print  || "btn_table_print"} 
     onClickOpen={_ToggleModal.bind(this, true)} 
     open={open} onClose={_ToggleModal.bind(this,false)}
     classNameBtn={props?.className} 
@@ -938,9 +938,9 @@ return (
   <div className='flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
      
   </div>  
-          <div className="space-x-5 w-[500px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">        
+          <div className="space-x-5 w-[400px] h-auto">        
           <div>
-           <div className='w-[500px]'>
+           <div className='w-[400px]'>
             <FilePDF 
               props={props}
               openAction={open}
