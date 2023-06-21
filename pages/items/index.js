@@ -417,7 +417,7 @@ const Index = (props) => {
                                                 <h6 className='px-2 py-2.5 xl:text-base text-xs w-[7%] text-center'>{e?.unit}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-base text-xs xl:w-[6%] w-[8%] text-center'>{e?.stock_quantity}</h6>
                                                 <h6 className='px-2 py-2.5 xl:text-base text-xs w-[11%]'>{e?.note}</h6>
-                                                <h6 className='px-2 py-2.5 xl:text-base text-xs xl:w-[6%] w-[7%] text-center'>{Number(e?.variation_count) || 0}</h6>
+                                                <h6 className='px-2 py-2.5 xl:text-base text-xs xl:w-[6%] w-[7%] text-center'>{e?.variation_count ? e?.variation_count : "0"}</h6>
                                                 <div className='px-2 py-2.5 w-[15%] flex flex-wrap'>
                                                     {e?.branch.map(e => 
                                                         <h6 key={e?.id.toString()} className='xl:text-[15px] text-xs mr-1 mb-1 xl:py-[1px] xl:px-1.5 px-0.5 text-[#0F4F9E] rounded border border-[#0F4F9E] h-fit font-[300]'>{e?.name}</h6>
