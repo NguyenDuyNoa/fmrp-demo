@@ -615,7 +615,11 @@ const Index = (props) => {
                                                   </div>
                                                 </h6>
                                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-2 text-left truncate '>{e?.note}</h6>
-                                                <h6 className="col-span-1 w-fit"><span className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{e?.branch_name}</span></h6>
+                                                <h6 className='col-span-1 w-fit '>
+                                                  <div className='cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase'>
+                                                      {e?.branch_name}
+                                                  </div>
+                                              </h6>
                                                 <div className='pl-2 py-2.5 col-span-1 flex space-x-2 justify-center'>
                                                     <BtnTacVu type="purchases" order={e?.order_status} onRefreshGroup={_ServerFetching_group.bind(this)}  dataLang={dataLang} id={e.id} name={e.name} code={e.code} onRefresh={_ServerFetching.bind(this)} status={e?.status} keepTooltipInside=".tooltipBoundary" className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] 2xl:text-base xl:text-xs text-[8px] hover:scale-x-105 hover:bg-slate-200 transition-all ease-in-out" />
                                                 </div>
@@ -768,7 +772,7 @@ const BtnTacVu = React.memo((props) => {
                         {/* <Popup_GiaiDoan setOpen={sOpen} isOpen={open} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} type="add" className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
                         <Popup_Bom setOpen={sOpenBom} isOpen={openBom} dataLang={props.dataLang} id={props.id} name={props.name} code={props.code} className='text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full' />
                         <Popup_ThanhPham onRefresh={props.onRefresh} dataProductExpiry={props.dataProductExpiry} dataLang={props.dataLang} id={props?.id} setOpen={sOpenDetail} isOpen={openDetail} className="text-sm hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full" /> */}
-                          <button onClick={handleClick} className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">
+                          <button onClick={handleClick} className="group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">
                             <BiEdit size={20} className='group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md '/>
                             <p className='group-hover:text-sky-500'>{props.dataLang?.purchase_editVoites || "purchase_editVoites"}</p>
                           </button>

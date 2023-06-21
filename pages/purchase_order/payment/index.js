@@ -565,7 +565,11 @@ const Index = (props) => {
                                   <h6 className="capitalize">{e?.staff_name}</h6>
                               </h6>
                               {/* <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left"><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6> */}
-                              <h6 className="col-span-1 w-fit"><span className="3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{e?.branch_name}</span></h6>
+                              <h6 className='col-span-1 w-fit '>
+                                  <div className='cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase'>
+                                      {e?.branch_name}
+                                  </div>
+                              </h6>
                               <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left truncate">{e?.note}</h6>
                               <div className='col-span-1 flex justify-center'>
                                     <BtnTacVu type="payment" onRefresh={_ServerFetching.bind(this)} dataLang={dataLang}  id={e?.id}  className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
@@ -694,18 +698,15 @@ const Index = (props) => {
             >
                 <div className="w-auto rounded">
                     <div className="bg-white rounded-t flex flex-col overflow-hidden">
-                          <div className='group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 '>
+                          <div className='group transition-all ease-in-out flex items-center  gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 '>
                             <BiEdit size={20} className='group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md '/>
                             <Popup_dspc onRefresh={props.onRefresh} dataLang={props.dataLang} id={props?.id} 
                             className=" 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded ">{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</Popup_dspc>
                           </div>
-                          <FilePDF 
-                              props={props}
-                              openAction={openTacvu}
-                              setOpenAction={sOpenTacvu}
-                              dataCompany={dataCompany}
-                              data={data}
-                              />
+                          <div className=' transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full'>
+                            <VscFilePdf size={20} className='group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md ' />
+                            <Popup_Pdf type={props.type} props={props} id={props.id} dataLang={props.dataLang} className='group-hover:text-[#65a30d] '/>
+                          </div>
                             <button onClick={_HandleDelete.bind(this, props.id)} className='group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
                               <RiDeleteBin6Line size={20} className='group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md '/>
                               <p className='group-hover:text-[#f87171]'>{props.dataLang?.purchase_deleteVoites || "purchase_deleteVoites"}</p>
@@ -716,6 +717,76 @@ const Index = (props) => {
         </div>
     )
   })
+
+  const Popup_Pdf =(props)=>{
+    const scrollAreaRef = useRef(null);
+    const [open, sOpen] = useState(false);
+    const _ToggleModal = (e) => sOpen(e);
+    const [data,sData] =useState()
+    const [onFetching, sOnFetching] = useState(false);
+  
+    useEffect(() => {
+      props?.id && sOnFetching(true) 
+    }, [open]);
+  
+    const [dataPDF, setData] = useState();
+    const [dataCompany, setDataCompany] = useState();
+  
+  
+    const fetchDataSettingsCompany = async () => {
+      if (props?.id) {
+        await  Axios("GET", `/api_web/Api_Setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+            if(!err){
+                    var {data} =  response.data
+                    setDataCompany(data)
+              }
+          })
+      }
+      if(props?.id){
+        await  Axios("GET", `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+            if(!err){
+              var db =  response.data
+              setData(db)
+            }
+          })
+      }
+  }
+    useEffect(() => {
+      open && fetchDataSettingsCompany()
+    }, [open])
+  
+  
+  return (
+  <>
+   <PopupEdit   
+      title={props.dataLang?.option_prin || "option_prin"} 
+      button={props.dataLang?.btn_table_print  || "btn_table_print"} 
+      onClickOpen={_ToggleModal.bind(this, true)} 
+      open={open} onClose={_ToggleModal.bind(this,false)}
+      classNameBtn={props?.className} 
+    >
+    <div className='flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
+       
+    </div>  
+            <div className="space-x-5 w-[400px] h-auto">        
+            <div>
+             <div className='w-[400px]'>
+              <FilePDF 
+                props={props}
+                openAction={open}
+                setOpenAction={sOpen}
+                dataCompany={dataCompany}
+                data={dataPDF}
+                />
+            </div>
+      
+       </div>
+    
+      </div>    
+    </PopupEdit>
+  </>
+  )
+  }
 
 const Popup_dspc = (props) => {
 

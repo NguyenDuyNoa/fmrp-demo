@@ -8,6 +8,14 @@ import {VscFilePdf} from 'react-icons/vsc'
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 // dataCompany:db header
 const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,dataProductExpiry,dataProductSerial }) => {
+
+    // var docDefinition = {
+    //     pageSize: 'A5',
+    //     pageOrientation: 'landscape',
+    //     // [left, top, right, bottom] 
+    //     pageMargins: [ 40, 60, 40, 60 ],
+    //   };
+
     const [url, setUrl] = useState(null)
 
     // uppercase text header table
@@ -628,7 +636,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                         text:uppercaseText(`${props.dataLang?.serviceVoucher_title || "serviceVoucher_title"}`, 'contentTitle')
                     },
                     {
-                        text: `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`,
+                        text: `${moment(data?.date).format("DD/MM/YYYY")}`,
                         style: 'contentDate'
                     },
                 ],
@@ -637,7 +645,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             {
                 text: [
                     {
-                        text: `${props.dataLang?.serviceVoucher_voucher_code + ":" || "serviceVoucher_voucher_code" }`,
+                        text: `${props.dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code" }: `,
                         inline: true,
                         fontSize: 10
                     },
@@ -651,22 +659,22 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             },
             {
                 text: [
-                    { text:  `${props.dataLang?.serviceVoucher_day_vouchers + ":" || "serviceVoucher_day_vouchers"}`, inline: true, fontSize: 10},
-                    { text: `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`, bold: true, fontSize: 10 },
+                    { text:  `${props.dataLang?.serviceVoucher_day_vouchers || "serviceVoucher_day_vouchers"}: `, inline: true, fontSize: 10},
+                    { text: `${moment(data?.date).format("DD/MM/YYYY")}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 2]
             },
 
             {
                 text: [
-                    { text: `${props.dataLang?.serviceVoucher_supplier + ":" || "serviceVoucher_supplier"}`, inline: true, fontSize: 10 },
+                    { text: `${props.dataLang?.serviceVoucher_supplier || "serviceVoucher_supplier"}: `, inline: true, fontSize: 10 },
                     { text: `${data?.supplier_name}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 2]
             },
             {
                 text: [
-                    { text: `${props.dataLang?.serviceVoucher_note + ":" || "serviceVoucher_note"} `, inline: true, fontSize: 10 },
+                    { text: `${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}: `, inline: true, fontSize: 10 },
                     { text: `${data?.note}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 10]
@@ -814,8 +822,10 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             }
         },
     };
-    //Phiếu chi
+    //Phiếu chi 1 liên
     const docDefinitionPayment = {
+        pageSize: 'A5',
+        pageOrientation: 'landscape',
         info: {
             title: `${`${props.dataLang?.payment_title || "payment_title"} - ${data?.code}` 
             }`,
@@ -823,7 +833,6 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             subject: 'Quotation',
             keywords: 'PDF',
         },
-        pageOrientation: 'portrait',
         content: [
             {
                 columns: [
@@ -876,108 +885,149 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                 ],
                 columnGap: 10
             },
-            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, color: '#e2e8f0' }] },
+            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1, color: '#e2e8f0' }] },
             {
                 stack: [
                     {
                         text:uppercaseText(`${props.dataLang?.payment_title || "payment_title"}`, 'contentTitle')
                     },
                     {
-                        text: `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`,
-                        style: 'contentDate'
+                        text: `${props.dataLang?.PDF_number || "PDF_number"}: ${data?.code}`,
+                        style: 'contentCode',
+                    },
+                    {
+                        text: `${moment(data?.date).format('[Ngày] DD [Tháng] MM [Năm] YYYY')}`,
+                        style: 'contentCode'
                     },
                 ],
                 margin: [0, 8, 0, 0]
             },
-            {
-                text: [
-                    {
-                        text: `${props.dataLang?.payment_code + ":" || "payment_code" }`,
-                        inline: true,
-                        fontSize: 10
-                    },
-                    {
-                        text: `${data?.code}`,
-                        bold: true,
-                        fontSize: 10
-                    },
+            {   
+                text:[
+                { text: `${props.dataLang?.PDF_bbject || "PDF_bbject"}: `,bold: true , fontSize: 10 },
+                { text: `${props.dataLang[data?.objects] || data?.objects} - ${data?.object_text}`, inline: true, fontSize: 10 },
                 ],
-                margin: [0, 10, 0, 2]
-            },
-            {
-                text: [
-                    { text:  `${props.dataLang?.import_day_vouchers + ":" || "import_day_vouchers"}`, inline: true, fontSize: 10},
-                    { text: `${moment(data?.date).format("DD/MM/YYYY")}`, bold: true, fontSize: 10 },
-                ],
-                margin: [0, 2, 0, 2]
-            },
+                margin: [0, 10, 0, 4]
 
-            {
-                text: [
-                    { text: `${"Người tạo"}`, inline: true, fontSize: 10 },
-                    { text: `${data?.supplier_name}`, bold: true, fontSize: 10 },
+            },
+            {   
+                text:[
+                { text: `${props.dataLang?.PDF_document || "PDF_document"}: `, bold: true, fontSize: 10 },
+                { text: data?.type_vouchers ? `${  props.dataLang[data?.type_vouchers] || data?.type_vouchers} - ${data?.voucher?.map(e => e.code).join(", ")}` : "", inline: true, fontSize: 10 },
                 ],
-                margin: [0, 2, 0, 2]
+                margin: [0, 4, 0, 4]
             },
             {
                 text: [
-                    { text: `${props.dataLang?.serviceVoucher_note + ":" || "serviceVoucher_note"} `, inline: true, fontSize: 10 },
-                    { text: `${data?.note}`, bold: true, fontSize: 10 },
+                    { text: `${props.dataLang?.PDF_methods || "PDF_methods"}: `, bold: true, fontSize: 10 },
+                    { text: `${data?.payment_mode_name}`, inline: true, fontSize: 10 },
                 ],
-                margin: [0, 2, 0, 10]
+                margin: [0, 4, 0, 4]
             },
-            // {
-            //     table: {
-            //         widths: "100%",
-            //         headerRows: 0,
-            //         widths:  props?.type== "serviceVoucher" &&  ['auto',90,'auto','auto','auto','auto','auto','auto',75],
-            //         body: [
-            //             // Header row
-            //                 [
-            //                     uppercaseText('STT', 'headerTable', 'center'),
-            //                     uppercaseText(`${props.dataLang?.serviceVoucher_services_arising || "serviceVoucher_services_arising"}`, 'headerTable', 'left'),
-            //                     uppercaseText(`${props.dataLang?.serviceVoucher_quantity || "serviceVoucher_quantity"}`, 'headerTable', 'center'),
-            //                     uppercaseText(`${props.dataLang?.serviceVoucher_unit_price || "serviceVoucher_unit_price"}`, 'headerTable', 'center'),
-            //                     uppercaseText('% CK', 'headerTable', 'center'),
-            //                     uppercaseText('% ĐGSCK', 'headerTable', 'center'),
-            //                     uppercaseText(`${props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}`, 'headerTable', 'center'),
-            //                     uppercaseText(`${props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}`, 'headerTable', 'center'),
-            //                     uppercaseText(`${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}`, 'headerTable', 'center'),
-            //                 ] ,
-
-            //             // Data rows
-            //             ...data && props?.type== "serviceVoucher" && data?.item.length > 0 ? data?.item.map((item, index) => {
-            //                 return [
-            //                     { text: `${index + 1}`, alignment: 'center', fontSize: 10 },
-            //                     {text: item?.name ? item?.name : "" , fontSize: 10,},
-            //                     { text: item?.quantity ? `${formatNumber(item?.quantity)}` : '', alignment: 'center', fontSize: 10 },
-            //                     { text: item?.price ? `${formatNumber(item?.price)}` : '', alignment: 'right', fontSize: 10 },
-            //                     { text: item?.discount_percent ? `${item?.discount_percent +'%'}` : '', alignment: 'center', fontSize: 10 },
-            //                     { text: item?.price_after_discount ? `${formatNumber(item?.price_after_discount)}` : '', alignment: 'right', fontSize: 10 },
-            //                     { text: item?.tax_rate ? `${item?.tax_rate +'%'}` : '', alignment: 'center', fontSize: 10 },
-            //                     { text: item?.amount ? `${formatNumber(item?.amount)}` : '', alignment: 'right', fontSize: 10 },
-            //                     { text: item?.note ? `${item?.note}` : '', fontSize: 10 },
-            //                 ];
-            //             }) : '',
-            //               [{ text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}`, bold: true, colSpan: 4, fontSize: 10 },'', '','',{ text: `${formatNumber(data?.total_price)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
-            //               [{ text: `${props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}`, bold: true, colSpan: 4, fontSize: 10 },'','','',{ text: `${formatNumber(data?.total_discount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
-            //               [{ text: `${props.dataLang?.purchase_order_detail_money_after_discount || "purchase_order_detail_money_after_discount"}`, bold: true, colSpan: 4, fontSize: 10 },'','','',{ text: `${formatNumber(data?.total_price_after_discount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
-            //               [{ text: `${props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}`, bold: true, colSpan: 4, fontSize: 10 },'','','',{ text: `${formatNumber(data?.total_tax)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
-            //               [{ text: `${props.dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}`, bold: true, colSpan: 4, fontSize: 10 },'', '','',{ text: `${formatNumber(data?.total_amount)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
-            //         ],
-            //     }
-            // },
+            {
+                text: [ 
+                    { text: `${props.dataLang?.PDF_reason || "PDF_reason"}: `, bold: true, fontSize: 10 },
+                    { text: `${data?.note}`, inline: true, fontSize: 10 },
+                ],
+                margin: [0, 4, 0, 4]
+            },
+            {
+                text: [
+                    { text: `${props.dataLang?.PDF_amountMoney || "PDF_amountMoney"}: `, bold: true, fontSize: 10 },
+                    { text: `${formatNumber(data?.total)}`, fontSize: 10, inline: true },
+                ],
+                margin: [0, 4, 0, 4]
+            },
+            {
+                text: [
+                    { text: `${props.dataLang?.PDF_price || "PDF_price"} : `, bold: true, fontSize: 10, },
+                    { text: capitalizedTotalAmountWord, fontSize: 10, inline: true },
+                ],
+                margin: [0, 4, 0, 0]
+            },
+             {style: 'dateTexts',text: `${currentDate}`,alignment: 'right', 
+            },
             {
                 columns: [
                     {
-                        text: '',
-                        width: '50%',
-                    },
-                    {
-                        width: '50%',
+                        width: '20%',
                         stack: [
                             {
-                                text: currentDate,
+                                text: '',
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_manager || "PDF_manager"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                    {
+                        width: '20%',
+                        stack: [
+                            {
+                                text: '',
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_accountant || "PDF_accountant"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                    {
+                        width: '20%',
+                        stack: [
+                            {
+                                text: '',
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_treasurer || "PDF_treasurer"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                    {
+                        width: '20%',
+                        stack: [
+                            {
+                                text: '',
                                 style: 'dateText',
                                 alignment: 'center',
                                 fontSize: 10
@@ -986,7 +1036,34 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                                 text: `${props.dataLang?.PDF_userMaker || "PDF_userMaker"}`,
                                 style: 'signatureText',
                                 alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
                                 fontSize: 10
+                            }
+                        ],
+                    },
+                    {
+                        width: '20%',
+                        stack: [
+                            {
+                                text: '',
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_receiver || "PDF_receiver"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+
                             },
                             {
                                 text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
@@ -997,7 +1074,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                         ],
                     },
                 ],
-                columnGap: 2
+                columnGap: 2,
             },
 
 
@@ -1036,6 +1113,12 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                 fontSize: 8,
                 alignment: 'center'
             },
+            contentCode: {
+                italics: true,
+                fontSize: 8,
+                alignment: 'center',
+                margin: [0, 1, 0, 1]
+            },
             headerTable: {
                 noWrap: true,
                 bold: true,
@@ -1045,9 +1128,13 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                 // alignment: 'center',
             },
             dateText: {
-                fontSize: 12,
+                fontSize: 10,
                 bold: true,
-                margin: [0, 10, 0, 2]
+                margin: [0, 5, 0, 2]
+            },
+            dateTexts: {
+                fontSize: 10,
+                bold: false,
             },
             signatureText: {
                 fontSize: 12,
@@ -1062,10 +1149,584 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
         },
     };
 
+    //Phiếu chi 2 liên
+    const docDefinitionPaymentTwo = {
+        pageSize: 'A5',
+        pageOrientation: 'landscape',
+        info: {
+            title: `${`${props.dataLang?.payment_title || "payment_title"} - ${data?.code}` 
+            }`,
+            author: 'Foso',
+            subject: 'Quotation',
+            keywords: 'PDF',
+        },
+        content: [
+            {
+                columns: [
+                    {
+                        width: '30%',
+                        stack: [
+                            {
+                                image: "logo",
+                                width: 100,
+                                height: 100,
+                                alignment: "left",
+                                margin: [0, -15, 0, 5],
+                                fit: [100, 100]
+                            },
+                        ]
+                    },
+                    {
+                        width: '70%',
+                        stack: [
+                            {
+                                text: `${dataCompany?.company_name}`,
+                                style: 'headerInfo'
+                            },
+                            {
+                                text: dataCompany?.company_address ? `${props.dataLang?.PDF_adress || "PDF_adress"} : ${dataCompany?.company_address}` : '',
+                                style: 'headerInfoText'
+                            },
+                            {
+                                text: dataCompany?.company_phone_number ? `${props.dataLang?.PDF_tel || "PDF_tel"}: ${dataCompany?.company_phone_number}` : '',
+                                style: 'headerInfoText'
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: dataCompany?.company_email ? `Email: ${dataCompany?.company_email}` : '',
+                                        style: 'headerInfoText'
+                                    },
+                                    '    ',
+                                    {
+                                        text: dataCompany?.company_website ? `Website: ${dataCompany?.company_website}` : '',
+                                        style: 'headerInfoText'
+                                    },
+                                ],
+                                margin: [0, -4, 0, 0]
 
-   
+                            }
+                        ],
+                        margin: [0, -20, 0, 5]
+                    },
+                ],
+                columnGap: 10
+            },
+            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1, color: '#e2e8f0' }] },
+            {
+                stack: [
+                    {
+                        text:uppercaseText(`${props.dataLang?.payment_title || "payment_title"}`, 'contentTitle')
+                    },
+                    {
+                        text: `${props.dataLang?.PDF_number || "PDF_number"}: ${data?.code}`,
+                        style: 'contentCode',
+                    },
+                    {
+                        text: `${moment(data?.date).format('[Ngày] DD [Tháng] MM [Năm] YYYY')}`,
+                        style: 'contentCode'
+                    },
+                ],
+                margin: [0, 8, 0, 0]
+            },
+            {   
+                text:[
+                { text: `${props.dataLang?.PDF_bbject || "PDF_bbject"}: `,bold: true , fontSize: 10 },
+                { text: `${props.dataLang[data?.objects] || data?.objects} - ${data?.object_text}`, inline: true, fontSize: 10 },
+                ],
+                margin: [0, 10, 0, 4]
+
+            },
+            {   
+                text:[
+                { text: `${props.dataLang?.PDF_document || "PDF_document"}: `, bold: true, fontSize: 10 },
+                { text: data?.type_vouchers ? `${  props.dataLang[data?.type_vouchers] || data?.type_vouchers} - ${data?.voucher?.map(e => e.code).join(", ")}` : "", inline: true, fontSize: 10 },
+                ],
+                margin: [0, 4, 0, 4]
+            },
+            {
+                text: [
+                    { text: `${props.dataLang?.PDF_methods || "PDF_methods"}: `, bold: true, fontSize: 10 },
+                    { text: `${data?.payment_mode_name}`, inline: true, fontSize: 10 },
+                ],
+                margin: [0, 4, 0, 4]
+            },
+            {
+                text: [ 
+                    { text: `${props.dataLang?.PDF_reason || "PDF_reason"}: `, bold: true, fontSize: 10 },
+                    { text: `${data?.note}`, inline: true, fontSize: 10 },
+                ],
+                margin: [0, 4, 0, 4]
+            },
+            {
+                text: [
+                    { text: `${props.dataLang?.PDF_amountMoney || "PDF_amountMoney"}: `, bold: true, fontSize: 10 },
+                    { text: `${formatNumber(data?.total)}`, fontSize: 10, inline: true },
+                ],
+                margin: [0, 4, 0, 4]
+            },
+            {
+                text: [
+                    { text: `${props.dataLang?.PDF_price || "PDF_price"} : `, bold: true, fontSize: 10, },
+                    { text: capitalizedTotalAmountWord, fontSize: 10, inline: true },
+                ],
+                margin: [0, 4, 0, 0]
+            },
+             {style: 'dateTexts',text: `${currentDate}`,alignment: 'right', 
+            },
+            {
+                columns: [
+                    {
+                        width: '20%',
+                        stack: [
+                            {
+                                text: '',
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_manager || "PDF_manager"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                    {
+                        width: '20%',
+                        stack: [
+                            {
+                                text: '',
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_accountant || "PDF_accountant"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                    {
+                        width: '20%',
+                        stack: [
+                            {
+                                text: '',
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_treasurer || "PDF_treasurer"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                    {
+                        width: '20%',
+                        stack: [
+                            {
+                                text: '',
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_userMaker || "PDF_userMaker"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                    {
+                        width: '20%',
+                        stack: [
+                            {
+                                text: '',
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_receiver || "PDF_receiver"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                ],
+                columnGap: 2,
+                pageBreak: 'after' 
+            },
+
+
+
+            ///page 2
+            {
+                columns: [
+                    {
+                        width: '30%',
+                        stack: [
+                            {
+                                image: "logo",
+                                width: 100,
+                                height: 100,
+                                alignment: "left",
+                                margin: [0, -15, 0, 5],
+                                fit: [100, 100]
+                            },
+                        ]
+                    },
+                    {
+                        width: '70%',
+                        stack: [
+                            {
+                                text: `${dataCompany?.company_name}`,
+                                style: 'headerInfo'
+                            },
+                            {
+                                text: dataCompany?.company_address ? `${props.dataLang?.PDF_adress || "PDF_adress"} : ${dataCompany?.company_address}` : '',
+                                style: 'headerInfoText'
+                            },
+                            {
+                                text: dataCompany?.company_phone_number ? `${props.dataLang?.PDF_tel || "PDF_tel"}: ${dataCompany?.company_phone_number}` : '',
+                                style: 'headerInfoText'
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: dataCompany?.company_email ? `Email: ${dataCompany?.company_email}` : '',
+                                        style: 'headerInfoText'
+                                    },
+                                    '    ',
+                                    {
+                                        text: dataCompany?.company_website ? `Website: ${dataCompany?.company_website}` : '',
+                                        style: 'headerInfoText'
+                                    },
+                                ],
+                                margin: [0, -4, 0, 0]
+
+                            }
+                        ],
+                        margin: [0, -20, 0, 5]
+                    },
+                ],
+                columnGap: 10
+            },
+            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1, color: '#e2e8f0' }] },
+            {
+                stack: [
+                    {
+                        text:uppercaseText(`${props.dataLang?.payment_title || "payment_title"}`, 'contentTitle')
+                    },
+                    {
+                        text: `${props.dataLang?.PDF_number || "PDF_number"}: ${data?.code}`,
+                        style: 'contentCode',
+                    },
+                    {
+                        text: `${moment(data?.date).format('[Ngày] DD [Tháng] MM [Năm] YYYY')}`,
+                        style: 'contentCode'
+                    },
+                ],
+                margin: [0, 8, 0, 0]
+            },
+            {   
+                text:[
+                { text: `${props.dataLang?.PDF_bbject || "PDF_bbject"}: `,bold: true , fontSize: 10 },
+                { text: `${props.dataLang[data?.objects] || data?.objects} - ${data?.object_text}`, inline: true, fontSize: 10 },
+                ],
+                margin: [0, 10, 0, 4]
+
+            },
+            {   
+                text:[
+                { text: `${props.dataLang?.PDF_document || "PDF_document"}: `, bold: true, fontSize: 10 },
+                { text: data?.type_vouchers ? `${  props.dataLang[data?.type_vouchers] || data?.type_vouchers} - ${data?.voucher?.map(e => e.code).join(", ")}` : "", inline: true, fontSize: 10 },
+                ],
+                margin: [0, 4, 0, 4]
+            },
+            {
+                text: [
+                    { text: `${props.dataLang?.PDF_methods || "PDF_methods"}: `, bold: true, fontSize: 10 },
+                    { text: `${data?.payment_mode_name}`, inline: true, fontSize: 10 },
+                ],
+                margin: [0, 4, 0, 4]
+            },
+            {
+                text: [ 
+                    { text: `${props.dataLang?.PDF_reason || "PDF_reason"}: `, bold: true, fontSize: 10 },
+                    { text: `${data?.note}`, inline: true, fontSize: 10 },
+                ],
+                margin: [0, 4, 0, 4]
+            },
+            {
+                text: [
+                    { text: `${props.dataLang?.PDF_amountMoney || "PDF_amountMoney"}: `, bold: true, fontSize: 10 },
+                    { text: `${formatNumber(data?.total)}`, fontSize: 10, inline: true },
+                ],
+                margin: [0, 4, 0, 4]
+            },
+            {
+                text: [
+                    { text: `${props.dataLang?.PDF_price || "PDF_price"} : `, bold: true, fontSize: 10, },
+                    { text: capitalizedTotalAmountWord, fontSize: 10, inline: true },
+                ],
+                margin: [0, 4, 0, 0]
+            },
+             {style: 'dateTexts',text: `${currentDate}`,alignment: 'right', 
+            },
+            {
+                columns: [
+                    {
+                        width: '20%',
+                        stack: [
+                            {
+                                text: '',
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_manager || "PDF_manager"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                    {
+                        width: '20%',
+                        stack: [
+                            {
+                                text: '',
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_accountant || "PDF_accountant"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                    {
+                        width: '20%',
+                        stack: [
+                            {
+                                text: '',
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_treasurer || "PDF_treasurer"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                    {
+                        width: '20%',
+                        stack: [
+                            {
+                                text: '',
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_userMaker || "PDF_userMaker"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                    {
+                        width: '20%',
+                        stack: [
+                            {
+                                text: '',
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_receiver || "PDF_receiver"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10,
+                                bold:true
+
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                ],
+                columnGap: 2,
+            },
+        ],
+        styles: {
+            headerInfoTextWithMargin: {
+                fontSize: 12,
+                bold: true,
+                margin: [2, 0, 0, 0]
+            },
+            headerLogo: {
+                alignment: 'left',
+            },
+            headerInfo: {
+                alignment: 'right',
+                fontSize: 12,
+                bold: true,
+                color: '#0F4F9E',
+                margin: [0, 1],
+            },
+            headerInfoText: {
+                alignment: 'right',
+                fontSize: 8,
+                italics: true,
+                color: 'black',
+                margin: [0, 2],
+            },
+            contentTitle: {
+                bold: true,
+                fontSize: 20,
+                alignment: 'center',
+                margin: [0, 10, 0, 2],
+            },
+            contentDate: {
+                italics: true,
+                fontSize: 8,
+                alignment: 'center'
+            },
+            contentCode: {
+                italics: true,
+                fontSize: 8,
+                alignment: 'center',
+                margin: [0, 1, 0, 1]
+            },
+            headerTable: {
+                noWrap: true,
+                bold: true,
+                fillColor: '#0374D5',
+                color: 'white',
+                fontSize: 10,
+                // alignment: 'center',
+            },
+            dateText: {
+                fontSize: 10,
+                bold: true,
+                margin: [0, 5, 0, 2]
+            },
+            dateTexts: {
+                fontSize: 10,
+                bold: false,
+            },
+            signatureText: {
+                fontSize: 12,
+                margin: [0, 0, 0, 2]
+            }
+        },
+        dontBreakRows: true,
+        images: {
+            logo: {
+                url: `${dataCompany?.company_logo}`
+            }
+        },
+    };
+
+    // Tạo tài liệu PDF
+    
    //nhập hàng
-    const docDefinitionImportFull = {
+    
+   
+   const docDefinitionImportFull = {
         info: {
             title: `${`${props.dataLang?.import_title || "import_title"} - ${data?.code}` 
             }`,
@@ -1171,7 +1832,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             },
             {
                 text: [
-                    { text: `${props.dataLang?.serviceVoucher_note + ":" || "serviceVoucher_note"} `, inline: true, fontSize: 10 },
+                    { text: `${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}: `, inline: true, fontSize: 10 },
                     { text: `${data?.note}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 10]
@@ -1512,7 +2173,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             },
             {
                 text: [
-                    { text: `${props.dataLang?.serviceVoucher_note + ":" || "serviceVoucher_note"} `, inline: true, fontSize: 10 },
+                    { text: `${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}: `, inline: true, fontSize: 10 },
                     { text: `${data?.note}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 10]
@@ -1739,8 +2400,16 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             })
             setOpenAction(false)
         }
-        if (data !== undefined && dataCompany !== undefined && props?.type == "payment") {
+        if (type== "oneLink" && data !== undefined && dataCompany !== undefined && props?.type == "payment") {
             const pdfGenerator = pdfMake.createPdf(docDefinitionPayment);
+            pdfGenerator.open((blob) => {
+                const url = URL.createObjectURL(blob);
+                setUrl(url)
+            })
+            setOpenAction(false)
+        }
+        if (type== "twoLink" && data !== undefined && dataCompany !== undefined && props?.type == "payment") {
+            const pdfGenerator = pdfMake.createPdf(docDefinitionPaymentTwo);
             pdfGenerator.open((blob) => {
                 const url = URL.createObjectURL(blob);
                 setUrl(url)
@@ -1750,32 +2419,52 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
        
     }
     return (
-        <>
+        <React.Fragment>
             {
-            props.type == "import" ? 
-             <React.Fragment>
-                <div className='flex justify-center items-center my-3'>
-                    <button onClick={handlePrintPdf.bind(this, "noprice")} className="relative inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
-                        <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
-                            {props.dataLang?.option_prin_notprice || "option_prin_notprice"}
-                        </span>
-                    </button>
-                    <button onClick={handlePrintPdf.bind(this, "fullStyle")} className="relative inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800">
-                        <span className="relative px-8 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
-                            {props.dataLang?.option_prin_price || "option_prin_price"}
-                        </span>
-                    </button>
-                </div>
-             </React.Fragment>
-            :
-            <React.Fragment>
-                <button onClick={handlePrintPdf} className='transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full'>
-                    <VscFilePdf size={20} className='group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md ' />
-                    <p className='group-hover:text-[#65a30d]'>{props?.dataLang?.btn_table_print || "btn_table_print"}</p>
-                </button>
-            </React.Fragment>
+                props.type == "import" &&
+                    <React.Fragment>
+                        <div className='flex justify-center items-center my-3'>
+                            <button onClick={handlePrintPdf.bind(this, "noprice")} className="relative inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
+                                <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                                    {props.dataLang?.option_prin_notprice || "option_prin_notprice"}
+                                </span>
+                            </button>
+                            <button onClick={handlePrintPdf.bind(this, "fullStyle")} className="relative inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800">
+                                <span className="relative px-8 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                                    {props.dataLang?.option_prin_price || "option_prin_price"}
+                                </span>
+                            </button>
+                        </div>
+                    </React.Fragment>
             }
-        </>
+            {
+                props.type == "payment" &&
+                    <React.Fragment>
+                        <div className='flex justify-center items-center my-3'>
+                            <button onClick={handlePrintPdf.bind(this, "oneLink")} className="relative inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
+                                <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                                    {props.dataLang?.PDF_PrintOnelink || "PDF_PrintOnelink"}
+                                </span>
+                            </button>
+                            <button onClick={handlePrintPdf.bind(this, "twoLink")} className="relative inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800">
+                                <span className="relative px-8 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                                    {props.dataLang?.PDF_PrintTwolink || "PDF_PrintTwolink"}
+                                </span>
+                            </button>
+                        </div>
+                    </React.Fragment>
+            }
+
+            {
+                props?.type == "purchases" || props?.type == "order" || props?.type == "serviceVoucher" ?
+                    <React.Fragment>
+                        <button onClick={handlePrintPdf} className='transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full'>
+                            <VscFilePdf size={20} className='group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md ' />
+                            <p className='group-hover:text-[#65a30d]'>{props?.dataLang?.btn_table_print || "btn_table_print"}</p>
+                        </button>
+                    </React.Fragment>:""
+            }
+        </React.Fragment>
     );
 }
 
