@@ -572,7 +572,7 @@ const BtnTacVu = React.memo((props) => {
 
   const fetchDataSettingsCompany = async () => {
     if (props?.id) {
-      await  Axios("GET", `/api_web/Api_Setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+      await  Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
           if(!err){
                   var {data} =  response.data
                   setDataCompany(data)

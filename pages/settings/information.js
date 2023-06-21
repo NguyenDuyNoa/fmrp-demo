@@ -22,7 +22,7 @@ const Index = (props) => {
     const [data, sData] = useState({});
 
     const _ServerFetching = () => {
-        Axios("GET", "/api_web/Api_Setting/companyInfo?csrf_protection=true", {}, (err, response) => {
+        Axios("GET", "/api_web/Api_setting/companyInfo?csrf_protection=true", {}, (err, response) => {
             if(!err){
                 var {isSuccess, data} = response.data;
                 if(isSuccess){
@@ -87,7 +87,7 @@ const Index = (props) => {
         formData.append("representative_phone_number", data?.representative_phone_number)
         formData.append("company_logo", data?.thumb)
 
-        Axios("POST", "/api_web/Api_Setting/companyInfo?csrf_protection=true", {
+        Axios("POST", "/api_web/Api_setting/companyInfo?csrf_protection=true", {
             data: formData,
             headers: {'Content-Type': 'multipart/form-data'}
         }, (err, response) => {

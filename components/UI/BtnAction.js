@@ -157,7 +157,7 @@ const BtnAction = React.memo((props) => {
     const fetchDataSettingsCompany = async () => {
         if (props?.id) {
             try {
-                await Axios("GET", `/api_web/Api_Setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+                await Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
                     if (response && response.data) {
                         let res = response.data.data
                         setDataCompany(res)
