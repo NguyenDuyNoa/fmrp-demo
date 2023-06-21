@@ -1311,8 +1311,8 @@ return(
                             </>
                              ):""}              
                               <h6 className='text-[13px] px-2 py-1.5 col-span-2 text-center  hover:font-normal cursor-pointer'>
-                                <div className='grid grid-cols-3'>
-                                  <h4 className='text-[13px] px-2 py-1.5  w-[full] col-span-1'>{e?.name}</h4>
+                                <div className='grid grid-cols-6 items-center'>
+                                  <h4 className='text-[13px] px-2 py-1.5  w-[full] col-span-4'>{e?.name}</h4>
                                   <h4 className='text-[13px] px-2 py-1.5  w-[full] col-span-2'>{e?.product_variation}</h4>
                                 </div>
                               </h6>
