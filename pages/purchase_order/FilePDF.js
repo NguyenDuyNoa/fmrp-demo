@@ -2456,13 +2456,31 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             }
 
             {
-                props?.type == "purchases" || props?.type == "order" || props?.type == "serviceVoucher" ?
+                props?.type == "purchases" &&
                     <React.Fragment>
                         <button onClick={handlePrintPdf} className='transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full'>
                             <VscFilePdf size={20} className='group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md ' />
                             <p className='group-hover:text-[#65a30d]'>{props?.dataLang?.btn_table_print || "btn_table_print"}</p>
                         </button>
-                    </React.Fragment>:""
+                    </React.Fragment>
+            }
+            {
+                props?.type == "order" &&
+                    <React.Fragment>
+                        <button onClick={handlePrintPdf} className='transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full'>
+                            <VscFilePdf size={20} className='group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md ' />
+                            <p className='group-hover:text-[#65a30d]'>{props?.dataLang?.btn_table_print || "btn_table_print"}</p>
+                        </button>
+                    </React.Fragment>
+            }
+            {
+                props?.type == "serviceVoucher" &&
+                    <React.Fragment>
+                        <button onClick={handlePrintPdf} className='transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full'>
+                            <VscFilePdf size={20} className='group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md ' />
+                            <p className='group-hover:text-[#65a30d]'>{props?.dataLang?.btn_table_print || "btn_table_print"}</p>
+                        </button>
+                    </React.Fragment>
             }
         </React.Fragment>
     );
