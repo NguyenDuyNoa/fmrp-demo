@@ -389,7 +389,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             {
                 text: [
                     { text:  `${props.dataLang?.purchase_order_detail_delivery_date + ": " || "purchase_order_detail_delivery_date"}`, inline: true, fontSize: 10 },
-                    { text: `${moment(data?.delivery_date).format("DD/MM/YYYY HH:mm:ss")}`, bold: true, fontSize: 10 },
+                    { text: `${moment(data?.delivery_date).format("DD/MM/YYYY")}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 0, 0, 2]
             },
