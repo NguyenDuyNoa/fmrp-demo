@@ -3,6 +3,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import moment from 'moment';
 import { upperCase } from 'lodash';
+import { saveAs } from 'file-saver';
 
 import {VscFilePdf} from 'react-icons/vsc'
 pdfMake.vfs = pdfFonts.pdfMake.vfs
@@ -1219,13 +1220,32 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                         text:uppercaseText(`${props.dataLang?.payment_title || "payment_title"}`, 'contentTitle')
                     },
                     {
-                        text: `${props.dataLang?.PDF_number || "PDF_number"}: ${data?.code}`,
-                        style: 'contentCode',
+                        columns:[
+                            {
+                                with:"110%",
+                                stack:[
+                                    {text: `${props.dataLang?.PDF_gion || "PDF_gion"}`, style: 'contentCodes',},
+                                    
+                               ]
+                            },
+                            {
+                                with:"5%",
+                                stack:[
+                                    {text: `${props.dataLang?.PDF_number || "PDF_number"}: ${data?.code}`,
+                                    style: 'contentCodeNumber',},
+                                    {
+                                        text: `${moment(data?.date).format('[Ngày] DD [Tháng] MM [Năm] YYYY')}`,
+                                        style: 'contentCodeNumber'
+                                    },
+                                    
+                               ]
+                            }
+                        ]
                     },
-                    {
-                        text: `${moment(data?.date).format('[Ngày] DD [Tháng] MM [Năm] YYYY')}`,
-                        style: 'contentCode'
-                    },
+                    // {
+                    //     text: `${moment(data?.date).format('[Ngày] DD [Tháng] MM [Năm] YYYY')}`,
+                    //     style: 'contentCode'
+                    // },
                 ],
                 margin: [0, 8, 0, 0]
             },
@@ -1466,12 +1486,27 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                         text:uppercaseText(`${props.dataLang?.payment_title || "payment_title"}`, 'contentTitle')
                     },
                     {
-                        text: `${props.dataLang?.PDF_number || "PDF_number"}: ${data?.code}`,
-                        style: 'contentCode',
-                    },
-                    {
-                        text: `${moment(data?.date).format('[Ngày] DD [Tháng] MM [Năm] YYYY')}`,
-                        style: 'contentCode'
+                        columns:[
+                            {
+                                with:"110%",
+                                stack:[
+                                    {text: `${props.dataLang?.PDF_gions || "PDF_gions"}`, style: 'contentCodes',},
+                                    
+                               ]
+                            },
+                            {
+                                with:"5%",
+                                stack:[
+                                    {text: `${props.dataLang?.PDF_number || "PDF_number"}: ${data?.code}`,
+                                    style: 'contentCodeNumber',},
+                                    {
+                                        text: `${moment(data?.date).format('[Ngày] DD [Tháng] MM [Năm] YYYY')}`,
+                                        style: 'contentCodeNumber'
+                                    },
+                                    
+                                ]
+                            }
+                        ]
                     },
                 ],
                 margin: [0, 8, 0, 0]
@@ -1689,6 +1724,18 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                 italics: true,
                 fontSize: 8,
                 alignment: 'center',
+                margin: [0, 1, 0, 1]
+            },
+            contentCodes: {
+                italics: true,
+                fontSize: 8,
+                alignment: 'right',
+                margin: [0, 1, 0, 0]
+            },
+            contentCodeNumber: {
+                italics: true,
+                fontSize: 8,
+                alignment: 'right',
                 margin: [0, 1, 0, 1]
             },
             headerTable: {
@@ -2416,8 +2463,9 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             })
             setOpenAction(false)
         }
-       
+        
     }
+    console.log(url);
     return (
         <React.Fragment>
             {
