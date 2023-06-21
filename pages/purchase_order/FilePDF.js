@@ -2043,7 +2043,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                 fillColor: '#0374D5',
                 color: 'white',
                 fontSize: 10,
-                margin: [25,0,25,0]
+                // margin: [25,0,25,0]
                 
                 // alignment: 'center',
             },
