@@ -637,7 +637,7 @@ const _ServerFetching =  () => {
     }).filter(e => e.child?.length > 0)
     sListData([...newData])
   }
-
+  const [load, sLoad] = useState(false)
   const _HandleChangeChild = (parentId, childId, type, value) => {
     const newData = listData.map(e => {
       if(e?.id === parentId){
@@ -665,11 +665,16 @@ const _ServerFetching =  () => {
                     timer: 3000
                   });
                   ce.amount = '' || null
-                  console.log("sai");
+                  setTimeout(()=>{
+                    sLoad(true)
+                  },500)
+                  setTimeout(()=>{
+                    sLoad(false)
+                  },1000)
                   return {...ce}
                 }
                 else {
-                  console.log("đúng");
+                  sLoad(false)
                   return {...ce}
 
                 //  ce.amount = parseFloat(value?.value);
@@ -1072,8 +1077,8 @@ const _ServerFetching =  () => {
                 </div>
               </div>
               <div className='h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'>
-                <div className="min:h-[400px] h-[100%] max:h-[800px]"> 
-                  {onFetchingDetail ? <Loading className="h-60"color="#0f4f9e" />
+                <div className="min:h-[400px] h-[100%] max:h-[800px] w-full"> 
+                  {onFetchingDetail ? <Loading className="h-10 w-full"color="#0f4f9e" />
                     :  
                     <>
                     {listData?.map(e => 
@@ -1185,7 +1190,8 @@ const _ServerFetching =  () => {
                         </div>
                         <div className='col-span-10  items-center'>
                           <div className="grid grid-cols-11  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                            {e?.child?.map(ce =>
+                          {load ? <Loading className="h-2 col-span-11"color="#0f4f9e"/> :
+                            e?.child?.map(ce =>
                               <React.Fragment key={ce?.id?.toString()}>
                                 <div className='p-0.5 border flex flex-col col-span-2 justify-center h-full'>
                                   <Select 
@@ -1359,7 +1365,8 @@ const _ServerFetching =  () => {
                                   </button>
                                 </div>
                               </React.Fragment>
-                            )}
+                            )
+                            }
                           </div>
                         </div>
                       </div>  
