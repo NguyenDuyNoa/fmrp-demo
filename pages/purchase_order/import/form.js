@@ -1621,7 +1621,7 @@ const _ServerFetching =  () => {
                   <div className={`${dataProductSerial.is_enable == "1" ? 
                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-13" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-[repeat(13_minmax(0_1fr))]" :"grid-cols-11" ) :
                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10") ) } grid  divide-x border-t border-b `}>
-                    <div className='col-span-1'> <Select placeholder="Kho - vị trí hàng" className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]' isDisabled={true} /></div>
+                    <div className='col-span-1'> <Select placeholder="Kho - vị trí kho" className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]' isDisabled={true} /></div>
                     {dataProductSerial.is_enable === "1" ? (
                               <div className=" col-span-1 flex items-center">
                                  <div className='flex justify-center   p-0.5 flex-col items-center'>

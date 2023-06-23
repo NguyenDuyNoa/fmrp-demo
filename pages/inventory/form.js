@@ -232,7 +232,6 @@ const Form = (props) => {
                                 e?.checkSerial == "1" && (ce?.locate !== null && ce?.serial !== null) && _HandleCheckSameSerial(parentId, id, ce?.locate, ce?.serial);
                             }, 1000);
                             setTimeout(() => {
-                                console.log(ce.amount);
                                 return {...ce}
                             }, 3000);
                         }else if(type === "price"){

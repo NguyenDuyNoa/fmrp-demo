@@ -140,7 +140,7 @@ const Header = () => {
                     img: "/icon/header/kho/Vector-9.png",
                     items: [
                         { name: "Nhập hàng", link: '/purchase_order/import' },
-                        { name: "Trả hàng" }
+                        { name: "Trả hàng", link:'/purchase_order/returns' }
                     ]
                 }
             ]

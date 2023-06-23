@@ -749,12 +749,12 @@ const Popup_danhmuc = (props) => {
                 <React.Fragment>
                   <div className="flex flex-wrap justify-between">
                     <div className="w-full">
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">{"Mã chi phí"}<span className="text-red-500">*</span></label>
+                      <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.settings_category_stages_codeAdd || "settings_category_stages_codeAdd"}<span className="text-red-500">*</span></label>
                       <div>
                         <input
                           // value={stages_code}                
                           // onChange={_HandleChangeInput.bind(this, "code")}
-                          placeholder={"Mã chi phí"}
+                          placeholder={props.dataLang?.settings_category_stages_codeAdd || "settings_category_stages_codeAdd"}
                           name="fname"                      
                           type="text"
                           className={`"focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
@@ -762,12 +762,12 @@ const Popup_danhmuc = (props) => {
                       </div>
                     </div>
                     <div className="w-full">
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">{"Tên chi phí"}<span className="text-red-500">*</span></label>
+                      <label className="text-[#344054] font-normal text-sm mb-1 ">{props.dataLang?.settings_category_stages_codenName || "settings_category_stages_codenName"}<span className="text-red-500">*</span></label>
                       <div>
                         <input
                           // value={stages_code}                
                           // onChange={_HandleChangeInput.bind(this, "code")}
-                          placeholder={"Tên chi phí"}
+                          placeholder={props.dataLang?.settings_category_stages_codenName || "settings_category_stages_codenName"}
                           name="fname"                      
                           type="text"
                           className={`"focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
