@@ -657,7 +657,7 @@ const _ServerFetching =  () => {
                     }
                   });
                   Toast.fire({
-                    title: `Số lượng vượt quá số lượng còn lại`,
+                    title: `Tổng số lượng chỉ được lớn hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại !`,
                     icon: 'error',
                     confirmButtonColor: '#296dc1',
                     cancelButtonColor: '#d33',
