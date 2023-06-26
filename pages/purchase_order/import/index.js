@@ -118,6 +118,7 @@ const Index = (props) => {
                 sData(rResult)
                 sTotalItems(output)
                 sDataExcel(rResult)
+                sTotal(rTotal)
             }
             sOnFetching(false)
         })
