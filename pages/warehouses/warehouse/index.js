@@ -383,7 +383,6 @@ const Popup_kho = (props) => {
     const [errInputBr, sErrInputBr] = useState(false);
     const [valueBr, sValueBr] = useState([])
     // const branch = valueBr.map(e => e.value)
-
     useEffect(() => {
       sErrInputBr(false)
       sErrInputCode(false)
@@ -394,9 +393,17 @@ const Popup_kho = (props) => {
       sAddress(props.address ? props.address : "")
       sNote(props.note ? props.note : "")
       sListBrand(props.listBr ? props.listBr && [...props.listBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
-      sValueBr(props.sValueBr ? props.listBr && [...props.sValueBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [])
+   
+      sValueBr(props.sValueBr ? props.listBr && [...props.sValueBr?.map(e => ({label: e.name, value: Number(e.id)}))] : [],
+      )
     }, [open]);
-    const branch_id = valueBr?.value
+    const checkId = props?.id && props.sValueBr?.reduce((obj, e) => {
+      obj.value = Number(e.id);
+      return obj;
+    }, {});
+    const branch_id = valueBr?.value || checkId?.value
+    
+
     const _HandleChangeInput = (type, value) => {
         if(type == "name"){
           sName(value.target?.value)
@@ -456,12 +463,13 @@ const Popup_kho = (props) => {
         onSending && _ServerSending()
     }, [onSending]);
     const _HandleSubmit = (e) => {
+    console.log(branch_id);
         e.preventDefault()
-        if(code.length == 0 || branch_id == null || name.length == 0 || address.length ==0 ){
+        if(code.length == 0 || branch_id == null || name.length == 0 || address.length ==0){
             code?.length ==0 &&  sErrInputCode(true)
             name?.length ==0 &&  sErrInputName(true)
             address?.length ==0 &&  sErrInputAddress(true)
-          branch_id == null && sErrInputBr(true) 
+          branch_id == null && sErrInputBr(true)    
             Toast.fire({
               icon: 'error',
               title: `${props.dataLang?.required_field_null}`
