@@ -1554,7 +1554,7 @@ const _ServerFetching =  () => {
                   options={options}
                   value={null}
                   onChange={_HandleAddParent.bind(this)}
-                  className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
+                  className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-none outline-none"
                   placeholder="Mặt hàng"
                   noOptionsMessage={() => "Không có dữ liệu"}
                   menuPortalTarget={document.body}
@@ -1614,14 +1614,16 @@ const _ServerFetching =  () => {
                         boxShadow: 'none'
                       }),
                     }),
+
                   }}
                 />
                 </div>
                 <div className='col-span-10'>
                   <div className={`${dataProductSerial.is_enable == "1" ? 
                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-13" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-[repeat(13_minmax(0_1fr))]" :"grid-cols-11" ) :
-                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10") ) } grid  divide-x border-t border-b `}>
-                    <div className='col-span-1'> <Select placeholder="Kho - vị trí kho" className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]' isDisabled={true} /></div>
+                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10") ) } grid  divide-x border-t border-b border-r border-l`}>
+                  
+                    <div className='col-span-1'> <Select classNamePrefix="customDropdowDefault"  placeholder="Kho - vị trí kho" className='3xl:text-[12px] border-none outline-none 2xl:text-[10px] xl:text-[9.5px] text-[9px]' isDisabled={true} /></div>
                     {dataProductSerial.is_enable === "1" ? (
                               <div className=" col-span-1 flex items-center">
                                  <div className='flex justify-center   p-0.5 flex-col items-center'>
@@ -1674,9 +1676,10 @@ const _ServerFetching =  () => {
                              ):""}
                       <div className='col-span-1'></div>
                       <div className="col-span-1 flex items-center justify-center">
+                      {/* 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px] */}
                         {/* <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center3xl:p-0 2xl:p-0 xl:p-0 p-0  bg-slate-200 rounded-full"><Minus className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button> */}
                         <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full" ><Minus className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
-                        <div className='text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b-2 border-gray-200'>1</div>
+                         <div className=' text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b-2 w-full border-gray-200'>1</div>
                         <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"><Add className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
                       </div>
                       <div className='col-span-1 justify-center flex items-center'>
@@ -1691,7 +1694,7 @@ const _ServerFetching =  () => {
                       </div>
                       <div className='col-span-1 text-right 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black  flex items-center justify-end'>1.00</div>
                       <input placeholder='Ghi chú' disabled className= " disabled:bg-gray-50 col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 " />
-                      <button title='Xóa' disabled className='col-span-1 disabled:opacity-50 transition w-full h-full bg-slate-100  rounded-[5.5px] text-red-500 flex flex-col justify-center items-center'>
+                      <button title='Xóa' disabled className='col-span-1  disabled:opacity-50 transition w-full h-full bg-slate-100  rounded-[5.5px] text-red-500 flex flex-col justify-center items-center'>
                         <IconDelete />
                       </button>
                   </div>
@@ -1704,7 +1707,7 @@ const _ServerFetching =  () => {
                     <>
                     {listData?.map(e => 
                       <div key={e?.id?.toString()} className='grid grid-cols-12 items-start'>
-                        <div className='col-span-2 border p-0.5 pb-1 h-full'>
+                        <div className='col-span-2 border border-r p-0.5 pb-1 h-full'>
                           <div className='relative mr-5 mt-5'>
                             <Select 
                               options={options}
@@ -1740,6 +1743,7 @@ const _ServerFetching =  () => {
                                   </div>
                                 </div>
                               )}
+                              classNamePrefix="customDropdow"
                               style={{ border: "none", boxShadow: "none", outline: "none" }}
                               theme={(theme) => ({
                                 ...theme,
@@ -1774,15 +1778,15 @@ const _ServerFetching =  () => {
                         <div className='col-span-10  items-center'>
                           <div className={`${dataProductSerial.is_enable == "1" ? 
                       (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-13" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-[repeat(13_minmax(0_1fr))]" :"grid-cols-11" ) :
-                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10") ) } grid  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]`}>
+                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10") ) } grid  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r`}>
                             {e?.child?.map(ce =>
                               <React.Fragment key={ce?.id?.toString()}>
-                                <div className='p-0.5 border flex flex-col justify-center h-full'>
+                                <div className='flex justify-center border-t border-l  h-full p-0.5 flex-col items-center '>
                                   <Select 
                                     options={warehouse}
                                     value={ce?.kho} 
                                     onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "kho")}
-                                    className={`${errWarehouse && ce?.kho == null ? "border-red-500" : "" } my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal outline-none border`} 
+                                    className={`${errWarehouse && ce?.kho == null ? "border-red-500" : "" } my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `} 
                                     placeholder={"Kho - vị trí kho"} 
                                     menuPortalTarget={document.body}
                                     formatOptionLabel={(option) => (
@@ -1801,11 +1805,12 @@ const _ServerFetching =  () => {
                                           primary: '#0F4F9E',
                                       },
                                     })}
+                                    classNamePrefix="customDropdow"
                                   />
                                 </div>
                                 {dataProductSerial.is_enable === "1" ? (
-                                <div className=" col-span-1">
-                                  <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
+                                <div className=" col-span-1 ">
+                                  <div className='flex justify-center  h-full p-0.5 flex-col items-center'>
                                       <input
                                         value={ce?.serial}
                                         disabled={e?.matHang?.e?.text_type != "products"}
@@ -1824,8 +1829,8 @@ const _ServerFetching =  () => {
                               ):""}
                             {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
                               <>
-                                <div className=" col-span-1 ">
-                                <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
+                                <div className=" col-span-1  ">
+                                <div className='flex justify-center  h-full p-0.5 flex-col items-center'>
                                       {/* <input
                                         value={ce?.lot}
                                         disabled={e?.matHang?.e?.text_type != "material"}
@@ -1849,8 +1854,8 @@ const _ServerFetching =  () => {
                                 </div>
                                 </div>
                             
-                                <div className=" col-span-1 ">
-                                <div className="custom-date-picker flex justify-center border h-full p-0.5 flex-col items-center w-full">
+                                <div className=" col-span-1  ">
+                                <div className="custom-date-picker flex justify-center h-full p-0.5 flex-col items-center w-full">
                                     {/* <input type='date'
                                         value={ce?.date}
                                         disabled={ce?.disabledDate}
@@ -1887,22 +1892,22 @@ const _ServerFetching =  () => {
                                 </div>
                               </>
                               ):""}
-                                <div className='text-center border p-0.5 pr-2.5 h-full flex flex-col justify-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{ce?.donViTinh}</div>
-                                <div className="flex items-center justify-center border h-full p-0.5">
+                                <div className='text-center  p-0.5 pr-2.5 h-full flex flex-col justify-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{ce?.donViTinh}</div>
+                                <div className="flex items-center justify-center  h-full p-0.5">
                                   <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full" onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "decrease")}><Minus className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
-                                  <NumericFormat
-                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b-2 border-gray-200"
-                                    onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "amount")}
-                                    value={ce?.amount || 1}
-                                    allowNegative={false}
-                                    decimalScale={0}
-                                    isNumericString={true}  
-                                    thousandSeparator=","
-                                    isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
-                                    />
+                                    <NumericFormat
+                                      className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b-2 border-gray-200"
+                                      onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "amount")}
+                                      value={ce?.amount || 1}
+                                      allowNegative={false}
+                                      decimalScale={0}
+                                      isNumericString={true}  
+                                      thousandSeparator=","
+                                      isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
+                                      />
                                   <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full" onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "increase")}><Add className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
                                 </div>
-                                <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
+                                <div className='flex justify-center  h-full p-0.5 flex-col items-center'>
                                   <NumericFormat
                                     className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b-2 border-gray-200 h-fit"
                                     onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "price")}
@@ -1914,7 +1919,7 @@ const _ServerFetching =  () => {
                                     isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
                                   />
                                 </div>
-                                <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
+                                <div className='flex justify-center  h-full p-0.5 flex-col items-center'>
                                   <NumericFormat
                                     className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
                                     onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "chietKhau")}
@@ -1927,10 +1932,10 @@ const _ServerFetching =  () => {
                                   />
                                 </div>
                                 {/* <div>{ce?.priceAfter}</div> */}
-                                <div className='col-span-1 text-right flex items-center justify-end border h-full p-0.5'>
+                                <div className='col-span-1  text-right flex items-center justify-end  h-full p-0.5'>
                                   <h3 className='px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{formatNumber(Number(ce?.price) * ( 1 - Number(ce?.chietKhau)/100 ))}</h3>
                                 </div>
-                                <div className='border flex flex-col items-center p-0.5 h-full justify-center'>
+                                <div className=' flex flex-col items-center p-0.5 h-full justify-center'>
                                   <Select 
                                     options={taxOptions}
                                     value={ce?.tax} 
@@ -1957,9 +1962,9 @@ const _ServerFetching =  () => {
                                   />
                                 </div>
                                 {/* <div>{ce?.thanhTien}</div> */}
-                                <div className='justify-center pr-1 border p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{formatNumber((ce?.price * ( 1 - Number(ce?.chietKhau)/100 )) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
+                                <div className='justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{formatNumber((ce?.price * ( 1 - Number(ce?.chietKhau)/100 )) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
                                 {/* <div>{ce?.note}</div> */}
-                                <div className='col-span-1 flex items-center justify-center border h-full p-0.5'>
+                                <div className='col-span-1  flex items-center justify-center  h-full p-0.5'>
                                 <input
                                     value={ce?.note}  
                                     onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "note")}
@@ -1968,7 +1973,7 @@ const _ServerFetching =  () => {
                                     className= "  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
                                   /> 
                                 </div>
-                                <div className='border h-full p-0.5 flex flex-col items-center justify-center'>
+                                <div className=' h-full p-0.5 flex flex-col items-center justify-center '>
                                   <button title='Xóa' onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)} className=' text-red-500 flex flex-col justify-center items-center'>
                                     <IconDelete />
                                   </button>
