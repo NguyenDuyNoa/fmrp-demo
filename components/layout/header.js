@@ -286,7 +286,8 @@ const Header = () => {
                     img: "/icon/header/khac/ti.png",
                     items: [
                         { name: "Yêu cầu khiếu nại" },
-                        { name: "Lịch" }
+                        { name: "Lịch",},
+                        { name: "Import dữ liệu", link: "/import"  }
                     ]
                 }
             ]

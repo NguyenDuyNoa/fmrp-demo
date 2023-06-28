@@ -863,7 +863,7 @@ return (
               <div className='col-span-7'>
                     <h3 className='text-[13px] p-1'>{props.dataLang?.purchase_order_note || "purchase_order_note"}</h3>
                     <textarea 
-                    className="resize-none scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
+                    className="resize-none text-[13px] scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
                     disabled value={data?.note}/>
                 </div>
              <div className='col-span-2 space-y-2'>

@@ -77,10 +77,12 @@ const Index = (props) => {
     const [listData, sListData] = useState([]);
     const [idParen, sIdParent] = useState(null)
     const [qtyHouse, sQtyHouse] = useState(null)
+    const [survive, sSurvive] = useState(null)
 
     const [idSupplier, sIdSupplier] = useState(null)
     const [idTreatment, sIdTreatment] = useState(null)
     const [idBranch, sIdBranch] = useState(null);
+    const [load, sLoad] = useState(false)
     
     const [errSupplier, sErrSupplier] = useState(false)
     const [errDate, sErrDate] = useState(false)
@@ -89,6 +91,7 @@ const Index = (props) => {
     const [errBranch, sErrBranch] = useState(false)
     const [errWarehouse, sErrWarehouse] = useState(false)
     const [errAmount, sErrAmount] = useState(false)
+    const [errSurvive, sErrSurvive] = useState(false)
     const [errLot, sErrLot] = useState(false)
     const [errSerial, sErrSerial] = useState(false)
     const [khotong, sKhotong] = useState(null)
@@ -163,7 +166,7 @@ const _ServerFetching =  () => {
   const options =  dataItems?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e})) 
 
   const _ServerFetchingDetailPage = () => {
-  Axios("GET", `/api_web/Api_import/getImport/${id}?csrf_protection=true`, {}, (err, response) => {
+  Axios("GET", `/api_web/Api_return_supplier/getDetail/${id}?csrf_protection=true`, {}, (err, response) => {
       if(!err){
         var rResult = response.data;
         sListData(rResult?.items.map(e => ({
@@ -172,8 +175,11 @@ const _ServerFetching =  () => {
           child: e?.child.map(ce => ({ 
                 id: Number(ce?.id),
                 disabledDate: (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) || (e.item?.text_type == "material"  && dataMaterialExpiry?.is_enable == "0" && true) || (e.item?.text_type == "products"  && dataProductExpiry?.is_enable == "1" && false) || (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true), 
-                kho: {label: ce?.location_name, value: ce?.location_warehouses_id, warehouse_name: ce?.warehouse_name}, 
+                kho: {label: ce?.location_name, value: ce?.location_warehouses_id, warehouse_name: ce?.warehouse_name, qty: ce?.quantity}, 
                 serial: ce?.serial == null ? "" : ce?.serial,
+                soluongcl: Number(e?.item?.quantity_left),
+                soluongdt: Number(e?.item?.quantity_returned) ,
+                soluongdn: Number(e?.item?.quantity_create) ,
                 lot: ce?.lot == null ? "" : ce?.lot,
                 date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
                 donViTinh: e?.item?.unit_name, 
@@ -182,18 +188,27 @@ const _ServerFetching =  () => {
                 chietKhau: Number(ce?.discount_percent), 
                 tax: {tax_rate: ce?.tax_rate, value: ce?.tax_id, label: ce?.tax_name},
                 note: ce?.note
-          }))
-        })))
+              }))
+            })
+            ))
+        // const checkQty = rResult?.items?.map(e => e.item).reduce((obj, e) => {
+        //   obj.id = Number(e.id);
+        //   return obj;
+        // }, {});
+        // sIdParent(checkQty.id)
         sCode(rResult?.code)
-        sIdBranch({label: rResult?.branch_name, value:rResult?.branch_id})
+        sIdBranch({label: rResult?.branch_name, value: rResult?.branch_id})
         sIdSupplier({label: rResult?.supplier_name, value: rResult?.supplier_id})
-        // sIdTreatment({label: rResult?.purchase_order_code, value: rResult?.purchase_order_id})
+        sIdTreatment({label: dataLang[rResult?.treatment_methods_name], value: rResult?.treatment_methods})
         sStartDate(moment(rResult?.date).toDate())
         sNote(rResult?.note)
       }
       sOnFetchingDetail(false)
     })
   }
+  // useEffect(()=>{
+  //   _ServerFetching_Warehouse()
+  // },[id])
   useEffect(() => {
     //new
     onFetchingDetail && _ServerFetchingDetailPage()
@@ -247,7 +262,7 @@ const _ServerFetching =  () => {
         if(listData?.length > 0){
           if(type ==="supplier" && idSupplier != value){
             Swal.fire({
-              title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
+              title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
               icon: 'warning',
               showCancelButton: true,
               confirmButtonColor: '#296dc1',
@@ -281,7 +296,7 @@ const _ServerFetching =  () => {
          if(listData?.length > 0){
             if(type ==="branch" && idBranch != value){
               Swal.fire({
-                title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
+                title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#296dc1',
@@ -344,30 +359,51 @@ const _ServerFetching =  () => {
     sStartDate(date)
   };
 
-
     const _HandleSubmit = (e) => {
       e.preventDefault();
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
-      const hasNullAmount = listData.some(item => item.child?.some(childItem => childItem.amount === null || childItem.amount === ''));
-     
-        if(idSupplier == null  || idBranch == null || idTreatment == null || hasNullKho || hasNullAmount ){
+      const hasNullAmount = listData.some(item => item.child?.some(childItem => childItem.amount === null || childItem.amount === '' || childItem.amount == 0));
+      const isTotalExceeded = listData?.some((e) =>
+         !hasNullKho && e.child?.some((opt) => {
+              const amount = parseFloat(opt?.amount) || 0;
+              const qty = parseFloat(opt?.kho?.qty) || 0;
+              return amount > qty;
+            })
+      );
+      const isEmpty = listData?.length === 0 ? true : false;
+      if(idSupplier == null  || idBranch == null || idTreatment == null || hasNullKho || hasNullAmount || isTotalExceeded || isEmpty){
           idSupplier == null && sErrSupplier(true)
           idBranch == null && sErrBranch(true)
           idTreatment == null && sErrTreatment(true)
           hasNullKho && sErrWarehouse(true) 
-          hasNullAmount && sErrAmount(true) 
+          hasNullAmount && sErrAmount(true)
+          if(isEmpty){
+            Toast.fire({
+                    icon: 'error',
+                    title: `Chưa nhập thông tin mặt hàng`
+            })
+          }
+         else if(isTotalExceeded) {
+            sErrSurvive(true)
             Toast.fire({
                 icon: 'error',
-                title: `${dataLang?.required_field_null}`
+                title: `${dataLang?.returns_err_QtyNotQexceed || "returns_err_QtyNotQexceed"}`
             })
+          }
+          else{
+              Toast.fire({
+                  icon: 'error',
+                  title: `${dataLang?.required_field_null}`
+              })
+            }
         }
         else {
+            sErrSurvive(false)
             sErrWarehouse(false)
             sErrAmount(false)
             sOnSending(true)
         }
       }
-
     useEffect(() => {
       sErrDate(false)
     }, [date != null]);
@@ -389,7 +425,7 @@ const _ServerFetching =  () => {
     sOnLoadingChild(true)
     Axios("GET", `/api_web/Api_import/quantityStock/${idParen}?csrf_protection=true`, {
       params:{
-        "filter[branch_id]":idBranch.value
+        "filter[branch_id]":idBranch?.value
       }
     }, (err, response) => {
 
@@ -541,21 +577,18 @@ const _ServerFetching =  () => {
                       sErrSupplier(false)
                       //new
                       sListData([])
-                      router.back()
+                      router.push('/purchase_order/returns?tab=all')
                   }else {    
-                    if(tongTienState.tongTien == 0){
-                      Toast.fire({
-                        icon: 'error',
-                        title: `Chưa nhập thông tin mặt hàng`
-                    })
-                     } 
-                    else{
+                    // if(listData?.length == 0){
+                    //   Toast.fire({
+                    //     icon: 'error',
+                    //     title: `Chưa nhập thông tin mặt hàng`
+                    // })
+                    //  } 
                       Toast.fire({
                         icon: 'error',
                         title: `${dataLang[message]}`
-                      })
-                    }
-                     
+                      })     
                   }
               }
               sOnSending(false)
@@ -620,7 +653,7 @@ const _ServerFetching =  () => {
       sListData([newData,...listData]);
     }else{
       Toast.fire({
-        title: `${"Mặt hàng đã được chọn"}`,
+        title: `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`,
         icon: 'error',
       })
     }
@@ -637,7 +670,7 @@ const _ServerFetching =  () => {
     }).filter(e => e.child?.length > 0)
     sListData([...newData])
   }
-  const [load, sLoad] = useState(false)
+
   const _HandleChangeChild = (parentId, childId, type, value) => {
     const newData = listData.map(e => {
       if(e?.id === parentId){
@@ -645,25 +678,25 @@ const _ServerFetching =  () => {
         var index = e.child.findIndex(x => x?.id === childId);
           if(ce?.id === childId){
             if(type === "amount"){
+              sErrSurvive(false)
               ce.amount = Number(value?.value);
-              const totalSotien = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
-                if (totalSotien > qtyHouse) {
+              const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
+                if (totalSoLuong > qtyHouse) {
                   e.child.forEach((opt, optIndex) => {
                     const currentValue = ce.amount; // Lưu giá trị hiện tại
                     ce.amount = '';
                     if (optIndex === index) {
                       ce.amount = currentValue; // Gán lại giá trị hiện tại
-                      // return {...ce, amount: currentValue}
                     }
                   });
-                  Toast.fire({
-                    title: `Tổng số lượng chỉ được lớn hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại !`,
-                    icon: 'error',
-                    confirmButtonColor: '#296dc1',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: dataLang?.aler_yes,
-                    timer: 3000
-                  });
+                    Toast.fire({
+                      title:`Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`,
+                      icon: 'error',
+                      confirmButtonColor: '#296dc1',
+                      cancelButtonColor: '#d33',
+                      confirmButtonText: dataLang?.aler_yes,
+                      timer: 3000
+                    });
                   ce.amount = '' || null
                   setTimeout(()=>{
                     sLoad(true)
@@ -672,21 +705,29 @@ const _ServerFetching =  () => {
                     sLoad(false)
                   },1000)
                   return {...ce}
-                }
-                else {
-                  sLoad(false)
+                }else {
+                    sLoad(false)
                   return {...ce}
-
-                //  ce.amount = parseFloat(value?.value);
                 }
-               
-
-              // ce.amount = Number(value?.value)
-              
             }else if(type === "increase"){
-              return {...ce, amount: Number(Number(ce?.amount) + 1)}
+              sErrSurvive(false)
+              const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
+              if(totalSoLuong == qtyHouse){
+                Toast.fire({
+                  title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`,
+                  icon: 'error',
+                  confirmButtonColor: '#296dc1',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: dataLang?.aler_yes,
+                  timer: 3000
+                });
+                return {...ce}
+              }else{
+                return {...ce,amount: Number(Number(ce?.amount) + 1)}
+              }
             }else if(type === "decrease"){
-              return {...ce, amount: Number(Number(ce?.amount) - 1)}
+                sErrSurvive(false)
+                return {...ce, amount: Number(Number(ce?.amount) - 1)}
             }else if(type === "price"){
               return {...ce, price: Number(value?.value)}
             }else if(type === "chietKhau"){
@@ -695,9 +736,11 @@ const _ServerFetching =  () => {
               return {...ce, note: value?.target.value}
             }else if(type === "kho"){
               const checkKho = e?.child?.map(house => house)?.some(i => i?.kho?.value === value?.value)
+              sSurvive(Number(value?.qty))
+              sErrSurvive(false)
                 if(checkKho){
                   Toast.fire({
-                    title: `${"Kho trả và trị trí trả đã được chọn"}`,
+                    title: `${dataLang?.returns_err_Warehouse || "returns_err_Warehouse"}`,
                     icon: 'error',
                   })
                   return {...ce}
@@ -718,7 +761,6 @@ const _ServerFetching =  () => {
     })
     sListData([...newData])
   }
-  console.log(listData);
 
   const _HandleChangeValue = (parentId, value) => {
     const checkData = listData?.some(e => e?.matHang?.value === value?.value)
@@ -750,11 +792,13 @@ const _ServerFetching =  () => {
       sListData([...newData]);
     }else{
       Toast.fire({
-        title: `${"Mặt hàng đã được chọn"}`,
+        title: `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`,
         icon: 'error',
       })
     }
   }
+
+
   return (
     <React.Fragment>
     <Head>
@@ -871,7 +915,7 @@ const _ServerFetching =  () => {
                             isClearable={true}
                             className={`${errSupplier ? "border-red-500" : "border-transparent" } placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `} 
                             isSearchable={true}
-                            noOptionsMessage={() => "Không có dữ liệu"}
+                            noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                             menuPortalTarget={document.body}
                             closeMenuOnSelect={true}
                             style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -913,7 +957,7 @@ const _ServerFetching =  () => {
                               isLoading={idBranch || idSupplier != null ? false : onLoading}
                               value={idTreatment}
                               isClearable={true}
-                              noOptionsMessage={() => "Không có dữ liệu"}
+                              noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                               closeMenuOnSelect={true}
                               hideSelectedOptions={false}
                               placeholder={dataLang?.returns_treatment_methods || "returns_treatment_methods"} 
@@ -959,12 +1003,12 @@ const _ServerFetching =  () => {
                   <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2 text-center truncate font-[400]'>{dataLang?.import_from_items || "import_from_items"}</h4>
                   <div className='col-span-10'>
                       <div className='grid grid-cols-11'>
-                      <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]'>{"Kho trả - Vị trí trả"}</h4>
+                      <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]'>{dataLang?.returns_point || "returns_point"}</h4>
                       <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"ĐVT"}</h4>
                       <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_quantity || "import_from_quantity"}</h4>
                       <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
                       <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_discount || "import_from_discount"}</h4>
-                      <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{"Đơn giá SCK"}</h4>
+                      <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.returns_sck || "returns_sck"}</h4>
                       <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]'>{dataLang?.import_from_tax || "import_from_tax"}</h4>
                       <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_into_money || "import_into_money"}</h4>
                       <h4 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]'>{dataLang?.import_from_note || "import_from_note"}</h4>
@@ -979,15 +1023,15 @@ const _ServerFetching =  () => {
                   value={null}
                   onChange={_HandleAddParent.bind(this)}
                   className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
-                  placeholder="Mặt hàng"
-                  noOptionsMessage={() => "Không có dữ liệu"}
+                  placeholder={dataLang?.returns_items || "returns_items"}
+                  noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                   menuPortalTarget={document.body}
                   formatOptionLabel={(option) => (
                     <div className='py-2'>
                         <div className='flex items-center '>
-                          <div className='w-[40px] h-[60px]'>
-                          {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='max-w-[30px] h-[40px] text-[8px] object-cover rounded' />):
-                                <div className=' w-[30px] h-[40px] object-cover  flex items-center justify-center rounded'>
+                          <div className='w-[40px] h-[50px]'>
+                          {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='max-w-[40px] h-[50px] text-[8px] object-cover rounded' />):
+                                <div className=' w-[40px] h-[50px] object-cover  flex items-center justify-center rounded'>
                                   <img src="/no_img.png" alt="Product Image"  className='w-[30px] h-[30px] object-cover rounded' />
                               </div>
                               }
@@ -995,10 +1039,14 @@ const _ServerFetching =  () => {
                           <div>
                             <h3 className='font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.name}</h3>
                             <div className='flex gap-2'>
-                              <h5 className='text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]' >{option.e?.code}</h5>
-                              <h5 className='font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.product_variation}</h5>
+                                        <h5 className='text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]' >{option.e?.code}</h5>
+                                        <h5 className='font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.product_variation}</h5>
+                             </div>
+                            <div className='flex items-center gap-1'>
+                                        <h5 className='text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.import_code} - </h5>
+                                        <h5 className='text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{`(ĐGSCK: ${formatNumber(option.e?.price_after_discount)}) -`}</h5>
+                                        <h5 className='text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{dataLang[option.e?.text_type]}</h5>
                             </div>
-                            <h5 className='text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.import_code} - {dataLang[option.e?.text_type]}</h5>
                           </div>
                         </div>
                         <div className='flex items-center gap-2 italic'>
@@ -1009,14 +1057,6 @@ const _ServerFetching =  () => {
                                 <div className="text-[11px] text-[#667085] font-[500]">Date: {option.e?.expiration_date ?  moment(option.e?.expiration_date).format('DD/MM/YYYY') : '-'}</div>
                               </> ):""}
                         </div>
-                      {/* <div className=''>
-                         <div className='text-right opacity-0'>{"0"}</div>
-                         <div className='flex gap-2'>
-                           <div className='flex items-center gap-2'>
-                             <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{qtyHouse?.quantity ?? 0}</h5>
-                           </div>
-                          </div>
-                      </div> */}
                     </div>
                   )}
                   style={{ border: "none", boxShadow: "none", outline: "none" }}
@@ -1045,15 +1085,18 @@ const _ServerFetching =  () => {
                         boxShadow: 'none'
                       }),
                     }),
+                    menu: (provided, state) => ({
+                      ...provided,
+                      width: "125%",
+                    }),
                   }}
                 />
                 </div>
                 <div className='col-span-10'>
-                  <div className="grid grid-cols-11  divide-x border-t border-b">
-                    <div className='col-span-2'> <Select placeholder="Kho trả - vị trí trả" className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]' isDisabled={true} /></div>
-                   
+                  <div className="grid grid-cols-11  divide-x border-t border-b border-r border-l">
+                    <div className='col-span-2'> <Select classNamePrefix="customDropdowDefault" placeholder={dataLang?.returns_point || "returns_point"} className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]' isDisabled={true} /></div>
                       <div className='col-span-1'></div>
-                      <div className="col-span-1 flex items-center justify-center">
+                      <div className="col-span-1 flex  justify-center items-center">
                         <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full" ><Minus className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
                           <div className='text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b-2 border-gray-200'>1</div>
                         <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"><Add className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
@@ -1066,11 +1109,11 @@ const _ServerFetching =  () => {
                       </div>
                       <div className='col-span-1 text-right 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black flex items-center justify-end'>0</div>
                       <div className='col-span-1 flex items-center w-full'>
-                       <Select placeholder="% Thuế" className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full' isDisabled={true} />
+                       <Select classNamePrefix="customDropdowDefault" placeholder={dataLang?.returns_tax || "returns_tax"} className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full' isDisabled={true} />
                       </div>
                       <div className='col-span-1 text-right 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black  flex items-center justify-end'>1.00</div>
-                      <input placeholder='Ghi chú' disabled className= " disabled:bg-gray-50 col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 " />
-                      <button title='Xóa' disabled className='col-span-1 disabled:opacity-50 transition w-full h-full bg-slate-100  rounded-[5.5px] text-red-500 flex flex-col justify-center items-center'>
+                      <input placeholder={dataLang?.returns_note || "returns_note"} disabled className= " disabled:bg-gray-50 col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 " />
+                      <button title={dataLang?.returns_delete ||"returns_delete"} disabled className='col-span-1 disabled:opacity-50 transition w-full h-full bg-slate-100  rounded-[5.5px] text-red-500 flex flex-col justify-center items-center'>
                         <IconDelete />
                       </button>
                   </div>
@@ -1083,7 +1126,7 @@ const _ServerFetching =  () => {
                     <>
                     {listData?.map(e => 
                       <div key={e?.id?.toString()} className='grid grid-cols-12 items-start'>
-                        <div className='col-span-2 border p-2 pb-1 h-full'>
+                        <div className='col-span-2 border border-r p-2 pb-1 h-full'>
                           <div className='relative mt-5'>
                             <Select 
                               options={options}
@@ -1122,9 +1165,9 @@ const _ServerFetching =  () => {
                                   // </div>
                                   <div className='py-2'>
                                   <div className='flex items-center gap-1'>
-                                    <div className='w-[30px] h-[60px]'>
-                                    {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='max-w-[30px] h-[40px] text-[8px] object-cover rounded' />):
-                                          <div className=' w-[30px] h-[60px] object-cover  flex items-center justify-center  rounded'>
+                                    <div className='w-[40px] h-[50px]'>
+                                    {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='max-w-[40px] max-h-[50px] text-[8px] object-cover rounded' />):
+                                          <div className=' w-[40px] h-[50px] object-cover  flex items-center justify-center  rounded'>
                                             <img src="/no_img.png" alt="Product Image"  className=' object-cover rounded' />
                                           </div>
                                         }
@@ -1135,7 +1178,11 @@ const _ServerFetching =  () => {
                                         <h5 className='text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]' >{option.e?.code}</h5>
                                         <h5 className='font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.product_variation}</h5>
                                       </div>
-                                      <h5 className='text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.import_code} - {dataLang[option.e?.text_type]}</h5>
+                                      <div className='flex items-center gap-1'>
+                                        <h5 className='text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.import_code} - </h5>
+                                        <h5 className='text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{`(ĐGSCK: ${formatNumber(option.e?.price_after_discount)}) -`}</h5>
+                                        <h5 className='text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{dataLang[option.e?.text_type]}</h5>
+                                      </div>
                                     </div>
                                   </div>
                                   <div className={`${option.e?.serial || option.e?.lot || option.e?.expiration_date ? "" :"" } flex items-center gap-2 italic`}>
@@ -1183,41 +1230,49 @@ const _ServerFetching =  () => {
                                     boxShadow: 'none'
                                   }),
                                 }),
+                                menu: (provided, state) => ({
+                                  ...provided,
+                                  width: "125%",
+                                }),
                               }}
+                            
                             />
                             <button onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)} className='w-8 h-8 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-4 right-5 hover:rotate-45 hover:bg-slate-200 transition hover:scale-105 hover:text-red-500 ease-in-out'><Add className=''/></button>
                           </div>
                         </div>
                         <div className='col-span-10  items-center'>
-                          <div className="grid grid-cols-11  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                          <div className="grid grid-cols-11  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
                           {load ? <Loading className="h-2 col-span-11"color="#0f4f9e"/> :
                             e?.child?.map(ce =>
                               <React.Fragment key={ce?.id?.toString()}>
-                                <div className='p-0.5 border flex flex-col col-span-2 justify-center h-full'>
+                                <div className='p-0.5 border-t border-l  flex flex-col col-span-2 justify-center h-full'>
                                   <Select 
                                     options={warehouse}
                                     value={ce?.kho} 
                                     isLoading={ce?.kho == null ? onLoadingChild : false}
                                     onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "kho")}
-                                    className={`${errWarehouse && ce?.kho == null ? "border-red-500" : "" } my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal outline-none border`} 
-                                    placeholder={onLoadingChild ? "" : "Kho trả - vị trí trả"} 
+                                    className={`${errWarehouse && ce?.kho == null ? "border-red-500" : "" } my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `} 
+                                    placeholder={onLoadingChild ? "" : dataLang?.returns_point || "returns_point"} 
                                     menuPortalTarget={document.body}
-                                    formatOptionLabel={(option) => (
+                                    formatOptionLabel={(option) => 
+                                      (
                                       <div className=''>
                                         <div className='flex gap-1'>
-                                          <h2 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium'>{"Kho trả"}:</h2>
+                                          <h2 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium'>{dataLang?.returns_wareshoue || "returns_wareshoue"}:</h2>
                                           <h2 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold'>{option?.warehouse_name}</h2>
                                         </div>
                                         <div className='flex gap-1'>
-                                          <h2 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium'>{"Vị trí trả"}:</h2>
+                                          <h2 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium'>{dataLang?.returns_wareshouePosition || "returns_wareshouePosition"}:</h2>
                                           <h2 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold'>{option?.label}</h2>
                                         </div>
                                         <div className='flex gap-1'>
-                                          <h2 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium'>Tồn:</h2>
+                                          <h2 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium'>{dataLang?.returns_survive || "returns_survive"}:</h2>
                                           <h2 className='3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold'>{formatNumber(option?.qty)}</h2>
                                         </div>
                                       </div>
-                                    )}
+                                    )
+                                    
+                                  }
                                     style={{ border: "none", boxShadow: "none", outline: "none" }}
                                     theme={(theme) => ({
                                       ...theme,
@@ -1237,14 +1292,14 @@ const _ServerFetching =  () => {
                                     classNamePrefix="customDropdow"
                                   />
                                 </div>
-                                <div className='text-center border p-0.5 pr-2.5 h-full flex flex-col justify-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{ce?.donViTinh}</div>
+                                <div className='text-center  p-0.5 pr-2.5 h-full flex flex-col justify-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{ce?.donViTinh}</div>
                                 <div className='relative'>
-                                    <div className="flex items-center justify-center border h-full p-0.5">
-                                    <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full" onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "decrease")}><Minus className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
+                                    <div className="flex items-center justify-center h-full p-0.5">
+                                    <button disabled={ce?.amount === 1 || ce?.amount === "" || ce?.amount === null || ce?.amount === 0} className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full" onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "decrease")}><Minus className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
                                     <NumericFormat
                                       onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "amount")}
                                       value={ce?.amount || null}
-                                      className={`${errAmount || ce?.amount == null || ce?.amount == '' ? "border-b-2 border-red-500" : "border-b-2 border-gray-200"} appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
+                                      className={`${errAmount && (ce?.amount == null || ce?.amount == '' || ce?.amount == 0) ? "border-b-2 border-red-500" : errSurvive ? "border-b-2 border-red-500": "border-b-2 border-gray-200"} appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
                                       allowNegative={false}
                                       decimalScale={0}
                                       isNumericString={true}  
@@ -1259,39 +1314,43 @@ const _ServerFetching =  () => {
                                             if (floatValue > ce?.soluongcl || floatValue > qtyHouse) {
                                               Toast.fire({
                                                 icon: 'error',
-                                                title: `${props.dataLang?.payment_errPlease || "payment_errPlease"} ${ce?.soluongcl?.toLocaleString("en")}`
+                                                title: `${props.dataLang?.returns_err_Qty || "returns_err_Qty"} ${ce?.soluongcl?.toLocaleString("en")}`
                                               })
                                             }
                                             return floatValue <= ce?.soluongcl 
                                           }
-                                         
                                       }
                                       />
-
-                                    <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full" onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "increase")}><Add className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
+                                    <button  className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full" onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, "increase")}><Add className='2xl:scale-100 xl:scale-100 scale-50' size="16"/></button>
                                   </div>
-                                  <div className='absolute top-0 right-0 p-1 cursor-pointer'>
+                                  <div className='absolute top-0 right-0 p-1 cursor-pointer '>
                                     <Popup
                                         className=''
                                         trigger={
-                                          <TableDocument
+                                         <div className='relative '>
+                                           <TableDocument
                                               size="18"
                                               color='#4f46e5'
                                               className='font-medium'
                                               />
+                                             <span className="h-2 w-2  absolute top-0 left-1/2  translate-x-[50%] -translate-y-[50%]">
+                                              <span className="inline-flex relative rounded-full h-2 w-2 bg-indigo-500">
+                                              <span className="animate-ping  inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75 absolute"></span></span>
+                                             </span>
+                                         </div>
                                         }
                                         position="left center"
                                         on={['hover', 'focus']}
                                       >
                                        <div className='flex flex-col bg-gray-300 px-2.5 py-0.5 rounded-sm'>
-                                        <span className='font-medium text-xs'>SL đã nhập: {formatNumber(ce?.soluongdn)} </span>
-                                        <span className='font-medium text-xs'>SL đã trả: {formatNumber(ce?.soluongdt) }</span>
-                                        <span className='font-medium text-xs'>SL còn lại: {formatNumber(ce?.soluongcl) }</span>
+                                        <span className='font-medium text-xs'>{dataLang?.returns_sldn || "returns_sldn"}: {formatNumber(ce?.soluongdn)} </span>
+                                        <span className='font-medium text-xs'>{dataLang?.returns_sldt || "returns_sldt"}: {formatNumber(ce?.soluongdt) }</span>
+                                        <span className='font-medium text-xs'>{dataLang?.returns_slcl || "returns_slcl"}: {formatNumber(ce?.soluongcl) }</span>
                                        </div>
                                       </Popup>
                                   </div>
                                 </div>
-                                <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
+                                <div className='flex justify-center  h-full p-0.5 flex-col items-center'>
                                   <NumericFormat
                                     className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px]  text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b-2 border-gray-200 h-fit"
                                     onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "price")}
@@ -1304,7 +1363,7 @@ const _ServerFetching =  () => {
                                          
                                   />
                                 </div>
-                                <div className='flex justify-center border h-full p-0.5 flex-col items-center'>
+                                <div className='flex justify-center  h-full p-0.5 flex-col items-center'>
                                   <NumericFormat
                                     className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
                                     onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "chietKhau")}
@@ -1317,10 +1376,10 @@ const _ServerFetching =  () => {
                                   />
                                 </div>
                                 {/* <div>{ce?.priceAfter}</div> */}
-                                <div className='col-span-1 text-right flex items-center justify-end border h-full p-0.5'>
+                                <div className='col-span-1 text-right flex items-center justify-end  h-full p-0.5'>
                                   <h3 className='px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{formatNumber(Number(ce?.price) * ( 1 - Number(ce?.chietKhau)/100 ))}</h3>
                                 </div>
-                                <div className='border flex flex-col items-center p-0.5 h-full justify-center'>
+                                <div className=' flex flex-col items-center p-0.5 h-full justify-center'>
                                   <Select 
                                     options={taxOptions}
                                     value={ce?.tax} 
@@ -1348,9 +1407,9 @@ const _ServerFetching =  () => {
                                   />
                                 </div>
                                 {/* <div>{ce?.thanhTien}</div> */}
-                                <div className='justify-center pr-1 border p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{formatNumber((ce?.price * ( 1 - Number(ce?.chietKhau)/100 )) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
+                                <div className='justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{formatNumber((ce?.price * ( 1 - Number(ce?.chietKhau)/100 )) * (1 + Number(ce?.tax?.tax_rate)/100) * Number(ce?.amount))}</div>
                                 {/* <div>{ce?.note}</div> */}
-                                <div className='col-span-1 flex items-center justify-center border h-full p-0.5'>
+                                <div className='col-span-1 flex items-center justify-center  h-full p-0.5'>
                                 <input
                                     value={ce?.note}  
                                     onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "note")}
@@ -1359,7 +1418,7 @@ const _ServerFetching =  () => {
                                     className= "  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
                                   /> 
                                 </div>
-                                <div className='border h-full p-0.5 flex flex-col items-center justify-center'>
+                                <div className=' h-full p-0.5 flex flex-col items-center justify-center'>
                                   <button title='Xóa' onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)} className=' text-red-500 flex flex-col justify-center items-center'>
                                     <IconDelete />
                                   </button>
@@ -1406,7 +1465,7 @@ const _ServerFetching =  () => {
                             hideSelectedOptions={false}
                             className={` "border-transparent placeholder:text-slate-300 w-[70%] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `} 
                             isSearchable={true}
-                            noOptionsMessage={() => "Không có dữ liệu"}
+                            noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                           //  dangerouslySetInnerHTML={{__html: option.label}}
                             menuPortalTarget={document.body}
                             closeMenuOnSelect={true}

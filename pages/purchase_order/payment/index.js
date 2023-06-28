@@ -516,7 +516,7 @@ const Index = (props) => {
                               <h6 className='3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px]  col-span-1 flex items-center w-fit mx-auto'>
                                   <div className='mx-auto'>
                                     {
-                                      e?.objects === "client_group_client" && <span className='flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{dataLang[e?.objects] || e?.objects}</span>||
+                                      e?.objects === "client" && <span className='flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{dataLang[e?.objects] || e?.objects}</span>||
                                       e?.objects === "supplier" && <span className=' flex items-center justify-center font-normal text-orange-500 rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-orange-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{dataLang[e?.objects] || e?.objects}</span>||
                                       e?.objects === "other" && <span className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-lime-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{dataLang[e?.objects] || e?.objects}</span>
                                     }
@@ -2117,7 +2117,7 @@ return (
                 <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
                   <div className='col-span-7'>
                       <h3 className='text-[13px]'>{props.dataLang?.import_from_note || "import_from_note"}</h3>
-                      <textarea className="resize-none scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[70px]  max-h-[70px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
+                      <textarea className="text-[13px] resize-none scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[70px]  max-h-[70px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
                                 disabled value={data?.note}/>
                   </div>
                   <div className='col-span-2 space-y-1 text-right'>

@@ -1174,27 +1174,27 @@ return (
               </div>
           <h2 className='font-normal p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
               <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
-              <div className='col-span-7'>
-                  <h3 className='text-[13px] p-1'>{props.dataLang?.import_from_note || "import_from_note"}</h3>
-                <textarea 
-                 className="resize-none scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
-                 disabled value={data?.note}/>
-              </div>
-             <div className='col-span-2 space-y-1 text-right'>
-                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_total_amount || "import_detail_total_amount"}</h3></div>
-                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_discount || "import_detail_discount"}</h3></div>
-                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_affter_discount || "import_detail_affter_discount"}</h3></div>
-                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_tax_money || "import_detail_tax_money"}</h3></div>
-                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_into_money || "import_detail_into_money"}</h3></div>
-             </div>
-             <div className='col-span-3 space-y-1 text-right'>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price)}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_discount)}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price_after_discount)}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_tax)}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_amount)}</h3></div>
-             </div>
-          </div>   
+                  <div className='col-span-7'>
+                      <h3 className='text-[13px] p-1'>{props.dataLang?.import_from_note || "import_from_note"}</h3>
+                    <textarea 
+                    className="resize-none text-[13px] scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
+                    disabled value={data?.note}/>
+                  </div>
+                <div className='col-span-2 space-y-1 text-right'>
+                      <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_total_amount || "import_detail_total_amount"}</h3></div>
+                      <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_discount || "import_detail_discount"}</h3></div>
+                      <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_affter_discount || "import_detail_affter_discount"}</h3></div>
+                      <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_tax_money || "import_detail_tax_money"}</h3></div>
+                      <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_into_money || "import_detail_into_money"}</h3></div>
+                </div>
+                <div className='col-span-3 space-y-1 text-right'>
+                      <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price)}</h3></div>
+                      <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_discount)}</h3></div>
+                      <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price_after_discount)}</h3></div>
+                      <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_tax)}</h3></div>
+                      <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_amount)}</h3></div>
+                </div>
+            </div>   
             </div>
           </div>
     

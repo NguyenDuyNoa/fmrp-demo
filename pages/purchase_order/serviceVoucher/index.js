@@ -1658,7 +1658,7 @@ return (
                             disabled
                             name="fname"                      
                             type="text"
-                            className=" placeholder:text-slate-300 w-[80%] scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 min-h-[100px] max-h-[100px] resize-none bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 outline-none "
+                            className="text-[13px] placeholder:text-slate-300 w-[80%] scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 min-h-[100px] max-h-[100px] resize-none bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 outline-none "
                           />
                   </div>
               </div>

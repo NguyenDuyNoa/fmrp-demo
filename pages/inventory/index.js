@@ -460,61 +460,63 @@ return (
     open={open} onClose={_ToggleModal.bind(this,false)}
     classNameBtn={props?.className} 
   >
-        <div className="mt-4 space-x-5 w-[1200px] h-auto">        
+        <div className="mt-4 space-x-5 3xl:w-[1250px] 2xl:w-[1100px] w-[1050px] h-auto">        
           <div>
-           <div className='w-[1200px]'>
+           <div className='3xl:w-[1250px] 2xl:w-[1100px] w-[1050px]'>
              <div className="min:h-[170px] h-[72%] max:h-[100px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
              <h2 className='font-normal bg-[#ECF0F4] p-2'>{props?.dataLang?.purchase_general || "purchase_general"}</h2>       
-              <div className='grid grid-cols-12 gap-2  min-h-[170px] p-2'>
-                  <div className='col-span-4'>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}</h3><h3 className='col-span-1 font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_vouchercode || "inventory_vouchercode"}</h3><h3 className='col-span-1 font-normal'>{data?.code}</h3></div>
-                     <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_creator || "inventory_creator"}</h3><h3 className='flex items-center gap-1 col-span-1'><img src={data?.staff_create_image}   className="object-cover rounded-[100%] w-6 h-6 text-left"></img>  <span className='font-normal'>{data?.staff_create_name} </span></h3></div>
+              <div className='grid grid-cols-13 gap-2  min-h-[110px] p-2'>
+                  <div className='col-span-3'>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 text-[13px]'>{props.dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}</h3><h3 className='col-span-1 text-[13px] font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}</h3></div>
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 text-[13px]'>{props.dataLang?.inventory_vouchercode || "inventory_vouchercode"}</h3><h3 className='col-span-1 text-[13px] font-normal'>{data?.code}</h3></div>
                   </div>
-                  <div className='col-span-4 '>
-                    <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_warehouse || "inventory_warehouse"}</h3><h3 className='col-span-1 font-normal'>{data?.warehouse_name}</h3></div>
-                    <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_total_item || "inventory_total_item"}</h3><h3 className='col-span-1 font-normal'>{formatNumber(data?.total_item)}</h3></div>
-                    <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_status || "inventory_status"}</h3>
+                  <div className='col-span-3 '>
+                    <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 text-[13px]'>{props.dataLang?.inventory_warehouse || "inventory_warehouse"}</h3><h3 className='col-span-1 font-normal text-[13px]'>{data?.warehouse_name}</h3></div>
+                    <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 text-[13px]'>{props.dataLang?.inventory_total_item || "inventory_total_item"}</h3><h3 className='col-span-1 font-normal text-[13px]'>{formatNumber(data?.total_item)}</h3></div>
+                  </div>
+                  <div className='col-span-3'>
+                  <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 text-[13px]'>{props.dataLang?.inventory_creator || "inventory_creator"}</h3><h3 className='flex items-center gap-1 col-span-1 text-[13px]'><img src={data?.staff_create_image}   className="object-cover rounded-[100%] w-6 h-6 text-left"></img>  <span className='font-normal'>{data?.staff_create_name} </span></h3></div>
+                  <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 text-[13px]'>{props.dataLang?.inventory_status || "inventory_status"}</h3>
                       <h3 className='col-span-1 cursor-pointer'>
                         <Popup
                           className='dropdown-avt ' key={data?.staff_create_id}
-                          trigger={open => (<span className='border border-orange-500 text-orange-500 p-1 rounded-md'> {data?.adjusted ? data?.adjusted.split("|||").length + " " + " Điều chỉnh" : ""}</span>)}
+                          trigger={open => (<span className='border border-orange-500 text-orange-500 p-1 rounded-md text-[13px]'> {data?.adjusted ? data?.adjusted.split("|||").length + " " + " Điều chỉnh" : ""}</span>)}
                           position="top center" on={['hover']} arrow={false}>
-                          <span className='bg-[#0f4f9e] text-white rounded p-1.5 '>{data?.adjusted?.split('|||')?.map(item => item?.split('--')[1])?.map(e => e).join(", ")} </span>
+                          <span className='bg-[#0f4f9e] text-white rounded p-1.5 text-[13px]'>{data?.adjusted?.split('|||')?.map(item => item?.split('--')[1])?.map(e => e).join(", ")} </span>
                         </Popup>
                       </h3>
                     </div>
                   </div>
-                  <div className='col-span-4 '>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_note || "inventory_note"}</h3><h3 className='col-span-1 font-normal'>{data?.note}</h3></div>
-                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1'>{props.dataLang?.inventory_branch || "inventory_branch"}</h3><h3 className="w-fit 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{data?.branch_name}</h3></div>
+                  <div className='col-span-3 '>
+                      {/* <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 text-[13px]'>{props.dataLang?.inventory_note || "inventory_note"}</h3><h3 className='col-span-1 font-normal text-[13px]'>{data?.note}</h3></div> */}
+                      <div className='my-4 font-medium grid grid-cols-2'><h3 className='col-span-1 text-[13px]'>{props.dataLang?.inventory_branch || "inventory_branch"}</h3><h3 className="w-fit 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">{data?.branch_name}</h3></div>
                   </div>
               </div>
               <div className="pr-2 w-[100%] lx:w-[110%] ">
                 <div className={`${dataProductSerial.is_enable == "1" ? 
-                    (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
-                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow  z-10`}>
+                    (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-13" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-13" :"grid-cols-11" ) :
+                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10") ) }  grid sticky top-0 bg-white shadow  z-10`}>
                   {/* <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.inventory_image || "inventory_image"}</h4>
                   <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.inventory_items || "inventory_items"}</h4>
                   <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[400] text-center">{props.dataLang?.inventory_variant || "inventory_variant"}</h4>  */}
-                   <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.inventory_items || "inventory_items"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.inventory_unit || "inventory_unit"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.inventory_unit_price || "inventory_unit_price"}</h4>
-                  {dataProductSerial.is_enable === "1" && (<h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Serial"}</h4>)}
+                   <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[500] text-center">{props.dataLang?.inventory_items || "inventory_items"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[500] text-center">{props.dataLang?.inventory_unit || "inventory_unit"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[500] text-center">{props.dataLang?.inventory_unit_price || "inventory_unit_price"}</h4>
+                  {dataProductSerial.is_enable === "1" && (<h4 className="text-[13px] px-2  col-span-1  text-[#667085] uppercase  font-[500] text-center">{"Serial"}</h4>)}
                           {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
                             <>
-                              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Lot"}</h4>
-                              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}</h4>
+                              <h4 className="text-[13px] px-2  col-span-1  text-[#667085] uppercase  font-[500] text-center">{"Lot"}</h4>
+                              <h4 className="text-[13px] px-2  col-span-1  text-[#667085] uppercase   font-[500] text-center">{props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}</h4>
                             </> ):""}
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.inventory_warehouse_location || "inventory_warehouse_location"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.inventory_qty_inventory || "inventory_qty_inventory"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.inventory_actual_quantity || "inventory_actual_quantity"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.inventory_qty_difference || "inventory_qty_difference"}</h4>
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.inventory_qty_into_money || "inventory_qty_into_money"}</h4> 
-                  <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[400] text-center">{props.dataLang?.inventory_handle || "inventory_handle"}</h4> 
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[500] text-center">{props.dataLang?.inventory_warehouse_location || "inventory_warehouse_location"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[500] text-center">{props.dataLang?.inventory_qty_inventory || "inventory_qty_inventory"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[500] text-center">{props.dataLang?.inventory_actual_quantity || "inventory_actual_quantity"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[500] text-center">{props.dataLang?.inventory_qty_difference || "inventory_qty_difference"}</h4>
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[500] text-center">{props.dataLang?.inventory_qty_into_money || "inventory_qty_into_money"}</h4> 
+                  <h4 className="text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[500] text-center">{props.dataLang?.inventory_handle || "inventory_handle"}</h4> 
                 </div>
                 {onFetching ?
-                  <Loading className="h-20 2xl:h-[160px]"color="#0f4f9e" /> 
+                  <Loading className="h-5"color="#0f4f9e" /> 
                   : 
                   data?.items?.length > 0 ? 
                   (<>
@@ -523,10 +525,10 @@ return (
                     <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">                       
                       {(data?.items?.map((e) => 
                         <div className={`${dataProductSerial.is_enable == "1" ? 
-                        (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
-                        (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid hover:bg-slate-50`} key={e.id.toString()}>
-                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]   py-0.5 col-span-1  rounded-md text-left">
-                          <div className='flex flex-wrap'>
+                        (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-13" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-13" :"grid-cols-11" ) :
+                        (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10") ) } items-center  grid hover:bg-slate-50`} key={e.id.toString()}>
+                          <h6 className="text-[13px]   py-1 col-span-2  rounded-md text-left">
+                          <div className='flex items-center'>
                               <div className=''>
                                 {e?.item?.images != null ? (<ModalImage  small={e?.item?.images} large={e?.item?.images} alt="Product Image" style={{ width: "50px", height: "60px" }} className='object-cover rounded' />):
                                   <div className='w-[50px] h-[60px] object-cover  flex items-center justify-center rounded'>
@@ -534,33 +536,36 @@ return (
                                   </div>
                                 }
                               </div>
-                              <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]   px-2 py-0.5  text-left">{e?.item?.name}</h6>                
-                              <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]   px-2 py-0.5  text-left break-words">{e?.item?.product_variation + " - " + props.dataLang[e?.item?.text_type]}</h6>                
+                              <div>
+                                <h6 className="text-[13px]   px-2 py-0.5  text-left">{e?.item?.name}</h6>                
+                                <h6 className="text-[13px]   px-2 py-0.5  text-left break-words w-full">{e?.item?.product_variation}</h6>                
+                                <h6 className="text-[13px]   px-2 py-0.5  text-left break-words italic">{props.dataLang[e?.item?.text_type]}</h6>                
+                              </div>
                           </div>
                           </h6>   
-                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5  text-center break-words">{e?.item?.unit_name}</h6>
-                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{formatNumber(e?.price)}</h6>  
+                          <h6 className="text-[13px]  px-2 py-1  text-center break-words">{e?.item?.unit_name}</h6>
+                          <h6 className="text-[13px]  px-2 py-1 col-span-1 text-center">{formatNumber(e?.price)}</h6>  
                           {dataProductSerial.is_enable === "1" ? (
-                                                <div className=" col-span-1 ">
-                                                  <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2  w-[full] text-left">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
+                                                <div className=" col-span-1 py-1">
+                                                  <h6 className="text-[13px]  px-2  w-[full] text-center">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
                                                 </div>
                                               ):""}
                           {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
                             <>
-                              <div className=" col-span-1  ">
-                                  <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2  w-[full] text-left">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
+                              <div className=" col-span-1 py-1 ">
+                                  <h6 className="text-[13px]  px-2  w-[full] text-center">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
                               </div>
-                              <div className=" col-span-1  ">
-                                  <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2  w-[full] text-center">{e.expiration_date ? moment(e.expiration_date).format("DD-MM-YYYY")   : "-"}</h6>                              
+                              <div className=" col-span-1  py-1">
+                                  <h6 className="text-[13px]  px-2  w-[full] text-center">{e.expiration_date ? moment(e.expiration_date).format("DD-MM-YYYY")   : "-"}</h6>                              
                               </div>
                             </>
                              ):""}              
-                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-left ">{e?.name_location}</h6>                
-                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{formatNumber(e?.quantity)}</h6>                
-                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{formatNumber(e?.quantity_net)}</h6>                
-                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{formatNumber(e?.quantity_diff)}</h6>                
-                          <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1 text-right">{formatNumber(e?.amount)}</h6>                
-                          <h6 className={`${e?.handling != "" ? "text-left 2xl:text-[12px] xl:text-[13px] text-[12px] px-2 py-0.5 col-span-1" : "text-right 2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1"}`}>{e?.handling != "" && props.dataLang[e?.handling]}{" "}{formatNumber(Math.abs(e?.quantity_diff))}</h6>                
+                          <h6 className="text-[13px]  px-2 py-1 col-span-1 text-center ">{e?.name_location}</h6>                
+                          <h6 className="text-[13px]  px-2 py-1 col-span-1 text-center">{formatNumber(e?.quantity)}</h6>                
+                          <h6 className="text-[13px]  px-2 py-1 col-span-1 text-center">{formatNumber(e?.quantity_net)}</h6>                
+                          <h6 className="text-[13px]  px-2 py-1 col-span-1 text-center">{formatNumber(e?.quantity_diff)}</h6>                
+                          <h6 className="text-[13px]  px-2 py-1 col-span-1 text-right">{formatNumber(e?.amount)}</h6>                
+                          <h6 className={`${e?.handling != "" ? "text-left text-[13px] px-2 py-1 col-span-1" : "text-right 2xl:text-[12px] xl:text-[13px] text-[12px]  px-2 py-0.5 col-span-1"}`}>{e?.handling != "" && props.dataLang[e?.handling]}{" "}{formatNumber(Math.abs(e?.quantity_diff))}</h6>                
                         </div>
                       ))}              
                     </div>   
@@ -579,29 +584,49 @@ return (
                     </div>
                   )}    
               </div>
-          <h2 className='font-normal p-2  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
-              <div className="text-right mt-5  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10">
-              <div className='col-span-9'>
-              </div>
-             <div className='col-span-3 space-y-2'>
-              <div className='flex justify-between '>
-                  <div className='font-normal'><h3 className='text-left'>{props.dataLang?.inventory_total_quantity_inventory || "inventory_total_quantity_inventory"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600 text-right'>{formatNumber(totalQuantity)}</h3></div>
+          <h2 className='font-normal p-2  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5] text-[13px]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
+                  {/* <div className="text-right mt-5  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10">
+                  <div className='col-span-7'>
+                  </div>
+                <div className='col-span-5 space-y-2'>
+                  <div className='flex justify-between '>
+                      <div className='font-normal'><h3 className='text-left text-[13px]'>{props.dataLang?.inventory_total_quantity_inventory || "inventory_total_quantity_inventory"}</h3></div>
+                      <div className='font-normal'><h3 className='text-blue-600 text-right text-[13px]'>{formatNumber(totalQuantity)}</h3></div>
+                    </div>
+                    <div className='flex justify-between '>
+                      <div className='font-normal'><h3 className='text-left text-[13px]'>{props.dataLang?.inventory_actual_total_amount || "inventory_actual_total_amount"}</h3></div>
+                      <div className='font-normal'><h3 className='text-blue-600 text-right text-[13px]'>{formatNumber(quantity_net)}</h3></div>
+                    </div>  
+                    <div className='flex justify-between '>
+                      <div className='font-normal'><h3 className='text-left text-[13px]'>{props.dataLang?.inventory_total_amount_difference || "inventory_total_amount_difference"}</h3></div>
+                      <div className='font-normal'><h3 className='text-blue-600 text-right text-[13px]'>{formatNumber(quantity_diff)}</h3></div>
+                    </div>  
+                    <div className='flex justify-between '>
+                      <div className='font-normal'><h3 className='text-left text-[13px]'>{props.dataLang?.inventory_qty_into_money || "inventory_qty_into_money"}</h3></div>
+                      <div className='font-normal'><h3 className='text-blue-600 text-right text-[13px]'>{formatNumber(amount)}</h3></div>
+                    </div>  
                 </div>
-                <div className='flex justify-between '>
-                  <div className='font-normal'><h3 className='text-left'>{props.dataLang?.inventory_actual_total_amount || "inventory_actual_total_amount"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600 text-right'>{formatNumber(quantity_net)}</h3></div>
-                </div>  
-                <div className='flex justify-between '>
-                  <div className='font-normal'><h3 className='text-left'>{props.dataLang?.inventory_total_amount_difference || "inventory_total_amount_difference"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600 text-right'>{formatNumber(quantity_diff)}</h3></div>
-                </div>  
-                <div className='flex justify-between '>
-                  <div className='font-normal'><h3 className='text-left'>{props.dataLang?.inventory_qty_into_money || "inventory_qty_into_money"}</h3></div>
-                  <div className='font-normal'><h3 className='text-blue-600 text-right'>{formatNumber(amount)}</h3></div>
-                </div>  
-             </div>
-          </div>   
+              </div>    */}
+              <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
+                  <div className='col-span-7'>
+                      <h3 className='text-[13px] p-1'>{props.dataLang?.import_from_note || "import_from_note"}</h3>
+                    <textarea 
+                    className="resize-none text-[13px] scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
+                    disabled value={data?.note}/>
+                  </div>
+                <div className='col-span-3 space-y-1 text-right'>
+                      <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.inventory_total_quantity_inventory || "inventory_total_quantity_inventory"}</h3></div>
+                      <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.inventory_actual_total_amount || "inventory_actual_total_amount"}</h3></div>
+                      <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.inventory_total_amount_difference || "inventory_total_amount_difference"}</h3></div>
+                      <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.inventory_qty_into_money || "inventory_qty_into_money"}</h3></div>
+                </div>
+                <div className='col-span-2 space-y-1 text-right'>
+                      <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(totalQuantity)}</h3></div>
+                      <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(quantity_net)}</h3></div>
+                      <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(quantity_diff)}</h3></div>
+                      <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(amount)}</h3></div>
+                </div>
+            </div>   
             </div>
           </div>
           </div>
@@ -667,18 +692,18 @@ const Popup_status = (props) => {
                   <div className={`${dataProductSerial.is_enable == "1" ? 
                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow  z-10`}>
-                              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{props.dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}</h4>
-                              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{props.dataLang?.inventory_vouchercode || "inventory_vouchercode"}</h4>
-                              <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{props.dataLang?.inventory_inventory_slip || "inventory_inventory_slip"}</h4>
-                              {dataProductSerial.is_enable === "1" && (<h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Serial"}</h4>)}
+                              <h4 className='text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{props.dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}</h4>
+                              <h4 className='text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{props.dataLang?.inventory_vouchercode || "inventory_vouchercode"}</h4>
+                              <h4 className='text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{props.dataLang?.inventory_inventory_slip || "inventory_inventory_slip"}</h4>
+                              {dataProductSerial.is_enable === "1" && (<h4 className="text-[13px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Serial"}</h4>)}
                           {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
                             <>
-                              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Lot"}</h4>
-                              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}</h4>
+                              <h4 className="text-[13px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Lot"}</h4>
+                              <h4 className="text-[13px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">{props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}</h4>
                             </> ):""}
-                            <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{"Mặt hàng"}</h4>
-                            <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{"kho -vị trí kho"}</h4>
-                            <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Số lượng"}</h4>
+                            <h4 className='text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{"Mặt hàng"}</h4>
+                            <h4 className='text-[13px] px-2 text-[#667085] uppercase col-span-2 font-[300] text-center'>{"kho -vị trí kho"}</h4>
+                            <h4 className='text-[13px] px-2 text-[#667085] uppercase col-span-1 font-[300] text-center'>{"Số lượng"}</h4>
                   </div>
                   {onFetching ?
                     <Loading className="h-50"color="#0f4f9e" /> 
@@ -690,38 +715,38 @@ const Popup_status = (props) => {
                               <div className={`${dataProductSerial.is_enable == "1" ? 
                               (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
                               (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid hover:bg-slate-50`}>
-                              <h6 className='2xl:text-[12px] xl:text-[13px] text-[12px]  text-xs px-2 col-span-2 text-center'>{e?.date_coupon != null ? moment(e?.date_coupon).format("DD/MM/YYYY, HH:mm:ss") : ""}</h6>
-                              <h6 className='2xl:text-[12px] xl:text-[13px] text-[12px]  text-xs px-2 col-span-1 text-center  hover:font-normal cursor-pointer'>{e?.code_coupon}</h6>
-                              <h6 className='2xl:text-[12px] xl:text-[13px] text-[12px]  text-xs px-2 col-span-1 text-center  hover:font-normal cursor-pointer'>{dataLang[e?.type_text]}</h6>
+                              <h6 className='text-[13px]  text-xs px-2 col-span-2 text-center'>{e?.date_coupon != null ? moment(e?.date_coupon).format("DD/MM/YYYY, HH:mm:ss") : ""}</h6>
+                              <h6 className='text-[13px]  text-xs px-2 col-span-1 text-center  hover:font-normal cursor-pointer'>{e?.code_coupon}</h6>
+                              <h6 className='text-[13px]  text-xs px-2 col-span-1 text-center  hover:font-normal cursor-pointer'>{dataLang[e?.type_text]}</h6>
 
                               {dataProductSerial.is_enable === "1" ? (
                                                 <div className=" col-span-1 ">
-                                                  <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2  w-[full] text-left">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
+                                                  <h6 className="text-[13px]  px-2  w-[full] text-left">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
                                                 </div>
                                               ):""}
                           {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
                             <>
                               <div className=" col-span-1  ">
-                                  <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2  w-[full] text-left">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
+                                  <h6 className="text-[13px]  px-2  w-[full] text-left">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
                               </div>
                               <div className=" col-span-1  ">
-                                  <h6 className="2xl:text-[12px] xl:text-[13px] text-[12px]  px-2  w-[full] text-center">{e.expiration_date ? moment(e.expiration_date).format("DD-MM-YYYY")   : "-"}</h6>                              
+                                  <h6 className="text-[13px]  px-2  w-[full] text-center">{e.expiration_date ? moment(e.expiration_date).format("DD-MM-YYYY")   : "-"}</h6>                              
                               </div>
                             </>
                              ):""}              
-                              <h6 className='2xl:text-[12px] xl:text-[13px] text-[12px]  text-xs px-2 col-span-2 text-center  hover:font-normal cursor-pointer'>
+                              <h6 className='text-[13px]  text-xs px-2 col-span-2 text-center  hover:font-normal cursor-pointer'>
                                 <div className='grid grid-cols-3'>
-                                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px]  px-2  w-[full] col-span-1'>{e?.name}</h4>
-                                  <h4 className='2xl:text-[12px] xl:text-[13px] text-[12px]  px-2  w-[full] col-span-2'>{e?.product_variation}</h4>
+                                  <h4 className='text-[13px]  px-2  w-[full] col-span-1'>{e?.name}</h4>
+                                  <h4 className='text-[13px]  px-2  w-[full] col-span-2'>{e?.product_variation}</h4>
                                 </div>
                               </h6>
-                              <h6 className='2xl:text-[12px] xl:text-[13px] text-[12px]  text-xs px-2 col-span-2 text-center  hover:font-normal cursor-pointer'>
+                              <h6 className='text-[13px]  text-xs px-2 col-span-2 text-center  hover:font-normal cursor-pointer'>
                                 <div className='grid grid-cols-2 items-center'>
                                 <span className='col-span-1'>{e?.warehouse_name}</span>
                                 <span className='col-span-1'>{e?.local_name}</span>
                                 </div>
                               </h6>
-                              <h6 className='2xl:text-[12px] xl:text-[13px] text-[12px]  text-xs px-2 col-span-1 text-center  hover:font-normal cursor-pointer'>
+                              <h6 className='text-[13px]  text-xs px-2 col-span-1 text-center  hover:font-normal cursor-pointer'>
                                {e?.quantity}
                               </h6>
                               </div>
