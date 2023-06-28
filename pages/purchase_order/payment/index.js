@@ -2042,7 +2042,7 @@ return (
                             </div>
                           <div className=' font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.payment_obType || "payment_obType"}</h3>
                               {
-                                data?.objects === "client_group_client" && <span className='flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-1 bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{props.dataLang[data?.objects] || data?.objects}</span>||
+                                data?.objects === "client" && <span className='flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-1 bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{props.dataLang[data?.objects] || data?.objects}</span>||
                                 data?.objects === "supplier" && <span className=' flex items-center justify-center font-normal text-orange-500 rounded-xl py-1 px-1 bg-orange-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]  '>{props.dataLang[data?.objects] || data?.objects}</span>||
                                 data?.objects === "other" && <span className='flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-1 bg-lime-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{props.dataLang[data?.objects] || data?.objects}</span>
                               }
