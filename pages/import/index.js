@@ -688,7 +688,7 @@ const Index = (props) => {
 
                   <div className='col-span-2'></div>
                   <div className='col-span-4'>
-                      <label for="importFile" className="block text-sm font-medium mb-2 dark:text-white">Tải lên file cần import</label>
+                      <label for="importFile" className="block text-sm font-medium mb-2 dark:text-white">Chọn file cần import</label>
                       <label for="importFile"  className={`${errFileImport && dataImport.length == 0 ? "border-red-500" : "border-gray-200"} " border-gray-200 flex w-full cursor-pointer p-2 appearance-none items-center justify-center rounded-md border-2 border-dashed  transition-all hover:border-blue-300"`}>
                         <input accept='.xlsx, .xls'   id="importFile" onChange={_HandleChange.bind(this, 'importFile')} type="file" className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-500 file:py-0.5 file:px-5 file:text-[13px] file:font-semibold file:text-white hover:file:bg-primary-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60" />
                       </label>
