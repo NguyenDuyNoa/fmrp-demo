@@ -8,7 +8,14 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 });
 import ReactExport from "react-data-export";
 
+
+
+
 import Swal from 'sweetalert2'
+
+import * as XLSX from 'xlsx';
+
+import {CircularProgressbar, buildStyles} from 'react-circular-progressbar';
 
 
 import { Edit as IconEdit,  Grid6 as IconExcel, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User, Add, ArrowCircleDown  } from "iconsax-react";
@@ -41,12 +48,14 @@ const Toast = Swal.mixin({
 
 const Index = (props) => {
     const dataLang = props.dataLang
+    const router = useRouter();
+    const tabPage = router.query?.tab;
+
     const scrollAreaRef = useRef(null);
     const handleMenuOpen = () => {
     const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
-    const router = useRouter();
     const dataExcel = getData()
 
     const _HandleSelectTab = (e) => {
@@ -55,32 +64,267 @@ const Index = (props) => {
           query: { tab: e }
       })
     }
+
     useEffect(() => {
       router.push({
           pathname: router.route,    
-          query: { tab: router.query?.tab ? router.query?.tab : 0  }
+          query: { tab: router.query?.tab ? router.query?.tab : 1  }
       })
     }, []);
 
-    const [valueCheck, sValueCheck] = useState(1)
+    const [valueCheck, sValueCheck] = useState('add')
+    const [condition_column, sCondition_column] = useState(null)
+
+    const [errValueCheck, sErrValueCheck] = useState(false)
 
 
-    const _HandleChange = (type, value) =>{
-      if(type == "valueAdd"){
-        sValueCheck(1)
-      }else if(type == "valueUpdate"){
-        sValueCheck(2)
-      }
-    }
-    
+    const [thumb, sThumb] = useState(null);
+    const [dataImport, sDataImport] = useState([]);
+
+    const [stemp, sStemp] = useState()
+
+    const [onFetching, sOnFetching] = useState(false);
+    const [onSending, sOnSending] = useState(false);
+
+    const [errFiles, sErrFiles] = useState(false);
+    const [errColumn, sErrColumn] = useState(false);
+
+    const [row_tarts, sRow_starts] = useState(null)
+    const [end_row, sEnd_row] = useState(null)
+
+    const [dataClient, sDataClient] = useState([]) 
+    const [dataColumn, sDataColumn] = useState([]) 
+
     const [listData, sListData] = useState([])
     const [listDataContact, sListDataContat] = useState([])
+
+    const [multipleProgress, sMultipleProgress] = useState(0);
+
+
+    const _ServerFetching =  () => {
+        // Axios("GET", `/api_web/${(tabPage === "0" || tabPage === "-1") ? "api_client/client?csrf_protection=true" : "api_client/client/?csrf_protection=true"}`, {
+        Axios("GET", `/api_web/${(tabPage === "1" ? "/Api_import_data/get_field_client?csrf_protection=true" : '')}`, {
+        }, (err, response) => {
+            if(!err){
+                var db =  response.data
+                sDataClient(db?.map(e => ({label: dataLang[e?.label], value: e?.value})))
+            }
+        })
+        Axios("GET", `/api_web/${(tabPage === "1" ? "/Api_import_data/get_colums_excel?csrf_protection=true" : '')}`, {
+        }, (err, response) => {
+            if(!err){
+                var db =  response.data
+                sDataColumn(db?.map(e => ({label: e, value: e})))
+            }
+        })
+        sOnFetching(false)
+    }
+
+
+    useEffect(() => {
+      onFetching && _ServerFetching() 
+    }, [onFetching]);
+  useEffect(() => {
+      router.query.tab && sOnFetching(true) 
+   }, [router.query?.page, router.query?.tab]);
+
+ 
+  
+  
+   const [test,sTest] = useState(false)
+
+
+
+
+
+
+
+
+
+  // Các xử lý và JSX khác của component...
+
+  
+  console.log(dataImport);
+
+
+
+  // useEffect(() =>{
+  //   sDataImport([...dataImport])
+  // },[row_tarts,end_row])
+
+
+
+//   const _HandleChangeFileImport = (e) => {
+//     const file = e.target.files[0];
+//     const reader = new FileReader();
+//     reader.readAsBinaryString(file)
+//     // reader.onload = (e) =>{
+//     //   const data = e.target.result;
+//     //   const workbook = XLSX.read(data, {type: "binary"})
+//     //   const SheetNames = workbook.SheetNames[0]
+//     //   const Sheet = workbook.Sheets[SheetNames]
+//     //   const partData = XLSX.utils.sheet_to_json(Sheet)
+//     //   sDataImport(partData)
+//     // }
+//     reader.onload = (e) => {
+//       const data = e.target.result;
+//       const workbook = XLSX.read(data, {type: "binary"});
+//       const sheetName = workbook.SheetNames[0];
+//       const sheet = workbook.Sheets[sheetName];
+//       const jsonData = [];
+//       for (let cell in sheet) {
+//         if (cell[0] === '!') continue;
+//         const col = cell.replace(/[0-9]/g, ''); // Lấy tên cột từ tên ô (ví dụ: 'A1' -> 'A')
+//         const rowIndex = parseInt(cell.replace(/\D/g, '')) - 1;
+//         const cellValue = sheet[cell].v;
+  
+//         if (!jsonData[rowIndex]) {
+//           jsonData[rowIndex] = { [col]: cellValue };
+//         } else {
+//           jsonData[rowIndex][col] = cellValue;
+//         }
+//       }
+//       // Xử lý dữ liệu trong jsonData
+//       sDataImport(jsonData)
+//     };
+// };
+
+
+
+    const _HandleChange =  (type, value) =>{
+      if(type == "valueAdd"){
+        sValueCheck('add')
+      }else if(type == "valueUpdate"){
+        sValueCheck('edit')
+      }else if(type == "condition_column"){
+        sCondition_column(value)
+      }else if(type == "row_tarts"){
+        sRow_starts(Number(value?.target.value))
+        var fname = document.getElementById('importFile').files[0]
+         _HandleChangeFileImportNew(fname, Number(value?.target.value), end_row)
+      }else if(type == "end_row"){
+        sEnd_row(Number(value?.target.value))
+          var fname = document.getElementById('importFile').files[0]
+            _HandleChangeFileImportNew(fname,row_tarts, Number(value?.target.value))
+      }else if(type == "importFile"){
+          var fname = document.getElementById('importFile').files[0]
+          _HandleChangeFileImportNew(fname,row_tarts, end_row)
+      }
+    }
+  
+    const _HandleChangeFileImportNew =   (file, startRowIndex2, endRow) => {
+
+     
+      // const file = e.target.files[0];
+      // console.log("file",file);
+      // sStemp(e)
+        if(!file) return
+        const reader = new FileReader();
+        reader.readAsBinaryString(file);
+      reader.onload = (e) => {
+        const data = e.target.result;
+        const workbook = XLSX.read(data, { type: "binary" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const startRows = parseInt(startRowIndex2) || 1; // Hàng bắt đầu, mặc định là 1
+        const endRows = parseInt(endRow) || XLSX.utils.sheet_to_json(sheet,{header: 1}).length; // Hàng kết thúc, mặc định là số hàng cuối cùng trong sheet
+        const jsonData = [];
+      //   // for (let cell in sheet) {
+      //   //   if (cell[0] === '!') continue;
+      //   //   const col = cell.replace(/[0-9]/g, ''); // Lấy tên cột từ tên ô (ví dụ: 'A1' -> 'A')
+      //   //   const rowIndex = parseInt(cell.replace(/\D/g, '')) - 1;
+      //   //   const cellValue = sheet[cell].v;
+      //   //   console.log("row_tarts",rowIndex);
+      //   //   if (rowIndex < startRow - 1 || rowIndex > endRow - 1) continue; // Bỏ qua các hàng không nằm trong khoảng bắt đầu và kết thúc
+    
+      //   //   if (!jsonData[rowIndex]) {
+      //   //     jsonData[rowIndex] = { [col]: cellValue };
+      //   //   } else {
+      //   //     jsonData[rowIndex][col] = cellValue;
+      //   //   }
+      //   // }
+  
+        const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          // for (let rowIndex = startRow - 1; rowIndex < endRow; rowIndex++) {
+          // for (let rowIndex = startRowIndex  - 1; rowIndex < endRow; rowIndex++) {
+          //   const row = sheetData[rowIndex];
+          //   if (row) {
+          //     const rowData = {};
+          //     for (let colIndex = 0; colIndex < row.length; colIndex++) {
+          //       const col = String.fromCharCode(65 + colIndex); // Chuyển đổi số cột thành chữ cái tương ứng ('A', 'B', 'C', ...)
+          //       rowData[col] = row[colIndex];
+          //     }
+          //     jsonData.push(rowData);
+          //   }
+          // }
+  
+          
+  
+          const startRowIndex = parseInt(startRows) - 1;
+        const endRowIndex = parseInt(endRows) - 1;
+        const maxRowIndex = sheetData.length - 1;
+  
+      const rowIndexStart = Math.max(0, startRowIndex);
+      const rowIndexEnd = Math.min(maxRowIndex, endRowIndex);
+  
+      for (let rowIndex = rowIndexStart; rowIndex <= rowIndexEnd; rowIndex++) {
+        const row = sheetData[rowIndex];
+        const rowData = {};
+        for (let colIndex = 0; colIndex < row.length; colIndex++) {
+          const col = String.fromCharCode(65 + colIndex);
+          rowData[col] = row[colIndex];
+        }
+        jsonData.push(rowData);
+      }
+  
+         setTimeout(() =>{
+          sDataImport(jsonData);
+         },0)
+        // Xử lý dữ liệu trong jsonData
+      };
+      sTest(false)
+    };
+
+    const _HandleChangeChild = (childId, type, value) => {
+      const newData = listData.map(e => {
+       if(e?.id == childId){
+          if(type == "data_fields"){
+              const checkData = listData?.some(e => e?.dataFields?.value === value?.value)
+              if(!checkData){
+                return {...e, dataFields: value}
+              }else{
+                Toast.fire({
+                  title: `${"Trường dữ liệu đã được chọn"}`,
+                  icon: 'error',
+                })
+              }
+              return {...e}
+          }else if(type == "column"){
+            const checkData = listData?.some(e => e?.column?.value === value?.value)
+              if(!checkData){
+                return {...e, column: value}
+              }else{
+                Toast.fire({
+                  title: `${"Cột dữ liệu đã được chọn"}`,
+                  icon: 'error',
+                })
+              }
+               return {...e}
+          }
+       }else{
+        return e;
+      }
+      })
+      sListData([...newData])
+    }
+ 
 
     const _HandleAddParent = (value) => {
         const newData = { 
           id: Date.now(), 
-          // dataFields: value, 
-          // column: value, 
+          dataFields: null, 
+          column: null,
+          // value: value 
           // find_exactly: true, //tìm chinh xac
           // find_similar: true, //tìm gần giống
           // add_new: true, //Thêm mới
@@ -134,7 +378,336 @@ const Index = (props) => {
           name: "Người dùng"
         }
       ]
-       
+
+
+      const _HandleSubmit = (e) => {
+        e.preventDefault();
+        const hasNullDataFiles = listData.some(e => e?.dataFields === null);
+        const hasNullColumn = listData.some(e => e?.column === null);
+
+        if(hasNullDataFiles || hasNullColumn || (valueCheck == 'edit' && condition_column == null)){
+          hasNullDataFiles  && sErrFiles(true)
+          hasNullColumn  && sErrColumn(true)
+          condition_column == null && sErrValueCheck(true)
+                Toast.fire({
+                    icon: 'error',
+                    title: `${dataLang?.required_field_null}`
+                })
+          }
+          else {
+              sTest(true)
+              sOnSending(true)
+          }
+        }
+
+        
+        
+        useEffect(() =>{
+            sErrValueCheck(false)
+        },[condition_column != null])
+
+
+        // const _ServerSending = async () => {
+        //   for (const item of dataImport) {
+        //     const result = {};
+        //     for (const listDataItem of listData) {
+        //       const columnValue = listDataItem.column?.value;
+        //       const dataFieldsValue = listDataItem.dataFields?.value;
+        
+        //       if (columnValue && item[columnValue]) {
+        //         result[dataFieldsValue] = item[columnValue];
+        //       }
+        
+        //       if (listDataItem.dataFields && listDataItem.dataFields.label && listDataItem.dataFields.value && item[listDataItem.dataFields.label]) {
+        //         const fieldKey = listDataItem.dataFields.value;
+        //         const fieldValue = item[listDataItem.dataFields.label];
+        //         result[fieldKey] = fieldValue;
+        //       }
+        //     }
+
+        //     const formData = new FormData();
+        //     for (const key in result) {
+        //       formData.append(key, result[key]);
+        //     }
+        //     try {
+        //       const response = await Axios('POTS',`/api_web/Api_import_data/action_add_client?csrf_protection=true`,
+        //         {
+        //           data: formData,
+        //           headers: {'Content-Type': 'multipart/form-data'}
+        //         }
+        //       );
+        //       console.log(response);
+        //       const { isSuccess, message } = response.data;
+        //       if (isSuccess) {
+        //         Toast.fire({
+        //           icon: 'success',
+        //           title: `${dataLang[message]}`
+        //         });
+        //         sListData([]);
+        //       } else {
+        //         Toast.fire({
+        //           icon: 'error',
+        //           title: `${dataLang[message]}`
+        //         });
+        //       }
+        //     } catch (error) {
+        //       Toast.fire({
+        //         icon: 'error',
+        //         title: 'Error sending data'
+        //       });
+        //     }
+        //   }
+        
+        //   sOnSending(false);
+        // };
+        
+
+
+        // const _ServerSending = async () => {
+        //   for (const item of dataImport) {
+        //     const result = {};
+        //     for (const listDataItem of listData) {
+        //       const columnValue = listDataItem.column?.value;
+        //       const dataFieldsValue = listDataItem.dataFields?.value;
+        
+        //       if (columnValue && item[columnValue]) {
+        //         result[dataFieldsValue] = item[columnValue];
+        //       }
+        
+        //       if (listDataItem.dataFields && listDataItem.dataFields.label && listDataItem.dataFields.value && item[listDataItem.dataFields.label]) {
+        //         const fieldKey = listDataItem.dataFields.value;
+        //         const fieldValue = item[listDataItem.dataFields.label];
+        //         result[fieldKey] = fieldValue;
+        //       }
+        //     }
+        //     const formData = new FormData();
+        //     for (const key in result) {
+        //       formData.append(key, result[key]);
+        //     }
+        //      await Axios("POST",`api_web/Api_import_data/action_add_client?csrf_protection=true`, {
+        //       // data: formData,
+        //       headers: {'Content-Type': 'multipart/form-data'}
+        //   }, (err, response) => {
+        //       if(!err){
+        //           var {isSuccess, message} = response.data
+        //           if(isSuccess){
+        //               Toast.fire({
+        //                   icon: 'success',
+        //                   title: `${dataLang[message]}`
+        //               })
+        //               //new
+        //               sListData([])
+        //               // router.push('/purchase_order/returns?tab=all')
+        //           }else {    
+        //               Toast.fire({
+        //                 icon: 'error',
+        //                 title: `${dataLang[message]}`
+        //               })     
+        //           }
+        //       }
+        //     })
+        //   }
+        //   sOnSending(false)
+        // };
+        
+      
+
+        // const _ServerSending = async () => {
+        //   const data = dataImport.map((item) => {
+        //     const result = {};
+        //     for (const listDataItem of listData) {
+        //       const columnValue = listDataItem.column?.value;
+        //       const dataFieldsValue = listDataItem.dataFields?.value;
+          
+        //       if (columnValue && item[columnValue]) {
+        //         result[dataFieldsValue] = item[columnValue];
+        //       }
+          
+        //       if (listDataItem.dataFields && listDataItem.dataFields.label && listDataItem.dataFields.value && item[listDataItem.dataFields.label]) {
+        //         const fieldKey = listDataItem.dataFields.value;
+        //         const fieldValue = item[listDataItem.dataFields.label];
+        //         result[fieldKey] = fieldValue;
+        //       }
+        //     }
+        //     return result;
+        //   });
+        //   await Axios("POST",`/api_web/Api_import_data/action_add_client?csrf_protection=true`, {
+        //       data: formData,
+        //       headers: {'Content-Type': 'multipart/form-data'}
+        //   }, (err, response) => {
+        //       if(!err){
+        //           var {isSuccess, message} = response.data
+        //           if(isSuccess){
+        //               Toast.fire({
+        //                   icon: 'success',
+        //                   title: `${dataLang[message]}`
+        //               })
+        //               //new
+        //               sListData([])
+        //               // router.push('/purchase_order/returns?tab=all')
+        //           }else {    
+        //               Toast.fire({
+        //                 icon: 'error',
+        //                 title: `${dataLang[message]}`
+        //               })     
+        //           }
+        //       }
+        //       sOnSending(false)
+        //   })
+        // }
+
+
+        // const _ServerSending = async () => {
+        //   sOnSending(false);
+        // };
+
+        // const data = dataImport.map((item) => {
+        //   const result = {};
+        //   for (const listDataItem of listData) {
+        //     const columnValue = listDataItem.column?.value;
+        //     const dataFieldsValue = listDataItem.dataFields?.value;
+        
+        //     if (columnValue && item[columnValue]) {
+        //       result[dataFieldsValue] = item[columnValue];
+        //     }
+        
+        //     if (listDataItem.dataFields && listDataItem.dataFields.label && listDataItem.dataFields.value && item[listDataItem.dataFields.label]) {
+        //       const fieldKey = listDataItem.dataFields.value;
+        //       const fieldValue = item[listDataItem.dataFields.label];
+        //       result[fieldKey] = fieldValue;
+        //     }
+        //   }
+        //   return result;
+        // });
+          
+        // const _ServerSending = async () => {
+
+        //   const data = dataImport.map((item) => {
+        //     const result = {};
+        //     for (const listDataItem of listData) {
+        //       const columnValue = listDataItem.column?.value;
+        //       const dataFieldsValue = listDataItem.dataFields?.value;
+          
+        //       if (columnValue && item[columnValue]) {
+        //         result[dataFieldsValue] = item[columnValue];
+        //       }
+        //       if (listDataItem.dataFields && listDataItem.dataFields.label && listDataItem.dataFields.value && item[listDataItem.dataFields.label]) {
+        //         const fieldKey = listDataItem.dataFields.value;
+        //         const fieldValue = item[listDataItem.dataFields.label];
+        //         result[fieldKey] = fieldValue;
+        //       }
+        //     }
+        //     return result;
+        //   });
+          // await Promise.all(
+          //   data.map((item) => {
+          //         return Axios("POST",`/api_web/Api_import_data/action_add_client?csrf_protection=true`, {
+          //                   data: item,
+          //                   headers: {'Content-Type': 'multipart/form-data'},
+          //                   onUploadProgress: (progressEvent) => {
+          //                     const {loaded, total} = progressEvent;
+          //                     const percentage = Math.floor(((loaded / 1000) * 100) / (total / 1000));
+          //                     sMultipleProgress(percentage);
+          //                   }
+          //               }, (err, response) => {
+          //                   if(!err){
+          //                       var {isSuccess, message} = response.data
+          //                       console.log(response.data);
+          //                       if(isSuccess){
+          //                           Toast.fire({
+          //                               icon: 'success',
+          //                               title: `${dataLang[message]}`
+          //                           })
+          //                         sMultipleProgress(0)
+          //                           //new
+          //                           sListData([])
+          //                           // router.push('/purchase_order/returns?tab=all')
+          //                       }else {    
+          //                           Toast.fire({
+          //                             icon: 'error',
+          //                             title: `${dataLang[message]}`
+          //                           })     
+          //                       }
+          //                   }
+          //           sOnSending(false)
+          //       })
+          //   })).then(res =>{
+          //     sMultipleProgress(0)
+          //   })
+        // }
+
+
+
+        const _ServerSending = async () => {
+          const data = dataImport.map((item) => {
+            const result = {};
+            for (const listDataItem of listData) {
+              const columnValue = listDataItem.column?.value;
+              const dataFieldsValue = listDataItem.dataFields?.value;
+        
+              if (columnValue && item[columnValue]) {
+                result[dataFieldsValue] = item[columnValue];
+              }
+              if (listDataItem.dataFields && listDataItem.dataFields.label && listDataItem.dataFields.value && item[listDataItem.dataFields.label]) {
+                const fieldKey = listDataItem.dataFields.value;
+                const fieldValue = item[listDataItem.dataFields.label];
+                result[fieldKey] = fieldValue;
+              }
+            }
+            return result;
+          });
+        
+          const chunkSize = 50; // Kích thước mỗi mảng con
+          const dataChunks = [];
+          // Chia nhỏ mảng data thành các mảng con có kích thước chunkSize
+          for (let i = 0; i < data.length; i += chunkSize) {
+            const chunk = data.slice(i, i + chunkSize);
+            dataChunks.push(chunk);
+          }
+          for (const data of dataChunks) {
+            // dataForm.append('data', dataChunk);
+            Axios("POST",`/api_web/Api_import_data/action_add_client?csrf_protection=true`, {
+              data:{
+                data,
+                "event": valueCheck,
+                "event_field": "add"
+              },
+              // data: fom,
+              headers: {"Content-Type": "multipart/form-data"} ,
+              onUploadProgress: (progressEvent) => {
+               const {loaded, total} = progressEvent;
+               const percentage = Math.floor(((loaded / 1000) * 100) / (total / 1000));
+               sMultipleProgress(percentage);
+             }
+            }, (err, response) => {
+              if(!err){
+                    var {isSuccess, message} = response.data;   
+                    if(isSuccess){
+                        Toast.fire({
+                            icon: 'success',
+                            title: `${props?.dataLang[message]}`
+                        })
+                    }else{
+                      Toast.fire({
+                        icon: 'error',
+                        title: `${props.dataLang[message] +" "+branch_name} `
+                      })
+                    }
+                }
+                sOnSending(false)
+                sMultipleProgress(0)
+            })
+          }
+        };
+        
+        
+        
+        
+        
+
+        useEffect(() =>{
+          onSending && _ServerSending()
+        },[onSending])
 
     return (
         <React.Fragment>
@@ -239,14 +812,14 @@ const Index = (props) => {
                             <ul className="items-center w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded sm:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 <li className="w-full border-b  cursor-pointer hover:bg-pink-600 group overflow-hidden transform  transition duration-300 ease-in-out border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
                                     <div className="flex cursor-pointer items-center pl-3">
-                                        <input id="horizontal-list-radio-license" type="radio"  value={valueCheck} checked={valueCheck == 1} onChange={_HandleChange.bind(this, "valueAdd")} name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"/>
-                                        <label for="horizontal-list-radio-license" className="w-full py-2 cursor-pointer ml-2 text-sm font-medium text-gray-900 group-hover:text-white transition-all ease-in-out dark:text-gray-300">Thêm</label>
+                                        <input id="horizontal-list-radio-license" type="radio"  value={valueCheck} checked={valueCheck == 'add'} onChange={_HandleChange.bind(this, "valueAdd")} name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"/>
+                                        <label htmlFor="horizontal-list-radio-license" className="w-full py-2 cursor-pointer ml-2 text-sm font-medium text-gray-900 group-hover:text-white transition-all ease-in-out dark:text-gray-300">Thêm</label>
                                     </div>
                                 </li>
                                 <li className="w-full border-b  cursor-pointer hover:bg-pink-600 group overflow-hidden transform  transition duration-300 ease-in-out border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
                                     <div className="flex cursor-pointer items-center pl-3">
-                                        <input id="horizontal-list-radio-id" type="radio" value={valueCheck} checked={valueCheck == 2} onChange={_HandleChange.bind(this, "valueUpdate")} name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"/>
-                                        <label for="horizontal-list-radio-id" className="w-full py-2 cursor-pointer ml-2 text-sm font-medium text-gray-900 group-hover:text-white transition-all ease-in-out dark:text-gray-300">Cập nhật</label>
+                                        <input id="horizontal-list-radio-id" type="radio" value={valueCheck} checked={valueCheck == "edit"} onChange={_HandleChange.bind(this, "valueUpdate")} name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"/>
+                                        <label htmlFor="horizontal-list-radio-id" className="w-full py-2 cursor-pointer ml-2 text-sm font-medium text-gray-900 group-hover:text-white transition-all ease-in-out dark:text-gray-300">Cập nhật</label>
                                     </div>
                                 </li>
                               
@@ -259,14 +832,14 @@ const Index = (props) => {
                   <div className='col-span-2'></div>
                   <div className='col-span-4'>
                           {
-                            (valueCheck === 2) || (valueCheck === 3) ? (<>
-                              <h5  className="mb-1 block text-sm font-medium text-gray-700">Cột điều kiện</h5>
+                            (valueCheck === 'edit') ? (<>
+                              <h5  className="mb-1 block text-sm font-medium text-gray-700">Cột điều kiện <span className='text-red-500'>*</span></h5>
                               <Select   
                               closeMenuOnSelect={true}
                               placeholder={"Cột điều kiện"}
                               // options={dataList_Object}
                               isSearchable={true}
-                              // onChange={_HandleChangeInput.bind(this, "listObject")}
+                              onChange={_HandleChange.bind(this, "condition_column")}
                               // value={listObject}
                               LoadingIndicator
                               noOptionsMessage={() => "Không có dữ liệu"}
@@ -296,11 +869,13 @@ const Index = (props) => {
                                   
                                 }), 
                             }}
-                            // className={`${errListObject ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `} 
-                            className="border-transparent text-sm placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border " 
+                            className={`${errValueCheck ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `} 
+                            // className="border-transparent text-sm placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border " 
                             />
+                            {errValueCheck && <label className="text-sm text-red-500">{"Vui lòng chọn cột điều kiện"}</label>}
                             </>):""
                           }
+
                   </div>
                   <div className='col-span-4'></div>
                   <div className='col-span-2'></div>
@@ -308,19 +883,21 @@ const Index = (props) => {
 
                   <div className='col-span-2'></div>
                   <div className='col-span-4'>
-                      <label for="example5" className="block text-sm font-medium mb-2 dark:text-white">Tải lên file cần import</label>
-                      <label  className="flex w-full cursor-pointer p-2 appearance-none items-center justify-center rounded-md border-2 border-dashed border-gray-200 transition-all hover:border-blue-300">
-                        <input id="example5" type="file" className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-500 file:py-0.5 file:px-5 file:text-[13px] file:font-semibold file:text-white hover:file:bg-primary-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60" />
+                      <label for="importFile" className="block text-sm font-medium mb-2 dark:text-white">Tải lên file cần import</label>
+                      <label for="importFile"  className="flex w-full cursor-pointer p-2 appearance-none items-center justify-center rounded-md border-2 border-dashed border-gray-200 transition-all hover:border-blue-300">
+                        <input accept='.xlsx, .xls'   id="importFile" onChange={_HandleChange.bind(this, 'importFile')} type="file" className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-500 file:py-0.5 file:px-5 file:text-[13px] file:font-semibold file:text-white hover:file:bg-primary-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60" />
                       </label>
                   </div>
                   <div className='col-span-4 grid grid-cols-4 space-x-2.5'>
                       <div className='mx-auto w-full col-span-2'>
                           <label for="input-label" className="block text-sm font-medium mb-2 dark:text-white">Hàng bắt đầu</label>
-                          <input type="text" id="input-label" className="py-2.5 outline-none px-4 border block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400" placeholder="Hàng bắt đầu"/>    
+                          <input  value={row_tarts} 
+                          onChange={_HandleChange.bind(this, 'row_tarts')}
+                           type="text" id="input-label" className="py-2.5 outline-none px-4 border block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400" placeholder={"Hàng bắt đầu"}/>    
                       </div>
                       <div className='mx-auto w-full col-span-2'>
                           <label for="input-labels" className="block text-sm font-medium mb-2 dark:text-white">Hàng kết thúc</label>
-                          <input type="text" id="input-labels" className="py-2.5 outline-none px-4 border block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400" placeholder="Hàng kết thúc"/>    
+                          <input  value={end_row} onChange={_HandleChange.bind(this, 'end_row')} type="text" id="input-labels" className="py-2.5 outline-none px-4 border block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400" placeholder={"Hàng kết thúc"}/>    
                       </div>
                   </div>
                   <div className='col-span-2'></div>
@@ -439,119 +1016,10 @@ const Index = (props) => {
                           </div>
                         </div>
                   </div> 
-                  <div className='col-span-2'></div> */}
-
-
-
-                  <div className='col-span-2'></div>
-                  <div className='col-span-8 mt-2'>
+                  <div className='  col-span-2'></div> */}
                   {
-                    listData?.map((e,index) =>
-                        
-                      <div className='grid grid-cols-8 gap-2.5 mb-2'>
-                      <div className='col-span-4'>
-                          <div className='grid-cols-13 grid items-end justify-center gap-2.5'>
-                              <div className='col-span-1 mx-auto'>
-                              <button onClick={_HandleDelete.bind(this, e?.id)}  className="xl:text-base text-xs hover:scale-105 transition-all ease-in-out "><IconDelete color="red"/></button>
-                              </div>
-                              <div className='col-span-6'>
-                                      {index ==0 &&<h5  className="mb-1 block text-sm font-medium text-gray-700">Trường dữ liệu</h5>}
-                                        <Select   
-                                        closeMenuOnSelect={true}
-                                        placeholder={"Trường dữ liệu"}
-                                        // options={dataList_Object}
-                                        isSearchable={true}
-                                        // onChange={_HandleChangeInput.bind(this, "listObject")}
-                                        // value={listObject}
-                                        LoadingIndicator
-                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                        maxMenuHeight="200px"
-                                        isClearable={true} 
-                                        menuPortalTarget={document.body}
-                                        onMenuOpen={handleMenuOpen}
-                                        theme={(theme) => ({
-                                        ...theme,
-                                        colors: {
-                                            ...theme.colors,
-                                            primary25: '#EBF5FF',
-                                            primary50: '#92BFF7',
-                                            primary: '#0F4F9E',
-                                        },
-                                    })}
-                                        styles={{
-                                          placeholder: (base) => ({
-                                          ...base,
-                                          color: "#cbd5e1",
-                                        
-                                          }),
-                                          menuPortal: (base) => ({
-                                              ...base,
-                                              zIndex: 9999,
-                                              position: "absolute", 
-                                            
-                                          }), 
-                                      }}
-                                      // className={`${errListObject ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `} 
-                                      className="border-transparent  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  text-sm font-normal outline-none border " 
-                                      />
-                              </div>
-                              <div className='col-span-6'>
-                              {index ==0 &&<h5  className="mb-1 block text-sm font-medium text-gray-700">Cột dữ liệu</h5>}
-                                        <Select   
-                                        closeMenuOnSelect={true}
-                                        placeholder={"Cột dữ liệu"}
-                                        // options={dataList_Object}
-                                        isSearchable={true}
-                                        // onChange={_HandleChangeInput.bind(this, "listObject")}
-                                        // value={listObject}
-                                        LoadingIndicator
-                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                        maxMenuHeight="200px"
-                                        isClearable={true} 
-                                        menuPortalTarget={document.body}
-                                        onMenuOpen={handleMenuOpen}
-                                        theme={(theme) => ({
-                                        ...theme,
-                                        colors: {
-                                            ...theme.colors,
-                                            primary25: '#EBF5FF',
-                                            primary50: '#92BFF7',
-                                            primary: '#0F4F9E',
-                                        },
-                                    })}
-                                        styles={{
-                                          placeholder: (base) => ({
-                                          ...base,
-                                          color: "#cbd5e1",
-                                        
-                                          }),
-                                          menuPortal: (base) => ({
-                                              ...base,
-                                              zIndex: 9999,
-                                              position: "absolute", 
-                                            
-                                          }), 
-                                      }}
-                                      // className={`${errListObject ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `} 
-                                      className="border-transparent  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  text-sm font-normal outline-none border " 
-                                      />
-                              </div>
-                          </div>
-                      </div>
-                        <div className='col-span-4 '>
-                              {index ==0 &&<h5  className="mb-1 block text-sm font-medium text-gray-700 opacity-0">Thao tác</h5>}
-                                <div className="flex items-center space-x-2 rounded p-2 ">
-                                  <TiTick color='green'/>
-                                  <label for="example11" className="flex w-full space-x-2 text-sm"> Thêm mới </label>
-                                </div>
-                          </div>
-                        </div>
-                    )
+                    listData?.length < 5
                   }
-                  </div>
-                  <div className='col-span-2'></div>
-
-
                   <div className='col-span-2'></div>
                   <div className='col-span-4 -mt-2'>
                     <div className='grid grid-cols-13 gap-2.5'>
@@ -570,8 +1038,148 @@ const Index = (props) => {
                         </div>
                     </div>          
                   </div>
+
                   <div className='col-span-4'></div>
                   <div className='col-span-2'></div>
+
+
+                  <div className='col-span-2'></div>
+                  <div className='col-span-6 mt-2'>
+                  {
+                    listData?.map((e,index) =>
+                        
+                      <div className='grid grid-cols-6 gap-2.5 mb-2'>
+                      <div className='col-span-4'>
+                          <div className='grid-cols-13 grid items-end justify-center gap-2.5'>
+                              <div className='col-span-1 mx-auto'>
+                              <button onClick={_HandleDelete.bind(this, e?.id)}  className="xl:text-base text-xs hover:scale-105 transition-all ease-in-out "><IconDelete color="red"/></button>
+                              </div>
+                              <div className='col-span-6'>
+                                      {index ==0 &&<h5  className="mb-1 block text-sm font-medium text-gray-700">Trường dữ liệu <span className='text-red-500'>*</span></h5>}
+                                        <Select   
+                                        closeMenuOnSelect={true}
+                                        placeholder={"Trường dữ liệu"}
+                                        options={dataClient}
+                                        isSearchable={true}
+                                        onChange={_HandleChangeChild.bind(this, e?.id, "data_fields")}
+                                        value={e.dataFields}
+                                        LoadingIndicator
+                                        noOptionsMessage={() => "Không có dữ liệu"}
+                                        maxMenuHeight="200px"
+                                        isClearable={true} 
+                                        menuPortalTarget={document.body}
+                                        onMenuOpen={handleMenuOpen}
+                                        theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                        styles={{
+                                          placeholder: (base) => ({
+                                          ...base,
+                                          color: "#cbd5e1",
+                                        
+                                          }),
+                                          menuPortal: (base) => ({
+                                              ...base,
+                                              zIndex: 9999,
+                                              position: "absolute", 
+                                            
+                                          }), 
+                                      }}
+                                      className={`${errFiles && e.dataFields == null ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `} 
+                                      // className="border-transparent  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  text-sm font-normal outline-none border " 
+                                      />
+                              </div>
+                              <div className='col-span-6'>
+                              {index ==0 &&<h5  className="mb-1 block text-sm font-medium text-gray-700">Cột dữ liệu <span className='text-red-500'>*</span></h5>}
+                                        <Select   
+                                        closeMenuOnSelect={true}
+                                        placeholder={"Cột dữ liệu"}
+                                        options={dataColumn}
+                                        isSearchable={true}
+                                        // onChange={_HandleChange.bind(this, "column")}
+                                        onChange={_HandleChangeChild.bind(this, e?.id, "column")}
+                                        value={e?.column}
+                                        LoadingIndicator
+                                        noOptionsMessage={() => "Không có dữ liệu"}
+                                        maxMenuHeight="200px"
+                                        isClearable={true} 
+                                        menuPortalTarget={document.body}
+                                        onMenuOpen={handleMenuOpen}
+                                        theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                            ...theme.colors,
+                                            primary25: '#EBF5FF',
+                                            primary50: '#92BFF7',
+                                            primary: '#0F4F9E',
+                                        },
+                                    })}
+                                        styles={{
+                                          placeholder: (base) => ({
+                                          ...base,
+                                          color: "#cbd5e1",
+                                        
+                                          }),
+                                          menuPortal: (base) => ({
+                                              ...base,
+                                              zIndex: 9999,
+                                              position: "absolute", 
+                                            
+                                          }), 
+                                      }}
+                                      className={`${errColumn && e?.column == null ? "border-red-500" : "border-transparent" } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `} 
+                                      // className="border-transparent  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  text-sm font-normal outline-none border " 
+                                      />
+                              </div>
+                          </div>
+                      </div>
+                          <div className='col-span-2 '>
+                              {index ==0 &&<h5  className="mb-1 block text-sm font-medium text-gray-700 opacity-0">Thao tác</h5>}
+                                    <div className="flex items-center space-x-2 rounded p-2 ">
+                                      <TiTick color='green'/>
+                                      <label for="example11" className="flex w-full space-x-2 text-sm"> Thêm mới </label>
+                                    </div>
+                          </div>
+                        </div>
+                    )
+                  }
+                  </div>
+                  <div className='col-span-2 flex items-center justify-center mt-5'>
+                    {listData.length > 0 && 
+                    <div className={`${listData.length < 2 ? "mt-4":""}`}>
+                    <CircularProgressbar
+                    className='text-center'
+                            value={multipleProgress}
+                            strokeWidth={10}
+                            text={`${multipleProgress}%`}
+                            // classes={`text: center`}
+                            styles={buildStyles({
+                            rotation: 0.25,
+                            strokeLinecap: 'butt',
+                            textSize: '16px',
+                            pathTransitionDuration: 0.5,
+                            pathColor: `rgba(236, 64, 122, ${multipleProgress / 100})`,
+                            // pathColor: `red`,
+                            textColor: '#ef4444',
+                            textAnchor: 'middle',
+                            trailColor: '#d6d6d6',
+                            backgroundColor: '#3e98c7',
+                            
+                        })}
+                      />
+                </div>
+                    }
+                  </div>
+                  <div className='col-span-2'></div>
+
+
+               
 
                   <div className='col-span-2'></div>
                   <div className='col-span-8 border-b'></div>
@@ -750,12 +1358,15 @@ const Index = (props) => {
                                   <label for="example11" className="flex w-full space-x-2 text-sm cursor-pointer"> Lưu mẫu import </label>
                                 </div>
                     <button 
-                    // onClick={_HandleSubmit.bind(this)} 
+                    onClick={_HandleSubmit.bind(this)} 
                    type="submit" className="xl:text-sm text-xs w-full p-2.5 bg-gradient-to-l hover:bg-blue-300 from-blue-500 via-blue-500  to-blue-500 text-white rounded btn-animation hover:scale-[1.02]">{"Import"}</button>
                   </div>
                   <div className='col-span-4 '></div>
 
-
+                  {/* <div className="w-full bg-gray-200 rounded-full dark:bg-gray-700">
+                    <div className="bg-blue-600 text-xs transition-all ease-in-out font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style={{width:`${multipleProgress}%`}}> {multipleProgress}%</div>
+                  </div>      */}
+                
               </div>
             </div>
           </div>
