@@ -1044,7 +1044,7 @@ const Index = (props) => {
 
 
                   <div className='col-span-2'></div>
-                  <div className='col-span-6 mt-2'>
+                  <div className='col-span-6'>
                   {
                     listData?.map((e,index) =>
                         
