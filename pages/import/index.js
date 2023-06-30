@@ -1025,7 +1025,7 @@ const Index = (props) => {
                     <div className='grid grid-cols-13 gap-2.5'>
                          <div className='col-span-1'></div>
                         <div className='col-span-12 '>
-                            <div className="b  flex items-center justify-center w-full  py-5">
+                            <div className="b  flex items-center justify-center w-full  pt-5">
                                   <button onClick={_HandleAddParent.bind(this)} className="i flex justify-center gap-2 bg-pink-600 w-full text-center py-2 text-white items-center rounded shadow-xl cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out">
                                   <Add
                                     size="20"
