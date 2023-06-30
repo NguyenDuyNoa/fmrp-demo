@@ -89,6 +89,8 @@ const Index = (props) => {
     const [errFiles, sErrFiles] = useState(false);
     const [errColumn, sErrColumn] = useState(false);
 
+    const [errFileImport, sErrFileImport] = useState(false);
+
     const [row_tarts, sRow_starts] = useState(null)
     const [end_row, sEnd_row] = useState(null)
 
@@ -134,23 +136,11 @@ const Index = (props) => {
    const [test,sTest] = useState(false)
 
 
-
-
-
-
-
-
-
-  // Các xử lý và JSX khác của component...
-
   
   console.log(dataImport);
 
 
 
-  // useEffect(() =>{
-  //   sDataImport([...dataImport])
-  // },[row_tarts,end_row])
 
 
 
@@ -213,22 +203,19 @@ const Index = (props) => {
     }
   
     const _HandleChangeFileImportNew =   (file, startRowIndex2, endRow) => {
-
-     
+  
       // const file = e.target.files[0];
-      // console.log("file",file);
-      // sStemp(e)
         if(!file) return
         const reader = new FileReader();
         reader.readAsBinaryString(file);
-      reader.onload = (e) => {
-        const data = e.target.result;
-        const workbook = XLSX.read(data, { type: "binary" });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const startRows = parseInt(startRowIndex2) || 1; // Hàng bắt đầu, mặc định là 1
-        const endRows = parseInt(endRow) || XLSX.utils.sheet_to_json(sheet,{header: 1}).length; // Hàng kết thúc, mặc định là số hàng cuối cùng trong sheet
-        const jsonData = [];
+        reader.onload = (e) => {
+          const data = e.target.result;
+          const workbook = XLSX.read(data, { type: "binary" });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          const startRows = parseInt(startRowIndex2) || 1; // Hàng bắt đầu, mặc định là 1
+          const endRows = parseInt(endRow) || XLSX.utils.sheet_to_json(sheet,{header: 1}).length; // Hàng kết thúc, mặc định là số hàng cuối cùng trong sheet
+          const jsonData = [];
       //   // for (let cell in sheet) {
       //   //   if (cell[0] === '!') continue;
       //   //   const col = cell.replace(/[0-9]/g, ''); // Lấy tên cột từ tên ô (ví dụ: 'A1' -> 'A')
@@ -245,43 +232,30 @@ const Index = (props) => {
       //   // }
   
         const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-          // for (let rowIndex = startRow - 1; rowIndex < endRow; rowIndex++) {
-          // for (let rowIndex = startRowIndex  - 1; rowIndex < endRow; rowIndex++) {
-          //   const row = sheetData[rowIndex];
-          //   if (row) {
-          //     const rowData = {};
-          //     for (let colIndex = 0; colIndex < row.length; colIndex++) {
-          //       const col = String.fromCharCode(65 + colIndex); // Chuyển đổi số cột thành chữ cái tương ứng ('A', 'B', 'C', ...)
-          //       rowData[col] = row[colIndex];
-          //     }
-          //     jsonData.push(rowData);
-          //   }
-          // }
-  
-          
-  
-          const startRowIndex = parseInt(startRows) - 1;
+
+        const startRowIndex = parseInt(startRows) - 1;
         const endRowIndex = parseInt(endRows) - 1;
         const maxRowIndex = sheetData.length - 1;
   
-      const rowIndexStart = Math.max(0, startRowIndex);
-      const rowIndexEnd = Math.min(maxRowIndex, endRowIndex);
+        const rowIndexStart = Math.max(0, startRowIndex);
+        const rowIndexEnd = Math.min(maxRowIndex, endRowIndex);
   
-      for (let rowIndex = rowIndexStart; rowIndex <= rowIndexEnd; rowIndex++) {
-        const row = sheetData[rowIndex];
-        const rowData = {};
-        for (let colIndex = 0; colIndex < row.length; colIndex++) {
-          const col = String.fromCharCode(65 + colIndex);
-          rowData[col] = row[colIndex];
+        for (let rowIndex = rowIndexStart; rowIndex <= rowIndexEnd; rowIndex++) {
+          const row = sheetData[rowIndex];
+          const rowData = {};
+          for (let colIndex = 0; colIndex < row.length; colIndex++) {
+            const col = String.fromCharCode(65 + colIndex);
+            rowData[col] = row[colIndex];
+          }
+          jsonData.push(rowData);
         }
-        jsonData.push(rowData);
-      }
-  
+
          setTimeout(() =>{
           sDataImport(jsonData);
          },0)
         // Xử lý dữ liệu trong jsonData
       };
+
       sTest(false)
     };
 
@@ -324,11 +298,6 @@ const Index = (props) => {
           id: Date.now(), 
           dataFields: null, 
           column: null,
-          // value: value 
-          // find_exactly: true, //tìm chinh xac
-          // find_similar: true, //tìm gần giống
-          // add_new: true, //Thêm mới
-          // skip_line: true, //bỏ qua dòng
         }
         sListData([newData,...listData]);
     }
@@ -381,14 +350,20 @@ const Index = (props) => {
 
 
       const _HandleSubmit = (e) => {
+
         e.preventDefault();
+
         const hasNullDataFiles = listData.some(e => e?.dataFields === null);
+
         const hasNullColumn = listData.some(e => e?.column === null);
 
-        if(hasNullDataFiles || hasNullColumn || (valueCheck == 'edit' && condition_column == null)){
+        const hasNullDataImport = dataImport?.length == 0
+
+        if(hasNullDataFiles || hasNullColumn || (valueCheck == 'edit' && condition_column == null) || hasNullDataImport){
           hasNullDataFiles  && sErrFiles(true)
           hasNullColumn  && sErrColumn(true)
           condition_column == null && sErrValueCheck(true)
+          hasNullDataImport && sErrFileImport(true)
                 Toast.fire({
                     icon: 'error',
                     title: `${dataLang?.required_field_null}`
@@ -396,6 +371,7 @@ const Index = (props) => {
           }
           else {
               sTest(true)
+              sErrFileImport(false)
               sOnSending(true)
           }
         }
@@ -405,180 +381,9 @@ const Index = (props) => {
         useEffect(() =>{
             sErrValueCheck(false)
         },[condition_column != null])
-
-
-        // const _ServerSending = async () => {
-        //   for (const item of dataImport) {
-        //     const result = {};
-        //     for (const listDataItem of listData) {
-        //       const columnValue = listDataItem.column?.value;
-        //       const dataFieldsValue = listDataItem.dataFields?.value;
-        
-        //       if (columnValue && item[columnValue]) {
-        //         result[dataFieldsValue] = item[columnValue];
-        //       }
-        
-        //       if (listDataItem.dataFields && listDataItem.dataFields.label && listDataItem.dataFields.value && item[listDataItem.dataFields.label]) {
-        //         const fieldKey = listDataItem.dataFields.value;
-        //         const fieldValue = item[listDataItem.dataFields.label];
-        //         result[fieldKey] = fieldValue;
-        //       }
-        //     }
-
-        //     const formData = new FormData();
-        //     for (const key in result) {
-        //       formData.append(key, result[key]);
-        //     }
-        //     try {
-        //       const response = await Axios('POTS',`/api_web/Api_import_data/action_add_client?csrf_protection=true`,
-        //         {
-        //           data: formData,
-        //           headers: {'Content-Type': 'multipart/form-data'}
-        //         }
-        //       );
-        //       console.log(response);
-        //       const { isSuccess, message } = response.data;
-        //       if (isSuccess) {
-        //         Toast.fire({
-        //           icon: 'success',
-        //           title: `${dataLang[message]}`
-        //         });
-        //         sListData([]);
-        //       } else {
-        //         Toast.fire({
-        //           icon: 'error',
-        //           title: `${dataLang[message]}`
-        //         });
-        //       }
-        //     } catch (error) {
-        //       Toast.fire({
-        //         icon: 'error',
-        //         title: 'Error sending data'
-        //       });
-        //     }
-        //   }
-        
-        //   sOnSending(false);
-        // };
-        
-
-
-        // const _ServerSending = async () => {
-        //   for (const item of dataImport) {
-        //     const result = {};
-        //     for (const listDataItem of listData) {
-        //       const columnValue = listDataItem.column?.value;
-        //       const dataFieldsValue = listDataItem.dataFields?.value;
-        
-        //       if (columnValue && item[columnValue]) {
-        //         result[dataFieldsValue] = item[columnValue];
-        //       }
-        
-        //       if (listDataItem.dataFields && listDataItem.dataFields.label && listDataItem.dataFields.value && item[listDataItem.dataFields.label]) {
-        //         const fieldKey = listDataItem.dataFields.value;
-        //         const fieldValue = item[listDataItem.dataFields.label];
-        //         result[fieldKey] = fieldValue;
-        //       }
-        //     }
-        //     const formData = new FormData();
-        //     for (const key in result) {
-        //       formData.append(key, result[key]);
-        //     }
-        //      await Axios("POST",`api_web/Api_import_data/action_add_client?csrf_protection=true`, {
-        //       // data: formData,
-        //       headers: {'Content-Type': 'multipart/form-data'}
-        //   }, (err, response) => {
-        //       if(!err){
-        //           var {isSuccess, message} = response.data
-        //           if(isSuccess){
-        //               Toast.fire({
-        //                   icon: 'success',
-        //                   title: `${dataLang[message]}`
-        //               })
-        //               //new
-        //               sListData([])
-        //               // router.push('/purchase_order/returns?tab=all')
-        //           }else {    
-        //               Toast.fire({
-        //                 icon: 'error',
-        //                 title: `${dataLang[message]}`
-        //               })     
-        //           }
-        //       }
-        //     })
-        //   }
-        //   sOnSending(false)
-        // };
-        
       
 
-        // const _ServerSending = async () => {
-        //   const data = dataImport.map((item) => {
-        //     const result = {};
-        //     for (const listDataItem of listData) {
-        //       const columnValue = listDataItem.column?.value;
-        //       const dataFieldsValue = listDataItem.dataFields?.value;
-          
-        //       if (columnValue && item[columnValue]) {
-        //         result[dataFieldsValue] = item[columnValue];
-        //       }
-          
-        //       if (listDataItem.dataFields && listDataItem.dataFields.label && listDataItem.dataFields.value && item[listDataItem.dataFields.label]) {
-        //         const fieldKey = listDataItem.dataFields.value;
-        //         const fieldValue = item[listDataItem.dataFields.label];
-        //         result[fieldKey] = fieldValue;
-        //       }
-        //     }
-        //     return result;
-        //   });
-        //   await Axios("POST",`/api_web/Api_import_data/action_add_client?csrf_protection=true`, {
-        //       data: formData,
-        //       headers: {'Content-Type': 'multipart/form-data'}
-        //   }, (err, response) => {
-        //       if(!err){
-        //           var {isSuccess, message} = response.data
-        //           if(isSuccess){
-        //               Toast.fire({
-        //                   icon: 'success',
-        //                   title: `${dataLang[message]}`
-        //               })
-        //               //new
-        //               sListData([])
-        //               // router.push('/purchase_order/returns?tab=all')
-        //           }else {    
-        //               Toast.fire({
-        //                 icon: 'error',
-        //                 title: `${dataLang[message]}`
-        //               })     
-        //           }
-        //       }
-        //       sOnSending(false)
-        //   })
-        // }
-
-
-        // const _ServerSending = async () => {
-        //   sOnSending(false);
-        // };
-
-        // const data = dataImport.map((item) => {
-        //   const result = {};
-        //   for (const listDataItem of listData) {
-        //     const columnValue = listDataItem.column?.value;
-        //     const dataFieldsValue = listDataItem.dataFields?.value;
-        
-        //     if (columnValue && item[columnValue]) {
-        //       result[dataFieldsValue] = item[columnValue];
-        //     }
-        
-        //     if (listDataItem.dataFields && listDataItem.dataFields.label && listDataItem.dataFields.value && item[listDataItem.dataFields.label]) {
-        //       const fieldKey = listDataItem.dataFields.value;
-        //       const fieldValue = item[listDataItem.dataFields.label];
-        //       result[fieldKey] = fieldValue;
-        //     }
-        //   }
-        //   return result;
-        // });
+   
           
         // const _ServerSending = async () => {
 
@@ -738,7 +543,7 @@ const Index = (props) => {
                                 key={e.id} 
                                 onClick={_HandleSelectTab.bind(this, `${e.id}`)} 
                                 active={e.id} 
-                                className='text-[#0F4F9E] col-span-1 bg-[#e2f0fe] hover:bg-blue-400 hover:text-white transition ease-in-out'
+                                className='text-[#0F4F9E] col-span-1 bg-[#e2f0fe] hover:bg-blue-400 hover:text-white transition ease-in-out '
                               >{e.name}</TabClient> 
                             </div>
                           )
@@ -884,9 +689,10 @@ const Index = (props) => {
                   <div className='col-span-2'></div>
                   <div className='col-span-4'>
                       <label for="importFile" className="block text-sm font-medium mb-2 dark:text-white">Tải lên file cần import</label>
-                      <label for="importFile"  className="flex w-full cursor-pointer p-2 appearance-none items-center justify-center rounded-md border-2 border-dashed border-gray-200 transition-all hover:border-blue-300">
+                      <label for="importFile"  className={`${errFileImport && dataImport.length == 0 ? "border-red-500" : "border-gray-200"} " border-gray-200 flex w-full cursor-pointer p-2 appearance-none items-center justify-center rounded-md border-2 border-dashed  transition-all hover:border-blue-300"`}>
                         <input accept='.xlsx, .xls'   id="importFile" onChange={_HandleChange.bind(this, 'importFile')} type="file" className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-500 file:py-0.5 file:px-5 file:text-[13px] file:font-semibold file:text-white hover:file:bg-primary-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60" />
                       </label>
+                        {errFileImport && dataImport.length == 0 && <label className="text-sm text-red-500">{"Vui lòng chọn file cần import"}</label>}
                   </div>
                   <div className='col-span-4 grid grid-cols-4 space-x-2.5'>
                       <div className='mx-auto w-full col-span-2'>
@@ -1044,7 +850,7 @@ const Index = (props) => {
 
 
                   <div className='col-span-2'></div>
-                  <div className={`${listData.length > 2 ? "mt-2" : ""} col-span-6`}>
+                  <div className={`${listData?.length > 2 ? "mt-3" : ""} col-span-6`}>
                   {
                     listData?.map((e,index) =>
                         
@@ -1353,7 +1159,7 @@ const Index = (props) => {
 
                   <div className='col-span-4'></div>
                   <div className='col-span-4 mt-2 grid-cols-2 grid gap-2.5'>
-                  <div className="flex items-center space-x-2 rounded p-2 hover:bg-gray-100 bg-gray-50 cursor-pointer">
+                  <div className="flex items-center space-x-2 rounded p-2 hover:bg-gray-200 bg-gray-100 cursor-pointer btn-animation hover:scale-[1.02]">
                                   <input type="checkbox" id="example11" name="checkGroup1" className="h-4 w-4 rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 focus:ring-offset-0 disabled:cursor-not-allowed disabled:text-gray-400" />
                                   <label for="example11" className="flex w-full space-x-2 text-sm cursor-pointer"> Lưu mẫu import </label>
                                 </div>
@@ -1379,7 +1185,7 @@ const Index = (props) => {
 const TabClient = React.memo((props) => {
     const router = useRouter();
     return(
-      <button  style={props.style} onClick={props.onClick} className={`${props.className} ${router.query?.tab === `${props.active}` ? "bg-blue-400 text-white":""} justify-center min-w-[220px] flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}>
+      <button  style={props.style} onClick={props.onClick} className={`${props.className} ${router.query?.tab === `${props.active}` ? "bg-blue-400 text-white":""} justify-center 3xl:w-[200px] 2xl:w-[180px] xl:w-[160px] lg:w-[140px] 3xl:h-10 2xl:h-8 xl:h-8 lg:h-7 3xl:text-[16px] 2xl:text-[14px] xl:text-[14px] lg:text-[12px] flex gap-2 items-center rounded-md px-2 py-2 outline-none`}>
         { router.query?.tab === `${props.active}` && <TiTick   size="20" color="white" />}
         {props.children}
       </button>
