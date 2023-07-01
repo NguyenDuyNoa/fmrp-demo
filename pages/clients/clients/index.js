@@ -402,7 +402,7 @@ const Index = (props) => {
                                
                                     {e.client_group?.map(h=>{
                                     return ( 
-                                      <span key={h.id} style={{ backgroundColor: `${h.color == "" ? "#e2f0fe" : h.color}`, color: `${h.color == "" ? "#0F4F9E" : "white"}`}} className={`  mr-2 mb-1 w-fit xl:text-base text-xs px-2 rounded-md font-[300] py-0.5`}>{h.name}</span>
+                                      <span key={h.id} style={{ backgroundColor: `${h.color == "" ? "#e2f0fe" : h.color}`, color: `${h.color == "" ? "#0F4F9E" : "white"}`}} className={`  mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] px-2 rounded-md font-[300] py-0.5`}>{h.name}</span>
                                       )})}
                               
                               </h6> 
