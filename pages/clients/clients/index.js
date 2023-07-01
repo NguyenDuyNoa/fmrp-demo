@@ -406,7 +406,7 @@ const Index = (props) => {
                                       )})}
                               
                               </h6> 
-                              <h6 className='w-[10%]'>
+                              <h6 className='w-[10%] flex flex-col gap-2 flex-wrap'>
                                   {e.branch?.map(i => (<span key={i} className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2">{i.name}</span>))}
                               </h6>
                                {/* <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[10%] rounded-md text-left flex justify-start flex-wrap ">{e.branch?.map(i => (<span key={i} className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{i.name}</span>))}</h6>                   */}
