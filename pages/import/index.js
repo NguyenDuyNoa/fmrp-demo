@@ -424,10 +424,10 @@ const Index = (props) => {
 
         const requiredColumn = listData?.length == 0
 
-        if(hasNullDataFiles || fileImport == null || hasNullColumn || (valueCheck == 'edit' && condition_column == null) || (valueCheck == 'edit' && hasNoCodeField) || hasNullDataImport || requiredColumn || hasNoNameField ||  (valueCheck == 'add' && hasNoBranchField) || end_row == null || row_tarts == null ){
+        if(hasNullDataFiles || fileImport == null || hasNullColumn || ( condition_column == null) || (valueCheck == 'edit' && hasNoCodeField) || hasNullDataImport || requiredColumn || hasNoNameField ||  (valueCheck == 'add' && hasNoBranchField) || end_row == null || row_tarts == null ){
           hasNullDataFiles  && sErrFiles(true)
           fileImport == null  && sErrFileImport(true)
-          valueCheck == 'edit' && condition_column == null  && sErrColumn(true)
+           condition_column == null  && sErrColumn(true)
           condition_column == null && sErrValueCheck(true)
           hasNullDataImport && sErrFileImport(true)
           row_tarts == null && sErrRowStart(true)
@@ -469,7 +469,7 @@ const Index = (props) => {
           }
           else {
               sErrFileImport(false)
-              sOnSending(true)
+              // sOnSending(true)
           }
         }
 
