@@ -410,28 +410,37 @@ const Index = (props) => {
         e.preventDefault();
 
         const hasNullDataFiles = listData.some(e => e?.dataFields === null);
-
-
+        
+        
         const hasNullColumn = listData.some(e => e?.column === null);
-
+        
         const hasNoNameField = !listData.some((item) => item?.dataFields?.value === "name");
-
+        
         const hasNoBranchField = !listData.some((item) => item?.dataFields?.value === "branch_id");
-
+        
         const hasNoCodeField = !listData.some((item) => item?.dataFields?.value === "code");
         
         const hasNullDataImport = dataImport?.length == 0
-
+        
         const requiredColumn = listData?.length == 0
 
-        if(hasNullDataFiles || fileImport == null || hasNullColumn || ( condition_column == null) || (valueCheck == 'edit' && hasNoCodeField) || hasNullDataImport || requiredColumn || hasNoNameField ||  (valueCheck == 'add' && hasNoBranchField) || end_row == null || row_tarts == null ){
-          hasNullDataFiles  && sErrFiles(true)
-          fileImport == null  && sErrFileImport(true)
-           condition_column == null  && sErrColumn(true)
-          condition_column == null && sErrValueCheck(true)
-          hasNullDataImport && sErrFileImport(true)
-          row_tarts == null && sErrRowStart(true)
-          end_row == null && sErrEndRow(true)
+        if(hasNullDataFiles || fileImport == null || hasNullColumn || (valueCheck == 'edit' && condition_column == null) || (valueCheck == 'edit' && hasNoCodeField) || hasNullDataImport || requiredColumn || hasNoNameField ||  (valueCheck == 'add' && hasNoBranchField) || end_row == null || row_tarts == null ){
+           console.log("hasNullDataFiles",condition_column == null);
+            hasNullDataFiles  && sErrFiles(true)
+
+            
+            hasNullColumn  && sErrColumn(true)
+            
+            valueCheck == 'edit' && condition_column == null && sErrValueCheck(true)
+            
+            fileImport == null  && sErrFileImport(true)
+
+            hasNullDataImport && sErrFileImport(true)
+
+            row_tarts == null && sErrRowStart(true)
+
+            end_row == null && sErrEndRow(true)
+
           //bắt buộc phải thêm cột
             if(requiredColumn){
                 Toast.fire({
@@ -469,7 +478,7 @@ const Index = (props) => {
           }
           else {
               sErrFileImport(false)
-              // sOnSending(true)
+              sOnSending(true)
           }
         }
 
