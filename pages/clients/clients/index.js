@@ -301,7 +301,6 @@ const Index = (props) => {
                                     hideSelectedOptions={false}
                                     isMulti
                                     isClearable={true}
-                                  
                                     className="rounded-md bg-white  xl:text-base text-[14.5px] z-20" 
                                     isSearchable={true}
                                     noOptionsMessage={() => "Không có dữ liệu"}
@@ -402,7 +401,7 @@ const Index = (props) => {
                                
                                     {e.client_group?.map(h=>{
                                     return ( 
-                                      <span key={h.id} style={{ backgroundColor: `${h.color == "" ? "#e2f0fe" : h.color}`, color: `${h.color == "" ? "#0F4F9E" : "white"}`}} className={`  mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] px-2 rounded-md font-[300] py-0.5`}>{h.name}</span>
+                                      <span key={h.id} style={{ backgroundColor: `${h.color == "" || h.color == null ? "#e2f0fe" : h.color}`, color: `${h.color == "" || h.color == null ? "#0F4F9E" : "white"}`}} className={`  mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] px-2 rounded-md font-[300] py-0.5`}>{h.name}</span>
                                       )})}
                               
                               </h6> 
@@ -540,8 +539,8 @@ const Popup_dskh = (props) => {
          sListChar([])
       }, [open]);
 
-      const _ServerFetching_detailUser =  () =>{
-          Axios("GET", `/api_web/api_client/client/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+      const _ServerFetching_detailUser = async () =>{
+        await  Axios("GET", `/api_web/api_client/client/${props?.id}?csrf_protection=true`, {}, (err, response) => {
           if(!err){
               var db =  response.data;
              
@@ -558,12 +557,11 @@ const Popup_dskh = (props) => {
               sDebt_limit(db?.debt_limit)
               sDebt_limit_day(db?.debt_limit_day)
               sDate_incorporation(db?.date_incorporation)
-              sValueDis(db?.district.districtid)
+              sValueDis({label:db?.district.name, value:db?.district.districtid})
               sValueCt(db?.city.provinceid)
               sNote(db?.note)
-              sValueWa(db?.ward.wardid)
+              sValueWa({label: db?.ward.name, value: db?.ward.wardid})
               sOption(db?.contact ? db?.contact : [])
-           
           }
           sOnFetching(false)
         })
@@ -727,15 +725,15 @@ const Popup_dskh = (props) => {
       //on chang ditrict 
       const [valueDis, sValueDis] = useState()
       const handleChangeDtric =  (e) => {   
-        sValueDis(e?.value) 
+        sValueDis(e) 
       }       
 
       //fecth ward
       const [ward_id, sWard] = useState()
       const _ServerFetching_war =  () =>{
-          Axios("GET","/api_web/Api_address/ward?limit=0", {
+      Axios("GET","/api_web/Api_address/ward?limit=0", {
             params: {
-              districtid: valueDis ? valueDis : -1
+              districtid: valueDis ? valueDis?.value : -1
             }
         }, (err, response) => {
           if(!err){
@@ -753,9 +751,8 @@ const Popup_dskh = (props) => {
 
       // const ward =  valueWa?.value
       const handleChangeWar =  (e) => {
-        sValueWa(e?.value) 
+        sValueWa(e) 
       };
-
 
     //post db
     const _ServerSending = () => {
@@ -773,8 +770,8 @@ const Popup_dskh = (props) => {
       data.append('debt_limit', debt_limit);
       data.append('debt_limit_day', debt_limit_day);
       data.append('city', valueCt);
-      data.append('district', valueDis);
-      data.append('ward', valueWa);
+      data.append('district', valueDis?.value);
+      data.append('ward', valueWa?.value);
       data.append('client_group_id', group);
       data.append('branch_id', branch_id);
       data.append('staff_charge', char);
@@ -1226,7 +1223,8 @@ const Popup_dskh = (props) => {
                               <Select 
                                   placeholder={props.dataLang?.client_popup_district}
                                   options={ditrict} 
-                                  value={valueDis ? {label: ditrict?.find(x => x.value == valueDis)?.label, value: valueDis} : null}
+                                  // value={valueDis ? {label: ditrict?.find(x => x.value == valueDis)?.label, value: valueDis} : null}
+                                  value={valueDis}
                                   onChange={handleChangeDtric} 
                                   isSearchable={true}
                                   maxMenuHeight="200px"
@@ -1262,7 +1260,8 @@ const Popup_dskh = (props) => {
                               <Select 
                                   placeholder={props.dataLang?.client_popup_wards}
                                   options={listWar} 
-                                  value={valueWa ? {label: listWar?.find(x => x.value == valueWa)?.label, value: valueWa} : null}
+                                  // value={valueWa ? {label: listWar?.find(x => x.value == valueWa)?.label, value: valueWa} : null}
+                                  value={valueWa }
                                   onChange={handleChangeWar} 
                                   isSearchable={true}
                                   maxMenuHeight="200px"
@@ -1462,7 +1461,7 @@ return (
                       </span>
                       </div>
                       <div className='mb-4 flex justify-between  p-2 items-center flex-wrap'><span className='text-slate-400 text-sm'>{props.dataLang?.client_list_brand}:</span> <span className='flex justify-between space-x-1'>{data?.branch?.map(e=>{ return (<span  className='last:ml-0 font-normal capitalize  w-fit xl:text-base text-xs px-2 text-[#0F4F9E] border border-[#0F4F9E] rounded-[5.5px]'> {e.name}</span>)})}</span></div>
-                      <div className='mb-4 justify-between  items-center p-2 flex space-x-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_list_group}:</span> <span className='flex justify-between space-x-1'>{data?.client_group?.map(e=>{ return (<span style={{ backgroundColor: `${e.color == "" ? "#e2f0fe" : e.color}`, color: `${e.color == "" ? "#0F4F9E" : "white"}`}} className="last:ml-0 font-normal capitalize  w-fit xl:text-base text-xs px-2   rounded-[5.5px]">{e.name} </span>)})}</span></div>
+                      <div className='mb-4 justify-between  items-center p-2 flex space-x-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_list_group}:</span> <span className='flex justify-between space-x-1'>{data?.client_group?.map(e=>{ return (<span style={{ backgroundColor: `${e.color == "" || e.color == null ? "#e2f0fe" : e.color}`, color: `${e.color == "" ? "#0F4F9E" : "#0F4F9E"}`}} className="last:ml-0 font-normal capitalize  w-fit xl:text-base text-xs px-2   rounded-[5.5px]">{e.name} </span>)})}</span></div>
                       <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_limit}:</span> <span className='font-normal capitalize'>{data?.debt_limit}</span></div>
                       <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_days}:</span> <span className='font-normal capitalize'>{data?.debt_limit_day}</span></div>
                       {/* <div className='mb-4 flex justify-between items-center p-2'><span className='text-slate-400 text-sm'>{props.dataLang?.client_popup_date}:</span> <span className='font-normal capitalize'>{moment(data?.date_create).format("DD/MM/YYYY")}</span></div> */}

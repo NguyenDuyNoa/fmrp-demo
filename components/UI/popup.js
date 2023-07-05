@@ -17,6 +17,9 @@ const Index = (props) => {
         open={props.open}
         closeOnDocumentClick={false}
         onClose={props.onClose}
+        // lockScroll={props.lockScroll}
+        // repositionOnResiz={props.repositionOnResiz}
+
         className={`${props.className} popup-edit`}
       >
         <div className="3xl:mt-48 2xl:mt-32 xl:mt-32 mt-36 ">

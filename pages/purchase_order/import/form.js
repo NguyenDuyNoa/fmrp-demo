@@ -1008,7 +1008,6 @@ const _ServerFetching =  () => {
                         title: `${dataLang[message]}`
                       })
                     }
-                     
                   }
               }
               sOnSending(false)
