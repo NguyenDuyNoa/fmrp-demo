@@ -339,10 +339,11 @@ const Index = (props) => {
                             </div>
                         </div>
                       <div className="flex space-x-2 items-center">
-                      <button onClick={_HandleFresh.bind(this)} type='button' className='bg-red-50 hover:bg-red-100 p-2 rounded-md transition-all ease-in-out'>
+                      <button onClick={_HandleFresh.bind(this)} type='button' className='bg-green-50 hover:bg-green-100 hover:scale-105 group p-2 rounded-md transition-all ease-in-out'>
                           <Refresh2
-                          size="22"
-                          color="red"
+                            className='group-hover:-rotate-45 transition-all ease-in-out'
+                            size="22"
+                            color="green"
                           />
                       </button>
                       {
