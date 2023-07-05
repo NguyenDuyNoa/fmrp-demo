@@ -11,7 +11,7 @@ import ReactExport from "react-data-export";
 import Swal from 'sweetalert2'
 
 
-import { Edit as IconEdit,  Grid6 as IconExcel, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User  } from "iconsax-react";
+import { Edit as IconEdit,  Grid6 as IconExcel, Trash as IconDelete, SearchNormal1 as IconSearch,Add as IconAdd, LocationTick, User, Refresh2  } from "iconsax-react";
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
 import Pagination from '/components/UI/pagination';
@@ -202,6 +202,10 @@ const Index = (props) => {
       })
     }
 
+    const _HandleFresh = () =>{
+      sOnFetching(true)
+    }
+
     //excel
     const multiDataSet = [
       {
@@ -335,6 +339,12 @@ const Index = (props) => {
                             </div>
                         </div>
                       <div className="flex space-x-2 items-center">
+                      <button onClick={_HandleFresh.bind(this)} type='button' className='bg-red-50 hover:bg-red-100 p-2 rounded-md transition-all ease-in-out'>
+                          <Refresh2
+                          size="22"
+                          color="red"
+                          />
+                      </button>
                       {
                         data_ex?.length > 0 &&(
                           <ExcelFile filename="Danh sách khách hàng" title="Dskh" element={
