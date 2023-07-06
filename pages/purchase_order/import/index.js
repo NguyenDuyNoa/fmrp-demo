@@ -1263,7 +1263,7 @@ return(
     onClose={() => sOpen(false)}
     classNameBtn={props.className}
   >
-    <div className="mt-4 space-x-5 w-[990px] h-auto">        
+    <div className="mt-4 space-x-5 w-[1100px] h-auto">        
     <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                 <div className="pr-2 ">
                   <div className={`${dataProductSerial.is_enable == "1" ? 
