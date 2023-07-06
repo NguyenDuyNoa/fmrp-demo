@@ -625,6 +625,7 @@ const _ServerFetching =  () => {
     })
     sListData(newData)
   }
+
   const _HandleAddParent = (value) => {
     const checkData = listData?.some(e => e?.matHang?.value === value?.value)
     if(!checkData){
@@ -659,7 +660,6 @@ const _ServerFetching =  () => {
     }
   }
 
-
   const _HandleDeleteChild = (parentId, childId) => {
     const newData = listData.map(e => {
         if(e.id === parentId){
@@ -668,6 +668,17 @@ const _ServerFetching =  () => {
         }
         return e;
     }).filter(e => e.child?.length > 0)
+    sListData([...newData])
+  }
+  
+  const _HandleDeleteAllChild = (parentId) => {
+      const newData = listData.map(e => {
+        if(e.id === parentId){
+          const newChild = e.child?.filter(ce => ce?.kho !== null)
+          return {...e, child: newChild}
+        }
+        return e;
+      }).filter(e => e.child?.length > 0)
     sListData([...newData])
   }
 
@@ -815,8 +826,8 @@ const _ServerFetching =  () => {
                 <h2 className='xl:text-2xl text-xl '>{dataLang?.returns_title || "returns_title"}</h2>
                 <div className="flex justify-end items-center">
                     <button   
-                    onClick={() => router.back()} 
-                    className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105">{dataLang?.import_comeback || "import_comeback"}</button>
+                    onClick={() => router.push('/purchase_order/returns')} 
+                    className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105">{dataLang?.import_comeback || "import_comeback"}</button>
                 </div>
             </div>
                 
@@ -835,7 +846,7 @@ const _ServerFetching =  () => {
                               className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}/>
                         </div>
                         <div className='col-span-2 relative'>
-                            <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_day_vouchers || "import_day_vouchers"} <span className="text-red-500">*</span></label>
+                            <label className="text-[#344054] font-normal text-sm mb-1 ">{dataLang?.import_day_vouchers || "import_day_vouchers"}</label>
                             <div className="custom-date-picker flex flex-row">
                               <DatePicker
                                 blur
@@ -1026,7 +1037,8 @@ const _ServerFetching =  () => {
                   placeholder={dataLang?.returns_items || "returns_items"}
                   noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                   menuPortalTarget={document.body}
-                  formatOptionLabel={(option) => (
+                  formatOptionLabel={(option) => 
+                    (
                     <div className='py-2'>
                         <div className='flex items-center '>
                           <div className='w-[40px] h-[50px]'>
@@ -1058,7 +1070,8 @@ const _ServerFetching =  () => {
                               </> ):""}
                         </div>
                     </div>
-                  )}
+                  )
+                }
                   style={{ border: "none", boxShadow: "none", outline: "none" }}
                   theme={(theme) => ({
                     ...theme,
@@ -1239,6 +1252,13 @@ const _ServerFetching =  () => {
                             />
                             <button onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)} className='w-8 h-8 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-4 right-5 hover:rotate-45 hover:bg-slate-200 transition hover:scale-105 hover:text-red-500 ease-in-out'><Add className=''/></button>
                           </div>
+                          {e?.child?.filter(e => e.kho == null).length >= 2 &&
+                            <button onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)} className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300">
+                                  <span className="absolute right-0 w-full h-full -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
+                                  <span className="relative text-xs">Xóa {e?.child?.filter(e => e.kho == null).length} hàng chưa chọn kho</span>
+                            </button>
+                          }
+                         
                         </div>
                         <div className='col-span-10  items-center'>
                           <div className="grid grid-cols-11  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
@@ -1251,7 +1271,7 @@ const _ServerFetching =  () => {
                                     value={ce?.kho} 
                                     isLoading={ce?.kho == null ? onLoadingChild : false}
                                     onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "kho")}
-                                    className={`${errWarehouse && ce?.kho == null ? "border-red-500" : "" } my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `} 
+                                    className={`${errWarehouse && ce?.kho == null ? "border-red-500" : "" } border my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `} 
                                     placeholder={onLoadingChild ? "" : dataLang?.returns_point || "returns_point"} 
                                     menuPortalTarget={document.body}
                                     formatOptionLabel={(option) => 
@@ -1372,7 +1392,7 @@ const _ServerFetching =  () => {
                                     decimalScale={0}
                                     isNumericString={true}  
                                     thousandSeparator=","
-                                    isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
+                                    isAllowed={(values) => { const {floatValue} = values; return floatValue >= 0 }}       
                                   />
                                 </div>
                                 {/* <div>{ce?.priceAfter}</div> */}
@@ -1419,7 +1439,7 @@ const _ServerFetching =  () => {
                                   /> 
                                 </div>
                                 <div className=' h-full p-0.5 flex flex-col items-center justify-center'>
-                                  <button title='Xóa' onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)} className=' text-red-500 flex flex-col justify-center items-center'>
+                                  <button title='Xóa' onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)} className=' text-red-500 flex flex-col justify-center items-center hover:scale-110 bg-red-50 p-2 rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom'>
                                     <IconDelete />
                                   </button>
                                 </div>
@@ -1596,11 +1616,11 @@ const _ServerFetching =  () => {
                 </div>
                 <div className='space-x-2'>
                 <button
-                 onClick={() => router.back()} 
-                 className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]">{dataLang?.purchase_order_purchase_back || "purchase_order_purchase_back"}</button>
+                 onClick={() => router.push('/purchase_order/returns')} 
+                 className="button text-[#344054] font-normal text-base hover:bg-blue-500 hover:text-white hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]">{dataLang?.purchase_order_purchase_back || "purchase_order_purchase_back"}</button>
                   <button 
                   onClick={_HandleSubmit.bind(this)} 
-                   type="submit"className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]">{dataLang?.purchase_order_purchase_save || "purchase_order_purchase_save"}</button>
+                   type="submit" className="button text-[#FFFFFF] hover:bg-blue-500 font-normal text-base hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]">{dataLang?.purchase_order_purchase_save || "purchase_order_purchase_save"}</button>
                 </div>
             </div>
         </div>

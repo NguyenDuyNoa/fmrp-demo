@@ -24,4 +24,6 @@ const Index = React.memo(({ postsPerPage, totalPosts, paginate, currentPage }) =
       );
 });
 
+
+
 export default Index;

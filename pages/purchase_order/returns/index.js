@@ -10,7 +10,8 @@ import {
     Grid6 as IconExcel, Filter as IconFilter, Calendar as IconCalendar, SearchNormal1 as IconSearch,
     ArrowDown2 as IconDown,
     TickCircle,
-    ArrowCircleDown
+    ArrowCircleDown,
+    Refresh2
 } from "iconsax-react";
 
 import {BiEdit} from 'react-icons/bi'
@@ -42,6 +43,7 @@ import ReactExport from "react-data-export";
 import { useEffect } from 'react';
 import Popup_chitietThere from '../detailThere';
 import FilePDF from '../FilePDF';
+
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -243,6 +245,9 @@ const Index = (props) => {
       }
     }
 
+    const _HandleFresh = () =>{
+      sOnFetching(true)
+    }
 
     const multiDataSet = [
       {
@@ -306,7 +311,7 @@ const Index = (props) => {
     var data = new FormData();
     data.append('warehouseman_id', checkedWare?.checkedpost != "0" ?  checkedWare?.checkedpost : '' );   
     data.append('id', checkedWare?.id);   
-  await  Axios("POST",`/api_web/api_import/ConfirmWarehous?csrf_protection=true`, {
+  await  Axios("POST",`/api_web/Api_return_supplier/ConfirmWarehous?csrf_protection=true`, {
         data:data,
         headers: {"Content-Type": "multipart/form-data"} 
     }, (err, response) => {
@@ -378,7 +383,7 @@ const Index = (props) => {
                               onClick={_HandleSelectTab.bind(this, `${e.id}`)} 
                               total={e.count} 
                               active={e.id} 
-                              className={"text-[#0F4F9E] i transition duration-300 ease-out font-medium"}
+                              className={"text-[#0F4F9E] transition duration-300 ease-out font-medium"}
                             >{dataLang[e?.name] || e?.name}</TabStatus> 
                           </div>
                           )
@@ -546,6 +551,13 @@ const Index = (props) => {
                         </div>
                         <div className="col-span-1">
                           <div className='flex justify-end items-center gap-2'>
+                            <button onClick={_HandleFresh.bind(this)} type='button' className='bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out'>
+                                  <Refresh2
+                                    className='group-hover:-rotate-45 transition-all ease-in-out'
+                                    size="22"
+                                    color="green"
+                                  />
+                            </button>
                              <div>
                              {
                               dataExcel?.length > 0 &&(
@@ -632,12 +644,12 @@ const Index = (props) => {
                                 <a class="text-center text-white font-semibold z-10 pointer-events-none">Hover on me!</a>
                               </div> */}
                                 <h6 className=' 2xl:text-base xl:text-xs text-[8px] col-span-1 cursor-pointer'>
-                                  <div className={`${e?.warehouseman_id == "0" ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation " : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "} rounded-md cursor-pointer` }>
+                                  <div className={`${e?.warehouseman_id == "0" ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation " : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "} rounded-md cursor-pointer hover:scale-105` }>
                                     <div className='flex items-center justify-center'>
                                                               <label className="relative flex cursor-pointer items-center rounded-full p-2" htmlFor={e.id} data-ripple-dark="true" > 
                                                                   <input
                                                                       type="checkbox"
-                                                                      className={`${e?.warehouseman_id == "0" ? "checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500" : "checked:border-lime-500 checked:bg-lime-500 border-lime-500 checked:before:bg-limborder-lime-500"}before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-gray-400 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
+                                                                      className={`${e?.warehouseman_id == "0" ? "checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 border-indigo-500 border" : "checked:border-lime-500 checked:bg-lime-500 border-lime-500 checked:before:bg-limborder-lime-500"}before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-gray-400 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
                                                                       id={e.id}
                                                                       value={e.warehouseman_id}
                                                                       checked={e.warehouseman_id != "0" ? true : false}
@@ -671,7 +683,7 @@ const Index = (props) => {
                                   </div>
                               </h6>
                                 <div className='col-span-1 flex justify-center'>
-                                    <BtnTacVu type="import" onRefresh={_ServerFetching.bind(this)} onRefreshGroup={_ServerFetching_group.bind(this)} dataLang={dataLang} warehouseman_id={e?.warehouseman_id} status_pay={e?.status_pay} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
+                                    <BtnTacVu type="returns" onRefresh={_ServerFetching.bind(this)} onRefreshGroup={_ServerFetching_group.bind(this)} dataLang={dataLang} warehouseman_id={e?.warehouseman_id} status_pay={e?.status_pay} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
                                 </div>
                                 </div>
        
@@ -745,6 +757,32 @@ const BtnTacVu = React.memo((props) => {
 
   const [openDetail, sOpenDetail] = useState(false);
   const router = useRouter()
+
+  const [dataPDF, setData] = useState();
+  const [dataCompany, setDataCompany] = useState();
+
+
+  const fetchDataSettingsCompany = async () => {
+    if (props?.id) {
+      await  Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+          if(!err){
+                  var {data} =  response.data
+                  setDataCompany(data)
+            }
+        })
+    }
+    if(props?.id){
+      await  Axios("GET", `/api_web/Api_return_supplier/returnSupplier/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+          if(!err){
+            var db =  response.data
+            setData(db)
+          }
+        })
+    }
+}
+  useEffect(() => {
+    openTacvu && fetchDataSettingsCompany()
+  }, [openTacvu])
 
   const _HandleDelete = (id) => {
       Swal.fire({
@@ -827,6 +865,13 @@ const BtnTacVu = React.memo((props) => {
                             <VscFilePdf size={20} className='group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md ' />
                             <Popup_Pdf type={props.type} props={props} id={props.id} dataLang={props.dataLang} className='group-hover:text-[#65a30d] '/>
                           </div> */}
+                          <FilePDF 
+                                  props={props}
+                                  openAction={openTacvu}
+                                  setOpenAction={sOpenTacvu}
+                                  dataCompany={dataCompany}
+                                  data={dataPDF}
+                           />
                           <button onClick={_HandleDelete.bind(this, props.id)} className='group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
                               <RiDeleteBin6Line size={20} className='group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md '/>
                               <p className='group-hover:text-[#f87171]'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</p>
@@ -839,96 +884,7 @@ const BtnTacVu = React.memo((props) => {
 })
 
 
-const Popup_Pdf =(props)=>{
-  const scrollAreaRef = useRef(null);
-  const [open, sOpen] = useState(false);
-  const _ToggleModal = (e) => sOpen(e);
-  const [data,sData] =useState()
-  const [onFetching, sOnFetching] = useState(false);
 
-  useEffect(() => {
-    props?.id && sOnFetching(true) 
-    props?.id && _ServerFetching()
-  }, [open]);
-
-  const [dataPDF, setData] = useState();
-  const [dataCompany, setDataCompany] = useState();
-
-
-  const fetchDataSettingsCompany = async () => {
-    if (props?.id) {
-      await  Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
-          if(!err){
-                  var {data} =  response.data
-                  setDataCompany(data)
-            }
-        })
-    }
-    if(props?.id){
-      await  Axios("GET", `/api_web/Api_import/import/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-          if(!err){
-            var db =  response.data
-            setData(db)
-          }
-        })
-    }
-}
-  useEffect(() => {
-    open && fetchDataSettingsCompany()
-  }, [open])
-
-  
- 
-  const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-  const [dataProductExpiry, sDataProductExpiry] = useState({});
-  const [dataProductSerial, sDataProductSerial] = useState({});
-
-  const _ServerFetching =  () =>{
-    Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-      if(!err){
-          var data = response.data;
-          sDataMaterialExpiry(data.find(x => x.code == "material_expiry"));
-          sDataProductExpiry(data.find(x => x.code == "product_expiry"));
-          sDataProductSerial(data.find(x => x.code == "product_serial"));
-      }
-      sOnFetching(false)
-    })
-  }
-
-return (
-<>
- <PopupEdit   
-    title={props.dataLang?.option_prin || "option_prin"} 
-    button={props.dataLang?.btn_table_print  || "btn_table_print"} 
-    onClickOpen={_ToggleModal.bind(this, true)} 
-    open={open} onClose={_ToggleModal.bind(this,false)}
-    classNameBtn={props?.className} 
-  >
-  <div className='flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
-     
-  </div>  
-          <div className="space-x-5 w-[400px] h-auto">        
-          <div>
-           <div className='w-[400px]'>
-            <FilePDF 
-              props={props}
-              openAction={open}
-              setOpenAction={sOpen}
-              dataCompany={dataCompany}
-              data={dataPDF}
-              dataMaterialExpiry={dataMaterialExpiry}
-              dataProductExpiry={dataProductExpiry}
-              dataProductSerial={dataProductSerial}
-              />
-          </div>
-    
-     </div>
-  
-    </div>    
-  </PopupEdit>
-</>
-)
-}
 
 
 const Popup_chitiet =(props)=>{
@@ -1092,8 +1048,10 @@ return (
                               <ModalImage small="/no_img.png" large="/no_img.png" className='w-full h-full rounded object-contain p-1' > </ModalImage>
                             </div>
                           }
-                          </h6>                 */}
-                          <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left font-medium">
+                          </h6>     
+                                      */}
+                                      {console.log(e?.item?.serial)}
+                          <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left ">
                             <div className='flex items-center gap-2'>
                                 <div>
                                   {e?.item?.images != null ? (<ModalImage   small={e?.item?.images} large={e?.item?.images} alt="Product Image"  className='custom-modal-image object-cover rounded w-[40px] h-[50px] mx-auto' />):
@@ -1108,16 +1066,17 @@ return (
                                     <div className='flex items-center font-oblique flex-wrap'>
                                       {dataProductSerial.is_enable === "1" ? (
                                           <div className="flex gap-0.5">
-                                            <h6 className="text-[12px]">Serial:</h6><h6 className="text-[12px]  px-2   w-[full] text-left ">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
+                                            {/* <h6 className="text-[12px]">Serial:</h6><h6 className="text-[12px]  px-2   w-[full] text-left ">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                               */}
+                                            <h6 className="text-[12px]">Serial:</h6><h6 className="text-[12px]  px-2   w-[full] text-left ">{e?.item?.serial == null || e?.item?.serial == "" ?  "-": e?.item?.serial}</h6>                              
                                           </div>
                                         ):""}
                                       {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
                                         <>
                                           <div className="flex gap-0.5">
-                                            <h6  className="text-[12px]">Lot:</h6>  <h6 className="text-[12px]  px-2   w-[full] text-left ">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
+                                            <h6  className="text-[12px]">Lot:</h6>  <h6 className="text-[12px]  px-2   w-[full] text-left ">{e?.item?.lot == null || e?.item?.lot == ""  ? "-" : e?.item?.lot}</h6>                              
                                           </div>
                                           <div className="flex gap-0.5">
-                                          <h6  className="text-[12px]">Date:</h6> <h6 className="text-[12px]  px-2   w-[full] text-center ">{e.expiration_date ? moment(e.expiration_date).format("DD/MM/YYYY")   : "-"}</h6>                              
+                                          <h6  className="text-[12px]">Date:</h6> <h6 className="text-[12px]  px-2   w-[full] text-center ">{e?.item?.expiration_date ? moment(e?.item?.expiration_date).format("DD/MM/YYYY")   : "-"}</h6>                              
                                           </div>
                                         </>
                                         ):""}

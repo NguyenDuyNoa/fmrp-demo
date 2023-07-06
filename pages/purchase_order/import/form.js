@@ -1785,7 +1785,7 @@ const _ServerFetching =  () => {
                                     options={warehouse}
                                     value={ce?.kho} 
                                     onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, "kho")}
-                                    className={`${errWarehouse && ce?.kho == null ? "border-red-500" : "" } my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `} 
+                                    className={`${errWarehouse && ce?.kho == null ? "border-red-500" : "" } border my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `} 
                                     placeholder={"Kho - vị trí kho"} 
                                     menuPortalTarget={document.body}
                                     formatOptionLabel={(option) => (
@@ -1927,7 +1927,7 @@ const _ServerFetching =  () => {
                                     decimalScale={0}
                                     isNumericString={true}  
                                     thousandSeparator=","
-                                    isAllowed={(values) => { const {floatValue} = values; return floatValue > 0 }}       
+                                    isAllowed={(values) => { const {floatValue} = values; return floatValue >= 0 }}       
                                   />
                                 </div>
                                 {/* <div>{ce?.priceAfter}</div> */}

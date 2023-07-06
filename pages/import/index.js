@@ -118,44 +118,50 @@ const Index = (props) => {
 
     const _ServerFetching =  () => {
 
-      sOnLoading(true)
-        Axios("GET", `/api_web/${(tabPage === "1" ? "/Api_import_data/get_field_client?csrf_protection=true" : '')}`, {
+        sOnLoading(true)
+
+        Axios("GET", `/api_web/${(tabPage === "1" && "Api_import_data/get_field_client?csrf_protection=true") || tabPage === "2"  && ''}`, {
         }, (err, response) => {
             if(!err){
                 var db =  response.data
                 sDataClient(db?.map(e => ({label: dataLang[e?.label], value: e?.value})))
             }
+
             sOnLoading(false)
         })
 
-       Axios("GET", `/api_web/${(tabPage === "1" ? "/Api_import_data/get_colums_excel?csrf_protection=true" : '')}`, {
+       Axios("GET", `/api_web/${(tabPage === "1" && "Api_import_data/get_colums_excel?csrf_protection=true") || tabPage === "2"  && ''}`, {
         }, (err, response) => {
             if(!err){
                 var db =  response.data
                 sDataColumn(db?.map(e => ({label: e, value: e})))
             }
+
             sOnLoading(false)
 
         })
 
-        Axios("GET", `/api_web/${(tabPage === "1" ? "/Api_import_data/get_field_isset?csrf_protection=true" : '')}`, {
+        Axios("GET", `/api_web/${(tabPage === "1" && "Api_import_data/get_field_isset?csrf_protection=true") || tabPage === "2"  && ''}`, {
         }, (err, response) => {
             if(!err){
                 var db =  response.data
                 sDataConditionColumn(db?.map(e => ({label: dataLang[e?.label] || e?.label,  value: e?.value})))
             }
+
             sOnLoading(false)
 
         })
 
-       Axios("GET", `/api_web/${(tabPage === "1" ? "/Api_import_data/get_template_import?csrf_protection=true" : '')}`, {
+       Axios("GET", `/api_web/${(tabPage === "1" && "Api_import_data/get_template_import?csrf_protection=true") || tabPage === "2"  && ''}`, {
         }, (err, response) => {
             if(!err){
                 var db =  response.data
                 sDataSampleImport(db?.map(e => ({label: e?.code, value: e?.id, date: moment(e?.date_create).format('DD/MM/YYYY'), setup_colums: e?.setup_colums})))
             }
+
             sOnLoading(false)
         })
+
         sOnFetching(false)
     }
 
@@ -163,9 +169,10 @@ const Index = (props) => {
     useEffect(() => {
       onFetching && _ServerFetching() 
     }, [onFetching]);
+
     useEffect(() => {
         router.query.tab && sOnFetching(true) 
-    }, [router.query?.page, router.query?.tab]);
+    }, [router.query?.page, router.query?.tab,]);
 
  
 //   const _HandleChangeFileImport = (e) => {
@@ -222,6 +229,7 @@ const Index = (props) => {
       }else if(type == "sampleImport"){
         sSampleImport(value)
         sOnLoadingListData(true)
+        // sDataClient([...dataClient])
         const dataBackup = value ? JSON?.parse(value?.setup_colums)?.map(e => JSON?.parse(e)) : []
         sListData(dataBackup)
       }else if(type == "row_tarts"){
@@ -229,7 +237,7 @@ const Index = (props) => {
         var fname = document.getElementById('importFile').files[0]
          _HandleChangeFileImportNew(fname, Number(value?.value), end_row)
       }else if(type == "end_row"){
-        sEnd_row(Number(value?.value))
+          sEnd_row(Number(value?.value))
           var fname = document.getElementById('importFile').files[0]
           _HandleChangeFileImportNew(fname,row_tarts, Number(value?.value))
       }else if(type == "importFile"){
@@ -289,21 +297,20 @@ const Index = (props) => {
           const rowIndexEnd = Math.min(maxRowIndex, endRowIndex);
 
           for (let rowIndex = rowIndexStart; rowIndex <= rowIndexEnd; rowIndex++) {
-            const row = sheetData[rowIndex];
-          
-            const rowData = {};
-                for (let colIndex = 0; colIndex < row.length; colIndex++) {
-                const col = String.fromCharCode(65 + colIndex);
-                rowData[col] = row[colIndex];
-                rowData['rowIndex'] = rowIndex;
-                }
-            jsonData.push(rowData);
+                const row = sheetData[rowIndex];
+            
+                const rowData = {};
+                    for (let colIndex = 0; colIndex < row.length; colIndex++) {
+                    const col = String.fromCharCode(65 + colIndex);
+                    rowData[col] = row[colIndex];
+                    rowData['rowIndex'] = rowIndex;
+                    }
+                jsonData.push(rowData);
           }
 
-         setTimeout(() =>{
-          sDataImport(jsonData);
-         },0)
-
+            setTimeout(() =>{
+                sDataImport(jsonData);
+            },0)
       };
     };
 
@@ -365,14 +372,17 @@ const Index = (props) => {
 
     //xóa cột khách hàng
     const _HandleDelete =  (id) => {
-        const newData = listData.filter(x => x.id !== id); // loại bỏ phần tử cần xóa
-        sListData(newData); // cập nhật lại mảng
-      }
+            const newData = listData.filter(x => x.id !== id); // loại bỏ phần tử cần xóa
+            sListData(newData); // cập nhật lại mảng
+    }
 
-      const _HandleDeleteParent = () => {
-        const newData = []; // Tạo một mảng rỗng
-        sListData(newData); // Cập nhật lại mảng
-      };
+    const _HandleDeleteParent = () => {
+            const newData = []; // Tạo một mảng rỗng
+            sListData(newData); // Cập nhật lại mảng
+            if(sampleImport != null){
+                sSampleImport(null)
+            }
+    };
 
     //xóa cột kliên hệ
     const _HandleDeleteContact =  (id) => {
@@ -381,7 +391,7 @@ const Index = (props) => {
       }
        
    //navbar
-      const dataTab = [
+    const dataTab = [
         {
           id: 1,
           name: "Khách hàng"
@@ -402,44 +412,65 @@ const Index = (props) => {
           id: 5,
           name: "Công đoạn"
         }
-      ]
+    ]
       
       // validate dữ liệu rồi post
       const _HandleSubmit = (e) => {
 
         e.preventDefault();
 
-        const hasNullDataFiles = listData.some(e => e?.dataFields === null);
+
+        const array = ["name", "branch_id", "code"]
+
+        const ObError = listData.reduce((a,b)=>{
+
+                let name = b?.dataFields?.value;
+                a[name] = array.includes(b?.dataFields?.value);
+                return a;
+        }, {});
+
+        const errEnd = end_row < row_tarts
+
+        const errStart = row_tarts < end_row
+
         
+        const hasNullDataFiles = listData.some(e => e?.dataFields === null);
         
         const hasNullColumn = listData.some(e => e?.column === null);
         
-        const hasNoNameField = !listData.some((item) => item?.dataFields?.value === "name");
+        const hasNoNameField = !listData.some((item) =>  item?.dataFields?.value === "name");
         
         const hasNoBranchField = !listData.some((item) => item?.dataFields?.value === "branch_id");
-        
+
         const hasNoCodeField = !listData.some((item) => item?.dataFields?.value === "code");
         
         const hasNullDataImport = dataImport?.length == 0
         
         const requiredColumn = listData?.length == 0
 
-        if(hasNullDataFiles || fileImport == null || hasNullColumn || (valueCheck == 'edit' && condition_column == null) || (valueCheck == 'edit' && hasNoCodeField) || hasNullDataImport || requiredColumn || hasNoNameField ||  (valueCheck == 'add' && hasNoBranchField) || end_row == null || row_tarts == null ){
-           console.log("hasNullDataFiles",condition_column == null);
+        if(hasNullDataFiles || fileImport == null || hasNullColumn || (valueCheck == 'edit' && condition_column == null) || 
+
+            (valueCheck == 'edit' && !ObError?.code) || hasNullDataImport || requiredColumn || !ObError?.name || 
+
+            (valueCheck == 'add' && !ObError?.branch_id) || end_row == null || end_row == '' || row_tarts == null || row_tarts == '' ||
+            errEnd || errStart  || row_tarts == 0 || end_row == 0
+            ){
+            
             hasNullDataFiles  && sErrFiles(true)
 
-            
             hasNullColumn  && sErrColumn(true)
             
             valueCheck == 'edit' && condition_column == null && sErrValueCheck(true)
-            
+
             fileImport == null  && sErrFileImport(true)
 
-            hasNullDataImport && sErrFileImport(true)
+            // hasNullDataImport && sErrFileImport(true)
 
             row_tarts == null && sErrRowStart(true)
+            row_tarts == '' && sErrRowStart(true)
 
             end_row == null && sErrEndRow(true)
+            end_row == '' && sErrEndRow(true)
 
           //bắt buộc phải thêm cột
             if(requiredColumn){
@@ -449,26 +480,44 @@ const Index = (props) => {
                 })
             }
           //bắt buộc phải có cột tên khách hàng
-            else if(hasNoNameField){
+            else if(!ObError?.name){
               Toast.fire({
                 icon: 'error',
                 title: `${dataLang?.import_ERR_add_nameData || "import_ERR_add_nameData"}`
                 })
             }
             //bắt buộc phải có cột chi nhánh
-            else if(valueCheck == 'add' && hasNoBranchField){
+            else if(valueCheck == 'add' && !ObError?.branch_id){
               Toast.fire({
                 icon: 'error',
                 title: `${dataLang?.import_ERR_add_branchData || "import_ERR_add_branchData"}`
                 })
             }
             //nếu cập nhật thì phải có cột mã kh
-            else if(valueCheck == 'edit' && hasNoCodeField){
+            else if(valueCheck == 'edit' && !ObError?.code){
               Toast.fire({
                 icon: 'error',
                 title: `${dataLang?.import_ERR_add_CodeData || "import_ERR_add_CodeData"}`
                 })
             }
+            else if(row_tarts == 0 || row_tarts == null || end_row == 0 || end_row == null){
+               Toast.fire({
+                icon: 'error',
+                title: `${"Hàng phải lớn hơn 0"}`
+                })
+            }
+            else if(errEnd){
+              Toast.fire({
+               icon: 'error',
+               title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"}`
+               })
+           }
+           else if(errStart){
+              Toast.fire({
+               icon: 'error',
+               title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"}`
+               })
+           }
             else{
               Toast.fire({
                 icon: 'error',
@@ -723,7 +772,7 @@ const Index = (props) => {
                                 key={e.id} 
                                 onClick={_HandleSelectTab.bind(this, `${e.id}`)} 
                                 active={e.id} 
-                                className='text-[#0F4F9E] col-span-1 bg-[#e2f0fe] hover:bg-blue-400 hover:text-white transition ease-in-out '
+                                className='text-[#0F4F9E] col-span-1 bg-[#e2f0fe] hover:bg-blue-400 hover:text-white transition-all ease-linear'
                               >{e.name}</TabClient> 
                             </div>
                           )
@@ -893,7 +942,7 @@ const Index = (props) => {
                       <div className='mx-auto w-full col-span-2'>
                           <label htmlFor="input-label" className="block text-sm font-medium mb-2 dark:text-white">{dataLang?.import_line_starts || "import_line_starts"}</label>
                             <NumericFormat
-                              className={`${errRowStart && row_tarts == null ? "border-red-500" : "border-gray-200"} py-2.5 outline-none px-4 border block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
+                              className={`${errRowStart && (row_tarts == null || row_tarts == '') ? "border-red-500" : "border-gray-200"} border py-2.5 outline-none px-4 border block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
                               onValueChange={_HandleChange.bind(this, "row_tarts")}
                               value={row_tarts} 
                               allowNegative={false}
@@ -901,30 +950,34 @@ const Index = (props) => {
                               isNumericString={true}  
                               thousandSeparator=","
                               placeholder={dataLang?.import_line_starts || "import_line_starts"}
-                              isAllowed={(values) => { const {floatValue} = values;
-                                if(floatValue < 1){
-                                  Toast.fire({
-                                    icon: 'error',
-                                    title: `${dataLang?.import_ERR_greater_than || "import_ERR_greater_than"} !`
-                                  })
-                                  return floatValue > 0
-                                }
-                                if(end_row != null && floatValue > Number(end_row)){
-                                  Toast.fire({
-                                    icon: 'error',
-                                    title: `${dataLang?.import_ERR_greater_start || "import_ERR_greater_start"} !`
-                                  })
-                                  return floatValue == Number(end_row)
-                                }
-                                return floatValue > 0
-                                }}       
+                              // isAllowed={(values) => { const {floatValue} = values; return floatValue  }}      
+
+                              // isAllowed={(values) => { const {floatValue} = values;
+                              //   if(floatValue < 1){
+                              //     Toast.fire({
+                              //       icon: 'error',
+                              //       title: `${dataLang?.import_ERR_greater_than || "import_ERR_greater_than"} !`
+                              //     })
+                              //     // return floatValue > 0
+                              //     return floatValue 
+                              //   }
+                              //   if(end_row != null && floatValue > Number(end_row)){
+                              //     Toast.fire({
+                              //       icon: 'error',
+                              //       title: `${dataLang?.import_ERR_greater_start || "import_ERR_greater_start"} !`
+                              //     })
+                              //     return floatValue == Number(end_row)
+                              //   }
+                              //   return floatValue 
+                              //   // return floatValue > 0
+                              //   }}       
                               />
                         {errRowStart && row_tarts == null && <label className="text-sm text-red-500">{dataLang?.import_ERR_line || "import_ERR_line"}</label>}
                       </div>
                       <div className='mx-auto w-full col-span-2'>
                           <label for="input-labels" className="block text-sm font-medium mb-2 dark:text-white">{dataLang?.import_finished_row || "import_finished_row"}</label>
                           <NumericFormat
-                            className={`${errEndRow && end_row == null ? "border-red-500" : "border-gray-200"} py-2.5 outline-none px-4 border block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
+                            className={`${errEndRow && (end_row == null || end_row == '') ? "border-red-500" : "border-gray-200"} border py-2.5 outline-none px-4 border block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
                             onValueChange={_HandleChange.bind(this, "end_row")}
                             value={end_row} 
                             disabled={row_tarts == null}
@@ -933,18 +986,21 @@ const Index = (props) => {
                             isNumericString={true}  
                             thousandSeparator=","
                             placeholder={row_tarts == null ? dataLang?.import_startrow || "import_startrow" :dataLang?.import_finished_row || "import_finished_row"}
-                            isAllowed={(values) => { 
-                              const {floatValue} = values; 
-                                if(floatValue < Number(row_tarts)){
-                                  Toast.fire({
-                                    icon: 'error',
-                                    title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"} !`
-                                  })
-                                  return floatValue >= Number(row_tarts)
-                                }
-                                return floatValue > 0
-                                }       
-                             }
+                            // isAllowed={(values) => {
+                            //   const { floatValue } = values;
+                            //   if (floatValue < Number(row_tarts)) {
+                            //     Toast.fire({
+                            //       icon: 'error',
+                            //       title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"} !`
+                            //     });
+                            //     return floatValue >= Number(row_tarts);
+                            //   }
+                            //   // return floatValue > 0;
+                            //   return floatValue ;
+                            // }}
+                           
+                            // isAllowed={(values) => { const {floatValue} = values; return floatValue || ''}}      
+                            
                             />
                         {errEndRow && end_row == null && <label className="text-sm text-red-500">{dataLang?.import_ERR_linefinish || "import_ERR_linefinish"}</label>}
                       </div>
@@ -990,7 +1046,7 @@ const Index = (props) => {
                       <div className='col-span-4'>
                           <div className='grid-cols-13 grid items-end justify-center gap-2.5'>
                               <div className='col-span-1 mx-auto'>
-                              <button onClick={_HandleDelete.bind(this, e?.id)}  className="xl:text-base text-xs hover:scale-105 transition-all ease-in-out "><IconDelete color="red"/></button>
+                              <button onClick={_HandleDelete.bind(this, e?.id)}  className="xl:text-base text-xs hover:scale-105 transition-all ease-in-out bg-red-50 p-2 rounded hover:bg-red-100"><IconDelete color="red"/></button>
                               </div>
                               <div className='col-span-6'>
                                       {index ==0 &&<h5  className="mb-1 block text-sm font-medium text-gray-700">{dataLang?.import_data_fields || "import_data_fields"} <span className='text-red-500'>*</span></h5>}
@@ -1309,8 +1365,8 @@ const Index = (props) => {
                                   <label  htmlFor="example12" className=" space-x-2 text-sm cursor-pointer">{dataLang?.import_save_template || "import_save_template"}</label>
                                 </div>
                     <button 
-                    onClick={_HandleSubmit.bind(this)} 
-                   type="submit" className="xl:text-sm text-xs w-full p-2.5 bg-gradient-to-l hover:bg-blue-300 from-blue-500 via-blue-500  to-blue-500 text-white rounded btn-animation hover:scale-[1.02]">{"Import"}</button>
+                        onClick={_HandleSubmit.bind(this)} 
+                        type="submit" className="xl:text-sm text-xs w-full p-2.5 bg-gradient-to-l hover:bg-blue-300 from-blue-500 via-blue-500  to-blue-500 text-white rounded btn-animation hover:scale-[1.02] flex items-center gap-1 justify-center"><div className={`${multipleProgress ? "w-4 h-4 border-2 rounded-full border-pink-200 border-t-rose-500 animate-spin" :''}`}></div><span>{"Import"}</span></button>
                   </div>
                   <div className='col-span-4 '></div>
 
