@@ -430,9 +430,9 @@ const Index = (props) => {
         }, {});
 
         const errEnd = end_row < row_tarts
-
+        //Hàng kết thúc bé hơn hàng bắt đầu thì lỗi
         const errStart = row_tarts > end_row
-
+        //Hàng bắt đầu lớn hơn hàng kết thúc thì lỗi
         const hasNullDataFiles = listData.some(e => e?.dataFields === null);
         
         const hasNullColumn = listData.some(e => e?.column === null);
@@ -499,6 +499,7 @@ const Index = (props) => {
                 title: `${dataLang?.import_ERR_add_CodeData || "import_ERR_add_CodeData"}`
                 })
             }
+            //Hàng bắt đầu hàng kết thúc
             else if(row_tarts == 0 || row_tarts == null || end_row == 0 || end_row == null){
                Toast.fire({
                 icon: 'error',
@@ -510,13 +511,13 @@ const Index = (props) => {
                icon: 'error',
                title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"}`
                })
-           }
-           else if(errStart){
-              Toast.fire({
-               icon: 'error',
-               title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"}`
-               })
-           }
+            }
+            else if(errStart){
+                Toast.fire({
+                icon: 'error',
+                title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"}`
+                })
+            }
             else{
               Toast.fire({
                 icon: 'error',
@@ -530,7 +531,6 @@ const Index = (props) => {
               sOnSending(true)
           }
         }
-console.log("onSending",onSending);
         
         useEffect(() =>{
             sErrValueCheck(false)
