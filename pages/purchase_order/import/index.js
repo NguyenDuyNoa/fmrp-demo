@@ -669,7 +669,7 @@ const Index = (props) => {
                                   </div>
                                   </h6>
                                 <h6 className=' 2xl:text-base xl:text-xs text-[8px] col-span-1 cursor-pointer'>
-                                  <div className={`${e?.warehouseman_id == "0" ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation " : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "} rounded-md cursor-pointer` }>
+                                  <div className={`${e?.warehouseman_id == "0" ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation " : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "} rounded-md cursor-pointer hover:scale-105 ease-in-out transition-all` }>
                                     <div className='flex items-center justify-center'>
                                                               <label className="relative flex cursor-pointer items-center rounded-full p-2" htmlFor={e.id} data-ripple-dark="true" > 
                                                                   <input
@@ -1271,7 +1271,7 @@ return(
                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow  z-10`}>
                               <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-[300] text-center'>{props.dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}</h4>
                               <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-[300] text-center '>{props.dataLang?.inventory_vouchercode || "inventory_vouchercode"}</h4>
-                              <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{props.dataLang?.inventory_inventory_slip || "inventory_inventory_slip"}</h4>
+                              <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{props.dataLang?.import_ballot || "import_ballot"}</h4>
                               {dataProductSerial.is_enable === "1" && (<h4 className="text-[13px]  px-2 py-1.5  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Serial"}</h4>)}
                           {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
                             <>
@@ -1292,35 +1292,35 @@ return(
                               <div className={`${dataProductSerial.is_enable == "1" ? 
                               (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
                               (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid hover:bg-slate-50 items-center`}>
-                              <h6 className='text-[13px] px-2 py-1.5 col-span-2 text-center'>{e?.date_coupon != null ? moment(e?.date_coupon).format("DD/MM/YYYY, HH:mm:ss") : ""}</h6>
+                              <h6 className='text-[13px] px-2 py-1.5 col-span-2 text-center'>{e?.date_coupon != null ? moment(e?.date_coupon).format("DD/MM/YYYY") : ""}</h6>
                               <h6 className='text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer'>{e?.code_coupon}</h6>
                               <h6 className='text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer'>{dataLang[e?.type_text]}</h6>
 
                               {dataProductSerial.is_enable === "1" ? (
                                                 <div className=" col-span-1 ">
-                                                  <h6 className="text-[13px] px-2 py-1.5  w-[full] text-left">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
+                                                  <h6 className="text-[13px] px-2 py-1.5  w-[full] text-center">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
                                                 </div>
                                               ):""}
                           {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
                             <>
                               <div className=" col-span-1  ">
-                                  <h6 className="text-[13px] px-2 py-1.5 w-[full] text-left">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
+                                  <h6 className="text-[13px] px-2 py-1.5 w-[full] text-center">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
                               </div>
                               <div className=" col-span-1  ">
                                   <h6 className="text-[13px] px-2 py-1.5 w-[full] text-center">{e.expiration_date ? moment(e.expiration_date).format("DD-MM-YYYY")   : "-"}</h6>                              
                               </div>
                             </>
                              ):""}              
-                              <h6 className='text-[13px] px-2 py-1.5 col-span-2 text-center  hover:font-normal cursor-pointer'>
-                                <div className='grid grid-cols-6 items-center'>
-                                  <h4 className='text-[13px] px-2 py-1.5  w-[full] col-span-4'>{e?.name}</h4>
-                                  <h4 className='text-[13px] px-2 py-1.5  w-[full] col-span-2'>{e?.product_variation}</h4>
+                              <h6 className='text-[13px] px-2 py-1.5 col-span-2   hover:font-normal cursor-pointer'>
+                                <div className=''>
+                                  <h4 className='text-[13px] px-2 py-1.5  w-[full] '>{e?.name}</h4>
+                                  <h4 className='text-[13px] px-2 py-1.5  w-[full] '>{e?.product_variation}</h4>
                                 </div>
                               </h6>
                               <h6 className='text-[13px] px-2 py-1.5 col-span-2 text-center hover:font-normal cursor-pointer'>
-                                <div className='grid grid-cols-2 items-center'>
-                                <span className='col-span-1'>{e?.warehouse_name}</span>
-                                <span className='col-span-1'>{e?.local_name}</span>
+                                <div className='flex flex-col'>
+                                <span className=''>{e?.warehouse_name}</span>
+                                <span className=''>{e?.local_name}</span>
                                 </div>
                               </h6>
                               <h6 className='text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer'>

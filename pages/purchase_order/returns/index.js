@@ -644,12 +644,12 @@ const Index = (props) => {
                                 <a class="text-center text-white font-semibold z-10 pointer-events-none">Hover on me!</a>
                               </div> */}
                                 <h6 className=' 2xl:text-base xl:text-xs text-[8px] col-span-1 cursor-pointer'>
-                                  <div className={`${e?.warehouseman_id == "0" ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation " : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "} rounded-md cursor-pointer hover:scale-105` }>
+                                  <div className={`${e?.warehouseman_id == "0" ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation " : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "} rounded-md cursor-pointer hover:scale-105 hover:font-semibold` }>
                                     <div className='flex items-center justify-center'>
                                                               <label className="relative flex cursor-pointer items-center rounded-full p-2" htmlFor={e.id} data-ripple-dark="true" > 
                                                                   <input
                                                                       type="checkbox"
-                                                                      className={`${e?.warehouseman_id == "0" ? "checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 border-indigo-500 border" : "checked:border-lime-500 checked:bg-lime-500 border-lime-500 checked:before:bg-limborder-lime-500"}before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-gray-400 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
+                                                                      className={`${e?.warehouseman_id == "0" ? "checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 border-indigo-500 border" : "checked:border-lime-500 checked:bg-lime-500 border-lime-500 checked:before:bg-limborder-lime-500"} before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-gray-400 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
                                                                       id={e.id}
                                                                       value={e.warehouseman_id}
                                                                       checked={e.warehouseman_id != "0" ? true : false}
@@ -999,7 +999,7 @@ return (
                           <div className='flex flex-wrap  gap-2 items-center '>
                               {
                                 data?.warehouseman_id === "0" && <div className=' font-medium text-[#3b82f6]  rounded-2xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]'>{"Chưa duyệt kho"}</div>||
-                                data?.warehouseman_id != "0" && <div className=' font-medium gap-1  text-lime-500  rounded-2xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/>{"Đã duyệt kho"}</div>
+                                data?.warehouseman_id != "0" && <div className=' font-medium gap-1  text-lime-500  rounded-2xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/><span>Đã duyệt kho</span></div>
                               }
                           </div>
                         </div>
@@ -1014,12 +1014,13 @@ return (
                 {/* <div className={`${dataProductSerial.is_enable == "1" ? 
                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow-lg  z-10`}> */}
-                <div className={`grid-cols-13  grid sticky top-0 bg-white shadow-lg  z-10`}>
+                <div className={`grid-cols-14  grid sticky top-0 bg-white shadow-lg  z-10`}>
                   {/* <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_image || "import_detail_image"}</h4> */}
                   <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-3 text-center whitespace-nowrap">{props.dataLang?.import_detail_items || "import_detail_items"}
                   </h4>
                   {/* <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4>  */}
                   <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-2 text-center whitespace-nowrap">{props.dataLang?.returns_point || "returns_point"}</h4> 
+                  <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{"Tồn kho"}</h4>
                   <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{"ĐVT"}</h4>
                   <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_quantity || "import_from_quantity"}</h4>
                   <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
@@ -1041,7 +1042,7 @@ return (
                         // <div className={`${dataProductSerial.is_enable == "1" ? 
                         // (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
                         // (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid hover:bg-slate-50 `} key={e.id?.toString()}>
-                        <div className="grid grid-cols-13 hover:bg-slate-50 items-center border-b" key={e.id?.toString()}>
+                        <div className="grid grid-cols-14 hover:bg-slate-50 items-center border-b" key={e.id?.toString()}>
                           {/* <h6 className="text-[13px]   py-0.5 col-span-1 text-center">
                           {e?.item?.images != null ? (<ModalImage   small={e?.item?.images} large={e?.item?.images} alt="Product Image"  className='custom-modal-image object-cover rounded w-[50px] h-[60px] mx-auto' />):
                             <div className='w-[50px] h-[60px] object-cover  mx-auto'>
@@ -1088,7 +1089,8 @@ return (
                           <h6 className="text-[13px]   px-2 py-2 col-span-2 text-left break-words">
                             <h6>{e?.warehouse_name}</h6>
                             <h6>{e.location_name}</h6>
-                          </h6>                
+                          </h6>           
+                          <h6 className="text-[13px]   py-2 col-span-1 text-center break-words">{formatNumber(e?.item?.quantity_left)}</h6>       
                           <h6 className="text-[13px]   py-2 col-span-1 text-center break-words">{e?.item?.unit_name}</h6>                
                           <h6 className="text-[13px]   py-2 col-span-1 text-center mr-1">{formatNumber(e?.quantity)}</h6>                
                           <h6 className="text-[13px]   py-2 col-span-1 text-center">{formatNumber(e?.price)}</h6>                
