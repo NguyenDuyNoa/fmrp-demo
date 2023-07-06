@@ -431,9 +431,8 @@ const Index = (props) => {
 
         const errEnd = end_row < row_tarts
 
-        const errStart = row_tarts < end_row
+        const errStart = row_tarts > end_row
 
-        
         const hasNullDataFiles = listData.some(e => e?.dataFields === null);
         
         const hasNullColumn = listData.some(e => e?.column === null);
@@ -526,11 +525,12 @@ const Index = (props) => {
             }
           }
           else {
+            
               sErrFileImport(false)
               sOnSending(true)
           }
         }
-
+console.log("onSending",onSending);
         
         useEffect(() =>{
             sErrValueCheck(false)
@@ -730,6 +730,7 @@ const Index = (props) => {
       },[onSending])
 
       useEffect(() =>{
+        onSending&&  console.log("hiii");
         onSending && _ServerSending()
       },[onSending])
 
