@@ -284,7 +284,7 @@ const Index = (props) => {
   ];
 
 
-  const [data_export,sData_export] = useState([])
+  const [errOpen, sErrOpen] = useState(false)
   const [checkedWare, sCheckedWare] = useState({})
   const _HandleChangeInput = (id, checkedUn, type, value) => {
     if (type === "browser") {
@@ -326,13 +326,11 @@ const Index = (props) => {
                   sOnFetching(true);
                 }, 300);
               }else{
-                Toast.fire({
-                  icon: 'error',
-                  title: `${dataLang[message]}`
-              })
-              } if(data_export?.length > 0){
-                sData_export(data_export)
-            } 
+                  Toast.fire({
+                    icon: 'error',
+                    title: `${dataLang[message]}`
+                  })
+              }
         }
         sOnSending(false)
     })
@@ -353,7 +351,7 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.returns_title || "returns_title"} </title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
+            <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
               {/* {data_export.length > 0 && <Popup_status className="hidden" data_export={data_export} dataLang={dataLang}/>} */}
             <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
             <h6 className="text-[#141522]/40">{dataLang?.returns_title || "returns_title"}</h6>
@@ -361,9 +359,9 @@ const Index = (props) => {
             <h6>{dataLang?.returns_list || "returns_list"}</h6>
             </div>
 
-        <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
+        <div className="grid grid-cols gap-1 h-[100%] overflow-hidden ">
           <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
-            <div className="space-y-3 h-[96%] overflow-hidden">
+            <div className="space-y-0.5 h-[96%] overflow-hidden">
                 <div className='flex justify-between'>
                     <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.returns_list || "returns_list"}</h2>
                     <div className="flex justify-end items-center">
@@ -391,9 +389,9 @@ const Index = (props) => {
                       })
                      }
                 </div>
-              <div className="space-y-2 2xl:h-[91%] h-[92%] overflow-hidden">    
+              <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">    
                 <div className="xl:space-y-3 space-y-2">
-                    <div className="bg-slate-100 w-full rounded grid grid-cols-6 justify-between xl:p-3 p-2">
+                    <div className="bg-slate-100 w-full rounded-lg grid grid-cols-6 justify-between xl:p-3 p-2">
                     <div className='col-span-5'>
                           <div className='grid grid-cols-5'>
                               <div className='col-span-1'>
@@ -552,7 +550,7 @@ const Index = (props) => {
                         </div>
                         <div className="col-span-1">
                           <div className='flex justify-end items-center gap-2'>
-                            <button onClick={_HandleFresh.bind(this)} type='button' className='bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out'>
+                            <button onClick={_HandleFresh.bind(this)} type='button' className='bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none'>
                                   <Refresh2
                                     className='group-hover:-rotate-45 transition-all ease-in-out'
                                     size="22"
@@ -561,13 +559,13 @@ const Index = (props) => {
                             </button>
                              <div>
                              {
-                              dataExcel?.length > 0 &&(
-                                  <ExcelFile filename={dataLang?.returns_list || "returns_list"} title="DSTH" element={
-                                  <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
-                                      <IconExcel className='2xl:scale-100 xl:scale-100 scale-75' size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
-                                  <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
-                              </ExcelFile>
-                              )
+                                dataExcel?.length > 0 &&(
+                                    <ExcelFile filename={dataLang?.returns_list || "returns_list"} title="DSTH" element={
+                                    <button className='xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition'>
+                                        <IconExcel className='2xl:scale-100 xl:scale-100 scale-75' size={18} /><span>{dataLang?.client_list_exportexcel}</span></button>}>
+                                    <ExcelSheet dataSet={multiDataSet} data={multiDataSet} name="Organization" />
+                                </ExcelFile>
+                                )
                               }
                              </div>
                             <div className=''>
@@ -584,20 +582,19 @@ const Index = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                  <div className="pr-2 w-[100%] lx:w-[120%] ">
-                    <div className="grid grid-cols-10 items-center sticky top-0 bg-white p-2 z-10 shadow">
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_day_vouchers || "import_day_vouchers"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_code_vouchers || "import_code_vouchers"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_supplier || "import_supplier"}</h4>
-                                {/* <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_the_order || "import_the_order"}</h4> */}
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_total_amount || "import_total_amount"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_tax_money || "import_tax_money"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_into_money || "import_into_money"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.returns_form || "returns_form"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_branch || "import_branch"}</h4>
-                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap'>{dataLang?.import_action || "import_action"}</h4>
+                <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                  <div className="pr-2 w-[100%]">
+                    <div className="grid grid-cols-10 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center '>{dataLang?.import_day_vouchers || "import_day_vouchers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center '>{dataLang?.import_code_vouchers || "import_code_vouchers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center '>{dataLang?.import_supplier || "import_supplier"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center '>{dataLang?.import_total_amount || "import_total_amount"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center '>{dataLang?.import_tax_money || "import_tax_money"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center '>{dataLang?.import_into_money || "import_into_money"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center '>{dataLang?.returns_form || "returns_form"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center '>{dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center '>{dataLang?.import_branch || "import_branch"}</h4>
+                                <h4 className='2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center '>{dataLang?.import_action || "import_action"}</h4>
                     </div>
                     {onFetching ?
                       <Loading className="h-80"color="#0f4f9e" /> 
@@ -606,74 +603,94 @@ const Index = (props) => {
                       (<>
                           <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">                       
                           {(data?.map((e) => 
-                                <div className='grid grid-cols-10 items-center py-1.5 px-2 hover:bg-slate-100/40 group' key={e.id.toString()}>
-                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center'>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
-                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer '><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
-                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left'>{e.supplier_name}</h6>
-                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_price)}</h6>
-                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_tax_price)}</h6>
-                                <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_amount)}</h6>
-                                <h6 className='col-span-1 w-fit mx-auto'>
-                                  {
-                                  e?.treatment_methods === "1" &&
-                                    <div className='cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full min-w-auto text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-lime-500 bg-lime-200  border-lime-200  px-2 py-0.5 border  rounded-2xl ml-2'>
-                                      {dataLang?.pay_down || "pay_down"}
+                                <div className='relative  grid grid-cols-10 items-center py-1.5  hover:bg-slate-100/40 group' key={e.id.toString()}>
+                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center'>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
+                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer '><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
+                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center capitalize'>{e.supplier_name}</h6>
+                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right'>{formatNumber(e.total_price)}</h6>
+                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right'>{formatNumber(e.total_tax_price)}</h6>
+                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right'>{formatNumber(e.total_amount)}</h6>
+                                    <h6 className='col-span-1 mx-auto'>
+                                      {
+                                      e?.treatment_methods === "1" &&
+                                        <div className='cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full min-w-auto text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-lime-500 bg-lime-200  border-lime-200  px-2 py-0.5 border  rounded-2xl ml-2'>
+                                          {dataLang?.pay_down || "pay_down"}
+                                        </div>
+                                      ||
+                                      e?.treatment_methods === "2" &&
+                                        <div className='cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-orange-500 bg-orange-200  border-orange-200 px-2 py-0.5 border   rounded-2xl ml-2'>
+                                          {dataLang?.debt_reduction || "debt_reduction"}
+                                        </div>
+                                      }
+                                  </h6>
+                                    <h6 className=' 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1'>
+                                      <div className={`${e?.warehouseman_id == "0" ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation " : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "} rounded-lg cursor-pointer hover:font-semibold ` }>
+                                        <div className='flex items-center justify-center'>
+                                                                  <label className="relative flex cursor-pointer items-center rounded-full p-2" htmlFor={e.id} data-ripple-dark="true" > 
+                                                                      <input
+                                                                          type="checkbox"
+                                                                          className={`${e?.warehouseman_id == "0" ? "checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 border-indigo-500 border" : "checked:border-lime-500 checked:bg-lime-500 border-lime-500 checked:before:bg-limborder-lime-500"} before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-gray-400 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
+                                                                          id={e.id}
+                                                                          value={e.warehouseman_id}
+                                                                          checked={e.warehouseman_id != "0" ? true : false}
+                                                                          onChange={_HandleChangeInput.bind(this, e?.id, e?.warehouseman_id, "browser")}
+                                                                      />
+                                                                      <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                          <svg
+                                                                              xmlns="http://www.w3.org/2000/svg"
+                                                                              className="h-3.5 w-3.5"
+                                                                              viewBox="0 0 20 20"
+                                                                              fill="currentColor"
+                                                                              stroke="currentColor"
+                                                                              stroke-width="1"
+                                                                          >
+                                                                          <path
+                                                                              fill-rule="evenodd"
+                                                                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                              clip-rule="evenodd"
+                                                                          ></path>
+                                                                          </svg>
+                                                                      </div>
+                                                                      
+                                                                  </label>
+                                            <label htmlFor={e.id} className={`${e?.warehouseman_id == "0" ? "text-[#6366f1]" : "text-lime-500"}  3xl:text-[14px] 2xl:text-[10px] xl:text-[10px] text-[8px] font-medium cursor-pointer`}>{e?.warehouseman_id == "0" ? "Chưa duyệt kho" : "Đã duyệt kho"}</label>
+                                        </div>
+                                      </div>
+                                    </h6>
+                                    <h6 className='col-span-1 w-fit '>
+                                      <div className='cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2'>
+                                          {e?.branch_name}
+                                      </div>
+                                  </h6>
+                                    <div className='col-span-1 flex justify-center'>
+                                        <BtnTacVu type="returns" onRefresh={_ServerFetching.bind(this)} onRefreshGroup={_ServerFetching_group.bind(this)} dataLang={dataLang} warehouseman_id={e?.warehouseman_id} status_pay={e?.status_pay} id={e?.id} className="bg-slate-100 hover:scale-105 transition-all ease-linear hover:bg-gray-200 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
                                     </div>
-                                  ||
-                                  e?.treatment_methods === "2" &&
-                                    <div className='cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-orange-500 bg-orange-200  border-orange-200 px-2 py-0.5 border   rounded-2xl ml-2'>
-                                      {dataLang?.debt_reduction || "debt_reduction"}
-                                    </div>
-                                  }
-                              </h6>
-                              {/* <div class=" mx-auto h-16 w-64 flex justify-center items-center col-span-1">
-                                <div class="i h-16 w-64 bg-pink-600 items-center rounded-2xl shadow-2xl cursor-pointer absolute overflow-hidden transform hover:scale-x-110 hover:scale-y-105 transition duration-300 ease-out">
                                 </div>
-                                <a class="text-center text-white font-semibold z-10 pointer-events-none">Hover on me!</a>
-                              </div> */}
-                                <h6 className=' 2xl:text-base xl:text-xs text-[8px] col-span-1 cursor-pointer'>
-                                  <div className={`${e?.warehouseman_id == "0" ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation " : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "} rounded-md cursor-pointer hover:scale-105 hover:font-semibold group-hover:scale-105` }>
-                                    <div className='flex items-center justify-center'>
-                                                              <label className="relative flex cursor-pointer items-center rounded-full p-2" htmlFor={e.id} data-ripple-dark="true" > 
-                                                                  <input
-                                                                      type="checkbox"
-                                                                      className={`${e?.warehouseman_id == "0" ? "checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 border-indigo-500 border" : "checked:border-lime-500 checked:bg-lime-500 border-lime-500 checked:before:bg-limborder-lime-500"} before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-gray-400 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
-                                                                      id={e.id}
-                                                                      value={e.warehouseman_id}
-                                                                      checked={e.warehouseman_id != "0" ? true : false}
-                                                                      onChange={_HandleChangeInput.bind(this, e?.id, e?.warehouseman_id, "browser")}
-                                                                  />
-                                                                  <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                                                      <svg
-                                                                          xmlns="http://www.w3.org/2000/svg"
-                                                                          className="h-3.5 w-3.5"
-                                                                          viewBox="0 0 20 20"
-                                                                          fill="currentColor"
-                                                                          stroke="currentColor"
-                                                                          stroke-width="1"
-                                                                      >
-                                                                      <path
-                                                                          fill-rule="evenodd"
-                                                                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                          clip-rule="evenodd"
-                                                                      ></path>
-                                                                      </svg>
-                                                                  </div>
-                                                                  
-                                                              </label>
-                                         <label htmlFor={e.id} className={`${e?.warehouseman_id == "0" ? "text-[#6366f1]" : "text-lime-500"}  3xl:text-[14px] 2xl:text-[10px] xl:text-[10px] text-[8px] font-medium cursor-pointer`}>{e?.warehouseman_id == "0" ? "Chưa duyệt kho" : "Đã duyệt kho"}</label>
-                                    </div>
-                                  </div>
-                                </h6>
-                                <h6 className='col-span-1 w-fit '>
-                                  <div className='cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2'>
-                                      {e?.branch_name}
-                                  </div>
-                              </h6>
-                                <div className='col-span-1 flex justify-center'>
-                                    <BtnTacVu type="returns" onRefresh={_ServerFetching.bind(this)} onRefreshGroup={_ServerFetching_group.bind(this)} dataLang={dataLang} warehouseman_id={e?.warehouseman_id} status_pay={e?.status_pay} id={e?.id}className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]" />
-                                </div>
-                                </div>
+
+                                // <div className='relative grid grid-cols-10 items-center py-1.5 px-2 hover:bg-slate-100/40' key={e.id.toString()}>
+                                     
+                                //       <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-left h-60px truncate '>
+                                //           {e?.note}
+                                //       </h6>
+
+                                //       <h6 className='col-span-1 w-fit '>
+                                //           <div className='cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#086FFC] font-[300] px-1.5 py-0.5 border border-[#086FFC] bg-white rounded-[5.5px] uppercase'>
+                                //               {e?.total_price}
+                                //           </div>
+                                //       </h6>
+
+                                //       <div className='col-span-1 flex justify-center'>
+                                //           {/* <BtnAction
+                                //               onRefresh={_ServerFetching.bind(this)}
+                                //               dataLang={dataLang}
+                                //               status={e?.status}
+                                //               id={e?.id}
+                                //               type='price_quote'
+                                //               className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                //           /> */}
+                                //       </div>
+                                //   </div>  
+
        
                           ))}              
                         </div>                     
@@ -693,18 +710,18 @@ const Index = (props) => {
                 </div>
               </div>     
             </div>
-            <div className='grid grid-cols-10 bg-gray-100 items-center'>
-                    <div className='col-span-4 p-2 text-center'>
-                        <h3 className='uppercase font-normal 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]'>{dataLang?.import_total || "import_total"}</h3>
+            <div className='grid grid-cols-10 bg-gray-100 items-center rounded-md'>
+                    <div className='col-span-3 p-2 text-center'>
+                        <h3 className='uppercase text-gray-600 font-medium 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]'>{dataLang?.import_total || "import_total"}</h3>
                     </div>  
-                    <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap'>
-                        <h3 className='font-normal 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]'>{formatNumber(total?.total_price)}</h3>
+                    <div className='col-span-1 text-right'>
+                        <h3 className='2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right'>{formatNumber(total?.total_price)}</h3>
                     </div>  
-                    <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap '>
-                        <h3 className='font-normal 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]'>{formatNumber(total?.total_tax_price)}</h3>
+                    <div className='col-span-1 text-right '>
+                        <h3 className='2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right'>{formatNumber(total?.total_tax_price)}</h3>
                     </div>  
-                    <div className='col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap'>
-                        <h3 className='font-normal 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]'>{formatNumber(total?.total_amount)}</h3>
+                    <div className='col-span-1 text-right'>
+                        <h3 className='2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right'>{formatNumber(total?.total_amount)}</h3>
                     </div>  
             </div>
             {data?.length != 0 &&
@@ -746,31 +763,6 @@ const BtnTacVu = React.memo((props) => {
   const [openDetail, sOpenDetail] = useState(false);
   const router = useRouter()
 
-  const [dataPDF, setData] = useState();
-  const [dataCompany, setDataCompany] = useState();
-
-
-  const fetchDataSettingsCompany = async () => {
-    if (props?.id) {
-      await  Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
-          if(!err){
-                  var {data} =  response.data
-                  setDataCompany(data)
-            }
-        })
-    }
-    if(props?.id){
-      await  Axios("GET", `/api_web/Api_return_supplier/returnSupplier/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-          if(!err){
-            var db =  response.data
-            setData(db)
-          }
-        })
-    }
-}
-  useEffect(() => {
-    openTacvu && fetchDataSettingsCompany()
-  }, [openTacvu])
 
   const _HandleDelete = (id) => {
       Swal.fire({
@@ -806,7 +798,7 @@ const BtnTacVu = React.memo((props) => {
       })
   }
   
-    const handleClick = () => {
+  const handleClick = () => {
       if(props?.warehouseman_id != "0"){
         Toast.fire({
           icon: 'error',
@@ -816,7 +808,7 @@ const BtnTacVu = React.memo((props) => {
         else {
           router.push(`/purchase_order/returns/form?id=${props.id}`);
         }
-      };
+  };
 
 
   return(
@@ -834,29 +826,14 @@ const BtnTacVu = React.memo((props) => {
           >
               <div className="w-auto rounded">
                   <div className="bg-white rounded-t flex flex-col overflow-hidden">
-
-
-                        {/* <div className='group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded  w-full'>
-                          <BiEdit size={20} className='group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md '/>
-                          <button
-                          onClick={handleClick}
-                          className=" hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full 2xl:text-sm xl:text-sm text-[8px]">{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</button>
-                        </div> */}
                           <button onClick={handleClick} className='group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
                               <BiEdit size={20} className='group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md '/>
                               <p className='group-hover:text-sky-500'>{props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}</p>
                           </button>            
-                          {/* <div className=' transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full'>
+                         <div className=' transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full'>
                             <VscFilePdf size={20} className='group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md ' />
                             <Popup_Pdf type={props.type} props={props} id={props.id} dataLang={props.dataLang} className='group-hover:text-[#65a30d] '/>
-                          </div> */}
-                          <FilePDF 
-                                  props={props}
-                                  openAction={openTacvu}
-                                  setOpenAction={sOpenTacvu}
-                                  dataCompany={dataCompany}
-                                  data={dataPDF}
-                           />
+                          </div>
                           <button onClick={_HandleDelete.bind(this, props.id)} className='group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full'>
                               <RiDeleteBin6Line size={20} className='group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md '/>
                               <p className='group-hover:text-[#f87171]'>{props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}</p>
@@ -957,11 +934,11 @@ return (
           <div>
            <div className='3xl:w-[1200px] 2xl:w-[1150px] w-[1100px]'>
              <div  className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-             <h2 className='font-normal bg-[#ECF0F4] p-2 text-[13px]'>{props.dataLang?.import_detail_info || "import_detail_info"}</h2>       
-              <div className='grid grid-cols-9  min-h-[100px] px-2 items-center bg-slate-50'>
+             <h2 className='font-medium bg-[#ECF0F4] p-2 text-[13px]'>{props.dataLang?.import_detail_info || "import_detail_info"}</h2>       
+              <div className='grid grid-cols-9  min-h-[100px] px-2 items-center bg-zinc-50'>
                   <div className='col-span-3'>
-                      <div className='my-2 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_day_vouchers || "import_day_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}</h3></div>
-                      <div className='my-2 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_code_vouchers || "import_code_vouchers"}</h3><h3 className=' text-[13px]  font-normal'>{data?.code}</h3></div>
+                      <div className='my-2 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_day_vouchers || "import_day_vouchers"}</h3><h3 className=' text-[13px]  font-medium'>{data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}</h3></div>
+                      <div className='my-2 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.import_code_vouchers || "import_code_vouchers"}</h3><h3 className=' text-[13px]  font-medium text-blue-600 capitalize'>{data?.code}</h3></div>
                   </div>
                     <div className='col-span-3'>
                         <div className='my-2 font-medium grid grid-cols-2'><h3 className=' text-[13px] '>{props.dataLang?.returns_form || "returns_form"}</h3>
@@ -984,36 +961,36 @@ return (
                           <div className='flex flex-wrap  gap-2 items-center '>
                               {
                                 data?.warehouseman_id === "0" && <div className=' font-medium text-[#3b82f6]  rounded-2xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]'>{"Chưa duyệt kho"}</div>||
-                                data?.warehouseman_id != "0" && <div className=' font-medium gap-1  text-lime-500  rounded-2xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center'><TickCircle className='bg-lime-500 rounded-full' color='white' size={15}/><span>Đã duyệt kho</span></div>
+                                data?.warehouseman_id != "0" && <div className=' font-medium gap-1  text-lime-500   rounded-2xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center'><TickCircle className='bg-lime-500 rounded-full animate-pulse ' color='white' size={15}/><span>Đã duyệt kho</span></div>
                               }
                           </div>
                         </div>
                     </div>
                   <div className='col-span-3 '>
-                      <div className='my-2 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_supplier || "import_supplier"}</h3><h3 className='text-[13px] font-normal'>{data?.supplier_name}</h3></div>
+                      <div className='my-2 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_supplier || "import_supplier"}</h3><h3 className='text-[13px] font-medium capitalize'>{data?.supplier_name}</h3></div>
                       <div className='my-2 font-medium grid grid-cols-2'><h3 className='text-[13px]'>{props.dataLang?.import_branch || "import_branch"}</h3><h3 className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase w-fit">{data?.branch_name}</h3></div>
                   </div>
                   
               </div>
-              <div className="pr-2 w-[100%] lx:w-[110%] ">
+              <div className=" w-[100%]">
                 {/* <div className={`${dataProductSerial.is_enable == "1" ? 
                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow-lg  z-10`}> */}
-                <div className={`grid-cols-14  grid sticky top-0 bg-white shadow-lg  z-10`}>
+                <div className={`grid-cols-14  grid sticky top-0 bg-white shadow-lg  z-10 rounded `}>
                   {/* <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_image || "import_detail_image"}</h4> */}
-                  <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-3 text-center whitespace-nowrap">{props.dataLang?.import_detail_items || "import_detail_items"}
+                  <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-3 text-center whitespace-nowrap">{props.dataLang?.import_detail_items || "import_detail_items"}
                   </h4>
-                  {/* <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4>  */}
-                  <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-2 text-center whitespace-nowrap">{props.dataLang?.returns_point || "returns_point"}</h4> 
-                  <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{"Tồn kho"}</h4>
-                  <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{"ĐVT"}</h4>
-                  <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_quantity || "import_from_quantity"}</h4>
-                  <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
-                  <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{"% CK"}</h4>
-                  <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
-                  <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_tax || "import_from_tax"}</h4>
-                  <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_into_money || "import_into_money"}</h4>
-                  <h4 className="text-[13px] px-2 py-1.5 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_note || "import_from_note"}</h4>
+                  {/* <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4>  */}
+                  <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">{props.dataLang?.returns_point || "returns_point"}</h4> 
+                  <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{"Tồn kho"}</h4>
+                  <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{"ĐVT"}</h4>
+                  <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_quantity || "import_from_quantity"}</h4>
+                  <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_unit_price || "import_from_unit_price"}</h4>
+                  <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{"% CK"}</h4>
+                  <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_price_affter || "import_from_price_affter"}</h4>
+                  <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_tax || "import_from_tax"}</h4>
+                  <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_into_money || "import_into_money"}</h4>
+                  <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_from_note || "import_from_note"}</h4>
                 </div>
                 {onFetching ?
                   <Loading className="max-h-28"color="#0f4f9e" /> 
@@ -1036,7 +1013,6 @@ return (
                           }
                           </h6>     
                                       */}
-                                      {console.log(e?.item?.serial)}
                           <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left ">
                             <div className='flex items-center gap-2'>
                                 <div>
@@ -1047,8 +1023,8 @@ return (
                                   }
                                 </div>
                                 <div>
-                                  <h6 className="text-[13px] text-left">{e?.item?.name}</h6>
-                                  <h6 className="text-[13px] text-left">{e?.item?.product_variation}</h6>
+                                  <h6 className="text-[13px] text-left font-medium capitalize">{e?.item?.name}</h6>
+                                  <h6 className="text-[13px] text-left font-medium capitalize">{e?.item?.product_variation}</h6>
                                     <div className='flex items-center font-oblique flex-wrap'>
                                       {dataProductSerial.is_enable === "1" ? (
                                           <div className="flex gap-0.5">
@@ -1072,18 +1048,18 @@ return (
                           </h6>                
                           {/* <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">{e?.item?.product_variation}</h6>                 */}
                           <h6 className="text-[13px]   px-2 py-2 col-span-2 text-left break-words">
-                            <h6>{e?.warehouse_name}</h6>
-                            <h6>{e.location_name}</h6>
+                            <h6 className='font-medium'>{e?.warehouse_name}</h6>
+                            <h6 className='font-medium'>{e.location_name}</h6>
                           </h6>           
-                          <h6 className="text-[13px]   py-2 col-span-1 text-center break-words">{formatNumber(e?.item?.quantity_left)}</h6>       
-                          <h6 className="text-[13px]   py-2 col-span-1 text-center break-words">{e?.item?.unit_name}</h6>                
-                          <h6 className="text-[13px]   py-2 col-span-1 text-center mr-1">{formatNumber(e?.quantity)}</h6>                
-                          <h6 className="text-[13px]   py-2 col-span-1 text-center">{formatNumber(e?.price)}</h6>                
-                          <h6 className="text-[13px]   py-2 col-span-1 text-center">{e?.discount_percent + "%"}</h6>                
-                          <h6 className="text-[13px]   py-2 col-span-1 text-center">{formatNumber(e?.price_after_discount)}</h6>                
-                          <h6 className="text-[13px]   py-2 col-span-1 text-center">{formatNumber(e?.tax_rate) + "%"}</h6>                
-                          <h6 className="text-[13px]   py-2 col-span-1 text-right ">{formatNumber(e?.amount)}</h6>  
-                          <h6 className="text-[13px]   py-2 col-span-1 text-left ml-3.5">{e?.note != undefined ? e?.note : ""}</h6>                
+                          <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">{formatNumber(e?.item?.quantity_left)}</h6>       
+                          <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">{e?.item?.unit_name}</h6>                
+                          <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center mr-1">{formatNumber(e?.quantity)}</h6>                
+                          <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center">{formatNumber(e?.price)}</h6>                
+                          <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center">{e?.discount_percent + "%"}</h6>                
+                          <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center">{formatNumber(e?.price_after_discount)}</h6>                
+                          <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center">{formatNumber(e?.tax_rate) + "%"}</h6>                
+                          <h6 className="text-[13px]   py-2 col-span-1 font-medium text-right ">{formatNumber(e?.amount)}</h6>  
+                          <h6 className="text-[13px]   py-2 col-span-1 font-medium text-left ml-3.5">{e?.note != undefined ? e?.note : ""}</h6>                
                                     
                         </div>
                       ))}              
@@ -1103,7 +1079,7 @@ return (
                     </div>
                   )}    
               </div>
-          <h2 className='font-normal p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
+          <h2 className='font-medium p-2 text-[13px]  border-b border-b-[#a9b5c5]  border-t z-10 border-t-[#a9b5c5]'>{props.dataLang?.purchase_total || "purchase_total"}</h2>  
               <div className=" mt-2  grid grid-cols-12 flex-col justify-between sticky bottom-0  z-10 ">
               <div className='col-span-7'>
                   <h3 className='text-[13px] p-1'>{props.dataLang?.returns_reason || "returns_reason"}</h3>
@@ -1112,18 +1088,18 @@ return (
                  disabled value={data?.note}/>
               </div>
              <div className='col-span-2 space-y-1 text-right'>
-                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_total_amount || "import_detail_total_amount"}</h3></div>
-                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_discount || "import_detail_discount"}</h3></div>
-                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_affter_discount || "import_detail_affter_discount"}</h3></div>
-                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_tax_money || "import_detail_tax_money"}</h3></div>
-                  <div className='font-normal text-left text-[13px]'><h3>{props.dataLang?.import_detail_into_money || "import_detail_into_money"}</h3></div>
+                  <div className='font-medium text-left text-[13px]'><h3>{props.dataLang?.import_detail_total_amount || "import_detail_total_amount"}</h3></div>
+                  <div className='font-medium text-left text-[13px]'><h3>{props.dataLang?.import_detail_discount || "import_detail_discount"}</h3></div>
+                  <div className='font-medium text-left text-[13px]'><h3>{props.dataLang?.import_detail_affter_discount || "import_detail_affter_discount"}</h3></div>
+                  <div className='font-medium text-left text-[13px]'><h3>{props.dataLang?.import_detail_tax_money || "import_detail_tax_money"}</h3></div>
+                  <div className='font-medium text-left text-[13px]'><h3>{props.dataLang?.import_detail_into_money || "import_detail_into_money"}</h3></div>
              </div>
              <div className='col-span-3 space-y-1 text-right'>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price)}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_discount)}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price_after_discount)}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_tax)}</h3></div>
-                  <div className='font-normal mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_amount)}</h3></div>
+                  <div className='font-medium mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price)}</h3></div>
+                  <div className='font-medium mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_discount)}</h3></div>
+                  <div className='font-medium mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_price_after_discount)}</h3></div>
+                  <div className='font-medium mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_tax)}</h3></div>
+                  <div className='font-medium mr-2.5'><h3 className='text-right text-blue-600 text-[13px]'>{formatNumber(data?.total_amount)}</h3></div>
              </div>
           </div>   
             </div>
@@ -1137,147 +1113,96 @@ return (
 )
 }
 
-// const Popup_status = (props) => {
+const Popup_Pdf =(props)=>{
+  const scrollAreaRef = useRef(null);
+  const [open, sOpen] = useState(false);
+  const _ToggleModal = (e) => sOpen(e);
+  const [data,sData] =useState()
+  const [onFetching, sOnFetching] = useState(false);
 
-//   const dataLang = props?.dataLang
-//   const [onFetching, sOnFetching] = useState(false);
-//   const [open, sOpen] = useState(false);
-//   const [data,sData] = useState([])
+  useEffect(() => {
+    props?.id && sOnFetching(true) 
+    props?.id && _ServerFetching()
+  }, [open]);
 
-//   const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-//   const [dataProductExpiry, sDataProductExpiry] = useState({});
-//   const [dataProductSerial, sDataProductSerial] = useState({});
+  const [dataPDF, setData] = useState();
+  const [dataCompany, setDataCompany] = useState();
 
-//   const formatNumber = (number) => {
-//     if (!number && number !== 0) return 0;
-//       const integerPart = Math.floor(number);
-//       const decimalPart = number - integerPart;
-//       const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-//       const roundedNumber = integerPart + roundedDecimalPart;
-//       return roundedNumber.toLocaleString("en");
-//   };
 
-//   const _ServerFetching =  () =>{
-//     Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-//       if(!err){
-//           var data = response.data;
-//           sDataMaterialExpiry(data.find(x => x.code == "material_expiry"));
-//           sDataProductExpiry(data.find(x => x.code == "product_expiry"));
-//           sDataProductSerial(data.find(x => x.code == "product_serial"));
-//       }
-//       sOnFetching(false)
-//     })
-//   }
-// useEffect(() =>{
-//   onFetching && _ServerFetching()
-// },[onFetching])
+  const fetchDataSettingsCompany = async () => {
+    if (props?.id) {
+      await  Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+          if(!err){
+                  var {data} =  response.data
+                  setDataCompany(data)
+            }
+        })
+    }
+    if(props?.id){
+      await  Axios("GET", `/api_web/Api_return_supplier/returnSupplier/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+          if(!err){
+            var db =  response.data
+            setData(db)
+          }
+        })
+    }
+}
+  useEffect(() => {
+    open && fetchDataSettingsCompany()
+  }, [open])
 
-// useEffect(() =>{
-//   open && sOnFetching(true)
-// },[open])
   
-//   useEffect(() => {
-//     sOnFetching(true);
-//     sData([]);
-//     sOpen(false);
-//     if (props?.data_export?.length > 0) {
-//       sOnFetching(false);
-//       sOpen(true);
-//       sData(props?.data_export);
-//     }
-//   }, [props?.data_export]);
+ 
+  const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+  const [dataProductExpiry, sDataProductExpiry] = useState({});
+  const [dataProductSerial, sDataProductSerial] = useState({});
 
-// return(
-//   <PopupEdit  
-//     title={props.dataLang?.inventory_votes || "inventory_votes"} 
-//     open={open} 
-//     onClose={() => sOpen(false)}
-//     classNameBtn={props.className}
-//   >
-//     <div className="mt-4 space-x-5 w-[990px] h-auto">        
-//     <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-//                 <div className="pr-2 ">
-//                   <div className={`${dataProductSerial.is_enable == "1" ? 
-//                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
-//                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow  z-10`}>
-//                               <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-[300] text-center'>{props.dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}</h4>
-//                               <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-[300] text-center '>{props.dataLang?.inventory_vouchercode || "inventory_vouchercode"}</h4>
-//                               <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{props.dataLang?.inventory_inventory_slip || "inventory_inventory_slip"}</h4>
-//                               {dataProductSerial.is_enable === "1" && (<h4 className="text-[13px]  px-2 py-1.5  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Serial"}</h4>)}
-//                           {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
-//                             <>
-//                               <h4 className="text-[13px]  px-2 py-1.5  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Lot"}</h4>
-//                               <h4 className="text-[13px]  px-2 py-1.5  col-span-1  text-[#667085] uppercase  font-[400] text-center">{props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}</h4>
-//                             </> ):""}
-//                             <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-[300] text-center'>{props.dataLang?.purchase_order_purchase_from_item || "purchase_order_purchase_from_item"}</h4>
-//                             <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-[300] text-center'>{props.dataLang?.PDF_house || "PDF_house"}</h4>
-//                             <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-[300] text-center'>{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
-//                   </div>
-//                   {onFetching ?
-//                     <Loading className="h-50" color="#0f4f9e" /> 
-//                     : 
-//                     data?.length > 0 ? 
-//                     (<>
-//                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px] mt-2 ">                       
-//                         {(data?.map((e) => 
-//                               <div className={`${dataProductSerial.is_enable == "1" ? 
-//                               (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
-//                               (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid hover:bg-slate-50 items-center`}>
-//                               <h6 className='text-[13px] px-2 py-1.5 col-span-2 text-center'>{e?.date_coupon != null ? moment(e?.date_coupon).format("DD/MM/YYYY, HH:mm:ss") : ""}</h6>
-//                               <h6 className='text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer'>{e?.code_coupon}</h6>
-//                               <h6 className='text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer'>{dataLang[e?.type_text]}</h6>
+  const _ServerFetching =  () =>{
+    Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+      if(!err){
+          var data = response.data;
+          sDataMaterialExpiry(data.find(x => x.code == "material_expiry"));
+          sDataProductExpiry(data.find(x => x.code == "product_expiry"));
+          sDataProductSerial(data.find(x => x.code == "product_serial"));
+      }
+      sOnFetching(false)
+    })
+  }
 
-//                               {dataProductSerial.is_enable === "1" ? (
-//                                                 <div className=" col-span-1 ">
-//                                                   <h6 className="text-[13px] px-2 py-1.5  w-[full] text-left">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
-//                                                 </div>
-//                                               ):""}
-//                           {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
-//                             <>
-//                               <div className=" col-span-1  ">
-//                                   <h6 className="text-[13px] px-2 py-1.5 w-[full] text-left">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
-//                               </div>
-//                               <div className=" col-span-1  ">
-//                                   <h6 className="text-[13px] px-2 py-1.5 w-[full] text-center">{e.expiration_date ? moment(e.expiration_date).format("DD-MM-YYYY")   : "-"}</h6>                              
-//                               </div>
-//                             </>
-//                              ):""}              
-//                               <h6 className='text-[13px] px-2 py-1.5 col-span-2 text-center  hover:font-normal cursor-pointer'>
-//                                 <div className='grid grid-cols-6 items-center'>
-//                                   <h4 className='text-[13px] px-2 py-1.5  w-[full] col-span-4'>{e?.name}</h4>
-//                                   <h4 className='text-[13px] px-2 py-1.5  w-[full] col-span-2'>{e?.product_variation}</h4>
-//                                 </div>
-//                               </h6>
-//                               <h6 className='text-[13px] px-2 py-1.5 col-span-2 text-center hover:font-normal cursor-pointer'>
-//                                 <div className='grid grid-cols-2 items-center'>
-//                                 <span className='col-span-1'>{e?.warehouse_name}</span>
-//                                 <span className='col-span-1'>{e?.local_name}</span>
-//                                 </div>
-//                               </h6>
-//                               <h6 className='text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer'>
-//                                {formatNumber(e?.quantity)}
-//                               </h6>
-//                               </div>
-//                         ))}              
-//                       </div>                     
-//                       </>
-//                     )  : 
-//                     (
-//                       <div className=" max-w-[352px] mt-24 mx-auto" >
-//                         <div className="text-center">
-//                           <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
-//                           <h1 className="textx-[#141522] text-base opacity-90 font-medium">{dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
-//                           <div className="flex items-center justify-around mt-6 ">
-//                               {/* <Popup_dsncc onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-//                           </div>
-//                         </div>
-//                       </div>
-//                     )}    
-//                 </div>
-//               </div>
-//     </div>
-//   </PopupEdit>
-// )
-// }
+return (
+<>
+ <PopupEdit   
+    title={props.dataLang?.option_prin || "option_prin"} 
+    button={props.dataLang?.btn_table_print  || "btn_table_print"} 
+    onClickOpen={_ToggleModal.bind(this, true)} 
+    open={open} onClose={_ToggleModal.bind(this,false)}
+    classNameBtn={props?.className} 
+  >
+  <div className='flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]'>
+     
+  </div>  
+          <div className="space-x-5 w-[400px] h-auto">        
+          <div>
+           <div className='w-[400px]'>
+            <FilePDF 
+              props={props}
+              openAction={open}
+              setOpenAction={sOpen}
+              dataCompany={dataCompany}
+              data={dataPDF}
+              dataMaterialExpiry={dataMaterialExpiry}
+              dataProductExpiry={dataProductExpiry}
+              dataProductSerial={dataProductSerial}
+              />
+          </div>
+    
+     </div>
+  
+    </div>    
+  </PopupEdit>
+</>
+)
+}
+
 
 export default Index;

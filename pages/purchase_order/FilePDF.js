@@ -2416,10 +2416,10 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
     };
 
 
-    //Trả hàng
-    const docDefinitionReturns = {
+    //Trả lại hàng mua
+    const docDefinitionReturnFull = {
         info: {
-            title: `${`Trả hàng - ${data?.code}` 
+            title: `${`${props?.dataLang?.import_purchase || "import_purchase"} - ${data?.code}` 
             }`,
             author: 'Foso',
             subject: 'Quotation',
@@ -2482,7 +2482,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             {
                 stack: [
                     {
-                        text:uppercaseText(`${"Trả hàng"}`, 'contentTitle')
+                        text:uppercaseText(`${props?.dataLang?.import_purchase || "import_purchase"}`, 'contentTitle')
                     },
                     {
                         text: `${moment(data?.date).format("DD/MM/YYYY")}`,
@@ -2494,7 +2494,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             {
                 text: [
                     {
-                        text: `Trả hàng: `,
+                        text: `${props?.dataLang?.import_purchase || "import_purchase"}: `,
                         inline: true,
                         fontSize: 10
                     },
@@ -2508,7 +2508,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             },
             {
                 text: [
-                    { text:  `${"Ngày chứng từ: "}`, inline: true, fontSize: 10},
+                    { text:  `${props?.dataLang?.import_day_vouchers || "import_day_vouchers"}: `, inline: true, fontSize: 10},
                     { text: `${moment(data?.date).format("DD/MM/YYYY")}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 2]
@@ -2523,7 +2523,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             },
             {
                 text: [
-                    { text: `${"Lý do"}: `, inline: true, fontSize: 10 },
+                    { text: `${props.dataLang?.PDF_reason || "PDF_reason"}: `, inline: true, fontSize: 10 },
                     { text: `${data?.note}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 10]
@@ -2532,7 +2532,6 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                 table: {
                     widths: "100%",
                     headerRows: 0,
-                    // widths:  props?.type== "import" &&  ['auto',70,'auto','auto','auto','auto',55,'auto','auto',50],
                     widths:  props?.type== "returns" &&  ['auto','auto','auto','auto','auto','auto','auto','auto','auto','*'],
                     body: [
                         // Header row
@@ -2570,20 +2569,20 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                                     if (dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1") {
                                     const subStack = [
                                         {
-                                        text: [
-                                            { text: "Lot: ", fontSize: 9, italics: true },
-                                            { text: item.lot == null || item.lot == "" ? "-" : item.lot, fontSize: 9, italics: true,margin: [0, 5, 0, 0] }
-                                        ],
-                                        fontSize: 9,
-                                        margin: [0, 5, 0, 0]
+                                            text: [
+                                                { text: "Lot: ", fontSize: 9, italics: true },
+                                                { text: item.lot == null || item.lot == "" ? "-" : item.lot, fontSize: 9, italics: true,margin: [0, 5, 0, 0] }
+                                            ],
+                                            fontSize: 9,
+                                            margin: [0, 5, 0, 0]
                                         },
                                         {
-                                        text: [
-                                            { text: "Date: ", fontSize: 9, italics: true },
-                                            { text: item.expiration_date ? moment(item.expiration_date).format("DD/MM/YYYY") : "-", fontSize: 8.5, italics: true,margin: [0, 5, 0, 0] }
-                                        ],
-                                        fontSize: 9,
-                                        margin: [0, 5, 0, 0]
+                                            text: [
+                                                { text: "Date: ", fontSize: 9, italics: true },
+                                                { text: item.expiration_date ? moment(item.expiration_date).format("DD/MM/YYYY") : "-", fontSize: 8.5, italics: true,margin: [0, 5, 0, 0] }
+                                            ],
+                                            fontSize: 9,
+                                            margin: [0, 5, 0, 0]
                                         },
                                     ];
                                     stack.push(subStack);
@@ -2591,42 +2590,8 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                             return [
                                 { text: `${index + 1}`, alignment: 'center', fontSize: 10},
                                     {
-                                        // stack: [
-                                        //   { text: item?.item?.name ? item?.item?.name : "", fontSize: 10, margin: [0, 0, 0, 0] }, // Khoảng cách giữa các hàng có thể được điều chỉnh bằng cách thay đổi các giá trị trong mảng margin
-                                        //   { text: `Biến thể: ${item?.item?.product_variation}`, fontSize: 9, italics: true, margin: [0, 5, 0, 0] },
-                                        //   {
-                                        //     if: dataProductSerial?.is_enable === "1",
-                                        //     text: [
-                                        //       { text: "Serial: ", fontSize: 9, italics: true },
-                                        //       { text: item.serial == null || item.serial == "" ? "-" : item.serial, fontSize: 9, italics: true }
-                                        //     ],
-                                        //     margin: [0, 5, 0, 0]
-                                        //   },
-                                        //   {
-                                        //     if: dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1",
-                                        //     stack: [
-                                        //       {
-                                        //         text: [
-                                        //           { text: "Lot: ", fontSize: 9, italics: true },
-                                        //           { text: item.lot == null || item.lot == "" ? "-" : item.lot, fontSize: 9, italics: true }
-                                        //         ],
-                                        //         fontSize: 9,
-                                        //         margin: [0, 5, 0, 0]
-                                        //       },
-                                        //       {
-                                        //         text: [
-                                        //           { text: "Date: ", fontSize: 9, italics: true },
-                                        //           { text: item.expiration_date ? moment(item.expiration_date).format("DD/MM/YYYY") : "-", fontSize: 9, italics: true }
-                                        //         ],
-                                        //         fontSize: 9,
-                                        //         margin: [0, 5, 0, 0]
-                                        //       },
-                                        //     ]
-                                        //   },
-                                        //   { text: `Kho - Vtk: ${item?.warehouse_name}`, fontSize: 10, margin: [0, 5, 0, 0] },
-                                        // ],
                                         stack: stack
-                                      },
+                                    },
                                 {text: item?.item?.unit_name ? item?.item?.unit_name : "" , fontSize: 10,alignment: 'center'},
                                 {text: item?.quantity ? formatNumber(item?.quantity) : "" , fontSize: 10,alignment: 'center'},
                                 {text: item?.price ? formatNumber(item?.price) : "" , fontSize: 10,alignment: 'center'},
@@ -2685,6 +2650,301 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                 ],
                 columnGap: 2
             },
+        ],
+        styles: {
+            headerInfoTextWithMargin: {
+                fontSize: 12,
+                bold: true,
+                margin: [2, 0, 0, 0]
+            },
+            headerLogo: {
+                alignment: 'left',
+            },
+            headerInfo: {
+                alignment: 'right',
+                fontSize: 12,
+                bold: true,
+                color: '#0F4F9E',
+                margin: [0, 1],
+            },
+            headerInfoText: {
+                alignment: 'right',
+                fontSize: 8,
+                italics: true,
+                color: 'black',
+                margin: [0, 2],
+            },
+            contentTitle: {
+                bold: true,
+                fontSize: 20,
+                alignment: 'center',
+                margin: [0, 10, 0, 2],
+            },
+            contentDate: {
+                italics: true,
+                fontSize: 8,
+                alignment: 'center'
+            },
+            headerTable: {
+                noWrap: true,
+                bold: true,
+                fillColor: '#0374D5',
+                color: 'white',
+                fontSize: 10,
+                // alignment: 'center',
+            },
+            headerTables: {
+                noWrap: true,
+                bold: true,
+                fillColor: '#0374D5',
+                color: 'white',
+                fontSize: 10,
+                // margin: [25,0,25,0]
+                
+                // alignment: 'center',
+            },
+            dateText: {
+                fontSize: 12,
+                bold: true,
+                margin: [0, 10, 0, 2]
+            },
+            signatureText: {
+                fontSize: 12,
+                margin: [0, 0, 0, 2]
+            }
+        },
+        dontBreakRows: true,
+        images: {
+            logo: {
+                url: `${dataCompany?.company_logo}`
+            }
+        },
+    };
+
+    const docDefinitionReturnFullNoPrice = {
+        info: {
+            title: `${`${props?.dataLang?.import_purchase || "import_purchase"} - ${data?.code}` 
+            }`,
+            author: 'Foso',
+            subject: 'Quotation',
+            keywords: 'PDF',
+        },
+        pageOrientation: 'portrait',
+        content: [
+            {
+                columns: [
+                    {
+                        width: '30%',
+                        stack: [
+                            {
+                                image: "logo",
+                                width: 100,
+                                height: 100,
+                                alignment: "left",
+                                margin: [0, -15, 0, 5],
+                                fit: [100, 100]
+                            },
+                        ]
+                    },
+                    {
+                        width: '70%',
+                        stack: [
+                            {
+                                text: `${dataCompany?.company_name}`,
+                                style: 'headerInfo'
+                            },
+                            {
+                                text: dataCompany?.company_address ? `${props.dataLang?.PDF_adress || "PDF_adress"} : ${dataCompany?.company_address}` : '',
+                                style: 'headerInfoText'
+                            },
+                            {
+                                text: dataCompany?.company_phone_number ? `${props.dataLang?.PDF_tel || "PDF_tel"}: ${dataCompany?.company_phone_number}` : '',
+                                style: 'headerInfoText'
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: dataCompany?.company_email ? `Email: ${dataCompany?.company_email}` : '',
+                                        style: 'headerInfoText'
+                                    },
+                                    '    ',
+                                    {
+                                        text: dataCompany?.company_website ? `Website: ${dataCompany?.company_website}` : '',
+                                        style: 'headerInfoText'
+                                    },
+                                ],
+                                margin: [0, -4, 0, 0]
+
+                            }
+                        ],
+                        margin: [0, -20, 0, 5]
+                    },
+                ],
+                columnGap: 10
+            },
+            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, color: '#e2e8f0' }] },
+            {
+                stack: [
+                    {
+                        text:uppercaseText(`${props.dataLang?.import_purchase || "import_purchase"}`, 'contentTitle')
+                    },
+                    {
+                        text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                        style: 'contentDate'
+                    },
+                ],
+                margin: [0, 8, 0, 0]
+            },
+            {
+                text: [
+                    {
+                        text: `${props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers" }`,
+                        inline: true,
+                        fontSize: 10
+                    },
+                    {
+                        text: `${data?.code}`,
+                        bold: true,
+                        fontSize: 10
+                    },
+                ],
+                margin: [0, 10, 0, 2]
+            },
+            {
+                text: [
+                    { text:  `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"}`, inline: true, fontSize: 10},
+                    { text: `${moment(data?.date).format("DD/MM/YYYY")}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 2]
+            },
+
+            {
+                text: [
+                    { text: `${props.dataLang?.import_supplier + ": " || "import_supplier"}`, inline: true, fontSize: 10 },
+                    { text: `${data?.supplier_name}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 2]
+            },
+            {
+                text: [
+                    { text: `${props.dataLang?.PDF_reason || "PDF_reason"}: `, inline: true, fontSize: 10 },
+                    { text: `${data?.note}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 10]
+            },
+            {
+                table: {
+                    widths: "100%",
+                    headerRows: 0,
+                    widths:  props?.type== "returns" &&  ['auto','auto','auto','auto','auto','*'],
+                    body: [
+                        // Header row
+                            [
+                                uppercaseText('STT', 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.inventory_items || "inventory_items"}`, 'headerTables', 'center'),
+                                uppercaseText(`${props.dataLang?.PDF_house || "PDF_house"}`, 'headerTable', 'center'),
+                                uppercaseText(`${"ĐVT"}`, 'headerTable', 'center'),
+                                uppercaseText(`${"SL"}`, 'headerTable', 'center'),
+                                uppercaseText(`${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}`, 'headerTable', 'center'),
+                            ] ,
+
+                        // Data rows
+                        ...data && props?.type== "returns" && data?.items.length > 0 ? data?.items.map((item, index) => {
+                            const stack = [];
+                                    stack.push({ text: item?.item?.name ? item?.item?.name : "", fontSize: 10, margin: [0, 0, 0, 0] });
+                                    stack.push({ text: `Biến thể: ${item?.item?.product_variation}`, fontSize: 9, italics: true, margin: [0, 5, 0, 5] });
+
+                                    if (dataProductSerial?.is_enable === "1") {
+                                    const serialStack = [
+                                       {
+                                        text:[
+                                            { text: "Serial: ", fontSize: 9, italics: true },
+                                            { text: item.serial == null || item.serial == "" ? "-" : item.serial, fontSize: 9, italics: true,margin: [0, 5, 0, 0] }
+                                        ]
+                                       }
+                                    ];
+                                    stack.push(serialStack);
+                                    }
+
+                                    if (dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1") {
+                                    const subStack = [
+                                        {
+                                        text: [
+                                            { text: "Lot: ", fontSize: 9, italics: true },
+                                            { text: item.lot == null || item.lot == "" ? "-" : item.lot, fontSize: 9, italics: true,margin: [0, 5, 0, 0] }
+                                        ],
+                                        fontSize: 9,
+                                        margin: [0, 5, 0, 0]
+                                        },
+                                        {
+                                        text: [
+                                            { text: "Date: ", fontSize: 9, italics: true },
+                                            { text: item.expiration_date ? moment(item.expiration_date).format("DD/MM/YYYY") : "-", fontSize: 8.5, italics: true,margin: [0, 5, 0, 0] }
+                                        ],
+                                        fontSize: 9,
+                                        margin: [0, 5, 0, 0]
+                                        },
+                                    ];
+                                    stack.push(subStack);
+                                    }
+                            return [
+                                { text: `${index + 1}`, alignment: 'center', fontSize: 10},
+                                {
+                                    stack: stack
+                                  },
+                                //   location_name
+
+                                { stack: 
+                                    [
+                                        {text: item?.warehouse_name ? item?.warehouse_name : "", fontSize: 10 },
+                                        {text: item?.location_name ? item?.location_name : "", fontSize: 10 }
+                                    ]
+                                },
+                                {text: item?.item?.unit_name ? item?.item?.unit_name : "" ,alignment: 'center', fontSize: 10,},
+                                {text: item?.quantity ? formatNumber(item?.quantity) : "" , fontSize: 10,alignment: 'center'},
+                                {text: item?.note ? item?.note : "" , fontSize: 10,},
+                                
+                            ];
+                        }) : '',
+                          [{ text: `${props.dataLang?.inventory_total_item || "inventory_total_item"}`, bold: true, colSpan: 2, fontSize: 10 },'', { text: `${formatNumber(data?.items?.length)}`, bold: true, alignment: 'right', colSpan: 4, fontSize: 10 },'','',''],
+                          [{ text: `${props.dataLang?.purchase_totalCount || "purchase_totalCount"}`, bold: true, colSpan: 2, fontSize: 10 },'',{ text: `${formatNumber(data?.items?.reduce((accumulator, item) => accumulator + parseInt(item.quantity), 0))}`, bold: true, alignment: 'right', colSpan: 4, fontSize: 10 }, '','',''],
+                    ],
+                }
+            },
+            {
+                columns: [
+                    {
+                        text: '',
+                        width: '50%',
+                    },
+                    {
+                        width: '50%',
+                        stack: [
+                            {
+                                text: currentDate,
+                                style: 'dateText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `${props.dataLang?.PDF_userMaker || "PDF_userMaker"}`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            },
+                            {
+                                text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                                style: 'signatureText',
+                                alignment: 'center',
+                                fontSize: 10
+                            }
+                        ],
+                    },
+                ],
+                columnGap: 2
+            },
+
+
         ],
         styles: {
             headerInfoTextWithMargin: {
@@ -2814,16 +3074,26 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             })
             setOpenAction(false)
         }
-        if (data !== undefined && dataCompany !== undefined && props?.type == "returns") {
-            const pdfGenerator = pdfMake.createPdf(docDefinitionReturns);
+
+        if (type == "fullStyle" && data !== undefined && dataCompany !== undefined && props?.type == "returns") {
+            const pdfGenerator = pdfMake.createPdf(docDefinitionReturnFull);
             pdfGenerator.open((blob) => {
                 const url = URL.createObjectURL(blob);
                 setUrl(url)
             })
             setOpenAction(false)
         }
+        if (type == "noprice" && data !== undefined && dataCompany !== undefined && props?.type == "returns") {
+            const pdfGenerator = pdfMake.createPdf(docDefinitionReturnFullNoPrice);
+            console.log(data);
+            pdfGenerator.open((blob) => {
+                const url = URL.createObjectURL(blob);
+                setUrl(url)
+            })
+            setOpenAction(false)
+        }
+       
     }
-    console.log(url);
     return (
         <React.Fragment>
             {
@@ -2889,12 +3159,20 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                     </React.Fragment>
             }
             {
-                props?.type == "returns" && 
+                props?.type == "returns" &&
                     <React.Fragment>
-                         <button onClick={handlePrintPdf} className='transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full'>
-                            <VscFilePdf size={20} className='group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md ' />
-                            <p className='group-hover:text-[#65a30d]'>{props?.dataLang?.btn_table_print || "btn_table_print"}</p>
-                        </button>
+                        <div className='flex justify-center items-center my-3'>
+                            <button onClick={handlePrintPdf.bind(this, "noprice")} className="relative inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium hover:-translate-y-[3px] transition-all ease-linear text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
+                                <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                                    {props.dataLang?.option_prin_notprice || "option_prin_notprice"}
+                                </span>
+                            </button>
+                            <button onClick={handlePrintPdf.bind(this, "fullStyle")} className="relative inline-flex items-center justify-center p-0.5  mr-2 overflow-hidden text-sm font-medium hover:-translate-y-[3px] transition-all ease-linear text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800">
+                                <span className="relative px-8 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                                    {props.dataLang?.option_prin_price || "option_prin_price"}
+                                </span>
+                            </button>
+                        </div>
                     </React.Fragment>
             }
         </React.Fragment>
