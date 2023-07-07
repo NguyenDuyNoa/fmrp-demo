@@ -1475,10 +1475,9 @@ const _ServerFetching =  () => {
                             onChange={_HandleChangeInput.bind(this, "khotong")}
                             value={khotong}
                             formatOptionLabel={(option) => (
-                              <div className='flex justify-start items-center gap-1 '>
+                              <div className=''>
                                   <h2>{dataLang?.import_Warehouse || "import_Warehouse"}: {option?.warehouse_name}</h2>
-                                  <h2>{dataLang?.import_Warehouse_location || "import_Warehouse_ocation" }</h2>
-                                  <h2>{option?.label}</h2>
+                                  <h2>{dataLang?.import_Warehouse_location || "import_Warehouse_ocation" }: {option?.label}</h2>
                               </div>
                               )}
                             options={warehouse}

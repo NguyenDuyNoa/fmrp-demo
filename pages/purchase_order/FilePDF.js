@@ -2289,7 +2289,14 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                                 {
                                     stack: stack
                                   },
-                                { text: item?.warehouse_name ? item?.warehouse_name : "", fontSize: 10 },
+                                //   location_name
+
+                                { stack: 
+                                    [
+                                        {text: item?.warehouse_name ? item?.warehouse_name : "", fontSize: 10 },
+                                        {text: item?.location_name ? item?.location_name : "", fontSize: 10 }
+                                    ]
+                                },
                                 {text: item?.item?.unit_name ? item?.item?.unit_name : "" ,alignment: 'center', fontSize: 10,},
                                 {text: item?.quantity ? formatNumber(item?.quantity) : "" , fontSize: 10,alignment: 'center'},
                                 {text: item?.note ? item?.note : "" , fontSize: 10,},
@@ -2475,10 +2482,10 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             {
                 stack: [
                     {
-                        text:uppercaseText(`${props.dataLang?.import_title || "import_title"}`, 'contentTitle')
+                        text:uppercaseText(`${"Trả hàng"}`, 'contentTitle')
                     },
                     {
-                        text: `${moment(data?.date).format("DD/MM/YYYY HH:mm:ss")}`,
+                        text: `${moment(data?.date).format("DD/MM/YYYY")}`,
                         style: 'contentDate'
                     },
                 ],
@@ -2487,7 +2494,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             {
                 text: [
                     {
-                        text: `Trả hàng`,
+                        text: `Trả hàng: `,
                         inline: true,
                         fontSize: 10
                     },
@@ -2501,7 +2508,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             },
             {
                 text: [
-                    { text:  `${"Trả hàng"}`, inline: true, fontSize: 10},
+                    { text:  `${"Ngày chứng từ: "}`, inline: true, fontSize: 10},
                     { text: `${moment(data?.date).format("DD/MM/YYYY")}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 2]
@@ -2516,7 +2523,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
             },
             {
                 text: [
-                    { text: `${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}: `, inline: true, fontSize: 10 },
+                    { text: `${"Lý do"}: `, inline: true, fontSize: 10 },
                     { text: `${data?.note}`, bold: true, fontSize: 10 },
                 ],
                 margin: [0, 2, 0, 10]
@@ -2526,7 +2533,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                     widths: "100%",
                     headerRows: 0,
                     // widths:  props?.type== "import" &&  ['auto',70,'auto','auto','auto','auto',55,'auto','auto',50],
-                    widths:  props?.type== "import" &&  ['auto','auto','auto','auto','auto','auto','auto','auto','auto','*'],
+                    widths:  props?.type== "returns" &&  ['auto','auto','auto','auto','auto','auto','auto','auto','auto','*'],
                     body: [
                         // Header row
                             [
@@ -2543,7 +2550,7 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction,dataMaterialExpiry,da
                             ] ,
 
                         // Data rows
-                        ...data && props?.type== "import" && data?.items.length > 0 ? data?.items.map((item, index) => {
+                        ...data && props?.type== "returns" && data?.items.length > 0 ? data?.items.map((item, index) => {
                             const stack = [];
                                     stack.push({ text: item?.item?.name ? item?.item?.name : "", fontSize: 10, margin: [0, 0, 0, 0] });
                                     stack.push({ text: `Biến thể: ${item?.item?.product_variation}`, fontSize: 9, italics: true, margin: [0, 5, 0, 5] });

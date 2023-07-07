@@ -170,32 +170,35 @@ const _ServerFetching =  () => {
       if(!err){
         var rResult = response.data;
         sListData(rResult?.items.map(e => ({
-          id: e?.item?.id, 
-          matHang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,value:e.item?.id},
-          child: e?.child.map(ce => ({ 
-                id: Number(ce?.id),
-                disabledDate: (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) || (e.item?.text_type == "material"  && dataMaterialExpiry?.is_enable == "0" && true) || (e.item?.text_type == "products"  && dataProductExpiry?.is_enable == "1" && false) || (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true), 
-                kho: {label: ce?.location_name, value: ce?.location_warehouses_id, warehouse_name: ce?.warehouse_name, qty: ce?.quantity}, 
-                serial: ce?.serial == null ? "" : ce?.serial,
-                soluongcl: Number(e?.item?.quantity_left),
-                soluongdt: Number(e?.item?.quantity_returned) ,
-                soluongdn: Number(e?.item?.quantity_create) ,
-                lot: ce?.lot == null ? "" : ce?.lot,
-                date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
-                donViTinh: e?.item?.unit_name, 
-                amount: Number(ce?.quantity), 
-                price: Number(ce?.price), 
-                chietKhau: Number(ce?.discount_percent), 
-                tax: {tax_rate: ce?.tax_rate, value: ce?.tax_id, label: ce?.tax_name},
-                note: ce?.note
-              }))
+            id: e?.item?.id, 
+            matHang: {e: e?.item, label: `${e.item?.name} <span style={{display: none}}>${e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name}</span>`,value:e.item?.id},
+            child: e?.child.map(ce => ({ 
+                    id: Number(ce?.id),
+                    disabledDate: (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) || (e.item?.text_type == "material"  && dataMaterialExpiry?.is_enable == "0" && true) || (e.item?.text_type == "products"  && dataProductExpiry?.is_enable == "1" && false) || (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true), 
+                    kho: {label: ce?.location_name, value: ce?.location_warehouses_id, warehouse_name: ce?.warehouse_name, qty: ce?.quantity_warehouse}, 
+                    serial: ce?.serial == null ? "" : ce?.serial,
+                    soluongcl: Number(e?.item?.quantity_left),
+                    soluongdt: Number(e?.item?.quantity_returned) ,
+                    soluongdn: Number(e?.item?.quantity_create) ,
+                    lot: ce?.lot == null ? "" : ce?.lot,
+                    date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
+                    donViTinh: e?.item?.unit_name, 
+                    amount: Number(ce?.quantity), 
+                    price: Number(ce?.price), 
+                    chietKhau: Number(ce?.discount_percent), 
+                    tax: {tax_rate: ce?.tax_rate, value: ce?.tax_id, label: ce?.tax_name},
+                    note: ce?.note
+                }))
             })
-            ))
-        // const checkQty = rResult?.items?.map(e => e.item).reduce((obj, e) => {
-        //   obj.id = Number(e.id);
-        //   return obj;
-        // }, {});
-        // sIdParent(checkQty.id)
+        ))
+        
+        const checkQty = rResult?.items?.map(e => e?.item).reduce((obj, e) => {
+            obj.id = e?.id;
+            obj.qty = Number(e?.quantity_left)
+            return obj;
+        }, {});
+        sIdParent(checkQty?.id)
+        sQtyHouse(checkQty?.qty)
         sCode(rResult?.code)
         sIdBranch({label: rResult?.branch_name, value: rResult?.branch_id})
         sIdSupplier({label: rResult?.supplier_name, value: rResult?.supplier_id})
@@ -206,9 +209,7 @@ const _ServerFetching =  () => {
       sOnFetchingDetail(false)
     })
   }
-  // useEffect(()=>{
-  //   _ServerFetching_Warehouse()
-  // },[id])
+  
   useEffect(() => {
     //new
     onFetchingDetail && _ServerFetchingDetailPage()
@@ -221,8 +222,8 @@ const _ServerFetching =  () => {
   const _ServerFetching_ItemsAll =  () => {
     Axios("GET", "/api_web/Api_return_supplier/getImportItems/?csrf_protection=true", {
       params:{
-        "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
-        "filter[branch_id]": idBranch ? idBranch?.value : null
+            "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
+            "filter[branch_id]": idBranch ? idBranch?.value : null
       }
     }, (err, response) => {
         if(!err){
@@ -237,7 +238,7 @@ const _ServerFetching =  () => {
       sOnLoading(true)
       Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {
         params:{
-          "filter[branch_id]": idBranch != null ? idBranch.value : null ,
+            "filter[branch_id]": idBranch != null ? idBranch.value : null ,
          }
       }, (err, response) => {
           if(!err){
@@ -255,29 +256,29 @@ const _ServerFetching =  () => {
 
     const _HandleChangeInput = (type, value) => {
       if(type == "code"){
-          sCode(value.target.value)
+            sCode(value.target.value)
       }else if(type === "date"){
-          sDate(moment(value.target.value).format('YYYY-MM-DD HH:mm:ss'))
+            sDate(moment(value.target.value).format('YYYY-MM-DD HH:mm:ss'))
       }else if(type === "supplier" && idSupplier != value){
         if(listData?.length > 0){
           if(type ==="supplier" && idSupplier != value){
-            Swal.fire({
-              title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#296dc1',
-              cancelButtonColor: '#d33',
-              confirmButtonText: `${dataLang?.aler_yes}`,
-              cancelButtonText:`${dataLang?.aler_cancel}`
-          }).then((result) => {
-              if (result.isConfirmed) {
-                  sDataItems([])
-                  sDataWarehouse([])
-                  sListData([])
-                  sIdSupplier(value)
-              }else{
-                sIdSupplier({...idSupplier})
-              }
+                Swal.fire({
+                title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#296dc1',
+                cancelButtonColor: '#d33',
+                confirmButtonText: `${dataLang?.aler_yes}`,
+                cancelButtonText:`${dataLang?.aler_cancel}`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    sDataItems([])
+                    sDataWarehouse([])
+                    sListData([])
+                    sIdSupplier(value)
+                }else{
+                    sIdSupplier({...idSupplier})
+                }
             })
           }
         }
@@ -295,54 +296,54 @@ const _ServerFetching =  () => {
       }else if(type == "branch" && idBranch != value){
          if(listData?.length > 0){
             if(type ==="branch" && idBranch != value){
-              Swal.fire({
-                title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#296dc1',
-                cancelButtonColor: '#d33',
-                confirmButtonText: `${dataLang?.aler_yes}`,
-                cancelButtonText:`${dataLang?.aler_cancel}`
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    sDataItems([])
-                    sDataWarehouse([])
-                    sListData([])
-                    sIdSupplier(null)
-                    sIdBranch(value)
-                }else{
-                  sIdBranch({...idBranch})
-                }
-              })
+                Swal.fire({
+                    title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#296dc1',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: `${dataLang?.aler_yes}`,
+                    cancelButtonText:`${dataLang?.aler_cancel}`
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        sDataItems([])
+                        sDataWarehouse([])
+                        sListData([])
+                        sIdSupplier(null)
+                        sIdBranch(value)
+                    }else{
+                    sIdBranch({...idBranch})
+                    }
+                })
             }
           }else{
-            sIdBranch(value)
-            sIdSupplier(null)
-            sKhotong(null)
-            if(value == null){
-              sDataSupplier([])
-            }
+                sIdBranch(value)
+                sIdSupplier(null)
+                sKhotong(null)
+                if(value == null){
+                sDataSupplier([])
+                }
           }
       }else if(type == "thuetong"){
         sThuetong(value)
         if(listData?.length > 0){
-          const newData = listData.map(e => {
-            const newChild = e?.child.map(ce => {
-              return {...ce, tax: value}
+            const newData = listData.map(e => {
+                const newChild = e?.child.map(ce => {
+                return {...ce, tax: value}
+                })
+                return {...e, child: newChild}
             })
-            return {...e, child: newChild}
-          })
           sListData(newData)
         }
       }else if(type == "chietkhautong"){
         sChietkhautong(value?.value)
         if(listData?.length > 0){
-          const newData = listData.map(e => {
-            const newChild = e?.child.map(ce => {
-              return {...ce, chietKhau: value?.value}
+            const newData = listData.map(e => {
+                const newChild = e?.child.map(ce => {
+                return {...ce, chietKhau: value?.value}
+                })
+                return {...e, child: newChild}
             })
-            return {...e, child: newChild}
-          })
           sListData(newData)
         }
       }
@@ -360,16 +361,19 @@ const _ServerFetching =  () => {
   };
 
     const _HandleSubmit = (e) => {
+
       e.preventDefault();
       const hasNullKho = listData.some(item => item.child?.some(childItem => childItem.kho === null));
       const hasNullAmount = listData.some(item => item.child?.some(childItem => childItem.amount === null || childItem.amount === '' || childItem.amount == 0));
+      
       const isTotalExceeded = listData?.some((e) =>
-         !hasNullKho && e.child?.some((opt) => {
-              const amount = parseFloat(opt?.amount) || 0;
-              const qty = parseFloat(opt?.kho?.qty) || 0;
-              return amount > qty;
+            !hasNullKho && e.child?.some((opt) => {
+                const amount = parseFloat(opt?.amount) || 0;
+                const qty = parseFloat(opt?.kho?.qty) || 0;
+                return amount > qty;
             })
       );
+
       const isEmpty = listData?.length === 0 ? true : false;
       if(idSupplier == null  || idBranch == null || idTreatment == null || hasNullKho || hasNullAmount || isTotalExceeded || isEmpty){
           idSupplier == null && sErrSupplier(true)
@@ -432,7 +436,6 @@ const _ServerFetching =  () => {
         if(!err){
             var result =  response.data
             sDataWarehouse(result?.map(e => ({label: e?.name, value:e?.id,  warehouse_name:e?.warehouse_name, qty: e?.quantity})))
-            // sQtyHouse(result?.find(e => e?.quantity))
             sOnLoadingChild(false)
         } 
     })
@@ -446,9 +449,11 @@ const _ServerFetching =  () => {
   useEffect(() => {
     onFetchingWarehouser && _ServerFetching_Warehouse() 
   }, [onFetchingWarehouser]);
+
   useEffect(() => {
     idParen != null && sOnFetchingWarehouse(true)
   }, [idParen]);
+
 
   useEffect(() => {
     onFetchingSupplier && _ServerFetching_Supplier()
@@ -460,6 +465,7 @@ const _ServerFetching =  () => {
   useEffect(()=>{
     onFetchingItemsAll && _ServerFetching_ItemsAll()
   },[onFetchingItemsAll])
+
   useEffect(()=>{
     idSupplier != null && sOnFetchingItemsAll(true)
   },[idSupplier])
@@ -722,7 +728,9 @@ const _ServerFetching =  () => {
                 }
             }else if(type === "increase"){
               sErrSurvive(false)
+              
               const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
+       
               if(totalSoLuong == qtyHouse){
                 Toast.fire({
                   title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`,
@@ -733,7 +741,19 @@ const _ServerFetching =  () => {
                   timer: 3000
                 });
                 return {...ce}
-              }else{
+              }
+             else if(totalSoLuong > qtyHouse){
+                Toast.fire({
+                  title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng tồn`,
+                  icon: 'error',
+                  confirmButtonColor: '#296dc1',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: dataLang?.aler_yes,
+                  timer: 3000
+                });
+                return {...ce}
+              }
+              else{
                 return {...ce,amount: Number(Number(ce?.amount) + 1)}
               }
             }else if(type === "decrease"){

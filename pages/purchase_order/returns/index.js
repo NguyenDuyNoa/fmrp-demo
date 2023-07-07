@@ -353,7 +353,8 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.returns_title || "returns_title"} </title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">{data_export.length > 0 && <Popup_status className="hidden" data_export={data_export} dataLang={dataLang}/>}
+            <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
+              {/* {data_export.length > 0 && <Popup_status className="hidden" data_export={data_export} dataLang={dataLang}/>} */}
             <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
             <h6 className="text-[#141522]/40">{dataLang?.returns_title || "returns_title"}</h6>
             <span className="text-[#141522]/40">/</span>
@@ -383,7 +384,7 @@ const Index = (props) => {
                               onClick={_HandleSelectTab.bind(this, `${e.id}`)} 
                               total={e.count} 
                               active={e.id} 
-                              className={"text-[#0F4F9E] transition duration-300 ease-out font-medium"}
+                              className={"text-[#0F4F9E] transition duration-300 ease-out font-medium hover:font-semibold"}
                             >{dataLang[e?.name] || e?.name}</TabStatus> 
                           </div>
                           )
@@ -605,23 +606,10 @@ const Index = (props) => {
                       (<>
                           <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">                       
                           {(data?.map((e) => 
-                                <div className='grid grid-cols-10 items-center py-1.5 px-2 hover:bg-slate-100/40 ' key={e.id.toString()}>
+                                <div className='grid grid-cols-10 items-center py-1.5 px-2 hover:bg-slate-100/40 group' key={e.id.toString()}>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center'>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer '><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-left'>{e.supplier_name}</h6>
-                                {/* <h6 className='3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px]  col-span-1 flex items-center w-fit mx-auto'>
-                                      
-                                      <div className='mx-auto'>
-                                          <Popup_chitietThere
-                                            className='i py-1 px-2 bg-gradient-to-br font-normal text-lime-500 bg-lime-200 items-center rounded-full shadow-2xl cursor-pointer 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]  overflow-hidden transform hover:scale-110 transition duration-300 ease-out hover:bg-lime-500 hover:text-white'
-                                            name={e?.purchase_order_code}
-                                            dataLang={dataLang}
-                                            id={e?.purchase_order_id}
-                                            type={"typePo"}
-                                            >
-                                          </Popup_chitietThere>
-                                      </div>
-                                </h6> */}
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_price)}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_tax_price)}</h6>
                                 <h6 className='2xl:text-base xl:text-xs text-[8px] px-2 col-span-1 text-right'>{formatNumber(e.total_amount)}</h6>
@@ -644,7 +632,7 @@ const Index = (props) => {
                                 <a class="text-center text-white font-semibold z-10 pointer-events-none">Hover on me!</a>
                               </div> */}
                                 <h6 className=' 2xl:text-base xl:text-xs text-[8px] col-span-1 cursor-pointer'>
-                                  <div className={`${e?.warehouseman_id == "0" ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation " : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "} rounded-md cursor-pointer hover:scale-105 hover:font-semibold` }>
+                                  <div className={`${e?.warehouseman_id == "0" ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation " : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "} rounded-md cursor-pointer hover:scale-105 hover:font-semibold group-hover:scale-105` }>
                                     <div className='flex items-center justify-center'>
                                                               <label className="relative flex cursor-pointer items-center rounded-full p-2" htmlFor={e.id} data-ripple-dark="true" > 
                                                                   <input
@@ -798,7 +786,6 @@ const BtnTacVu = React.memo((props) => {
           Axios("DELETE", `/api_web/Api_return_supplier/returnSupplier/${id}?csrf_protection=true`, {
           }, (err, response) => {
             if(!err){
-              console.log(response.data);
               var {isSuccess, message} = response.data;
               if(isSuccess){
                 Toast.fire({
@@ -820,17 +807,15 @@ const BtnTacVu = React.memo((props) => {
   }
   
     const handleClick = () => {
-      // if(props?.warehouseman_id != "0" || props?.status_pay != "not_spent"){
-      //   Toast.fire({
-      //     icon: 'error',
-      //     title: `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit || props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit") }`
-      //   })  
-      // } 
-      //   else {
-      //     router.push(`/purchase_order/returns/form?id=${props.id}`);
-      //   }
-      router.push(`/purchase_order/returns/form?id=${props.id}`);
-
+      if(props?.warehouseman_id != "0"){
+        Toast.fire({
+          icon: 'error',
+          title: `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`
+        })  
+      } 
+        else {
+          router.push(`/purchase_order/returns/form?id=${props.id}`);
+        }
       };
 
 
@@ -1152,147 +1137,147 @@ return (
 )
 }
 
-const Popup_status = (props) => {
+// const Popup_status = (props) => {
 
-  const dataLang = props?.dataLang
-  const [onFetching, sOnFetching] = useState(false);
-  const [open, sOpen] = useState(false);
-  const [data,sData] = useState([])
+//   const dataLang = props?.dataLang
+//   const [onFetching, sOnFetching] = useState(false);
+//   const [open, sOpen] = useState(false);
+//   const [data,sData] = useState([])
 
-  const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-  const [dataProductExpiry, sDataProductExpiry] = useState({});
-  const [dataProductSerial, sDataProductSerial] = useState({});
+//   const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+//   const [dataProductExpiry, sDataProductExpiry] = useState({});
+//   const [dataProductSerial, sDataProductSerial] = useState({});
 
-  const formatNumber = (number) => {
-    if (!number && number !== 0) return 0;
-      const integerPart = Math.floor(number);
-      const decimalPart = number - integerPart;
-      const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-      const roundedNumber = integerPart + roundedDecimalPart;
-      return roundedNumber.toLocaleString("en");
-  };
+//   const formatNumber = (number) => {
+//     if (!number && number !== 0) return 0;
+//       const integerPart = Math.floor(number);
+//       const decimalPart = number - integerPart;
+//       const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
+//       const roundedNumber = integerPart + roundedDecimalPart;
+//       return roundedNumber.toLocaleString("en");
+//   };
 
-  const _ServerFetching =  () =>{
-    Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-      if(!err){
-          var data = response.data;
-          sDataMaterialExpiry(data.find(x => x.code == "material_expiry"));
-          sDataProductExpiry(data.find(x => x.code == "product_expiry"));
-          sDataProductSerial(data.find(x => x.code == "product_serial"));
-      }
-      sOnFetching(false)
-    })
-  }
-useEffect(() =>{
-  onFetching && _ServerFetching()
-},[onFetching])
+//   const _ServerFetching =  () =>{
+//     Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+//       if(!err){
+//           var data = response.data;
+//           sDataMaterialExpiry(data.find(x => x.code == "material_expiry"));
+//           sDataProductExpiry(data.find(x => x.code == "product_expiry"));
+//           sDataProductSerial(data.find(x => x.code == "product_serial"));
+//       }
+//       sOnFetching(false)
+//     })
+//   }
+// useEffect(() =>{
+//   onFetching && _ServerFetching()
+// },[onFetching])
 
-useEffect(() =>{
-  open && sOnFetching(true)
-},[open])
+// useEffect(() =>{
+//   open && sOnFetching(true)
+// },[open])
   
-  useEffect(() => {
-    sOnFetching(true);
-    sData([]);
-    sOpen(false);
-    if (props?.data_export?.length > 0) {
-      sOnFetching(false);
-      sOpen(true);
-      sData(props?.data_export);
-    }
-  }, [props?.data_export]);
+//   useEffect(() => {
+//     sOnFetching(true);
+//     sData([]);
+//     sOpen(false);
+//     if (props?.data_export?.length > 0) {
+//       sOnFetching(false);
+//       sOpen(true);
+//       sData(props?.data_export);
+//     }
+//   }, [props?.data_export]);
 
-return(
-  <PopupEdit  
-    title={props.dataLang?.inventory_votes || "inventory_votes"} 
-    open={open} 
-    onClose={() => sOpen(false)}
-    classNameBtn={props.className}
-  >
-    <div className="mt-4 space-x-5 w-[990px] h-auto">        
-    <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                <div className="pr-2 ">
-                  <div className={`${dataProductSerial.is_enable == "1" ? 
-                    (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
-                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow  z-10`}>
-                              <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-[300] text-center'>{props.dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}</h4>
-                              <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-[300] text-center '>{props.dataLang?.inventory_vouchercode || "inventory_vouchercode"}</h4>
-                              <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{props.dataLang?.inventory_inventory_slip || "inventory_inventory_slip"}</h4>
-                              {dataProductSerial.is_enable === "1" && (<h4 className="text-[13px]  px-2 py-1.5  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Serial"}</h4>)}
-                          {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
-                            <>
-                              <h4 className="text-[13px]  px-2 py-1.5  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Lot"}</h4>
-                              <h4 className="text-[13px]  px-2 py-1.5  col-span-1  text-[#667085] uppercase  font-[400] text-center">{props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}</h4>
-                            </> ):""}
-                            <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-[300] text-center'>{props.dataLang?.purchase_order_purchase_from_item || "purchase_order_purchase_from_item"}</h4>
-                            <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-[300] text-center'>{props.dataLang?.PDF_house || "PDF_house"}</h4>
-                            <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-[300] text-center'>{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
-                  </div>
-                  {onFetching ?
-                    <Loading className="h-50" color="#0f4f9e" /> 
-                    : 
-                    data?.length > 0 ? 
-                    (<>
-                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px] mt-2 ">                       
-                        {(data?.map((e) => 
-                              <div className={`${dataProductSerial.is_enable == "1" ? 
-                              (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
-                              (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid hover:bg-slate-50 items-center`}>
-                              <h6 className='text-[13px] px-2 py-1.5 col-span-2 text-center'>{e?.date_coupon != null ? moment(e?.date_coupon).format("DD/MM/YYYY, HH:mm:ss") : ""}</h6>
-                              <h6 className='text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer'>{e?.code_coupon}</h6>
-                              <h6 className='text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer'>{dataLang[e?.type_text]}</h6>
+// return(
+//   <PopupEdit  
+//     title={props.dataLang?.inventory_votes || "inventory_votes"} 
+//     open={open} 
+//     onClose={() => sOpen(false)}
+//     classNameBtn={props.className}
+//   >
+//     <div className="mt-4 space-x-5 w-[990px] h-auto">        
+//     <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+//                 <div className="pr-2 ">
+//                   <div className={`${dataProductSerial.is_enable == "1" ? 
+//                     (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
+//                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow  z-10`}>
+//                               <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-[300] text-center'>{props.dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}</h4>
+//                               <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-[300] text-center '>{props.dataLang?.inventory_vouchercode || "inventory_vouchercode"}</h4>
+//                               <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-[300] text-center whitespace-nowrap'>{props.dataLang?.inventory_inventory_slip || "inventory_inventory_slip"}</h4>
+//                               {dataProductSerial.is_enable === "1" && (<h4 className="text-[13px]  px-2 py-1.5  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Serial"}</h4>)}
+//                           {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
+//                             <>
+//                               <h4 className="text-[13px]  px-2 py-1.5  col-span-1  text-[#667085] uppercase  font-[400] text-center">{"Lot"}</h4>
+//                               <h4 className="text-[13px]  px-2 py-1.5  col-span-1  text-[#667085] uppercase  font-[400] text-center">{props.dataLang?.warehouses_detail_date || "warehouses_detail_date"}</h4>
+//                             </> ):""}
+//                             <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-[300] text-center'>{props.dataLang?.purchase_order_purchase_from_item || "purchase_order_purchase_from_item"}</h4>
+//                             <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-[300] text-center'>{props.dataLang?.PDF_house || "PDF_house"}</h4>
+//                             <h4 className='text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-[300] text-center'>{props.dataLang?.purchase_quantity || "purchase_quantity"}</h4>
+//                   </div>
+//                   {onFetching ?
+//                     <Loading className="h-50" color="#0f4f9e" /> 
+//                     : 
+//                     data?.length > 0 ? 
+//                     (<>
+//                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px] mt-2 ">                       
+//                         {(data?.map((e) => 
+//                               <div className={`${dataProductSerial.is_enable == "1" ? 
+//                               (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
+//                               (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid hover:bg-slate-50 items-center`}>
+//                               <h6 className='text-[13px] px-2 py-1.5 col-span-2 text-center'>{e?.date_coupon != null ? moment(e?.date_coupon).format("DD/MM/YYYY, HH:mm:ss") : ""}</h6>
+//                               <h6 className='text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer'>{e?.code_coupon}</h6>
+//                               <h6 className='text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer'>{dataLang[e?.type_text]}</h6>
 
-                              {dataProductSerial.is_enable === "1" ? (
-                                                <div className=" col-span-1 ">
-                                                  <h6 className="text-[13px] px-2 py-1.5  w-[full] text-left">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
-                                                </div>
-                                              ):""}
-                          {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
-                            <>
-                              <div className=" col-span-1  ">
-                                  <h6 className="text-[13px] px-2 py-1.5 w-[full] text-left">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
-                              </div>
-                              <div className=" col-span-1  ">
-                                  <h6 className="text-[13px] px-2 py-1.5 w-[full] text-center">{e.expiration_date ? moment(e.expiration_date).format("DD-MM-YYYY")   : "-"}</h6>                              
-                              </div>
-                            </>
-                             ):""}              
-                              <h6 className='text-[13px] px-2 py-1.5 col-span-2 text-center  hover:font-normal cursor-pointer'>
-                                <div className='grid grid-cols-6 items-center'>
-                                  <h4 className='text-[13px] px-2 py-1.5  w-[full] col-span-4'>{e?.name}</h4>
-                                  <h4 className='text-[13px] px-2 py-1.5  w-[full] col-span-2'>{e?.product_variation}</h4>
-                                </div>
-                              </h6>
-                              <h6 className='text-[13px] px-2 py-1.5 col-span-2 text-center hover:font-normal cursor-pointer'>
-                                <div className='grid grid-cols-2 items-center'>
-                                <span className='col-span-1'>{e?.warehouse_name}</span>
-                                <span className='col-span-1'>{e?.local_name}</span>
-                                </div>
-                              </h6>
-                              <h6 className='text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer'>
-                               {formatNumber(e?.quantity)}
-                              </h6>
-                              </div>
-                        ))}              
-                      </div>                     
-                      </>
-                    )  : 
-                    (
-                      <div className=" max-w-[352px] mt-24 mx-auto" >
-                        <div className="text-center">
-                          <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
-                          <h1 className="textx-[#141522] text-base opacity-90 font-medium">{dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
-                          <div className="flex items-center justify-around mt-6 ">
-                              {/* <Popup_dsncc onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-                          </div>
-                        </div>
-                      </div>
-                    )}    
-                </div>
-              </div>
-    </div>
-  </PopupEdit>
-)
-}
+//                               {dataProductSerial.is_enable === "1" ? (
+//                                                 <div className=" col-span-1 ">
+//                                                   <h6 className="text-[13px] px-2 py-1.5  w-[full] text-left">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                              
+//                                                 </div>
+//                                               ):""}
+//                           {dataMaterialExpiry.is_enable === "1" ||  dataProductExpiry.is_enable === "1" ? (
+//                             <>
+//                               <div className=" col-span-1  ">
+//                                   <h6 className="text-[13px] px-2 py-1.5 w-[full] text-left">{e.lot == null || e.lot == ""  ? "-" : e.lot}</h6>                              
+//                               </div>
+//                               <div className=" col-span-1  ">
+//                                   <h6 className="text-[13px] px-2 py-1.5 w-[full] text-center">{e.expiration_date ? moment(e.expiration_date).format("DD-MM-YYYY")   : "-"}</h6>                              
+//                               </div>
+//                             </>
+//                              ):""}              
+//                               <h6 className='text-[13px] px-2 py-1.5 col-span-2 text-center  hover:font-normal cursor-pointer'>
+//                                 <div className='grid grid-cols-6 items-center'>
+//                                   <h4 className='text-[13px] px-2 py-1.5  w-[full] col-span-4'>{e?.name}</h4>
+//                                   <h4 className='text-[13px] px-2 py-1.5  w-[full] col-span-2'>{e?.product_variation}</h4>
+//                                 </div>
+//                               </h6>
+//                               <h6 className='text-[13px] px-2 py-1.5 col-span-2 text-center hover:font-normal cursor-pointer'>
+//                                 <div className='grid grid-cols-2 items-center'>
+//                                 <span className='col-span-1'>{e?.warehouse_name}</span>
+//                                 <span className='col-span-1'>{e?.local_name}</span>
+//                                 </div>
+//                               </h6>
+//                               <h6 className='text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer'>
+//                                {formatNumber(e?.quantity)}
+//                               </h6>
+//                               </div>
+//                         ))}              
+//                       </div>                     
+//                       </>
+//                     )  : 
+//                     (
+//                       <div className=" max-w-[352px] mt-24 mx-auto" >
+//                         <div className="text-center">
+//                           <div className="bg-[#EBF4FF] rounded-[100%] inline-block "><IconSearch /></div>
+//                           <h1 className="textx-[#141522] text-base opacity-90 font-medium">{dataLang?.purchase_order_table_item_not_found || "purchase_order_table_item_not_found"}</h1>
+//                           <div className="flex items-center justify-around mt-6 ">
+//                               {/* <Popup_dsncc onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+//                           </div>
+//                         </div>
+//                       </div>
+//                     )}    
+//                 </div>
+//               </div>
+//     </div>
+//   </PopupEdit>
+// )
+// }
 
 export default Index;
