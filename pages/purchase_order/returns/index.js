@@ -601,6 +601,7 @@ const Index = (props) => {
                       : 
                       data?.length > 0 ? 
                       (<>
+                 
                           <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">                       
                           {(data?.map((e) => 
                                 <div className='relative  grid grid-cols-10 items-center py-1.5  hover:bg-slate-100/40 group' key={e.id.toString()}>
