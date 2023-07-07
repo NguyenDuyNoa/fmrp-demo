@@ -607,7 +607,7 @@ const Index = (props) => {
                                 <div className='relative  grid grid-cols-10 items-center py-1.5  hover:bg-slate-100/40 group' key={e.id.toString()}>
                                     <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center'>{e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}</h6>
                                     <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer '><Popup_chitiet dataLang={dataLang} className="text-left" name={e?.code} id={e?.id}/></h6>
-                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center capitalize'>{e.supplier_name}</h6>
+                                    <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize'>{e.supplier_name}</h6>
                                     <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right'>{formatNumber(e.total_price)}</h6>
                                     <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right'>{formatNumber(e.total_tax_price)}</h6>
                                     <h6 className='3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right'>{formatNumber(e.total_amount)}</h6>
