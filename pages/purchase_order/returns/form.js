@@ -704,7 +704,7 @@ const _ServerFetching =  () => {
               sErrSurvive(false)
               ce.amount = Number(value?.value);
               const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
-                if (totalSoLuong > qtyHouse) {
+                if (totalSoLuong > (Number(ce?.kho?.qty))) {
                   e.child.forEach((opt, optIndex) => {
                     const currentValue = ce.amount; // Lưu giá trị hiện tại
                     ce.amount = '';
@@ -713,7 +713,7 @@ const _ServerFetching =  () => {
                     }
                   });
                     Toast.fire({
-                      title:`Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`,
+                      title:`Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(ce?.kho?.qty)} số lượng còn lại`,
                       icon: 'error',
                       confirmButtonColor: '#296dc1',
                       cancelButtonColor: '#d33',
@@ -734,34 +734,36 @@ const _ServerFetching =  () => {
                 }
             }else if(type === "increase"){
               sErrSurvive(false)
-              
-              const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
-       
-              if(totalSoLuong == qtyHouse){
-                Toast.fire({
-                  title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`,
-                  icon: 'error',
-                  confirmButtonColor: '#296dc1',
-                  cancelButtonColor: '#d33',
-                  confirmButtonText: dataLang?.aler_yes,
-                  timer: 3000
-                });
-                return {...ce}
-              }
-             else if(totalSoLuong > qtyHouse){
-                Toast.fire({
-                  title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng tồn`,
-                  icon: 'error',
-                  confirmButtonColor: '#296dc1',
-                  cancelButtonColor: '#d33',
-                  confirmButtonText: dataLang?.aler_yes,
-                  timer: 3000
-                });
-                return {...ce}
-              }
+      
+                const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
+    
+                if((ce?.id === childId && totalSoLuong ==  qtyHouse) || (ce?.id === childId  && totalSoLuong == Number(ce?.kho?.qty))){
+                  Toast.fire({
+                    title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber((ce?.id === childId && totalSoLuong ==  qtyHouse && qtyHouse) || (ce?.id === childId && totalSoLuong == Number(ce?.kho?.qty) && Number(ce?.kho?.qty)))} số lượng còn lại`,
+                    icon: 'error',
+                    confirmButtonColor: '#296dc1',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: dataLang?.aler_yes,
+                    timer: 3000
+                  });
+                  return {...ce}
+                }
+              //  else if(totalSoLuong > Number(ce?.kho?.qty) || totalSoLuong > qtyHouse){
+              //     Toast.fire({
+              //       title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(totalSoLuong > Number(ce?.kho?.qty) && Number(ce?.kho?.qty) || totalSoLuong > qtyHouse&& qtyHouse)} số lượng tồn`,
+              //       icon: 'error',
+              //       confirmButtonColor: '#296dc1',
+              //       cancelButtonColor: '#d33',
+              //       confirmButtonText: dataLang?.aler_yes,
+              //       timer: 3000
+              //     });
+              //     return {...ce}
+              //   }
               else{
                 return {...ce,amount: Number(Number(ce?.amount) + 1)}
               }
+            
+              
             }else if(type === "decrease"){
                 sErrSurvive(false)
                 return {...ce, amount: Number(Number(ce?.amount) - 1)}
@@ -1278,10 +1280,10 @@ const _ServerFetching =  () => {
                             />
                             <button onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)} className='w-8 h-8 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-4 right-5 hover:rotate-45 hover:bg-slate-200 transition hover:scale-105 hover:text-red-500 ease-in-out'><Add className=''/></button>
                           </div>
-                          {e?.child?.filter(e => e.kho == null).length >= 2 &&
+                          {e?.child?.filter(e => e?.kho == null).length >= 2 &&
                             <button onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)} className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300">
                                   <span className="absolute right-0 w-full h-full -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
-                                  <span className="relative text-xs">Xóa {e?.child?.filter(e => e.kho == null).length} hàng chưa chọn kho</span>
+                                  <span className="relative text-xs">Xóa {e?.child?.filter(e => e?.kho == null).length} hàng chưa chọn kho</span>
                             </button>
                           }
                          
@@ -1357,7 +1359,7 @@ const _ServerFetching =  () => {
                                       isAllowed={(values) => {
                                         if (!values.value) return true;
                                           const { floatValue } = values;
-                                            if (floatValue > ce?.soluongcl || floatValue > qtyHouse) {
+                                            if (floatValue > ce?.soluongcl || floatValue > Number(ce?.kho?.qty)) {
                                               Toast.fire({
                                                 icon: 'error',
                                                 title: `${props.dataLang?.returns_err_Qty || "returns_err_Qty"} ${ce?.soluongcl?.toLocaleString("en")}`
