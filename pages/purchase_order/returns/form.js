@@ -1359,7 +1359,7 @@ const _ServerFetching =  () => {
                                       isAllowed={(values) => {
                                         if (!values.value) return true;
                                           const { floatValue } = values;
-                                            if (floatValue > ce?.soluongcl || floatValue > Number(ce?.kho?.qty)) {
+                                            if (floatValue > ce?.soluongcl || floatValue > qtyHouse) {
                                               Toast.fire({
                                                 icon: 'error',
                                                 title: `${props.dataLang?.returns_err_Qty || "returns_err_Qty"} ${ce?.soluongcl?.toLocaleString("en")}`
