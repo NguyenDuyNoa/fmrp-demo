@@ -655,7 +655,7 @@ const _ServerFetching =  () => {
           soluongdt: Number(value?.e?.quantity_returned) ,
           soluongdn: Number(value?.e?.quantity_create) ,
           price: Number(value?.e?.price),
-          amount: Number(value?.e?.quantity_create),
+          amount: Number(value?.e?.quantity_left),
           chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent),
           priceAfter: Number(value?.e?.price_after_discount), 
           tax: thuetong ? thuetong : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate},
