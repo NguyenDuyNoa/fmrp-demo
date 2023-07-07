@@ -704,7 +704,7 @@ const _ServerFetching =  () => {
               sErrSurvive(false)
               ce.amount = Number(value?.value);
               const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
-                if (totalSoLuong > (Number(ce?.kho?.qty))) {
+                if (totalSoLuong > qtyHouse) {
                   e.child.forEach((opt, optIndex) => {
                     const currentValue = ce.amount; // Lưu giá trị hiện tại
                     ce.amount = '';
@@ -713,7 +713,7 @@ const _ServerFetching =  () => {
                     }
                   });
                     Toast.fire({
-                      title:`Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(ce?.kho?.qty)} số lượng còn lại`,
+                      title:`Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`,
                       icon: 'error',
                       confirmButtonColor: '#296dc1',
                       cancelButtonColor: '#d33',
