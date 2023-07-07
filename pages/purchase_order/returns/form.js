@@ -713,7 +713,7 @@ const _ServerFetching =  () => {
                     }
                   });
                     Toast.fire({
-                      title:`Tổng số lượng chỉ được bé hơn hoặc bằng số lượng còn lại`,
+                      title:`Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`,
                       icon: 'error',
                       confirmButtonColor: '#296dc1',
                       cancelButtonColor: '#d33',
@@ -739,7 +739,7 @@ const _ServerFetching =  () => {
        
               if(totalSoLuong == qtyHouse){
                 Toast.fire({
-                  title: `Tổng số lượng chỉ được bé hơn hoặc bằng số lượng còn lại`,
+                  title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`,
                   icon: 'error',
                   confirmButtonColor: '#296dc1',
                   cancelButtonColor: '#d33',
@@ -750,7 +750,7 @@ const _ServerFetching =  () => {
               }
              else if(totalSoLuong > qtyHouse){
                 Toast.fire({
-                  title: `Tổng số lượng chỉ được bé hơn hoặc bằng số lượng tồn`,
+                  title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng tồn`,
                   icon: 'error',
                   confirmButtonColor: '#296dc1',
                   cancelButtonColor: '#d33',
