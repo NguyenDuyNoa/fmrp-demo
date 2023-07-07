@@ -737,9 +737,9 @@ const _ServerFetching =  () => {
       
                 const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
     
-                if((ce?.id === childId && totalSoLuong ==  qtyHouse) || (ce?.id === childId  && totalSoLuong == Number(ce?.kho?.qty))){
+                if((ce?.id === childId && totalSoLuong ==  qtyHouse)){
                   Toast.fire({
-                    title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber((ce?.id === childId && totalSoLuong ==  qtyHouse && qtyHouse) || (ce?.id === childId && totalSoLuong == Number(ce?.kho?.qty) && Number(ce?.kho?.qty)))} số lượng còn lại`,
+                    title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`,
                     icon: 'error',
                     confirmButtonColor: '#296dc1',
                     cancelButtonColor: '#d33',
@@ -748,17 +748,39 @@ const _ServerFetching =  () => {
                   });
                   return {...ce}
                 }
-              //  else if(totalSoLuong > Number(ce?.kho?.qty) || totalSoLuong > qtyHouse){
-              //     Toast.fire({
-              //       title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(totalSoLuong > Number(ce?.kho?.qty) && Number(ce?.kho?.qty) || totalSoLuong > qtyHouse&& qtyHouse)} số lượng tồn`,
-              //       icon: 'error',
-              //       confirmButtonColor: '#296dc1',
-              //       cancelButtonColor: '#d33',
-              //       confirmButtonText: dataLang?.aler_yes,
-              //       timer: 3000
-              //     });
-              //     return {...ce}
-              //   }
+               else if(ce?.id === childId  && totalSoLuong == Number(ce?.kho?.qty)){
+                  Toast.fire({
+                    title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(Number(ce?.kho?.qty))} số lượng còn lại`,
+                    icon: 'error',
+                    confirmButtonColor: '#296dc1',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: dataLang?.aler_yes,
+                    timer: 3000
+                  });
+                  return {...ce}
+                }
+               else if(ce?.id === childId && totalSoLuong > Number(ce?.kho?.qty)){
+                  Toast.fire({
+                    title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(Number(ce?.kho?.qty))} số lượng tồn`,
+                    icon: 'error',
+                    confirmButtonColor: '#296dc1',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: dataLang?.aler_yes,
+                    timer: 3000
+                  });
+                  return {...ce}
+                }
+               else if(ce?.id === childId && totalSoLuong > qtyHouse){
+                  Toast.fire({
+                    title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng tồn`,
+                    icon: 'error',
+                    confirmButtonColor: '#296dc1',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: dataLang?.aler_yes,
+                    timer: 3000
+                  });
+                  return {...ce}
+                }
               else{
                 return {...ce,amount: Number(Number(ce?.amount) + 1)}
               }
