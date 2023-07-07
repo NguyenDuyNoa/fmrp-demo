@@ -163,8 +163,15 @@ const _ServerFetching =  () => {
     JSON.stringify(dataMaterialExpiry) === '{}' && JSON.stringify(dataProductExpiry) === '{}' && JSON.stringify(dataProductSerial) === '{}' && sOnFetchingCondition(true)
   }, [JSON.stringify(dataMaterialExpiry) === '{}', JSON.stringify(dataProductExpiry) === '{}', JSON.stringify(dataProductSerial) === '{}']);
 
-  const options =  dataItems?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e})) 
-
+  const options =  dataItems?.map(e => ({
+    label: `${e.name}
+     <span style={{display: none}}>${e.code}</span>
+     <span style={{display: none}}>${e.product_variation} </span>
+     <span style={{display: none}}>${e.serial} </span>
+     <span style={{display: none}}>${e.lot} </span>
+     <span style={{display: none}}>${e.expiration_date} </span>
+     <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+     value:e.id,e})) 
   const _ServerFetchingDetailPage = () => {
   Axios("GET", `/api_web/Api_return_supplier/getDetail/${id}?csrf_protection=true`, {}, (err, response) => {
       if(!err){
