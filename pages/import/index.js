@@ -498,6 +498,14 @@ const Index = (props) => {
       name: "Công đoạn",
     },
   ];
+  /// tên model
+  const dataName = {
+    1: dataLang?.import_client || "import_client",
+    2: dataLang?.import_suppliers || "import_suppliers",
+    3: dataLang?.import_materials || "import_materials",
+    4: dataLang?.import_finished_product || "import_finished_product",
+    5: dataLang?.import_user || "import_user",
+  };
 
   // validate dữ liệu rồi post
   const _HandleSubmit = (e) => {
@@ -935,19 +943,7 @@ const Index = (props) => {
 
                 <div className="col-span-2"></div>
                 <div className="col-span-8 border-b">
-                  <h2 className="py-2">
-                    {(router.query?.tab == 1 &&
-                      (dataLang?.import_client || "import_client")) ||
-                      (router.query?.tab == 2 &&
-                        (dataLang?.import_suppliers || "import_suppliers")) ||
-                      (router.query?.tab == 3 &&
-                        (dataLang?.import_materials || "import_materials")) ||
-                      (router.query?.tab == 4 &&
-                        (dataLang?.import_finished_product ||
-                          "import_finished_product")) ||
-                      (router.query?.tab == 5 &&
-                        (dataLang?.import_user || "import_user"))}
-                  </h2>
+                  <h2 className="py-2">{dataName[tabPage] || ""}</h2>
                 </div>
                 <div className="col-span-2"></div>
 
