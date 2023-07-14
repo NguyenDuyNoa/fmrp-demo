@@ -1308,7 +1308,7 @@ const Popup_chitiet = (props) => {
                   </div>
                 </div>
                 <div className="pr-2 w-[100%] lx:w-[110%] ">
-                  <div className="grid grid-cols-8 sticky top-0 bg-white  p-2 z-10 rounded shadow-md  divide-x">
+                  <div className="grid grid-cols-8 sticky top-0 bg-white  p-2 z-10 rounded shadow-md  ">
                     <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
                       {props.dataLang?.purchase_image || "purchase_image"}
                     </h4>
