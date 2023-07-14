@@ -41,11 +41,12 @@ const Index = () => {
                 <IconRight size="32" className="text-[#3276FA]" />
               </div>
 
-              <div className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] group hover:bg-blue-400 ease-in-out transition-all xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] flex space-x-3 border-none bg-[#E2F0FE] rounded-md  items-center justify-center relative">
+              {/* <div className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px]  xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] flex space-x-3 border-none bg-[#E2F0FE] rounded-md  items-center justify-center relative"> */}
+              <div className="flex space-x-3 border-none  items-center justify-center relative">
                 <button
                   type="button"
                   onClick={() => router.push("/purchase_order/purchases?tab=")}
-                  className="3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] group-hover:text-white transition-all ease-in-out font-medium lg:max-w-[100px] p-1 text-center "
+                  className="3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-6 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
                 >
                   Yêu cầu mua hàng{" "}
                 </button>
@@ -63,11 +64,12 @@ const Index = () => {
                   </div>
                 </div>
 
-                <div className="3xl:h-[96px] 3xl:w-[180px] hover:bg-blue-400 group ease-in-out transition-all 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[175%] 2xl:top-[165%] 2xl:left-[-7%] xl:top-[175%] xl:-left-[9%] lg:top-[160%] lg:-left-[11%] flex border rounded-md items-center justify-center absolute">
+                {/* <div className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[175%] 2xl:top-[165%] 2xl:left-[-7%] xl:top-[175%] xl:-left-[9%] lg:top-[160%] lg:-left-[11%] flex border rounded-md items-center justify-center absolute"> */}
+                <div className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[175%] 2xl:top-[165%] 2xl:left-[-7%] xl:top-[175%] xl:-left-[9%] lg:top-[160%] lg:-left-[11%] flex border rounded-md items-center justify-center absolute">
                   <button
                     type="button"
                     onClick={() => router.push("")}
-                    className="hover:text-white transition-all ease-in-out font-medium"
+                    className="3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-6 rounded py-9  hover:scale-[1.03] transition-all ease-in-out"
                   >
                     Sản xuất
                   </button>
@@ -79,15 +81,17 @@ const Index = () => {
                 <IconRight size="32" color="#3276FA" variant="Outline" />
               </div>
 
-              <div className="flex space-x-3 border-none hover:bg-blue-400 group ease-in-out transition-all bg-[#E2F0FE] rounded-md 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[150px] lg:h-[70px] lg:w-[130px] items-center justify-center relative">
+              {/* <div className="flex space-x-3 border-none bg-[#E2F0FE] rounded-md 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[150px] lg:h-[70px] lg:w-[130px] items-center justify-center relative"> */}
+              <div className="flex space-x-3items-center justify-center relative">
                 <button
                   type="button"
                   onClick={() => router.push("/purchase_order/order?tab=all")}
-                  className="group-hover:text-white transition-all ease-in-out font-medium 2xl:max-w-[180px] xl:max-w-[140px] lg:max-w-[130px] p-1 text-center"
+                  // className=" font-medium 2xl:max-w-[180px] xl:max-w-[140px] lg:max-w-[130px] p-1 text-center"
+                  className="3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-3 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
                 >
                   Tạo đơn đặt hàng (PO)
                 </button>
-                <h5 className="xl:h-4 xl:w-4 lg:h-3 lg:w-3 xl:text-sm lg:text-[10px] xl:top-[8%] lg:top-[6%] 2xl:-left-[2%] xl:-left-[6%] lg:-left-[6%] rounded-full flex flex-col justify-center items-center bg-[#3276FA] absolute text-white ">
+                <h5 className="xl:h-4 xl:w-4 lg:h-3 lg:w-3 xl:text-sm lg:text-[10px] xl:top-[8%] lg:top-[6%] 2xl:-left-[-5%] xl:-left-[6%] lg:-left-[6%] rounded-full flex flex-col justify-center items-center bg-[#3276FA] absolute text-white ">
                   2
                 </h5>
 
@@ -135,14 +139,15 @@ const Index = () => {
                 <IconRight size="32" color="#3276FA" variant="Outline" />
               </div>
 
-              <div className="flex space-x-3 border-none bg-[#E2F0FE] hover:bg-blue-400 group ease-in-out transition-all rounded-md 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[130px] items-center justify-center relative">
+              {/* <div className="flex space-x-3 border-none bg-[#E2F0FE] rounded-md 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[130px] items-center justify-center relative"> */}
+              <div className="flex space-x-3items-center justify-center relative">
                 <button
                   onClick={() => router.push("/purchase_order/import?tab=all")}
-                  className="group-hover:text-white transition-all ease-in-out font-medium 2xl:max-w-[180px] xl:max-w-[130px] lg:max-w-[130px] p-1 text-center"
+                  className=" 3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-14 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
                 >
                   Nhập kho
                 </button>
-                <h5 className="xl:h-4 xl:w-4 lg:h-3 lg:w-3 xl:text-sm lg:text-[10px] xl:top-[8%] lg:top-[6%] 2xl:-left-[2%] xl:-left-[6%] lg:-left-[6%] rounded-full flex flex-col justify-center items-center bg-[#3276FA] absolute text-white ">
+                <h5 className="xl:h-4 xl:w-4 lg:h-3 lg:w-3 xl:text-sm lg:text-[10px] xl:top-[8%] lg:top-[6%] 2xl:-left-[-5%] xl:-left-[6%] lg:-left-[6%] rounded-full flex flex-col justify-center items-center bg-[#3276FA] absolute text-white ">
                   3
                 </h5>
 
@@ -166,11 +171,12 @@ const Index = () => {
                   </div>
                 </div>
 
-                <div className="3xl:h-[96px] group hover:bg-blue-400 group ease-in-out transition-all 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[160%] 3xl:left-[75%] 2xl:top-[120%] 2xl:left-[78%] xl:top-[140%] xl:left-[70%] lg:top-[160%] lg:left-[70%] flex border rounded-md items-center justify-center absolute">
+                {/* <div className="3xl:h-[96px] group 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[160%] 3xl:left-[75%] 2xl:top-[120%] 2xl:left-[78%] xl:top-[140%] xl:left-[70%] lg:top-[160%] lg:left-[70%] flex border rounded-md items-center justify-center absolute"> */}
+                <div className="3xl:h-[96px] group 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[160%] 3xl:left-[75%] 2xl:top-[120%] 2xl:left-[78%] xl:top-[140%] xl:left-[70%] lg:top-[160%] lg:left-[70%] flex border rounded-md items-center justify-center absolute">
                   <button
                     type="button"
                     onClick={() => router.push("/warehouses/warehouse")}
-                    className="hover:text-white transition-all ease-in-out font-medium"
+                    className=" 3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-14 rounded py-9  hover:scale-[1.03] transition-all ease-in-out"
                   >
                     Kho hàng
                   </button>
@@ -200,14 +206,15 @@ const Index = () => {
                   </div>
                 </div>
 
-                <div className="flex border rounded-md 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[72px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[320%] 3xl:-left-[85%] 2xl:top-[280%] 2xl:-left-[90%] xl:top-[310%] xl:-left-[84%] lg:top-[330%] lg:-left-[83%]  items-center justify-center absolute  bg-[#FDE7AE]">
+                {/* <div className="flex border rounded-md 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[72px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[320%] 3xl:-left-[85%] 2xl:top-[280%] 2xl:-left-[90%] xl:top-[310%] xl:-left-[84%] lg:top-[330%] lg:-left-[83%]  items-center justify-center absolute  bg-[#FDE7AE]"> */}
+                <div className="flex  3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[72px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[320%] 3xl:-left-[85%] 2xl:top-[280%] 2xl:-left-[90%] xl:top-[310%] xl:-left-[84%] lg:top-[330%] lg:-left-[83%]  items-center justify-center absolute  ">
                   <button
                     onClick={() => router.push("/purchase_order/returns")}
-                    className="3xl:max-w-[180px] 2xl:max-w-[167px] xl:max-w-[90px] lg:max-w-[120px] p-1 text-center hover:text-blue-600 transition-all ease-in-out hover:translate-y-1"
+                    className="3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-11 rounded py-9  hover:scale-[1.03] transition-all ease-in-out bg-[#FDE7AE]"
                   >
                     Trả lại hàng
                   </button>
-                  <h5 className="xl:h-4 xl:w-4 lg:h-3 lg:w-3 xl:text-sm lg:text-[10px] top-[8%] 2xl:left-[4%] xl:left-[4%] lg:left-[3%] 2xl:text-sm rounded-full flex flex-col justify-center items-center bg-[#DC6803] absolute text-white ">
+                  <h5 className="xl:h-4 xl:w-4 lg:h-3 lg:w-3 xl:text-sm lg:text-[10px] top-[8%] 2xl:left-[5%] xl:left-[4%] lg:left-[3%] 2xl:text-sm rounded-full flex flex-col justify-center items-center bg-[#DC6803] absolute text-white ">
                     5
                   </h5>
                   <div className="flex flex-col items-center absolute 3xl:-top-[50%] 3xl:left-[50%] 2xl:-top-[50%] 2xl:left-[50%] xl:-top-[55%] xl:left-[50%] lg:-top-[55%] lg:left-[45%]">
