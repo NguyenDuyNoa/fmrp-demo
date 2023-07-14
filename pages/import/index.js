@@ -1454,7 +1454,7 @@ const Index = (props) => {
                           {dataLang?.import_variation || "import_variation"}
                         </h3>
                       </div>
-                      <div
+                      {/* <div
                         className={`3xl:w-[50%] 2xl:w-[40%] w-[35%]  h-2 bg-gray-200  rounded-xl relative before:animate-pulse  before:transition-all before:absolute before:duration-500  before:ease-in-out duration-500 transition before:h-full before:bg-blue-500 before:rounded-xl before:${
                           stepper.main && !stepper.extra
                             ? "w-[50%]"
@@ -1462,7 +1462,23 @@ const Index = (props) => {
                             ? "w-[100%]"
                             : "w-[0%]"
                         }`}
-                      ></div>
+                      > */}
+                      <div
+                        className={`3xl:w-[50%] 2xl:w-[40%] w-[35%]  h-2 bg-gray-200  rounded-xl relative duration-500 transition`}
+                      >
+                        <div
+                          style={{
+                            width: `${
+                              stepper.main && !stepper.extra
+                                ? "50%"
+                                : stepper.main && stepper.extra
+                                ? "100%"
+                                : "0%"
+                            }`,
+                          }}
+                          className={`absolute  bg-blue-600 top-0 left-0 h-full rounded transition-all duration-500`}
+                        ></div>
+                      </div>
                       <div className="flex items-center gap-1 group">
                         <Colorfilter
                           size="22"
