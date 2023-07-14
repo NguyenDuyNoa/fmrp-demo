@@ -1736,6 +1736,15 @@ const Popup_chitiet = (props) => {
   const _HandleSelectTab = (e) => sTab(e);
   const [data, sData] = useState();
   const [onFetching, sOnFetching] = useState(false);
+  const formatNumber = (number) => {
+    if (!number && number !== 0) return 0;
+    const integerPart = Math.floor(number);
+    const decimalPart = number - integerPart;
+    const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
+    const roundedNumber = integerPart + roundedDecimalPart;
+    return roundedNumber.toLocaleString("en");
+  };
+
   useEffect(() => {
     props?.id && sOnFetching(true);
   }, [open]);
@@ -1911,7 +1920,7 @@ const Popup_chitiet = (props) => {
                           {props.dataLang?.suppliers_supplier_debt}:
                         </span>{" "}
                         <span className="font-normal capitalize">
-                          {data?.debt_limit}
+                          {formatNumber(data?.debt_limit)}
                         </span>
                       </div>
                       <div className="mb-4 flex justify-between items-center p-2">

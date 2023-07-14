@@ -2,170 +2,168 @@
 @tailwind components;
 @tailwind utilities;
 
-
 //input eye password
 input::-ms-reveal,
-	input::-ms-clear {
-	display: none;
+input::-ms-clear {
+  display: none;
 }
 
 //Popup
 .popup-edit-overlay {
-	.popup-content {
-		width: inherit;
-		padding: inherit;
-		border-radius: 8px;
-		-webkit-animation: anvil 0.1s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
-		top: -120px;
-	}
+  .popup-content {
+    width: inherit;
+    padding: inherit;
+    border-radius: 8px;
+    -webkit-animation: anvil 0.1s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
+    top: -120px;
+  }
 }
 .popup-overlay {
-	background: rgba(0, 0, 0, 0.5);
-  }
-[data-popup='tooltip'].popup-overlay {
-	background: transparent;
-  }
+  background: rgba(0, 0, 0, 0.5);
+}
+[data-popup="tooltip"].popup-overlay {
+  background: transparent;
+}
 
 @keyframes anvil {
-	0% {
-		transform: scale(1) translateY(0px);
-		opacity: 0;
-		box-shadow: 0 0 0 rgba(241, 241, 241, 0);
-	}
+  0% {
+    transform: scale(1) translateY(0px);
+    opacity: 0;
+    box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+  }
 
-	1% {
-		transform: scale(0.96) translateY(10px);
-		opacity: 0;
-		box-shadow: 0 0 0 rgba(241, 241, 241, 0);
-	}
+  1% {
+    transform: scale(0.96) translateY(10px);
+    opacity: 0;
+    box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+  }
 
-	100% {
-		transform: scale(1) translateY(0px);
-		opacity: 1;
-		box-shadow: 0 0 500px rgba(241, 241, 241, 0);
-	}
+  100% {
+    transform: scale(1) translateY(0px);
+    opacity: 1;
+    box-shadow: 0 0 500px rgba(241, 241, 241, 0);
+  }
 }
 
 .popover-edit-content {
-	margin: 24px 0px 0px 0px !important;
-	width: inherit !important;
-	border: none !important;
-	// box-shadow: 0 0 5px rgb(0 0 0 / 16%) !important;
-	box-shadow: 0px 4px 40px rgba(47, 65, 110, 0.12) !important;
-	-webkit-animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
-	position: fixed !important;
-	top: 38px !important;
+  margin: 24px 0px 0px 0px !important;
+  width: inherit !important;
+  border: none !important;
+  // box-shadow: 0 0 5px rgb(0 0 0 / 16%) !important;
+  box-shadow: 0px 4px 40px rgba(47, 65, 110, 0.12) !important;
+  -webkit-animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
+  position: fixed !important;
+  top: 38px !important;
 }
-.react-datepicker-popper{
-	z-index: 999 !important;
+.react-datepicker-popper {
+  z-index: 999 !important;
 }
 
 .popover-bottom-left-content {
-	margin: 24px 0px 0px -20px !important;
+  margin: 24px 0px 0px -20px !important;
 }
 
 .popover-bottom-left-muanhaphang-content {
-	margin: 24px 0px 0px -220px !important;
+  margin: 24px 0px 0px -220px !important;
 }
 
 .popover-khosanxuat-content {
-	margin: 24px 0px 0px 40px !important;
+  margin: 24px 0px 0px 40px !important;
 }
 
 .popover-khac-content {
-	margin: 24px 0px 0px 0px !important;
+  margin: 24px 0px 0px 0px !important;
 }
 
 .popover-quytrinh-content {
-	margin: 24px 0px 0px 25px !important;
+  margin: 24px 0px 0px 25px !important;
 }
 
-.dropdown-edit-content{
-	margin: 5px 0px 0px 15px !important;
-	width: inherit !important;
-	border: none !important;
-	box-shadow: 0px 4px 40px rgba(47, 65, 110, 0.12) !important;
-	-webkit-animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
-
+.dropdown-edit-content {
+  margin: 5px 0px 0px 15px !important;
+  width: inherit !important;
+  border: none !important;
+  box-shadow: 0px 4px 40px rgba(47, 65, 110, 0.12) !important;
+  -webkit-animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
 }
 
 // arrow tooltip
-.arrow-danhmuc-arrow{
-	position: relative !important;
-	left: 21px;
+.arrow-danhmuc-arrow {
+  position: relative !important;
+  left: 21px;
 }
 
-.arrow-banxuathang-arrow{
-	position: relative !important;
-	left: 19px;
+.arrow-banxuathang-arrow {
+  position: relative !important;
+  left: 19px;
 }
 
-.arrow-muanhaphang-arrow{
-	position: relative !important;
-	left: 220px;
+.arrow-muanhaphang-arrow {
+  position: relative !important;
+  left: 220px;
 }
 
-.popover-khosanxuat-arrow{
-	position: relative !important;
-	left: -43px;
+.popover-khosanxuat-arrow {
+  position: relative !important;
+  left: -43px;
 }
 
-.popover-khac-arrow{
-	position: relative !important;
-	left: 0px;
+.popover-khac-arrow {
+  position: relative !important;
+  left: 0px;
 }
 
-.popover-quytrinh-arrow{
-	position: relative !important;
-	left: -23px;
+.popover-quytrinh-arrow {
+  position: relative !important;
+  left: -23px;
 }
 
 //scroll bar
 .scrollarea .scrollbar-container.vertical .scrollbar {
-	background: #94a3b8 !important;
-	border-radius: 50px;
+  background: #94a3b8 !important;
+  border-radius: 50px;
 }
 
 .scrollarea .scrollbar-container.active,
 .scrollarea .scrollbar-container:hover {
-	background: #f1f5f9 !important;
-	border-radius: 50px !important;
+  background: #f1f5f9 !important;
+  border-radius: 50px !important;
 }
 
 //button animation
 .btn-animation {
-	background-size: 300% 100%;
-	transition: all .4s ease-in-out;
+  background-size: 300% 100%;
+  transition: all 0.4s ease-in-out;
 
-	&:hover {
-		background-position: 100% 0;
-		transition: all .4s ease-in-out;
-	}
+  &:hover {
+    background-position: 100% 0;
+    transition: all 0.4s ease-in-out;
+  }
 }
 
 //alert
-.swal2-popup.swal2-toast{
-	.swal2-html-container{	
-		font-size: 14px !important;
-		margin: 0em 1em !important
-	} 
+.swal2-popup.swal2-toast {
+  .swal2-html-container {
+    font-size: 14px !important;
+    margin: 0em 1em !important;
+  }
 }
 
 /// .Select__single-value,
 .Select__custom .Select__single-value {
-	white-space: initial !important;
-	overflow: visible !important;
-	text-overflow: ellipsis !important;
-	display: block;
+  white-space: initial !important;
+  overflow: visible !important;
+  text-overflow: ellipsis !important;
+  display: block;
 }
 
-.removeDivide .css-1u9des2-indicatorSeparator{
-	width: 0px;
+.removeDivide .css-1u9des2-indicatorSeparator {
+  width: 0px;
 }
-.transition-all.ease-out.duration-300.absolute.z-10{
-	bottom: 0 !important;
-	transform: translateY(100%) !important;
-	z-index: 999;
+.transition-all.ease-out.duration-300.absolute.z-10 {
+  bottom: 0 !important;
+  transform: translateY(100%) !important;
+  z-index: 999;
 }
 
 /// model img Chi tiet YCMH
@@ -175,126 +173,121 @@ input::-ms-reveal,
 // 	height: 100vh;
 // 	left: -43%;
 //   }
-  
+
 // .custom-modal-image .__react_modal_image__modal_content {
 // 	/* styles for modal content */
 //   }
 
-
-
-
-
 .i::before {
-	content: "";
-	position: absolute;
-	width: 0px;
-	height: 0px;
-	opacity: 20%;
-	background: white;
+  content: "";
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  opacity: 20%;
+  background: white;
   /*   background: #3B82F6; */
-	/* Centering */
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	margin: auto;
-  }
-  
-  .i:hover:before {
-	animation: anim-in 0.7s forwards ease-out;
-  }
-  
-  @keyframes anim-in {
-	100% {
-	  opacity: 0%;
-	  border-radius: 0;
-	  width: 600px;
-	  height: 600px;
-	}
-	0% {
-	  width: 0px;
-	  height: 0px;
-	  border-radius: 100%;
-	  opacity: 20%;
-	}
-  }
+  /* Centering */
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+}
 
+.i:hover:before {
+  animation: anim-in 0.7s forwards ease-out;
+}
 
+@keyframes anim-in {
+  100% {
+    opacity: 0%;
+    border-radius: 0;
+    width: 600px;
+    height: 600px;
+  }
+  0% {
+    width: 0px;
+    height: 0px;
+    border-radius: 100%;
+    opacity: 20%;
+  }
+}
 
 .customDropdow__indicator {
-	padding:15px 0px !important;
+  padding: 15px 0px !important;
 }
 .customDropdowTax__indicator {
-	padding: 0px 0px !important;
+  padding: 0px 0px !important;
 }
-.customDropdowDefault__control{
-	border: none !important;
-	padding: 0;
+.customDropdowDefault__control {
+  border: none !important;
+  padding: 0;
 }
 .customDropdowDefault__indicator {
-	padding: 0px 0px !important;
+  padding: 0px 0px !important;
 }
-.CircularProgressbar{
-	width: 80px;
+.CircularProgressbar {
+  width: 80px;
 }
-
 
 /*
  * react-circular-progressbar styles
  * All of the styles in this file are configurable!
  */
 
- .CircularProgressbar {
-	width: 50%;
-	vertical-align: middle;
-	margin: 0 auto;
-  }
-  
-  .CircularProgressbar .CircularProgressbar-path {
-	stroke: #3e98c7;
-	stroke-linecap: round;
-	transition: stroke-dashoffset 0.5s ease 0s;
-  }
-  
-  .CircularProgressbar .CircularProgressbar-trail {
-	stroke: #d6d6d6;
-	stroke-linecap: round;
-  }
-  .CircularProgressbar .CircularProgressbar-text {
-	fill: #3e98c7;
-	font-size: 20px;
-	dominant-baseline: middle;
-	text-anchor: middle;
-  }
-  
-  .CircularProgressbar .CircularProgressbar-background {
-	fill: #d6d6d6;
-  }
-  .CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-background {
-	fill: #3e98c7;
-  }
-  .CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-text {
-	fill: #fff;
-  }
-  
-  .CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-path {
-	stroke: #fff;
-  }
-  
-  .CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-trail {
-	stroke: transparent;
-  }
+.CircularProgressbar {
+  width: 50%;
+  vertical-align: middle;
+  margin: 0 auto;
+}
 
-  @keyframes bounce {
-    0%, 100% {
-        transform: translateY(-5%);
-        animation-timing-function: cubic-bezier(0.8,0,1,1);
-    }
-    50% {
-        transform: none;
-        animation-timing-function: cubic-bezier(0,0,0.2,1);
-    }
+.CircularProgressbar .CircularProgressbar-path {
+  stroke: #3e98c7;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease 0s;
+}
+
+.CircularProgressbar .CircularProgressbar-trail {
+  stroke: #d6d6d6;
+  stroke-linecap: round;
+}
+.CircularProgressbar .CircularProgressbar-text {
+  fill: #3e98c7;
+  font-size: 20px;
+  dominant-baseline: middle;
+  text-anchor: middle;
+}
+
+.CircularProgressbar .CircularProgressbar-background {
+  fill: #d6d6d6;
+}
+.CircularProgressbar.CircularProgressbar-inverted
+  .CircularProgressbar-background {
+  fill: #3e98c7;
+}
+.CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-text {
+  fill: #fff;
+}
+
+.CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-path {
+  stroke: #fff;
+}
+
+.CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-trail {
+  stroke: transparent;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(-5%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
 }
 .animate-bounce-custom {
-    animation: bounce 1s infinite;
+  animation: bounce 1s infinite;
 }

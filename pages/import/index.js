@@ -30,6 +30,8 @@ import {
   FilterRemove,
   ArrowRight,
   RefreshCircle,
+  ColorsSquare,
+  Colorfilter,
 } from "iconsax-react";
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
@@ -124,13 +126,18 @@ const Index = (props) => {
   const [multipleProgress, sMultipleProgress] = useState(0);
   const [fileImport, sFileImport] = useState(null);
 
+  const [stepper, sStepper] = useState({
+    main: false,
+    extra: false,
+  });
+
   const _ServerFetching = () => {
     sOnLoading(true);
 
     const apiDataFields = {
       1: "/api_web/Api_import_data/get_field_client?csrf_protection=true",
       2: "/api_web/Api_import_data/get_field_suppliers?csrf_protection=true",
-      3: "",
+      3: "/api_web/Api_import_data/get_field_materials?csrf_protection=true",
       4: "",
       5: "",
     };
@@ -149,7 +156,7 @@ const Index = (props) => {
     const apiDataComlumn = {
       1: "/api_web/Api_import_data/get_colums_excel?csrf_protection=true",
       2: "/api_web/Api_import_data/get_colums_excel?csrf_protection=true",
-      3: "",
+      3: "/api_web/Api_import_data/get_colums_excel?csrf_protection=true",
       4: "",
       5: "",
     };
@@ -166,7 +173,7 @@ const Index = (props) => {
     const apiDataConditionColumn = {
       1: "/api_web/Api_import_data/get_field_isset?csrf_protection=true",
       2: "/api_web/Api_import_data/get_field_isset_suppliers?csrf_protection=true",
-      3: "",
+      3: "/api_web/Api_import_data/get_field_isset_materials?csrf_protection=true",
       4: "",
       5: "",
     };
@@ -188,7 +195,7 @@ const Index = (props) => {
     const apiDataSampleImport = {
       1: "/api_web/Api_import_data/get_template_import?csrf_protection=true",
       2: "/api_web/Api_import_data/get_template_import?csrf_protection=true",
-      3: "",
+      3: "/api_web/Api_import_data/get_template_import?csrf_protection=true",
       4: "",
       5: "",
     };
@@ -293,7 +300,6 @@ const Index = (props) => {
     } else if (type == "sampleImport") {
       sSampleImport(value);
       sOnLoadingListData(true);
-      // sDataClient([...dataClient])
       const dataBackup = value
         ? JSON?.parse(value?.setup_colums)?.map((e) => JSON?.parse(e))
         : [];
@@ -377,31 +383,103 @@ const Index = (props) => {
   };
 
   //change trường dữ liệu, cột dữ liệu
+  // const _HandleChangeChild = (childId, type, value) => {
+  //   const newData = listData.map((e) => {
+  //     if (e?.id == childId) {
+  //       if (type == "data_fields") {
+  //         const checkData = listData?.some(
+  //           (e) => e?.dataFields?.value === value?.value
+  //         );
+  //         if (!checkData) {
+  //           return { ...e, dataFields: value };
+  //         } else {
+  //           Toast.fire({
+  //             title: `${
+  //               dataLang?.import_ERR_selected || "import_ERR_selected"
+  //             }`,
+  //             icon: "error",
+  //           });
+  //         }
+  //         return { ...e };
+  //       } else if (type == "column") {
+  //         const checkData = listData?.some(
+  //           (e) => e?.column?.value === value?.value
+  //         );
+  //         if (!checkData) {
+  //           return { ...e, column: value };
+  //         } else {
+  //           Toast.fire({
+  //             title: `${
+  //               dataLang?.import_ERR_selectedColumn ||
+  //               "import_ERR_selectedColumn"
+  //             }`,
+  //             icon: "error",
+  //           });
+  //         }
+  //         return { ...e };
+  //       }
+  //     } else {
+  //       return e;
+  //     }
+  //   });
+  //   sListData([...newData]);
+  // };
+  const checkMain = listData?.some((e) => e?.dataFields?.value == "variation");
+
   const _HandleChangeChild = (childId, type, value) => {
     const newData = listData.map((e) => {
+      const checkMain2 = e?.dataFields?.value == "variation";
       if (e?.id == childId) {
         if (type == "data_fields") {
-          const checkData = listData?.some(
-            (e) => e?.dataFields?.value === value?.value
-          );
-          if (!checkData) {
-            return { ...e, dataFields: value };
-          } else {
+          const isDuplicate =
+            value &&
+            listData.some(
+              (data) =>
+                data?.dataFields?.value === value?.value && data.id !== childId
+            );
+          //Lỗi trùng nhau
+          if (isDuplicate && e?.dataFields?.value !== value?.value) {
             Toast.fire({
               title: `${
                 dataLang?.import_ERR_selected || "import_ERR_selected"
               }`,
               icon: "error",
             });
-          }
-          return { ...e };
-        } else if (type == "column") {
-          const checkData = listData?.some(
-            (e) => e?.column?.value === value?.value
-          );
-          if (!checkData) {
-            return { ...e, column: value };
+
+            return { ...e, dataFields: null };
+          } else if (
+            //Lỗi trùng nhau phải có biến thể chính mới cho chọn phụ
+            tabPage == 3 &&
+            value?.value == "variation_option" &&
+            !checkMain
+          ) {
+            Toast.fire({
+              title: `${"Chọn biến thể chính trước !"}`,
+              icon: "error",
+            });
+            return e;
+          } else if (tabPage == 3 && checkMain2) {
+            //Khi không có biến thể chính thì trường biến thể phụ thành null
+            const checkEx = listData?.findIndex(
+              (e) => e?.dataFields?.value == "variation_option"
+            );
+            if (checkEx >= 0) {
+              listData[checkEx].dataFields = null;
+            }
+            return { ...e, dataFields: null };
           } else {
+            return { ...e, dataFields: value };
+          }
+        } else if (type == "column") {
+          //Trùng cột
+          const isDuplicate =
+            value &&
+            listData.some(
+              (data) =>
+                data?.column?.value === value?.value && data.id !== childId
+            );
+
+          if (isDuplicate && e?.column?.value !== value?.value) {
             Toast.fire({
               title: `${
                 dataLang?.import_ERR_selectedColumn ||
@@ -409,8 +487,10 @@ const Index = (props) => {
               }`,
               icon: "error",
             });
+            return e; // Giữ nguyên phần tử cũ nếu trùng lặp
+          } else {
+            return { ...e, column: value };
           }
-          return { ...e };
         }
       } else {
         return e;
@@ -419,7 +499,21 @@ const Index = (props) => {
     sListData([...newData]);
   };
 
-  //Thêm cột phần khách hàng
+  useEffect(() => {
+    const arrayCheck = ["variation", "variation_option"];
+    const ObError = [...listData].reduce((a, b) => {
+      let name = b?.dataFields?.value;
+      a[name] = arrayCheck.includes(b?.dataFields?.value);
+      return a;
+    }, {});
+    setTimeout(() => {
+      sStepper({
+        main: ObError?.variation,
+        extra: ObError?.variation_option,
+      });
+    }, 300);
+  }, [listData]);
+  //Thêm cột
   const _HandleAddParent = (value) => {
     const newData = {
       id: Date.now(),
@@ -439,10 +533,18 @@ const Index = (props) => {
     sListDataContat([newData, ...listDataContact]);
   };
 
-  //xóa cột khách hàng
+  //xóa cột
+  // const chechData =
   const _HandleDelete = (id) => {
     const newData = listData.filter((x) => x.id !== id); // loại bỏ phần tử cần xóa
-    sListData(newData); // cập nhật lại mảng
+    const newDatas = listData.filter((item) => {
+      const value = item?.dataFields?.value;
+      return (
+        item.id !== id && value !== "variation" && value !== "variation_option"
+      );
+    });
+
+    sListData(newDatas); // cập nhật lại mảng
   };
 
   const _HandleDeleteParent = () => {
@@ -527,18 +629,6 @@ const Index = (props) => {
 
     const hasNullColumn = listData.some((e) => e?.column === null);
 
-    const hasNoNameField = !listData.some(
-      (item) => item?.dataFields?.value === "name"
-    );
-
-    const hasNoBranchField = !listData.some(
-      (item) => item?.dataFields?.value === "branch_id"
-    );
-
-    const hasNoCodeField = !listData.some(
-      (item) => item?.dataFields?.value === "code"
-    );
-
     const hasNullDataImport = dataImport?.length == 0;
 
     const requiredColumn = listData?.length == 0;
@@ -585,17 +675,20 @@ const Index = (props) => {
           }`,
         });
       }
-      //KH - bắt buộc phải có cột tên khách hàng, NCC PHẢI CÓ TÊN NCC
+      //KH - bắt buộc phải có cột tên khách hàng, NCC PHẢI CÓ TÊN NCC, nvl PHẢI CÓ TÊN nvl
       else if (!ObError?.name) {
         Toast.fire({
           icon: "error",
           title: `${
-            (router.query?.tab == 1 &&
+            (tabPage == 1 &&
               !ObError?.name &&
               dataLang?.import_ERR_add_nameData) ||
-            (router.query?.tab == 2 &&
+            (tabPage == 2 &&
               !ObError?.name &&
-              dataLang?.import_ERR_add_nameDataSuplier)
+              dataLang?.import_ERR_add_nameDataSuplier) ||
+            (tabPage == 3 &&
+              !ObError?.name &&
+              dataLang?.import_ERR_add_nameMterial)
           }`,
         });
       }
@@ -609,11 +702,7 @@ const Index = (props) => {
         });
       }
       //nếu cập nhật thì phải có cột mã kh
-      else if (
-        valueCheck == "edit" &&
-        router.query?.tab == 1 &&
-        !ObError?.code
-      ) {
+      else if (valueCheck == "edit" && tabPage == 1 && !ObError?.code) {
         Toast.fire({
           icon: "error",
           title: `${
@@ -778,7 +867,7 @@ const Index = (props) => {
     const apiPaths = {
       1: "/api_web/Api_import_data/action_add_client?csrf_protection=true",
       2: "/api_web/Api_import_data/action_add_suppliers?csrf_protection=true",
-      3: "",
+      3: "/api_web/Api_import_data/action_add_materials?csrf_protection=true",
       4: "",
       5: "",
     };
@@ -891,7 +980,6 @@ const Index = (props) => {
     const roundedNumber = integerPart + roundedDecimalPart;
     return roundedNumber.toLocaleString("en");
   };
-
   return (
     <React.Fragment>
       <Head>
@@ -1321,9 +1409,11 @@ const Index = (props) => {
                     </div>
                   </div>
                 </div>
-                <div className="col-span-4 -mt-2">
+                <div className="col-span-4 -mt-2 relative">
                   {save_template && onLoadingDataBack && (
-                    <div className="b  flex items-center justify-center w-full  pt-5">
+                    <div
+                      className={`b  flex items-center justify-center w-full  pt-5`}
+                    >
                       <button
                         onClick={_HandleLoadDataBackup.bind(this)}
                         className="i flex justify-center gap-2 bg-green-600 w-full text-center py-2 text-white items-center rounded cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
@@ -1334,8 +1424,64 @@ const Index = (props) => {
                           ref={hiRef}
                           className="bg-gray-50 rounded-full hi "
                         />
-                        <p className="text-sm">{"Cập nhật mẫu import"}</p>
+                        <p className="text-sm">
+                          {dataLang?.import_updateImport ||
+                            "import_updateImport"}
+                        </p>
                       </button>
+                    </div>
+                  )}
+                  {tabPage == 3 && listData.length > 0 && (
+                    <div
+                      className={`flex items-center justify-center  gap-2 pt-5 ${
+                        save_template && onLoadingDataBack
+                          ? "absolute w-[100%] top-[66%]"
+                          : ""
+                      }`}
+                    >
+                      <div className="flex items-center gap-1 group">
+                        <ColorsSquare
+                          size="22"
+                          className={`${
+                            stepper.main ? "text-blue-600" : "text-gray-500"
+                          } group-hover:scale-105 transition-all ease-linear animate-pulse duration-700`}
+                        />
+                        <h3
+                          className={`${
+                            stepper.main ? "text-blue-600" : "text-gray-600"
+                          } font-semibold duration-700 3xl:text-sm 2xl:text-sm xl:text-xs text-xs`}
+                        >
+                          {dataLang?.import_variation || "import_variation"}
+                        </h3>
+                      </div>
+                      <div
+                        className={`3xl:w-[50%] 2xl:w-[40%] w-[35%]  h-2 bg-gray-200  rounded-xl relative before:animate-pulse  before:transition-all before:absolute before:duration-500  before:ease-in-out duration-500 transition before:h-full before:bg-blue-500 before:rounded-xl before:${
+                          stepper.main && !stepper.extra
+                            ? "w-[50%]"
+                            : stepper.main && stepper.extra
+                            ? "w-[100%]"
+                            : "w-[0%]"
+                        }`}
+                      ></div>
+                      <div className="flex items-center gap-1 group">
+                        <Colorfilter
+                          size="22"
+                          className={`${
+                            stepper?.main && stepper?.extra
+                              ? "text-blue-600"
+                              : "text-gray-500"
+                          } group-hover:scale-105 duration-700 transition-all ease-linear animate-pulse`}
+                        />
+                        <h3
+                          className={`${
+                            stepper?.main && stepper?.extra
+                              ? "text-blue-600"
+                              : "text-gray-600"
+                          } font-semibold 3xl:text-sm 2xl:text-sm xl:text-xs text-xs duration-700`}
+                        >
+                          {dataLang?.import_subvariant || "import_subvariant"}
+                        </h3>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1351,7 +1497,10 @@ const Index = (props) => {
                     <Loading className="h-2" color="#0f4f9e" />
                   ) : (
                     listData?.map((e, index) => (
-                      <div className="grid grid-cols-6 gap-2.5 mb-2">
+                      <div
+                        className="grid grid-cols-6 gap-2.5 mb-2"
+                        key={e?.id}
+                      >
                         <div className="col-span-4">
                           <div className="grid-cols-13 grid items-end justify-center gap-2.5">
                             <div className="col-span-1 mx-auto">
@@ -1383,7 +1532,7 @@ const Index = (props) => {
                                   e?.id,
                                   "data_fields"
                                 )}
-                                value={e.dataFields}
+                                value={e?.dataFields}
                                 LoadingIndicator
                                 noOptionsMessage={() =>
                                   dataLang?.import_no_data || "import_no_data"
@@ -1485,7 +1634,12 @@ const Index = (props) => {
                               {dataLang?.import_operation || "import_operation"}
                             </h5>
                           )}
-                          {e?.dataFields?.value == "group_id" ? (
+                          {e?.dataFields?.value == "group_id" ||
+                          (tabPage == 3 &&
+                            e?.dataFields?.value == "category_id") ||
+                          (tabPage == 3 && e?.dataFields?.value == "unit_id") ||
+                          (tabPage == 3 &&
+                            e?.dataFields?.value == "unit_convert_id") ? (
                             <div className="flex items-center space-x-2 rounded p-2 ">
                               <TiTick color="green" />
                               <label
@@ -1874,7 +2028,8 @@ const Popup_status = (props) => {
                 dataLang?.import_error_data || "import_error_data"
               } ${
                 (props?.router == 1 && "danh mục khách hàng") ||
-                (props?.router == 2 && "danh mục nhà cung cấp")
+                (props?.router == 2 && "danh mục nhà cung cấp") ||
+                (props?.router == 3 && "danh mục nguyên vật liệu")
               }`}
               title="DLL"
               element={
