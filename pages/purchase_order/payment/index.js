@@ -2821,12 +2821,12 @@ const Popup_chitiet = (props) => {
                           {data?.payment_mode_name}
                         </h3>
                       </div>
-                      <div className="my-4 font-medium grid grid-cols-2">
+                      <div className="my-4 font-semibold grid grid-cols-2">
                         <h3 className="text-[13px]">
                           {props.dataLang?.payment_ob || "payment_ob"}
                         </h3>
                         <div className="flex flex-wrap  gap-2 items-center justify-start">
-                          <h3 className=" text-[13px]  font-semibold">
+                          <h3 className=" text-[13px]  font-medium">
                             {data?.object_text}
                           </h3>
                         </div>
@@ -2839,12 +2839,12 @@ const Popup_chitiet = (props) => {
                       </div>
                     </div>
                   </div>
-                  <div className="mb-4 font-medium col-span-2 grid grid-cols-4 ">
+                  <div className="mb-4 font-semibold col-span-2 grid grid-cols-4 ">
                     <h3 className=" text-[13px] col-span-1 ">
                       {props.dataLang?.payment_voucherCode ||
                         "payment_voucherCode"}
                     </h3>
-                    <div className="flex flex-wrap col-span-3 gap-2 items-center justify-start font-semibold">
+                    <div className="flex flex-wrap col-span-3 gap-2 items-center justify-start font-medium">
                       {data?.voucher?.map((code, index) => (
                         <React.Fragment key={code?.id}>
                           {code.code}
