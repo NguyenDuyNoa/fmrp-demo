@@ -916,12 +916,12 @@ const Index = (props) => {
                               className="grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 "
                               key={e.id.toString()}
                             >
-                              <h6 className="2xl:text-base xl:text-xs text-[8px] px-2 col-span-1      font-medium  text-zinc-600  text-center">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1      font-medium  text-zinc-600  text-center">
                                 {e?.date != null
                                   ? moment(e?.date).format("DD/MM/YYYY")
                                   : ""}
                               </h6>
-                              <h6 className="2xl:text-base xl:text-xs text-[8px] px-2  font-medium text-center text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear cursor-pointer ">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2  font-medium text-center text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear cursor-pointer ">
                                 <Popup_chitiet
                                   dataLang={dataLang}
                                   className="text-left"
@@ -929,7 +929,7 @@ const Index = (props) => {
                                   id={e?.id}
                                 />
                               </h6>
-                              <h6 className="2xl:text-base xl:text-xs text-[8px] px-2      font-medium  text-zinc-600  text-left">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2      font-medium  text-zinc-600  text-left">
                                 {e.supplier_name}
                               </h6>
                               <h6 className="3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px]  col-span-1 flex items-center w-fit mx-auto">
@@ -946,13 +946,13 @@ const Index = (props) => {
                                   {/* <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-center'>{e?.purchase_order_code}</span> */}
                                 </div>
                               </h6>
-                              <h6 className="2xl:text-base xl:text-xs text-[8px] px-2      font-medium  text-zinc-600 col-span-1 text-right">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2      font-medium  text-zinc-600 col-span-1 text-right">
                                 {formatNumber(e.total_price)}
                               </h6>
-                              <h6 className="2xl:text-base xl:text-xs text-[8px] px-2      font-medium  text-zinc-600 col-span-1 text-right">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2      font-medium  text-zinc-600 col-span-1 text-right">
                                 {formatNumber(e.total_tax_price)}
                               </h6>
-                              <h6 className="2xl:text-base xl:text-xs text-[8px] px-2      font-medium  text-zinc-600 col-span-1 text-right">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2      font-medium  text-zinc-600 col-span-1 text-right">
                                 {formatNumber(e.total_amount)}
                               </h6>
                               <h6 className="3xl:items-center 3xl-text-[18px] 2xl:text-[16px]      font-medium  text-zinc-600 xl:text-xs text-[8px]  col-span-2 flex items-center  mx-auto">
@@ -980,7 +980,7 @@ const Index = (props) => {
                                     ))}
                                 </div>
                               </h6>
-                              <h6 className=" 2xl:text-base xl:text-xs text-[8px] col-span-1 cursor-pointer">
+                              <h6 className=" 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] col-span-1 cursor-pointer">
                                 <div
                                   className={`${
                                     e?.warehouseman_id == "0"

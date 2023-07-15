@@ -522,9 +522,9 @@ const Popup_chitietThere = (props) => {
           </div>
         )) ||
           (props?.type == "service" && (
-            <div className=" space-x-5 w-[999px]  h-auto ">
+            <div className=" space-x-5 w-[1100px]  h-auto ">
               <div>
-                <div className="w-[999px]">
+                <div className="w-[1100px]">
                   <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                     <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
                       {props?.dataLang
@@ -611,8 +611,9 @@ const Popup_chitietThere = (props) => {
                             "serviceVoucher_services_arising"}
                         </h4>
                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1  text-center">
-                          {props.dataLang?.serviceVoucher_quantity ||
-                            "serviceVoucher_quantity"}
+                          {/* {props.dataLang?.serviceVoucher_quantity ||
+                            "serviceVoucher_quantity"} */}
+                          {"SL"}
                         </h4>
                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1  text-center">
                           {props.dataLang?.serviceVoucher_unit_price ||
@@ -783,9 +784,9 @@ const Popup_chitietThere = (props) => {
             </div>
           )) ||
           (props?.type == "deposit" && (
-            <div className=" space-x-5 w-[999px]  h-auto">
+            <div className=" space-x-5 w-[1100px]  h-auto">
               <div>
-                <div className="w-[999px]">
+                <div className="w-[1100px]">
                   <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                     <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
                       {props?.dataLang
@@ -933,31 +934,35 @@ const Popup_chitietThere = (props) => {
                             "purchase_variant"}
                         </h4>
                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                          {props.dataLang?.purchase_order_purchase_from_unit ||
-                            "purchase_order_purchase_from_unit"}
+                          {/* {props.dataLang?.purchase_order_purchase_from_unit ||
+                            "purchase_order_purchase_from_unit"} */}
+                          {"ĐVT"}
                         </h4>
                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                          {props.dataLang?.purchase_quantity ||
-                            "purchase_quantity"}
+                          {/* {props.dataLang?.purchase_quantity ||
+                            "purchase_quantity"} */}
+                          {"SL"}
                         </h4>
                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
                           {props.dataLang?.purchase_order_detail_unit_price ||
                             "purchase_order_detail_unit_price"}
                         </h4>
                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                          {props.dataLang?.purchase_order_detail_discount ||
-                            "purchase_order_detail_discount"}
+                          {/* {props.dataLang?.purchase_order_detail_discount ||
+                            "purchase_order_detail_discount"} */}
+                          {"% ck"}
                         </h4>
                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center">
-                          {props.dataLang
+                          {/* {props.dataLang
                             ?.purchase_order_detail_after_discount ||
-                            "purchase_order_detail_after_discount"}
+                            "purchase_order_detail_after_discount"} */}
+                          {"Đơn giá SCK"}
                         </h4>
                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
                           {props.dataLang?.purchase_order_detail_tax ||
                             "purchase_order_detail_tax"}
                         </h4>
-                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
+                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                           {props.dataLang?.purchase_order_detail_into_money ||
                             "purchase_order_detail_into_money"}
                         </h4>
@@ -1137,9 +1142,9 @@ const Popup_chitietThere = (props) => {
             </div>
           )) ||
           (props?.type == "1" && (
-            <div className="mt-4 space-x-5 w-[999px] h-auto ">
+            <div className="mt-4 space-x-5 w-[1100px] h-auto ">
               <div>
-                <div className="w-[999px]">
+                <div className="w-[1100px]">
                   <div className="min:h-[170px] h-[72%] max:h-[100px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                     <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
                       {props?.dataLang?.purchase_general || "purchase_general"}
@@ -1278,12 +1283,14 @@ const Popup_chitietThere = (props) => {
                             "purchase_quantity"}
                         </h4>
                         <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                          {props.dataLang?.purchase_quantity_purchased ||
-                            "purchase_quantity_purchased"}
+                          {/* {props.dataLang?.purchase_quantity_purchased ||
+                            "purchase_quantity_purchased"} */}
+                          {"SL đã mua"}
                         </h4>
                         <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                          {props.dataLang?.purchase_reaining_amout ||
-                            "purchase_reaining_amout"}
+                          {/* {props.dataLang?.purchase_reaining_amout ||
+                            "purchase_reaining_amout"} */}
+                          {"SL còn lại"}
                         </h4>
                         <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
                           {props.dataLang?.purchase_note || "purchase_note"}
@@ -1423,9 +1430,9 @@ const Popup_chitietThere = (props) => {
             </div>
           )) ||
           (props?.type == "typePo" && (
-            <div className=" space-x-5 w-[999px]  h-auto">
+            <div className=" space-x-5 w-[1100px]  h-auto">
               <div>
-                <div className="w-[999px]">
+                <div className="w-[1100px]">
                   <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                     <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
                       {props?.dataLang
@@ -1573,8 +1580,9 @@ const Popup_chitietThere = (props) => {
                             "purchase_variant"}
                         </h4>
                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                          {props.dataLang?.purchase_order_purchase_from_unit ||
-                            "purchase_order_purchase_from_unit"}
+                          {/* {props.dataLang?.purchase_order_purchase_from_unit ||
+                            "purchase_order_purchase_from_unit"} */}
+                          {"ĐVT"}
                         </h4>
                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
                           {props.dataLang?.purchase_quantity ||

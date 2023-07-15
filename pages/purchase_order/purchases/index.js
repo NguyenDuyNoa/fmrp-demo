@@ -1325,12 +1325,14 @@ const Popup_chitiet = (props) => {
                       {props.dataLang?.purchase_quantity || "purchase_quantity"}
                     </h4>
                     <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                      {props.dataLang?.purchase_quantity_purchased ||
-                        "purchase_quantity_purchased"}
+                      {/* {props.dataLang?.purchase_quantity_purchased ||
+                        "purchase_quantity_purchased"} */}
+                      {"SL đã mua"}
                     </h4>
                     <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                      {props.dataLang?.purchase_reaining_amout ||
-                        "purchase_reaining_amout"}
+                      {/* {props.dataLang?.purchase_reaining_amout ||
+                        "purchase_reaining_amout"} */}
+                      {"SL còn lại"}
                     </h4>
                     <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
                       {props.dataLang?.purchase_note || "purchase_note"}

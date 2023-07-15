@@ -2401,8 +2401,9 @@ const Popup_chitiet = (props) => {
                         "serviceVoucher_services_arising"}
                     </h4>
                     <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1  text-center">
-                      {props.dataLang?.serviceVoucher_quantity ||
-                        "serviceVoucher_quantity"}
+                      {/* {props.dataLang?.serviceVoucher_quantity ||
+                        "serviceVoucher_quantity"} */}
+                      {"SL"}
                     </h4>
                     <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1  text-center">
                       {props.dataLang?.serviceVoucher_unit_price ||

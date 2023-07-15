@@ -1311,8 +1311,9 @@ const Popup_chitiet = (props) => {
                       {props.dataLang?.purchase_variant || "purchase_variant"}
                     </h4>
                     <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                      {props.dataLang?.purchase_order_purchase_from_unit ||
-                        "purchase_order_purchase_from_unit"}
+                      {/* {props.dataLang?.purchase_order_purchase_from_unit ||
+                        "purchase_order_purchase_from_unit"} */}
+                      {"ĐVT"}
                     </h4>
                     <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
                       {props.dataLang?.purchase_quantity || "purchase_quantity"}
@@ -1322,18 +1323,20 @@ const Popup_chitiet = (props) => {
                         "purchase_order_detail_unit_price"}
                     </h4>
                     <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                      {props.dataLang?.purchase_order_detail_discount ||
-                        "purchase_order_detail_discount"}
+                      {/* {props.dataLang?.purchase_order_detail_discount ||
+                        "purchase_order_detail_discount"} */}
+                      {"% CK"}
                     </h4>
                     <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center">
-                      {props.dataLang?.purchase_order_detail_after_discount ||
-                        "purchase_order_detail_after_discount"}
+                      {/* {props.dataLang?.purchase_order_detail_after_discount ||
+                        "purchase_order_detail_after_discount"} */}
+                      {"Đơn giá SCK"}
                     </h4>
                     <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
                       {props.dataLang?.purchase_order_detail_tax ||
                         "purchase_order_detail_tax"}
                     </h4>
-                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
+                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                       {props.dataLang?.purchase_order_detail_into_money ||
                         "purchase_order_detail_into_money"}
                     </h4>
