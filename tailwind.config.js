@@ -4,7 +4,7 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx}",
     "./pages/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
- 
+
     // Or if using `src` directory:
     "./src/**/*.{js,ts,jsx,tsx}",
     "./node_modules/react-tailwindcss-datepicker/dist/index.esm.js",
@@ -12,25 +12,26 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        '3xl': '1600px',
+        "3xl": "1600px",
+        xxl: "1400px",
       },
-      gridTemplateColumns:{
-        "13": 'repeat(13, minmax(0, 1fr))',
-        "14": 'repeat(14, minmax(0, 1fr))',
-        "26": 'repeat(26, minmax(0, 1fr))'
+      gridTemplateColumns: {
+        13: "repeat(13, minmax(0, 1fr))",
+        14: "repeat(14, minmax(0, 1fr))",
+        26: "repeat(26, minmax(0, 1fr))",
       },
     },
   },
   plugins: [
-    require('@tailwindcss/line-clamp'),
-    require('tailwind-scrollbar'),
-    require('@tailwindcss/aspect-ratio'),
+    require("@tailwindcss/line-clamp"),
+    require("tailwind-scrollbar"),
+    require("@tailwindcss/aspect-ratio"),
     function ({ addUtilities }) {
       addUtilities({
-        '.font-oblique': {
-          'font-style': 'oblique',
+        ".font-oblique": {
+          "font-style": "oblique",
         },
       });
     },
   ],
-}
+};
