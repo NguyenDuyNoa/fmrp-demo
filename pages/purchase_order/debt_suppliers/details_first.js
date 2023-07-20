@@ -60,9 +60,9 @@ const Popup_chitietDauki = (props) => {
         classNameBtn={props?.className}
       >
         <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
-        <div className=" space-x-5 3xl:w-[1200px] 2xl:w-[1150px] w-[1100px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">
+        <div className=" space-x-5 3xl:w-[1200px] 2xl:w-[1150px] xl:w-[w-[900px] lg:w-[900px] w-[1200px] 3xl:h-auto  2xl:h-auto xl:h-[350px] lg:h-[400px] h-[500px] ">
           <div>
-            <div className="3xl:w-[1200px] 2xl:w-[1150px] w-[1100px]">
+            <div className="3xl:w-[1200px] 2xl:w-[1150px] xl:w-[w-[900px] lg:w-[900px] w-[1200px]">
               <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                 <div className=" w-[100%]">
                   <div
@@ -95,7 +95,7 @@ const Popup_chitietDauki = (props) => {
                   ) : data?.items?.length > 0 ? (
                     <>
                       <ScrollArea
-                        className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
+                        className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] xl:max-h-[280px] lg:max-h-[340px] overflow-hidden"
                         speed={1}
                         smoothScrolling={true}
                       >
