@@ -6,6 +6,7 @@ import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
+import { NumericFormat } from "react-number-format";
 import ReactExport from "react-data-export";
 
 import Swal from "sweetalert2";
@@ -609,7 +610,7 @@ const Index = (props) => {
                                   note={e.note}
                                   email={e.email}
                                   website={e.website}
-                                  debt_limit={e.debt_limit}
+                                  debt_begin={e.debt_begin}
                                   city={e.city}
                                   district={e.district}
                                   ward={e.ward}
@@ -727,7 +728,7 @@ const Popup_dsncc = (props) => {
   const [date_incorporation, sDate_incorporation] = useState("");
   const [email, sEmail] = useState("");
   const [note, sNote] = useState("");
-  const [debt_limit, sDebt_limit] = useState("");
+  const [debt_begin, sDebt_begin] = useState("");
 
   const [tab, sTab] = useState(0);
 
@@ -749,7 +750,7 @@ const Popup_dsncc = (props) => {
     sDate_incorporation("");
     sEmail("");
     sNote("");
-    sDebt_limit("");
+    sDebt_begin("");
     props?.id && sOnFetching(true);
     sCityOpt(
       props.listSelectCt && [
@@ -792,7 +793,7 @@ const Popup_dsncc = (props) => {
           sPhone(db?.phone_number);
           sAdress(db?.address);
           sEmail(db?.email);
-          sDebt_limit(db?.debt_limit);
+          sDebt_begin(db?.debt_begin);
           sDate_incorporation(db?.date_incorporation);
           sValueDis(db?.district.districtid);
           sValueCt(db?.city.provinceid);
@@ -838,8 +839,8 @@ const Popup_dsncc = (props) => {
       sEmail(value.target?.value);
     } else if (type == "note") {
       sNote(value.target?.value);
-    } else if (type == "debt_limit") {
-      sDebt_limit(value.target?.value);
+    } else if (type == "debt_begin") {
+      sDebt_begin(value?.value);
     } else if (type == "valueBr") {
       sValueBr(value);
     }
@@ -999,7 +1000,7 @@ const Popup_dsncc = (props) => {
     data.append("date_incorporation", date_incorporation);
     data.append("note", note);
     data.append("email", email);
-    data.append("debt_limit", debt_limit);
+    data.append("debt_begin", debt_begin);
     data.append("city", valueCt);
     data.append("district", valueDis);
     data.append("ward", valueWa);
@@ -1024,7 +1025,7 @@ const Popup_dsncc = (props) => {
           date_incorporation: date_incorporation,
           note: note,
           email: email,
-          debt_limit: debt_limit,
+          debt_begin: debt_begin,
           city: valueCt,
           district: valueDis,
           ward: valueWa,
@@ -1057,7 +1058,7 @@ const Popup_dsncc = (props) => {
             sNote("");
             sEmail("");
             sWebsite("");
-            sDebt_limit("");
+            sDebt_begin("");
             sWard("");
             sOption([]);
             sValueBr([]);
@@ -1408,14 +1409,26 @@ const Popup_dsncc = (props) => {
                       <label className="text-[#344054] font-normal text-sm mb-1 ">
                         {props.dataLang?.suppliers_supplier_debt}
                       </label>
-                      <input
-                        value={debt_limit}
-                        onChange={_HandleChangeInput.bind(this, "debt_limit")}
+                      <NumericFormat
+                        value={debt_begin}
+                        onValueChange={_HandleChangeInput.bind(
+                          this,
+                          "debt_begin"
+                        )}
+                        className="ocus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
+                        thousandSeparator=","
+                        allowNegative={false}
+                        isNumericString={true}
+                        placeholder={props.dataLang?.suppliers_supplier_debt}
+                      />
+                      {/* <input
+                        value={debt_begin}
+                        onChange={_HandleChangeInput.bind(this, "debt_begin")}
                         placeholder={props.dataLang?.suppliers_supplier_debt}
                         name="fname"
                         type="text"
                         className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                      />
+                      /> */}
 
                       <div>
                         <label className="text-[#344054] font-normal text-sm mb-1 ">
@@ -1920,7 +1933,7 @@ const Popup_chitiet = (props) => {
                           {props.dataLang?.suppliers_supplier_debt}:
                         </span>{" "}
                         <span className="font-normal capitalize">
-                          {formatNumber(data?.debt_limit)}
+                          {formatNumber(data?.debt_begin)}
                         </span>
                       </div>
                       <div className="mb-4 flex justify-between items-center p-2">

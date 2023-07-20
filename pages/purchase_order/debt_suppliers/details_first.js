@@ -1,0 +1,206 @@
+import React, { useState, useEffect } from "react";
+import PopupEdit from "/components/UI/popup";
+import { SearchNormal1 as IconSearch } from "iconsax-react";
+import Loading from "components/UI/loading";
+import { _ServerInstance as Axios } from "/services/axios";
+const ScrollArea = dynamic(() => import("react-scrollbar"), {
+  ssr: false,
+});
+import dynamic from "next/dynamic";
+const Popup_chitietDauki = (props) => {
+  const [open, sOpen] = useState(false);
+  const _ToggleModal = (e) => sOpen(e);
+  const [data, sData] = useState();
+  const [onFetching, sOnFetching] = useState(false);
+
+  useEffect(() => {
+    props?.id && sOnFetching(true);
+  }, [open]);
+
+  const formatNumber = (number) => {
+    if (!number && number !== 0) return 0;
+    const integerPart = Math.floor(number);
+    const decimalPart = number - integerPart;
+    const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
+    const roundedNumber = integerPart + roundedDecimalPart;
+    return roundedNumber.toLocaleString("en");
+  };
+
+  const _ServerFetching_detailOrder = () => {
+    Axios(
+      "GET",
+      `/api_web/Api_return_supplier/returnSupplier/${props?.id}?csrf_protection=true`,
+      {},
+      (err, response) => {
+        if (!err) {
+          var db = response.data;
+
+          sData(db);
+        }
+        sOnFetching(false);
+      }
+    );
+  };
+
+  useEffect(() => {
+    onFetching && _ServerFetching_detailOrder();
+  }, [open]);
+
+  return (
+    <>
+      <PopupEdit
+        title={
+          (props?.type == "no_start" && "Chi tiết số dư đầu kì") ||
+          (props?.type == "chi_start" && "Chi tiết số dư đầu kì")
+        }
+        button={props?.name}
+        onClickOpen={_ToggleModal.bind(this, true)}
+        open={open}
+        onClose={_ToggleModal.bind(this, false)}
+        classNameBtn={props?.className}
+      >
+        <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
+        <div className=" space-x-5 3xl:w-[1200px] 2xl:w-[1150px] w-[1100px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">
+          <div>
+            <div className="3xl:w-[1200px] 2xl:w-[1150px] w-[1100px]">
+              <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <div className=" w-[100%]">
+                  <div
+                    className={`grid-cols-14  grid sticky top-0 rounded-xl shadow-md bg-white   z-10  divide-x`}
+                  >
+                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                      Ngày chứng từ
+                    </h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                      Mã chứng từ
+                    </h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                      Loại chứng từ
+                    </h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                      Số tiền nợ
+                    </h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                      Số tiền chi
+                    </h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                      Ghi chú
+                    </h4>
+                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                      Chi nhánh
+                    </h4>
+                  </div>
+                  {onFetching ? (
+                    <Loading className="max-h-28" color="#0f4f9e" />
+                  ) : data?.items?.length > 0 ? (
+                    <>
+                      <ScrollArea
+                        className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
+                        speed={1}
+                        smoothScrolling={true}
+                      >
+                        <div className="divide-y divide-slate-100 min:h-[170px]  max:h-[170px]">
+                          {data?.items?.map((e) => (
+                            <div
+                              className="grid grid-cols-14 hover:bg-slate-50 items-center border-b"
+                              key={e.id?.toString()}
+                            >
+                              <h6 className="text-[13px]   py-2 px-2 col-span-2 font-medium text-center ">
+                                {formatNumber(e?.amount)}
+                              </h6>
+                              <h6 className="text-[13px]   py-2 px-2 col-span-2 font-medium text-center ">
+                                {formatNumber(e?.amount)}
+                              </h6>
+                              <h6 className="text-[13px] flex items-center w-fit mx-auto  py-2 px-2 col-span-2 font-medium ">
+                                <div className="mx-auto">
+                                  <span className="flex items-center justify-center font-normal text-purple-500  rounded-xl py-1 px-3 xl:min-w-[100px] min-w-[70px]  bg-purple-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
+                                    Phiếu nhập hàng
+                                  </span>
+                                  {/* {(e?.type_vouchers === "import" && (
+                                    <span className="flex items-center justify-center font-normal text-purple-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-purple-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
+                                      {dataLang[e?.type_vouchers] ||
+                                        e?.type_vouchers}
+                                    </span>
+                                  )) ||
+                                    (e?.type_vouchers === "deposit" && (
+                                      <span className=" flex items-center justify-center font-normal text-cyan-500 rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-cyan-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
+                                        {dataLang[e?.type_vouchers] ||
+                                          e?.type_vouchers}
+                                      </span>
+                                    )) ||
+                                    (e?.type_vouchers === "service" && (
+                                      <span className="flex items-center justify-center gap-1 font-normal text-red-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-rose-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
+                                        {dataLang[e?.type_vouchers] ||
+                                          e?.type_vouchers}
+                                      </span>
+                                    ))} */}
+                                </div>
+                              </h6>
+                              <h6 className="text-[13px]   py-2 px-2 col-span-2 font-medium text-right ">
+                                {formatNumber(e?.amount)}
+                              </h6>
+                              <h6 className="text-[13px]   py-2 px-2 col-span-2 font-medium text-right ">
+                                {formatNumber(e?.amount)}
+                              </h6>
+                              <h6 className="text-[13px]   py-2 px-2 col-span-2 font-medium text-left">
+                                test ghi chú
+                              </h6>
+                              <h6 className="col-span-2 w-fit mx-auto">
+                                <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                  Hồ chí minh
+                                </div>
+                              </h6>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </>
+                  ) : (
+                    <div className=" max-w-[352px] mt-24 mx-auto">
+                      <div className="text-center">
+                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
+                          <IconSearch />
+                        </div>
+                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">
+                          {props.dataLang
+                            ?.purchase_order_table_item_not_found ||
+                            "purchase_order_table_item_not_found"}
+                        </h1>
+                        <div className="flex items-center justify-around mt-6 ">
+                          {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="grid-cols-14 grid items-center  border-b-gray-200 border-b  border-t   border-t-gray-200  z-10 ">
+                  <h2 className="border-l font-semibold p-2 text-[13px] border-r border-b  col-span-6 text-center">
+                    Tổng tiền
+                  </h2>
+                  <h2 className="font-medium p-2 text-[13px] border-r border-b    col-span-2 text-right">
+                    10.0000
+                  </h2>
+                  <h2 className="font-medium p-2 text-[13px] border-r border-b   col-span-2 text-right">
+                    10.0000
+                  </h2>
+                  <h2 className="font-medium p-[17px] text-[13px] border-r border-b  col-span-2 text-right"></h2>
+                  <h2 className="font-medium p-[17px] text-[13px] border-r border-b  col-span-2 text-right"></h2>
+                  <h2 className="border-l font-semibold p-2  text-[13px] border-r col-span-6 text-center">
+                    Số dư
+                  </h2>
+                  <h2 className="col-span-2 p-[17px] border-r "></h2>
+                  <h2 className=" font-medium p-2 text-[13px] border-r   col-span-2 text-right">
+                    10.000
+                  </h2>
+                  <h2 className="col-span-2 p-[17px] border-r "></h2>
+                  <h2 className="col-span-2 p-[17px] border-r "></h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </PopupEdit>
+    </>
+  );
+};
+export default Popup_chitietDauki;

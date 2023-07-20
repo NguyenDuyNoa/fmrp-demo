@@ -8,7 +8,9 @@ import Dropdown from "../UI/dropdown";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import Popup from "reactjs-popup";
-import { ArrowDown2 as IconDown } from "iconsax-react";
+import { ArrowUp, ArrowDown2 as IconDown } from "iconsax-react";
+import { Tooltip } from "react-tippy";
+import "react-tippy/dist/tippy.css";
 
 const Header = () => {
   const ListDanhMuc = [
@@ -164,7 +166,10 @@ const Header = () => {
           img: "/icon/header/muanhap/cnm.png",
           items: [
             { name: "Phiếu chi", link: "/purchase_order/payment" },
-            { name: "Công nợ nhà cung cấp" },
+            {
+              name: "Công nợ nhà cung cấp",
+              link: "/purchase_order/debt_suppliers",
+            },
           ],
         },
       ],
@@ -399,6 +404,107 @@ const Header = () => {
     },
   ];
 
+  const dropdowns = [
+    {
+      data: ListDanhMuc,
+      position: "bottom left",
+      className: "popover-bottom-left arrow-danhmuc",
+      title: "Danh mục",
+      text: "Quản lý các model Khách hàng, nhà cung cấp, NVL, thành phẩm, nhân sự",
+    },
+    {
+      data: ListBanXuatHang,
+      position: "bottom left",
+      className: "popover-bottom-left arrow-banxuathang",
+      text: "Quản lý các model bán hàng, giao hàng, công nợ bán",
+      title: "Bán & Xuất hàng",
+    },
+    {
+      data: ListMuaNhapHang,
+      position: "bottom left",
+      className: "popover-bottom-left-muanhaphang arrow-muanhaphang",
+      title: "Mua & Nhập hàng",
+      text: "Quản lý các model mua, nhập, trả hàng, công nợ",
+    },
+    {
+      data: ListKhoSanXuat,
+      // position: "",
+      className: "popover-khosanxuat",
+      title: "Kho & Sản xuất",
+      text: "Quản lý các model kho, sản xuất, gia công, QC",
+    },
+    {
+      data: ListBaoCao,
+      position: "bottom left",
+      className: "",
+      title: "Báo cáo & Thống kê",
+      text: "Quản lý các báo cáo, thống kê",
+    },
+    {
+      data: ListKhac,
+      className: "popover-khac",
+      text: "Quản lý các tiện ích, công việc",
+      title: "Tiện ích",
+    },
+    {
+      data: ListAdd,
+      position: "bottom center",
+      text: "Thêm mới",
+      className: "",
+      title: "+ Thêm",
+    },
+  ];
+  const dataPstWH = useSelector((state) => state.trangthai);
+  // Khai báo biến state
+  const [currentDropdownIndex, setCurrentDropdownIndex] = useState(0);
+  const [isLastDropdown, setIsLastDropdown] = useState(false);
+  useEffect(() => {
+    setIsLastDropdown(currentDropdownIndex === dropdowns.length - 1);
+  }, [currentDropdownIndex, dropdowns.length]);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (dataPstWH) {
+      // Ẩn phần tử hiện tại
+
+      // Kiểm tra xem nó có phải là cuối cùng hay không
+      if (isLastDropdown) {
+        setTimeout(() => {
+          setCurrentDropdownIndex(0);
+          setIsLastDropdown(false);
+          dispatch({
+            type: "trangthai",
+            payload: false,
+          });
+        }, 3000);
+      } else {
+        // Sau 3000ms, hiển thị phần tử tiếp theo
+        const timer = setTimeout(() => {
+          setCurrentDropdownIndex(
+            (prevIndex) => (prevIndex + 1) % dropdowns.length
+          );
+        }, 3000);
+
+        return () => {
+          clearTimeout(timer);
+        };
+      }
+      // const timer = setTimeout(() => {
+      //   setCurrentDropdownIndex(
+      //     (prevIndex) => (prevIndex + 1) % dropdowns.length
+      //   );
+      // }, 3000);
+
+      // return () => {
+      //   clearTimeout(timer);
+      // };
+    }
+  }, [dataPstWH, isLastDropdown, dropdowns.length, currentDropdownIndex]);
+  // useEffect(() => {
+  //   if (dataPstWH) {
+  //     body.style;
+  //   }
+  // }, [dataPstWH]);
+  const currentDropdown = dropdowns[currentDropdownIndex];
   return (
     <header className="z-40 w-full bg-[#0f4f9e] fixed top-0 3xl:h-[74px] 2xl:h-16 xl:h-14 lg:h-12">
       <div className="3xl:mx-10 2xl:mx-10 mx-5 3xl:py-4 2xl:py-3.5 xl:py-2.5 py-1.5">
@@ -418,13 +524,99 @@ const Header = () => {
                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
               />
             </Link>
-            <Dropdown
+            {/* {dropdowns.map((dropdown, index) => (
+              <Tooltip
+                titleStyle={{
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  color: "white",
+                }}
+                titleClassName="custom-title-class"
+                trigger="manual"
+                key={index}
+                title={dropdown.text}
+                open={dataPstWH && index === currentDropdownIndex}
+                arrow={true}
+                position="bottom"
+                animation="scale"
+                duration={200}
+                hideOnClick={false}
+                theme="light"
+              >
+                <Dropdown
+                  data={dropdown.data}
+                  position={dropdown.position}
+                  className={dropdown.className}
+                  onClick={() => dispatch({ type: "trangthai", payload: true })}
+                >
+                  {dropdown.title}
+                </Dropdown>
+              </Tooltip>
+            ))} */}
+            {dropdowns.map((dropdown, index) => (
+              <React.Fragment key={index}>
+                <Tooltip
+                  titleClassName="custom-title-class"
+                  trigger="manual"
+                  html={
+                    <React.Fragment>
+                      <div className="  rounded-lg  w-auto h-auto  ">
+                        <div className="flex justify-center items-center  rounded-lg">
+                          <ArrowUp
+                            size="32"
+                            color="green"
+                            className="rotate-45 animate-pulse "
+                          />
+                          <h2 className="text-black font-semibold text-justify  py-2 px-3 ">
+                            {dropdown.text}
+                          </h2>
+                        </div>
+                      </div>
+                      {/* <div className=" mt-[20px]   bg-gray-100 shadow-2xl rounded-lg  w-auto h-auto min-h-[30px] ">
+                        <div className="flex justify-center items-center shadow-2xl rounded-lg">
+                          <ArrowUp
+                            size="32"
+                            color="green"
+                            className="rotate-45 animate-pulse "
+                          />
+                          <h2 className="text-black font-semibold  py-2 px-3 max-w-[200px] ">
+                            {dropdown.text}
+                          </h2>
+                        </div>
+                      </div> */}
+                    </React.Fragment>
+                  }
+                  title={dropdown.text}
+                  open={dataPstWH && index === currentDropdownIndex}
+                  position="bottom"
+                  animation="perspective"
+                  size="regular"
+                  theme="light"
+                  arrow={true}
+                >
+                  <Dropdown
+                    data={dropdown.data}
+                    position={dropdown.position}
+                    className={dropdown.className}
+                    style={dataPstWH}
+                    // onClick={() =>
+                    //   dispatch({ type: "trangthai", payload: true })
+                    // }
+                  >
+                    {dropdown.title}
+                  </Dropdown>
+                </Tooltip>
+              </React.Fragment>
+            ))}
+
+            {/* <Dropdown
               data={ListDanhMuc}
               position={"bottom left"}
               className="popover-bottom-left arrow-danhmuc "
             >
               Danh mục
             </Dropdown>
+
             <Dropdown
               data={ListBanXuatHang}
               position={"bottom left"}
@@ -434,7 +626,7 @@ const Header = () => {
             </Dropdown>
             <Dropdown
               data={ListMuaNhapHang}
-              position={"bottom left"}
+              position="bottom left"
               className="popover-bottom-left-muanhaphang arrow-muanhaphang"
             >
               Mua & Nhập hàng
@@ -450,7 +642,10 @@ const Header = () => {
             </Dropdown>
             <Dropdown data={ListAdd} position={"bottom center"}>
               <div>+ Thêm</div>
-            </Dropdown>
+            </Dropdown> */}
+            {/* <Dropdown data={ListKhoSanXuat} className="popover-khosanxuat">
+              Kho & Sản xuất
+            </Dropdown> */}
           </div>
           <div className="flex 3xl:space-x-5 2xl:space-x-4 xl:space-x-3 lg:space-x-2  items-center">
             <a

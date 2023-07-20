@@ -27,6 +27,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
 import ReactExport from "react-data-export";
+import moment from "moment";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -607,7 +608,7 @@ const Index = (props) => {
                     {data.map((e) => (
                       <div
                         key={e?.id.toString()}
-                        className="flex p-2 hover:bg-slate-50 relative"
+                        className="flex items-center p-2 hover:bg-slate-50 relative"
                       >
                         <div className="xl:w-[10%] w-[6%] pointer-events-none select-none justify-center flex">
                           {e?.images == null ? (
@@ -799,7 +800,7 @@ const Popup_NVL = React.memo((props) => {
 
   const [dataTotalVariant, sDataTotalVariant] = useState([]);
   const [dataVariantSending, sDataVariantSending] = useState([]);
-
+  console.log("variantMain", variantMain);
   useEffect(() => {
     sOptVariantMain(
       dataOptVariant?.find((e) => e.value == variantMain)?.option
@@ -2442,7 +2443,7 @@ const Popup_ThongTin = React.memo((props) => {
                     <h5 className="text-slate-400 text-sm w-[40%]">
                       {props.dataLang?.avatar || "avatar"}:
                     </h5>
-                    {list?.images == null ? (
+                    {list?.created_by_avatar == null ? (
                       <img
                         src="/no_image.png"
                         className="w-48 h-48 rounded object-contain select-none pointer-events-none"
@@ -2452,7 +2453,7 @@ const Popup_ThongTin = React.memo((props) => {
                         width={200}
                         height={200}
                         quality={100}
-                        src={list?.images}
+                        src={list?.created_by_avatar}
                         alt="thumb type"
                         className="w-48 h-48 rounded object-contain select-none pointer-events-none"
                         loading="lazy"
@@ -2472,13 +2473,15 @@ const Popup_ThongTin = React.memo((props) => {
                       <h5 className="text-slate-400 text-sm w-[30%]">
                         {props.dataLang?.creator || "creator"}:
                       </h5>
-                      <h6 className="w-[65%] text-right">ABC</h6>
+                      <h6 className="w-[65%] text-right">{list?.created_by}</h6>
                     </div>
                     <div className="flex justify-between">
                       <h5 className="text-slate-400 text-sm w-[30%]">
                         {props.dataLang?.date_created || "date_created"}:
                       </h5>
-                      <h6 className="w-[65%] text-right">dasd</h6>
+                      <h6 className="w-[65%] text-right">
+                        {moment(list?.date_created).format("DD/MM/YYYY")}
+                      </h6>
                     </div>
                   </div>
                 </div>

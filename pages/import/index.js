@@ -32,6 +32,7 @@ import {
   RefreshCircle,
   ColorsSquare,
   Colorfilter,
+  Notification,
 } from "iconsax-react";
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
@@ -138,7 +139,7 @@ const Index = (props) => {
       1: "/api_web/Api_import_data/get_field_client?csrf_protection=true",
       2: "/api_web/Api_import_data/get_field_suppliers?csrf_protection=true",
       3: "/api_web/Api_import_data/get_field_materials?csrf_protection=true",
-      4: "",
+      4: "/api_web/Api_import_data/get_field_products?csrf_protection=true",
       5: "",
     };
 
@@ -147,7 +148,11 @@ const Index = (props) => {
       if (!err) {
         var db = response.data;
         sDataClient(
-          db?.map((e) => ({ label: dataLang[e?.label], value: e?.value }))
+          db?.map((e) => ({
+            label: dataLang[e?.label],
+            value: e?.value,
+            note: e?.note,
+          }))
         );
       }
       sOnLoading(false);
@@ -157,7 +162,7 @@ const Index = (props) => {
       1: "/api_web/Api_import_data/get_colums_excel?csrf_protection=true",
       2: "/api_web/Api_import_data/get_colums_excel?csrf_protection=true",
       3: "/api_web/Api_import_data/get_colums_excel?csrf_protection=true",
-      4: "",
+      4: "/api_web/Api_import_data/get_colums_excel?csrf_protection=true",
       5: "",
     };
 
@@ -174,7 +179,7 @@ const Index = (props) => {
       1: "/api_web/Api_import_data/get_field_isset?csrf_protection=true",
       2: "/api_web/Api_import_data/get_field_isset_suppliers?csrf_protection=true",
       3: "/api_web/Api_import_data/get_field_isset_materials?csrf_protection=true",
-      4: "",
+      4: "/api_web/Api_import_data/get_field_isset_products?csrf_protection=true",
       5: "",
     };
 
@@ -196,7 +201,7 @@ const Index = (props) => {
       1: "/api_web/Api_import_data/get_template_import?csrf_protection=true",
       2: "/api_web/Api_import_data/get_template_import?csrf_protection=true",
       3: "/api_web/Api_import_data/get_template_import?csrf_protection=true",
-      4: "",
+      4: "/api_web/Api_import_data/get_template_import?csrf_protection=true",
       5: "",
     };
 
@@ -449,7 +454,7 @@ const Index = (props) => {
             return { ...e, dataFields: null };
           } else if (
             //Lỗi trùng nhau phải có biến thể chính mới cho chọn phụ
-            tabPage == 3 &&
+            (tabPage == 3 || tabPage == 4) &&
             value?.value == "variation_option" &&
             !checkMain
           ) {
@@ -458,7 +463,7 @@ const Index = (props) => {
               icon: "error",
             });
             return e;
-          } else if (tabPage == 3 && checkMain2) {
+          } else if ((tabPage == 3 || tabPage == 4) && checkMain2) {
             //Khi không có biến thể chính thì trường biến thể phụ thành null
             const checkEx = listData?.findIndex(
               (e) => e?.dataFields?.value == "variation_option"
@@ -468,6 +473,7 @@ const Index = (props) => {
             }
             return { ...e, dataFields: null };
           } else {
+            console.log(value);
             return { ...e, dataFields: value };
           }
         } else if (type == "column") {
@@ -498,7 +504,6 @@ const Index = (props) => {
     });
     sListData([...newData]);
   };
-
   useEffect(() => {
     const arrayCheck = ["variation", "variation_option"];
     const ObError = [...listData].reduce((a, b) => {
@@ -688,7 +693,10 @@ const Index = (props) => {
               dataLang?.import_ERR_add_nameDataSuplier) ||
             (tabPage == 3 &&
               !ObError?.name &&
-              dataLang?.import_ERR_add_nameMterial)
+              dataLang?.import_ERR_add_nameMterial) ||
+            (tabPage == 4 &&
+              !ObError?.name &&
+              dataLang?.import_ERR_add_nameProduct)
           }`,
         });
       }
@@ -868,7 +876,7 @@ const Index = (props) => {
       1: "/api_web/Api_import_data/action_add_client?csrf_protection=true",
       2: "/api_web/Api_import_data/action_add_suppliers?csrf_protection=true",
       3: "/api_web/Api_import_data/action_add_materials?csrf_protection=true",
-      4: "",
+      4: "/api_web/Api_import_data/action_add_products?csrf_protection=true",
       5: "",
     };
     //ánh xạ apiPaths
@@ -1431,7 +1439,7 @@ const Index = (props) => {
                       </button>
                     </div>
                   )}
-                  {tabPage == 3 && listData.length > 0 && (
+                  {(tabPage == 3 || tabPage == 4) && listData.length > 0 && (
                     <div
                       className={`flex items-center justify-center  gap-2 pt-5 ${
                         save_template && onLoadingDataBack
@@ -1650,11 +1658,13 @@ const Index = (props) => {
                               {dataLang?.import_operation || "import_operation"}
                             </h5>
                           )}
+                          {console.log(e)}
                           {e?.dataFields?.value == "group_id" ||
-                          (tabPage == 3 &&
+                          ((tabPage == 3 || tabPage == 4) &&
                             e?.dataFields?.value == "category_id") ||
-                          (tabPage == 3 && e?.dataFields?.value == "unit_id") ||
-                          (tabPage == 3 &&
+                          ((tabPage == 3 || tabPage == 4) &&
+                            e?.dataFields?.value == "unit_id") ||
+                          ((tabPage == 3 || tabPage == 4) &&
                             e?.dataFields?.value == "unit_convert_id") ? (
                             <div className="flex items-center space-x-2 rounded p-2 ">
                               <TiTick color="green" />
@@ -1667,6 +1677,70 @@ const Index = (props) => {
                             </div>
                           ) : (
                             ""
+                          )}
+                          {e?.dataFields?.value == "type_products" && (
+                            <div
+                              className={` shadow-2xl rounded-xl  bg-slate-700 relative`}
+                            >
+                              <div className="absolute right-0 top-0 translate-x-1/2 bg-rose-50 rounded-lg">
+                                <Notification
+                                  size="22"
+                                  color="red"
+                                  className=" animate-bounce"
+                                />
+                              </div>
+
+                              <div className="grid grid-cols-2 items-center p-1 gap-2 ">
+                                <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white font-medium col-span-2">
+                                  {dataLang?.import_ERR_format ||
+                                    "import_ERR_format"}
+                                </h2>
+                                <div className="col-span-2">
+                                  <div className="flex items-center gap-1">
+                                    <p className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm font-semibold text-white  capitalize flex items-center gap-1">
+                                      <ArrowRight
+                                        size="16"
+                                        color="white"
+                                        className="animate-bounce 3xl:scale-100 2xl:scale-95"
+                                      />
+                                      products:
+                                    </p>
+                                    <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
+                                      {e?.dataFields?.note?.products}
+                                    </h2>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <p className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm font-semibold text-white  capitalize flex items-center gap-1">
+                                      <ArrowRight
+                                        size="16"
+                                        color="white"
+                                        className="animate-bounce 3xl:scale-100 2xl:scale-95"
+                                      />{" "}
+                                      semi_products:
+                                    </p>
+                                    <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
+                                      {e?.dataFields?.note?.semi_products}
+                                    </h2>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <p className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm font-semibold text-white  capitalize flex items-center gap-1">
+                                      <ArrowRight
+                                        size="16"
+                                        color="white"
+                                        className="animate-bounce 3xl:scale-100 2xl:scale-95"
+                                      />{" "}
+                                      semi_products_outside:
+                                    </p>
+                                    <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
+                                      {
+                                        e?.dataFields?.note
+                                          ?.semi_products_outside
+                                      }
+                                    </h2>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           )}
                         </div>
                       </div>
@@ -2045,7 +2119,8 @@ const Popup_status = (props) => {
               } ${
                 (props?.router == 1 && "danh mục khách hàng") ||
                 (props?.router == 2 && "danh mục nhà cung cấp") ||
-                (props?.router == 3 && "danh mục nguyên vật liệu")
+                (props?.router == 3 && "danh mục nguyên vật liệu") ||
+                (props?.router == 4 && "danh mục thành phẩm")
               }`}
               title="DLL"
               element={
