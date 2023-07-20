@@ -33,10 +33,12 @@ const Popup_chitietPhatsinh = (props) => {
       `/api_web/Api_debt_supplier/debtDetail/${props?.id}/${props?.type}?csrf_protection=true`,
       {
         params: {
-          "filter[start_date]": moment(props?.date?.startDate).format(
-            "YYYY-MM-DD"
-          ),
-          "filter[end_date]": moment(props?.date?.endDate).format("YYYY-MM-DD"),
+          "filter[start_date]": props?.date?.startDate
+            ? moment(props?.date?.startDate).format("YYYY-MM-DD")
+            : "",
+          "filter[end_date]": props?.date?.endDate
+            ? moment(props?.date?.endDate).format("YYYY-MM-DD")
+            : "",
         },
       },
       (err, response) => {
