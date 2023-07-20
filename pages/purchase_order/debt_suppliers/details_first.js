@@ -83,11 +83,11 @@ const Popup_chitietDauki = (props) => {
                 </h2>
                 <h2 className="font-medium flex gap-2">
                   <h2>Lọc từ ngày</h2>
-                  <h2 className="text-red-600">
+                  <h2 className="text-blue-600">
                     {moment(props?.date?.startDate).format("DD/MM/YYYY")}
                   </h2>
                   <h2> đến ngày</h2>
-                  <h2 className="text-red-600">
+                  <h2 className="text-blue-600">
                     {moment(props?.date?.endDate).format("DD/MM/YYYY")}
                   </h2>
                 </h2>

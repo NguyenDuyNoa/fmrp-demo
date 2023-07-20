@@ -659,14 +659,14 @@ const Index = (props) => {
                               className="relative  grid grid-cols-12 items-center py-1.5  hover:bg-slate-100/40 group"
                               key={e.id.toString()}
                             >
-                              <h6 className="text-center 3xl:text-base 2xl:text-[12.5px] py-1 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 capitalize">
+                              <h6 className="text-center 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 capitalize">
                                 {e.code}
                               </h6>
-                              <h6 className="text-left 3xl:text-base 2xl:text-[12.5px] py-1 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
+                              <h6 className="text-left 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
                                 {e.name}
                               </h6>
                               <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-1 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
                                   {e.no_start == "0" ? (
                                     "-"
                                   ) : (
@@ -685,7 +685,7 @@ const Index = (props) => {
                                     />
                                   )}
                                 </h4>
-                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-1 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
                                   {e.chi_start == "0" ? (
                                     "-"
                                   ) : (
@@ -706,7 +706,7 @@ const Index = (props) => {
                                 </h4>
                               </div>
                               <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-1 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
                                   {e.no_debt == "0" ? (
                                     "-"
                                   ) : (
@@ -726,7 +726,7 @@ const Index = (props) => {
                                   )}
                                 </h4>
 
-                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-1 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
+                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
                                   {e.chi_debt == "0" ? (
                                     "-"
                                   ) : (
@@ -747,12 +747,12 @@ const Index = (props) => {
                                 </h4>
                               </div>
                               <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-1 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
+                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
                                   {e.no_end == "0"
                                     ? "-"
                                     : formatNumber(e.no_end)}
                                 </h4>
-                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-1 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
+                                <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
                                   {e.chi_end == "0"
                                     ? "-"
                                     : formatNumber(e.chi_end)}
