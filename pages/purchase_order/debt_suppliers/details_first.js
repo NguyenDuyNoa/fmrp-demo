@@ -7,6 +7,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
 import dynamic from "next/dynamic";
+import moment from "moment";
 const Popup_chitietDauki = (props) => {
   const [open, sOpen] = useState(false);
   const _ToggleModal = (e) => sOpen(e);
@@ -30,7 +31,16 @@ const Popup_chitietDauki = (props) => {
     Axios(
       "GET",
       `/api_web/Api_return_supplier/returnSupplier/${props?.id}?csrf_protection=true`,
-      {},
+      {
+        params: {
+          "filter[start_date]": props?.date?.startDate
+            ? moment(props?.date?.startDate).format("YYYY-MM-DD")
+            : "",
+          "filter[end_date]": props?.date?.endDate
+            ? moment(props?.date?.endDate).format("YYYY-MM-DD")
+            : "",
+        },
+      },
       (err, response) => {
         if (!err) {
           var db = response.data;
@@ -62,6 +72,27 @@ const Popup_chitietDauki = (props) => {
         <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
         <div className=" space-x-5 3xl:w-[1200px] 2xl:w-[1150px] xl:w-[w-[900px] lg:w-[900px] w-[1200px] 3xl:h-auto  2xl:h-auto xl:h-[350px] lg:h-[400px] h-[500px] ">
           <div>
+            {" "}
+            <div className="bg-slate-100">
+              <div className=" flex gap-2 justify-between p-2">
+                <h2 className="flex gap-2 font-semibold">
+                  Nhà cung cấp:
+                  <h2 className="font-semibold capitalize text-blue-700">
+                    {props?.supplier_name}
+                  </h2>
+                </h2>
+                <h2 className="font-medium flex gap-2">
+                  <h2>Lọc từ ngày</h2>
+                  <h2 className="text-red-600">
+                    {moment(props?.date?.startDate).format("DD/MM/YYYY")}
+                  </h2>
+                  <h2> đến ngày</h2>
+                  <h2 className="text-red-600">
+                    {moment(props?.date?.endDate).format("DD/MM/YYYY")}
+                  </h2>
+                </h2>
+              </div>
+            </div>
             <div className="3xl:w-[1200px] 2xl:w-[1150px] xl:w-[w-[900px] lg:w-[900px] w-[1200px]">
               <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                 <div className=" w-[100%]">
@@ -95,7 +126,7 @@ const Popup_chitietDauki = (props) => {
                   ) : data?.items?.length > 0 ? (
                     <>
                       <ScrollArea
-                        className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] xl:max-h-[280px] lg:max-h-[340px] overflow-hidden"
+                        className="min-h-[90px] max-h-[170px] 3xl:max-h-[439px] 2xl:max-h-[250px] xl:max-h-[280px] lg:max-h-[286px] overflow-hidden"
                         speed={1}
                         smoothScrolling={true}
                       >
@@ -173,8 +204,8 @@ const Popup_chitietDauki = (props) => {
                     </div>
                   )}
                 </div>
-                <div className="grid-cols-14 grid items-center  border-b-gray-200 border-b  border-t   border-t-gray-200  z-10 ">
-                  <h2 className="border-l font-semibold p-2 text-[13px] border-r border-b  col-span-6 text-center">
+                <div className="grid-cols-14 grid items-center  border-b-gray-200 border-b  border-t   border-t-gray-200  z-10 bg-slate-100 rounded">
+                  <h2 className="border-l font-semibold p-2 text-[13px] border-r border-b  col-span-6 text-center uppercase">
                     Tổng tiền
                   </h2>
                   <h2 className="font-medium p-2 text-[13px] border-r border-b    col-span-2 text-right">
@@ -185,7 +216,7 @@ const Popup_chitietDauki = (props) => {
                   </h2>
                   <h2 className="font-medium p-[17px] text-[13px] border-r border-b  col-span-2 text-right"></h2>
                   <h2 className="font-medium p-[17px] text-[13px] border-r border-b  col-span-2 text-right"></h2>
-                  <h2 className="border-l font-semibold p-2  text-[13px] border-r col-span-6 text-center">
+                  <h2 className="border-l font-semibold p-2  text-[13px] border-r col-span-6 text-center uppercase">
                     Số dư
                   </h2>
                   <h2 className="col-span-2 p-[17px] border-r "></h2>

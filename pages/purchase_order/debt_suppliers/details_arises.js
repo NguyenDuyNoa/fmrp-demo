@@ -72,6 +72,26 @@ const Popup_chitietPhatsinh = (props) => {
         <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
         <div className=" space-x-5 3xl:w-[1200px] 2xl:w-[1150px] xl:w-[w-[900px] lg:w-[900px] w-[1200px] 3xl:h-auto  2xl:h-auto xl:h-[350px] lg:h-[400px] h-[500px] ">
           <div>
+            <div className="bg-slate-100">
+              <div className=" flex gap-2 justify-between p-2">
+                <h2 className="flex gap-2 font-semibold">
+                  Nhà cung cấp:
+                  <h2 className="font-semibold capitalize text-blue-700">
+                    {props?.supplier_name}
+                  </h2>
+                </h2>
+                <h2 className="font-medium flex gap-2">
+                  <h2>Lọc từ ngày</h2>
+                  <h2 className="text-red-600">
+                    {moment(props?.date?.startDate).format("DD/MM/YYYY")}
+                  </h2>
+                  <h2> đến ngày</h2>
+                  <h2 className="text-red-600">
+                    {moment(props?.date?.endDate).format("DD/MM/YYYY")}
+                  </h2>
+                </h2>
+              </div>
+            </div>
             <div className="3xl:w-[1200px] 2xl:w-[1150px] xl:w-[w-[900px] lg:w-[900px] w-[1200px]">
               <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                 <div className=" w-[100%]">
@@ -102,7 +122,7 @@ const Popup_chitietPhatsinh = (props) => {
                   ) : data?.length > 0 ? (
                     <>
                       <ScrollArea
-                        className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] xl:max-h-[280px] lg:max-h-[340px] overflow-hidden"
+                        className="min-h-[90px] max-h-[170px] 3xl:max-h-[439px] 2xl:max-h-[250px] xl:max-h-[280px] lg:max-h-[286px] overflow-hidden"
                         speed={1}
                         smoothScrolling={true}
                       >
@@ -113,7 +133,7 @@ const Popup_chitietPhatsinh = (props) => {
                               key={e.id?.toString()}
                             >
                               <h6 className="text-[13px]   py-2.5 px-2 col-span-2 font-medium text-center ">
-                                {moment(e?.date).format("DD/MM/YYYY, HH:mm:ss")}
+                                {moment(e?.date).format("DD/MM/YYYY")}
                               </h6>
                               <h6 className="text-[13px]   py-2.5 px-2 col-span-2 font-medium text-center ">
                                 {e?.code}
@@ -176,8 +196,8 @@ const Popup_chitietPhatsinh = (props) => {
                     </div>
                   )}
                 </div>
-                <div className="grid-cols-12 grid items-center border-b-gray-200 border-b  border-t z-10 border-t-gray-200 ">
-                  <h2 className="font-semibold p-2 text-[13px] col-span-6 text-center border-l border-r">
+                <div className="grid-cols-12 grid items-center border-b-gray-200 border-b  border-t z-10 border-t-gray-200 bg-slate-100 rounded">
+                  <h2 className="font-semibold p-2 text-[13px] col-span-6 text-center border-l border-r uppercase">
                     Tổng tiền
                   </h2>
                   <h2 className="font-medium p-2 text-[13px]   col-span-2 text-right border-r">

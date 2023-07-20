@@ -680,6 +680,8 @@ const Index = (props) => {
                                       }
                                       id={e?.id}
                                       type={"no_start"}
+                                      date={valueDate}
+                                      supplier_name={e.name}
                                     />
                                   )}
                                 </h4>
@@ -695,6 +697,8 @@ const Index = (props) => {
                                           ? "-"
                                           : formatNumber(e.chi_start)
                                       }
+                                      date={valueDate}
+                                      supplier_name={e.name}
                                       id={e?.id}
                                       type={"chi_start"}
                                     />
@@ -708,7 +712,8 @@ const Index = (props) => {
                                   ) : (
                                     <Popup_chitietPhatsinh
                                       dataLang={dataLang}
-                                      className="text-left"
+                                      className="text-left uppercase"
+                                      supplier_name={e.name}
                                       name={
                                         e.no_debt == "0"
                                           ? "-"
@@ -727,7 +732,8 @@ const Index = (props) => {
                                   ) : (
                                     <Popup_chitietPhatsinh
                                       dataLang={dataLang}
-                                      className="text-left"
+                                      className="text-left uppercase"
+                                      supplier_name={e.name}
                                       name={
                                         e.chi_debt == "0"
                                           ? "-"
