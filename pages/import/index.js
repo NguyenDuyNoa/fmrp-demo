@@ -33,6 +33,7 @@ import {
   ColorsSquare,
   Colorfilter,
   Notification,
+  ArrowRight2,
 } from "iconsax-react";
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
@@ -48,6 +49,7 @@ import { TiTick } from "react-icons/ti";
 
 import { getData } from "components/UI/dataExcel";
 import { Joan } from "@next/font/google";
+import { ulrExel } from "services/URL";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -611,7 +613,7 @@ const Index = (props) => {
     2: dataLang?.import_suppliers || "import_suppliers",
     3: dataLang?.import_materials || "import_materials",
     4: dataLang?.import_finished_product || "import_finished_product",
-    5: dataLang?.import_user || "import_user",
+    5: dataLang?.import_stage || "import_stage",
   };
 
   // validate dữ liệu rồi post
@@ -637,121 +639,135 @@ const Index = (props) => {
     const hasNullDataImport = dataImport?.length == 0;
 
     const requiredColumn = listData?.length == 0;
-
-    if (
-      hasNullDataFiles ||
-      fileImport == null ||
-      hasNullColumn ||
-      (valueCheck == "edit" && condition_column == null) ||
-      (valueCheck == "edit" && !ObError?.code) ||
-      hasNullDataImport ||
-      requiredColumn ||
-      !ObError?.name ||
-      (valueCheck == "add" && !ObError?.branch_id) ||
-      end_row == null ||
-      end_row == "" ||
-      row_tarts == null ||
-      row_tarts == "" ||
-      errEnd ||
-      errStart ||
-      row_tarts == 0 ||
-      end_row == 0
-    ) {
-      hasNullDataFiles && sErrFiles(true);
-      hasNullColumn && sErrColumn(true);
-
-      valueCheck == "edit" && condition_column == null && sErrValueCheck(true);
-
-      fileImport == null && sErrFileImport(true);
-
-      // hasNullDataImport && sErrFileImport(true)
-
-      row_tarts == null && sErrRowStart(true);
-      row_tarts == "" && sErrRowStart(true);
-
-      end_row == null && sErrEndRow(true);
-      end_row == "" && sErrEndRow(true);
-      //bắt buộc phải thêm cột
-      if (requiredColumn) {
-        Toast.fire({
-          icon: "error",
-          title: `${
-            dataLang?.import_ERR_add_column || "import_ERR_add_column"
-          }`,
-        });
-      }
-      //KH - bắt buộc phải có cột tên khách hàng, NCC PHẢI CÓ TÊN NCC, nvl PHẢI CÓ TÊN nvl
-      else if (!ObError?.name) {
-        Toast.fire({
-          icon: "error",
-          title: `${
-            (tabPage == 1 &&
-              !ObError?.name &&
-              dataLang?.import_ERR_add_nameData) ||
-            (tabPage == 2 &&
-              !ObError?.name &&
-              dataLang?.import_ERR_add_nameDataSuplier) ||
-            (tabPage == 3 &&
-              !ObError?.name &&
-              dataLang?.import_ERR_add_nameMterial) ||
-            (tabPage == 4 &&
-              !ObError?.name &&
-              dataLang?.import_ERR_add_nameProduct)
-          }`,
-        });
-      }
-      //bắt buộc phải có cột chi nhánh
-      else if (valueCheck == "add" && !ObError?.branch_id) {
-        Toast.fire({
-          icon: "error",
-          title: `${
-            dataLang?.import_ERR_add_branchData || "import_ERR_add_branchData"
-          }`,
-        });
-      }
-      //nếu cập nhật thì phải có cột mã kh
-      else if (valueCheck == "edit" && tabPage == 1 && !ObError?.code) {
-        Toast.fire({
-          icon: "error",
-          title: `${
-            dataLang?.import_ERR_add_CodeData || "import_ERR_add_CodeData"
-          }`,
-        });
-      }
-      //Hàng bắt đầu hàng kết thúc
-      else if (
-        row_tarts == 0 ||
+    if (tabPage != 5) {
+      if (
+        hasNullDataFiles ||
+        fileImport == null ||
+        hasNullColumn ||
+        (valueCheck == "edit" && condition_column == null) ||
+        (valueCheck == "edit" && !ObError?.code) ||
+        hasNullDataImport ||
+        requiredColumn ||
+        !ObError?.name ||
+        (valueCheck == "add" && !ObError?.branch_id) ||
+        end_row == null ||
+        end_row == "" ||
         row_tarts == null ||
-        end_row == 0 ||
-        end_row == null
+        row_tarts == "" ||
+        errEnd ||
+        errStart ||
+        row_tarts == 0 ||
+        end_row == 0
       ) {
-        Toast.fire({
-          icon: "error",
-          title: `${"Hàng phải lớn hơn 0"}`,
-        });
-      } else if (errEnd) {
-        Toast.fire({
-          icon: "error",
-          title: `${
-            dataLang?.import_ERR_greater_end || "import_ERR_greater_end"
-          }`,
-        });
-      } else if (errStart) {
-        Toast.fire({
-          icon: "error",
-          title: `${
-            dataLang?.import_ERR_greater_end || "import_ERR_greater_end"
-          }`,
-        });
+        hasNullDataFiles && sErrFiles(true);
+        hasNullColumn && sErrColumn(true);
+
+        valueCheck == "edit" &&
+          condition_column == null &&
+          sErrValueCheck(true);
+
+        fileImport == null && sErrFileImport(true);
+
+        // hasNullDataImport && sErrFileImport(true)
+
+        row_tarts == null && sErrRowStart(true);
+        row_tarts == "" && sErrRowStart(true);
+
+        end_row == null && sErrEndRow(true);
+        end_row == "" && sErrEndRow(true);
+        //bắt buộc phải thêm cột
+        if (requiredColumn) {
+          Toast.fire({
+            icon: "error",
+            title: `${
+              dataLang?.import_ERR_add_column || "import_ERR_add_column"
+            }`,
+          });
+        }
+        //KH - bắt buộc phải có cột tên khách hàng, NCC PHẢI CÓ TÊN NCC, nvl PHẢI CÓ TÊN nvl
+        else if (!ObError?.name) {
+          Toast.fire({
+            icon: "error",
+            title: `${
+              (tabPage == 1 &&
+                !ObError?.name &&
+                dataLang?.import_ERR_add_nameData) ||
+              (tabPage == 2 &&
+                !ObError?.name &&
+                dataLang?.import_ERR_add_nameDataSuplier) ||
+              (tabPage == 3 &&
+                !ObError?.name &&
+                dataLang?.import_ERR_add_nameMterial) ||
+              (tabPage == 4 &&
+                !ObError?.name &&
+                dataLang?.import_ERR_add_nameProduct)
+            }`,
+          });
+        }
+        //bắt buộc phải có cột chi nhánh
+        else if (valueCheck == "add" && !ObError?.branch_id) {
+          Toast.fire({
+            icon: "error",
+            title: `${
+              dataLang?.import_ERR_add_branchData || "import_ERR_add_branchData"
+            }`,
+          });
+        }
+        //nếu cập nhật thì phải có cột mã kh
+        else if (valueCheck == "edit" && tabPage == 1 && !ObError?.code) {
+          Toast.fire({
+            icon: "error",
+            title: `${
+              dataLang?.import_ERR_add_CodeData || "import_ERR_add_CodeData"
+            }`,
+          });
+        }
+        //Hàng bắt đầu hàng kết thúc
+        else if (
+          row_tarts == 0 ||
+          row_tarts == null ||
+          end_row == 0 ||
+          end_row == null
+        ) {
+          Toast.fire({
+            icon: "error",
+            title: `${"Hàng phải lớn hơn 0"}`,
+          });
+        } else if (errEnd) {
+          Toast.fire({
+            icon: "error",
+            title: `${
+              dataLang?.import_ERR_greater_end || "import_ERR_greater_end"
+            }`,
+          });
+        } else if (errStart) {
+          Toast.fire({
+            icon: "error",
+            title: `${
+              dataLang?.import_ERR_greater_end || "import_ERR_greater_end"
+            }`,
+          });
+        } else {
+          Toast.fire({
+            icon: "error",
+            title: `${dataLang?.required_field_null}`,
+          });
+        }
       } else {
+        sErrFileImport(false);
+        sOnSending(true);
+      }
+    } else {
+      if (fileImport == null) {
+        fileImport == null && sErrFileImport(true);
         Toast.fire({
           icon: "error",
           title: `${dataLang?.required_field_null}`,
         });
+      } else {
+        sErrFileImport(false);
+        sOnSending(true);
       }
-    } else {
-      sErrFileImport(false);
-      sOnSending(true);
     }
   };
 
@@ -1045,55 +1061,90 @@ const Index = (props) => {
 
                 <div className="col-span-2"></div>
                 <div className="col-span-4 mb-2 mt-2">
-                  <h5 className="mb-1 block text-sm font-medium text-gray-700">
-                    {dataLang?.import_form || "import_form"}
-                  </h5>
-                  <Select
-                    closeMenuOnSelect={true}
-                    placeholder={dataLang?.import_form || "import_form"}
-                    options={dataSampleImport}
-                    isLoading={sampleImport != null ? false : onLoading}
-                    formatOptionLabel={(option) => (
-                      <div className="flex justify-start items-center gap-1 ">
-                        <h2 className="font-medium">
-                          {option?.label}{" "}
-                          <span className="italic text-sm">{`(${option?.date})`}</span>
-                        </h2>
-                      </div>
-                    )}
-                    isSearchable={true}
-                    onChange={_HandleChange.bind(this, "sampleImport")}
-                    value={sampleImport}
-                    LoadingIndicator
-                    noOptionsMessage={() =>
-                      dataLang?.import_no_data || "import_no_data"
-                    }
-                    maxMenuHeight="200px"
-                    isClearable={true}
-                    menuPortalTarget={document.body}
-                    onMenuOpen={handleMenuOpen}
-                    theme={(theme) => ({
-                      ...theme,
-                      colors: {
-                        ...theme.colors,
-                        primary25: "#EBF5FF",
-                        primary50: "#92BFF7",
-                        primary: "#0F4F9E",
-                      },
-                    })}
-                    styles={{
-                      placeholder: (base) => ({
-                        ...base,
-                        color: "#cbd5e1",
-                      }),
-                      menuPortal: (base) => ({
-                        ...base,
-                        zIndex: 9999,
-                        position: "absolute",
-                      }),
-                    }}
-                    className="border-transparent text-sm placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border "
-                  />
+                  {tabPage != 5 ? (
+                    <React.Fragment>
+                      <h5 className="mb-1 block text-sm font-medium text-gray-700">
+                        {dataLang?.import_form || "import_form"}
+                      </h5>
+                      <Select
+                        closeMenuOnSelect={true}
+                        placeholder={dataLang?.import_form || "import_form"}
+                        options={dataSampleImport}
+                        isLoading={sampleImport != null ? false : onLoading}
+                        formatOptionLabel={(option) => (
+                          <div className="flex justify-start items-center gap-1 ">
+                            <h2 className="font-medium">
+                              {option?.label}{" "}
+                              <span className="italic text-sm">{`(${option?.date})`}</span>
+                            </h2>
+                          </div>
+                        )}
+                        isSearchable={true}
+                        onChange={_HandleChange.bind(this, "sampleImport")}
+                        value={sampleImport}
+                        LoadingIndicator
+                        noOptionsMessage={() =>
+                          dataLang?.import_no_data || "import_no_data"
+                        }
+                        maxMenuHeight="200px"
+                        isClearable={true}
+                        menuPortalTarget={document.body}
+                        onMenuOpen={handleMenuOpen}
+                        theme={(theme) => ({
+                          ...theme,
+                          colors: {
+                            ...theme.colors,
+                            primary25: "#EBF5FF",
+                            primary50: "#92BFF7",
+                            primary: "#0F4F9E",
+                          },
+                        })}
+                        styles={{
+                          placeholder: (base) => ({
+                            ...base,
+                            color: "#cbd5e1",
+                          }),
+                          menuPortal: (base) => ({
+                            ...base,
+                            zIndex: 9999,
+                            position: "absolute",
+                          }),
+                        }}
+                        className="border-transparent text-sm placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border "
+                      />
+                    </React.Fragment>
+                  ) : (
+                    <React.Fragment>
+                      <h5 className="mb-1 block text-sm font-medium text-gray-700">
+                        File mẫu <span className="text-red-500">*</span>
+                      </h5>
+                      <a
+                        href={`${ulrExel}/file/products/import_stages.xlsx`}
+                        class="relative inline-flex items-center w-full py-1.5 overflow-hidden text-lg font-medium text-indigo-600 border-2 border-indigo-600 rounded-md hover:text-white group hover:bg-gray-50"
+                      >
+                        <span class="absolute left-0 block w-full h-0 transition-all bg-indigo-600 opacity-100 group-hover:h-full top-1/2 group-hover:top-0 duration-400 ease"></span>
+                        <span class="absolute right-0 flex items-center justify-start w-10 h-10 duration-300 transform translate-x-full group-hover:translate-x-0 ease">
+                          <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M14 5l7 7m0 0l-7 7m7-7H3"
+                            ></path>
+                          </svg>
+                        </span>
+                        <span class="relative left-1/2 -translate-x-1/2 text-sm">
+                          Tải file mẫu
+                        </span>
+                      </a>
+                    </React.Fragment>
+                  )}
                 </div>
                 <div className="col-span-4 mb-2 mt-2">
                   <h5 className="mb-1 block text-sm font-medium text-gray-700">
@@ -1213,209 +1264,287 @@ const Index = (props) => {
                 <div className="col-span-2"></div>
 
                 <div className="col-span-2"></div>
-                <div className="col-span-4 grid-cols-12 grid items-center gap-1">
-                  <div
-                    className={`${
-                      !showDeleteButton ? "col-span-12" : "col-span-11"
-                    }`}
-                  >
-                    <label
-                      for="importFile"
-                      className="block text-sm font-medium mb-2 dark:text-white"
-                    >
-                      {dataLang?.import_file || "import_file"}
-                    </label>
-                    <label
-                      for="importFile"
+                <div className="col-span-4 ">
+                  <div className="grid-cols-12 grid items-center gap-1">
+                    <div
                       className={`${
-                        (errFileImport && dataImport.length == 0) ||
-                        (errFileImport && fileImport == null)
-                          ? "border-red-500"
-                          : "border-gray-200"
-                      } " border-gray-200 flex w-full cursor-pointer p-2 appearance-none items-center justify-center rounded-md border-2 border-dashed  transition-all hover:border-blue-300"`}
+                        !showDeleteButton ? "col-span-12" : "col-span-11"
+                      }`}
                     >
-                      <input
-                        accept=".xlsx, .xls"
-                        id="importFile"
-                        onChange={_HandleChange.bind(this, "importFile")}
-                        type="file"
-                        className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-500 file:py-0.5 file:px-5 file:text-[13px] file:font-semibold file:text-white hover:file:bg-primary-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60"
-                      />
-                    </label>
-                    {(errFileImport && dataImport.length == 0) ||
-                      (errFileImport && fileImport == null && (
-                        <label className="text-sm text-red-500">
-                          {dataLang?.import_ERR_file || "import_ERR_file"}
-                        </label>
-                      ))}
-                  </div>
-                  <div className="col-span-1  mx-auto">
-                    {showDeleteButton && (
-                      <button
-                        type="button"
-                        onClick={_HandleDeleteFile.bind(this)}
-                        className="mt-8 hover:bg-red-200 group animate-bounce  bg-red-50  rounded p-2 gap-1 i cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
+                      <label
+                        for="importFile"
+                        className="block text-sm font-medium mb-2 dark:text-white"
                       >
-                        <IconDelete size={20} color="red" />
-                      </button>
-                    )}
+                        {dataLang?.import_file || "import_file"}
+                      </label>
+                      <label
+                        for="importFile"
+                        className={`${
+                          (errFileImport && dataImport.length == 0) ||
+                          (errFileImport && fileImport == null)
+                            ? "border-red-500"
+                            : "border-gray-200"
+                        } " border-gray-200 flex w-full cursor-pointer p-2 appearance-none items-center justify-center rounded-md border-2 border-dashed  transition-all hover:border-blue-300"`}
+                      >
+                        <input
+                          accept=".xlsx, .xls"
+                          id="importFile"
+                          onChange={_HandleChange.bind(this, "importFile")}
+                          type="file"
+                          className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-500 file:py-0.5 file:px-5 file:text-[13px] file:font-semibold file:text-white hover:file:bg-primary-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60"
+                        />
+                      </label>
+                      {(errFileImport && dataImport.length == 0) ||
+                        (errFileImport && fileImport == null && (
+                          <label className="text-sm text-red-500">
+                            {dataLang?.import_ERR_file || "import_ERR_file"}
+                          </label>
+                        ))}
+                    </div>
+
+                    <div className="col-span-1  mx-auto">
+                      {showDeleteButton && (
+                        <button
+                          type="button"
+                          onClick={_HandleDeleteFile.bind(this)}
+                          className="mt-8 hover:bg-red-200 group animate-bounce  bg-red-50  rounded p-2 gap-1 i cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
+                        >
+                          <IconDelete size={20} color="red" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <div className="col-span-4 grid grid-cols-4 gap-2.5">
-                  <div className="mx-auto w-full col-span-2">
-                    <label
-                      htmlFor="input-label"
-                      className="block text-sm font-medium mb-2 dark:text-white"
-                    >
-                      {dataLang?.import_line_starts || "import_line_starts"}
-                    </label>
-                    <NumericFormat
-                      className={`${
-                        errRowStart && (row_tarts == null || row_tarts == "")
-                          ? "border-red-500"
-                          : "border-gray-200"
-                      } border py-2.5 outline-none px-4  block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
-                      onValueChange={_HandleChange.bind(this, "row_tarts")}
-                      value={row_tarts}
-                      allowNegative={false}
-                      decimalScale={0}
-                      isNumericString={true}
-                      thousandSeparator=","
-                      placeholder={
-                        dataLang?.import_line_starts || "import_line_starts"
-                      }
-                      // isAllowed={(values) => { const {floatValue} = values; return floatValue  }}
+                <div className="col-span-4  ">
+                  {tabPage != 5 ? (
+                    <div className="grid grid-cols-4 gap-2.5">
+                      <div className="mx-auto w-full col-span-2">
+                        <label
+                          htmlFor="input-label"
+                          className="block text-sm font-medium mb-2 dark:text-white"
+                        >
+                          {dataLang?.import_line_starts || "import_line_starts"}
+                        </label>
+                        <NumericFormat
+                          className={`${
+                            errRowStart &&
+                            (row_tarts == null || row_tarts == "")
+                              ? "border-red-500"
+                              : "border-gray-200"
+                          } border py-2.5 outline-none px-4  block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
+                          onValueChange={_HandleChange.bind(this, "row_tarts")}
+                          value={row_tarts}
+                          allowNegative={false}
+                          decimalScale={0}
+                          isNumericString={true}
+                          thousandSeparator=","
+                          placeholder={
+                            dataLang?.import_line_starts || "import_line_starts"
+                          }
+                          // isAllowed={(values) => { const {floatValue} = values; return floatValue  }}
 
-                      // isAllowed={(values) => { const {floatValue} = values;
-                      //   if(floatValue < 1){
-                      //     Toast.fire({
-                      //       icon: 'error',
-                      //       title: `${dataLang?.import_ERR_greater_than || "import_ERR_greater_than"} !`
-                      //     })
-                      //     // return floatValue > 0
-                      //     return floatValue
-                      //   }
-                      //   if(end_row != null && floatValue > Number(end_row)){
-                      //     Toast.fire({
-                      //       icon: 'error',
-                      //       title: `${dataLang?.import_ERR_greater_start || "import_ERR_greater_start"} !`
-                      //     })
-                      //     return floatValue == Number(end_row)
-                      //   }
-                      //   return floatValue
-                      //   // return floatValue > 0
-                      //   }}
-                    />
-                    {errRowStart && row_tarts == null && (
-                      <label className="text-sm text-red-500">
-                        {dataLang?.import_ERR_line || "import_ERR_line"}
-                      </label>
-                    )}
-                  </div>
-                  <div className="mx-auto w-full col-span-2">
-                    <label
-                      for="input-labels"
-                      className="block text-sm font-medium mb-2 dark:text-white"
-                    >
-                      {dataLang?.import_finished_row || "import_finished_row"}
-                    </label>
-                    <NumericFormat
-                      className={`${
-                        errEndRow && (end_row == null || end_row == "")
-                          ? "border-red-500"
-                          : "border-gray-200"
-                      } border py-2.5 outline-none px-4 border block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
-                      onValueChange={_HandleChange.bind(this, "end_row")}
-                      value={end_row}
-                      disabled={row_tarts == null}
-                      allowNegative={false}
-                      decimalScale={0}
-                      isNumericString={true}
-                      thousandSeparator=","
-                      placeholder={
-                        row_tarts == null
-                          ? dataLang?.import_startrow || "import_startrow"
-                          : dataLang?.import_finished_row ||
-                            "import_finished_row"
-                      }
-                      // isAllowed={(values) => {
-                      //   const { floatValue } = values;
-                      //   if (floatValue < Number(row_tarts)) {
-                      //     Toast.fire({
-                      //       icon: 'error',
-                      //       title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"} !`
-                      //     });
-                      //     return floatValue >= Number(row_tarts);
-                      //   }
-                      //   // return floatValue > 0;
-                      //   return floatValue ;
-                      // }}
+                          // isAllowed={(values) => { const {floatValue} = values;
+                          //   if(floatValue < 1){
+                          //     Toast.fire({
+                          //       icon: 'error',
+                          //       title: `${dataLang?.import_ERR_greater_than || "import_ERR_greater_than"} !`
+                          //     })
+                          //     // return floatValue > 0
+                          //     return floatValue
+                          //   }
+                          //   if(end_row != null && floatValue > Number(end_row)){
+                          //     Toast.fire({
+                          //       icon: 'error',
+                          //       title: `${dataLang?.import_ERR_greater_start || "import_ERR_greater_start"} !`
+                          //     })
+                          //     return floatValue == Number(end_row)
+                          //   }
+                          //   return floatValue
+                          //   // return floatValue > 0
+                          //   }}
+                        />
+                        {errRowStart && row_tarts == null && (
+                          <label className="text-sm text-red-500">
+                            {dataLang?.import_ERR_line || "import_ERR_line"}
+                          </label>
+                        )}
+                      </div>
+                      <div className="mx-auto w-full col-span-2">
+                        <label
+                          for="input-labels"
+                          className="block text-sm font-medium mb-2 dark:text-white"
+                        >
+                          {dataLang?.import_finished_row ||
+                            "import_finished_row"}
+                        </label>
+                        <NumericFormat
+                          className={`${
+                            errEndRow && (end_row == null || end_row == "")
+                              ? "border-red-500"
+                              : "border-gray-200"
+                          } border py-2.5 outline-none px-4 border block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
+                          onValueChange={_HandleChange.bind(this, "end_row")}
+                          value={end_row}
+                          disabled={row_tarts == null}
+                          allowNegative={false}
+                          decimalScale={0}
+                          isNumericString={true}
+                          thousandSeparator=","
+                          placeholder={
+                            row_tarts == null
+                              ? dataLang?.import_startrow || "import_startrow"
+                              : dataLang?.import_finished_row ||
+                                "import_finished_row"
+                          }
+                          // isAllowed={(values) => {
+                          //   const { floatValue } = values;
+                          //   if (floatValue < Number(row_tarts)) {
+                          //     Toast.fire({
+                          //       icon: 'error',
+                          //       title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"} !`
+                          //     });
+                          //     return floatValue >= Number(row_tarts);
+                          //   }
+                          //   // return floatValue > 0;
+                          //   return floatValue ;
+                          // }}
 
-                      // isAllowed={(values) => { const {floatValue} = values; return floatValue || ''}}
-                    />
-                    {errEndRow && end_row == null && (
-                      <label className="text-sm text-red-500">
-                        {dataLang?.import_ERR_linefinish ||
-                          "import_ERR_linefinish"}
-                      </label>
-                    )}
-                  </div>
+                          // isAllowed={(values) => { const {floatValue} = values; return floatValue || ''}}
+                        />
+                        {errEndRow && end_row == null && (
+                          <label className="text-sm text-red-500">
+                            {dataLang?.import_ERR_linefinish ||
+                              "import_ERR_linefinish"}
+                          </label>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <React.Fragment>
+                      <div className="bg-white rounded-2xl shadow-2xl relative">
+                        <div className="absolute right-0 top-0 translate-x-1/2 bg-rose-50 rounded-lg">
+                          <Notification
+                            size="26"
+                            color="red"
+                            className=" animate-bounce"
+                          />
+                        </div>
+                        <div className="p-2">
+                          <div className="flex items-center gap-2">
+                            <ArrowRight
+                              size="18"
+                              color="red"
+                              className="animate-bounce"
+                            />
+                            <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
+                              Xin vui lòng tải xuống tập tin mẫu.
+                            </h2>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <ArrowRight
+                              size="18"
+                              color="red"
+                              className="animate-bounce"
+                            />
+                            <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
+                              Vui lòng nhập các trường * bắt buộc và các trường
+                              mã phải có dự liệu trước trong phần mềm.
+                            </h2>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <ArrowRight
+                              size="18"
+                              color="red"
+                              className="animate-bounce"
+                            />
+                            <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
+                              Không thay đổi thứ tự các cột trong file Excel.
+                            </h2>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <ArrowRight
+                              size="18"
+                              color="red"
+                              className="animate-bounce"
+                            />
+                            <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
+                              Bắt đầu lưu dữ liệu từ dòng thứ 3 trong file
+                              Excel.
+                            </h2>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <ArrowRight
+                              size="18"
+                              color="red"
+                              className="animate-bounce"
+                            />
+                            <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
+                              Trường dữ liệu phải dưới dạng text không dùng công
+                              thức hay định dạng.
+                            </h2>
+                          </div>
+                        </div>
+                      </div>
+                    </React.Fragment>
+                  )}
                 </div>
                 <div className="col-span-2"></div>
 
                 <div className="col-span-2"></div>
                 <div className="col-span-4 -mt-2">
-                  <div
-                    className={`${
-                      listData?.length > 1 && !onLoadingListData
-                        ? "grid-cols-14"
-                        : "grid-cols-12"
-                    } grid  gap-2 items-center`}
-                  >
-                    {listData?.length > 1 && !onLoadingListData && (
-                      <div className="col-span-3 pt-5">
-                        <button
-                          type="button"
-                          onClick={_HandleDeleteParent.bind(this)}
-                          className="flex w-full  items-center  justify-center bg-rose-600 rounded p-2 gap-1 i cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
-                        >
-                          <IconDelete
-                            size={19}
-                            color="white"
-                            className="transition-all ease-out animate-bounce-custom"
-                          />{" "}
-                          <h6 className="text-white font-normal text-xs">
-                            {listData?.length}{" "}
-                            {dataLang?.import_column || "import_column"}
-                          </h6>
-                        </button>
-                      </div>
-                    )}
+                  {tabPage != 5 && (
                     <div
                       className={`${
                         listData?.length > 1 && !onLoadingListData
-                          ? "col-span-11"
-                          : "col-span-12"
-                      } `}
+                          ? "grid-cols-14"
+                          : "grid-cols-12"
+                      } grid  gap-2 items-center`}
                     >
-                      <div className="b  flex items-center justify-center w-full  pt-5">
-                        <button
-                          onClick={_HandleAddParent.bind(this)}
-                          className="i flex justify-center gap-2 group bg-pink-600 w-full text-center py-2 text-white items-center rounded cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
-                        >
-                          <Add
-                            size="20"
-                            color="red"
-                            className="bg-gray-50 rounded-full group-hover:animate-spin ease-linear transition-all"
-                          />
-                          <p className="text-sm">
-                            {dataLang?.import_more_collum ||
-                              "import_more_collum"}
-                          </p>
-                        </button>
+                      {listData?.length > 1 && !onLoadingListData && (
+                        <div className="col-span-3 pt-5">
+                          <button
+                            type="button"
+                            onClick={_HandleDeleteParent.bind(this)}
+                            className="flex w-full  items-center  justify-center bg-rose-600 rounded p-2 gap-1 i cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
+                          >
+                            <IconDelete
+                              size={19}
+                              color="white"
+                              className="transition-all ease-out animate-bounce-custom"
+                            />{" "}
+                            <h6 className="text-white font-normal text-xs">
+                              {listData?.length}{" "}
+                              {dataLang?.import_column || "import_column"}
+                            </h6>
+                          </button>
+                        </div>
+                      )}
+                      <div
+                        className={`${
+                          listData?.length > 1 && !onLoadingListData
+                            ? "col-span-11"
+                            : "col-span-12"
+                        } `}
+                      >
+                        <div className="b  flex items-center justify-center w-full  pt-5">
+                          <button
+                            onClick={_HandleAddParent.bind(this)}
+                            className="i flex justify-center gap-2 group bg-pink-600 w-full text-center py-2 text-white items-center rounded cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
+                          >
+                            <Add
+                              size="20"
+                              color="red"
+                              className="bg-gray-50 rounded-full group-hover:animate-spin ease-linear transition-all"
+                            />
+                            <p className="text-sm">
+                              {dataLang?.import_more_collum ||
+                                "import_more_collum"}
+                            </p>
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
                 <div className="col-span-4 -mt-2 relative">
                   {save_template && onLoadingDataBack && (
@@ -1974,23 +2103,28 @@ const Index = (props) => {
 
                 <div className="col-span-4"></div>
                 <div className="col-span-4 mt-2 grid-cols-2 grid gap-2.5">
-                  <div className="flex items-center  space-x-2 rounded p-2 hover:bg-gray-200 bg-gray-100 cursor-pointer btn-animation hover:scale-[1.02]">
-                    <input
-                      type="checkbox"
-                      onChange={_HandleChange.bind(this, "save_template")}
-                      checked={save_template}
-                      value={save_template}
-                      id="example12"
-                      name="checkGroup1"
-                      className="h-4 w-4 rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 focus:ring-offset-0 disabled:cursor-not-allowed disabled:text-gray-400"
-                    />
-                    <label
-                      htmlFor="example12"
-                      className=" space-x-2 text-sm cursor-pointer"
-                    >
-                      {dataLang?.import_save_template || "import_save_template"}
-                    </label>
-                  </div>
+                  {tabPage != 5 ? (
+                    <div className="flex items-center  space-x-2 rounded p-2 hover:bg-gray-200 bg-gray-100 cursor-pointer btn-animation hover:scale-[1.02]">
+                      <input
+                        type="checkbox"
+                        onChange={_HandleChange.bind(this, "save_template")}
+                        checked={save_template}
+                        value={save_template}
+                        id="example12"
+                        name="checkGroup1"
+                        className="h-4 w-4 rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 focus:ring-offset-0 disabled:cursor-not-allowed disabled:text-gray-400"
+                      />
+                      <label
+                        htmlFor="example12"
+                        className=" space-x-2 text-sm cursor-pointer"
+                      >
+                        {dataLang?.import_save_template ||
+                          "import_save_template"}
+                      </label>
+                    </div>
+                  ) : (
+                    <div></div>
+                  )}
                   <button
                     onClick={_HandleSubmit.bind(this)}
                     type="submit"

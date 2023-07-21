@@ -96,7 +96,7 @@ const Popup_chitietDauki = (props) => {
         <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
         <div className=" space-x-5 3xl:w-[1200px] 2xl:w-[1150px] xl:w-[w-[900px] lg:w-[900px] w-[1200px] 3xl:h-auto  2xl:h-auto xl:h-auto lg:h-[400px] h-[500px] ">
           <div>
-            <div className="bg-teal-500 rounded flex justify-between">
+            <div className="bg-blue-400 rounded flex justify-between">
               <h2 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-semibold p-2 text-white">
                 {dataLang?.debt_suppliers_balance || "debt_suppliers_balance"}
               </h2>

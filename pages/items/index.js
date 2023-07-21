@@ -125,7 +125,8 @@ const Index = (props) => {
     sOnFetching(true) ||
       (keySearch && sOnFetching(true)) ||
       (idCategory && sOnFetching(true)) ||
-      (idBranch?.length > 0 && sOnFetching(true));
+      (idBranch?.length > 0 && sOnFetching(true)) ||
+      (router.query?.page && sOnFetching(true));
   }, [limit, router.query?.page, idCategory, idBranch]);
 
   const _ServerFetchingUnit = () => {
