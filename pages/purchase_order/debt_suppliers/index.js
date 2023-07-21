@@ -28,6 +28,7 @@ import ReactExport from "react-data-export";
 import { useEffect } from "react";
 import Popup_chitietPhatsinh from "./details_arises";
 import Popup_chitietDauki from "./details_first";
+import moment from "moment";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -93,9 +94,13 @@ const Index = (props) => {
           "filter[branch_id]": idBranch != null ? idBranch.value : null,
           "filter[supplier_id]": idSupplier ? idSupplier.value : null,
           "filter[start_date]":
-            valueDate?.startDate != null ? valueDate?.startDate : null,
+            valueDate?.startDate != null
+              ? moment(valueDate?.startDate).format("YYYY-MM-DD")
+              : null,
           "filter[end_date]":
-            valueDate?.endDate != null ? valueDate?.endDate : null,
+            valueDate?.endDate != null
+              ? moment(valueDate?.endDate).format("YYYY-MM-DD")
+              : null,
         },
       },
       (err, response) => {
@@ -746,6 +751,7 @@ const Index = (props) => {
                                   )}
                                 </h4>
                               </div>
+
                               <div className="col-span-3 grid grid-cols-4  items-center justify-center">
                                 <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
                                   {e.no_end == "0"
@@ -788,26 +794,26 @@ const Index = (props) => {
               </div>
 
               <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
+                <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
                   {formatNumber(total?.no_start)}
                 </h3>
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
+                <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
                   {formatNumber(total?.chi_start)}
                 </h3>
               </div>
               <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
+                <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
                   {formatNumber(total?.no_debt)}
                 </h3>
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
+                <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
                   {formatNumber(total?.chi_debt)}
                 </h3>
               </div>
               <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
+                <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
                   {formatNumber(total?.no_end)}
                 </h3>
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right ">
+                <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right ">
                   {formatNumber(total?.chi_end)}
                 </h3>
               </div>

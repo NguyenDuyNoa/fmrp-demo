@@ -74,20 +74,24 @@ const Popup_chitietPhatsinh = (props) => {
           <div>
             <div className="bg-slate-100">
               <div className=" flex gap-2 justify-between p-2">
-                <h2 className="flex gap-2 font-semibold">
+                <h2 className="flex gap-2 font-semibold 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
                   Nhà cung cấp:
-                  <h2 className="font-semibold capitalize text-blue-700">
+                  <h2 className="font-semibold capitalize text-blue-700 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
                     {props?.supplier_name}
                   </h2>
                 </h2>
-                <h2 className="font-medium flex gap-2">
+                <h2 className="font-medium flex gap-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
                   <h2>Lọc từ ngày</h2>
                   <h2 className="text-blue-600">
-                    {moment(props?.date?.startDate).format("DD/MM/YYYY")}
+                    {props?.date?.startDate
+                      ? moment(props?.date?.startDate).format("DD/MM/YYYY")
+                      : "-"}
                   </h2>
                   <h2> đến ngày</h2>
-                  <h2 className="text-blue-600">
-                    {moment(props?.date?.endDate).format("DD/MM/YYYY")}
+                  <h2 className="text-blue-600 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
+                    {props?.date?.endDate
+                      ? moment(props?.date?.endDate).format("DD/MM/YYYY")
+                      : "-"}
                   </h2>
                 </h2>
               </div>
@@ -98,22 +102,22 @@ const Popup_chitietPhatsinh = (props) => {
                   <div
                     className={`grid-cols-12  grid sticky top-0 rounded-xl shadow-md bg-white   z-10  divide-x`}
                   >
-                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                    <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                       Ngày chứng từ
                     </h4>
-                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                    <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                       Mã chứng từ
                     </h4>
-                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                    <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                       Loại chứng từ
                     </h4>
-                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                    <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                       Thành tiền
                     </h4>
-                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                    <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                       Ghi chú
                     </h4>
-                    <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                    <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                       Chi nhánh
                     </h4>
                   </div>

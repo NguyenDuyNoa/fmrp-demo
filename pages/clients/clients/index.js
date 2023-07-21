@@ -504,35 +504,35 @@ const Index = (props) => {
                 </div>
                 <div className="min:h-[500px] 2xl:h-[80%] xl:h-[69%] h-[72%] max:h-[800px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2">
-                    <div className="flex items-center sticky top-0 bg-white p-2 z-10">
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[12%] font-[300] text-left">
+                    <div className="flex items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[12%] font-[600] text-center">
                         {dataLang?.client_list_namecode}
                       </h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[15%] font-[600] text-center">
                         {dataLang?.client_list_name}
                       </h4>
-                      {/* <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.client_list_repre}</h4> */}
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-left">
+                      {/* <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[20%] font-[600] text-center">{dataLang?.client_list_repre}</h4> */}
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
                         {dataLang?.client_list_taxtcode}
                       </h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
                         {dataLang?.client_list_phone}
                       </h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[15%] font-[600] text-center">
                         {dataLang?.client_list_adress}
                       </h4>
-                      {/* <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300] text-left">{dataLang?.client_group_statusclient}</h4> */}
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[18%] font-[300] text-left">
+                      {/* <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[20%] font-[600] text-center">{dataLang?.client_group_statusclient}</h4> */}
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[18%] font-[600] text-center">
                         {dataLang?.client_list_charge}
                       </h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300] text-left">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[15%] font-[600] text-center">
                         {dataLang?.client_list_group}
                       </h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-left">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
                         {dataLang?.client_list_brand}
                       </h4>
-                      {/* <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[18%] font-[300] text-center">{dataLang?.client_list_datecre}</h4> */}
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center">
+                      {/* <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[18%] font-[300] text-center">{dataLang?.client_list_datecre}</h4> */}
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
                         {dataLang?.branch_popup_properties}
                       </h4>
                     </div>
@@ -546,10 +546,10 @@ const Index = (props) => {
                               className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 "
                               key={e.id.toString()}
                             >
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[12%]  rounded-md text-left">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[12%]  rounded-md text-center">
                                 {e.code}
                               </h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left text-[#0F4F9E] hover:font-normal">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 py-0.5 w-[15%]  rounded-md text-left text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear">
                                 <Popup_chitiet
                                   dataLang={dataLang}
                                   className="text-left"
@@ -558,17 +558,17 @@ const Index = (props) => {
                                 />
                               </h6>
                               {/* <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{e.representative}</h6>                 */}
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[10%]  rounded-md text-left">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[10%]  rounded-md text-left">
                                 {e.tax_code}
                               </h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[10%]  rounded-md text-center">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[10%]  rounded-md text-center">
                                 {e.phone_number}
                               </h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[15%]  rounded-md text-left">
                                 {e.address}
                               </h6>
-                              {/* <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">{"Vip"}</h6>                 */}
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[18%]   rounded-md text-left flex object-cover cursor-pointer justify-start items-center flex-wrap gap-2">
+                              {/* <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[20%]  rounded-md text-left">{"Vip"}</h6>                 */}
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[18%]   rounded-md text-left flex object-cover cursor-pointer justify-start items-center flex-wrap gap-2">
                                 {e.staff_charge?.map((d) => {
                                   return (
                                     <>
@@ -595,7 +595,7 @@ const Index = (props) => {
                                   );
                                 })}
                               </h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left flex justify-start flex-wrap ">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[15%]  rounded-md text-left flex justify-start flex-wrap ">
                                 {e.client_group?.map((h) => {
                                   return (
                                     <span
