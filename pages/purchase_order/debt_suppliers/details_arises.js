@@ -8,6 +8,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 });
 import dynamic from "next/dynamic";
 import moment from "moment";
+import ExpandableContent from "/components/UI/more";
 const Popup_chitietPhatsinh = (props) => {
   const dataLang = props?.dataLang;
   const [open, sOpen] = useState(false);
@@ -33,6 +34,11 @@ const Popup_chitietPhatsinh = (props) => {
       `/api_web/Api_debt_supplier/debtDetail/${props?.id}/${props?.type}?csrf_protection=true`,
       {
         params: {
+          "filter[branch_id]":
+            props?.idBranch != null ? props?.idBranch.value : null,
+          "filter[supplier_id]": props?.idSupplier
+            ? props?.idSupplier.value
+            : null,
           "filter[start_date]": props?.date?.startDate
             ? moment(props?.date?.startDate).format("YYYY-MM-DD")
             : "",
@@ -60,8 +66,8 @@ const Popup_chitietPhatsinh = (props) => {
     <>
       <PopupEdit
         title={
-          (props?.type == "no_debt" && "Chi tiết phát sinh nợ") ||
-          (props?.type == "chi_debt" && "Chi tiết phát sinh chi")
+          (props?.type == "no_debt" && dataLang?.debt_suppliers_detail_ps) ||
+          (props?.type == "chi_debt" && dataLang?.debt_suppliers_detail_c)
         }
         button={props?.name}
         onClickOpen={_ToggleModal.bind(this, true)}
@@ -70,24 +76,31 @@ const Popup_chitietPhatsinh = (props) => {
         classNameBtn={props?.className}
       >
         <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
-        <div className=" space-x-5 3xl:w-[1200px] 2xl:w-[1150px] xl:w-[w-[900px] lg:w-[900px] w-[1200px] 3xl:h-auto  2xl:h-auto xl:h-[350px] lg:h-[400px] h-[500px] ">
+        <div className=" space-x-5 3xl:w-[1200px] 2xl:w-[1150px] xl:w-[w-[900px] lg:w-[900px] w-[1200px] 3xl:h-auto  2xl:h-auto xl:h-auto lg:h-[400px] h-[500px] ">
           <div>
             <div className="bg-slate-100">
               <div className=" flex gap-2 justify-between p-2">
                 <h2 className="flex gap-2 font-semibold 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
-                  Nhà cung cấp:
+                  {dataLang?.debt_suppliers_name_Detail ||
+                    "debt_suppliers_name_Detail"}
                   <h2 className="font-semibold capitalize text-blue-700 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
                     {props?.supplier_name}
                   </h2>
                 </h2>
                 <h2 className="font-medium flex gap-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
-                  <h2>Lọc từ ngày</h2>
+                  <h2>
+                    {dataLang?.debt_suppliers_filter_Detail ||
+                      "debt_suppliers_filter_Detail"}
+                  </h2>
                   <h2 className="text-blue-600">
                     {props?.date?.startDate
                       ? moment(props?.date?.startDate).format("DD/MM/YYYY")
                       : "-"}
                   </h2>
-                  <h2> đến ngày</h2>
+                  <h2>
+                    {dataLang?.debt_suppliers_todate_Detail ||
+                      "debt_suppliers_todate_Detail"}
+                  </h2>
                   <h2 className="text-blue-600 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
                     {props?.date?.endDate
                       ? moment(props?.date?.endDate).format("DD/MM/YYYY")
@@ -103,30 +116,33 @@ const Popup_chitietPhatsinh = (props) => {
                     className={`grid-cols-12  grid sticky top-0 rounded-xl shadow-md bg-white   z-10  divide-x`}
                   >
                     <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                      Ngày chứng từ
+                      {dataLang?.debt_suppliers_day_vouchers ||
+                        "debt_suppliers_day_vouchers"}
                     </h4>
                     <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                      Mã chứng từ
+                      {dataLang?.debt_suppliers_code_vouchers ||
+                        "debt_suppliers_code_vouchers"}
                     </h4>
                     <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                      Loại chứng từ
+                      {dataLang?.debt_suppliers_type || "debt_suppliers_type"}
                     </h4>
                     <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                      Thành tiền
+                      {dataLang?.debt_suppliers_into_money ||
+                        "debt_suppliers_into_money"}
                     </h4>
                     <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                      Ghi chú
+                      {dataLang?.debt_suppliers_note || "debt_suppliers_note"}
                     </h4>
                     <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                      Chi nhánh
+                      {dataLang?.import_branch || "import_branch"}
                     </h4>
                   </div>
                   {onFetching ? (
-                    <Loading className="max-h-28" color="#0f4f9e" />
+                    <Loading className="" color="#0f4f9e" />
                   ) : data?.length > 0 ? (
                     <>
                       <ScrollArea
-                        className="min-h-[90px] max-h-[170px] 3xl:max-h-[439px] 2xl:max-h-[250px] xl:max-h-[280px] lg:max-h-[286px] overflow-hidden"
+                        className="min-h-[90px] max-h-[170px] 3xl:max-h-[439px] 2xl:max-h-[250px] xl:max-h-[350px] lg:max-h-[286px] overflow-hidden"
                         speed={1}
                         smoothScrolling={true}
                       >
@@ -170,7 +186,10 @@ const Popup_chitietPhatsinh = (props) => {
                                 {formatNumber(e?.total_amount)}
                               </h6>
                               <h6 className="text-[13px]   py-2.5 px-2 col-span-2 font-medium text-left">
-                                {e?.note}
+                                <ExpandableContent
+                                  content={e?.note}
+                                  maxChar={60}
+                                />
                               </h6>
                               <h6 className="col-span-2 w-fit mx-auto">
                                 <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
@@ -200,16 +219,19 @@ const Popup_chitietPhatsinh = (props) => {
                     </div>
                   )}
                 </div>
-                <div className="grid-cols-12 grid items-center border-b-gray-200 border-b  border-t z-10 border-t-gray-200 bg-slate-100 rounded">
-                  <h2 className="font-semibold p-2 text-[13px] col-span-6 text-center border-l border-r uppercase">
-                    Tổng tiền
-                  </h2>
-                  <h2 className="font-medium p-2 text-[13px]   col-span-2 text-right border-r">
-                    {formatNumber(total)}
-                  </h2>
-                  <h2 className="font-medium p-[17px] text-[13px]   col-span-2 text-right border-r"></h2>
-                  <h2 className="font-medium p-[17px] text-[13px]   col-span-2 text-right border-r"></h2>
-                </div>
+                {data?.length > 0 && (
+                  <div className="grid-cols-12 grid items-center border-b-gray-200 border-b  border-t z-10 border-t-gray-200 bg-slate-100 rounded">
+                    <h2 className="font-semibold p-2 text-[13px] col-span-6 text-center border-l border-r uppercase">
+                      {dataLang?.debt_suppliers_totalAmount ||
+                        "debt_suppliers_totalAmount"}
+                    </h2>
+                    <h2 className="font-medium p-2 text-[13px]   col-span-2 text-right border-r">
+                      {formatNumber(total)}
+                    </h2>
+                    <h2 className="font-medium p-[17px] text-[13px]   col-span-2 text-right border-r"></h2>
+                    <h2 className="font-medium p-[17px] text-[13px]   col-span-2 text-right border-r"></h2>
+                  </div>
+                )}
               </div>
             </div>
           </div>

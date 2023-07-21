@@ -350,13 +350,15 @@ const Index = (props) => {
   return (
     <React.Fragment>
       <Head>
-        <title>{"Công nợ nhà cung cấp"} </title>
+        <title>{dataLang?.debt_suppliers || "debt_suppliers"} </title>
       </Head>
       <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
         <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-          <h6 className="text-[#141522]/40">{"Công nợ nhà cung cấp"}</h6>
+          <h6 className="text-[#141522]/40">
+            {dataLang?.debt_suppliers || "debt_suppliers"}
+          </h6>
           <span className="text-[#141522]/40">/</span>
-          <h6>{"Công nợ nhà cung cấp"}</h6>
+          <h6>{dataLang?.debt_suppliers || "debt_suppliers"}</h6>
         </div>
 
         <div className="grid grid-cols gap-1 h-[100%] overflow-hidden ">
@@ -364,7 +366,7 @@ const Index = (props) => {
             <div className="space-y-0.5 h-[96%] overflow-hidden">
               <div className="flex justify-between">
                 <h2 className="text-2xl text-[#52575E] capitalize">
-                  {"Công nợ nhà cung cấp"}
+                  {dataLang?.debt_suppliers || "debt_suppliers"}
                 </h2>
               </div>
               <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
@@ -611,46 +613,55 @@ const Index = (props) => {
                     </div>
                   </div>
                 </div>
-                <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <div className="min:h-[200px] 3xl:h-[92%] 2xl:h-[92%] xl:h-[82%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%]">
                     <div className="grid grid-cols-12 items-center sticky top-0 p-2 z-10 rounded-xl shadow-md bg-white divide-x">
                       <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                        Mã NCC
+                        {dataLang?.debt_suppliers_code || "debt_suppliers_code"}
                       </h4>
                       <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                        Tên nhà cung cấp
+                        {dataLang?.debt_suppliers_name || "debt_suppliers_name"}
                       </h4>
                       <div className="col-span-3 grid grid-cols-4  items-center justify-center">
                         <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
-                          Số dư đầu kì
+                          {dataLang?.debt_suppliers_balance ||
+                            "debt_suppliers_balance"}
                         </h4>
                         <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                          Nợ
+                          {dataLang?.debt_suppliers_inDebt ||
+                            "debt_suppliers_inDebt"}
                         </h4>
                         <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                          Chi
+                          {dataLang?.debt_suppliers_Spend ||
+                            "debt_suppliers_Spend"}
                         </h4>
                       </div>
                       <div className="col-span-3 grid grid-cols-4  items-center justify-center">
                         <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
-                          Phát sinh
+                          {dataLang?.debt_suppliers_Arise ||
+                            "debt_suppliers_Arise"}
                         </h4>
                         <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                          Nợ
+                          {dataLang?.debt_suppliers_inDebt ||
+                            "debt_suppliers_inDebt"}
                         </h4>
                         <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                          Chi
+                          {dataLang?.debt_suppliers_Spend ||
+                            "debt_suppliers_Spend"}
                         </h4>
                       </div>
                       <div className="col-span-3 grid grid-cols-4  items-center justify-center">
                         <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
-                          Số dư cuối kì
+                          {dataLang?.debt_suppliers_Ending ||
+                            "debt_suppliers_Ending"}
                         </h4>
                         <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                          Nợ
+                          {dataLang?.debt_suppliers_inDebt ||
+                            "debt_suppliers_inDebt"}
                         </h4>
                         <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                          Chi
+                          {dataLang?.debt_suppliers_Spend ||
+                            "debt_suppliers_Spend"}
                         </h4>
                       </div>
                     </div>
@@ -687,6 +698,8 @@ const Index = (props) => {
                                       type={"no_start"}
                                       date={valueDate}
                                       supplier_name={e.name}
+                                      idBranch={idBranch}
+                                      idSupplier={idSupplier}
                                     />
                                   )}
                                 </h4>
@@ -706,6 +719,8 @@ const Index = (props) => {
                                       supplier_name={e.name}
                                       id={e?.id}
                                       type={"chi_start"}
+                                      idBranch={idBranch}
+                                      idSupplier={idSupplier}
                                     />
                                   )}
                                 </h4>
@@ -727,6 +742,8 @@ const Index = (props) => {
                                       id={e?.id}
                                       date={valueDate}
                                       type={"no_debt"}
+                                      idBranch={idBranch}
+                                      idSupplier={idSupplier}
                                     />
                                   )}
                                 </h4>
@@ -747,6 +764,8 @@ const Index = (props) => {
                                       id={e?.id}
                                       date={valueDate}
                                       type={"chi_debt"}
+                                      idBranch={idBranch}
+                                      idSupplier={idSupplier}
                                     />
                                   )}
                                 </h4>
