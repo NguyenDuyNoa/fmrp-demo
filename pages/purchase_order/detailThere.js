@@ -115,7 +115,6 @@ const Popup_chitietThere = (props) => {
   for (let i = 0; i < listQty?.length; i++) {
     totalQuantity += parseInt(listQty[i].quantity);
   }
-  console.log(props);
   return (
     <>
       <PopupEdit

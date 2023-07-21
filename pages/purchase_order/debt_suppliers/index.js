@@ -110,7 +110,6 @@ const Index = (props) => {
           sTotalItems(output);
           sDataExcel(rResult);
           sTotal(rTotal);
-          console.log("rTotal", rTotal);
         }
         sOnFetching(false);
       }
@@ -211,9 +210,6 @@ const Index = (props) => {
   const listBr_filter = listBr
     ? listBr?.map((e) => ({ label: e.name, value: e.id }))
     : [];
-  const listCode_filter = lisCode
-    ? lisCode?.map((e) => ({ label: `${e.code}`, value: e.id }))
-    : [];
 
   const onchang_filter = (type, value) => {
     if (type == "branch") {
@@ -230,7 +226,6 @@ const Index = (props) => {
   const _HandleFresh = () => {
     sOnFetching(true);
   };
-
   const multiDataSet = [
     {
       columns: [
@@ -240,82 +235,74 @@ const Index = (props) => {
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
         {
-          title: `${dataLang?.import_day_vouchers || "import_day_vouchers"}`,
+          title: `${dataLang?.debt_suppliers_code || "debt_suppliers_code"}`,
           width: { wpx: 100 },
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
         {
-          title: `${dataLang?.import_code_vouchers || "import_code_vouchers"}`,
-          width: { wch: 40 },
-          style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
-        },
-        {
-          title: `${dataLang?.import_supplier || "import_supplier"}`,
-          width: { wch: 40 },
-          style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
-        },
-        {
-          title: `${dataLang?.import_total_amount || "import_total_amount"}`,
-          width: { wch: 40 },
-          style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
-        },
-        {
-          title: `${dataLang?.import_tax_money || "import_tax_money"}`,
-          width: { wch: 40 },
-          style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
-        },
-        {
-          title: `${dataLang?.import_into_money || "import_into_money"}`,
-          width: { wch: 40 },
-          style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
-        },
-        {
-          title: `${"Hình thức"}`,
+          title: `${dataLang?.debt_suppliers_name || "debt_suppliers_name"}`,
           width: { wch: 40 },
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
         {
           title: `${
-            dataLang?.import_brow_storekeepers || "import_brow_storekeepers"
+            dataLang?.debt_suppliers_detail_opening ||
+            "debt_suppliers_detail_opening"
           }`,
           width: { wch: 40 },
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
         {
-          title: `${dataLang?.import_branch || "import_branch"}`,
+          title: `${
+            dataLang?.debt_suppliers_detail_period ||
+            "debt_suppliers_detail_period"
+          }`,
           width: { wch: 40 },
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
         {
-          title: `${dataLang?.import_from_note || "import_from_note"}`,
+          title: `${
+            dataLang?.debt_suppliers_detail_incurred ||
+            "debt_suppliers_detail_incurred"
+          }`,
+          width: { wch: 40 },
+          style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
+        },
+        {
+          title: `${
+            dataLang?.debt_suppliers_detail_expenses ||
+            "debt_suppliers_detail_expenses"
+          }`,
+          width: { wch: 40 },
+          style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
+        },
+        {
+          title: `${
+            dataLang?.debt_suppliers_detail_debt_period ||
+            "debt_suppliers_detail_debt_period"
+          }`,
+          width: { wch: 40 },
+          style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
+        },
+        {
+          title: `${
+            dataLang?.debt_suppliers_detail_Ending ||
+            "debt_suppliers_detail_Ending"
+          }`,
           width: { wch: 40 },
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
       ],
       data: dataExcel?.map((e) => [
         { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
-        { value: `${e?.date ? e?.date : ""}` },
         { value: `${e?.code ? e?.code : ""}` },
-        { value: `${e?.supplier_name ? e?.supplier_name : ""}` },
-        { value: `${e?.total_price ? formatNumber(e?.total_price) : ""}` },
-        {
-          value: `${
-            e?.total_tax_price ? formatNumber(e?.total_tax_price) : ""
-          }`,
-        },
-        { value: `${e?.total_amount ? formatNumber(e?.total_amount) : ""}` },
-        {
-          value: `${
-            e?.treatment_methods === "2" ? "Giảm trừ công nợ" : "Trả tiền mặt"
-          }`,
-        },
-        {
-          value: `${
-            e?.warehouseman_id === "0" ? "Chưa duyệt kho" : "Đã duyệt kho"
-          }`,
-        },
-        { value: `${e?.branch_name ? e?.branch_name : ""}` },
-        { value: `${e?.note ? e?.note : ""}` },
+        { value: `${e?.name ? e?.name : ""}` },
+        { value: `${e?.no_start ? formatNumber(e?.no_start) : ""}` },
+        { value: `${e?.chi_start ? formatNumber(e?.chi_start) : ""}` },
+        { value: `${e?.no_debt ? formatNumber(e?.no_debt) : ""}` },
+        { value: `${e?.chi_debt ? formatNumber(e?.chi_debt) : ""}` },
+        { value: `${e?.no_end ? formatNumber(e?.no_end) : ""}` },
+        { value: `${e?.chi_end ? formatNumber(e?.chi_end) : ""}` },
       ]),
     },
   ];
@@ -615,51 +602,57 @@ const Index = (props) => {
                 </div>
                 <div className="min:h-[200px] 3xl:h-[92%] 2xl:h-[92%] xl:h-[82%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   <div className="pr-2 w-[100%]">
-                    <div className="grid grid-cols-12 items-center sticky top-0 p-2 z-10 rounded-xl shadow-md bg-white divide-x">
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                        {dataLang?.debt_suppliers_code || "debt_suppliers_code"}
-                      </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                        {dataLang?.debt_suppliers_name || "debt_suppliers_name"}
-                      </h4>
+                    <div className="grid grid-cols-12  sticky top-0 z-10 rounded-xl shadow-md bg-gray-50 divide-x">
+                      <div className="col-span-1 grid items-center">
+                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]   text-center ">
+                          {dataLang?.debt_suppliers_code ||
+                            "debt_suppliers_code"}
+                        </h4>
+                      </div>
+                      <div className="col-span-2 grid items-center">
+                        <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]   text-center ">
+                          {dataLang?.debt_suppliers_name ||
+                            "debt_suppliers_name"}
+                        </h4>
+                      </div>
                       <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                        <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
+                        <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
                           {dataLang?.debt_suppliers_balance ||
                             "debt_suppliers_balance"}
                         </h4>
-                        <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
+                        <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
                           {dataLang?.debt_suppliers_inDebt ||
                             "debt_suppliers_inDebt"}
                         </h4>
-                        <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
+                        <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
                           {dataLang?.debt_suppliers_Spend ||
                             "debt_suppliers_Spend"}
                         </h4>
                       </div>
-                      <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                        <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
+                      <div className="col-span-3 grid grid-cols-4   items-center justify-center">
+                        <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
                           {dataLang?.debt_suppliers_Arise ||
                             "debt_suppliers_Arise"}
                         </h4>
-                        <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
+                        <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
                           {dataLang?.debt_suppliers_inDebt ||
                             "debt_suppliers_inDebt"}
                         </h4>
-                        <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
+                        <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
                           {dataLang?.debt_suppliers_Spend ||
                             "debt_suppliers_Spend"}
                         </h4>
                       </div>
                       <div className="col-span-3 grid grid-cols-4  items-center justify-center">
-                        <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
+                        <h4 className="2xl:text-[14px] xl:text-[10px] border-b text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-4 text-center ">
                           {dataLang?.debt_suppliers_Ending ||
                             "debt_suppliers_Ending"}
                         </h4>
-                        <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
+                        <h4 className="2xl:text-[14px] pt-1 xl:text-[10px] border-r border-gray-200  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
                           {dataLang?.debt_suppliers_inDebt ||
                             "debt_suppliers_inDebt"}
                         </h4>
-                        <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
+                        <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
                           {dataLang?.debt_suppliers_Spend ||
                             "debt_suppliers_Spend"}
                         </h4>

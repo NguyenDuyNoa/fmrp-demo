@@ -8,17 +8,23 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 });
 import dynamic from "next/dynamic";
 import moment from "moment";
+import Pagination from "/components/UI/pagination";
 import ExpandableContent from "/components/UI/more";
 const Popup_chitietDauki = (props) => {
   const dataLang = props?.dataLang;
+  const [totalItems, sTotalItems] = useState([]);
   const [open, sOpen] = useState(false);
   const _ToggleModal = (e) => sOpen(e);
   const [data, sData] = useState();
   const [onFetching, sOnFetching] = useState(false);
   const [total, sTotal] = useState(null);
+  const [limit, sLimit] = useState(15);
+  const [currentPage, setCurrentPage] = useState(1);
+
   useEffect(() => {
-    props?.id && sOnFetching(true);
-  }, [open]);
+    (props?.id && sOnFetching(true)) || (currentPage && sOnFetching(true));
+    limit && sOnFetching(true);
+  }, [open, limit, currentPage]);
 
   const formatNumber = (number) => {
     if (!number && number !== 0) return 0;
@@ -28,13 +34,19 @@ const Popup_chitietDauki = (props) => {
     const roundedNumber = integerPart + roundedDecimalPart;
     return roundedNumber.toLocaleString("en");
   };
-  console.log(props);
+
+  useEffect(() => {
+    onFetching && _ServerFetching_detailFrirst();
+  }, [onFetching]);
+
   const _ServerFetching_detailFrirst = () => {
     Axios(
       "GET",
       `/api_web/Api_debt_supplier/debtDetail/${props?.id}/no_chi_start?csrf_protection=true`,
       {
         params: {
+          limit: limit,
+          page: currentPage,
           "filter[branch_id]":
             props?.idBranch != null ? props?.idBranch.value : null,
           "filter[supplier_id]": props?.idSupplier
@@ -50,22 +62,23 @@ const Popup_chitietDauki = (props) => {
       },
       (err, response) => {
         if (!err) {
-          var { rResult, rTotal, data } = response.data;
+          var { rResult, rTotal, data, output } = response.data;
 
           sData(rResult);
           sTotal({
             rTotal,
             data,
           });
+          sTotalItems(output);
         }
         sOnFetching(false);
       }
     );
   };
-
-  useEffect(() => {
-    onFetching && _ServerFetching_detailFrirst();
-  }, [open]);
+  // Hàm để xử lý sự kiện chuyển trang
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <>
@@ -155,11 +168,14 @@ const Popup_chitietDauki = (props) => {
                     </h4>
                   </div>
                   {onFetching ? (
-                    <Loading className="" color="#0f4f9e" />
+                    <Loading
+                      className="3xl:max-h-auto  2xl:max-h-auto xl:max-h-auto lg:max-h-[400px] max-h-[500px]"
+                      color="#0f4f9e"
+                    />
                   ) : data?.length > 0 ? (
                     <>
                       <ScrollArea
-                        className="min-h-[90px] max-h-[170px] 3xl:max-h-[439px] 2xl:max-h-[250px] xl:max-h-[350px] lg:max-h-[286px] overflow-hidden"
+                        className="min-h-[90px] max-h-[170px] 3xl:max-h-[364px] 2xl:max-h-[250px] xl:max-h-[350px] lg:max-h-[186px] overflow-hidden"
                         speed={1}
                         smoothScrolling={true}
                       >
@@ -239,32 +255,71 @@ const Popup_chitietDauki = (props) => {
                     </div>
                   )}
                 </div>
-                {data?.length > 0 && (
-                  <div className="grid-cols-14 grid items-center  border-b-gray-200 border-b  border-t   border-t-gray-200  z-10 bg-slate-100  rounded">
-                    <h2 className="border-l font-semibold p-2 text-[13px] border-r border-b  col-span-6 text-center uppercase">
-                      {dataLang?.debt_suppliers_totalAmount ||
-                        "debt_suppliers_totalAmount"}
-                    </h2>
-                    <h2 className="font-medium p-2 text-[13px] border-r border-b    col-span-2 text-right">
-                      {formatNumber(total?.rTotal?.no_amount)}
-                    </h2>
-                    <h2 className="font-medium p-2 text-[13px] border-r border-b   col-span-2 text-right">
-                      {formatNumber(total?.rTotal?.chi_amount)}
-                    </h2>
-                    <h2 className="font-medium p-[17px] text-[13px] border-r border-b  col-span-2 text-right"></h2>
-                    <h2 className="font-medium p-[17px] text-[13px] border-r border-b  col-span-2 text-right"></h2>
-                    <h2 className="border-l font-semibold p-2  text-[13px] border-r col-span-6 text-center uppercase">
-                      {dataLang?.debt_suppliers_detail_Surplus ||
-                        "debt_suppliers_detail_Surplus"}
-                    </h2>
-                    <h2 className="col-span-2 p-[17px]  "></h2>
-                    <h2 className=" font-medium p-2 text-[13px] border-r   col-span-2 text-right">
-                      {formatNumber(total?.rTotal?.total_amount)}
-                    </h2>
-                    <h2 className="col-span-2 p-[17px] border-r "></h2>
-                    <h2 className="col-span-2 p-[17px] border-r "></h2>
+                <div className="flex space-x-5 items-center justify-between">
+                  <Pagination
+                    postsPerPage={limit}
+                    totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                    paginate={handlePageChange}
+                    currentPage={currentPage}
+                  />
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <select
+                        id="select-2"
+                        onChange={(e) => sLimit(e.target.value)}
+                        value={limit}
+                        className="py-1 px-4 pr-9 block  border-green-500 border rounded-md text-sm focus:border-green-500 focus:ring-green-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                      >
+                        <option selected value={15}>
+                          15
+                        </option>
+                        <option value={20}>20</option>
+                        <option value={40}>40</option>
+                        <option value={60}>60</option>
+                      </select>
+                      <div className="absolute inset-y-0 -right-3 flex items-center pointer-events-none pr-8">
+                        <svg
+                          className="h-4 w-4 text-green-500"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M13.6091 3.41829C13.8594 3.68621 14 4.04952 14 4.42835C14 4.80718 13.8594 5.1705 13.6091 5.43841L6.93313 12.5817C6.68275 12.8495 6.3432 13 5.98916 13C5.63511 13 5.29556 12.8495 5.04518 12.5817L2.3748 9.72439C2.13159 9.45494 1.99701 9.09406 2.00005 8.71947C2.00309 8.34488 2.14351 7.98656 2.39107 7.72167C2.63862 7.45679 2.9735 7.30654 3.32359 7.30328C3.67367 7.30002 4.01094 7.44403 4.26276 7.70427L5.98916 9.55152L11.7211 3.41829C11.9715 3.15046 12.3111 3 12.6651 3C13.0191 3 13.3587 3.15046 13.6091 3.41829Z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    <p className="text-sm text-green-600 mt-2">Hiển thị</p>
                   </div>
-                )}
+                </div>
+                <div className="grid-cols-14 grid items-center  border-b-gray-200 border-b  border-t   border-t-gray-200  z-10 bg-slate-100  rounded">
+                  <h2 className="border-l font-semibold p-2 text-[13px] border-r border-b  col-span-6 text-center uppercase">
+                    {dataLang?.debt_suppliers_totalAmount ||
+                      "debt_suppliers_totalAmount"}
+                  </h2>
+                  <h2 className="font-medium p-2 text-[13px] border-r border-b    col-span-2 text-right">
+                    {formatNumber(total?.rTotal?.no_amount)}
+                  </h2>
+                  <h2 className="font-medium p-2 text-[13px] border-r border-b   col-span-2 text-right">
+                    {formatNumber(total?.rTotal?.chi_amount)}
+                  </h2>
+                  <h2 className="font-medium p-[17px] text-[13px] border-r border-b  col-span-2 text-right"></h2>
+                  <h2 className="font-medium p-[17px] text-[13px] border-r border-b  col-span-2 text-right"></h2>
+                  <h2 className="border-l font-semibold p-2  text-[13px] border-r col-span-6 text-center uppercase">
+                    {dataLang?.debt_suppliers_detail_Surplus ||
+                      "debt_suppliers_detail_Surplus"}
+                  </h2>
+                  <h2 className="col-span-2 p-[17px]  "></h2>
+                  <h2 className=" font-medium p-2 text-[13px] border-r   col-span-2 text-right">
+                    {formatNumber(total?.rTotal?.total_amount)}
+                  </h2>
+                  <h2 className="col-span-2 p-[17px] border-r "></h2>
+                  <h2 className="col-span-2 p-[17px] border-r "></h2>
+                </div>
               </div>
             </div>
           </div>
