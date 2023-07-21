@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -6,8 +6,6 @@ import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
-
-import ReactExport from "react-data-export";
 
 import Swal from "sweetalert2";
 
@@ -23,36 +21,28 @@ import {
   Trash as IconDelete,
   SearchNormal1 as IconSearch,
   Add as IconAdd,
-  LocationTick,
-  User,
   Add,
-  ArrowCircleDown,
-  FilterRemove,
   ArrowRight,
   RefreshCircle,
   ColorsSquare,
   Colorfilter,
   Notification,
-  ArrowRight2,
+  ArrowDown,
 } from "iconsax-react";
-import PopupEdit from "/components/UI/popup";
+
 import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
+
 import dynamic from "next/dynamic";
+
 import moment from "moment/moment";
+
 import Select, { components } from "react-select";
-import Popup from "reactjs-popup";
-import { data } from "autoprefixer";
-import TabFilter from "components/UI/TabFilter";
 
 import { TiTick } from "react-icons/ti";
 
-import { getData } from "components/UI/dataExcel";
-import { Joan } from "@next/font/google";
 import { ulrExel } from "services/URL";
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+import Popup_status from "./popup";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -68,11 +58,11 @@ const Index = (props) => {
   const tabPage = router.query?.tab;
   const hiRef = useRef(null);
   const scrollAreaRef = useRef(null);
+
   const handleMenuOpen = () => {
     const menuPortalTarget = scrollAreaRef.current;
     return { menuPortalTarget };
   };
-  const dataExcel = getData();
 
   const _HandleSelectTab = (e) => {
     router.push({
@@ -1115,17 +1105,22 @@ const Index = (props) => {
                     </React.Fragment>
                   ) : (
                     <React.Fragment>
-                      <h5 className="mb-1 block text-sm font-medium text-gray-700">
+                      <h5 className="mb-1 block text-sm font-medium text-gray-700 relative">
                         File mẫu <span className="text-red-500">*</span>
+                        <ArrowDown
+                          size="20"
+                          className="absolute top-0 right-0 animate-bounce"
+                          color="blue"
+                        />
                       </h5>
                       <a
                         href={`${ulrExel}/file/products/import_stages.xlsx`}
-                        class="relative inline-flex items-center w-full py-1.5 overflow-hidden text-lg font-medium text-indigo-600 border-2 border-indigo-600 rounded-md hover:text-white group hover:bg-gray-50"
+                        className="relative inline-flex items-center w-full py-1.5 overflow-hidden text-lg font-medium text-indigo-600 border-2 border-indigo-600 rounded-md hover:text-white group hover:bg-gray-50"
                       >
-                        <span class="absolute left-0 block w-full h-0 transition-all bg-indigo-600 opacity-100 group-hover:h-full top-1/2 group-hover:top-0 duration-400 ease"></span>
-                        <span class="absolute right-0 flex items-center justify-start w-10 h-10 duration-300 transform translate-x-full group-hover:translate-x-0 ease">
+                        <span className="absolute left-0 block w-full h-0 transition-all bg-indigo-600 opacity-100 group-hover:h-full top-1/2 group-hover:top-0 duration-400 ease"></span>
+                        <span className="absolute right-0 flex items-center justify-start w-10 h-10 duration-300 transform translate-x-full group-hover:translate-x-0 ease">
                           <svg
-                            class="w-5 h-5"
+                            className="w-5 h-5"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -1139,7 +1134,7 @@ const Index = (props) => {
                             ></path>
                           </svg>
                         </span>
-                        <span class="relative left-1/2 -translate-x-1/2 text-sm">
+                        <span className="relative left-1/2 -translate-x-1/2 text-sm">
                           Tải file mẫu
                         </span>
                       </a>
@@ -1432,7 +1427,7 @@ const Index = (props) => {
                         <div className="p-2">
                           <div className="flex items-center gap-2">
                             <ArrowRight
-                              size="18"
+                              size="16"
                               color="red"
                               className="animate-bounce"
                             />
@@ -1442,7 +1437,7 @@ const Index = (props) => {
                           </div>
                           <div className="flex items-center gap-2">
                             <ArrowRight
-                              size="18"
+                              size="16"
                               color="red"
                               className="animate-bounce"
                             />
@@ -1453,7 +1448,7 @@ const Index = (props) => {
                           </div>
                           <div className="flex items-center gap-2">
                             <ArrowRight
-                              size="18"
+                              size="16"
                               color="red"
                               className="animate-bounce"
                             />
@@ -1463,7 +1458,7 @@ const Index = (props) => {
                           </div>
                           <div className="flex items-center gap-2">
                             <ArrowRight
-                              size="18"
+                              size="16"
                               color="red"
                               className="animate-bounce"
                             />
@@ -1474,7 +1469,7 @@ const Index = (props) => {
                           </div>
                           <div className="flex items-center gap-2">
                             <ArrowRight
-                              size="18"
+                              size="16"
                               color="red"
                               className="animate-bounce"
                             />
@@ -2151,192 +2146,6 @@ const Index = (props) => {
         </div>
       </div>
     </React.Fragment>
-  );
-};
-
-const Popup_status = (props) => {
-  const dataLang = props?.dataLang;
-  const [open, sOpen] = useState(false);
-  const [sroll, sSroll] = useState(false);
-  const [repositionOnResiz, sRepositionOnResiz] = useState(false);
-  const [data_ex, sData_ex] = useState([]);
-
-  useEffect(() => {
-    sData_ex(props.data);
-    props?.totalFalse > 0 && sOpen(true);
-    props?.totalFalse > 0 && sSroll(true);
-    props?.totalFalse > 0 && sRepositionOnResiz(true);
-  }, [props.data, props.totalFalse]);
-
-  const { values, columns } = useMemo(() => {
-    const arrayFormater = props.data?.map((e) => {
-      if (e?.date_incorporation) {
-        return {
-          ...e,
-          date_incorporation: e?.date_incorporation
-            ? moment(e?.date_incorporation).format("DD/MM/YYYY")
-            : "",
-        };
-      }
-      return { ...e };
-    });
-
-    const newArr = (arrayFormater || []).filter(Boolean).map((e) => {
-      const { rowIndex, error, ...newObject } = e;
-      return newObject;
-    });
-
-    const mappedData = newArr.map((item) => {
-      const rowData = {};
-      props?.listData.forEach((column) => {
-        const value = item[column?.dataFields?.value];
-        rowData[column?.dataFields?.value] = value || "";
-      });
-      return rowData;
-    });
-
-    const columns = props?.listData?.map((header) => ({
-      title: `${header?.dataFields?.label}`,
-      width: { wpx: 150 },
-      style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
-    }));
-
-    const values = mappedData.map((i) =>
-      Object.values(i)?.map((e) => ({
-        value: e,
-        style:
-          e == ""
-            ? { fill: { patternType: "solid", fgColor: { rgb: "FFCCEEFF" } } }
-            : "",
-      }))
-    );
-
-    return { values, columns };
-  }, [props.data, props?.listData]);
-
-  const multiDataSet = [{ columns: columns, data: values }];
-
-  return (
-    <PopupEdit
-      title={
-        <>
-          <span className="text-red-500 capitalize">
-            {`${dataLang?.import_total_detection || "import_total_detection"} ${
-              props?.totalFalse
-            } ${dataLang?.import_error || "import_error"} `}{" "}
-          </span>{" "}
-        </>
-      }
-      open={open}
-      onClose={() => sOpen(false)}
-      classNameBtn={props.className}
-      lockScroll={sroll}
-      repositionOnResiz={repositionOnResiz}
-    >
-      <div className="mt-4 space-x-5 w-[590px] h-auto">
-        <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-          <div className="flex items-center justify-between p-1 bg-gray-50">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg text-[#52575E] font-semibold">
-                {dataLang?.import_detailed_error || "import_detailed_error"}
-              </h2>
-              <FilterRemove
-                size="20"
-                color="red"
-                className="transition-all animate-pulse"
-              />
-            </div>
-            {/* <ExcelFile filename={dataLang?.import_error_data || "import_error_data" `${props?.router == 1 && "danh mục khách hàng"}`} title="DLL" element={ */}
-            <ExcelFile
-              filename={`${
-                dataLang?.import_error_data || "import_error_data"
-              } ${
-                (props?.router == 1 && "danh mục khách hàng") ||
-                (props?.router == 2 && "danh mục nhà cung cấp") ||
-                (props?.router == 3 && "danh mục nguyên vật liệu") ||
-                (props?.router == 4 && "danh mục thành phẩm")
-              }`}
-              title="DLL"
-              element={
-                <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                  <IconExcel size={18} />
-                  <span>{props.dataLang?.client_list_exportexcel}</span>
-                </button>
-              }
-            >
-              <ExcelSheet
-                dataSet={multiDataSet}
-                data={multiDataSet}
-                name="Organization"
-              />
-            </ExcelFile>
-          </div>
-          <div className="pr-2 w-[100%] lx:w-[110%] ">
-            <div
-              className={`grid-cols-12  grid sticky top-0 bg-white shadow-lg  z-10`}
-            ></div>
-            {data_ex?.length > 0 ? (
-              <>
-                <ScrollArea
-                  className="min-h-[90px] max-h-[400px] overflow-hidden"
-                  speed={1}
-                  smoothScrolling={true}
-                >
-                  <div className=" divide-slate-200 min:h-[170px]  max:h-[170px]">
-                    {data_ex?.map((e) => (
-                      <div
-                        className="grid grid-cols-12 hover:bg-slate-50 items-center border-b"
-                        key={e.id?.toString()}
-                      >
-                        <h6 className="text-[13px] col-span-12    py-2.5 text-left flex items-center gap-1">
-                          <ArrowRight
-                            size="18"
-                            color="red"
-                            className="transition-all animate-pulse animate-bounce-custom"
-                          />
-                          <h6 className="text-blue-500 font-semibold">
-                            Dòng {e?.rowIndex}
-                          </h6>
-                          <h6>-</h6>
-                          {e?.error?.map((e, index, array) => (
-                            <div key={e} className="flex gap-1 items-center ">
-                              <h6
-                                className={`${
-                                  e.includes("*")
-                                    ? "text-blue-500 font-bold"
-                                    : "text-black-500 font-semibold"
-                                } text-[13px] col-span-12     py-2.5 text-left "`}
-                              >
-                                {" "}
-                                {dataLang[e] || e?.replace("*", "") || e}
-                                {index === array.length - 1 && "."}
-                              </h6>
-                            </div>
-                          ))}
-                        </h6>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </>
-            ) : (
-              <div className=" max-w-[352px] mt-24 mx-auto">
-                <div className="text-center">
-                  <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                    <IconSearch />
-                  </div>
-                  <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                    {props.dataLang?.purchase_order_table_item_not_found ||
-                      "purchase_order_table_item_not_found"}
-                  </h1>
-                  <div className="flex items-center justify-around mt-6 "></div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </PopupEdit>
   );
 };
 
