@@ -531,10 +531,8 @@ const Index = (props) => {
                         <div>
                           {dataExcel?.length > 0 && (
                             <ExcelFile
-                              filename={
-                                dataLang?.returns_list || "returns_list"
-                              }
-                              title="DSTH"
+                              filename={"Danh sách công nợ nhà cung cấp"}
+                              title="DSCNNCC"
                               element={
                                 <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
                                   <IconExcel
