@@ -24,6 +24,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
 import ModalImage from "react-modal-image";
+import ExpandableContent from "components/UI/more";
 
 const Popup_chitietThere = (props) => {
   const scrollAreaRef = useRef(null);
@@ -416,7 +417,11 @@ const Popup_chitietThere = (props) => {
                                   {formatNumber(e?.amount)}
                                 </h6>
                                 <h6 className="text-[13px] font-medium   py-0.5 col-span-1 text-left ml-3.5">
-                                  {e?.note != undefined ? e?.note : ""}
+                                  {e?.note != undefined ? (
+                                    <ExpandableContent content={e?.note} />
+                                  ) : (
+                                    ""
+                                  )}
                                 </h6>
                               </div>
                             ))}
@@ -675,7 +680,11 @@ const Popup_chitietThere = (props) => {
                                     {formatNumber(e?.amount)}
                                   </h6>
                                   <h6 className="text-[13px]  px-2 py-0.5 col-span-2  font-medium text-left">
-                                    {e?.note != undefined ? e?.note : ""}
+                                    {e?.note != undefined ? (
+                                      <ExpandableContent content={e?.note} />
+                                    ) : (
+                                      ""
+                                    )}
                                   </h6>
                                 </div>
                               ))}
@@ -1034,7 +1043,11 @@ const Popup_chitietThere = (props) => {
                                   </h6>
 
                                   <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-left ml-3.5 ">
-                                    {e?.note != undefined ? e?.note : ""}
+                                    {e?.note != undefined ? (
+                                      <ExpandableContent content={e?.note} />
+                                    ) : (
+                                      ""
+                                    )}
                                   </h6>
                                 </div>
                               ))}
@@ -1357,7 +1370,7 @@ const Popup_chitietThere = (props) => {
                                       : formatNumber(e?.quantity_left)}
                                   </h6>
                                   <h6 className="text-[13px] font-medium  px-2 py-0.5 col-span-1 text-left">
-                                    {e?.note}
+                                    <ExpandableContent content={e?.note} />
                                   </h6>
                                 </div>
                               ))}
@@ -1678,7 +1691,11 @@ const Popup_chitietThere = (props) => {
                                   </h6>
 
                                   <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-left ml-3.5 ">
-                                    {e?.note != undefined ? e?.note : ""}
+                                    {e?.note != undefined ? (
+                                      <ExpandableContent content={e?.note} />
+                                    ) : (
+                                      ""
+                                    )}
                                   </h6>
                                 </div>
                               ))}

@@ -15,6 +15,7 @@ import {
   Trash as IconDelete,
   Edit as IconEdit,
   Grid6 as IconExcel,
+  Refresh2,
 } from "iconsax-react";
 import Select, { components } from "react-select";
 import Swal from "sweetalert2";
@@ -273,7 +274,7 @@ const Index = (props) => {
       ]),
     },
   ];
-
+  const _HandleFresh = () => sOnFetching(true);
   return (
     <React.Fragment>
       <Head>
@@ -313,139 +314,166 @@ const Index = (props) => {
             </div>
           </div>
 
-          <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
-            <div className="flex gap-2">
-              <form className="flex items-center relative">
-                <IconSearch
-                  size={20}
-                  className="absolute left-3 z-10 text-[#cccccc]"
-                />
-                <input
-                  className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
-                  type="text"
-                  onChange={_HandleOnChangeKeySearch.bind(this)}
-                  placeholder={dataLang?.branch_search}
-                />
-              </form>
+          <div className="bg-slate-100 w-full rounded grid grid-cols-6 items-center justify-between xl:p-3 p-2">
+            <div className="col-span-4">
+              <div className="grid grid-cols-5 gap-2">
+                <form className="flex items-center relative">
+                  <IconSearch
+                    size={20}
+                    className="absolute left-3 z-10 text-[#cccccc]"
+                  />
+                  <input
+                    className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-2 rounded-md w-[400px]"
+                    type="text"
+                    onChange={_HandleOnChangeKeySearch.bind(this)}
+                    placeholder={dataLang?.branch_search}
+                  />
+                </form>
 
-              <div className="w-[23vw]">
-                {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand || "client_list_brand"}</h6> */}
-                <Select
-                  // options={options}
-                  options={[
-                    { value: "", label: "Chọn chi nhánh", isDisabled: true },
-                    ...options,
-                  ]}
-                  onChange={_HandleFilterOpt.bind(this, "branch")}
-                  value={idBranch}
-                  noOptionsMessage={() => `${dataLang?.no_data_found}`}
-                  isClearable={true}
-                  isMulti
-                  closeMenuOnSelect={false}
-                  hideSelectedOptions={false}
-                  placeholder={
-                    dataLang?.client_list_brand || "client_list_brand"
-                  }
-                  className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20"
-                  isSearchable={true}
-                  components={{ MultiValue }}
-                  style={{ border: "none", boxShadow: "none", outline: "none" }}
-                  theme={(theme) => ({
-                    ...theme,
-                    colors: {
-                      ...theme.colors,
-                      primary25: "#EBF5FF",
-                      primary50: "#92BFF7",
-                      primary: "#0F4F9E",
-                    },
-                  })}
-                  styles={{
-                    placeholder: (base) => ({
-                      ...base,
-                      color: "#cbd5e1",
-                    }),
-                    control: (base, state) => ({
-                      ...base,
+                <div className="ml-1 col-span-1">
+                  {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand || "client_list_brand"}</h6> */}
+                  <Select
+                    // options={options}
+                    options={[
+                      { value: "", label: "Chọn chi nhánh", isDisabled: true },
+                      ...options,
+                    ]}
+                    onChange={_HandleFilterOpt.bind(this, "branch")}
+                    value={idBranch}
+                    noOptionsMessage={() => `${dataLang?.no_data_found}`}
+                    isClearable={true}
+                    isMulti
+                    closeMenuOnSelect={false}
+                    hideSelectedOptions={false}
+                    placeholder={
+                      dataLang?.client_list_brand || "client_list_brand"
+                    }
+                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20"
+                    isSearchable={true}
+                    components={{ MultiValue }}
+                    style={{
                       border: "none",
-                      outline: "none",
                       boxShadow: "none",
-                      ...(state.isFocused && {
-                        boxShadow: "0 0 0 1.5px #0F4F9E",
+                      outline: "none",
+                    }}
+                    theme={(theme) => ({
+                      ...theme,
+                      colors: {
+                        ...theme.colors,
+                        primary25: "#EBF5FF",
+                        primary50: "#92BFF7",
+                        primary: "#0F4F9E",
+                      },
+                    })}
+                    styles={{
+                      placeholder: (base) => ({
+                        ...base,
+                        color: "#cbd5e1",
                       }),
-                    }),
-                  }}
-                />
-              </div>
-              <div className="w-[23vw]">
-                {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.category_material_group_name || "category_material_group_name"}</h6> */}
-                <Select
-                  // options={dataCategoryOption}
-                  options={[
-                    { value: "", label: "Chọn tên danh mục", isDisabled: true },
-                    ...dataCategoryOption,
-                  ]}
-                  formatOptionLabel={CustomSelectOption}
-                  onChange={_HandleFilterOpt.bind(this, "category")}
-                  value={idCategory}
-                  noOptionsMessage={() => `${dataLang?.no_data_found}`}
-                  isClearable={true}
-                  placeholder={
-                    dataLang?.category_material_group_name ||
-                    "category_material_group_name"
-                  }
-                  className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20"
-                  isSearchable={true}
-                  style={{ border: "none", boxShadow: "none", outline: "none" }}
-                  theme={(theme) => ({
-                    ...theme,
-                    colors: {
-                      ...theme.colors,
-                      primary25: "#EBF5FF",
-                      primary50: "#92BFF7",
-                      primary: "#0F4F9E",
-                    },
-                  })}
-                  styles={{
-                    placeholder: (base) => ({
-                      ...base,
-                      color: "#cbd5e1",
-                    }),
-                    control: (base, state) => ({
-                      ...base,
+                      control: (base, state) => ({
+                        ...base,
+                        border: "none",
+                        outline: "none",
+                        boxShadow: "none",
+                        ...(state.isFocused && {
+                          boxShadow: "0 0 0 1.5px #0F4F9E",
+                        }),
+                      }),
+                    }}
+                  />
+                </div>
+                <div className="col-span-1">
+                  {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.category_material_group_name || "category_material_group_name"}</h6> */}
+                  <Select
+                    // options={dataCategoryOption}
+                    options={[
+                      {
+                        value: "",
+                        label: "Chọn tên danh mục",
+                        isDisabled: true,
+                      },
+                      ...dataCategoryOption,
+                    ]}
+                    formatOptionLabel={CustomSelectOption}
+                    onChange={_HandleFilterOpt.bind(this, "category")}
+                    value={idCategory}
+                    noOptionsMessage={() => `${dataLang?.no_data_found}`}
+                    isClearable={true}
+                    placeholder={
+                      dataLang?.category_material_group_name ||
+                      "category_material_group_name"
+                    }
+                    className="rounded-md py-0.5 bg-white border-none xl:text-base text-[14.5px] z-20"
+                    isSearchable={true}
+                    style={{
                       border: "none",
-                      outline: "none",
                       boxShadow: "none",
-                      ...(state.isFocused && {
-                        boxShadow: "0 0 0 1.5px #0F4F9E",
+                      outline: "none",
+                    }}
+                    theme={(theme) => ({
+                      ...theme,
+                      colors: {
+                        ...theme.colors,
+                        primary25: "#EBF5FF",
+                        primary50: "#92BFF7",
+                        primary: "#0F4F9E",
+                      },
+                    })}
+                    styles={{
+                      placeholder: (base) => ({
+                        ...base,
+                        color: "#cbd5e1",
                       }),
-                    }),
-                  }}
-                />
+                      control: (base, state) => ({
+                        ...base,
+                        border: "none",
+                        outline: "none",
+                        boxShadow: "none",
+                        ...(state.isFocused && {
+                          boxShadow: "0 0 0 1.5px #0F4F9E",
+                        }),
+                      }),
+                    }}
+                  />
+                </div>
               </div>
             </div>
-            {data.length != 0 && (
-              <div className="flex space-x-6">
-                <ExcelFile
-                  filename={
-                    dataLang?.header_category_finishedProduct_group ||
-                    "header_category_finishedProduct_group"
-                  }
-                  element={
-                    <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                      <IconExcel size={18} />
-                      <span>{dataLang?.client_list_exportexcel}</span>
-                    </button>
-                  }
+            <div className="col-span-2">
+              <div className="flex space-x-2 items-center justify-end">
+                <button
+                  onClick={_HandleFresh.bind(this)}
+                  type="button"
+                  className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out"
                 >
-                  <ExcelSheet
-                    dataSet={multiDataSet}
-                    data={multiDataSet}
-                    name={
+                  <Refresh2
+                    className="group-hover:-rotate-45 transition-all ease-in-out"
+                    size="22"
+                    color="green"
+                  />
+                </button>
+                {data.length != 0 && (
+                  <ExcelFile
+                    filename={
                       dataLang?.header_category_finishedProduct_group ||
                       "header_category_finishedProduct_group"
                     }
-                  />
-                </ExcelFile>
+                    element={
+                      <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
+                        <IconExcel size={18} />
+                        <span>{dataLang?.client_list_exportexcel}</span>
+                      </button>
+                    }
+                  >
+                    <ExcelSheet
+                      dataSet={multiDataSet}
+                      data={multiDataSet}
+                      name={
+                        dataLang?.header_category_finishedProduct_group ||
+                        "header_category_finishedProduct_group"
+                      }
+                    />
+                  </ExcelFile>
+                )}
 
                 <div className="flex space-x-2 items-center">
                   <label className="font-[300] text-slate-400">
@@ -467,54 +495,59 @@ const Index = (props) => {
                   </select>
                 </div>
               </div>
-            )}
+            </div>
           </div>
           <div className="min:h-[500px] h-[91%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
             <div className="pr-2">
-              <div className="flex items-center sticky top-0 bg-white p-2 z-10 shadow-[-20px_-9px_20px_0px_#0000003d]">
+              <div className="flex items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10 ">
                 <h4 className="w-[10%]" />
-                <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300]">
+                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[20%] font-[600] text-center">
                   {dataLang?.category_material_group_code ||
                     "category_material_group_code"}
                 </h4>
-                <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[300]">
+                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[20%] font-[600] text-center">
                   {dataLang?.category_material_group_name ||
                     "category_material_group_name"}
                 </h4>
-                <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[300]">
+                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[15%] font-[600] text-center">
                   {dataLang?.note || "note"}
                 </h4>
-                <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[25%] font-[300]">
+                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[25%] font-[600] text-center">
                   {dataLang?.client_list_brand || "client_list_brand"}
                 </h4>
-                <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[300] text-center">
+                <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
                   {dataLang?.branch_popup_properties ||
                     "branch_popup_properties"}
                 </h4>
               </div>
               <div className="divide-y divide-slate-200">
-                {data.map((e) => (
-                  <Item
-                    onRefresh={_ServerFetching.bind(this)}
-                    onRefreshSub={_ServerFetchingSub.bind(this)}
-                    dataLang={dataLang}
-                    key={e.id}
-                    data={e}
-                  />
-                ))}
-                {!onFetching && data?.length == 0 && (
-                  <div className=" max-w-[352px] mt-24 mx-auto">
-                    <div className="text-center">
-                      <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                        <IconSearch />
+                {
+                  onFetching ? (
+                    <Loading />
+                  ) : data?.length > 0 ? (
+                    data.map((e) => (
+                      <Item
+                        onRefresh={_ServerFetching.bind(this)}
+                        onRefreshSub={_ServerFetchingSub.bind(this)}
+                        dataLang={dataLang}
+                        key={e.id}
+                        data={e}
+                      />
+                    ))
+                  ) : (
+                    <div className=" max-w-[352px] mt-24 mx-auto">
+                      <div className="text-center">
+                        <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
+                          <IconSearch />
+                        </div>
+                        <h1 className="textx-[#141522] text-base opacity-90 font-medium">
+                          Không tìm thấy các mục
+                        </h1>
                       </div>
-                      <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                        Không tìm thấy các mục
-                      </h1>
                     </div>
-                  </div>
-                )}
-                {onFetching && <Loading />}
+                  )
+                  // {onFetching && <Loading />}
+                }
               </div>
             </div>
           </div>
@@ -602,13 +635,13 @@ const Item = React.memo((props) => {
             />
           </button>
         </div>
-        <h6 className="xl:text-base text-xs px-2 w-[20%]">
+        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 w-[20%]">
           {props.data?.code}
         </h6>
-        <h6 className="xl:text-base text-xs px-2 w-[20%]">
+        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 w-[20%]">
           {props.data?.name}
         </h6>
-        <h6 className="xl:text-base text-xs px-2 w-[15%]">
+        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 w-[15%]">
           {props.data?.note}
         </h6>
         <div className="flex flex-wrap px-2 w-[25%]">
@@ -702,13 +735,13 @@ const ItemsChild = React.memo((props) => {
             <IconMinus className="mt-1.5" />
           </div>
         )}
-        <h6 className="xl:text-base text-xs px-2 w-[20%]">
+        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 text-xs px-2 w-[20%]">
           {props.data?.code}
         </h6>
-        <h6 className="xl:text-base text-xs px-2 w-[20%]">
+        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 text-xs px-2 w-[20%]">
           {props.data?.name}
         </h6>
-        <h6 className="xl:text-base text-xs px-2 w-[15%]">
+        <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 text-xs px-2 w-[15%]">
           {props.data?.note}
         </h6>
         <div className="w-[25%] flex flex-wrap px-2">

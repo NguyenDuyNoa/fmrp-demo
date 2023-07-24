@@ -45,6 +45,7 @@ import { useEffect } from "react";
 import { data } from "autoprefixer";
 import Popup_chitietThere from "../detailThere";
 import FilePDF from "../FilePDF";
+import ExpandableContent from "components/UI/more";
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -1409,7 +1410,11 @@ const Popup_chitiet = (props) => {
                               </h6>
 
                               <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-left ml-3.5 ">
-                                {e?.note != undefined ? e?.note : ""}
+                                {e?.note != undefined ? (
+                                  <ExpandableContent content={e?.note} />
+                                ) : (
+                                  ""
+                                )}
                               </h6>
                             </div>
                           ))}

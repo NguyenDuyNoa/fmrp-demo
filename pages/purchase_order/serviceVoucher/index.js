@@ -50,6 +50,7 @@ import { v4 as uuidv4 } from "uuid";
 import ReactExport from "react-data-export";
 import { useEffect } from "react";
 import FilePDF from "../FilePDF";
+import ExpandableContent from "components/UI/more";
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -2466,7 +2467,11 @@ const Popup_chitiet = (props) => {
                                 {formatNumber(e?.amount)}
                               </h6>
                               <h6 className="text-[13px]  px-2 py-0.5 col-span-2  font-medium text-left">
-                                {e?.note != undefined ? e?.note : ""}
+                                {e?.note != undefined ? (
+                                  <ExpandableContent content={e?.note} />
+                                ) : (
+                                  ""
+                                )}
                               </h6>
                             </div>
                           ))}

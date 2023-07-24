@@ -54,6 +54,7 @@ const Toast = Swal.mixin({
 
 import ReactExport from "react-data-export";
 import FilePDF from "../FilePDF";
+import ExpandableContent from "components/UI/more";
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -1400,7 +1401,7 @@ const Popup_chitiet = (props) => {
                                   : formatNumber(e?.quantity_left)}
                               </h6>
                               <h6 className="text-[13px] font-medium  px-2 py-0.5 col-span-1 text-left">
-                                {e?.note}
+                                <ExpandableContent content={e?.note} />
                               </h6>
                             </div>
                           ))}

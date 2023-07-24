@@ -42,7 +42,8 @@ import { TiTick } from "react-icons/ti";
 
 import { ulrExel } from "services/URL";
 
-import Popup_status from "./popup";
+import Popup_status from "./(popup)/popup";
+import Popup_stages from "./(popup)/popupStages";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -90,7 +91,6 @@ const Index = (props) => {
   const [onLoading, sOnLoading] = useState(false);
   const [onLoadingListData, sOnLoadingListData] = useState(false);
   const [onLoadingDataBack, sOnLoadingDataBack] = useState(false);
-
   const [errFiles, sErrFiles] = useState(false);
   const [errColumn, sErrColumn] = useState(false);
   const [errRowStart, sErrRowStart] = useState(false);
@@ -109,9 +109,11 @@ const Index = (props) => {
   const [sampleImport, sSampleImport] = useState(null);
 
   const [dataFail, sDataFail] = useState([]);
+  const [dataFailStages, sDataFailStages] = useState([]);
   const [totalFalse, sTotalFalse] = useState(null);
 
   const [dataSuccess, sDataSuccess] = useState(0);
+  const [totalSuccessStages, sTotalSuccessStages] = useState();
 
   const [listData, sListData] = useState([]);
   const [listDataContact, sListDataContat] = useState([]);
@@ -132,7 +134,7 @@ const Index = (props) => {
       2: "/api_web/Api_import_data/get_field_suppliers?csrf_protection=true",
       3: "/api_web/Api_import_data/get_field_materials?csrf_protection=true",
       4: "/api_web/Api_import_data/get_field_products?csrf_protection=true",
-      5: "",
+      // 5: "",
     };
 
     const apiUrls = apiDataFields[tabPage] || "";
@@ -155,7 +157,7 @@ const Index = (props) => {
       2: "/api_web/Api_import_data/get_colums_excel?csrf_protection=true",
       3: "/api_web/Api_import_data/get_colums_excel?csrf_protection=true",
       4: "/api_web/Api_import_data/get_colums_excel?csrf_protection=true",
-      5: "",
+      // 5: "",
     };
 
     const apiUrlComLumn = apiDataComlumn[tabPage] || "";
@@ -172,7 +174,7 @@ const Index = (props) => {
       2: "/api_web/Api_import_data/get_field_isset_suppliers?csrf_protection=true",
       3: "/api_web/Api_import_data/get_field_isset_materials?csrf_protection=true",
       4: "/api_web/Api_import_data/get_field_isset_products?csrf_protection=true",
-      5: "",
+      // 5: "",
     };
 
     const apiUrlConditionColumn = apiDataConditionColumn[tabPage] || "";
@@ -194,7 +196,7 @@ const Index = (props) => {
       2: "/api_web/Api_import_data/get_template_import?csrf_protection=true",
       3: "/api_web/Api_import_data/get_template_import?csrf_protection=true",
       4: "/api_web/Api_import_data/get_template_import?csrf_protection=true",
-      5: "",
+      // 5: "",
     };
 
     const apiUrlSampleImport = apiDataSampleImport[tabPage] || "";
@@ -230,13 +232,17 @@ const Index = (props) => {
   }, [onFetching]);
 
   useEffect(() => {
-    router.query.tab && sOnFetching(true);
+    router.query.tab && tabPage != 5 && sOnFetching(true);
     router.query.tab && sListData([]);
     router.query.tab && sSampleImport(null);
     router.query.tab && sOnLoading(true);
     router.query.tab && sValueCheck("add");
     router.query.tab && sCondition_column(null);
     router.query.tab && sOnLoadingDataBack(false);
+    router.query.tab && sDataFailStages([]);
+    router.query.tab && sDataFail([]);
+    router.query.tab && sTotalSuccessStages();
+
     if (router.query.tab) {
       const inputElement = document.getElementById("importFile");
       inputElement.value = "";
@@ -465,7 +471,6 @@ const Index = (props) => {
             }
             return { ...e, dataFields: null };
           } else {
-            console.log(value);
             return { ...e, dataFields: value };
           }
         } else if (type == "column") {
@@ -883,65 +888,140 @@ const Index = (props) => {
       2: "/api_web/Api_import_data/action_add_suppliers?csrf_protection=true",
       3: "/api_web/Api_import_data/action_add_materials?csrf_protection=true",
       4: "/api_web/Api_import_data/action_add_products?csrf_protection=true",
-      5: "",
+      5: "/api_web/api_import_data/importStages?csrf_protection=true",
     };
     //ánh xạ apiPaths
     const apiUrl = apiPaths[tabPage] || "";
-    for (const data of dataChunks) {
+
+    if (tabPage == 5) {
+      const apiUrl = apiPaths[tabPage] || "";
+      var formData = new FormData();
+      formData.append("file", fileImport);
+      formData.append("actions", valueCheck);
       Axios(
         "POST",
         `${apiUrl}`,
         {
-          data: {
-            data,
-            event: valueCheck,
-            field_where_update: condition_column?.value,
-          },
+          data: formData,
           headers: { "Content-Type": "multipart/form-data" },
           onUploadProgress: (progressEvent) => {
             const { loaded, total } = progressEvent;
-            const percentage = Math.floor(
-              ((loaded / 1000) * 100) / (total / 1000)
-            );
+            const percentage = Math.floor((loaded * 100) / total);
             sMultipleProgress(percentage);
           },
         },
         (err, response) => {
           if (!err) {
-            var { lang_message, data_fail, fail, success } = response.data;
-
-            sDataFail(data_fail);
-            sTotalFalse(fail);
-            sDataSuccess(success);
-            if (success) {
-              if (success == 0) {
-                Toast.fire({
-                  icon: "success",
-                  title: `${dataLang[lang_message?.success]}`,
-                });
-              } else {
-                Toast.fire({
-                  icon: "success",
-                  title: `${dataLang[lang_message?.success]}`,
-                });
-              }
-            }
-            if (fail > 0) {
-              Toast.fire({
-                icon: "error",
-                title: `${dataLang[lang_message?.fail]}`,
-              });
-            }
+            var { message, type, errors, count } = response.data;
+            sDataFailStages(errors);
+            Toast.fire({
+              icon: `${type}`,
+              title: `${message}`,
+            });
           }
+          sTotalSuccessStages(count);
           sOnSending(false);
           setTimeout(() => {
             sMultipleProgress(0);
           }, 2000);
         }
       );
+    } else {
+      for (const data of dataChunks) {
+        Axios(
+          "POST",
+          `${apiUrl}`,
+
+          {
+            data: {
+              data,
+              event: valueCheck,
+              field_where_update: condition_column?.value,
+            },
+            headers: { "Content-Type": "multipart/form-data" },
+            onUploadProgress: (progressEvent) => {
+              const { loaded, total } = progressEvent;
+              const percentage = Math.floor(
+                ((loaded / 1000) * 100) / (total / 1000)
+              );
+              sMultipleProgress(percentage);
+            },
+          },
+          (err, response) => {
+            if (!err) {
+              var { lang_message, data_fail, fail, success } = response.data;
+
+              sDataFail(data_fail);
+              sTotalFalse(fail);
+              sDataSuccess(success);
+              if (success) {
+                if (success == 0) {
+                  Toast.fire({
+                    icon: "success",
+                    title: `${dataLang[lang_message?.success]}`,
+                  });
+                } else {
+                  Toast.fire({
+                    icon: "success",
+                    title: `${dataLang[lang_message?.success]}`,
+                  });
+                }
+              }
+              if (fail > 0) {
+                Toast.fire({
+                  icon: "error",
+                  title: `${dataLang[lang_message?.fail]}`,
+                });
+              }
+            }
+            sOnSending(false);
+            setTimeout(() => {
+              sMultipleProgress(0);
+            }, 2000);
+          }
+        );
+      }
     }
   };
 
+  ///post công đoạn
+  // const _ServerSendingStages = async () => {
+  //   const apiPaths = {
+  //     5: "/api_web/api_import_data/importStages?csrf_protection=true",
+  //   };
+  //   //ánh xạ apiPaths
+  //   const apiUrl = apiPaths[tabPage] || "";
+  //   var formData = new FormData();
+  //   formData.append("file", fileImport);
+  //   Axios(
+  //     "POST",
+  //     `${apiUrl}`,
+  //     {
+  //       data: formData,
+  //       headers: { "Content-Type": "multipart/form-data" },
+  //       onUploadProgress: (progressEvent) => {
+  //         const { loaded, total } = progressEvent;
+  //         const percentage = Math.floor((loaded * 100) / total);
+  //         sMultipleProgress(percentage);
+  //       },
+  //     },
+  //     (err, response) => {
+  //       if (!err) {
+  //         var { message, type, errors, count } = response.data;
+  //         sDataFailStages(errors);
+  //         Toast.fire({
+  //           icon: `${type}`,
+  //           title: `${message}`,
+  //         });
+  //       }
+  //       sTotalSuccessStages();
+  //       sOnSending(false);
+  //       setTimeout(() => {
+  //         sMultipleProgress(0);
+  //       }, 2000);
+  //     }
+  //   );
+  // };
   //Lưu mẫu import
 
   const _ServerSendingImporTemplate = () => {
@@ -979,7 +1059,7 @@ const Index = (props) => {
   };
 
   useEffect(() => {
-    onSending && save_template && _ServerSendingImporTemplate();
+    tabPage != 5 && onSending && save_template && _ServerSendingImporTemplate();
   }, [onSending]);
 
   useEffect(() => {
@@ -1007,14 +1087,25 @@ const Index = (props) => {
           <span className="text-[#141522]/40">/</span>
           <h6>{dataLang?.import_category || "import_category"}</h6>
         </div>
-        <Popup_status
-          dataLang={dataLang}
-          className=""
-          router={router.query?.tab}
-          data={dataFail}
-          totalFalse={totalFalse}
-          listData={listData}
-        />
+        {tabPage != 5 ? (
+          <Popup_status
+            dataLang={dataLang}
+            className=""
+            router={router.query?.tab}
+            data={dataFail}
+            totalFalse={totalFalse}
+            listData={listData}
+          />
+        ) : (
+          <Popup_stages
+            dataLang={dataLang}
+            // className=""
+            router={router.query?.tab}
+            data={dataFailStages}
+            // totalFalse={totalFalse}
+            // listData={listData}
+          />
+        )}
         <div className="">
           <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
             <div className="space-y-3 h-[96%] overflow-hidden">
@@ -1106,7 +1197,9 @@ const Index = (props) => {
                   ) : (
                     <React.Fragment>
                       <h5 className="mb-1 block text-sm font-medium text-gray-700 relative">
-                        File mẫu <span className="text-red-500">*</span>
+                        {dataLang?.import_file_template ||
+                          "import_file_template"}{" "}
+                        <span className="text-red-500">*</span>
                         <ArrowDown
                           size="20"
                           className="absolute top-0 right-0 animate-bounce"
@@ -1135,7 +1228,8 @@ const Index = (props) => {
                           </svg>
                         </span>
                         <span className="relative left-1/2 -translate-x-1/2 text-sm">
-                          Tải file mẫu
+                          {dataLang?.import_Download_file_template ||
+                            "import_Download_file_template"}
                         </span>
                       </a>
                     </React.Fragment>
@@ -1192,7 +1286,7 @@ const Index = (props) => {
 
                 <div className="col-span-2"></div>
                 <div className="col-span-4">
-                  {valueCheck === "edit" ? (
+                  {tabPage != 5 && valueCheck === "edit" ? (
                     <>
                       <h5 className="mb-1 block text-sm font-medium text-gray-700">
                         {dataLang?.import_condition_column ||
@@ -1279,7 +1373,7 @@ const Index = (props) => {
                           (errFileImport && fileImport == null)
                             ? "border-red-500"
                             : "border-gray-200"
-                        } " border-gray-200 flex w-full cursor-pointer p-2 appearance-none items-center justify-center rounded-md border-2 border-dashed  transition-all hover:border-blue-300"`}
+                        } " border-gray-200 flex w-full cursor-pointer p-2 appearance-none hover:border-blue-400 items-center justify-center rounded-md border-2 border-dashed  transition-all`}
                       >
                         <input
                           accept=".xlsx, .xls"
@@ -1336,27 +1430,6 @@ const Index = (props) => {
                           placeholder={
                             dataLang?.import_line_starts || "import_line_starts"
                           }
-                          // isAllowed={(values) => { const {floatValue} = values; return floatValue  }}
-
-                          // isAllowed={(values) => { const {floatValue} = values;
-                          //   if(floatValue < 1){
-                          //     Toast.fire({
-                          //       icon: 'error',
-                          //       title: `${dataLang?.import_ERR_greater_than || "import_ERR_greater_than"} !`
-                          //     })
-                          //     // return floatValue > 0
-                          //     return floatValue
-                          //   }
-                          //   if(end_row != null && floatValue > Number(end_row)){
-                          //     Toast.fire({
-                          //       icon: 'error',
-                          //       title: `${dataLang?.import_ERR_greater_start || "import_ERR_greater_start"} !`
-                          //     })
-                          //     return floatValue == Number(end_row)
-                          //   }
-                          //   return floatValue
-                          //   // return floatValue > 0
-                          //   }}
                         />
                         {errRowStart && row_tarts == null && (
                           <label className="text-sm text-red-500">
@@ -1391,20 +1464,6 @@ const Index = (props) => {
                               : dataLang?.import_finished_row ||
                                 "import_finished_row"
                           }
-                          // isAllowed={(values) => {
-                          //   const { floatValue } = values;
-                          //   if (floatValue < Number(row_tarts)) {
-                          //     Toast.fire({
-                          //       icon: 'error',
-                          //       title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"} !`
-                          //     });
-                          //     return floatValue >= Number(row_tarts);
-                          //   }
-                          //   // return floatValue > 0;
-                          //   return floatValue ;
-                          // }}
-
-                          // isAllowed={(values) => { const {floatValue} = values; return floatValue || ''}}
                         />
                         {errEndRow && end_row == null && (
                           <label className="text-sm text-red-500">
@@ -1432,7 +1491,8 @@ const Index = (props) => {
                               className="animate-bounce"
                             />
                             <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                              Xin vui lòng tải xuống tập tin mẫu.
+                              {dataLang?.import_err_stages ||
+                                "import_err_stages"}
                             </h2>
                           </div>
                           <div className="flex items-center gap-2">
@@ -1442,8 +1502,8 @@ const Index = (props) => {
                               className="animate-bounce"
                             />
                             <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                              Vui lòng nhập các trường * bắt buộc và các trường
-                              mã phải có dự liệu trước trong phần mềm.
+                              {dataLang?.import_err_stages_two ||
+                                "import_err_stages_two"}
                             </h2>
                           </div>
                           <div className="flex items-center gap-2">
@@ -1453,7 +1513,8 @@ const Index = (props) => {
                               className="animate-bounce"
                             />
                             <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                              Không thay đổi thứ tự các cột trong file Excel.
+                              {dataLang?.import_err_stages_there ||
+                                "import_err_stages_there"}
                             </h2>
                           </div>
                           <div className="flex items-center gap-2">
@@ -1463,8 +1524,8 @@ const Index = (props) => {
                               className="animate-bounce"
                             />
                             <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                              Bắt đầu lưu dữ liệu từ dòng thứ 3 trong file
-                              Excel.
+                              {dataLang?.import_err_stages_for ||
+                                "import_err_stages_for"}
                             </h2>
                           </div>
                           <div className="flex items-center gap-2">
@@ -1474,8 +1535,8 @@ const Index = (props) => {
                               className="animate-bounce"
                             />
                             <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                              Trường dữ liệu phải dưới dạng text không dùng công
-                              thức hay định dạng.
+                              {dataLang?.import_err_stages_five ||
+                                "import_err_stages_five"}
                             </h2>
                           </div>
                         </div>
@@ -1586,15 +1647,6 @@ const Index = (props) => {
                           {dataLang?.import_variation || "import_variation"}
                         </h3>
                       </div>
-                      {/* <div
-                        className={`3xl:w-[50%] 2xl:w-[40%] w-[35%]  h-2 bg-gray-200  rounded-xl relative before:animate-pulse  before:transition-all before:absolute before:duration-500  before:ease-in-out duration-500 transition before:h-full before:bg-blue-500 before:rounded-xl before:${
-                          stepper.main && !stepper.extra
-                            ? "w-[50%]"
-                            : stepper.main && stepper.extra
-                            ? "w-[100%]"
-                            : "w-[0%]"
-                        }`}
-                      > */}
                       <div
                         className={`3xl:w-[50%] 2xl:w-[40%] w-[35%]  h-2 bg-gray-200  rounded-xl relative duration-500 transition`}
                       >
@@ -1782,7 +1834,6 @@ const Index = (props) => {
                               {dataLang?.import_operation || "import_operation"}
                             </h5>
                           )}
-                          {console.log(e)}
                           {e?.dataFields?.value == "group_id" ||
                           ((tabPage == 3 || tabPage == 4) &&
                             e?.dataFields?.value == "category_id") ||
@@ -1872,59 +1923,125 @@ const Index = (props) => {
                   )}
                 </div>
                 {!onLoadingListData && (
-                  <div className="col-span-2 flex items-center justify-center mt-5">
-                    {listData.length > 0 && (
-                      <div className={`${listData.length < 2 ? "mt-4" : ""}`}>
-                        <CircularProgressbar
-                          className="text-center"
-                          value={multipleProgress}
-                          strokeWidth={10}
-                          text={`${multipleProgress}%`}
-                          // classes={`text: center`}
-                          styles={buildStyles({
-                            rotation: 0.25,
-                            strokeLinecap: "butt",
-                            textSize: "16px",
-                            pathTransitionDuration: 0.5,
-                            pathColor: `rgba(236, 64, 122, ${
-                              multipleProgress / 100
-                            })`,
-                            pathColor: `green`,
-                            textColor: "green",
-                            textAnchor: "middle",
-                            trailColor: "#d6d6d6",
-                            backgroundColor: "#3e98c7",
-                          })}
-                        />
-                        <div className=" grid grid-cols-12 group items-center justify-center mt-4">
+                  <React.Fragment>
+                    {tabPage != 5 ? (
+                      <div className="col-span-2 flex items-center justify-center mt-5">
+                        {listData.length > 0 && (
                           <div
-                            className={`${
-                              multipleProgress
-                                ? "animate-spin"
-                                : "animate-pulse"
-                            } w-4 h-4 bg-green-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
-                          ></div>
-                          <h6 className="text-green-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
-                            dataSuccess
-                          )} ${
-                            dataLang?.import_susces || "import_susces"
-                          }`}</h6>
-                        </div>
-                        <div className=" grid grid-cols-12 group items-center justify-center mt-4">
-                          <div
-                            className={`${
-                              multipleProgress
-                                ? "animate-spin"
-                                : "animate-pulse"
-                            } w-4 h-4 bg-orange-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
-                          ></div>
-                          <h6 className="text-orange-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
-                            totalFalse
-                          )} ${dataLang?.import_fail || "import_fail"}`}</h6>
-                        </div>
+                            className={`${listData.length < 2 ? "mt-4" : ""}`}
+                          >
+                            <CircularProgressbar
+                              className="text-center"
+                              value={multipleProgress}
+                              strokeWidth={10}
+                              text={`${multipleProgress}%`}
+                              // classes={`text: center`}
+                              styles={buildStyles({
+                                rotation: 0.25,
+                                strokeLinecap: "butt",
+                                textSize: "16px",
+                                pathTransitionDuration: 0.5,
+                                pathColor: `rgba(236, 64, 122, ${
+                                  multipleProgress / 100
+                                })`,
+                                pathColor: `green`,
+                                textColor: "green",
+                                textAnchor: "middle",
+                                trailColor: "#d6d6d6",
+                                backgroundColor: "#3e98c7",
+                              })}
+                            />
+                            <div className=" grid grid-cols-12 group items-center justify-center mt-4">
+                              <div
+                                className={`${
+                                  multipleProgress
+                                    ? "animate-spin"
+                                    : "animate-pulse"
+                                } w-4 h-4 bg-green-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
+                              ></div>
+                              <h6 className="text-green-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
+                                dataSuccess
+                              )} ${
+                                dataLang?.import_susces || "import_susces"
+                              }`}</h6>
+                            </div>
+                            <div className=" grid grid-cols-12 group items-center justify-center mt-4">
+                              <div
+                                className={`${
+                                  multipleProgress
+                                    ? "animate-spin"
+                                    : "animate-pulse"
+                                } w-4 h-4 bg-orange-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
+                              ></div>
+                              <h6 className="text-orange-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
+                                totalFalse
+                              )} ${
+                                dataLang?.import_fail || "import_fail"
+                              }`}</h6>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="col-span-2 flex items-center justify-center mt-5">
+                        {totalSuccessStages >= 0 ? (
+                          <div className={`${"mt-4"}`}>
+                            <CircularProgressbar
+                              className="text-center"
+                              value={multipleProgress}
+                              strokeWidth={10}
+                              text={`${multipleProgress}%`}
+                              // classes={`text: center`}
+                              styles={buildStyles({
+                                rotation: 0.25,
+                                strokeLinecap: "butt",
+                                textSize: "16px",
+                                pathTransitionDuration: 0.5,
+                                pathColor: `rgba(236, 64, 122, ${
+                                  multipleProgress / 100
+                                })`,
+                                pathColor: `green`,
+                                textColor: "green",
+                                textAnchor: "middle",
+                                trailColor: "#d6d6d6",
+                                backgroundColor: "#3e98c7",
+                              })}
+                            />
+                            <div className=" grid grid-cols-12 group items-center justify-center mt-4">
+                              <div
+                                className={`${
+                                  multipleProgress
+                                    ? "animate-spin"
+                                    : "animate-pulse"
+                                } w-4 h-4 bg-green-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
+                              ></div>
+                              <h6 className="text-green-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
+                                totalSuccessStages
+                              )} ${
+                                dataLang?.import_susces || "import_susces"
+                              }`}</h6>
+                            </div>
+                            <div className=" grid grid-cols-12 group items-center justify-center mt-4">
+                              <div
+                                className={`${
+                                  multipleProgress
+                                    ? "animate-spin"
+                                    : "animate-pulse"
+                                } w-4 h-4 bg-orange-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
+                              ></div>
+                              <h6 className="text-orange-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
+                                dataFailStages?.length
+                              )} ${
+                                dataLang?.import_fail || "import_fail"
+                              }`}</h6>
+                            </div>
+                          </div>
+                        ) : (
+                          ""
+                        )}
                       </div>
                     )}
-                  </div>
+                  </React.Fragment>
                 )}
                 <div className="col-span-2"></div>
 

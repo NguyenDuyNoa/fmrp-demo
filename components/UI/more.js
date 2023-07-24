@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 
-const ExpandableContent = ({ content, maxChar }) => {
+const ExpandableContent = ({ content }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const maxChar = 60;
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
