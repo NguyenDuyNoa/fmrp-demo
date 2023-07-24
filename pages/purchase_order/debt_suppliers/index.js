@@ -27,7 +27,7 @@ import Swal from "sweetalert2";
 import ReactExport from "react-data-export";
 import { useEffect } from "react";
 import Popup_chitietPhatsinh from "./(popup)/details_arises";
-import Popup_chitietDauki from "./details_first";
+import Popup_chitietDauki from "./(popup)/details_first";
 import moment from "moment";
 
 const ExcelFile = ReactExport.ExcelFile;
