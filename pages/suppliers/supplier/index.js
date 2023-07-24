@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
-import Image from "next/image";
+import { NumericFormat } from "react-number-format";
 import ReactExport from "react-data-export";
-import ModalImage from "react-modal-image";
 
 import Swal from "sweetalert2";
 
@@ -17,10 +17,9 @@ import {
   Trash as IconDelete,
   SearchNormal1 as IconSearch,
   Add as IconAdd,
-  Eye as IconEye,
-  EyeSlash as IconEyeSlash,
-  Image as IconImage,
-  GalleryEdit as IconEditImg,
+  LocationTick,
+  User,
+  ArrowCircleDown,
   Refresh2,
 } from "iconsax-react";
 import PopupEdit from "/components/UI/popup";
@@ -30,8 +29,10 @@ import dynamic from "next/dynamic";
 import moment from "moment/moment";
 import Select, { components } from "react-select";
 import Popup from "reactjs-popup";
-import Popup_chitiet from "./(popupStaff)/popupDetail";
-import Popup_dsnd from "./(popupStaff)/popup";
+import { data } from "autoprefixer";
+import { useDispatch } from "react-redux";
+import Popup_dsncc from "./(popup)/popup";
+import Popup_chitiet from "./(popup)/detail";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -44,20 +45,11 @@ const Toast = Swal.mixin({
   timerProgressBar: true,
 });
 
-const CustomSelectOption = ({ value, label, level, code }) => (
-  <div className="flex space-x-2 truncate">
-    {level == 1 && <span>--</span>}
-    {level == 2 && <span>----</span>}
-    {level == 3 && <span>------</span>}
-    {level == 4 && <span>--------</span>}
-    <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">
-      {label}
-    </span>
-  </div>
-);
 const Index = (props) => {
   const dataLang = props.dataLang;
   const router = useRouter();
+  const tabPage = router.query?.tab;
+  const dispatch = useDispatch();
 
   const [keySearch, sKeySearch] = useState("");
   const [limit, sLimit] = useState(15);
@@ -67,38 +59,35 @@ const Index = (props) => {
   const [data, sData] = useState({});
   const [data_ex, sData_ex] = useState([]);
   const [listDs, sListDs] = useState();
-  const [onSending, sOnSending] = useState(false);
-  const [dataOption, sDataOption] = useState([]);
-  const [idPos, sIdPos] = useState(null);
-  const [onFetchingOpt, sOnFetchingOpt] = useState(false);
 
-  const [room, sRoom] = useState([]);
-  const _ServerFetching_room = () => {
-    Axios(
-      "GET",
-      `/api_web/api_staff/department/?csrf_protection=true`,
-      {},
-      (err, response) => {
-        if (!err) {
-          var { rResult } = response.data;
-          sRoom(rResult);
-        }
-        sOnFetching(false);
-      }
-    );
+  const [listSelectCt, sListSelectCt] = useState();
+
+  const _HandleSelectTab = (e) => {
+    router.push({
+      pathname: router.route,
+      query: { tab: e },
+    });
   };
+  useEffect(() => {
+    router.push({
+      pathname: router.route,
+      query: { tab: router.query?.tab ? router.query?.tab : 0 },
+    });
+  }, []);
   const _ServerFetching = () => {
+    const id = Number(tabPage);
     Axios(
       "GET",
-      `/api_web/api_staff/staff/?csrf_protection=true" }`,
+      `/api_web/api_supplier/supplier/?csrf_protection=true`,
       {
         params: {
           search: keySearch,
           limit: limit,
           page: router.query?.page || 1,
+          "filter[supplier_group_id]":
+            tabPage !== "0" ? (tabPage !== "-1" ? id : -1) : null,
           "filter[branch_id]":
             idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
-          "filter[position_id]": idPos?.value,
         },
       },
       (err, response) => {
@@ -112,14 +101,15 @@ const Index = (props) => {
       }
     );
   };
-
   const [listBr, sListBr] = useState();
   const _ServerFetching_brand = () => {
     Axios(
       "GET",
       `/api_web/Api_Branch/branch/?csrf_protection=true`,
       {
-        params: {},
+        params: {
+          limit: 0,
+        },
       },
       (err, response) => {
         if (!err) {
@@ -130,48 +120,60 @@ const Index = (props) => {
       }
     );
   };
-  const listBr_filter = listBr?.map((e) => ({ label: e.name, value: e.id }));
+
+  const listBr_filter = listBr
+    ? listBr?.map((e) => ({ label: e.name, value: e.id }))
+    : [];
   const [idBranch, sIdBranch] = useState(null);
   const onchang_filterBr = (type, value) => {
     if (type == "branch") {
       sIdBranch(value);
     }
   };
-
-  const _ServerFetchingOtp = () => {
-    Axios("GET", "/api_web/api_staff/positionOption", {}, (err, response) => {
-      if (!err) {
-        var { rResult } = response.data;
-        sDataOption(
-          rResult.map((x) => ({
-            label: `${x.name}`,
-            value: x.id,
-            level: x.level,
-            code: x.code,
-            parent_id: x.parent_id,
-          }))
-        );
-      }
-    });
-    sOnFetchingOpt(false);
-  };
-  const _HandleFilterOpt = (type, value) => {
-    if (type == "pos") {
-      sIdPos(value);
-    }
-  };
-  useEffect(() => {
-    onFetchingOpt && _ServerFetchingOtp();
-  }, [onFetchingOpt]);
-
-  useEffect(() => {
-    sOnFetchingOpt(true);
-  }, []);
-
   const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
-  const options = listBr_filter
-    ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value))
-    : [];
+  const options = listBr_filter?.filter(
+    (x) => !hiddenOptions.includes(x.value)
+  );
+
+  const _ServerFetching_group = () => {
+    Axios(
+      "GET",
+      `/api_web/api_supplier/group_count/?csrf_protection=true`,
+      {
+        params: {
+          limit: 0,
+          search: keySearch,
+          "filter[branch_id]":
+            idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
+        },
+      },
+      (err, response) => {
+        if (!err) {
+          var { rResult, output } = response.data;
+          sListDs(rResult);
+        }
+        sOnFetching(false);
+      }
+    );
+  };
+
+  const _ServerFetching_selectct = () => {
+    Axios(
+      "GET",
+      `/api_web/Api_address/province?limit=0`,
+      {
+        limit: 0,
+      },
+      (err, response) => {
+        if (!err) {
+          var { rResult, output } = response.data;
+          sListSelectCt(rResult);
+        }
+        sOnFetching(false);
+      }
+    );
+  };
+
   const paginate = (pageNumber) => {
     router.push({
       pathname: router.route,
@@ -199,16 +201,15 @@ const Index = (props) => {
   };
   useEffect(() => {
     (onFetching && _ServerFetching()) ||
-      (onFetching && _ServerFetching_brand()) ||
-      (onFetching && _ServerFetching_room());
+      (onFetching && _ServerFetching_group()) ||
+      (onFetching && _ServerFetching_selectct()) ||
+      (onFetching && _ServerFetching_brand());
   }, [onFetching]);
   useEffect(() => {
-    sOnFetching(true) ||
+    (router.query.tab && sOnFetching(true)) ||
       (keySearch && sOnFetching(true)) ||
-      (idBranch?.length > 0 && sOnFetching(true)) ||
-      (idPos && sOnFetching(true));
-  }, [limit, router.query?.page, , idBranch, idPos]);
-
+      (idBranch?.length > 0 && sOnFetching(true));
+  }, [limit, router.query?.page, router.query?.tab, idBranch]);
   const handleDelete = (event) => {
     Swal.fire({
       title: `${dataLang?.aler_ask}`,
@@ -223,111 +224,32 @@ const Index = (props) => {
         const id = event;
         Axios(
           "DELETE",
-          `/api_web/api_staff/staff/${id}?csrf_protection=true`,
+          `/api_web/api_supplier/supplier/${id}?csrf_protection=true`,
           {},
           (err, response) => {
             if (!err) {
               var { isSuccess, message } = response.data;
-
               if (isSuccess) {
                 Toast.fire({
                   icon: "success",
-                  title: dataLang?.aler_success_delete,
+                  title: dataLang[message],
                 });
-              } else if (message) {
+              } else {
                 Toast.fire({
                   icon: "error",
-                  title: `${dataLang[message]}`,
+                  title: dataLang[message],
                 });
               }
             }
             _ServerFetching();
+            _ServerFetching_group();
           }
         );
       }
     });
   };
-  const [status, sStatus] = useState("");
-  const [active, sActive] = useState("");
-  // const [fecthActive,sFecthActive] = useState(false)
-  // const _ToggleStatus = (id, value) => {
-  //   var index = data.findIndex(x => {
-  //     if(x.id === id){
-  //       return x.id === id
-  //     }
-  //   });
-  //   var db =  data[index].active = value.target.checked
-  //   // sActive()
-  //   sStatus(id)
-  //   sData([...data])
-  //   // console.log(data[index] = !active);
-  //   // data[index]?.active = !active
-  //   // sData([...data])
-  // }
-  const _ToggleStatus = (id) => {
-    Swal.fire({
-      title: `${"Thay đổi trạng thái"}`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#296dc1",
-      cancelButtonColor: "#d33",
-      confirmButtonText: `${dataLang?.aler_yes}`,
-      cancelButtonText: `${dataLang?.aler_cancel}`,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        sStatus(id);
-        var index = data.findIndex((x) => x.id === id);
-        if (index !== -1 && data[index].active === "0") {
-          sActive((data[index].active = "1"));
-        } else if (index !== -1 && data[index].active === "1") {
-          sActive((data[index].active = "0"));
-        }
-        sData([...data]);
-      }
-    });
-  };
-  const _ServerSending = () => {
-    let id = status;
-    var data = new FormData();
-    data.append("active", active);
-    Axios(
-      "POST",
-      `${
-        id &&
-        `/api_web/api_staff/change_status_staff/${id}?csrf_protection=true`
-      }`,
-      {
-        data: {
-          active: active,
-        },
-        headers: { "Content-Type": "multipart/form-data" },
-      },
-      (err, response) => {
-        if (!err) {
-          var { isSuccess, message } = response.data;
-          if (isSuccess) {
-            Toast.fire({
-              icon: "success",
-              title: `${dataLang[message]}`,
-            });
-          }
-        }
-        sOnSending(false);
-      }
-    );
-  };
-  useEffect(() => {
-    onSending && _ServerSending();
-  }, [onSending]);
 
-  useEffect(() => {
-    sOnSending(true);
-  }, [active]);
-  useEffect(() => {
-    sOnSending(true);
-  }, [status]);
   //excel
-
   const multiDataSet = [
     {
       columns: [
@@ -337,47 +259,37 @@ const Index = (props) => {
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
         {
-          title: `${dataLang?.personnels_staff_table_fullname}`,
+          title: `${dataLang?.suppliers_supplier_code} `,
           width: { wpx: 100 },
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
         {
-          title: `${dataLang?.personnels_staff_table_code}`,
+          title: `${dataLang?.suppliers_supplier_name}`,
           width: { wch: 40 },
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
         {
-          title: `${dataLang?.personnels_staff_table_email}`,
+          title: `${dataLang?.suppliers_supplier_reper}`,
           width: { wch: 40 },
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
         {
-          title: `${dataLang?.personnels_staff_table_depart}`,
+          title: `${dataLang?.suppliers_supplier_taxcode}`,
           width: { wch: 40 },
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
         {
-          title: `${dataLang?.personnels_staff_position}`,
+          title: `${dataLang?.suppliers_supplier_phone}`,
           width: { wch: 40 },
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
         {
-          title: `${dataLang?.personnels_staff_table_logged}`,
+          title: `${dataLang?.suppliers_supplier_adress}`,
           width: { wch: 40 },
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
         {
-          title: `${dataLang?.personnels_staff_table_active}`,
-          width: { wch: 40 },
-          style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
-        },
-        {
-          title: `${dataLang?.personnels_staff_popup_manager}`,
-          width: { wch: 40 },
-          style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
-        },
-        {
-          title: `${dataLang?.personnels_staff_position}`,
+          title: `${dataLang?.suppliers_supplier_group}`,
           width: { wch: 40 },
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
@@ -386,48 +298,47 @@ const Index = (props) => {
           width: { wch: 40 },
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
+        {
+          title: `${dataLang?.suppliers_supplier_date}`,
+          width: { wch: 40 },
+          style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
+        },
       ],
       data: data_ex?.map((e) => [
         { value: `${e.id}`, style: { numFmt: "0" } },
-        { value: `${e.full_name ? e.full_name : ""}` },
         { value: `${e.code ? e.code : ""}` },
-        { value: `${e.email ? e.email : ""}` },
-        { value: `${e.department ? e.department?.map((e) => e.name) : ""}` },
-        { value: `${e.position_name ? e.position_name : ""}` },
-        { value: `${e.last_login ? e.last_login : ""}` },
-
+        { value: `${e.name ? e.name : ""}` },
+        { value: `${e.representative ? e.representative : ""}` },
+        { value: `${e.tax_code ? e.tax_code : ""}` },
+        { value: `${e.phone_number ? e.phone_number : ""}` },
+        { value: `${e.address ? e.address : ""}` },
         {
           value: `${
-            e.active
-              ? e.active == "1"
-                ? "Đang hoạt động"
-                : "Không hoạt động"
-              : ""
+            e.supplier_group ? e.supplier_group?.map((i) => i.name) : ""
           }`,
         },
-        {
-          value: `${
-            e.admin ? e.admin == "1" && "Có" : e.admin == "0" && "Không"
-          }`,
-        },
-        { value: `${e.position_name ? e.position_name : ""}` },
         { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
+        { value: `${e.date_create ? e.date_create : ""}` },
       ]),
     },
   ];
-  const _HandleFresh = () => sOnFetching(true);
+
+  const _HandleFresh = () => {
+    sOnFetching(true);
+  };
+
   return (
     <React.Fragment>
       <Head>
-        <title>{dataLang?.personnels_staff_title}</title>
+        <title>{dataLang?.suppliers_supplier_title}</title>
       </Head>
       <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
         <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
           <h6 className="text-[#141522]/40">
-            {dataLang?.personnels_staff_title}
+            {dataLang?.suppliers_supplier_title}
           </h6>
           <span className="text-[#141522]/40">/</span>
-          <h6>{dataLang?.personnels_staff_title}</h6>
+          <h6>{dataLang?.suppliers_supplier_title}</h6>
         </div>
 
         <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
@@ -435,24 +346,51 @@ const Index = (props) => {
             <div className="space-y-3 h-[96%] overflow-hidden">
               <div className="flex justify-between">
                 <h2 className="text-2xl text-[#52575E] capitalize">
-                  {dataLang?.personnels_staff_title}
+                  {dataLang?.suppliers_supplier_title}
                 </h2>
                 <div className="flex justify-end items-center">
-                  <Popup_dsnd
-                    room={room}
+                  <Popup_dsncc
                     listBr={listBr}
-                    dataOption={dataOption}
+                    listSelectCt={listSelectCt}
                     onRefresh={_ServerFetching.bind(this)}
+                    onRefreshGroup={_ServerFetching_group.bind(this)}
                     dataLang={dataLang}
-                    data={data}
                     className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                   />
                 </div>
               </div>
 
+              <div className="flex space-x-3 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                {/* <div><TabClient onClick={_HandleSelectTab.bind(this, "all")} active="all" total={totalItem.iTotalDisplayRecords}>{dataLang?.client_list_grroupall}</TabClient></div>
+                    <div><TabClient onClick={_HandleSelectTab.bind(this, "nogroup")} active="nogroup"  total={totalItem.iTotalDisplayRecords}>{dataLang?.client_list_nogroup}</TabClient></div> */}
+                {listDs &&
+                  listDs.map((e) => {
+                    return (
+                      <div>
+                        <TabClient
+                          style={{
+                            backgroundColor: "#e2f0fe",
+                          }}
+                          dataLang={dataLang}
+                          key={e.id}
+                          onClick={_HandleSelectTab.bind(this, `${e.id}`)}
+                          total={e.count}
+                          active={e.id}
+                          className={"text-[#0F4F9E] "}
+                        >
+                          {(e.name == "all_group" && dataLang.all_group) ||
+                            (e.name == "no_group" && dataLang.no_group) ||
+                            e.name}
+                        </TabClient>
+                        {/* >{e.name}</TabClient>  */}
+                      </div>
+                    );
+                  })}
+              </div>
+
               <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
                 <div className="xl:space-y-3 space-y-2">
-                  <div className="bg-slate-100 w-full rounded grid grid-cols-6 justify-between xl:p-3 p-2">
+                  <div className="bg-slate-100 w-full rounded grid grid-cols-6 items-center justify-between xl:p-3 p-2">
                     <div className="col-span-4">
                       <div className="grid grid-cols-5 gap-2">
                         <div className="col-span-1">
@@ -470,80 +408,27 @@ const Index = (props) => {
                           </form>
                         </div>
                         <div className="ml-1 col-span-1">
-                          {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.client_list_brand}</h6> */}
                           <Select
-                            // options={options}
+                            //  options={listBr_filter}
                             options={[
                               {
                                 value: "",
                                 label: "Chọn chi nhánh",
                                 isDisabled: true,
                               },
-                              ...options,
+                              ...listBr_filter,
                             ]}
                             onChange={onchang_filterBr.bind(this, "branch")}
                             value={idBranch}
+                            placeholder={dataLang?.client_list_filterbrand}
                             hideSelectedOptions={false}
                             isMulti
                             isClearable={true}
-                            placeholder={dataLang?.client_list_filterbrand}
                             className="rounded-md bg-white  xl:text-base text-[14.5px] z-20"
                             isSearchable={true}
                             noOptionsMessage={() => "Không có dữ liệu"}
                             components={{ MultiValue }}
                             closeMenuOnSelect={false}
-                            style={{
-                              border: "none",
-                              boxShadow: "none",
-                              outline: "none",
-                            }}
-                            theme={(theme) => ({
-                              ...theme,
-                              colors: {
-                                ...theme.colors,
-                                primary25: "#EBF5FF",
-                                primary50: "#92BFF7",
-                                primary: "#0F4F9E",
-                              },
-                            })}
-                            styles={{
-                              placeholder: (base) => ({
-                                ...base,
-                                color: "#cbd5e1",
-                              }),
-                              control: (base, state) => ({
-                                ...base,
-                                border: "none",
-                                outline: "none",
-                                boxShadow: "none",
-                                ...(state.isFocused && {
-                                  boxShadow: "0 0 0 1.5px #0F4F9E",
-                                }),
-                              }),
-                            }}
-                          />
-                        </div>
-                        <div className="ml-1 col-span-1">
-                          {/* <h6 className='text-gray-400 xl:text-[14px] text-[12px]'>{dataLang?.personnels_staff_position}</h6> */}
-                          <Select
-                            // options={dataOption}
-                            options={[
-                              {
-                                value: "",
-                                label: "Chọn chức vụ",
-                                isDisabled: true,
-                              },
-                              ...dataOption,
-                            ]}
-                            formatOptionLabel={CustomSelectOption}
-                            onChange={_HandleFilterOpt.bind(this, "pos")}
-                            value={idPos}
-                            isClearable={true}
-                            placeholder={
-                              dataLang?.personnels_staff_position_click
-                            }
-                            className="rounded-md bg-white  xl:text-base text-[14.5px] z-20"
-                            isSearchable={true}
                             style={{
                               border: "none",
                               boxShadow: "none",
@@ -592,8 +477,8 @@ const Index = (props) => {
                         </button>
                         {data_ex?.length > 0 && (
                           <ExcelFile
-                            filename="Danh sách người dùng"
-                            title="Dsnd"
+                            filename="Danh sách nhà cung cấp"
+                            title="Dsncc"
                             element={
                               <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
                                 <IconExcel size={18} />
@@ -629,37 +514,33 @@ const Index = (props) => {
                     </div>
                   </div>
                 </div>
-                <div className="min:h-[500px] 2xl:h-[92%] xl:h-[69%] h-[72%] max:h-[800px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                  <div className="pr-2 w-[100%] lx:w-[115%] ">
-                    <div className="flex items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10">
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600  uppercase w-[18%] font-semibold text-center">
-                        {dataLang?.personnels_staff_table_avtar}
+                {/* <div className="min:h-[200px] h-[65%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"> */}
+                <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                  <div className="pr-2 w-[100%] lx:w-[110%] ">
+                    <div className="flex items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x  p-2 z-10">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[13%] font-[600] text-center">
+                        {dataLang?.suppliers_supplier_code}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600  uppercase w-[20%] font-semibold text-center">
-                        {dataLang?.personnels_staff_table_fullname}
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[15%] font-[600] text-center">
+                        {dataLang?.suppliers_supplier_name}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600  uppercase w-[20%] font-semibold text-center">
-                        {dataLang?.personnels_staff_table_code}
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
+                        {dataLang?.suppliers_supplier_taxcode}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600  uppercase w-[22%] font-semibold text-center">
-                        {dataLang?.personnels_staff_table_email}
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
+                        {dataLang?.suppliers_supplier_phone}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600  uppercase w-[15%] font-semibold text-center">
-                        {dataLang?.personnels_staff_table_depart}
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[15%] font-[600] text-center">
+                        {dataLang?.suppliers_supplier_adress}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600  uppercase w-[15%] font-semibold text-center">
-                        {dataLang?.personnels_staff_position}
+                      {/* <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[20%] font-[600] text-center">{dataLang?.client_group_statusclient}</h4> */}
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[15%] font-[600] text-center">
+                        {dataLang?.suppliers_supplier_group}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600  uppercase w-[28%] font-semibold text-center">
-                        {dataLang?.personnels_staff_table_logged}
-                      </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600  uppercase w-[20%] font-semibold text-center">
-                        {dataLang?.personnels_staff_table_active}
-                      </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600  uppercase w-[20%] font-semibold text-center">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[15%] font-[600] text-center">
                         {dataLang?.client_list_brand}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600  uppercase w-[10%] font-semibold text-center">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
                         {dataLang?.branch_popup_properties}
                       </h4>
                     </div>
@@ -667,82 +548,47 @@ const Index = (props) => {
                       <Loading className="h-80" color="#0f4f9e" />
                     ) : data?.length > 0 ? (
                       <>
-                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
+                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                           {data?.map((e) => (
                             <div
                               className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 "
-                              key={e?.id.toString()}
+                              key={e.id.toString()}
                             >
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[18%]  rounded-md text-center ">
-                                <div className="w-[60px] h-[60px] mx-auto">
-                                  {e?.profile_image == null ? (
-                                    <ModalImage
-                                      small="/no_image.png"
-                                      large="/no_image.png"
-                                      className="w-full h-full rounded object-contain"
-                                    />
-                                  ) : (
-                                    <>
-                                      <ModalImage
-                                        small={e?.profile_image}
-                                        large={e?.profile_image}
-                                        className="w-[60px] h-[60px]  rounded-[100%] object-cover"
-                                      />
-                                      {/* <Image width={60} height={60} quality={100} src={e?.profile_image} alt="thumb type" className="w-[60px] h-[60px] rounded-[100%] object-cover" loading="lazy" crossOrigin="anonymous" blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/> */}
-                                    </>
-                                  )}
-                                </div>
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[13%]  rounded-md text-center">
+                                {e.code}
                               </h6>
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]   px-2 py-0.5 w-[20%]  rounded-md text-left text-[#0F4F9E] hover:textx-blue-600 transition-all ease-linear">
+                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%] font-semibold  rounded-md text-left hover:text-blue-600 transition-all ease-linear text-[#0F4F9E] ">
                                 <Popup_chitiet
                                   dataLang={dataLang}
                                   className="text-left"
-                                  name={e.full_name}
+                                  name={e.name}
                                   id={e?.id}
                                 />
                               </h6>
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[20%]  rounded-md text-left">
-                                {e.code}
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[10%]  rounded-md text-left">
+                                {e.tax_code}
                               </h6>
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[22%]  rounded-md text-left">
-                                {e.email}
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[10%]  rounded-md text-center">
+                                {e.phone_number}
                               </h6>
                               <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[15%]  rounded-md text-left">
-                                <div className="flex flex-wrap gap-2">
-                                  {e.department?.map((e) => {
-                                    return <span key={e.id}>{e.name}</span>;
-                                  })}
-                                </div>
+                                {e.address}
                               </h6>
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[15%]  rounded-md text-center">
-                                {e.position_name}
-                              </h6>
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[28%]  rounded-md text-left">
-                                {e.last_login != null
-                                  ? moment(e.last_login).format(
-                                      "DD/MM/YYYY, h:mm:ss"
-                                    )
-                                  : ""}
-                              </h6>
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[20%]  rounded-md text-center">
-                                <label
-                                  htmlFor={e.id}
-                                  className="relative inline-flex items-center cursor-pointer"
-                                >
-                                  <input
-                                    type="checkbox"
-                                    className="sr-only peer"
-                                    value={e.active}
-                                    id={e.id}
-                                    // defaultChecked
-                                    checked={e.active == "0" ? false : true}
-                                    onChange={_ToggleStatus.bind(this, e.id)}
-                                  />
 
-                                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                </label>
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[15%]  rounded-md text-left flex justify-start flex-wrap ">
+                                {e.supplier_group?.map((h) => {
+                                  return (
+                                    <span
+                                      key={h.id}
+                                      style={{ backgroundColor: "#e2f0fe" }}
+                                      className={`text-[#0F4F9E]  mr-2 mb-1 w-fit 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 rounded-md py-0.5`}
+                                    >
+                                      {h.name}
+                                    </span>
+                                  );
+                                })}
                               </h6>
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]   px-2 py-0.5 w-[20%] rounded-md text-left flex justify-start flex-wrap ">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5 w-[15%] rounded-md text-left flex justify-start flex-wrap ">
                                 {e.branch?.map((i) => (
                                   <span
                                     key={i.id}
@@ -752,23 +598,30 @@ const Index = (props) => {
                                   </span>
                                 ))}
                               </h6>
+                              {/* <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[18%]  rounded-md text-center">{moment(e.date_create).format('DD/MM/YYYY, h:mm:ss')}</h6>                 */}
                               <div className="space-x-2 w-[10%] text-center">
-                                <Popup_dsnd
-                                  room={room}
+                                <Popup_dsncc
                                   listBr={listBr}
-                                  dataOption={dataOption}
+                                  listSelectCt={listSelectCt}
                                   onRefresh={_ServerFetching.bind(this)}
                                   className="xl:text-base text-xs "
                                   listDs={listDs}
                                   dataLang={dataLang}
                                   name={e.name}
+                                  representative={e.representative}
                                   code={e.code}
+                                  tax_code={e.tax_code}
                                   phone_number={e.phone_number}
+                                  address={e.address}
+                                  date_incorporation={e.date_incorporation}
+                                  note={e.note}
                                   email={e.email}
+                                  website={e.website}
+                                  debt_begin={e.debt_begin}
+                                  city={e.city}
+                                  district={e.district}
+                                  ward={e.ward}
                                   id={e?.id}
-                                  department={e.department}
-                                  position_name={e.position_name}
-                                  last_login={e.last_login}
                                 />
                                 <button
                                   onClick={() => handleDelete(e.id)}
@@ -790,7 +643,9 @@ const Index = (props) => {
                           <h1 className="textx-[#141522] text-base opacity-90 font-medium">
                             Không tìm thấy các mục
                           </h1>
-                          <div className="flex items-center justify-around mt-6 "></div>
+                          <div className="flex items-center justify-around mt-6 ">
+                            {/* <Popup_dsncc onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
+                          </div>
                         </div>
                       </div>
                     )}
@@ -819,6 +674,29 @@ const Index = (props) => {
     </React.Fragment>
   );
 };
+const TabClient = React.memo((props) => {
+  const router = useRouter();
+  return (
+    <button
+      style={props.style}
+      onClick={props.onClick}
+      className={`${props.className} justify-center min-w-[220px] flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}
+    >
+      {router.query?.tab === `${props.active}` && (
+        <ArrowCircleDown size="20" color="#0F4F9E" />
+      )}
+      {props.children}
+      <span
+        className={`${
+          props?.total > 0 &&
+          "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"
+        } `}
+      >
+        {props?.total > 0 && props?.total}
+      </span>
+    </button>
+  );
+});
 
 const MoreSelectedBadge = ({ items }) => {
   const style = {

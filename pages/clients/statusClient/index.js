@@ -6,7 +6,7 @@ import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 import Pagination from "/components/UI/pagination";
-import ReactExport from "react-data-export";
+import Select, { components } from "react-select";
 
 import {
   Edit as IconEdit,
@@ -17,8 +17,8 @@ import {
 } from "iconsax-react";
 import Swal from "sweetalert2";
 import "react-phone-input-2/lib/style.css";
-import Select, { components } from "react-select";
-import { da } from "date-fns/locale";
+import ReactExport from "react-data-export";
+import Popup_status from "./(popup)/popup";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -37,16 +37,16 @@ const Index = (props) => {
 
   const [data, sData] = useState([]);
   const [onFetching, sOnFetching] = useState(true);
-  const [data_ex, sData_ex] = useState([]);
 
   const [keySearch, sKeySearch] = useState("");
   const [limit, sLimit] = useState(15);
   const [totalItem, sTotalItem] = useState([]);
+  const [data_ex, sData_ex] = useState([]);
 
   const _ServerFetching = () => {
     Axios(
       "GET",
-      `/api_web/Api_client/group?csrf_protection=true`,
+      `/api_web/api_client/status?csrf_protection=true`,
       {
         params: {
           search: keySearch,
@@ -86,7 +86,9 @@ const Index = (props) => {
       }
     );
   };
-  const listBr_filter = listBr?.map((e) => ({ label: e.name, value: e.id }));
+  const listBr_filter = listBr
+    ? listBr?.map((e) => ({ label: e.name, value: e.id }))
+    : [];
   const [idBranch, sIdBranch] = useState(null);
   const onchang_filterBr = (type, value) => {
     if (type == "branch") {
@@ -117,23 +119,17 @@ const Index = (props) => {
     }).then((result) => {
       if (result.isConfirmed) {
         const id = event;
-
         Axios(
           "DELETE",
-          `/api_web/Api_client/group/${id}?csrf_protection=true`,
+          `/api_web/api_client/status/${id}?csrf_protection=true`,
           {},
           (err, response) => {
             if (!err) {
-              var { isSuccess, message } = response.data;
+              var isSuccess = response.data?.isSuccess;
               if (isSuccess) {
                 Toast.fire({
                   icon: "success",
-                  title: dataLang[message],
-                });
-              } else {
-                Toast.fire({
-                  icon: "error",
-                  title: dataLang[message],
+                  title: dataLang?.aler_success_delete,
                 });
               }
             }
@@ -146,14 +142,14 @@ const Index = (props) => {
 
   const paginate = (pageNumber) => {
     router.push({
-      pathname: "/clients/groups",
+      pathname: "/clients/statusClient",
       query: { page: pageNumber },
     });
   };
 
   const _HandleOnChangeKeySearch = ({ target: { value } }) => {
     sKeySearch(value);
-    router.replace("/clients/groups");
+    router.replace("/clients/statusClient");
     setTimeout(() => {
       if (!value) {
         sOnFetching(true);
@@ -171,7 +167,7 @@ const Index = (props) => {
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
         {
-          title: `${dataLang?.client_group_name}`,
+          title: `${dataLang?.client_group_statusclient}`,
           width: { wpx: 100 },
           style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
         },
@@ -190,7 +186,7 @@ const Index = (props) => {
         { value: `${e.id}`, style: { numFmt: "0" } },
         { value: `${e.name ? e.name : ""}` },
         { value: `${e.color ? e.color : ""}` },
-        { value: `${e.branch ? e.branch?.map((i) => i.name).join(", ") : ""}` },
+        { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
       ]),
     },
   ];
@@ -200,23 +196,23 @@ const Index = (props) => {
   return (
     <React.Fragment>
       <Head>
-        <title>{dataLang?.client_groupuser_title}</title>
+        <title>{dataLang?.client_group_statusclient}</title>
       </Head>
       <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
         <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
           <h6 className="text-[#141522]/40">{dataLang?.client_group_client}</h6>
           <span className="text-[#141522]/40">/</span>
-          <h6>{dataLang?.client_groupuser_title}</h6>
+          <h6>{dataLang?.client_group_statusclient}</h6>
         </div>
         <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
           <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
             <div className="space-y-3 h-[96%] overflow-hidden">
               <div className="flex justify-between">
                 <h2 className="text-2xl text-[#52575E]">
-                  {dataLang?.client_groupuser}
+                  {dataLang?.client_group_statusctitle}
                 </h2>
                 <div className="flex justify-end items-center">
-                  <Popup_groupKh
+                  <Popup_status
                     listBr={listBr}
                     onRefresh={_ServerFetching.bind(this)}
                     dataLang={dataLang}
@@ -227,7 +223,7 @@ const Index = (props) => {
 
               <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
                 <div className="xl:space-y-3 space-y-2">
-                  <div className="bg-slate-100 w-full r rounded-lg grid grid-cols-6 items-center justify-between xl:p-3 p-2">
+                  <div className="bg-slate-100 w-full grid grid-cols-6 rounded items-center justify-between xl:p-3 p-2">
                     <div className="col-span-4">
                       <div className="grid grid-cols-5">
                         <div className="col-span-1">
@@ -246,7 +242,15 @@ const Index = (props) => {
                         </div>
                         <div className="ml-1 col-span-1">
                           <Select
-                            options={listBr_filter}
+                            // options={listBr_filter}
+                            options={[
+                              {
+                                value: "",
+                                label: "Chi chọn nhánh",
+                                isDisabled: true,
+                              },
+                              ...listBr_filter,
+                            ]}
                             onChange={onchang_filterBr.bind(this, "branch")}
                             value={idBranch}
                             placeholder={dataLang?.client_list_filterbrand}
@@ -296,7 +300,7 @@ const Index = (props) => {
                         <button
                           onClick={_HandleFresh.bind(this)}
                           type="button"
-                          className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none"
+                          className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out"
                         >
                           <Refresh2
                             className="group-hover:-rotate-45 transition-all ease-in-out"
@@ -306,8 +310,8 @@ const Index = (props) => {
                         </button>
                         {data_ex?.length > 0 && (
                           <ExcelFile
-                            filename="Nhóm khách hàng"
-                            title="Nkh"
+                            filename="Trạng thái khách hàng"
+                            title="Ttkh"
                             element={
                               <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
                                 <IconExcel size={18} />
@@ -343,22 +347,22 @@ const Index = (props) => {
                     </div>
                   </div>
                 </div>
-                <div className="min:h-[500px] 2xl:h-[90%] xl:h-[69%] h-[100%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                  <div className="xl:w-[100%] w-[110%] pr-2 ">
-                    <div className="flex items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10">
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  w-[50%] text-left">
-                        {dataLang?.client_group_name}
+                <div className="min:h-[500px] 2xl:h-[90%] xl:h-[69%] h-[82%] max:h-[800px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                  <div className="xl:w-[100%] w-[110%] pr-2">
+                    <div className="flex items-center sticky top-0  rounded-xl shadow-sm bg-white divide-x p-2 z-10">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  w-[50%]  text-left">
+                        {dataLang?.client_group_statusclient}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  w-[15%] text-center">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  w-[15%]  text-center">
                         {dataLang?.client_group_colorcode}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  w-[15%] text-center">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  w-[15%]  text-center">
                         {dataLang?.client_group_color}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  w-[15%] text-center">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  w-[15%]  text-center">
                         {dataLang?.client_list_brand}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  w-[20%] text-center">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  w-[20%]  text-center">
                         {dataLang?.branch_popup_properties}
                       </h4>
                     </div>
@@ -366,7 +370,7 @@ const Index = (props) => {
                       <Loading className="h-80" color="#0f4f9e" />
                     ) : data?.length > 0 ? (
                       <>
-                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px] ">
+                        <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
                           {data?.map((e) => (
                             <div
                               className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 "
@@ -375,7 +379,7 @@ const Index = (props) => {
                               <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3 w-[50%] text-left">
                                 {e.name}
                               </h6>
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3 w-[15%] text-center rounded-md ">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3 w-[15%]  rounded-md text-center ">
                                 {e.color}
                               </h6>
                               <h6
@@ -384,8 +388,8 @@ const Index = (props) => {
                                 }}
                                 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3 w-[15%]  rounded-md "
                               ></h6>
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 py-3 w-[15%]  rounded-md  ">
-                                <span className="flex flex-wrap justify-start gap-2 ">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-3 w-[15%]  rounded-md  ">
+                                <span className="flex flex-wrap justify-start space-x-2 ">
                                   {e?.branch?.map((e) => (
                                     <span className="mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-lg">
                                       {e.name}
@@ -393,13 +397,12 @@ const Index = (props) => {
                                   ))}
                                 </span>
                               </h6>
-
                               <div className="space-x-2 w-[20%] text-center">
-                                <Popup_groupKh
-                                  onRefresh={_ServerFetching.bind(this)}
-                                  className="xl:text-base text-xs "
+                                <Popup_status
                                   listBr={listBr}
                                   sValueBr={e.branch}
+                                  onRefresh={_ServerFetching.bind(this)}
+                                  className="xl:text-base text-xs "
                                   dataLang={dataLang}
                                   name={e.name}
                                   color={e.color}
@@ -426,7 +429,7 @@ const Index = (props) => {
                             Không tìm thấy các mục
                           </h1>
                           <div className="flex items-center justify-around mt-6 ">
-                            <Popup_groupKh
+                            <Popup_status
                               onRefresh={_ServerFetching.bind(this)}
                               dataLang={dataLang}
                               className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
@@ -458,261 +461,6 @@ const Index = (props) => {
         </div>
       </div>
     </React.Fragment>
-  );
-};
-
-const Popup_groupKh = (props) => {
-  const [open, sOpen] = useState(false);
-  const _ToggleModal = (e) => sOpen(e);
-  const scrollAreaRef = useRef(null);
-  const handleMenuOpen = () => {
-    const menuPortalTarget = scrollAreaRef.current;
-    return { menuPortalTarget };
-  };
-
-  const [onSending, sOnSending] = useState(false);
-  const [brandpOpt, sListBrand] = useState([]);
-  const [name, sName] = useState("");
-  const [color, sColor] = useState("");
-  const [errInput, sErrInput] = useState(false);
-
-  const [errInputBr, sErrInputBr] = useState(false);
-  const [valueBr, sValueBr] = useState([]);
-  // const branch = valueBr.map(e => e.value)
-
-  useEffect(() => {
-    sErrInputBr(false);
-    sErrInput(false);
-    sName(props.name ? props.name : "");
-    sColor(props.color ? props.color : "");
-    sListBrand(
-      props.listBr
-        ? props.listBr && [
-            ...props.listBr?.map((e) => ({
-              label: e.name,
-              value: Number(e.id),
-            })),
-          ]
-        : []
-    );
-    sValueBr(
-      props.sValueBr
-        ? props.listBr && [
-            ...props.sValueBr?.map((e) => ({
-              label: e.name,
-              value: Number(e.id),
-            })),
-          ]
-        : []
-    );
-  }, [open]);
-  const branch_id = valueBr?.map((e) => {
-    return e?.value;
-  });
-  const _HandleChangeInput = (type, value) => {
-    if (type == "name") {
-      sName(value.target?.value);
-    } else if (type == "valueBr") {
-      sValueBr(value);
-    } else if (type == "color") {
-      sColor(value.target?.value);
-    }
-  };
-
-  useEffect(() => {
-    sErrInput(false);
-  }, [name.length > 0]);
-  useEffect(() => {
-    sErrInputBr(false);
-  }, [branch_id?.length > 0]);
-
-  const _ServerSending = () => {
-    const id = props.id;
-    var data = new FormData();
-    data.append("name", name);
-    data.append("color", color);
-    Axios(
-      "POST",
-      `${
-        props.id
-          ? `/api_web/Api_client/group/${id}?csrf_protection=true`
-          : "/api_web/Api_client/group?csrf_protection=true"
-      }`,
-      {
-        data: {
-          name: name,
-          color: color,
-          branch_id: branch_id,
-        },
-        headers: { "Content-Type": "multipart/form-data" },
-      },
-      (err, response) => {
-        if (!err) {
-          var { isSuccess, message } = response.data;
-          if (isSuccess) {
-            Toast.fire({
-              icon: "success",
-              title: `${props.dataLang[message]}`,
-            });
-            sErrInput(false);
-            sName("");
-            sColor("");
-            sErrInputBr(false);
-            sValueBr([]);
-            props.onRefresh && props.onRefresh();
-            sOpen(false);
-          } else {
-            Toast.fire({
-              icon: "error",
-              title: `${props.dataLang[message]}`,
-            });
-          }
-        }
-        sOnSending(false);
-      }
-    );
-  };
-  //da up date
-  useEffect(() => {
-    onSending && _ServerSending();
-  }, [onSending]);
-  const _HandleSubmit = (e) => {
-    e.preventDefault();
-    if (name.length == 0 || branch_id?.length == 0) {
-      name?.length == 0 && sErrInput(true);
-      branch_id?.length == 0 && sErrInputBr(true);
-      Toast.fire({
-        icon: "error",
-        title: `${props.dataLang?.required_field_null}`,
-      });
-    } else {
-      // sErrInput(false)
-      sOnSending(true);
-    }
-  };
-  return (
-    <PopupEdit
-      title={
-        props.id
-          ? `${props.dataLang?.client_group_edit}`
-          : `${props.dataLang?.client_group_add}`
-      }
-      button={
-        props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`
-      }
-      onClickOpen={_ToggleModal.bind(this, true)}
-      open={open}
-      onClose={_ToggleModal.bind(this, false)}
-      classNameBtn={props.className}
-    >
-      <div className="w-96 mt-4">
-        <form onSubmit={_HandleSubmit.bind(this)}>
-          <div>
-            <div className="flex flex-wrap justify-between">
-              <label className="text-[#344054] font-normal text-sm mb-1 ">
-                {props.dataLang?.client_group_name}{" "}
-                <span className="text-red-500">*</span>
-              </label>
-              <input
-                value={name}
-                onChange={_HandleChangeInput.bind(this, "name")}
-                name="fname"
-                type="text"
-                className={`${
-                  errInput
-                    ? "border-red-500"
-                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-md text-[#52575E] font-normal p-2 border outline-none mb-2`}
-              />
-              {errInput && (
-                <label className="mb-2  text-[14px] text-red-500">
-                  {props.dataLang?.client_group_please_name}
-                </label>
-              )}
-            </div>
-            <label className="text-[#344054] font-normal text-sm mb-1 ">
-              {props.dataLang?.client_list_brand}{" "}
-              <span className="text-red-500">*</span>
-            </label>
-            <Select
-              closeMenuOnSelect={false}
-              placeholder={props.dataLang?.client_list_brand}
-              options={brandpOpt}
-              isSearchable={true}
-              onChange={_HandleChangeInput.bind(this, "valueBr")}
-              LoadingIndicator
-              isMulti
-              noOptionsMessage={() => "Không có dữ liệu"}
-              value={valueBr}
-              maxMenuHeight="200px"
-              isClearable={true}
-              menuPortalTarget={document.body}
-              onMenuOpen={handleMenuOpen}
-              styles={{
-                placeholder: (base) => ({
-                  ...base,
-                  color: "#cbd5e1",
-                }),
-                menuPortal: (base) => ({
-                  ...base,
-                  zIndex: 9999,
-                  position: "absolute",
-                }),
-                // control: base => ({
-                //   ...base,
-                //   border: '1px solid #d0d5dd',
-                //   boxShadow: 'none',
-
-                // })  ,
-                control: (provided) => ({
-                  ...provided,
-                  border: "1px solid #d0d5dd",
-                  "&:focus": {
-                    outline: "none",
-                    border: "none",
-                  },
-                }),
-              }}
-              className={`${
-                errInputBr ? "border-red-500" : "border-transparent"
-              } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-            />
-            {errInputBr && (
-              <label className="mb-2  text-[14px] text-red-500">
-                {props.dataLang?.client_list_bran}
-              </label>
-            )}
-            <div className="flex flex-wrap justify-between mt-2">
-              <label className="text-[#344054] font-normal text-sm mb-1 ">
-                {props.dataLang?.client_group_color}
-              </label>
-              <input
-                value={color}
-                onChange={_HandleChangeInput.bind(this, "color")}
-                name="color"
-                type="color"
-                className="placeholder-[color:#667085] w-full min-h-[50px] bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none mb-6"
-              />
-            </div>
-            <div className="text-right mt-5 space-x-2">
-              <button
-                type="button"
-                onClick={_ToggleModal.bind(this, false)}
-                className="button text-[#344054] font-normal text-base py-2 px-4 rounded-lg border border-solid border-[#D0D5DD]"
-              >
-                {props.dataLang?.branch_popup_exit}
-              </button>
-              <button
-                type="submit"
-                className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-lg bg-[#0F4F9E]"
-              >
-                {props.dataLang?.branch_popup_save}
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </PopupEdit>
   );
 };
 
