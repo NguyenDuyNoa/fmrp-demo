@@ -55,6 +55,8 @@ import ParentControls from "./(button)/buttonAddParent";
 import DeleteButton from "./(button)/buttonDeleteSlect";
 import TabClient from "./(tab)/tabImport";
 import { Reorder } from "framer-motion";
+import ProgressBarWithLabels from "./(stepper)/stepper";
+import Stepper from "./(stepper)/stepper";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -378,7 +380,6 @@ const Index = (props) => {
 
   const _HandleChangeFileImportNew = (file, startRowIndex2, endRow) => {
     // const file = e.target.files[0];
-
     //đọc file exl
     if (!file) return;
     const reader = new FileReader();
@@ -404,7 +405,6 @@ const Index = (props) => {
         raw: false,
         dateNF: "yyyy-mm-dd",
       });
-      console.log("sheetData", sheetData);
 
       const startRowIndex = parseInt(startRows) - 1;
       const endRowIndex = parseInt(endRows) - 1;
@@ -672,13 +672,21 @@ const Index = (props) => {
       a[name] = arrayCheck.includes(b?.dataFields?.value);
       return a;
     }, {});
+
     setTimeout(() => {
-      sStepper({
-        main: ObError?.variation,
-        extra: ObError?.variation_option,
-      });
+      if (tabPage == 1) {
+        sStepper({
+          main: listDataContact?.length > 0 ? true : false,
+          extra: listDataDelivery?.length > 0 ? true : false,
+        });
+      } else {
+        sStepper({
+          main: ObError?.variation,
+          extra: ObError?.variation_option,
+        });
+      }
     }, 300);
-  }, [listData]);
+  }, [listData, listDataContact, listDataDelivery]);
   //Thêm cột
   const _HandleAddParent = (value) => {
     const newData = {
@@ -1831,56 +1839,39 @@ const Index = (props) => {
                           : ""
                       }`}
                     >
-                      <div className="flex items-center gap-1 group">
-                        <ColorsSquare
-                          size="22"
-                          className={`${
-                            stepper.main ? "text-blue-600" : "text-gray-500"
-                          } group-hover:scale-105 transition-all ease-linear animate-pulse duration-700`}
-                        />
-                        <h3
-                          className={`${
-                            stepper.main ? "text-blue-600" : "text-gray-600"
-                          } font-semibold duration-700 3xl:text-sm 2xl:text-sm xl:text-xs text-xs`}
-                        >
-                          {dataLang?.import_variation || "import_variation"}
-                        </h3>
-                      </div>
-                      <div
-                        className={`3xl:w-[50%] 2xl:w-[40%] w-[35%]  h-2 bg-gray-200  rounded-xl relative duration-500 transition`}
-                      >
-                        <div
-                          style={{
-                            width: `${
-                              stepper.main && !stepper.extra
-                                ? "50%"
-                                : stepper.main && stepper.extra
-                                ? "100%"
-                                : "0%"
-                            }`,
-                          }}
-                          className={`absolute  bg-blue-600 top-0 left-0 h-full rounded transition-all duration-500`}
-                        ></div>
-                      </div>
-                      <div className="flex items-center gap-1 group">
-                        <Colorfilter
-                          size="22"
-                          className={`${
-                            stepper?.main && stepper?.extra
-                              ? "text-blue-600"
-                              : "text-gray-500"
-                          } group-hover:scale-105 duration-700 transition-all ease-linear animate-pulse`}
-                        />
-                        <h3
-                          className={`${
-                            stepper?.main && stepper?.extra
-                              ? "text-blue-600"
-                              : "text-gray-600"
-                          } font-semibold 3xl:text-sm 2xl:text-sm xl:text-xs text-xs duration-700`}
-                        >
-                          {dataLang?.import_subvariant || "import_subvariant"}
-                        </h3>
-                      </div>
+                      <Stepper
+                        stepper={stepper}
+                        dataLang={dataLang}
+                        label1={
+                          dataLang?.import_variation || "import_variation"
+                        }
+                        tabPage={tabPage}
+                        label2={
+                          dataLang?.import_subvariant || "import_subvariant"
+                        }
+                      />
+                    </div>
+                  )}
+                  {tabPage == 1 && (
+                    <div
+                      className={`flex items-center justify-center  gap-2 pt-5 ${
+                        save_template && onLoadingDataBack
+                          ? "absolute w-[100%] top-[66%]"
+                          : ""
+                      }`}
+                    >
+                      <Stepper
+                        stepper={stepper}
+                        dataLang={dataLang}
+                        label1={
+                          dataLang?.import_contactInfo || "import_contactInfo"
+                        }
+                        tabPage={tabPage}
+                        label2={
+                          dataLang?.import_deliveryAdress ||
+                          "import_deliveryAdress"
+                        }
+                      />
                     </div>
                   )}
                 </div>

@@ -28,7 +28,7 @@ const ParentControls = ({
         <div className="b flex items-center justify-center w-full pt-5">
           <button
             onClick={_HandleAddParent}
-            className={`${color} "i flex justify-center gap-2 group  w-full text-center py-2 text-white items-center rounded cursor-pointer hover:scale-[1.02] overflow-hidden transform transition duration-300 ease-out`}
+            className={`${color} i flex justify-center gap-2 group  w-full text-center py-2 text-white items-center rounded cursor-pointer hover:scale-[1.02] overflow-hidden transform transition duration-300 ease-out`}
           >
             <Add
               size="20"
