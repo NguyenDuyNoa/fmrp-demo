@@ -37,7 +37,7 @@ const FormClient = ({
               ? "bg-white"
               : (listDataContact?.length > 0 || listDataDelivery?.length > 0) &&
                 "bg-zinc-100 mt-2 "
-          } grid grid-cols-8 items-start gap-2 p-4 rounded-xl  transition-all ease-linear`}
+          } grid grid-cols-8 items-start 3xl:gap-2 xxl:gap-2 2xl:gap-4 p-4 rounded-xl  transition-all ease-linear`}
         >
           <div className={`col-span-4   rounded-lg`}>
             {listDataContact?.map((e) => (
