@@ -41,7 +41,7 @@ const FormClient = ({
         >
           <div className={`col-span-4   rounded-lg`}>
             {listDataContact?.map((e) => (
-              <AnimatedDiv
+              <div
                 className="grid-cols-13 grid gap-2.5 mt-2"
                 key={e?.id}
                 isExiting={true}
@@ -139,15 +139,12 @@ const FormClient = ({
                 <DeleteButton
                   onClick={_HandleDeleteContact.bind(this, e?.id)}
                 />
-              </AnimatedDiv>
+              </div>
             ))}
           </div>
           <div className={`col-span-4  rounded-lg`}>
             {listDataDelivery?.map((e) => (
-              <AnimatedDiv
-                className="grid-cols-13 grid gap-2.5 mt-2"
-                key={e?.id}
-              >
+              <div className="grid-cols-13 grid gap-2.5 mt-2" key={e?.id}>
                 <div className="col-span-6">
                   <Select
                     closeMenuOnSelect={true}
@@ -242,7 +239,7 @@ const FormClient = ({
                   onClick={_HandleDeleteDelivery.bind(this, e?.id)}
                   id="contact-id-1"
                 />
-              </AnimatedDiv>
+              </div>
             ))}
           </div>
         </div>

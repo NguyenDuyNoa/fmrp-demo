@@ -694,9 +694,7 @@ const Index = (props) => {
       dataFields: null,
       column: null,
     };
-    setTimeout(() => {
-      sListData([...listData, newData]);
-    }, 300);
+    sListData([...listData, newData]);
   };
 
   //them liên hệ
@@ -706,9 +704,7 @@ const Index = (props) => {
       dataFieldsContact: null,
       columnContact: null,
     };
-    setTimeout(() => {
-      sListDataContat([...listDataContact, newData]);
-    }, 300);
+    sListDataContat([...listDataContact, newData]);
   };
   const _HandleAddDelivery = (value) => {
     const newData = {
@@ -717,9 +713,7 @@ const Index = (props) => {
       columnDelivery: null,
     };
 
-    setTimeout(() => {
-      sListDataDelivery([...listDataDelivery, newData]);
-    }, 300);
+    sListDataDelivery([...listDataDelivery, newData]);
   };
 
   //xóa cột
@@ -1886,7 +1880,7 @@ const Index = (props) => {
                     <Loading className="h-2" color="#0f4f9e" />
                   ) : (
                     listData?.map((e, index) => (
-                      <AnimatedDiv
+                      <div
                         className="grid grid-cols-6 gap-2.5 mb-2"
                         key={e?.id}
                       >
@@ -2103,7 +2097,7 @@ const Index = (props) => {
                             </div>
                           )}
                         </div>
-                      </AnimatedDiv>
+                      </div>
                     ))
                   )}
                 </div>

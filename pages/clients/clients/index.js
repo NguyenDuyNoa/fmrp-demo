@@ -598,7 +598,7 @@ const Index = (props) => {
                                         arrow={false}
                                       >
                                         <span className="bg-[#0f4f9e] text-white rounded p-1.5 ">
-                                          {d.full_name}{" "}
+                                          {d.full_name}
                                         </span>
                                       </Popup>
                                     </>
