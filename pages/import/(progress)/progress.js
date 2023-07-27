@@ -13,7 +13,7 @@ const Progress = ({
   formatNumber,
 }) => {
   return (
-    <div className="col-span-2 flex items-center justify-center mt-5">
+    <div className="col-span-2 flex items-center justify-center mt-5 mb-2">
       {tabPage !== 5 ? (
         listData.length > 0 && (
           <div className={`${listData.length < 2 ? "mt-4" : ""}`}>
@@ -58,7 +58,7 @@ const Progress = ({
           </div>
         )
       ) : (
-        <div className={`${totalSuccessStages >= 0 ? "mt-4" : ""}`}>
+        <div className={`${totalSuccessStages >= 0 ? "mt-4 " : ""}`}>
           <CircularProgressbar
             className="text-center"
             value={multipleProgress}
