@@ -30,8 +30,6 @@ import {
   ArrowDown,
 } from "iconsax-react";
 
-import { Tooltip } from "react-tippy";
-
 import Loading from "components/UI/loading";
 
 import dynamic from "next/dynamic";
@@ -48,13 +46,6 @@ import Popup_status from "./(popup)/popup";
 import Popup_stages from "./(popup)/popupStages";
 import { flatMap } from "lodash";
 import FormClient from "./(form)/formClient";
-import Progress from "./(progress)/progress";
-import AnimatedDiv from "components/UI/motions";
-import DeleteParentButton from "./(button)/buttonDeleteParent";
-import ParentControls from "./(button)/buttonAddParent";
-import DeleteButton from "./(button)/buttonDeleteSlect";
-import TabClient from "./(tab)/tabImport";
-import { Reorder } from "framer-motion";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -686,9 +677,7 @@ const Index = (props) => {
       dataFields: null,
       column: null,
     };
-    setTimeout(() => {
-      sListData([...listData, newData]);
-    }, 300);
+    sListData([...listData, newData]);
   };
 
   //them liên hệ
@@ -698,9 +687,8 @@ const Index = (props) => {
       dataFieldsContact: null,
       columnContact: null,
     };
-    setTimeout(() => {
-      sListDataContat([...listDataContact, newData]);
-    }, 300);
+
+    sListDataContat([...listDataContact, newData]);
   };
   const _HandleAddDelivery = (value) => {
     const newData = {
@@ -709,9 +697,7 @@ const Index = (props) => {
       columnDelivery: null,
     };
 
-    setTimeout(() => {
-      sListDataDelivery([...listDataDelivery, newData]);
-    }, 300);
+    sListDataDelivery([...listDataDelivery, newData]);
   };
 
   //xóa cột
@@ -728,15 +714,9 @@ const Index = (props) => {
     sListData(newDatas); // cập nhật lại mảng
   };
 
-  const _HandleDeleteParent = (type) => {
-    const newData = [];
-    if (type == "main") {
-      sListData(newData);
-    } else if (type == "contact") {
-      sListDataContat([]);
-    } else if (type == "delivery") {
-      sListDataDelivery([]);
-    }
+  const _HandleDeleteParent = () => {
+    const newData = []; // Tạo một mảng rỗng
+    sListData(newData); // Cập nhật lại mảng
     if (sampleImport != null) {
       sSampleImport(null);
     }
@@ -1106,6 +1086,44 @@ const Index = (props) => {
               result[fieldKey] = fieldValue;
             }
           }
+          //   for (const listDataItem of mergedListData) {
+          //     const columnValue = listDataItem.column?.value;
+          //     const dataFieldsValue = listDataItem.dataFields?.value;
+          //     const columnContactValue = listDataItem.columnContact?.value;
+          //     const dataFieldsContactValue =
+          //       listDataItem.dataFieldsContact?.value;
+
+          //     /// Xử lý cột khách hàng
+          //     if (columnValue && item[columnValue]) {
+          //       result[dataFieldsValue] = item[columnValue];
+          //     }
+          //     if (
+          //       listDataItem?.dataFields?.label &&
+          //       listDataItem?.dataFields?.value &&
+          //       item[listDataItem?.dataFields?.label]
+          //     ) {
+          //       const fieldKey = listDataItem?.dataFields?.value;
+          //       const fieldValue = item[listDataItem?.dataFields?.label];
+          //       result[fieldKey] = fieldValue;
+          //     }
+
+          //     /// Xử lý liên hệ
+          //     if (columnContactValue && item[columnContactValue]) {
+          //       result[dataFieldsContactValue] = item[columnContactValue];
+          //     }
+
+          //     if (
+          //       listDataItem?.dataFieldsContact?.label &&
+          //       listDataItem?.dataFieldsContact?.value &&
+          //       item[listDataItem?.dataFieldsContact?.label]
+          //     ) {
+          //       const fieldKey = listDataItem?.dataFieldsContact?.value;
+          //       const fieldValue = item[listDataItem?.dataFieldsContact?.label];
+          //       result[fieldKey] = fieldValue;
+          //     }
+          //     // Xử lý địa chỉ
+          //   }
+
           if (Object.keys(result).length > 0) {
             result["rowIndex"] = item.rowIndex
               ? Number(item.rowIndex) + 1
@@ -1124,6 +1142,7 @@ const Index = (props) => {
       }
     } else {
       const data = dataImport
+        //   ?.filter((item) => item.rowIndex != null && item.rowIndex != "")
         ?.filter((item) => item)
         .map((item) => {
           const result = {};
@@ -1291,10 +1310,17 @@ const Index = (props) => {
       (err, response) => {
         if (!err) {
           var { isSuccess, message, alert_type } = response.data;
+          //   if (isSuccess) {
           Toast.fire({
             icon: `${alert_type}`,
             title: `${dataLang[message]}`,
           });
+          //   } else {
+          //     Toast.fire({
+          //       icon: "error",
+          //       title: `${dataLang[message]}`,
+          //     });
+          //   }
         }
         sOnLoadingDataBack(true);
         sOnSending(false);
@@ -1345,8 +1371,11 @@ const Index = (props) => {
         ) : (
           <Popup_stages
             dataLang={dataLang}
+            // className=""
             router={router.query?.tab}
             data={dataFailStages}
+            // totalFalse={totalFalse}
+            // listData={listData}
           />
         )}
         <div className="">
@@ -1376,11 +1405,13 @@ const Index = (props) => {
                     })}
                 </div>
                 <div className="col-span-2"></div>
+
                 <div className="col-span-2"></div>
                 <div className="col-span-8 border-b">
                   <h2 className="py-2">{dataName[tabPage] || ""}</h2>
                 </div>
                 <div className="col-span-2"></div>
+
                 <div className="col-span-2"></div>
                 <div className="col-span-4 mb-2 mt-2">
                   {tabPage != 5 ? (
@@ -1524,6 +1555,7 @@ const Index = (props) => {
                   </div>
                 </div>
                 <div className="col-span-2"></div>
+
                 <div className="col-span-2"></div>
                 <div className="col-span-4">
                   {tabPage != 5 && valueCheck === "edit" ? (
@@ -1591,6 +1623,7 @@ const Index = (props) => {
                 </div>
                 <div className="col-span-4"></div>
                 <div className="col-span-2"></div>
+
                 <div className="col-span-2"></div>
                 <div className="col-span-4 ">
                   <div className="grid-cols-12 grid items-center gap-1">
@@ -1635,7 +1668,7 @@ const Index = (props) => {
                         <button
                           type="button"
                           onClick={_HandleDeleteFile.bind(this)}
-                          className="mt-8 hover:bg-red-200 group animate-bounce  bg-red-100  rounded p-2 gap-1 i cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
+                          className="mt-8 hover:bg-red-200 group animate-bounce  bg-red-50  rounded p-2 gap-1 i cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
                         >
                           <IconDelete size={20} color="red" />
                         </button>
@@ -1784,21 +1817,61 @@ const Index = (props) => {
                   )}
                 </div>
                 <div className="col-span-2"></div>
+
                 <div className="col-span-2"></div>
                 <div className="col-span-4 -mt-2">
                   {tabPage != 5 && (
-                    <ParentControls
-                      listData={listData}
-                      onLoadingListData={onLoadingListData}
-                      dataLang={dataLang}
-                      _HandleAddParent={_HandleAddParent.bind(this)}
-                      _HandleDeleteParent={_HandleDeleteParent.bind(
-                        this,
-                        "main"
+                    <div
+                      className={`${
+                        listData?.length > 1 && !onLoadingListData
+                          ? "grid-cols-14"
+                          : "grid-cols-12"
+                      } grid  gap-2 items-center`}
+                    >
+                      {listData?.length > 1 && !onLoadingListData && (
+                        <div className="col-span-3 pt-5">
+                          <button
+                            type="button"
+                            onClick={_HandleDeleteParent.bind(this)}
+                            className="flex w-full  items-center  justify-center bg-rose-600 rounded p-2 gap-1 i cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
+                          >
+                            <IconDelete
+                              size={19}
+                              color="white"
+                              className="transition-all ease-out animate-bounce-custom"
+                            />{" "}
+                            <h6 className="text-white font-normal text-xs">
+                              {listData?.length}{" "}
+                              {dataLang?.import_column || "import_column"}
+                            </h6>
+                          </button>
+                        </div>
                       )}
-                      color="bg-pink-600"
-                      colorIcon="red"
-                    />
+                      <div
+                        className={`${
+                          listData?.length > 1 && !onLoadingListData
+                            ? "col-span-11"
+                            : "col-span-12"
+                        } `}
+                      >
+                        <div className="b  flex items-center justify-center w-full  pt-5">
+                          <button
+                            onClick={_HandleAddParent.bind(this)}
+                            className="i flex justify-center gap-2 group bg-pink-600 w-full text-center py-2 text-white items-center rounded cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
+                          >
+                            <Add
+                              size="20"
+                              color="red"
+                              className="bg-gray-50 rounded-full group-hover:animate-spin ease-linear transition-all"
+                            />
+                            <p className="text-sm">
+                              {dataLang?.import_more_collum ||
+                                "import_more_collum"}
+                            </p>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
                 <div className="col-span-4 -mt-2 relative">
@@ -1885,6 +1958,7 @@ const Index = (props) => {
                   )}
                 </div>
                 <div className="col-span-2"></div>
+
                 <div className="col-span-2"></div>
                 <div
                   className={`${listData?.length > 2 ? "mt-3" : ""} ${
@@ -1895,12 +1969,20 @@ const Index = (props) => {
                     <Loading className="h-2" color="#0f4f9e" />
                   ) : (
                     listData?.map((e, index) => (
-                      <AnimatedDiv
+                      <div
                         className="grid grid-cols-6 gap-2.5 mb-2"
                         key={e?.id}
                       >
                         <div className="col-span-4">
                           <div className="grid-cols-13 grid items-end justify-center gap-2.5">
+                            <div className="col-span-1 mx-auto">
+                              <button
+                                onClick={_HandleDelete.bind(this, e?.id)}
+                                className="xl:text-base text-xs hover:scale-105 transition-all ease-in-out bg-red-50 p-2 rounded-sm hover:bg-red-100"
+                              >
+                                <IconDelete color="red" />
+                              </button>
+                            </div>
                             <div className="col-span-6">
                               {index == 0 && (
                                 <h5 className="mb-1 block text-sm font-medium text-gray-700">
@@ -1955,7 +2037,7 @@ const Index = (props) => {
                                   errFiles && e.dataFields == null
                                     ? "border-red-500"
                                     : "border-transparent"
-                                }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                               />
                             </div>
                             <div className="col-span-6">
@@ -1974,6 +2056,7 @@ const Index = (props) => {
                                 }
                                 options={dataColumn}
                                 isSearchable={true}
+                                // onChange={_HandleChange.bind(this, "column")}
                                 onChange={_HandleChangeChild.bind(
                                   this,
                                   e?.id,
@@ -2013,11 +2096,6 @@ const Index = (props) => {
                                     ? "border-red-500"
                                     : "border-transparent"
                                 } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
-                              />
-                            </div>
-                            <div className="col-span-1 mx-auto">
-                              <DeleteButton
-                                onClick={_HandleDelete.bind(this, e?.id)}
                               />
                             </div>
                           </div>
@@ -2112,75 +2190,449 @@ const Index = (props) => {
                             </div>
                           )}
                         </div>
-                      </AnimatedDiv>
+                      </div>
                     ))
                   )}
                 </div>
                 {!onLoadingListData && (
                   <React.Fragment>
-                    <Progress
-                      tabPage={tabPage}
-                      listData={listData}
-                      multipleProgress={multipleProgress}
-                      dataSuccess={dataSuccess}
-                      totalFalse={totalFalse}
-                      totalSuccessStages={totalSuccessStages}
-                      dataFailStages={dataFailStages}
-                      dataLang={dataLang}
-                      formatNumber={formatNumber}
-                    />
+                    {tabPage != 5 ? (
+                      <div className="col-span-2 flex items-center justify-center mt-5">
+                        {listData.length > 0 && (
+                          <div
+                            className={`${listData.length < 2 ? "mt-4" : ""}`}
+                          >
+                            <CircularProgressbar
+                              className="text-center"
+                              value={multipleProgress}
+                              strokeWidth={10}
+                              text={`${multipleProgress}%`}
+                              // classes={`text: center`}
+                              styles={buildStyles({
+                                rotation: 0.25,
+                                strokeLinecap: "butt",
+                                textSize: "16px",
+                                pathTransitionDuration: 0.5,
+                                pathColor: `rgba(236, 64, 122, ${
+                                  multipleProgress / 100
+                                })`,
+                                pathColor: `green`,
+                                textColor: "green",
+                                textAnchor: "middle",
+                                trailColor: "#d6d6d6",
+                                backgroundColor: "#3e98c7",
+                              })}
+                            />
+                            <div className=" grid grid-cols-12 group items-center justify-center mt-4">
+                              <div
+                                className={`${
+                                  multipleProgress
+                                    ? "animate-spin"
+                                    : "animate-pulse"
+                                } w-4 h-4 bg-green-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
+                              ></div>
+                              <h6 className="text-green-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
+                                dataSuccess
+                              )} ${
+                                dataLang?.import_susces || "import_susces"
+                              }`}</h6>
+                            </div>
+                            <div className=" grid grid-cols-12 group items-center justify-center mt-4">
+                              <div
+                                className={`${
+                                  multipleProgress
+                                    ? "animate-spin"
+                                    : "animate-pulse"
+                                } w-4 h-4 bg-orange-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
+                              ></div>
+                              <h6 className="text-orange-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
+                                totalFalse
+                              )} ${
+                                dataLang?.import_fail || "import_fail"
+                              }`}</h6>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="col-span-2 flex items-center justify-center mt-5">
+                        {totalSuccessStages >= 0 ? (
+                          <div className={`${"mt-4"}`}>
+                            <CircularProgressbar
+                              className="text-center"
+                              value={multipleProgress}
+                              strokeWidth={10}
+                              text={`${multipleProgress}%`}
+                              // classes={`text: center`}
+                              styles={buildStyles({
+                                rotation: 0.25,
+                                strokeLinecap: "butt",
+                                textSize: "16px",
+                                pathTransitionDuration: 0.5,
+                                pathColor: `rgba(236, 64, 122, ${
+                                  multipleProgress / 100
+                                })`,
+                                pathColor: `green`,
+                                textColor: "green",
+                                textAnchor: "middle",
+                                trailColor: "#d6d6d6",
+                                backgroundColor: "#3e98c7",
+                              })}
+                            />
+                            <div className=" grid grid-cols-12 group items-center justify-center mt-4">
+                              <div
+                                className={`${
+                                  multipleProgress
+                                    ? "animate-spin"
+                                    : "animate-pulse"
+                                } w-4 h-4 bg-green-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
+                              ></div>
+                              <h6 className="text-green-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
+                                totalSuccessStages
+                              )} ${
+                                dataLang?.import_susces || "import_susces"
+                              }`}</h6>
+                            </div>
+                            <div className=" grid grid-cols-12 group items-center justify-center mt-4">
+                              <div
+                                className={`${
+                                  multipleProgress
+                                    ? "animate-spin"
+                                    : "animate-pulse"
+                                } w-4 h-4 bg-orange-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
+                              ></div>
+                              <h6 className="text-orange-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
+                                dataFailStages?.length
+                              )} ${
+                                dataLang?.import_fail || "import_fail"
+                              }`}</h6>
+                            </div>
+                          </div>
+                        ) : (
+                          ""
+                        )}
+                      </div>
+                    )}
                   </React.Fragment>
                 )}
                 <div className="col-span-2"></div>
+
                 <div className="col-span-2"></div>
                 <div className="col-span-8 border-b"></div>
                 <div className="col-span-2"></div>
                 {tabPage == 1 && (
-                  <React.Fragment>
+                  <>
                     <div className="col-span-2"></div>
-                    <div className="col-span-8 border-b flex justify-between divide-x ">
-                      <h2 className="py-2 w-1/2">
-                        {dataLang?.import_contactInfo || "import_contactInfo"}
-                      </h2>
+                    <div className="col-span-8 border-b flex justify-between divide-x">
+                      <h2 className="py-2 w-1/2">Thông tin liên hệ</h2>
                       <h2 className="py-2 w-1/2 text-right">
-                        {dataLang?.import_deliveryAdress ||
-                          "import_deliveryAdress"}
+                        Địa chỉ giao hàng
                       </h2>
                     </div>
                     <div className="col-span-2"></div>
 
                     <div className="col-span-2"></div>
                     <div className="col-span-4 ">
-                      <ParentControls
-                        listData={listDataContact}
-                        onLoadingListData={onLoadingListData}
-                        dataLang={dataLang}
-                        _HandleAddParent={_HandleAddContact.bind(this)}
-                        _HandleDeleteParent={_HandleDeleteParent.bind(
-                          this,
-                          "contact"
-                        )}
-                        color="bg-green-600"
-                        colorIcon="green"
-                      />
+                      <div className="grid grid-cols-12 gap-2.5 items-center">
+                        <div className="col-span-12 ">
+                          <div className="b  flex items-center justify-center w-full  pt-5 ">
+                            <button
+                              onClick={_HandleAddContact.bind(this)}
+                              className="i  mt-2 flex justify-center group gap-2 bg-lime-600 w-full text-center py-2 text-white items-center rounded  cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
+                            >
+                              <Add
+                                size="20"
+                                color="green"
+                                className="bg-gray-50 rounded-full group-hover:animate-spin ease-linear transition-all"
+                              />
+                              <p className="text-sm">Thêm cột</p>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                     <div className="col-span-4">
-                      <ParentControls
-                        listData={listDataDelivery}
-                        onLoadingListData={onLoadingListData}
-                        dataLang={dataLang}
-                        _HandleAddParent={_HandleAddDelivery.bind(this)}
-                        _HandleDeleteParent={_HandleDeleteParent.bind(
-                          this,
-                          "delivery"
-                        )}
-                        color="bg-orange-600"
-                        colorIcon="red"
-                      />
+                      <div className="grid grid-cols-12 gap-2.5 items-center">
+                        <div className="col-span-12 ">
+                          <div className="b  flex items-center justify-center w-full  pt-5 ">
+                            <button
+                              onClick={_HandleAddDelivery.bind(this)}
+                              className="i  mt-2 flex justify-center gap-2 group bg-orange-600 w-full text-center py-2 text-white items-center rounded  cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
+                            >
+                              <Add
+                                size="20"
+                                color="red"
+                                className="bg-gray-50 rounded-full group-hover:animate-spin ease-linear transition-all"
+                              />
+                              <p className="text-sm">Thêm cột</p>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                     <div className="col-span-2"></div>
 
                     <div className="col-span-2"></div>
+                    {/* <div className={`col-span-8 `}>
+                      {onLoadingListData ? (
+                        <Loading className="h-2 col-span-2" color="#0f4f9e" />
+                      ) : (
+                        <div
+                          className={`${
+                            onLoadingListData
+                              ? "bg-white"
+                              : (listDataContact?.length > 0 ||
+                                  listDataDelivery?.length > 0) &&
+                                "bg-zinc-100 mt-2"
+                          } grid grid-cols-8 items-start gap-2 p-4 rounded-xl`}
+                        >
+                          <div
+                            className={`col-span-4 grid-cols-2 grid gap-2.5 mt-4  rounded-lg`}
+                          >
+                            {listDataContact?.map((e) => (
+                              <React.Fragment key={e?.id}>
+                                <div className="relative  ">
+                                  <Select
+                                    closeMenuOnSelect={true}
+                                    placeholder={"Trường dữ liệu"}
+                                    options={dataContact}
+                                    isSearchable={true}
+                                    onChange={_HandleChangeChildContact.bind(
+                                      this,
+                                      e?.id,
+                                      "dataFieldsContact"
+                                    )}
+                                    value={e?.dataFieldsContact}
+                                    LoadingIndicator
+                                    noOptionsMessage={() =>
+                                      dataLang?.import_no_data ||
+                                      "import_no_data"
+                                    }
+                                    maxMenuHeight="200px"
+                                    isClearable={true}
+                                    menuPortalTarget={document.body}
+                                    onMenuOpen={handleMenuOpen}
+                                    theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                        ...theme.colors,
+                                        primary25: "#EBF5FF",
+                                        primary50: "#92BFF7",
+                                        primary: "#0F4F9E",
+                                      },
+                                    })}
+                                    styles={{
+                                      placeholder: (base) => ({
+                                        ...base,
+                                        color: "#cbd5e1",
+                                      }),
+                                      menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        position: "absolute",
+                                      }),
+                                    }}
+                                    className="border-transparent   placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  text-sm font-normal outline-none border "
+                                  />
+                                  <button
+                                    onClick={_HandleDeleteContact.bind(
+                                      this,
+                                      e?.id
+                                    )}
+                                    className="-top-[25%] bg-rose-50 hover:bg-pink-200 rounded-xl p-0.5 -right-[3%] absolute xl:text-base text-xs hover:scale-105 transition-all ease-in-out "
+                                  >
+                                    <IconDelete
+                                      size={20}
+                                      color="red"
+                                      className="animate-bounce-custom"
+                                    />
+                                  </button>
+                                </div>
+                                <div className="relative ">
+                                  <Select
+                                    closeMenuOnSelect={true}
+                                    placeholder={"Cột dữ liệu"}
+                                    options={dataColumn}
+                                    isSearchable={true}
+                                    onChange={_HandleChangeChildContact.bind(
+                                      this,
+                                      e?.id,
+                                      "columnContact"
+                                    )}
+                                    value={e?.columnContact}
+                                    LoadingIndicator
+                                    noOptionsMessage={() =>
+                                      dataLang?.import_no_data ||
+                                      "import_no_data"
+                                    }
+                                    maxMenuHeight="200px"
+                                    isClearable={true}
+                                    menuPortalTarget={document.body}
+                                    onMenuOpen={handleMenuOpen}
+                                    theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                        ...theme.colors,
+                                        primary25: "#EBF5FF",
+                                        primary50: "#92BFF7",
+                                        primary: "#0F4F9E",
+                                      },
+                                    })}
+                                    styles={{
+                                      placeholder: (base) => ({
+                                        ...base,
+                                        color: "#cbd5e1",
+                                      }),
+                                      menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        position: "absolute",
+                                      }),
+                                    }}
+                                    className="border-transparent   placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  text-sm font-normal outline-none border "
+                                  />
+                                  <button
+                                    onClick={_HandleDeleteContact.bind(
+                                      this,
+                                      e?.id
+                                    )}
+                                    className="-top-[25%] bg-rose-50 hover:bg-pink-200 rounded-xl p-0.5 -right-[3%] absolute xl:text-base text-xs hover:scale-105 transition-all ease-in-out "
+                                  >
+                                    <IconDelete
+                                      size={20}
+                                      color="red"
+                                      className="animate-bounce-custom"
+                                    />
+                                  </button>
+                                </div>
+                              </React.Fragment>
+                            ))}
+                          </div>
+                          <div
+                            className={`col-span-4 grid-cols-2 grid gap-2.5 mt-4  rounded-lg`}
+                          >
+                            {listDataDelivery?.map((e) => (
+                              <React.Fragment key={e?.id}>
+                                <div className="relative  ">
+                                  <Select
+                                    closeMenuOnSelect={true}
+                                    placeholder={"Trường dữ liệu"}
+                                    options={dataDelivery}
+                                    isSearchable={true}
+                                    onChange={_HandleChangeChildDelivery.bind(
+                                      this,
+                                      e?.id,
+                                      "dataFieldsDelivery"
+                                    )}
+                                    value={e?.dataFieldsDelivery}
+                                    LoadingIndicator
+                                    noOptionsMessage={() =>
+                                      dataLang?.import_no_data ||
+                                      "import_no_data"
+                                    }
+                                    maxMenuHeight="200px"
+                                    isClearable={true}
+                                    menuPortalTarget={document.body}
+                                    onMenuOpen={handleMenuOpen}
+                                    theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                        ...theme.colors,
+                                        primary25: "#EBF5FF",
+                                        primary50: "#92BFF7",
+                                        primary: "#0F4F9E",
+                                      },
+                                    })}
+                                    styles={{
+                                      placeholder: (base) => ({
+                                        ...base,
+                                        color: "#cbd5e1",
+                                      }),
+                                      menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        position: "absolute",
+                                      }),
+                                    }}
+                                    className="border-transparent   placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  text-sm font-normal outline-none border "
+                                  />
+                                  <button
+                                    onClick={_HandleDeleteDelivery.bind(
+                                      this,
+                                      e?.id
+                                    )}
+                                    className="-top-[25%] bg-rose-50 hover:bg-pink-200 rounded-xl p-0.5 -right-[3%] absolute xl:text-base text-xs hover:scale-105 transition-all ease-in-out "
+                                  >
+                                    <IconDelete
+                                      size={20}
+                                      color="red"
+                                      className="animate-bounce-custom"
+                                    />
+                                  </button>
+                                </div>
+                                <div className="relative ">
+                                  <Select
+                                    closeMenuOnSelect={true}
+                                    placeholder={"Cột dữ liệu"}
+                                    options={dataColumn}
+                                    isSearchable={true}
+                                    onChange={_HandleChangeChildDelivery.bind(
+                                      this,
+                                      e?.id,
+                                      "columnDelivery"
+                                    )}
+                                    value={e?.columnDelivery}
+                                    LoadingIndicator
+                                    noOptionsMessage={() =>
+                                      dataLang?.import_no_data ||
+                                      "import_no_data"
+                                    }
+                                    maxMenuHeight="200px"
+                                    isClearable={true}
+                                    menuPortalTarget={document.body}
+                                    onMenuOpen={handleMenuOpen}
+                                    theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                        ...theme.colors,
+                                        primary25: "#EBF5FF",
+                                        primary50: "#92BFF7",
+                                        primary: "#0F4F9E",
+                                      },
+                                    })}
+                                    styles={{
+                                      placeholder: (base) => ({
+                                        ...base,
+                                        color: "#cbd5e1",
+                                      }),
+                                      menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        position: "absolute",
+                                      }),
+                                    }}
+                                    className="border-transparent   placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  text-sm font-normal outline-none border "
+                                  />
+                                  <button
+                                    onClick={_HandleDeleteDelivery.bind(
+                                      this,
+                                      e?.id
+                                    )}
+                                    className="-top-[25%] bg-rose-50 hover:bg-pink-200 rounded-xl p-0.5 -right-[3%] absolute xl:text-base text-xs hover:scale-105 transition-all ease-in-out "
+                                  >
+                                    <IconDelete
+                                      size={20}
+                                      color="red"
+                                      className="animate-bounce-custom"
+                                    />
+                                  </button>
+                                </div>
+                              </React.Fragment>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div> */}
                     <FormClient
                       onLoadingListData={onLoadingListData}
                       dataContact={dataContact}
@@ -2200,7 +2652,7 @@ const Index = (props) => {
                       _HandleDeleteDelivery={_HandleDeleteDelivery.bind(this)}
                     />
                     <div className="col-span-2"></div>
-                  </React.Fragment>
+                  </>
                 )}
                 <div className="col-span-4"></div>
                 <div className="col-span-4 mt-4 grid-cols-2 grid gap-2.5">
@@ -2242,6 +2694,10 @@ const Index = (props) => {
                   </button>
                 </div>
                 <div className="col-span-4 "></div>
+
+                {/* <div className="w-full bg-gray-200 rounded-full dark:bg-gray-700">
+                    <div className="bg-blue-600 text-xs transition-all ease-in-out font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style={{width:`${multipleProgress}%`}}> {multipleProgress}%</div>
+                  </div>      */}
               </div>
             </div>
           </div>
@@ -2251,4 +2707,55 @@ const Index = (props) => {
   );
 };
 
+const TabClient = React.memo((props) => {
+  const router = useRouter();
+  return (
+    <button
+      style={props.style}
+      onClick={props.onClick}
+      className={`${props.className} ${
+        router.query?.tab === `${props.active}` ? "bg-blue-400 text-white" : ""
+      } justify-center 3xl:w-[230px] 2xl:w-[180px] xl:w-[160px] lg:w-[140px] 3xl:h-10 2xl:h-8 xl:h-8 lg:h-7 3xl:text-[16px] 2xl:text-[14px] xl:text-[14px] lg:text-[12px] flex gap-2 items-center rounded-md px-2 py-2 outline-none`}
+    >
+      {router.query?.tab === `${props.active}` && (
+        <TiTick size="20" color="white" />
+      )}
+      {props.children}
+    </button>
+  );
+});
+
+const MoreSelectedBadge = ({ items }) => {
+  const style = {
+    marginLeft: "auto",
+    background: "#d4eefa",
+    borderRadius: "4px",
+    fontSize: "14px",
+    padding: "1px 3px",
+    order: 99,
+  };
+
+  const title = items.join(", ");
+  const length = items.length;
+  const label = `+ ${length}`;
+
+  return (
+    <div style={style} title={title}>
+      {label}
+    </div>
+  );
+};
+
+const MultiValue = ({ index, getValue, ...props }) => {
+  const maxToShow = 3;
+  const overflow = getValue()
+    .slice(maxToShow)
+    .map((x) => x.label);
+
+  return index < maxToShow ? (
+    <components.MultiValue {...props} />
+  ) : index === maxToShow ? (
+    <MoreSelectedBadge items={overflow} />
+  ) : null;
+};
 export default Index;

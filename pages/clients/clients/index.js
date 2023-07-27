@@ -54,6 +54,10 @@ const Index = (props) => {
 
   const [listSelectCt, sListSelectCt] = useState();
 
+  const [listBr, sListBr] = useState();
+
+  const [idBranch, sIdBranch] = useState(null);
+
   const _HandleSelectTab = (e) => {
     router.push({
       pathname: router.route,
@@ -66,6 +70,7 @@ const Index = (props) => {
       query: { tab: router.query?.tab ? router.query?.tab : 0 },
     });
   }, []);
+
   const _ServerFetching = () => {
     const id = Number(tabPage);
     Axios(
@@ -97,7 +102,7 @@ const Index = (props) => {
       }
     );
   };
-  const [listBr, sListBr] = useState();
+
   const _ServerFetching_brand = () => {
     Axios(
       "GET",
@@ -118,13 +123,15 @@ const Index = (props) => {
   };
 
   const listBr_filter = listBr?.map((e) => ({ label: e.name, value: e.id }));
-  const [idBranch, sIdBranch] = useState(null);
+
   const onchang_filterBr = (type, value) => {
     if (type == "branch") {
       sIdBranch(value);
     }
   };
+
   const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
+
   const options = listBr_filter
     ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value))
     : [];
@@ -193,6 +200,7 @@ const Index = (props) => {
       sOnFetching(true);
     }, 500);
   };
+
   useEffect(() => {
     (onFetching && _ServerFetching()) ||
       (onFetching && _ServerFetching_group()) ||
@@ -204,6 +212,7 @@ const Index = (props) => {
       (keySearch && sOnFetching(true)) ||
       (idBranch?.length > 0 && sOnFetching(true));
   }, [limit, router.query?.page, router.query?.tab, idBranch]);
+
   const handleDelete = (event) => {
     Swal.fire({
       title: `${dataLang?.aler_ask}`,
@@ -240,7 +249,6 @@ const Index = (props) => {
   const _HandleFresh = () => {
     sOnFetching(true);
   };
-
   //excel
   const multiDataSet = [
     {
@@ -353,7 +361,7 @@ const Index = (props) => {
                   />
                 </div>
               </div>
-              <div className="flex space-x-3 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+              <div className="flex space-x-3 items-center  3xl:h-[8vh] 2xl:h-[8vh] xl:h-[9vh] lg:h-[9vh] h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                 {listDs &&
                   listDs.map((e) => {
                     return (
@@ -398,7 +406,11 @@ const Index = (props) => {
                             />
                           </form>
                         </div>
-                        <div className="ml-1 col-span-1">
+                        <div
+                          className={`${
+                            idBranch?.length > 2 ? "col-span-2" : "col-span-1"
+                          } ml-1 `}
+                        >
                           <Select
                             // options={options}
                             options={[

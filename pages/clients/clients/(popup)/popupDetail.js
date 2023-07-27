@@ -16,19 +16,30 @@ import {
   Trash as IconDelete,
   SearchNormal1 as IconSearch,
   Add as IconAdd,
+  Map,
 } from "iconsax-react";
+import TableContact from "./(table)/tableContact";
+import TableDelivery from "./(table)/tableDelivery";
 
 const Popup_chitiet = (props) => {
   const scrollAreaRef = useRef(null);
+
   const [open, sOpen] = useState(false);
+
   const _ToggleModal = (e) => sOpen(e);
+
   const [tab, sTab] = useState(0);
-  const _HandleSelectTab = (e) => sTab(e);
+
+  const _HandleSelectTab = (index) => sTab(index);
+
   const [data, sData] = useState();
+
   const [onFetching, sOnFetching] = useState(false);
+
   useEffect(() => {
     props?.id && sOnFetching(true);
   }, [open]);
+
   const _ServerFetching_detailUser = () => {
     Axios(
       "GET",
@@ -44,9 +55,11 @@ const Popup_chitiet = (props) => {
       }
     );
   };
+
   useEffect(() => {
     onFetching && _ServerFetching_detailUser();
   }, [open]);
+
   const formatNumber = (number) => {
     if (!number && number !== 0) return 0;
     const integerPart = Math.floor(number);
@@ -55,6 +68,21 @@ const Popup_chitiet = (props) => {
     const roundedNumber = integerPart + roundedDecimalPart;
     return roundedNumber.toLocaleString("en");
   };
+
+  const TabButtons = [
+    {
+      index: 0,
+      label: props.dataLang?.client_popup_general,
+    },
+    {
+      index: 1,
+      label: props.dataLang?.client_popup_detailContact,
+    },
+    {
+      index: 2,
+      label: props.dataLang?.client_popup_devivelyInfo,
+    },
+  ];
   return (
     <>
       <PopupEdit
@@ -66,32 +94,25 @@ const Popup_chitiet = (props) => {
         classNameBtn={props?.className}
       >
         <div className="flex items-center space-x-4 my-3 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
-          <button
-            onClick={_HandleSelectTab.bind(this, 0)}
-            className={`${
-              tab === 0
-                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                : "hover:text-[#0F4F9E] "
-            }  px-4 py-2 outline-none font-semibold`}
-          >
-            {props.dataLang?.client_popup_general}
-          </button>
-          <button
-            onClick={_HandleSelectTab.bind(this, 1)}
-            className={`${
-              tab === 1
-                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                : "hover:text-[#0F4F9E] "
-            }  px-4 py-2 outline-none font-semibold`}
-          >
-            {props.dataLang?.client_popup_detailContact}
-          </button>
+          {TabButtons.map((tabItem) => (
+            <button
+              key={tabItem.index}
+              onClick={_HandleSelectTab.bind(this, tabItem.index)}
+              className={`px-4 py-2 outline-none font-semibold ${
+                tab === tabItem.index
+                  ? "text-[#0F4F9E] border-b-2 border-[#0F4F9E]"
+                  : "hover:text-[#0F4F9E]"
+              }`}
+            >
+              {tabItem.label}
+            </button>
+          ))}
         </div>
-        <div className="mt-4 space-x-5 w-[930px] h-auto  ">
+        <div className="mt-4 space-x-5 w-[930px] 3xl:h-[500px] 2xl:h-[500px] xl:h-[500px]  lg:h-[400px] h-[500px]">
           {tab === 0 && (
             <ScrollArea
               ref={scrollAreaRef}
-              className="h-[auto] overflow-hidden "
+              className="w-[930px] 3xl:h-[500px] 2xl:h-[500px] xl:h-[500px]  lg:h-[400px] h-[500px] overflow-hidden "
               speed={1}
               smoothScrolling={true}
             >
@@ -259,7 +280,8 @@ const Popup_chitiet = (props) => {
                           {props.dataLang?.client_popup_date}:
                         </span>{" "}
                         <span className="font-normal capitalize">
-                          {data?.date_incorporation != null
+                          {data?.date_incorporation != null &&
+                          data?.date_incorporation != "0000-00-00"
                             ? moment(data?.date_incorporation).format(
                                 "DD/MM/YYYY"
                               )
@@ -302,89 +324,22 @@ const Popup_chitiet = (props) => {
             </ScrollArea>
           )}
           {tab === 1 && (
-            <div>
-              <div className="w-[930px]">
-                <div className="min:h-[200px] h-[72%] max:h-[400px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                  <div className="pr-2 w-[100%] lx:w-[110%] ">
-                    <div className="flex items-center sticky top-0 bg-slate-100 p-2 z-10">
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-left">
-                        {props.dataLang?.client_popup_detailName}
-                      </h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-center">
-                        {props.dataLang?.client_popup_phone}
-                      </h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[400] text-left">
-                        {props.dataLang?.client_popup_mail}
-                      </h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[10%] font-[400] text-left">
-                        {props.dataLang?.client_popup_position}
-                      </h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[15%] font-[400] text-left">
-                        {props.dataLang?.client_popup_birthday}
-                      </h4>
-                      <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-left">
-                        {props.dataLang?.client_popup_adress}
-                      </h4>
-                    </div>
-                    {onFetching ? (
-                      <Loading className="h-80" color="#0f4f9e" />
-                    ) : data?.contact?.length > 0 ? (
-                      <>
-                        <ScrollArea
-                          className="min-h-[455px] max-h-[455px] overflow-hidden"
-                          speed={1}
-                          smoothScrolling={true}
-                        >
-                          <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px]">
-                            {data?.contact?.map((e) => (
-                              <div
-                                className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 "
-                                key={e.id.toString()}
-                              >
-                                <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">
-                                  {e.full_name}
-                                </h6>
-                                <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-center">
-                                  {e.phone_number}
-                                </h6>
-                                <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left break-words">
-                                  {e.email}
-                                </h6>
-                                <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[10%]  rounded-md text-left break-words">
-                                  {e.position}
-                                </h6>
-                                <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%]  rounded-md text-left">
-                                  {e.birthday != "0000-00-00"
-                                    ? moment(e.birthday).format("DD-MM-YYYY")
-                                    : ""}
-                                </h6>
-                                <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">
-                                  {e.address}
-                                </h6>
-                              </div>
-                            ))}
-                          </div>
-                        </ScrollArea>
-                      </>
-                    ) : (
-                      <div className=" max-w-[352px] mt-24 mx-auto">
-                        <div className="text-center">
-                          <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                            <IconSearch />
-                          </div>
-                          <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                            Không tìm thấy các mục
-                          </h1>
-                          <div className="flex items-center justify-around mt-6 ">
-                            {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <TableContact
+              onFetching={onFetching}
+              data={data}
+              dataLang={props.dataLang}
+            >
+              <IconSearch />
+            </TableContact>
+          )}
+          {tab === 2 && (
+            <TableDelivery
+              onFetching={onFetching}
+              data={data}
+              dataLang={props.dataLang}
+            >
+              <IconSearch />
+            </TableDelivery>
           )}
         </div>
       </PopupEdit>

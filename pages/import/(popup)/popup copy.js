@@ -40,6 +40,52 @@ const Popup_status = (props) => {
   }, [props.data, props.totalFalse]);
 
   //Nối mảng kahcsh hàng - Liên hệ - Địa chỉ
+  // const { values, columns } = useMemo(() => {
+  //   const arrayFormater = props.data?.map((e) => {
+  //     if (e?.date_incorporation) {
+  //       return {
+  //         ...e,
+  //         date_incorporation: e?.date_incorporation
+  //           ? moment(e?.date_incorporation).format("DD/MM/YYYY")
+  //           : "",
+  //       };
+  //     }
+  //     return { ...e };
+  //   });
+
+  //   const newArr = (arrayFormater || []).filter(Boolean).map((e) => {
+  //     const { rowIndex, error, ...newObject } = e;
+  //     return newObject;
+  //   });
+
+  //   const mappedData = newArr.map((item) => {
+  //     const rowData = {};
+  //     props?.listData.forEach((column) => {
+  //       const value = item[column?.dataFields?.value];
+  //       rowData[column?.dataFields?.value] = value || "";
+  //     });
+  //     return rowData;
+  //   });
+
+  //   const columns = props?.listData?.map((header) => ({
+  //     title: `${header?.dataFields?.label}`,
+  //     width: { wpx: 150 },
+  //     style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
+  //   }));
+
+  //   const values = mappedData.map((i) =>
+  //     Object.values(i)?.map((e) => ({
+  //       value: e,
+  //       style:
+  //         e == ""
+  //           ? { fill: { patternType: "solid", fgColor: { rgb: "FFCCEEFF" } } }
+  //           : "",
+  //     }))
+  //   );
+
+  //   return { values, columns };
+  // }, [props.data, props?.listData]);
+
   const { values, columns } = useMemo(() => {
     if (props.router == 1) {
       const arrayFormater = props.data?.map((e) => {
@@ -91,6 +137,8 @@ const Popup_status = (props) => {
         width: { wpx: 150 },
         style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
       }));
+      console.log("columns", columns);
+
       const values = mappedData.map((i) =>
         allFields.map((header) => {
           const value =
@@ -120,7 +168,7 @@ const Popup_status = (props) => {
         })
       );
 
-      console.log(values);
+      console.log("values", values);
 
       return { values, columns };
     } else {

@@ -12,6 +12,7 @@ import dynamic from "next/dynamic";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
   ssr: false,
 });
+
 import {
   Edit as IconEdit,
   Grid6 as IconExcel,
@@ -21,6 +22,12 @@ import {
 } from "iconsax-react";
 
 import Swal from "sweetalert2";
+import ButtoonAdd from "./(button)/buttonAdd";
+import ButtoonDelete from "./(button)/buttonDelete";
+import FormContactInfo from "./(form)/formContactInfo";
+import FormContactDelivery from "./(form)/formDelivery";
+import Form from "./(form)/form";
+
 const Toast = Swal.mixin({
   toast: true,
   position: "top-end",
@@ -28,6 +35,7 @@ const Toast = Swal.mixin({
   timer: 2000,
   timerProgressBar: true,
 });
+
 const Popup_dskh = (props) => {
   const dataLang = props.dataLang;
   const scrollAreaRef = useRef(null);
@@ -61,6 +69,7 @@ const Popup_dskh = (props) => {
   const [optionphone_number, sOptionPhone_number] = useState("");
   const [name, sName] = useState("");
   const [code, sCode] = useState(null);
+
   const [tax_code, sTaxcode] = useState(null);
   const [representative, sRepresentative] = useState(null);
   const [phone_number, sPhone] = useState(null);
@@ -83,10 +92,10 @@ const Popup_dskh = (props) => {
     sErrInputBr(false);
     sErrInput(false);
     sName("");
-    sCode();
-    sTaxcode();
-    sRepresentative();
-    sPhone();
+    sCode(null);
+    sTaxcode(null);
+    sRepresentative(null);
+    sPhone(null);
     sAdress("");
     sDate_incorporation("");
     sEmail("");
@@ -120,6 +129,8 @@ const Popup_dskh = (props) => {
     sValueGr([]);
     sValueChar([]);
     sListChar([]);
+    sOptionDelivery(props.optionDelivery ? props.optionDelivery : []);
+    sTab(0);
   }, [open]);
 
   const _ServerFetching_detailUser = async () => {
@@ -164,6 +175,16 @@ const Popup_dskh = (props) => {
           sNote(db?.note);
           sValueWa({ label: db?.ward.name, value: db?.ward.wardid });
           sOption(db?.contact ? db?.contact : []);
+          sOptionDelivery(
+            db?.clients_address_delivery?.map((e) => ({
+              id: e?.id,
+              nameDelivery: e?.fullname,
+              phoneDelivery: e?.phone,
+              addressDelivery: e?.address,
+              actionDelivery: e?.is_primary == "1" ? true : false,
+              idUpdate: e?.id,
+            }))
+          );
         }
         sOnFetching(false);
       }
@@ -392,26 +413,63 @@ const Popup_dskh = (props) => {
   };
 
   //post db
+  console.log("optionDelivery", optionDelivery);
   const _ServerSending = () => {
     let id = props?.id;
     var data = new FormData();
-    data.append("name", name);
-    data.append("code", code);
-    data.append("tax_code", tax_code);
-    data.append("representative", representative);
-    data.append("phone_number", phone_number);
-    data.append("address", address);
-    data.append("date_incorporation", date_incorporation);
-    data.append("note", note);
-    data.append("email", email);
-    data.append("debt_limit", debt_limit);
-    data.append("debt_limit_day", debt_limit_day);
-    data.append("city", valueCt);
-    data.append("district", valueDis?.value);
-    data.append("ward", valueWa?.value);
-    data.append("client_group_id", group);
-    data.append("branch_id", branch_id);
-    data.append("staff_charge", char);
+    data.append("name", name ? name : "");
+    data.append("code", code ? code : "");
+    data.append("tax_code", tax_code ? tax_code : "");
+    data.append("representative", representative ? representative : "");
+    data.append("phone_number", phone_number ? phone_number : "");
+    data.append("address", address ? address : "");
+    data.append(
+      "date_incorporation",
+      date_incorporation ? date_incorporation : ""
+    );
+    data.append("note", note ? note : "");
+    data.append("email", email ? email : "");
+    data.append("debt_limit", debt_limit ? debt_limit : "");
+    data.append("debt_limit_day", debt_limit_day ? debt_limit_day : "");
+    data.append("city", valueCt ? valueCt : "");
+    data.append("district", valueDis?.value ? valueDis?.value : "");
+    data.append("ward", valueWa?.value ? valueWa?.value : "");
+    // data.append("client_group_id", group ? group : "");
+    // data.append("branch_id", branch_id ? branch_id : "");
+    valueBr?.forEach((e, index) => {
+      data.append(`branch_id[${index}]`, e?.value ? e?.value : "");
+    });
+    valueGr?.forEach((e, index) => {
+      data.append(`client_group_id[${index}]`, e?.value ? e?.value : "");
+    });
+    valueChar?.forEach((e, index) => {
+      data.append(`staff_charge[${index}]`, e?.value ? e?.value : "");
+    });
+    // data.append("staff_charge", char ? char : "");
+    option?.forEach((e, index) => {
+      data.append(`contact[${index}][id]`, e?.id);
+      data.append(`contact[${index}][full_name]`, e?.full_name);
+      data.append(`contact[${index}][email]`, e?.email);
+      data.append(`contact[${index}][position]`, e?.position);
+      data.append(`contact[${index}][address]`, e?.address);
+      data.append(`contact[${index}][phone_number]`, e?.phone_number);
+    });
+    optionDelivery?.forEach((e, index) => {
+      data.append(`items[${index}][id]`, id ? e?.idUpdate : "");
+      data.append(
+        `items[${index}][fullname]`,
+        e?.nameDelivery ? e?.nameDelivery : ""
+      );
+      data.append(
+        `items[${index}][phone]`,
+        e?.phoneDelivery ? e?.phoneDelivery : ""
+      );
+      data.append(
+        `items[${index}][address]`,
+        e?.addressDelivery ? e?.addressDelivery : ""
+      );
+      data.append(`items[${index}][is_primary]`, e?.actionDelivery ? 1 : 0);
+    });
     Axios(
       "POST",
       `${
@@ -420,26 +478,27 @@ const Popup_dskh = (props) => {
           : "/api_web/api_client/client?csrf_protection=true"
       }`,
       {
-        data: {
-          name: name,
-          code: code,
-          tax_code: tax_code,
-          representative: representative,
-          phone_number: phone_number,
-          address: address,
-          date_incorporation: date_incorporation,
-          note: note,
-          email: email,
-          debt_limit: debt_limit,
-          debt_limit_day: debt_limit_day,
-          city: valueCt,
-          district: valueDis,
-          ward: valueWa,
-          branch_id: branch_id,
-          staff_charge: char,
-          client_group_id: group,
-          contact: option,
-        },
+        // data: {
+        //   name: name,
+        //   code: code,
+        //   tax_code: tax_code,
+        //   representative: representative,
+        //   phone_number: phone_number,
+        //   address: address,
+        //   date_incorporation: date_incorporation ? date_incorporation : "",
+        //   note: note,
+        //   email: email,
+        //   debt_limit: debt_limit,
+        //   debt_limit_day: debt_limit_day,
+        //   city: valueCt,
+        //   district: valueDis,
+        //   ward: valueWa,
+        //   branch_id: branch_id,
+        //   staff_charge: char,
+        //   client_group_id: group,
+        //   contact: option,
+        // },
+        data: data,
         headers: { "Content-Type": "multipart/form-data" },
       },
       (err, response) => {
@@ -448,7 +507,11 @@ const Popup_dskh = (props) => {
           if (isSuccess) {
             Toast.fire({
               icon: "success",
-              title: `${props?.dataLang[message]}`,
+              title: `${
+                typeof props?.dataLang[message] !== "undefined"
+                  ? props?.dataLang[message]
+                  : message
+              }`,
             });
             props.onRefresh && props.onRefresh();
             sOpen(false);
@@ -458,8 +521,9 @@ const Popup_dskh = (props) => {
             sCode(null);
             sTaxcode(null);
             sRepresentative(null);
+            sTab(0);
             sDate_incorporation("");
-            sPhone("");
+            sPhone(null);
             sAdress("");
             sNote("");
             sEmail("");
@@ -471,10 +535,15 @@ const Popup_dskh = (props) => {
             sValueBr([]);
             sGroupOpt([]);
             sValueChar([]);
+            sOptionDelivery([]);
           } else {
             Toast.fire({
               icon: "error",
-              title: `${props.dataLang[message] + " " + branch_name} `,
+              title: `${
+                typeof props?.dataLang[message] !== "undefined"
+                  ? props.dataLang[message] + " " + branch_name
+                  : message
+              } `,
             });
           }
         }
@@ -492,11 +561,11 @@ const Popup_dskh = (props) => {
       option[index].email = value.target?.value;
     } else if (type == "position") {
       option[index].position = value.target?.value;
-    } else if (type === "birthday") {
+    } else if (type == "birthday") {
       option[index].birthday = value.target?.value;
-    } else if (type === "address") {
+    } else if (type == "address") {
       option[index].address = value.target?.value;
-    } else if (type === "phone_number") {
+    } else if (type == "phone_number") {
       option[index].phone_number = value.target?.value;
     }
     sOption([...option]);
@@ -547,7 +616,6 @@ const Popup_dskh = (props) => {
     sOptionDelivery(updatedOptionDelivery);
   };
 
-  console.log("optionDelivery", optionDelivery);
   // add option form
   const _HandleAddNew = () => {
     sOption([
@@ -577,6 +645,7 @@ const Popup_dskh = (props) => {
       phoneDelivery: null,
       addressDelivery: null,
       actionDelivery: false,
+      idUpdate: "",
     };
     sOptionDelivery([...optionDelivery, newData]);
   };
@@ -617,6 +686,7 @@ const Popup_dskh = (props) => {
     option.length == 0 && sHidden(false);
     option.length != 0 && sHidden(true);
   }, [option.length]);
+
   useEffect(() => {
     onSending && _ServerSending();
   }, [onSending]);
@@ -639,6 +709,7 @@ const Popup_dskh = (props) => {
   useEffect(() => {
     sErrInput(false);
   }, [name?.length > 0]);
+
   useEffect(() => {
     sErrInputBr(false);
   }, [branch_id?.length > 0]);
@@ -656,7 +727,6 @@ const Popup_dskh = (props) => {
   useEffect(() => {
     open && sOnFetchingGr(true);
   }, [valueBr]);
-  // },[valueChar])
 
   useEffect(() => {
     onFetchingGr && _ServerFetching_Gr();
@@ -665,13 +735,11 @@ const Popup_dskh = (props) => {
   useEffect(() => {
     onFetchingDis && _ServerFetching_distric();
   }, [onFetchingDis]);
+
   useEffect(() => {
     onFetchingWar && _ServerFetching_war();
   }, [onFetchingWar]);
 
-  // useEffect(()=>{
-  //   onFetchingChar && _ServerFetching_Char()
-  // },[onFetchingChar])
   return (
     <>
       <PopupEdit
@@ -717,7 +785,7 @@ const Popup_dskh = (props) => {
                 : "hover:text-[#0F4F9E] "
             }  px-4 py-2 outline-none font-semibold`}
           >
-            {"Thông tin giao hàng"}
+            {props.dataLang?.client_popup_devivelyInfo}
           </button>
         </div>
         <div className="mt-4">
@@ -725,421 +793,45 @@ const Popup_dskh = (props) => {
             {tab === 0 && (
               <ScrollArea
                 ref={scrollAreaRef}
-                className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-hidden"
+                className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-hidden bg-white shadow-lg rounded-xl"
                 speed={1}
                 smoothScrolling={true}
               >
-                <div className="w-[50vw]  p-2  ">
-                  <div className="flex flex-wrap justify-between ">
-                    <div className="w-[48%]">
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">
-                        {props.dataLang?.client_list_namecode}{" "}
-                      </label>
-                      <input
-                        value={code}
-                        onChange={_HandleChangeInput.bind(this, "code")}
-                        name="fname"
-                        type="text"
-                        placeholder={props.dataLang?.client_popup_sytem}
-                        className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                      />
-
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">
-                        {props.dataLang?.client_list_name}
-                        <span className="text-red-500">*</span>
-                      </label>
-                      <div>
-                        <input
-                          value={name}
-                          onChange={_HandleChangeInput.bind(this, "name")}
-                          placeholder={props.dataLang?.client_list_name}
-                          name="fname"
-                          type="text"
-                          className={`${
-                            errInput
-                              ? "border-red-500"
-                              : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                          } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2`}
-                        />
-                        {errInput && (
-                          <label className="mb-4  text-[14px] text-red-500">
-                            {props.dataLang?.client_list_nameuser}
-                          </label>
-                        )}
-                      </div>
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">
-                        {props.dataLang?.client_list_repre}
-                      </label>
-                      <input
-                        value={representative}
-                        placeholder={props.dataLang?.client_list_repre}
-                        onChange={_HandleChangeInput.bind(
-                          this,
-                          "representative"
-                        )}
-                        name="fname"
-                        type="text"
-                        className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                      />
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">
-                        {props.dataLang?.client_popup_mail}
-                      </label>
-                      <input
-                        value={email}
-                        onChange={_HandleChangeInput.bind(this, "email")}
-                        placeholder={props.dataLang?.client_popup_mail}
-                        name="fname"
-                        type="email"
-                        className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                      />
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">
-                        {props.dataLang?.client_list_phone}
-                      </label>
-                      <input
-                        value={phone_number}
-                        placeholder={props.dataLang?.client_list_phone}
-                        onChange={_HandleChangeInput.bind(this, "phone_number")}
-                        name="fname"
-                        type="text"
-                        className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                      />
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">
-                        {props.dataLang?.client_list_taxtcode}
-                      </label>
-                      <input
-                        value={tax_code}
-                        placeholder={props.dataLang?.client_list_taxtcode}
-                        onChange={_HandleChangeInput.bind(this, "tax_code")}
-                        name="fname"
-                        type="text"
-                        className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                      />
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">
-                        {props.dataLang?.client_popup_date}
-                      </label>
-                      <input
-                        value={date_incorporation}
-                        onChange={_HandleChangeInput.bind(
-                          this,
-                          "date_incorporation"
-                        )}
-                        name="fname"
-                        type="date"
-                        className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                      />
-
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">
-                        {props.dataLang?.client_popup_adress}
-                      </label>
-                      <textarea
-                        value={address}
-                        placeholder={props.dataLang?.client_popup_adress}
-                        onChange={_HandleChangeInput.bind(this, "address")}
-                        name="fname"
-                        type="text"
-                        className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[40px] h-[40px] max-h-[200px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"
-                      />
-                    </div>
-                    <div className="w-[48%]">
-                      <div>
-                        <label className="text-[#344054] font-normal text-sm mb-1 ">
-                          {props.dataLang?.client_list_brand}{" "}
-                          <span className="text-red-500">*</span>
-                        </label>
-                        <Select
-                          closeMenuOnSelect={false}
-                          placeholder={props.dataLang?.client_list_brand}
-                          options={brandpOpt}
-                          isSearchable={true}
-                          onChange={_HandleChangeInput.bind(this, "valueBr")}
-                          isMulti
-                          noOptionsMessage={() => "Không có dữ liệu"}
-                          value={valueBr}
-                          maxMenuHeight="200px"
-                          isClearable={true}
-                          menuPortalTarget={document.body}
-                          onMenuOpen={handleMenuOpen}
-                          styles={{
-                            placeholder: (base) => ({
-                              ...base,
-                              color: "#cbd5e1",
-                            }),
-                            menuPortal: (base) => ({
-                              ...base,
-                              zIndex: 9999,
-                              position: "absolute",
-                            }),
-                            // control: base => ({
-                            //   ...base,
-                            //   border: '1px solid #d0d5dd',
-                            //   boxShadow: 'none',
-
-                            // })  ,
-                            control: (provided) => ({
-                              ...provided,
-                              border: "1px solid #d0d5dd",
-                              "&:focus": {
-                                outline: "none",
-                                border: "none",
-                              },
-                            }),
-                          }}
-                          className={`${
-                            errInputBr ? "border-red-500" : "border-transparent"
-                          } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                        />
-                        {errInputBr && (
-                          <label className="mb-2  text-[14px] text-red-500">
-                            {props.dataLang?.client_list_bran}
-                          </label>
-                        )}
-                      </div>
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">
-                        {props.dataLang?.client_popup_char}
-                      </label>
-                      <Select
-                        closeMenuOnSelect={false}
-                        placeholder={props.dataLang?.client_popup_char}
-                        options={listChar}
-                        isSearchable={true}
-                        onChange={handleChangeChar}
-                        isMulti
-                        value={valueChar}
-                        maxMenuHeight="200px"
-                        isClearable={true}
-                        theme={(theme) => ({
-                          ...theme,
-                          colors: {
-                            ...theme.colors,
-                            primary25: "#EBF5FF",
-                            primary50: "#92BFF7",
-                            primary: "#0F4F9E",
-                          },
-                        })}
-                        noOptionsMessage={() => "Không có dữ liệu"}
-                        menuPortalTarget={document.body}
-                        onMenuOpen={handleMenuOpen}
-                        styles={{
-                          placeholder: (base) => ({
-                            ...base,
-                            color: "#cbd5e1",
-                          }),
-                          menuPortal: (base) => ({
-                            ...base,
-                            zIndex: 9999,
-                            position: "absolute",
-                          }),
-                        }}
-                        className={`${
-                          errInputBr
-                            ? "border-red-500"
-                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                        } placeholder:text-slate-300 w-full  text-[#52575E] font-normal border outline-none mb-2 rounded-[5.5px] bg-white border-none xl:text-base text-[14.5px]`}
-                      />
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">
-                        {props.dataLang?.client_list_group}
-                      </label>
-                      <Select
-                        placeholder={props.dataLang?.client_list_group}
-                        noOptionsMessage={() => "Không có dữ liệu"}
-                        options={listGr}
-                        //hihi
-                        value={valueGr}
-                        onChange={handleChangeGr}
-                        isSearchable={true}
-                        isMulti={true}
-                        maxMenuHeight="200px"
-                        isClearable={true}
-                        theme={(theme) => ({
-                          ...theme,
-                          colors: {
-                            ...theme.colors,
-                            primary25: "#EBF5FF",
-                            primary50: "#92BFF7",
-                            primary: "#0F4F9E",
-                          },
-                        })}
-                        menuPortalTarget={document.body}
-                        onMenuOpen={handleMenuOpen}
-                        styles={{
-                          placeholder: (base) => ({
-                            ...base,
-                            color: "#cbd5e1",
-                          }),
-                          menuPortal: (base) => ({
-                            ...base,
-                            zIndex: 9999,
-                            position: "absolute",
-                          }),
-                        }}
-                        className="rounded-[5.5px] py-0.5 mb-2 bg-white border-none xl:text-base text-[14.5px] "
-                      />
-                      <label className="text-[#344054] font-normal text-sm mb-1 ">
-                        {props.dataLang?.client_popup_limit}
-                      </label>
-                      <input
-                        value={debt_limit}
-                        onChange={_HandleChangeInput.bind(this, "debt_limit")}
-                        placeholder={props.dataLang?.client_popup_limit}
-                        name="fname"
-                        type="text"
-                        className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                      />
-                      <div>
-                        <label className="text-[#344054] font-normal text-sm mb-1 ">
-                          {props.dataLang?.client_popup_days}
-                        </label>
-                        <input
-                          value={debt_limit_day}
-                          onChange={_HandleChangeInput.bind(
-                            this,
-                            "debt_limit_day"
-                          )}
-                          name="fname"
-                          placeholder={props.dataLang?.client_popup_days}
-                          type="text"
-                          className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[#344054] font-normal text-sm mb-1 ">
-                          {props.dataLang?.client_popup_city}
-                        </label>
-                        <Select
-                          placeholder={props.dataLang?.client_popup_city}
-                          options={cityOpt}
-                          value={
-                            valueCt
-                              ? {
-                                  label: cityOpt?.find(
-                                    (x) => x.value == valueCt
-                                  )?.label,
-                                  value: valueCt,
-                                }
-                              : null
-                          }
-                          onChange={handleChangeCt}
-                          isSearchable={true}
-                          maxMenuHeight="200px"
-                          isClearable={true}
-                          noOptionsMessage={() => "Không có dữ liệu"}
-                          theme={(theme) => ({
-                            ...theme,
-                            colors: {
-                              ...theme.colors,
-                              primary25: "#EBF5FF",
-                              primary50: "#92BFF7",
-                              primary: "#0F4F9E",
-                            },
-                          })}
-                          menuPortalTarget={document.body}
-                          onMenuOpen={handleMenuOpen}
-                          styles={{
-                            placeholder: (base) => ({
-                              ...base,
-                              color: "#cbd5e1",
-                            }),
-                            menuPortal: (base) => ({
-                              ...base,
-                              zIndex: 9999,
-                              position: "absolute",
-                            }),
-                          }}
-                          className="rounded-[5.5px] py-0.5 mb-1 bg-white border-none xl:text-base text-[14.5px] "
-                        />
-                      </div>
-                      <div className="mb-2">
-                        <label className="text-[#344054] font-normal text-sm mb-1 ">
-                          {props.dataLang?.client_popup_district}
-                        </label>
-                        <Select
-                          placeholder={props.dataLang?.client_popup_district}
-                          options={ditrict}
-                          // value={valueDis ? {label: ditrict?.find(x => x.value == valueDis)?.label, value: valueDis} : null}
-                          value={valueDis}
-                          onChange={handleChangeDtric}
-                          isSearchable={true}
-                          maxMenuHeight="200px"
-                          isClearable={true}
-                          theme={(theme) => ({
-                            ...theme,
-                            colors: {
-                              ...theme.colors,
-                              primary25: "#EBF5FF",
-                              primary50: "#92BFF7",
-                              primary: "#0F4F9E",
-                            },
-                          })}
-                          noOptionsMessage={() => "Không có dữ liệu"}
-                          menuPortalTarget={document.body}
-                          onMenuOpen={handleMenuOpen}
-                          styles={{
-                            placeholder: (base) => ({
-                              ...base,
-                              color: "#cbd5e1",
-                            }),
-                            menuPortal: (base) => ({
-                              ...base,
-                              zIndex: 9999,
-                              position: "absolute",
-                            }),
-                          }}
-                          className="rounded-[5.5px] py-0.5 bg-white border-none xl:text-base text-[14.5px] "
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[#344054] font-normal text-sm mb-1 ">
-                          {props.dataLang?.client_popup_wards}
-                        </label>
-                        <Select
-                          placeholder={props.dataLang?.client_popup_wards}
-                          options={listWar}
-                          // value={valueWa ? {label: listWar?.find(x => x.value == valueWa)?.label, value: valueWa} : null}
-                          value={valueWa}
-                          onChange={handleChangeWar}
-                          isSearchable={true}
-                          maxMenuHeight="200px"
-                          isClearable={true}
-                          theme={(theme) => ({
-                            ...theme,
-                            colors: {
-                              ...theme.colors,
-                              primary25: "#EBF5FF",
-                              primary50: "#92BFF7",
-                              primary: "#0F4F9E",
-                            },
-                          })}
-                          noOptionsMessage={() => "Không có dữ liệu"}
-                          menuPortalTarget={document.body}
-                          onMenuOpen={handleMenuOpen}
-                          styles={{
-                            placeholder: (base) => ({
-                              ...base,
-                              color: "#cbd5e1",
-                            }),
-                            menuPortal: (base) => ({
-                              ...base,
-                              zIndex: 9999,
-                              position: "absolute",
-                            }),
-                          }}
-                          className="rounded-[5.5px] py-0.5 bg-white border-none xl:text-base text-[14.5px] "
-                        />
-                      </div>
-                    </div>
-                    <label className="text-[#344054] font-normal text-sm mb-1 ">
-                      {props.dataLang?.client_popup_note}
-                    </label>
-                    <textarea
-                      value={note}
-                      placeholder={props.dataLang?.client_popup_note}
-                      onChange={_HandleChangeInput.bind(this, "note")}
-                      name="fname"
-                      type="text"
-                      className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[40px] max-h-[200px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"
-                    />
-                  </div>
-                </div>
+                <Form
+                  code={code}
+                  name={name}
+                  representative={representative}
+                  email={email}
+                  phone_number={phone_number}
+                  tax_code={tax_code}
+                  date_incorporation={date_incorporation}
+                  address={address}
+                  dataLang={props.dataLang}
+                  errInput={errInput}
+                  errInputBr={errInputBr}
+                  handleMenuOpen={handleMenuOpen}
+                  handleChangeChar={handleChangeChar}
+                  handleChangeGr={handleChangeGr}
+                  handleChangeCt={handleChangeCt}
+                  handleChangeDtric={handleChangeDtric}
+                  handleChangeWar={handleChangeWar}
+                  valueBr={valueBr}
+                  valueChar={valueChar}
+                  valueGr={valueGr}
+                  valueCt={valueCt}
+                  valueDis={valueDis}
+                  valueWa={valueWa}
+                  listChar={listChar}
+                  listGr={listGr}
+                  cityOpt={cityOpt}
+                  ditrict={ditrict}
+                  listWar={listWar}
+                  brandpOpt={brandpOpt}
+                  debt_limit={debt_limit}
+                  debt_limit_day={debt_limit_day}
+                  note={note}
+                  _HandleChangeInput={_HandleChangeInput.bind(this)}
+                />
               </ScrollArea>
             )}
             {tab === 1 && (
@@ -1151,110 +843,20 @@ const Popup_dskh = (props) => {
                 >
                   <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
                     {option.map((e) => (
-                      <div className="w-[48%]">
-                        <div className="" key={e.id?.toString()}>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {props.dataLang?.client_popup_fiandlass}
-                          </label>
-                          <input
-                            value={e.full_name}
-                            onChange={_OnChangeOption.bind(
-                              this,
-                              e.id,
-                              "full_name"
-                            )}
-                            name="optionVariant"
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                          />
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {props.dataLang?.client_popup_phone}
-                          </label>
-                          <input
-                            value={e.phone_number}
-                            onChange={_OnChangeOption.bind(
-                              this,
-                              e.id,
-                              "phone_number"
-                            )}
-                            name="fname"
-                            type="number"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                          />
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            Email
-                          </label>
-                          <input
-                            value={e.email}
-                            onChange={_OnChangeOption.bind(this, e.id, "email")}
-                            name="optionEmail"
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                          />
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {props.dataLang?.client_popup_position}
-                          </label>
-                          <input
-                            value={e.position}
-                            onChange={_OnChangeOption.bind(
-                              this,
-                              e.id,
-                              "position"
-                            )}
-                            name="fname"
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                          />
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {props.dataLang?.client_popup_birthday}
-                          </label>
-                          <input
-                            value={e.birthday}
-                            onChange={_OnChangeOption.bind(
-                              this,
-                              e.id,
-                              "birthday"
-                            )}
-                            name="fname"
-                            type="date"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                          />
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {props.dataLang?.client_popup_adress}
-                          </label>
-                          <textarea
-                            value={e.address}
-                            onChange={_OnChangeOption.bind(
-                              this,
-                              e.id,
-                              "address"
-                            )}
-                            name="fname"
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[90px] max-h-[200px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"
-                          />
-
-                          <button
-                            onClick={_HandleDelete.bind(this, e.id)}
-                            type="button"
-                            title="Xóa"
-                            className="transition  w-full bg-slate-100 hover:bg-blue-400 duration-200 ease-linear  group h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center"
-                          >
-                            <IconDelete className="group-hover:text-white animate-bounce transition  duration-200 ease-linea" />
-                          </button>
-                        </div>
-                      </div>
+                      <FormContactInfo
+                        key={e.id?.toString()}
+                        option={e}
+                        dataLang={props.dataLang}
+                        _OnChangeOption={_OnChangeOption.bind(this)}
+                        onDelete={_HandleDelete.bind(this)}
+                      >
+                        <IconDelete className="group-hover:text-white animate-bounce transition  duration-200 ease-linea" />
+                      </FormContactInfo>
                     ))}
-
-                    <button
-                      type="button"
-                      onClick={_HandleAddNew.bind(this)}
-                      title="Thêm"
-                      className="transition w-[48%] mt-5 duration-200 ease-linear  min-h-[160px] h-40 rounded-[5.5px] hover:bg-blue-400 hover:text-white bg-slate-100 flex flex-col justify-center items-center"
-                    >
+                    <ButtoonAdd onClick={_HandleAddNew.bind(this)}>
                       <IconAdd className="animate-bounce" />
                       {props.dataLang?.client_popup_addcontact}
-                    </button>
+                    </ButtoonAdd>
                   </div>
                 </ScrollArea>
               </div>
@@ -1268,112 +870,22 @@ const Popup_dskh = (props) => {
                 >
                   <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
                     {optionDelivery.map((e) => (
-                      <div className="w-[48%]">
-                        <div className="" key={e.id?.toString()}>
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {props.dataLang?.client_popup_fiandlass}
-                          </label>
-                          <input
-                            value={e.nameDelivery}
-                            onChange={_OnChangeOptionDelivery.bind(
-                              this,
-                              e.id,
-                              "nameDelivery"
-                            )}
-                            name="optionVariant"
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                          />
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {props.dataLang?.client_popup_phone}
-                          </label>
-                          <input
-                            value={e.phoneDelivery}
-                            onChange={_OnChangeOptionDelivery.bind(
-                              this,
-                              e.id,
-                              "phoneDelivery"
-                            )}
-                            name="fname"
-                            type="number"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                          />
-
-                          <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {props.dataLang?.client_popup_adress}
-                          </label>
-                          <textarea
-                            value={e.addressDelivery}
-                            onChange={_OnChangeOptionDelivery.bind(
-                              this,
-                              e.id,
-                              "addressDelivery"
-                            )}
-                            name="fname"
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[90px] max-h-[200px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"
-                          />
-                          <div className="flex items-center ">
-                            <label
-                              className="relative flex cursor-pointer items-center rounded-full p-3 gap-3.5"
-                              htmlFor={e.id}
-                              data-ripple-dark="true"
-                            >
-                              <input
-                                type="checkbox"
-                                className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
-                                id={e.id}
-                                value={e.actionDelivery}
-                                checked={e.actionDelivery}
-                                onChange={_OnChangeOptionDelivery.bind(
-                                  this,
-                                  e.id,
-                                  "actionDelivery"
-                                )}
-                              />
-                              <div className="pointer-events-none absolute top-2/4 3xl:left-[7%] 2xl:left-[7%] xl:left-[7%] lg:left-[7%] left-[7%] -translate-y-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-3.5 w-3.5"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                  stroke="currentColor"
-                                  stroke-width="1"
-                                >
-                                  <path
-                                    fill-rule="evenodd"
-                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                    clip-rule="evenodd"
-                                  ></path>
-                                </svg>
-                              </div>
-                              <div>
-                                <span className="text-[#344054] font-normal text-sm ">
-                                  {"Địa chỉ giao hàng chính"}
-                                </span>
-                              </div>
-                            </label>
-                          </div>
-                          <button
-                            onClick={_HandleDeleteDelivery.bind(this, e.id)}
-                            type="button"
-                            title="Xóa"
-                            className="transition  w-full bg-slate-100 hover:bg-blue-400 duration-200 ease-linear  group h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center"
-                          >
-                            <IconDelete className="group-hover:text-white animate-bounce transition  duration-200 ease-linea" />
-                          </button>
-                        </div>
-                      </div>
+                      <FormContactDelivery
+                        key={e.id?.toString()}
+                        optionDelivery={e}
+                        dataLang={props.dataLang}
+                        _OnChangeOptionDelivery={_OnChangeOptionDelivery.bind(
+                          this
+                        )}
+                        onDelete={_HandleDeleteDelivery.bind(this)}
+                      >
+                        <IconDelete className="group-hover:text-white animate-bounce transition  duration-200 ease-linea" />
+                      </FormContactDelivery>
                     ))}
-                    <button
-                      type="button"
-                      onClick={_HandleAddNewDelivery.bind(this)}
-                      title="Thêm"
-                      className="transition w-[48%] mt-5   min-h-[160px] h-40 rounded-[5.5px] hover:bg-blue-400 ease-linear duration-200 hover:text-white bg-slate-100 flex flex-col justify-center items-center"
-                    >
+                    <ButtoonAdd onClick={_HandleAddNewDelivery.bind(this)}>
                       <IconAdd className="animate-bounce" />
-                      {"Thêm địa chỉ giao hàng"}
-                    </button>
+                      {props.dataLang?.client_popup_devivelyAdd}
+                    </ButtoonAdd>
                   </div>
                 </ScrollArea>
               </div>
@@ -1382,13 +894,13 @@ const Popup_dskh = (props) => {
               <button
                 type="button"
                 onClick={_ToggleModal.bind(this, false)}
-                className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
+                className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD] hover:scale-105 transition-all ease-linear"
               >
                 {props.dataLang?.branch_popup_exit}
               </button>
               <button
                 type="submit"
-                className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
+                className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E] hover:scale-105 transition-all ease-linear"
               >
                 {props.dataLang?.branch_popup_save}
               </button>
