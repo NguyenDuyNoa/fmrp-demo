@@ -33,6 +33,8 @@ import { data } from "autoprefixer";
 import { useDispatch } from "react-redux";
 import Popup_dsncc from "./(popup)/popup";
 import Popup_chitiet from "./(popup)/detail";
+import TabClient from "./(tab)/tab";
+import TabFilter from "components/UI/TabFilter";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -360,7 +362,7 @@ const Index = (props) => {
                 </div>
               </div>
 
-              <div className="flex space-x-3 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+              <div className="flex space-x-3 items-center  3xl:h-[8vh] 2xl:h-[9vh] xl:h-[9vh] lg:h-[9vh] md:h-[10vh] h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                 {/* <div><TabClient onClick={_HandleSelectTab.bind(this, "all")} active="all" total={totalItem.iTotalDisplayRecords}>{dataLang?.client_list_grroupall}</TabClient></div>
                     <div><TabClient onClick={_HandleSelectTab.bind(this, "nogroup")} active="nogroup"  total={totalItem.iTotalDisplayRecords}>{dataLang?.client_list_nogroup}</TabClient></div> */}
                 {listDs &&
@@ -378,9 +380,10 @@ const Index = (props) => {
                           active={e.id}
                           className={"text-[#0F4F9E] "}
                         >
-                          {(e.name == "all_group" && dataLang.all_group) ||
+                          {/* {(e.name == "all_group" && dataLang.all_group) ||
                             (e.name == "no_group" && dataLang.no_group) ||
-                            e.name}
+                            e.name} */}
+                          {dataLang[e.name] || e.name}
                         </TabClient>
                         {/* >{e.name}</TabClient>  */}
                       </div>
@@ -674,29 +677,29 @@ const Index = (props) => {
     </React.Fragment>
   );
 };
-const TabClient = React.memo((props) => {
-  const router = useRouter();
-  return (
-    <button
-      style={props.style}
-      onClick={props.onClick}
-      className={`${props.className} justify-center min-w-[220px] flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}
-    >
-      {router.query?.tab === `${props.active}` && (
-        <ArrowCircleDown size="20" color="#0F4F9E" />
-      )}
-      {props.children}
-      <span
-        className={`${
-          props?.total > 0 &&
-          "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"
-        } `}
-      >
-        {props?.total > 0 && props?.total}
-      </span>
-    </button>
-  );
-});
+// const TabClient = React.memo((props) => {
+//   const router = useRouter();
+//   return (
+//     <button
+//       style={props.style}
+//       onClick={props.onClick}
+//       className={`${props.className} justify-center min-w-[220px] flex gap-2 items-center rounded-[5.5px] px-4 py-2 outline-none relative `}
+//     >
+//       {router.query?.tab === `${props.active}` && (
+//         <ArrowCircleDown size="20" color="#0F4F9E" />
+//       )}
+//       {props.children}
+//       <span
+//         className={`${
+//           props?.total > 0 &&
+//           "absolute min-w-[29px] top-0 right-0 bg-[#ff6f00] text-xs translate-x-2.5 -translate-y-2 text-white rounded-[100%] px-2 text-center items-center flex justify-center py-1.5"
+//         } `}
+//       >
+//         {props?.total > 0 && props?.total}
+//       </span>
+//     </button>
+//   );
+// });
 
 const MoreSelectedBadge = ({ items }) => {
   const style = {

@@ -41,24 +41,22 @@ const Popup_status = (props) => {
 
   //Nối mảng kahcsh hàng - Liên hệ - Địa chỉ
   const { values, columns } = useMemo(() => {
+    const arrayFormater = props.data?.map((e) => {
+      if (e?.date_incorporation) {
+        return {
+          ...e,
+          date_incorporation: e?.date_incorporation
+            ? moment(e?.date_incorporation).format("DD/MM/YYYY")
+            : "",
+        };
+      }
+      return { ...e };
+    });
+    const newArr = (arrayFormater || []).filter(Boolean).map((e) => {
+      const { rowIndex, error, ...newObject } = e;
+      return newObject;
+    });
     if (props.router == 1) {
-      const arrayFormater = props.data?.map((e) => {
-        if (e?.date_incorporation) {
-          return {
-            ...e,
-            date_incorporation: e?.date_incorporation
-              ? moment(e?.date_incorporation).format("DD/MM/YYYY")
-              : "",
-          };
-        }
-        return { ...e };
-      });
-
-      const newArr = (arrayFormater || []).filter(Boolean).map((e) => {
-        const { rowIndex, error, ...newObject } = e;
-        return newObject;
-      });
-
       const allFields = [
         ...props.listData,
         ...props.listDataContact,
@@ -120,27 +118,53 @@ const Popup_status = (props) => {
         })
       );
 
-      console.log(values);
+      return { values, columns };
+    } else if (props.router == 2) {
+      const allFields = [...props.listData, ...props.listDataContact];
+      const mappedData = newArr.map((item) => {
+        const rowData = {};
+        allFields.forEach((column) => {
+          const value =
+            item[column.dataFieldsContact?.value] ||
+            item[column.dataFields?.value] ||
+            item[column?.value];
+          rowData[column.dataFields?.value] = value || "";
+          rowData[column.dataFieldsContact?.value] =
+            item[column.dataFieldsContact?.value] || "";
+        });
+        return rowData;
+      });
+      const columns = allFields.map((header) => ({
+        title: `${header.dataFields?.label || header.dataFieldsContact?.label}`,
+        width: { wpx: 150 },
+        style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } },
+      }));
+      const values = mappedData.map((i) =>
+        allFields.map((header) => {
+          const value =
+            i[header.dataFieldsContact?.value] ||
+            i[header.dataFields?.value] ||
+            i[header.value] ||
+            (header.dataFieldsContact?.value === "contact"
+              ? JSON.stringify(i.contact)
+              : "");
+          return {
+            value: value || "",
+            style:
+              value === ""
+                ? {
+                    fill: {
+                      patternType: "solid",
+                      fgColor: { rgb: "FFCCEEFF" },
+                    },
+                  }
+                : "",
+          };
+        })
+      );
 
       return { values, columns };
     } else {
-      const arrayFormater = props.data?.map((e) => {
-        if (e?.date_incorporation) {
-          return {
-            ...e,
-            date_incorporation: e?.date_incorporation
-              ? moment(e?.date_incorporation).format("DD/MM/YYYY")
-              : "",
-          };
-        }
-        return { ...e };
-      });
-
-      const newArr = (arrayFormater || []).filter(Boolean).map((e) => {
-        const { rowIndex, error, ...newObject } = e;
-        return newObject;
-      });
-
       const mappedData = newArr.map((item) => {
         const rowData = {};
         props?.listData.forEach((column) => {

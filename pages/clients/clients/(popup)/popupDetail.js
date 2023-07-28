@@ -20,6 +20,8 @@ import {
 } from "iconsax-react";
 import TableContact from "./(table)/tableContact";
 import TableDelivery from "./(table)/tableDelivery";
+import ImageErrors from "components/UI/imageErrors";
+import { Tooltip } from "react-tippy";
 
 const Popup_chitiet = (props) => {
   const scrollAreaRef = useRef(null);
@@ -191,10 +193,11 @@ const Popup_chitiet = (props) => {
                           {props.dataLang?.client_popup_char}:
                         </span>
                         <span className="flex flex-wrap">
-                          {data?.staff_charge?.map((e) => {
-                            return (
-                              <span className="font-normal capitalize   ml-1">
-                                <Popup
+                          {data?.staff_charge
+                            ? data?.staff_charge?.map((e) => {
+                                return (
+                                  <span className="font-normal capitalize   ml-1">
+                                    {/* <Popup
                                   className="dropdown-avt"
                                   key={e.id}
                                   trigger={(open) => (
@@ -212,10 +215,25 @@ const Popup_chitiet = (props) => {
                                   <span className="bg-[#0f4f9e] text-white rounded p-1.5">
                                     {e.full_name}{" "}
                                   </span>
-                                </Popup>
-                              </span>
-                            );
-                          })}
+                                </Popup> */}
+                                    <Tooltip
+                                      title={e.full_name}
+                                      arrow
+                                      theme="dark"
+                                    >
+                                      <ImageErrors
+                                        src={e.profile_image}
+                                        width={40}
+                                        height={40}
+                                        defaultSrc="/user-placeholder.jpg"
+                                        alt="Image"
+                                        className="object-cover rounded-[100%] text-left"
+                                      />
+                                    </Tooltip>
+                                  </span>
+                                );
+                              })
+                            : ""}
                         </span>
                       </div>
                       <div className="mb-4 flex justify-between  p-2 items-center flex-wrap">

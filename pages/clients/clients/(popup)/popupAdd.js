@@ -413,7 +413,8 @@ const Popup_dskh = (props) => {
   };
 
   //post db
-  console.log("optionDelivery", optionDelivery);
+
+  console.log("option", option);
   const _ServerSending = () => {
     let id = props?.id;
     var data = new FormData();
@@ -451,6 +452,7 @@ const Popup_dskh = (props) => {
       data.append(`contact[${index}][full_name]`, e?.full_name);
       data.append(`contact[${index}][email]`, e?.email);
       data.append(`contact[${index}][position]`, e?.position);
+      data.append(`contact[${index}][birthday]`, e?.birthday);
       data.append(`contact[${index}][address]`, e?.address);
       data.append(`contact[${index}][phone_number]`, e?.phone_number);
     });

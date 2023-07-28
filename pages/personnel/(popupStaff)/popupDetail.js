@@ -18,6 +18,8 @@ import {
   Image as IconImage,
   GalleryEdit as IconEditImg,
 } from "iconsax-react";
+import moment from "moment/moment";
+import Image from "next/image";
 const Popup_chitiet = (props) => {
   const scrollAreaRef = useRef(null);
   const [open, sOpen] = useState(false);

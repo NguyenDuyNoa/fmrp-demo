@@ -11,8 +11,6 @@ import Swal from "sweetalert2";
 
 import * as XLSX from "xlsx";
 
-import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-
 import { NumericFormat } from "react-number-format";
 
 import {
@@ -21,11 +19,8 @@ import {
   Trash as IconDelete,
   SearchNormal1 as IconSearch,
   Add as IconAdd,
-  Add,
   ArrowRight,
   RefreshCircle,
-  ColorsSquare,
-  Colorfilter,
   Notification,
   ArrowDown,
 } from "iconsax-react";
@@ -46,17 +41,13 @@ import { ulrExel } from "services/URL";
 
 import Popup_status from "./(popup)/popup";
 import Popup_stages from "./(popup)/popupStages";
-import { flatMap } from "lodash";
 import FormClient from "./(form)/formClient";
 import Progress from "./(progress)/progress";
-import AnimatedDiv from "components/UI/motions";
-import DeleteParentButton from "./(button)/buttonDeleteParent";
 import ParentControls from "./(button)/buttonAddParent";
 import DeleteButton from "./(button)/buttonDeleteSlect";
 import TabClient from "./(tab)/tabImport";
-import { Reorder } from "framer-motion";
-import ProgressBarWithLabels from "./(stepper)/stepper";
 import Stepper from "./(stepper)/stepper";
+import FormSupplier from "./(form)/formSupplier";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -166,8 +157,18 @@ const Index = (props) => {
               note: e?.note,
             }))
           );
+
           sDataConTact(db?.contacts);
           sDataDelivery(db?.address);
+        } else if (tabPage == 2) {
+          sDataClient(
+            db?.suppliers?.map((e) => ({
+              label: dataLang[e?.label],
+              value: e?.value,
+              note: e?.note,
+            }))
+          );
+          sDataConTact(db?.contacts);
         } else {
           sDataClient(
             db?.map((e) => ({
@@ -264,6 +265,8 @@ const Index = (props) => {
   useEffect(() => {
     router.query.tab && tabPage != 5 && sOnFetching(true);
     router.query.tab && sListData([]);
+    router.query.tab && (tabPage == 1 || tabPage == 2) && sListDataContat([]);
+    router.query.tab && tabPage == 1 && sListDataDelivery([]);
     router.query.tab && sSampleImport(null);
     router.query.tab && sOnLoading(true);
     router.query.tab && sValueCheck("add");
@@ -272,6 +275,7 @@ const Index = (props) => {
     router.query.tab && sDataFailStages([]);
     router.query.tab && sDataFail([]);
     router.query.tab && sTotalSuccessStages();
+    router.query.tab && sTotalFalse(0);
 
     if (router.query.tab) {
       const inputElement = document.getElementById("importFile");
@@ -339,10 +343,14 @@ const Index = (props) => {
         if (tabPage == 1) {
           const dataBackupContact =
             parsedValue?.dataSub?.map((e) => JSON.parse(e)) || [];
-          sListDataContat(dataBackupContact);
           const dataBackupDelivery =
             parsedValue?.dataSubDelivery?.map((e) => JSON.parse(e)) || [];
+          sListDataContat(dataBackupContact);
           sListDataDelivery(dataBackupDelivery);
+        } else if (tabPage == 2) {
+          const dataBackupContact =
+            parsedValue?.dataSub?.map((e) => JSON.parse(e)) || [];
+          sListDataContat(dataBackupContact);
         }
         sListData(dataBackup);
       } else {
@@ -442,49 +450,23 @@ const Index = (props) => {
     };
   };
 
-  //change trường dữ liệu, cột dữ liệu
-  // const _HandleChangeChild = (childId, type, value) => {
-  //   const newData = listData.map((e) => {
-  //     if (e?.id == childId) {
-  //       if (type == "data_fields") {
-  //         const checkData = listData?.some(
-  //           (e) => e?.dataFields?.value === value?.value
-  //         );
-  //         if (!checkData) {
-  //           return { ...e, dataFields: value };
-  //         } else {
-  //           Toast.fire({
-  //             title: `${
-  //               dataLang?.import_ERR_selected || "import_ERR_selected"
-  //             }`,
-  //             icon: "error",
-  //           });
-  //         }
-  //         return { ...e };
-  //       } else if (type == "column") {
-  //         const checkData = listData?.some(
-  //           (e) => e?.column?.value === value?.value
-  //         );
-  //         if (!checkData) {
-  //           return { ...e, column: value };
-  //         } else {
-  //           Toast.fire({
-  //             title: `${
-  //               dataLang?.import_ERR_selectedColumn ||
-  //               "import_ERR_selectedColumn"
-  //             }`,
-  //             icon: "error",
-  //           });
-  //         }
-  //         return { ...e };
-  //       }
-  //     } else {
-  //       return e;
-  //     }
-  //   });
-  //   sListData([...newData]);
-  // };
   const checkMain = listData?.some((e) => e?.dataFields?.value == "variation");
+
+  const isDuplicateValue = (list, childId, type, value) => {
+    return (
+      value &&
+      list.some(
+        (data) => data[type]?.value === value?.value && data.id !== childId
+      )
+    );
+  };
+
+  const showToastError = (title) => {
+    Toast.fire({
+      title,
+      icon: "error",
+    });
+  };
 
   const _HandleChangeChild = (childId, type, value) => {
     const newData = listData.map((e) => {
@@ -499,13 +481,9 @@ const Index = (props) => {
             );
           //Lỗi trùng nhau
           if (isDuplicate && e?.dataFields?.value !== value?.value) {
-            Toast.fire({
-              title: `${
-                dataLang?.import_ERR_selected || "import_ERR_selected"
-              }`,
-              icon: "error",
-            });
-
+            showToastError(
+              dataLang?.import_ERR_selected || "import_ERR_selected"
+            );
             return { ...e, dataFields: null };
           } else if (
             //Lỗi trùng nhau phải có biến thể chính mới cho chọn phụ
@@ -513,10 +491,7 @@ const Index = (props) => {
             value?.value == "variation_option" &&
             !checkMain
           ) {
-            Toast.fire({
-              title: `${"Chọn biến thể chính trước !"}`,
-              icon: "error",
-            });
+            showToastError("Chọn biến thể chính trước !");
             return e;
           } else if ((tabPage == 3 || tabPage == 4) && checkMain2) {
             //Khi không có biến thể chính thì trường biến thể phụ thành null
@@ -540,13 +515,9 @@ const Index = (props) => {
             );
 
           if (isDuplicate && e?.column?.value !== value?.value) {
-            Toast.fire({
-              title: `${
-                dataLang?.import_ERR_selectedColumn ||
-                "import_ERR_selectedColumn"
-              }`,
-              icon: "error",
-            });
+            showToastError(
+              dataLang?.import_ERR_selectedColumn || "import_ERR_selectedColumn"
+            );
             return e; // Giữ nguyên phần tử cũ nếu trùng lặp
           } else {
             return { ...e, column: value };
@@ -559,55 +530,95 @@ const Index = (props) => {
     sListData([...newData]);
   };
 
+  // const _HandleChangeChildContact = (childId, type, value) => {
+  //   const newData = listDataContact.map((e) => {
+  //     if (e?.id == childId) {
+  //       if (type == "dataFieldsContact") {
+  //         const isDuplicate =
+  //           value &&
+  //           listDataContact.some(
+  //             (data) =>
+  //               data?.dataFieldsContact?.value === value?.value &&
+  //               data.id !== childId
+  //           );
+  //         //Lỗi trùng nhau
+  //         if (isDuplicate && e?.dataFieldsContact?.value !== value?.value) {
+  //           Toast.fire({
+  //             title: `${
+  //               dataLang?.import_ERR_selected || "import_ERR_selected"
+  //             }`,
+  //             icon: "error",
+  //           });
+
+  //           return { ...e, dataFieldsContact: null };
+  //         }
+  //         return { ...e, dataFieldsContact: value };
+  //       } else if (type == "columnContact") {
+  //         //Trùng cột
+  //         const isDuplicate =
+  //           value &&
+  //           listDataContact.some(
+  //             (data) =>
+  //               data?.columnContact?.value === value?.value &&
+  //               data.id !== childId
+  //           );
+
+  //         if (isDuplicate && e?.columnContact?.value !== value?.value) {
+  //           Toast.fire({
+  //             title: `${
+  //               dataLang?.import_ERR_selectedColumn ||
+  //               "import_ERR_selectedColumn"
+  //             }`,
+  //             icon: "error",
+  //           });
+  //           return e;
+  //         } else {
+  //           return { ...e, columnContact: value };
+  //         }
+  //       }
+  //     } else {
+  //       return e;
+  //     }
+  //   });
+  //   sListDataContat([...newData]);
+  // };
+
   const _HandleChangeChildContact = (childId, type, value) => {
     const newData = listDataContact.map((e) => {
-      if (e?.id == childId) {
-        if (type == "dataFieldsContact") {
-          const isDuplicate =
-            value &&
-            listDataContact.some(
-              (data) =>
-                data?.dataFieldsContact?.value === value?.value &&
-                data.id !== childId
-            );
-          //Lỗi trùng nhau
+      if (e?.id === childId) {
+        if (type === "dataFieldsContact") {
+          const isDuplicate = isDuplicateValue(
+            listDataContact,
+            childId,
+            "dataFieldsContact",
+            value
+          );
+          //Kiểm tra trùng cột
           if (isDuplicate && e?.dataFieldsContact?.value !== value?.value) {
-            Toast.fire({
-              title: `${
-                dataLang?.import_ERR_selected || "import_ERR_selected"
-              }`,
-              icon: "error",
-            });
-
+            showToastError(
+              dataLang?.import_ERR_selected || "import_ERR_selected"
+            );
             return { ...e, dataFieldsContact: null };
           }
           return { ...e, dataFieldsContact: value };
-        } else if (type == "columnContact") {
-          //Trùng cột
-          const isDuplicate =
-            value &&
-            listDataContact.some(
-              (data) =>
-                data?.columnContact?.value === value?.value &&
-                data.id !== childId
-            );
-
+        } else if (type === "columnContact") {
+          const isDuplicate = isDuplicateValue(
+            listDataContact,
+            childId,
+            "columnContact",
+            value
+          );
           if (isDuplicate && e?.columnContact?.value !== value?.value) {
-            Toast.fire({
-              title: `${
-                dataLang?.import_ERR_selectedColumn ||
-                "import_ERR_selectedColumn"
-              }`,
-              icon: "error",
-            });
+            showToastError(
+              dataLang?.import_ERR_selectedColumn || "import_ERR_selectedColumn"
+            );
             return e;
           } else {
             return { ...e, columnContact: value };
           }
         }
-      } else {
-        return e;
       }
+      return e; // Trả về giá trị mặc định nếu không có điều kiện nào phù hợp
     });
     sListDataContat([...newData]);
   };
@@ -616,43 +627,33 @@ const Index = (props) => {
     const newData = listDataDelivery.map((e) => {
       if (e?.id == childId) {
         if (type == "dataFieldsDelivery") {
-          const isDuplicate =
-            value &&
-            listDataDelivery.some(
-              (data) =>
-                data?.dataFieldsDelivery?.value === value?.value &&
-                data.id !== childId
-            );
+          const isDuplicate = isDuplicateValue(
+            listDataDelivery,
+            childId,
+            "dataFieldsDelivery",
+            value
+          );
           //Lỗi trùng nhau
           if (isDuplicate && e?.dataFieldsDelivery?.value !== value?.value) {
-            Toast.fire({
-              title: `${
-                dataLang?.import_ERR_selected || "import_ERR_selected"
-              }`,
-              icon: "error",
-            });
-
+            showToastError(
+              dataLang?.import_ERR_selected || "import_ERR_selected"
+            );
             return { ...e, dataFieldsDelivery: null };
           }
           return { ...e, dataFieldsDelivery: value };
         } else if (type == "columnDelivery") {
           //Trùng cột
-          const isDuplicate =
-            value &&
-            listDataDelivery.some(
-              (data) =>
-                data?.columnDelivery?.value === value?.value &&
-                data.id !== childId
-            );
+          const isDuplicate = isDuplicateValue(
+            listDataDelivery,
+            childId,
+            "columnDelivery",
+            value
+          );
 
           if (isDuplicate && e?.columnDelivery?.value !== value?.value) {
-            Toast.fire({
-              title: `${
-                dataLang?.import_ERR_selectedColumn ||
-                "import_ERR_selectedColumn"
-              }`,
-              icon: "error",
-            });
+            showToastError(
+              dataLang?.import_ERR_selectedColumn || "import_ERR_selectedColumn"
+            );
             return e;
           } else {
             return { ...e, columnDelivery: value };
@@ -676,8 +677,13 @@ const Index = (props) => {
     setTimeout(() => {
       if (tabPage == 1) {
         sStepper({
-          main: listDataContact?.length > 0 ? true : false,
-          extra: listDataDelivery?.length > 0 ? true : false,
+          main: listDataContact?.length > 0,
+          extra: listDataDelivery?.length > 0,
+        });
+      } else if (tabPage == 2) {
+        sStepper({
+          main: listDataContact?.length > 0,
+          extra: listDataContact?.length > 0,
         });
       } else {
         sStepper({
@@ -1037,8 +1043,9 @@ const Index = (props) => {
     ...item,
     dataFieldsContact: listDataContact[index]?.dataFieldsContact,
     columnContact: listDataContact[index]?.columnContact,
-    dataFieldsDelivery: listDataDelivery[index]?.dataFieldsDelivery,
-    columnDelivery: listDataDelivery[index]?.columnDelivery,
+    dataFieldsDelivery:
+      tabPage == 1 && listDataDelivery[index]?.dataFieldsDelivery,
+    columnDelivery: tabPage == 1 && listDataDelivery[index]?.columnDelivery,
   }));
 
   const _ServerSending = async () => {
@@ -1105,6 +1112,62 @@ const Index = (props) => {
             ) {
               const fieldKey = dataFieldsDeliveryValue;
               const fieldValue = item[dataFieldsDelivery.label];
+              result[fieldKey] = fieldValue;
+            }
+          }
+          if (Object.keys(result).length > 0) {
+            result["rowIndex"] = item.rowIndex
+              ? Number(item.rowIndex) + 1
+              : item.rowIndex == 0
+              ? 1
+              : null;
+            return result;
+          }
+
+          return null;
+        })
+        .filter((item) => item !== null);
+      for (let i = 0; i < dataClientContact.length; i += chunkSize) {
+        const chunk = dataClientContact.slice(i, i + chunkSize);
+        dataChunks.push(chunk);
+      }
+    } else if (tabPage == 2) {
+      const dataClientContact = dataImport
+        ?.filter((item) => item)
+        .map((item, index) => {
+          const result = {};
+          for (const listDataItem of mergedListData) {
+            const { column, dataFields, columnContact, dataFieldsContact } =
+              listDataItem;
+            const columnValue = column?.value;
+            const dataFieldsValue = dataFields?.value;
+            const columnContactValue = columnContact?.value;
+            const dataFieldsContactValue = dataFieldsContact?.value;
+
+            if (columnValue && item[columnValue]) {
+              result[dataFieldsValue] = item[columnValue];
+            }
+
+            if (columnContactValue && item[columnContactValue]) {
+              result[dataFieldsContactValue] = item[columnContactValue];
+            }
+            if (
+              dataFields?.label &&
+              dataFieldsValue &&
+              item[dataFields.label]
+            ) {
+              const fieldKey = dataFieldsValue;
+              const fieldValue = item[dataFields.label];
+              result[fieldKey] = fieldValue;
+            }
+
+            if (
+              dataFieldsContact?.label &&
+              dataFieldsContactValue &&
+              item[dataFieldsContact.label]
+            ) {
+              const fieldKey = dataFieldsContactValue;
+              const fieldValue = item[dataFieldsContact.label];
               result[fieldKey] = fieldValue;
             }
           }
@@ -1271,6 +1334,7 @@ const Index = (props) => {
     listData.forEach((e, index) => {
       formData.append(`setup_colums[data][${index}]`, JSON.stringify(e));
     });
+
     if (tabPage == 1) {
       listDataContact.forEach((e, index) => {
         formData.append(`setup_colums[dataSub][${index}]`, JSON.stringify(e));
@@ -1280,6 +1344,10 @@ const Index = (props) => {
           `setup_colums[dataSubDelivery][${index}]`,
           JSON.stringify(e)
         );
+      });
+    } else if (tabPage == 2) {
+      listDataContact.forEach((e, index) => {
+        formData.append(`setup_colums[dataSub][${index}]`, JSON.stringify(e));
       });
     }
     formData.append(`tab`, tabPage);
@@ -1846,7 +1914,7 @@ const Index = (props) => {
                       />
                     </div>
                   )}
-                  {tabPage == 1 && (
+                  {(tabPage == 1 || tabPage == 2) && (
                     <div
                       className={`flex items-center justify-center  gap-2 pt-5 ${
                         save_template && onLoadingDataBack
@@ -2120,70 +2188,94 @@ const Index = (props) => {
                 <div className="col-span-2"></div>
                 <div className="col-span-8 border-b"></div>
                 <div className="col-span-2"></div>
-                {tabPage == 1 && (
+                {(tabPage == 1 || tabPage == 2) && (
                   <React.Fragment>
                     <div className="col-span-2"></div>
                     <div className="col-span-8 border-b flex justify-between divide-x ">
-                      <h2 className="py-2 w-1/2">
-                        {dataLang?.import_contactInfo || "import_contactInfo"}
-                      </h2>
-                      <h2 className="py-2 w-1/2 text-right">
-                        {dataLang?.import_deliveryAdress ||
-                          "import_deliveryAdress"}
-                      </h2>
+                      {(tabPage == 1 || tabPage == 2) && (
+                        <h2 className="py-2 w-1/2">
+                          {dataLang?.import_contactInfo || "import_contactInfo"}
+                        </h2>
+                      )}
+                      {tabPage == 1 && (
+                        <h2 className="py-2 w-1/2 text-right">
+                          {dataLang?.import_deliveryAdress ||
+                            "import_deliveryAdress"}
+                        </h2>
+                      )}
                     </div>
                     <div className="col-span-2"></div>
 
                     <div className="col-span-2"></div>
                     <div className="col-span-4 ">
-                      <ParentControls
-                        listData={listDataContact}
-                        onLoadingListData={onLoadingListData}
-                        dataLang={dataLang}
-                        _HandleAddParent={_HandleAddContact.bind(this)}
-                        _HandleDeleteParent={_HandleDeleteParent.bind(
-                          this,
-                          "contact"
-                        )}
-                        color="bg-green-600"
-                        colorIcon="green"
-                      />
+                      {(tabPage == 1 || tabPage == 2) && (
+                        <ParentControls
+                          listData={listDataContact}
+                          onLoadingListData={onLoadingListData}
+                          dataLang={dataLang}
+                          _HandleAddParent={_HandleAddContact.bind(this)}
+                          _HandleDeleteParent={_HandleDeleteParent.bind(
+                            this,
+                            "contact"
+                          )}
+                          color="bg-green-600"
+                          colorIcon="green"
+                        />
+                      )}
                     </div>
                     <div className="col-span-4">
-                      <ParentControls
-                        listData={listDataDelivery}
-                        onLoadingListData={onLoadingListData}
-                        dataLang={dataLang}
-                        _HandleAddParent={_HandleAddDelivery.bind(this)}
-                        _HandleDeleteParent={_HandleDeleteParent.bind(
-                          this,
-                          "delivery"
-                        )}
-                        color="bg-orange-600"
-                        colorIcon="red"
-                      />
+                      {tabPage == 1 && (
+                        <ParentControls
+                          listData={listDataDelivery}
+                          onLoadingListData={onLoadingListData}
+                          dataLang={dataLang}
+                          _HandleAddParent={_HandleAddDelivery.bind(this)}
+                          _HandleDeleteParent={_HandleDeleteParent.bind(
+                            this,
+                            "delivery"
+                          )}
+                          color="bg-orange-600"
+                          colorIcon="red"
+                        />
+                      )}
                     </div>
                     <div className="col-span-2"></div>
 
                     <div className="col-span-2"></div>
-                    <FormClient
-                      onLoadingListData={onLoadingListData}
-                      dataContact={dataContact}
-                      dataDelivery={dataDelivery}
-                      dataColumn={dataColumn}
-                      listDataContact={listDataContact}
-                      listDataDelivery={listDataDelivery}
-                      dataLang={dataLang}
-                      handleMenuOpen={handleMenuOpen.bind(this)}
-                      _HandleChangeChildContact={_HandleChangeChildContact.bind(
-                        this
-                      )}
-                      _HandleChangeChildDelivery={_HandleChangeChildDelivery.bind(
-                        this
-                      )}
-                      _HandleDeleteContact={_HandleDeleteContact.bind(this)}
-                      _HandleDeleteDelivery={_HandleDeleteDelivery.bind(this)}
-                    />
+                    {tabPage == 1 && (
+                      <FormClient
+                        onLoadingListData={onLoadingListData}
+                        dataContact={dataContact}
+                        dataDelivery={dataDelivery}
+                        dataColumn={dataColumn}
+                        listDataContact={listDataContact}
+                        listDataDelivery={listDataDelivery}
+                        dataLang={dataLang}
+                        handleMenuOpen={handleMenuOpen.bind(this)}
+                        _HandleChangeChildContact={_HandleChangeChildContact.bind(
+                          this
+                        )}
+                        _HandleChangeChildDelivery={_HandleChangeChildDelivery.bind(
+                          this
+                        )}
+                        _HandleDeleteContact={_HandleDeleteContact.bind(this)}
+                        _HandleDeleteDelivery={_HandleDeleteDelivery.bind(this)}
+                      />
+                    )}
+                    {tabPage == 2 && (
+                      <FormSupplier
+                        onLoadingListData={onLoadingListData}
+                        dataContact={dataContact}
+                        dataColumn={dataColumn}
+                        listDataContact={listDataContact}
+                        dataLang={dataLang}
+                        handleMenuOpen={handleMenuOpen.bind(this)}
+                        _HandleChangeChildContact={_HandleChangeChildContact.bind(
+                          this
+                        )}
+                        _HandleDeleteContact={_HandleDeleteContact.bind(this)}
+                      />
+                    )}
                     <div className="col-span-2"></div>
                   </React.Fragment>
                 )}

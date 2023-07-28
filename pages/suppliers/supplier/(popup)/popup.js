@@ -27,6 +27,10 @@ import Select, { components } from "react-select";
 import Popup from "reactjs-popup";
 import { data } from "autoprefixer";
 import { useDispatch } from "react-redux";
+import ButtonAdd from "../(buttonContact)/buttonAdd";
+import ButtonDelete from "../(buttonContact)/buttonDelete";
+import FormContact from "../(form)/formContact";
+import FormInfo from "../(form)/formInfo";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -337,22 +341,38 @@ const Popup_dsncc = (props) => {
   const _ServerSending = () => {
     let id = props?.id;
     var data = new FormData();
-    data.append("name", name);
-    data.append("code", code);
-    data.append("tax_code", tax_code);
-    data.append("representative", representative);
-    data.append("phone_number", phone_number);
-    data.append("address", address);
-    data.append("date_incorporation", date_incorporation);
-    data.append("note", note);
-    data.append("email", email);
-    data.append("debt_begin", debt_begin);
-    data.append("city", valueCt);
-    data.append("district", valueDis);
-    data.append("ward", valueWa);
-    data.append("supplier_group_id", group);
-    data.append("branch_id", branch_id);
-
+    data.append("name", name ? name : "");
+    data.append("code", code ? code : "");
+    data.append("tax_code", tax_code ? tax_code : "");
+    data.append("representative", representative ? representative : "");
+    data.append("phone_number", phone_number ? phone_number : "");
+    data.append("address", address ? address : "");
+    data.append(
+      "date_incorporation",
+      date_incorporation ? date_incorporation : ""
+    );
+    data.append("note", note ? note : "");
+    data.append("email", email ? email : "");
+    data.append("debt_begin", debt_begin ? debt_begin : "");
+    data.append("city", valueCt ? valueCt : "");
+    data.append("district", valueDis ? valueDis : "");
+    data.append("ward", valueWa ? valueWa : "");
+    // data.append("supplier_group_id", group);
+    // data.append("branch_id", branch_id);
+    valueBr?.forEach((e, index) => {
+      data.append(`branch_id[${index}]`, e?.value ? e?.value : "");
+    });
+    valueGr?.forEach((e, index) => {
+      data.append(`supplier_group_id[${index}]`, e?.value ? e?.value : "");
+    });
+    option?.forEach((e, index) => {
+      data.append(`contact[${index}][id]`, id ? e?.id : "");
+      data.append(`contact[${index}][full_name]`, e?.full_name);
+      data.append(`contact[${index}][email]`, e?.email);
+      data.append(`contact[${index}][position]`, e?.position);
+      data.append(`contact[${index}][address]`, e?.address);
+      data.append(`contact[${index}][phone_number]`, e?.phone_number);
+    });
     Axios(
       "POST",
       `${
@@ -361,24 +381,25 @@ const Popup_dsncc = (props) => {
           : "/api_web/api_supplier/supplier/?csrf_protection=true"
       }`,
       {
-        data: {
-          name: name,
-          code: code,
-          tax_code: tax_code,
-          representative: representative,
-          phone_number: phone_number,
-          address: address,
-          date_incorporation: date_incorporation,
-          note: note,
-          email: email,
-          debt_begin: debt_begin,
-          city: valueCt,
-          district: valueDis,
-          ward: valueWa,
-          supplier_group_id: group,
-          branch_id: branch_id,
-          contact: option,
-        },
+        data: data,
+        // data: {
+        //   name: name,
+        //   code: code,
+        //   tax_code: tax_code,
+        //   representative: representative,
+        //   phone_number: phone_number,
+        //   address: address,
+        //   date_incorporation: date_incorporation,
+        //   note: note,
+        //   email: email,
+        //   debt_begin: debt_begin,
+        //   city: valueCt,
+        //   district: valueDis,
+        //   ward: valueWa,
+        //   supplier_group_id: group,
+        //   branch_id: branch_id,
+        //   contact: option,
+        // },
         headers: { "Content-Type": "multipart/form-data" },
       },
       (err, response) => {
@@ -574,7 +595,7 @@ const Popup_dsncc = (props) => {
                 speed={1}
                 smoothScrolling={true}
               >
-                <div className="w-[50vw]  p-2  ">
+                {/* <div className="w-[50vw]  p-2  ">
                   <div className="flex flex-wrap justify-between ">
                     <div className="w-[48%]">
                       <label className="text-[#344054] font-normal text-sm mb-1 ">
@@ -767,14 +788,7 @@ const Popup_dsncc = (props) => {
                         isNumericString={true}
                         placeholder={props.dataLang?.suppliers_supplier_debt}
                       />
-                      {/* <input
-                          value={debt_begin}
-                          onChange={_HandleChangeInput.bind(this, "debt_begin")}
-                          placeholder={props.dataLang?.suppliers_supplier_debt}
-                          name="fname"
-                          type="text"
-                          className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                        /> */}
+                    
 
                       <div>
                         <label className="text-[#344054] font-normal text-sm mb-1 ">
@@ -948,7 +962,38 @@ const Popup_dsncc = (props) => {
                       />
                     </div>
                   </div>
-                </div>
+                </div> */}
+                <FormInfo
+                  code={code}
+                  name={name}
+                  representative={representative}
+                  email={email}
+                  phone_number={phone_number}
+                  tax_code={tax_code}
+                  date_incorporation={date_incorporation}
+                  valueBr={valueBr}
+                  brandpOpt={brandpOpt}
+                  errInput={errInput}
+                  errInputBr={errInputBr}
+                  listGr={listGr}
+                  valueGr={valueGr}
+                  debt_begin={debt_begin}
+                  _HandleChangeInput={_HandleChangeInput.bind(this)}
+                  handleChangeGr={handleChangeGr.bind(this)}
+                  handleMenuOpen={handleMenuOpen.bind(this)}
+                  cityOpt={cityOpt}
+                  valueCt={valueCt}
+                  handleChangeCt={handleChangeCt.bind(this)}
+                  ditrict={ditrict}
+                  valueDis={valueDis}
+                  handleChangeDtric={handleChangeDtric.bind(this)}
+                  listWar={listWar}
+                  valueWa={valueWa}
+                  handleChangeWar={handleChangeWar.bind(this)}
+                  address={address}
+                  note={note}
+                  dataLang={dataLang}
+                ></FormInfo>
               </ScrollArea>
             )}
             {tab === 1 && (
@@ -961,7 +1006,7 @@ const Popup_dsncc = (props) => {
                   <div className="w-[50vw] flex justify-between space-x-1  flex-wrap p-2">
                     {option.map((e) => (
                       <div className="w-[48%]">
-                        <div className="" key={e.id?.toString()}>
+                        {/* <div className="" key={e.id?.toString()}>
                           <label className="text-[#344054] font-normal text-sm mb-1 ">
                             {props.dataLang?.suppliers_supplier_fullname}
                           </label>
@@ -1041,27 +1086,22 @@ const Popup_dsncc = (props) => {
                             type="text"
                             className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full min-h-[90px] max-h-[200px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none mb-2"
                           />
-
-                          <button
+                          <ButtonDelete
                             onClick={_HandleDelete.bind(this, e.id)}
-                            type="button"
-                            title="Xóa"
-                            className="transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center"
-                          >
-                            <IconDelete />
-                          </button>
-                        </div>
+                          />
+                        </div> */}
+                        <FormContact
+                          dataLang={dataLang}
+                          e={e}
+                          _OnChangeOption={_OnChangeOption.bind(this)}
+                          _HandleDelete={_HandleDelete.bind(this)}
+                        />
                       </div>
                     ))}
-                    <button
-                      type="button"
+                    <ButtonAdd
                       onClick={_HandleAddNew.bind(this)}
-                      title="Thêm"
-                      className="transition w-[48%] mt-5   min-h-[160px] h-40 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center"
-                    >
-                      <IconAdd />
-                      {props.dataLang?.client_popup_addcontact}
-                    </button>
+                      dataLang={dataLang}
+                    ></ButtonAdd>
                   </div>
                 </ScrollArea>
               </div>

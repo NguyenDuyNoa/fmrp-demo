@@ -26,6 +26,8 @@ import Popup from "reactjs-popup";
 import TabFilter from "components/UI/TabFilter";
 import Popup_dskh from "./(popup)/popupAdd";
 import Popup_chitiet from "./(popup)/popupDetail";
+import ImageErrors from "components/UI/imageErrors";
+import { Tooltip } from "react-tippy";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -57,6 +59,10 @@ const Index = (props) => {
   const [listBr, sListBr] = useState();
 
   const [idBranch, sIdBranch] = useState(null);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
 
   const _HandleSelectTab = (e) => {
     router.push({
@@ -361,7 +367,7 @@ const Index = (props) => {
                   />
                 </div>
               </div>
-              <div className="flex space-x-3 items-center  3xl:h-[8vh] 2xl:h-[8vh] xl:h-[9vh] lg:h-[9vh] h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+              <div className="flex space-x-3 items-center  3xl:h-[8vh] 2xl:h-[9vh] xl:h-[9vh] lg:h-[9vh] md:h-[10vh] h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                 {listDs &&
                   listDs.map((e) => {
                     return (
@@ -578,20 +584,43 @@ const Index = (props) => {
                               <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[15%]  rounded-md text-left">
                                 {e.address}
                               </h6>
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[18%]   rounded-md text-left flex object-cover cursor-pointer justify-start items-center flex-wrap gap-2">
-                                {e.staff_charge?.map((d) => {
-                                  return (
-                                    <>
-                                      <Popup
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[18%]   rounded-md text-left flex object-cover  justify-start items-center flex-wrap gap-2">
+                                {e?.staff_charge
+                                  ? e.staff_charge?.map((d) => {
+                                      return (
+                                        <>
+                                          <Tooltip
+                                            title={d.full_name}
+                                            arrow
+                                            theme="dark"
+                                          >
+                                            <ImageErrors
+                                              src={d.profile_image}
+                                              width={40}
+                                              height={40}
+                                              defaultSrc="/user-placeholder.jpg"
+                                              alt="Image"
+                                              className="object-cover rounded-[100%] text-left cursor-pointer"
+                                            />
+                                          </Tooltip>
+                                          {/* <Popup
                                         className="dropdown-avt "
                                         key={d.id}
                                         trigger={(open) => (
-                                          <img
+                                          // <img
+                                          //   src={d.profile_image}
+                                          //   width={40}
+                                          //   height={40}
+                                          //   className="object-cover rounded-[100%] text-left"
+                                          // ></img>
+                                          <ImageErrors
                                             src={d.profile_image}
                                             width={40}
                                             height={40}
+                                            defaultSrc="/user-placeholder.jpg"
+                                            alt="Image"
                                             className="object-cover rounded-[100%] text-left"
-                                          ></img>
+                                          />
                                         )}
                                         position="top center"
                                         on={["hover"]}
@@ -600,10 +629,11 @@ const Index = (props) => {
                                         <span className="bg-[#0f4f9e] text-white rounded p-1.5 ">
                                           {d.full_name}
                                         </span>
-                                      </Popup>
-                                    </>
-                                  );
-                                })}
+                                      </Popup> */}
+                                        </>
+                                      );
+                                    })
+                                  : ""}
                               </h6>
                               <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[15%]  rounded-md text-left flex justify-start flex-wrap ">
                                 {e.client_group?.map((h) => {
