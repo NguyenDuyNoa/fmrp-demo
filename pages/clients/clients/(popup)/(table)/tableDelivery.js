@@ -16,7 +16,8 @@ const TableDelivery = (props) => {
                 {"STT"}
               </h4>
               <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase col-span-2  font-semibold text-center">
-                {props?.client_popup_devivelyName?.client_popup_devivelyName}
+                {props?.dataLang.client_popup_devivelyName ||
+                  "client_popup_devivelyName"}
               </h4>
               <h4 className="xl:text-[14px] text-[12px] px-2 py-2 text-gray-500 uppercase col-span-2  font-semibold text-center">
                 {props.dataLang?.client_popup_phone}
