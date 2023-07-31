@@ -591,7 +591,7 @@ const Popup_dsncc = (props) => {
             {tab === 0 && (
               <ScrollArea
                 ref={scrollAreaRef}
-                className="h-[555px] overflow-hidden"
+                className="3xl:h-[500px] 2xl:h-[500px] xl:h-[500px]  lg:h-[400px] h-[500px] overflow-hidden"
                 speed={1}
                 smoothScrolling={true}
               >

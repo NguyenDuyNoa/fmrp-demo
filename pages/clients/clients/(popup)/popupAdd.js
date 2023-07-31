@@ -795,7 +795,7 @@ const Popup_dskh = (props) => {
             {tab === 0 && (
               <ScrollArea
                 ref={scrollAreaRef}
-                className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-hidden bg-white shadow-lg rounded-xl"
+                className="3xl:h-[600px]  2xl:h-[470px] xl:h-[380px] lg:h-[350px] h-[400px] overflow-hidden "
                 speed={1}
                 smoothScrolling={true}
               >

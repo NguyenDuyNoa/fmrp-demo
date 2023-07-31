@@ -519,31 +519,31 @@ const Index = (props) => {
                 </div>
                 {/* <div className="min:h-[200px] h-[65%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"> */}
                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                  <div className="pr-2 w-[100%] lx:w-[110%] ">
-                    <div className="flex items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x  p-2 z-10">
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[13%] font-[600] text-center">
+                  <div className="pr-2 w-[100%] ">
+                    <div className="grid grid-cols-8 items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x  p-2 z-10">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                         {dataLang?.suppliers_supplier_code}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[15%] font-[600] text-center">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                         {dataLang?.suppliers_supplier_name}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                         {dataLang?.suppliers_supplier_taxcode}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                         {dataLang?.suppliers_supplier_phone}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[15%] font-[600] text-center">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                         {dataLang?.suppliers_supplier_adress}
                       </h4>
                       {/* <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[20%] font-[600] text-center">{dataLang?.client_group_statusclient}</h4> */}
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[15%] font-[600] text-center">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                         {dataLang?.suppliers_supplier_group}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[15%] font-[600] text-center">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                         {dataLang?.client_list_brand}
                       </h4>
-                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
+                      <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                         {dataLang?.branch_popup_properties}
                       </h4>
                     </div>
@@ -554,13 +554,13 @@ const Index = (props) => {
                         <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                           {data?.map((e) => (
                             <div
-                              className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 "
+                              className="grid grid-cols-8 items-center py-1.5 px-2 hover:bg-slate-100/40 "
                               key={e.id.toString()}
                             >
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[13%]  rounded-md text-center">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 col-span-1  rounded-md text-center">
                                 {e.code}
                               </h6>
-                              <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[15%] font-semibold  rounded-md text-left hover:text-blue-600 transition-all ease-linear text-[#0F4F9E] ">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 py-0.5 col-span-1   rounded-md text-left text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear">
                                 <Popup_chitiet
                                   dataLang={dataLang}
                                   className="text-left"
@@ -568,41 +568,44 @@ const Index = (props) => {
                                   id={e?.id}
                                 />
                               </h6>
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[10%]  rounded-md text-left">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 col-span-1   rounded-md text-left">
                                 {e.tax_code}
                               </h6>
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[10%]  rounded-md text-center">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 col-span-1   rounded-md text-center">
                                 {e.phone_number}
                               </h6>
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[15%]  rounded-md text-left">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 col-span-1   rounded-md text-left">
                                 {e.address}
                               </h6>
 
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[15%]  rounded-md text-left flex justify-start flex-wrap ">
+                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 col-span-1   rounded-md text-left flex justify-start flex-wrap ">
                                 {e.supplier_group?.map((h) => {
                                   return (
                                     <span
                                       key={h.id}
                                       style={{ backgroundColor: "#e2f0fe" }}
-                                      className={`text-[#0F4F9E]  mr-2 mb-1 w-fit 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 rounded-md py-0.5`}
+                                      className={`text-[#0F4F9E]  mr-2 mb-1 w-fit 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-normal text-[9px] px-2 rounded-md py-0.5`}
                                     >
                                       {h.name}
                                     </span>
                                   );
                                 })}
                               </h6>
-                              <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-0.5 w-[15%] rounded-md text-left flex justify-start flex-wrap ">
+                              <h6 className="col-span-1  flex  gap-1 flex-wrap">
                                 {e.branch?.map((i) => (
                                   <span
-                                    key={i.id}
-                                    className="mr-2 mb-1 w-fit xl:text-base text-xs px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]"
+                                    key={i}
+                                    className="cursor-default w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2"
                                   >
                                     {i.name}
                                   </span>
                                 ))}
                               </h6>
                               {/* <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[18%]  rounded-md text-center">{moment(e.date_create).format('DD/MM/YYYY, h:mm:ss')}</h6>                 */}
-                              <div className="space-x-2 w-[10%] text-center">
+                              <div
+                                className="space-x-2 col-span-1 
+                               text-center mx-auto"
+                              >
                                 <Popup_dsncc
                                   listBr={listBr}
                                   listSelectCt={listSelectCt}

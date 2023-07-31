@@ -113,11 +113,11 @@ const Popup_chitiet = (props) => {
             {props.dataLang?.client_popup_detailContact}
           </button>
         </div>
-        <div className="mt-4 space-x-5 w-[930px] h-auto  ">
+        <div className="mt-4 space-x-5 w-[930px] 3xl:h-[500px] 2xl:h-[500px] xl:h-[500px]  lg:h-[400px] h-[500px] ">
           {tab === 0 && (
             <ScrollArea
               ref={scrollAreaRef}
-              className="h-[auto] overflow-hidden "
+              className="3xl:h-[500px] 2xl:h-[500px] xl:h-[500px]  lg:h-[400px] h-[500px] overflow-hidden "
               speed={1}
               smoothScrolling={true}
             >
@@ -315,7 +315,7 @@ const Popup_chitiet = (props) => {
                     ) : data?.contact?.length > 0 ? (
                       <>
                         <ScrollArea
-                          className="min-h-[455px] max-h-[455px] overflow-hidden"
+                          className="3xl:h-[500px] 2xl:h-[500px] xl:h-[500px]  lg:h-[400px] h-[500px] overflow-hidden"
                           speed={1}
                           smoothScrolling={true}
                         >
