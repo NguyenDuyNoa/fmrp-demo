@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 
-import Dropdown from "../UI/dropdown";
+import { Dropdown, DropdownThongBao } from "../UI/dropdown";
 import { _ServerInstance as Axios } from "/services/axios";
 
 import Popup from "reactjs-popup";
@@ -201,7 +201,7 @@ const Header = () => {
         {
           title: "Xuất kho sản xuất",
           img: "/icon/header/kho/xuatkho.png",
-          link: "#",
+          link: "/manufacture/production_warehouse",
         },
         {
           title: "Nhập kho thành phẩm",
@@ -403,6 +403,186 @@ const Header = () => {
       ],
     },
   ];
+
+  const ListThongBao = {
+    main: {
+      title: "Thông báo",
+      type: "thongbao",
+    },
+    tab: [
+      {
+        id: 1,
+        title: "Danh mục",
+        sub: [
+          {
+            title:
+              "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+          {
+            title:
+              "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+          {
+            title:
+              "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+          {
+            title:
+              "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+
+          {
+            title:
+              "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+          {
+            title:
+              "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+          {
+            title:
+              "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+          {
+            title:
+              "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+          {
+            title:
+              "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+          {
+            title:
+              "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+          {
+            title:
+              "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+          {
+            title:
+              "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+          {
+            title:
+              "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+        ],
+        link: "#",
+        more: "Xem tất cả thông báo",
+      },
+      {
+        id: 2,
+        title: "Bán & Xuất hàng",
+        sub: [
+          {
+            title: "Kho Hà Nội vừa được xuất kho 1,000 mặt hàng",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+          {
+            title:
+              "Admin số lệnh sản xuất LSX thuộc đơn SO vừa được nhân viên Mạnh Trần tạo",
+            img: "/user-placeholder.jpg",
+            class: "rounded-full",
+            link: "#",
+            time: "01/08/2023",
+          },
+        ],
+        link: "#",
+        more: "Xem tất cả thông báo",
+      },
+      {
+        id: 3,
+        title: "Mua & Nhập hàng",
+        sub: [],
+        link: "#",
+        more: "Xem tất cả thông báo",
+      },
+      {
+        id: 4,
+        title: "Kho & Sản xuất",
+        sub: [],
+        link: "#",
+        more: "Xem tất cả thông báo",
+      },
+      {
+        id: 5,
+        title: "Báo cáo & Thống kê",
+        sub: [],
+        link: "#",
+        more: "Xem tất cả thông báo",
+      },
+      {
+        id: 6,
+        title: "Tiện ích",
+        sub: [],
+        link: "#",
+        more: "Xem tất cả thông báo",
+      },
+      {
+        id: 7,
+        title: "Thêm",
+        sub: [],
+        link: "#",
+        more: "Xem tất cả thông báo",
+      },
+    ],
+  };
 
   const dropdowns = [
     {
@@ -702,7 +882,7 @@ const Header = () => {
                 blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
               />
             </Link>
-            <a
+            {/* <a
               href="#"
               title="Thông báo"
               className="3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition relative  "
@@ -721,6 +901,32 @@ const Header = () => {
               <div className="3xl:text-[9px] 2xl:text-[9px] xl:text-[9px] text-[9px] bg-red-500 3xl:h-3.5 3xl:w-3.5 2xl:h-3.5 2xl:w-3.5 xl:h-3.5 xl:w-3.5 lg:h-3.5 lg:w-3.5 rounded-full absolute top-0 right-0 3xl:translate-x-1 3xl:-translate-y-1 2xl:translate-x-1 2xl:-translate-y-1 xl:translate-x-1 xl:-translate-y-1 translate-x-1 -translate-y-1 flex flex-col items-center justify-center text-white font-medium">
                 2
               </div>
+            </a> */}
+            <a
+              href="#"
+              title="Thông báo"
+              className="3xl:scale-100 2xl:scale-95 xl:scale-90 lg:scale-75 transition relative  "
+            >
+              <DropdownThongBao
+                data={ListThongBao}
+                className="popover-thongbao"
+                position={"bottom right"}
+              >
+                <Image
+                  alt=""
+                  src="/icon/header/tb2.png"
+                  width={18}
+                  height={18}
+                  quality={100}
+                  className="object-contain 3xl:scale-110 2xl:scale-95 xl:scale-90 lg:scale-75 transition"
+                  loading="lazy"
+                  crossOrigin="anonymous"
+                  blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                />
+                <div className="3xl:text-[9px] 2xl:text-[9px] xl:text-[9px] text-[9px] bg-red-500 3xl:h-3.5 3xl:w-3.5 2xl:h-3.5 2xl:w-3.5 xl:h-3.5 xl:w-3.5 lg:h-3.5 lg:w-3.5 rounded-full absolute top-0 right-0 3xl:translate-x-1 3xl:-translate-y-1 2xl:translate-x-1 2xl:-translate-y-1 xl:translate-x-1 xl:-translate-y-1 translate-x-1 -translate-y-1 flex flex-col items-center justify-center text-white font-medium">
+                  2
+                </div>
+              </DropdownThongBao>
             </a>
             <Dropdown
               data={ListQuyTrinh}

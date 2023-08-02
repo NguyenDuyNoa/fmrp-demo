@@ -66,7 +66,7 @@ const Index = () => {
 
           <button
             style={{
-              zIndex: 99999,
+              zIndex: dataPstWH && 99999,
             }}
             onClick={() => _HandleExample()}
             type="button"

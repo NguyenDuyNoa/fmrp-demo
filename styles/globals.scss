@@ -78,6 +78,9 @@ input::-ms-clear {
 .popover-quytrinh-content {
   margin: 24px 0px 0px 25px !important;
 }
+.popover-thongbao-content {
+  margin: 24px 0px 0px 25px !important;
+}
 
 .dropdown-edit-content {
   margin: 5px 0px 0px 15px !important;
@@ -116,6 +119,10 @@ input::-ms-clear {
 .popover-quytrinh-arrow {
   position: relative !important;
   left: -23px;
+}
+.popover-thongbao-arrow {
+  position: relative !important;
+  left: -20px;
 }
 
 //scroll bar

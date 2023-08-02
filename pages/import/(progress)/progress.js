@@ -8,13 +8,15 @@ const Progress = ({
   dataSuccess,
   totalFalse,
   totalSuccessStages,
+  totalSuccessBom,
   dataFailStages,
+  dataFailBom,
   dataLang,
   formatNumber,
 }) => {
   return (
     <div className="col-span-2 flex items-center justify-center mt-5 mb-2">
-      {tabPage !== 5 ? (
+      {tabPage !== 5 && tabPage !== 6 ? (
         listData.length > 0 && (
           <div className={`${listData.length < 2 ? "mt-4" : ""}`}>
             <CircularProgressbar
@@ -58,7 +60,14 @@ const Progress = ({
           </div>
         )
       ) : (
-        <div className={`${totalSuccessStages >= 0 ? "mt-4 " : ""}`}>
+        <div
+          className={`${
+            (tabPage == 5 && totalSuccessStages) ||
+            (tabPage == 6 && totalSuccessBom >= 0)
+              ? "mt-4 "
+              : ""
+          }`}
+        >
           <CircularProgressbar
             className="text-center"
             value={multipleProgress}
@@ -84,7 +93,8 @@ const Progress = ({
               } w-4 h-4 bg-green-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
             ></div>
             <h6 className="text-green-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
-              totalSuccessStages
+              (tabPage == 5 && totalSuccessStages) ||
+                (tabPage == 6) & totalSuccessBom
             )} ${dataLang?.import_susces || "import_susces"}`}</h6>
           </div>
           <div className="grid grid-cols-12 group items-center justify-center mt-4">
@@ -94,7 +104,8 @@ const Progress = ({
               } w-4 h-4 bg-orange-500  transition-all mx-auto col-span-3 group-hover:animate-spin ease-linear`}
             ></div>
             <h6 className="text-orange-600 font-semibold text-[13.5px] col-span-9">{`${formatNumber(
-              dataFailStages?.length
+              (tabPage == 5 && dataFailStages?.length) ||
+                (tabPage == 6 && dataFailBom?.length)
             )} ${dataLang?.import_fail || "import_fail"}`}</h6>
           </div>
         </div>

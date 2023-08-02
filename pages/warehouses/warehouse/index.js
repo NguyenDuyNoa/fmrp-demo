@@ -28,6 +28,7 @@ import dynamic from "next/dynamic";
 import moment from "moment/moment";
 import Select, { components } from "react-select";
 import Popup from "reactjs-popup";
+import formatNumber from "components/UI/formanumber/formanumber";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -408,13 +409,13 @@ const Index = (props) => {
                                     <h3 className="font-normal mt-2.5 ml-2.5">
                                       {dataLang?.Warehouse_total}:{" "}
                                       <span className=" text-[#0F4F9E] font-medium capitalize">
-                                        {e?.code}
+                                        {formatNumber(e?.totalItems)}
                                       </span>
                                     </h3>
                                     <h3 className="font-normal mt-2.5 ml-2.5">
                                       {dataLang?.Warehouse_inventory}:{" "}
                                       <span className=" text-[#0F4F9E] font-medium capitalize">
-                                        {e?.code}
+                                        {formatNumber(e?.totalQuantity)}
                                       </span>
                                     </h3>
                                     <h3 className="font-normal mt-2.5 ml-2.5">

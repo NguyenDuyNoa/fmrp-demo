@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 
-const ExpandableContent = ({ content }) => {
+const ExpandableContent = ({ content, maxChar }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const maxChar = 60;
+  const maxChars = maxChar || 60;
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
@@ -14,11 +14,11 @@ const ExpandableContent = ({ content }) => {
         <div>{content}</div>
       ) : (
         <div>
-          {content.slice(0, maxChar)}
-          {content.length > maxChar && <span className="">...</span>}
+          {content.slice(0, maxChars)}
+          {content.length > maxChars && <span className="">...</span>}
         </div>
       )}
-      {content.length > maxChar && (
+      {maxChar != 30 && content.length > maxChars && (
         <button
           onClick={toggleExpand.bind(this)}
           className="text-blue-400 text-[10px] hover:text-blue-600 transition-all ease-linear font-semibold animate-bounce-custom"

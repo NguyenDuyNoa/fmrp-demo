@@ -5,13 +5,34 @@ import Image from "next/image";
 import Popup from "reactjs-popup";
 import { Tooltip } from "react-tippy";
 
+import Loading from "./loading";
+
 import { Lexend_Deca } from "@next/font/google";
 import { useSelector } from "react-redux";
+import ExpandableContent from "./more";
+import TabFilter from "./TabFilter";
+import { ArrowCircleDown, SearchNormal1 } from "iconsax-react";
 const deca = Lexend_Deca({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
 });
-const Dropdown = (props) => {
+
+export const Dropdown = (props) => {
+  const [isZoomed, setIsZoomed] = useState(false);
+
+  const handleClick = () => {
+    setIsZoomed(true);
+
+    setTimeout(() => {
+      setIsZoomed(false);
+    }, 200);
+  };
+
+  const zoomedStyle = {
+    transform: isZoomed ? "scale(1.1)" : "scale(1)",
+    transition: "transform 0.2s",
+    willChange: "transform",
+  };
   return (
     <div className="">
       <Popup
@@ -29,7 +50,7 @@ const Dropdown = (props) => {
         position={props.position}
         className={`popover-edit -translate-y-10 ` + props.className}
       >
-        <div className={`w-auto ${deca.className}`}>
+        <div className={`w-auto ${deca.className} `}>
           <div className="bg-white 2xl:py-2 lg:py-0.5 px-0.5 rounded-lg justify-between flex divide-x divide-[#DDDDE2]">
             {props.data?.map((e, i) => (
               <div
@@ -51,7 +72,7 @@ const Dropdown = (props) => {
                       <Link
                         title={ce.title}
                         href={ce.link}
-                        className="flex items-center 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]"
+                        className="flex  items-center 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]"
                       >
                         {ce?.img ? (
                           <React.Fragment>
@@ -61,13 +82,13 @@ const Dropdown = (props) => {
                               width={24}
                               height={24}
                               quality={100}
-                              className="object-contain"
+                              className={`object-contain"`}
                               loading="lazy"
                               crossOrigin="anonymous"
                               placeholder="blur"
                               blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                             />
-                            <h5 className="uppercase 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px]">
+                            <h5 className="uppercase 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] ">
                               {ce.title}
                             </h5>
                           </React.Fragment>
@@ -120,6 +141,7 @@ const Dropdown = (props) => {
                         {/* </a> */}
                       </Link>
                     ))}
+                    {console.log(props)}
                   </div>
                 ))}
               </div>
@@ -155,4 +177,201 @@ const ZoomableElement = (props) => {
     </div>
   );
 };
-export default Dropdown;
+
+export const DropdownThongBao = (props) => {
+  const [tab, sTab] = useState(1);
+  const [onFetching, sOnFetching] = useState(false);
+  const _HandleSelectTab = (e) => {
+    sTab(e);
+    sOnFetching(true);
+  };
+  useEffect(() => {
+    sOnFetching(true);
+    setTimeout(() => {
+      sOnFetching(false);
+    }, 500);
+  }, [tab]);
+  useEffect(() => {
+    sOnFetching(true);
+    setTimeout(() => {
+      sOnFetching(false);
+    }, 500);
+  }, []);
+
+  return (
+    <div className="">
+      <Popup
+        trigger={
+          <button
+            className={`text-slate-200 3xl:text-[18px] 2xl:text-[14px] xl:text-[12px] lg:text-[10px]  hover:text-white hover:drop-shadow-[0_0_5px_#eabd7a99] 
+              `}
+          >
+            {props.children}
+          </button>
+        }
+        closeOnDocumentClick
+        arrow={props.position}
+        on={["hover"]}
+        position={props.position}
+        className={`popover-edit -translate-y-10 ${props.className}`}
+      >
+        <div
+          className={`w-auto ${deca.className} bg-white mb-1  overflow-auto scrollbar-thin  scrollbar-thumb-slate-300 scrollbar-track-slate-100 3xl:max-h-[700px] xxl:max-h-[500px] 2xl:max-h-[500px] xl:max-h-[400px] lg:max-h-[370px] max-h-[500px]  px-0.5 rounded-lg justify-between  `}
+        >
+          <div className="flex items-center sticky top-0  bg-white  rounded z-[999]  p-2">
+            {props?.data?.tab &&
+              props?.data?.tab.map((e) => {
+                return (
+                  <div>
+                    <TabFilters
+                      tab={tab}
+                      key={e.id}
+                      onClick={_HandleSelectTab.bind(this, e.id)}
+                      active={e.id}
+                      className="text-[#0F4F9E] my-0 mx-2 bg-[#e2f0fe] hover:bg-blue-400 z-[999] hover:text-white transition-all ease-linear"
+                    >
+                      {e.title}
+                    </TabFilters>
+                  </div>
+                );
+              })}
+          </div>
+          <div className="">
+            <div
+              className={`3xl:px-2 3xl:py-3 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}
+            >
+              <div className="space-y-0.5">
+                {onFetching ? (
+                  <Loading />
+                ) : (
+                  <>
+                    <TabContent
+                      subItems={
+                        props.data?.tab.find((e) => e.id === tab)?.sub || []
+                      }
+                    />
+                    {props.data?.tab.find((e) => e.id === tab)?.sub?.length >
+                      0 && (
+                      <Link href={props.data?.tab[tab]?.link}>
+                        <ZoomableElements className="text-center    items-center ">
+                          <h5 className="tex-center my-1 3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]">
+                            {props.data?.tab[tab]?.more}
+                          </h5>
+                        </ZoomableElements>
+                      </Link>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Popup>
+    </div>
+  );
+};
+const TabContent = ({ subItems }) => {
+  return (
+    <div className="tab-content">
+      {subItems.length === 0 ? (
+        <div className=" max-w-[352px] mt-14 mx-auto">
+          <div className="text-center">
+            <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
+              <SearchNormal1 />
+            </div>
+            <h1 className="textx-[#141522] text-base opacity-90 font-medium">
+              Không tìm thấy các mục
+            </h1>
+            <div className="flex items-center justify-around mt-6 "></div>
+          </div>
+        </div>
+      ) : (
+        <div
+          className={`3xl:px-2 3xl:py-1 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}
+        >
+          {subItems.map((ce, index) => (
+            <React.Fragment>
+              <Link title={ce.title} href={ce.link}>
+                <ZoomableElements className="border-b  items-center 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]">
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <Image
+                        alt={ce.title}
+                        src={ce?.img}
+                        width={24}
+                        height={24}
+                        quality={100}
+                        className={`object-contain" ${ce?.class}`}
+                        loading="lazy"
+                        crossOrigin="anonymous"
+                        placeholder="blur"
+                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                      />
+                      <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
+                        <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
+                          <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                        </span>
+                      </span>
+                    </div>
+                    <div>
+                      <h5 className="3xl:text-base 2xl:text-[14px] xl:text-[10px] lg:text-[10px] ">
+                        {ce.title}
+                      </h5>
+                      <h5 className="text-xs text-gray-400 italic">
+                        {ce.time}
+                      </h5>
+                    </div>
+                  </div>
+                </ZoomableElements>
+              </Link>
+            </React.Fragment>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+const TabFilters = React.memo((props) => {
+  return (
+    <button
+      style={props.style}
+      onClick={props.onClick}
+      className={`${props.tab == props.active && "bg-blue-400 text-white"} ${
+        props.className
+      } justify-center  text-[12px] flex  items-center rounded-md px-2 py-1 outline-none relative`}
+    >
+      {props.children}
+      <span
+        className={`${
+          props?.total > 0 &&
+          "absolute 3xl:w-[24px] 2xl:w-[20px] xl:w-[18px] lg:w-[18px] 3xl:h-[24px] 2xl:h-[20px] xl:h-[18px] lg:h-[18px] 3xl:py-1 3xl:px-2  2xl:py-1 2xl:px-2  xl:py-1 xl-px-2  lg:py-1 lg:px-2 3xl:text-[15px] 2xl:text-[13px] xl:text-[11px] lg:text-[11px] top-0 right-0 bg-[#ff6f00]  3xl:translate-x-[30%] 2xl:translate-x-2.5 xl:translate-x-2 lg:translate-x-[40%] 3xl:-translate-y-[50%] 2xl:-translate-y-2  xl:-translate-y-[40%] lg:-translate-y-[40%] text-white rounded-full text-center items-center flex justify-center"
+        } `}
+      >
+        {props?.total > 0 && props?.total}
+      </span>
+    </button>
+  );
+});
+
+const ZoomableElements = (props) => {
+  const [isZoomed, setIsZoomed] = useState(false);
+
+  const handleClick = () => {
+    setIsZoomed(true);
+
+    setTimeout(() => {
+      setIsZoomed(false);
+    }, 200);
+  };
+
+  const zoomedStyle = {
+    transform: isZoomed ? "scale(1.01)" : "scale(1)",
+    transition: "transform 0.2s",
+    willChange: "transform",
+  };
+  return (
+    <div style={zoomedStyle} onClick={handleClick} className={props.className}>
+      {props.children}
+    </div>
+  );
+};

@@ -11,8 +11,6 @@ import Swal from "sweetalert2";
 
 import * as XLSX from "xlsx";
 
-import { NumericFormat } from "react-number-format";
-
 import {
   Edit as IconEdit,
   Grid6 as IconExcel,
@@ -22,10 +20,7 @@ import {
   ArrowRight,
   RefreshCircle,
   Notification,
-  ArrowDown,
 } from "iconsax-react";
-
-import { Tooltip } from "react-tippy";
 
 import Loading from "components/UI/loading";
 
@@ -48,6 +43,11 @@ import DeleteButton from "./(button)/buttonDeleteSlect";
 import TabClient from "./(tab)/tabImport";
 import Stepper from "./(stepper)/stepper";
 import FormSupplier from "./(form)/formSupplier";
+import ImportFileTemplate from "./(inputDowStages_Bom)/inputTab";
+import SampleImport from "./(sample_guide)/sample";
+import Row from "./(row)/row";
+import Radio from "./(radio)/radio";
+import Popup_bom from "./(popup)/popupBom";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -117,10 +117,12 @@ const Index = (props) => {
 
   const [dataFail, sDataFail] = useState([]);
   const [dataFailStages, sDataFailStages] = useState([]);
+  const [dataFailBom, sDataFailBom] = useState([]);
   const [totalFalse, sTotalFalse] = useState(null);
 
   const [dataSuccess, sDataSuccess] = useState(0);
   const [totalSuccessStages, sTotalSuccessStages] = useState();
+  const [totalSuccessBom, sTotalSuccessBom] = useState();
 
   const [listData, sListData] = useState([]);
   const [listDataContact, sListDataContat] = useState([]);
@@ -263,7 +265,7 @@ const Index = (props) => {
   }, [onFetching]);
 
   useEffect(() => {
-    router.query.tab && tabPage != 5 && sOnFetching(true);
+    router.query.tab && tabPage != 5 && tabPage != 6 && sOnFetching(true);
     router.query.tab && sListData([]);
     router.query.tab && (tabPage == 1 || tabPage == 2) && sListDataContat([]);
     router.query.tab && tabPage == 1 && sListDataDelivery([]);
@@ -273,6 +275,7 @@ const Index = (props) => {
     router.query.tab && sCondition_column(null);
     router.query.tab && sOnLoadingDataBack(false);
     router.query.tab && sDataFailStages([]);
+    router.query.tab && sDataFailBom([]);
     router.query.tab && sDataFail([]);
     router.query.tab && sTotalSuccessStages();
     router.query.tab && sTotalFalse(0);
@@ -442,7 +445,6 @@ const Index = (props) => {
           rowData["rowIndex"] = rowIndex;
         }
         jsonData.push(rowData);
-        console.log("rowData", rowData);
       }
       setTimeout(() => {
         sDataImport(jsonData);
@@ -800,6 +802,10 @@ const Index = (props) => {
       id: 5,
       name: "Công đoạn",
     },
+    {
+      id: 6,
+      name: "Định mức BOM",
+    },
   ];
   /// tên model
   const dataName = {
@@ -808,6 +814,7 @@ const Index = (props) => {
     3: dataLang?.import_materials || "import_materials",
     4: dataLang?.import_finished_product || "import_finished_product",
     5: dataLang?.import_stage || "import_stage",
+    6: "Định mức BOM",
   };
 
   // validate dữ liệu rồi post
@@ -832,7 +839,7 @@ const Index = (props) => {
     const hasNullDataImport = dataImport?.length == 0;
 
     const requiredColumn = listData?.length == 0;
-    if (tabPage != 5) {
+    if (tabPage != 5 && tabPage != 6) {
       if (
         hasNullDataFiles ||
         fileImport == null ||
@@ -1227,22 +1234,24 @@ const Index = (props) => {
         dataChunks.push(chunk);
       }
     }
-
     const apiPaths = {
       1: "/api_web/Api_import_data/action_add_client?csrf_protection=true",
       2: "/api_web/Api_import_data/action_add_suppliers?csrf_protection=true",
       3: "/api_web/Api_import_data/action_add_materials?csrf_protection=true",
       4: "/api_web/Api_import_data/action_add_products?csrf_protection=true",
       5: "/api_web/api_import_data/importStages?csrf_protection=true",
+      6: "/api_web/api_import_data/importBOM?csrf_protection=true",
     };
     //ánh xạ apiPaths
     const apiUrl = apiPaths[tabPage] || "";
 
-    if (tabPage == 5) {
+    if (tabPage == 5 || tabPage == 6) {
       const apiUrl = apiPaths[tabPage] || "";
       var formData = new FormData();
+
       formData.append("file", fileImport);
       formData.append("actions", valueCheck);
+
       Axios(
         "POST",
         `${apiUrl}`,
@@ -1258,13 +1267,15 @@ const Index = (props) => {
         (err, response) => {
           if (!err) {
             var { message, type, errors, count } = response.data;
-            sDataFailStages(errors);
+            tabPage == 5 && sDataFailStages(errors);
+            tabPage == 6 && sDataFailBom(errors);
             Toast.fire({
               icon: `${type}`,
               title: `${message}`,
             });
           }
-          sTotalSuccessStages(count);
+          tabPage == 5 && sTotalSuccessStages(count);
+          tabPage == 6 && sTotalSuccessBom(count);
           sOnSending(false);
           setTimeout(() => {
             sMultipleProgress(0);
@@ -1276,7 +1287,6 @@ const Index = (props) => {
         Axios(
           "POST",
           `${apiUrl}`,
-
           {
             data: {
               data,
@@ -1373,7 +1383,11 @@ const Index = (props) => {
   };
 
   useEffect(() => {
-    tabPage != 5 && onSending && save_template && _ServerSendingImporTemplate();
+    tabPage != 5 &&
+      tabPage != 6 &&
+      onSending &&
+      save_template &&
+      _ServerSendingImporTemplate();
   }, [onSending]);
 
   useEffect(() => {
@@ -1401,7 +1415,7 @@ const Index = (props) => {
           <span className="text-[#141522]/40">/</span>
           <h6>{dataLang?.import_category || "import_category"}</h6>
         </div>
-        {tabPage != 5 ? (
+        {(tabPage != 5 && tabPage != 6 && (
           <Popup_status
             dataLang={dataLang}
             className=""
@@ -1412,13 +1426,21 @@ const Index = (props) => {
             listDataContact={listDataContact}
             listDataDelivery={listDataDelivery}
           />
-        ) : (
-          <Popup_stages
-            dataLang={dataLang}
-            router={router.query?.tab}
-            data={dataFailStages}
-          />
-        )}
+        )) ||
+          (tabPage == 5 && (
+            <Popup_stages
+              dataLang={dataLang}
+              router={router.query?.tab}
+              data={dataFailStages}
+            />
+          )) ||
+          (tabPage == 6 && (
+            <Popup_bom
+              dataLang={dataLang}
+              router={router.query?.tab}
+              data={dataFailBom}
+            />
+          ))}
         <div className="">
           <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
             <div className="space-y-3 h-[96%] overflow-hidden">
@@ -1428,7 +1450,7 @@ const Index = (props) => {
 
               <div className="grid grid-cols-12 items-center justify-center mx-auto space-x-3">
                 <div className="col-span-2"></div>
-                <div className="col-span-8 grid-cols-5 grid  items-center overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <div className="col-span-8 flex flex-nowrap gap-4 items-center overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                   {dataTab &&
                     dataTab.map((e) => {
                       return (
@@ -1437,7 +1459,7 @@ const Index = (props) => {
                             key={e.id}
                             onClick={_HandleSelectTab.bind(this, `${e.id}`)}
                             active={e.id}
-                            className="text-[#0F4F9E] col-span-1 bg-[#e2f0fe] hover:bg-blue-400 hover:text-white transition-all ease-linear"
+                            className="text-[#0F4F9E] my-1 bg-[#e2f0fe] hover:bg-blue-400 hover:text-white transition-all ease-linear"
                           >
                             {e.name}
                           </TabClient>
@@ -1453,150 +1475,124 @@ const Index = (props) => {
                 <div className="col-span-2"></div>
                 <div className="col-span-2"></div>
                 <div className="col-span-4 mb-2 mt-2">
-                  {tabPage != 5 ? (
-                    <React.Fragment>
-                      <h5 className="mb-1 block text-sm font-medium text-gray-700">
-                        {dataLang?.import_form || "import_form"}
-                      </h5>
-                      <Select
-                        closeMenuOnSelect={true}
-                        placeholder={dataLang?.import_form || "import_form"}
-                        options={dataSampleImport}
-                        isLoading={sampleImport != null ? false : onLoading}
-                        formatOptionLabel={(option) => (
-                          <div className="flex justify-start items-center gap-1 ">
-                            <h2 className="font-medium">
-                              {option?.label}{" "}
-                              <span className="italic text-sm">{`(${option?.date})`}</span>
-                            </h2>
-                          </div>
-                        )}
-                        isSearchable={true}
-                        onChange={_HandleChange.bind(this, "sampleImport")}
-                        value={sampleImport}
-                        LoadingIndicator
-                        noOptionsMessage={() =>
-                          dataLang?.import_no_data || "import_no_data"
-                        }
-                        maxMenuHeight="200px"
-                        isClearable={true}
-                        menuPortalTarget={document.body}
-                        onMenuOpen={handleMenuOpen}
-                        theme={(theme) => ({
-                          ...theme,
-                          colors: {
-                            ...theme.colors,
-                            primary25: "#EBF5FF",
-                            primary50: "#92BFF7",
-                            primary: "#0F4F9E",
-                          },
-                        })}
-                        styles={{
-                          placeholder: (base) => ({
-                            ...base,
-                            color: "#cbd5e1",
-                          }),
-                          menuPortal: (base) => ({
-                            ...base,
-                            zIndex: 9999,
-                            position: "absolute",
-                          }),
-                        }}
-                        className="border-transparent text-sm placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border "
+                  {(tabPage == 5 && (
+                    // <React.Fragment>
+                    //   <h5 className="mb-1 block text-sm font-medium text-gray-700 relative">
+                    //     {dataLang?.import_file_template ||
+                    //       "import_file_template"}{" "}
+                    //     <span className="text-red-500">*</span>
+                    //     <ArrowDown
+                    //       size="20"
+                    //       className="absolute top-0 right-0 animate-bounce"
+                    //       color="blue"
+                    //     />
+                    //   </h5>
+                    //   <a
+                    //     href={`${ulrExel}/file/products/import_stages.xlsx`}
+                    //     className="relative inline-flex items-center w-full py-1.5 overflow-hidden text-lg font-medium text-indigo-600 border-2 border-indigo-600 rounded-md hover:text-white group hover:bg-gray-50"
+                    //   >
+                    //     <span className="absolute left-0 block w-full h-0 transition-all bg-indigo-600 opacity-100 group-hover:h-full top-1/2 group-hover:top-0 duration-400 ease"></span>
+                    //     <span className="absolute right-0 flex items-center justify-start w-10 h-10 duration-300 transform translate-x-full group-hover:translate-x-0 ease">
+                    //       <svg
+                    //         className="w-5 h-5"
+                    //         fill="none"
+                    //         stroke="currentColor"
+                    //         viewBox="0 0 24 24"
+                    //         xmlns="http://www.w3.org/2000/svg"
+                    //       >
+                    //         <path
+                    //           stroke-linecap="round"
+                    //           stroke-linejoin="round"
+                    //           stroke-width="2"
+                    //           d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    //         ></path>
+                    //       </svg>
+                    //     </span>
+                    //     <span className="relative left-1/2 -translate-x-1/2 text-sm">
+                    //       {dataLang?.import_Download_file_template ||
+                    //         "import_Download_file_template"}
+                    //     </span>
+                    //   </a>
+                    // </React.Fragment>
+                    <ImportFileTemplate
+                      dataLang={dataLang}
+                      tabPage={tabPage}
+                      ulrExel={ulrExel}
+                    />
+                  )) ||
+                    (tabPage == 6 && (
+                      <ImportFileTemplate
+                        dataLang={dataLang}
+                        ulrExel={ulrExel}
+                        tabPage={tabPage}
                       />
-                    </React.Fragment>
-                  ) : (
-                    <React.Fragment>
-                      <h5 className="mb-1 block text-sm font-medium text-gray-700 relative">
-                        {dataLang?.import_file_template ||
-                          "import_file_template"}{" "}
-                        <span className="text-red-500">*</span>
-                        <ArrowDown
-                          size="20"
-                          className="absolute top-0 right-0 animate-bounce"
-                          color="blue"
+                    )) ||
+                    (tabPage != 5 && tabPage != 6 && (
+                      <React.Fragment>
+                        <h5 className="mb-1 block text-sm font-medium text-gray-700">
+                          {dataLang?.import_form || "import_form"}
+                        </h5>
+                        <Select
+                          closeMenuOnSelect={true}
+                          placeholder={dataLang?.import_form || "import_form"}
+                          options={dataSampleImport}
+                          isLoading={sampleImport != null ? false : onLoading}
+                          formatOptionLabel={(option) => (
+                            <div className="flex justify-start items-center gap-1 ">
+                              <h2 className="font-medium">
+                                {option?.label}{" "}
+                                <span className="italic text-sm">{`(${option?.date})`}</span>
+                              </h2>
+                            </div>
+                          )}
+                          isSearchable={true}
+                          onChange={_HandleChange.bind(this, "sampleImport")}
+                          value={sampleImport}
+                          LoadingIndicator
+                          noOptionsMessage={() =>
+                            dataLang?.import_no_data || "import_no_data"
+                          }
+                          maxMenuHeight="200px"
+                          isClearable={true}
+                          menuPortalTarget={document.body}
+                          onMenuOpen={handleMenuOpen}
+                          theme={(theme) => ({
+                            ...theme,
+                            colors: {
+                              ...theme.colors,
+                              primary25: "#EBF5FF",
+                              primary50: "#92BFF7",
+                              primary: "#0F4F9E",
+                            },
+                          })}
+                          styles={{
+                            placeholder: (base) => ({
+                              ...base,
+                              color: "#cbd5e1",
+                            }),
+                            menuPortal: (base) => ({
+                              ...base,
+                              zIndex: 9999,
+                              position: "absolute",
+                            }),
+                          }}
+                          className="border-transparent text-sm placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border "
                         />
-                      </h5>
-                      <a
-                        href={`${ulrExel}/file/products/import_stages.xlsx`}
-                        className="relative inline-flex items-center w-full py-1.5 overflow-hidden text-lg font-medium text-indigo-600 border-2 border-indigo-600 rounded-md hover:text-white group hover:bg-gray-50"
-                      >
-                        <span className="absolute left-0 block w-full h-0 transition-all bg-indigo-600 opacity-100 group-hover:h-full top-1/2 group-hover:top-0 duration-400 ease"></span>
-                        <span className="absolute right-0 flex items-center justify-start w-10 h-10 duration-300 transform translate-x-full group-hover:translate-x-0 ease">
-                          <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M14 5l7 7m0 0l-7 7m7-7H3"
-                            ></path>
-                          </svg>
-                        </span>
-                        <span className="relative left-1/2 -translate-x-1/2 text-sm">
-                          {dataLang?.import_Download_file_template ||
-                            "import_Download_file_template"}
-                        </span>
-                      </a>
-                    </React.Fragment>
-                  )}
+                      </React.Fragment>
+                    ))}
                 </div>
-                <div className="col-span-4 mb-2 mt-2">
-                  <h5 className="mb-1 block text-sm font-medium text-gray-700">
-                    {dataLang?.import_operation || "import_operation"}
-                  </h5>
-                  <div>
-                    <ul className="items-center w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded sm:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                      <li className="w-full border-b  cursor-pointer  hover:bg-pink-600 group overflow-hidden transform  transition duration-300 ease-in-out border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
-                        <div className="flex cursor-pointer items-center pl-3">
-                          <input
-                            id="horizontal-list-radio-license"
-                            type="radio"
-                            value={valueCheck}
-                            checked={valueCheck == "add"}
-                            onChange={_HandleChange.bind(this, "valueAdd")}
-                            name="list-radio"
-                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-                          />
-                          <label
-                            htmlFor="horizontal-list-radio-license"
-                            className="w-full py-2 cursor-pointer ml-2 text-sm font-medium text-gray-900 group-hover:text-white transition-all ease-in-out dark:text-gray-300"
-                          >
-                            {dataLang?.import_more || "import_more"}
-                          </label>
-                        </div>
-                      </li>
-                      <li className="w-full border-b  cursor-pointer hover:bg-pink-600 group overflow-hidden transform  transition duration-300 ease-in-out border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
-                        <div className="flex cursor-pointer items-center pl-3">
-                          <input
-                            id="horizontal-list-radio-id"
-                            type="radio"
-                            value={valueCheck}
-                            checked={valueCheck == "edit"}
-                            onChange={_HandleChange.bind(this, "valueUpdate")}
-                            name="list-radio"
-                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-                          />
-                          <label
-                            htmlFor="horizontal-list-radio-id"
-                            className="w-full py-2 cursor-pointer ml-2 text-sm font-medium text-gray-900 group-hover:text-white transition-all ease-in-out dark:text-gray-300"
-                          >
-                            {dataLang?.import_update || "import_update"}
-                          </label>
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
+
+                <Radio
+                    dataLang={dataLang}
+                    valueCheck={valueCheck}
+                    _HandleChange={_HandleChange.bind(this)}
+                    tabPage={tabPage}
+                  />
+
                 <div className="col-span-2"></div>
                 <div className="col-span-2"></div>
                 <div className="col-span-4">
-                  {tabPage != 5 && valueCheck === "edit" ? (
+                  {tabPage != 5 && tabPage != 6 && valueCheck === "edit" ? (
                     <>
                       <h5 className="mb-1 block text-sm font-medium text-gray-700">
                         {dataLang?.import_condition_column ||
@@ -1673,7 +1669,8 @@ const Index = (props) => {
                         for="importFile"
                         className="block text-sm font-medium mb-2 dark:text-white"
                       >
-                        {dataLang?.import_file || "import_file"}
+                        {dataLang?.import_file || "import_file"}{" "}
+                        <span className="text-red-500">*</span>
                       </label>
                       <label
                         for="importFile"
@@ -1714,149 +1711,161 @@ const Index = (props) => {
                   </div>
                 </div>
                 <div className="col-span-4  ">
-                  {tabPage != 5 ? (
-                    <div className="grid grid-cols-4 gap-2.5">
-                      <div className="mx-auto w-full col-span-2">
-                        <label
-                          htmlFor="input-label"
-                          className="block text-sm font-medium mb-2 dark:text-white"
-                        >
-                          {dataLang?.import_line_starts || "import_line_starts"}
-                        </label>
-                        <NumericFormat
-                          className={`${
-                            errRowStart &&
-                            (row_tarts == null || row_tarts == "")
-                              ? "border-red-500"
-                              : "border-gray-200"
-                          } border py-2.5 outline-none px-4  block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
-                          onValueChange={_HandleChange.bind(this, "row_tarts")}
-                          value={row_tarts}
-                          allowNegative={false}
-                          decimalScale={0}
-                          isNumericString={true}
-                          thousandSeparator=","
-                          placeholder={
-                            dataLang?.import_line_starts || "import_line_starts"
-                          }
-                        />
-                        {errRowStart && row_tarts == null && (
-                          <label className="text-sm text-red-500">
-                            {dataLang?.import_ERR_line || "import_ERR_line"}
-                          </label>
-                        )}
-                      </div>
-                      <div className="mx-auto w-full col-span-2">
-                        <label
-                          for="input-labels"
-                          className="block text-sm font-medium mb-2 dark:text-white"
-                        >
-                          {dataLang?.import_finished_row ||
-                            "import_finished_row"}
-                        </label>
-                        <NumericFormat
-                          className={`${
-                            errEndRow && (end_row == null || end_row == "")
-                              ? "border-red-500"
-                              : "border-gray-200"
-                          } border py-2.5 outline-none px-4 border block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
-                          onValueChange={_HandleChange.bind(this, "end_row")}
-                          value={end_row}
-                          disabled={row_tarts == null}
-                          allowNegative={false}
-                          decimalScale={0}
-                          isNumericString={true}
-                          thousandSeparator=","
-                          placeholder={
-                            row_tarts == null
-                              ? dataLang?.import_startrow || "import_startrow"
-                              : dataLang?.import_finished_row ||
-                                "import_finished_row"
-                          }
-                        />
-                        {errEndRow && end_row == null && (
-                          <label className="text-sm text-red-500">
-                            {dataLang?.import_ERR_linefinish ||
-                              "import_ERR_linefinish"}
-                          </label>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <React.Fragment>
-                      <div className="bg-white rounded-2xl shadow-2xl relative">
-                        <div className="absolute right-0 top-0 translate-x-1/2 bg-rose-50 rounded-lg">
-                          <Notification
-                            size="26"
-                            color="red"
-                            className=" animate-bounce"
-                          />
-                        </div>
-                        <div className="p-2">
-                          <div className="flex items-center gap-2">
-                            <ArrowRight
-                              size="16"
-                              color="red"
-                              className="animate-bounce"
-                            />
-                            <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                              {dataLang?.import_err_stages ||
-                                "import_err_stages"}
-                            </h2>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <ArrowRight
-                              size="16"
-                              color="red"
-                              className="animate-bounce"
-                            />
-                            <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                              {dataLang?.import_err_stages_two ||
-                                "import_err_stages_two"}
-                            </h2>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <ArrowRight
-                              size="16"
-                              color="red"
-                              className="animate-bounce"
-                            />
-                            <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                              {dataLang?.import_err_stages_there ||
-                                "import_err_stages_there"}
-                            </h2>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <ArrowRight
-                              size="16"
-                              color="red"
-                              className="animate-bounce"
-                            />
-                            <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                              {dataLang?.import_err_stages_for ||
-                                "import_err_stages_for"}
-                            </h2>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <ArrowRight
-                              size="16"
-                              color="red"
-                              className="animate-bounce"
-                            />
-                            <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
-                              {dataLang?.import_err_stages_five ||
-                                "import_err_stages_five"}
-                            </h2>
-                          </div>
-                        </div>
-                      </div>
-                    </React.Fragment>
-                  )}
+                  {(tabPage != 5 && tabPage != 6 && (
+                    // <div className="grid grid-cols-4 gap-2.5">
+                    //   <div className="mx-auto w-full col-span-2">
+                    //     <label
+                    //       htmlFor="input-label"
+                    //       className="block text-sm font-medium mb-2 dark:text-white"
+                    //     >
+                    //       {dataLang?.import_line_starts || "import_line_starts"}{" "}
+                    //       <span className="text-red-500">*</span>
+                    //     </label>
+                    //     <NumericFormat
+                    //       className={`${
+                    //         errRowStart &&
+                    //         (row_tarts == null || row_tarts == "")
+                    //           ? "border-red-500"
+                    //           : "border-gray-200"
+                    //       } border py-2.5 outline-none px-4  block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
+                    //       onValueChange={_HandleChange.bind(this, "row_tarts")}
+                    //       value={row_tarts}
+                    //       allowNegative={false}
+                    //       decimalScale={0}
+                    //       isNumericString={true}
+                    //       thousandSeparator=","
+                    //       placeholder={
+                    //         dataLang?.import_line_starts || "import_line_starts"
+                    //       }
+                    //     />
+                    //     {errRowStart && row_tarts == null && (
+                    //       <label className="text-sm text-red-500">
+                    //         {dataLang?.import_ERR_line || "import_ERR_line"}
+                    //       </label>
+                    //     )}
+                    //   </div>
+                    //   <div className="mx-auto w-full col-span-2">
+                    //     <label
+                    //       for="input-labels"
+                    //       className="block text-sm font-medium mb-2 dark:text-white"
+                    //     >
+                    //       {dataLang?.import_finished_row ||
+                    //         "import_finished_row"}
+                    //       <span className="text-red-500">*</span>
+                    //     </label>
+                    //     <NumericFormat
+                    //       className={`${
+                    //         errEndRow && (end_row == null || end_row == "")
+                    //           ? "border-red-500"
+                    //           : "border-gray-200"
+                    //       } border py-2.5 outline-none px-4 border block w-full  rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400`}
+                    //       onValueChange={_HandleChange.bind(this, "end_row")}
+                    //       value={end_row}
+                    //       disabled={row_tarts == null}
+                    //       allowNegative={false}
+                    //       decimalScale={0}
+                    //       isNumericString={true}
+                    //       thousandSeparator=","
+                    //       placeholder={
+                    //         row_tarts == null
+                    //           ? dataLang?.import_startrow || "import_startrow"
+                    //           : dataLang?.import_finished_row ||
+                    //             "import_finished_row"
+                    //       }
+                    //     />
+                    //     {errEndRow && end_row == null && (
+                    //       <label className="text-sm text-red-500">
+                    //         {dataLang?.import_ERR_linefinish ||
+                    //           "import_ERR_linefinish"}
+                    //       </label>
+                    //     )}
+                    //   </div>
+                    // </div>
+                    <Row
+                      dataLang={dataLang}
+                      _HandleChange={_HandleChange.bind(this)}
+                      errRowStart={errRowStart}
+                      row_tarts={row_tarts}
+                      errEndRow={errEndRow}
+                      end_row={end_row}
+                    />
+                  )) ||
+                    ((tabPage == 5 || tabPage == 6) && (
+                      // <React.Fragment>
+                      //   <div className="bg-white rounded-2xl shadow-2xl relative">
+                      //     <div className="absolute right-0 top-0 translate-x-1/2 bg-rose-50 rounded-lg">
+                      //       <Notification
+                      //         size="26"
+                      //         color="red"
+                      //         className=" animate-bounce"
+                      //       />
+                      //     </div>
+                      //     <div className="p-2">
+                      //       <div className="flex items-center gap-2">
+                      //         <ArrowRight
+                      //           size="16"
+                      //           color="red"
+                      //           className="animate-bounce"
+                      //         />
+                      //         <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
+                      //           {dataLang?.import_err_stages ||
+                      //             "import_err_stages"}
+                      //         </h2>
+                      //       </div>
+                      //       <div className="flex items-center gap-2">
+                      //         <ArrowRight
+                      //           size="16"
+                      //           color="red"
+                      //           className="animate-bounce"
+                      //         />
+                      //         <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
+                      //           {dataLang?.import_err_stages_two ||
+                      //             "import_err_stages_two"}
+                      //         </h2>
+                      //       </div>
+                      //       <div className="flex items-center gap-2">
+                      //         <ArrowRight
+                      //           size="16"
+                      //           color="red"
+                      //           className="animate-bounce"
+                      //         />
+                      //         <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
+                      //           {dataLang?.import_err_stages_there ||
+                      //             "import_err_stages_there"}
+                      //         </h2>
+                      //       </div>
+                      //       <div className="flex items-center gap-2">
+                      //         <ArrowRight
+                      //           size="16"
+                      //           color="red"
+                      //           className="animate-bounce"
+                      //         />
+                      //         <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
+                      //           {dataLang?.import_err_stages_for ||
+                      //             "import_err_stages_for"}
+                      //         </h2>
+                      //       </div>
+                      //       <div className="flex items-center gap-2">
+                      //         <ArrowRight
+                      //           size="16"
+                      //           color="red"
+                      //           className="animate-bounce"
+                      //         />
+                      //         <h2 className="text-slate-700 font-semibold 3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm">
+                      //           {dataLang?.import_err_stages_five ||
+                      //             "import_err_stages_five"}
+                      //         </h2>
+                      //       </div>
+                      //     </div>
+                      //   </div>
+                      // </React.Fragment>
+                      <SampleImport dataLang={dataLang} tabPage={tabPage} />
+                    ))}
                 </div>
                 <div className="col-span-2"></div>
                 <div className="col-span-2"></div>
                 <div className="col-span-4 -mt-2">
-                  {tabPage != 5 && (
+                  {tabPage != 5 && tabPage != 6 && (
                     <ParentControls
                       listData={listData}
                       onLoadingListData={onLoadingListData}
@@ -2178,7 +2187,9 @@ const Index = (props) => {
                       dataSuccess={dataSuccess}
                       totalFalse={totalFalse}
                       totalSuccessStages={totalSuccessStages}
+                      totalSuccessBom={totalSuccessBom}
                       dataFailStages={dataFailStages}
+                      dataFailBom={dataFailBom}
                       dataLang={dataLang}
                       formatNumber={formatNumber}
                     />
@@ -2281,7 +2292,7 @@ const Index = (props) => {
                 )}
                 <div className="col-span-4"></div>
                 <div className="col-span-4 mt-4 grid-cols-2 grid gap-2.5">
-                  {tabPage != 5 ? (
+                  {tabPage != 5 && tabPage != 6 ? (
                     <div className="flex items-center  space-x-2 rounded p-2 hover:bg-gray-200 bg-gray-100 cursor-pointer btn-animation hover:scale-[1.02]">
                       <input
                         type="checkbox"

@@ -29,6 +29,7 @@ import { NumericFormat } from "react-number-format";
 import Link from "next/link";
 import moment from "moment/moment";
 import Popup from "reactjs-popup";
+import { debounce } from "lodash";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -53,8 +54,9 @@ const Index = (props) => {
   const [onFetchingDetail, sOnFetchingDetail] = useState(false);
   const [onFetchingCondition, sOnFetchingCondition] = useState(false);
   const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
-  const [onFetchingSupplier, sOnFetchingSupplier] = useState(false);
+
   const [onFetchingWarehouser, sOnFetchingWarehouse] = useState(false);
+  const [onFetchingUnit, sOnFetchingUnit] = useState(false);
   const [onLoading, sOnLoading] = useState(false);
   const [onLoadingChild, sOnLoadingChild] = useState(false);
 
@@ -72,6 +74,7 @@ const Index = (props) => {
   const [dataBranch, sDataBranch] = useState([]);
   const [dataItems, sDataItems] = useState([]);
   const [warehouse, sDataWarehouse] = useState([]);
+  const [dataUnit, sDataWareUnit] = useState([]);
   const [dataTasxes, sDataTasxes] = useState([]);
 
   const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
@@ -83,7 +86,6 @@ const Index = (props) => {
   const [qtyHouse, sQtyHouse] = useState(null);
   const [survive, sSurvive] = useState(null);
 
-  const [idSupplier, sIdSupplier] = useState(null);
   const [idTreatment, sIdTreatment] = useState(null);
   const [idBranch, sIdBranch] = useState(null);
   const [load, sLoad] = useState(false);
@@ -94,7 +96,8 @@ const Index = (props) => {
   const [errTreatment, sErrTreatment] = useState(false);
   const [errBranch, sErrBranch] = useState(false);
   const [errWarehouse, sErrWarehouse] = useState(false);
-  const [errAmount, sErrAmount] = useState(false);
+  const [errUnit, sErrUnit] = useState(false);
+  const [errQty, sErrQty] = useState(false);
   const [errSurvive, sErrSurvive] = useState(false);
   const [errLot, sErrLot] = useState(false);
   const [errSerial, sErrSerial] = useState(false);
@@ -126,38 +129,21 @@ const Index = (props) => {
         }
       }
     );
-    Axios(
-      "GET",
-      "/api_web/Api_tax/tax?csrf_protection=true",
-      {},
-      (err, response) => {
-        if (!err) {
-          var { rResult } = response.data;
-          sDataTasxes(
-            rResult?.map((e) => ({
-              label: e.name,
-              value: e.id,
-              tax_rate: e.tax_rate,
-            }))
-          );
-          sOnLoading(false);
-        }
-      }
-    );
-    Axios(
-      "GET",
-      "/api_web/Api_return_supplier/treatment_methods/?csrf_protection=true",
-      {},
-      (err, response) => {
-        if (!err) {
-          var data = response.data;
-          sData_Treatmentr(
-            data?.map((e) => ({ label: dataLang[e?.name], value: e?.id }))
-          );
-          sOnLoading(false);
-        }
-      }
-    );
+
+    // Axios(
+    //   "GET",
+    //   "/api_web/Api_return_supplier/treatment_methods/?csrf_protection=true",
+    //   {},
+    //   (err, response) => {
+    //     if (!err) {
+    //       var data = response.data;
+    //       sData_Treatmentr(
+    //         data?.map((e) => ({ label: dataLang[e?.name], value: e?.id }))
+    //       );
+    //       sOnLoading(false);
+    //     }
+    //   }
+    // );
 
     sOnFetching(false);
   };
@@ -289,10 +275,7 @@ const Index = (props) => {
           sQtyHouse(checkQty?.qty);
           sCode(rResult?.code);
           sIdBranch({ label: rResult?.branch_name, value: rResult?.branch_id });
-          sIdSupplier({
-            label: rResult?.supplier_name,
-            value: rResult?.supplier_id,
-          });
+
           sIdTreatment({
             label: dataLang[rResult?.treatment_methods_name],
             value: rResult?.treatment_methods,
@@ -325,10 +308,9 @@ const Index = (props) => {
   const _ServerFetching_ItemsAll = () => {
     Axios(
       "GET",
-      "/api_web/Api_return_supplier/getImportItems/?csrf_protection=true",
+      "/api_web/Api_stock/getSemiItems/?csrf_protection=true",
       {
         params: {
-          "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
           "filter[branch_id]": idBranch ? idBranch?.value : null,
         },
       },
@@ -342,67 +324,11 @@ const Index = (props) => {
     sOnFetchingItemsAll(false);
   };
 
-  const _ServerFetching_Supplier = () => {
-    sOnLoading(true);
-    Axios(
-      "GET",
-      "/api_web/api_supplier/supplier/?csrf_protection=true",
-      {
-        params: {
-          "filter[branch_id]": idBranch != null ? idBranch.value : null,
-        },
-      },
-      (err, response) => {
-        if (!err) {
-          var { rResult } = response.data;
-          sDataSupplier(rResult?.map((e) => ({ label: e.name, value: e.id })));
-          sOnLoading(false);
-        }
-      }
-    );
-    sOnFetchingSupplier(false);
-  };
-
-  useEffect(() => {
-    (idBranch === null && sDataSupplier([])) || sIdSupplier(null);
-  }, []);
-
   const _HandleChangeInput = (type, value) => {
     if (type == "code") {
       sCode(value.target.value);
     } else if (type === "date") {
       sDate(moment(value.target.value).format("YYYY-MM-DD HH:mm:ss"));
-    } else if (type === "supplier" && idSupplier != value) {
-      if (listData?.length > 0) {
-        if (type === "supplier" && idSupplier != value) {
-          Swal.fire({
-            title: `${
-              dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"
-            }`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#296dc1",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${dataLang?.aler_yes}`,
-            cancelButtonText: `${dataLang?.aler_cancel}`,
-          }).then((result) => {
-            if (result.isConfirmed) {
-              sDataItems([]);
-              sDataWarehouse([]);
-              sListData([]);
-              sIdSupplier(value);
-            } else {
-              sIdSupplier({ ...idSupplier });
-            }
-          });
-        }
-      } else {
-        sIdSupplier(null);
-      }
-      if (listData.length === 0) {
-        sIdSupplier(value);
-        sDataItems([]);
-      }
     } else if (type === "treatment") {
       sIdTreatment(value);
     } else if (type === "note") {
@@ -425,7 +351,6 @@ const Index = (props) => {
               sDataItems([]);
               sDataWarehouse([]);
               sListData([]);
-              sIdSupplier(null);
               sIdBranch(value);
             } else {
               sIdBranch({ ...idBranch });
@@ -434,33 +359,10 @@ const Index = (props) => {
         }
       } else {
         sIdBranch(value);
-        sIdSupplier(null);
         sKhotong(null);
         if (value == null) {
           sDataSupplier([]);
         }
-      }
-    } else if (type == "thuetong") {
-      sThuetong(value);
-      if (listData?.length > 0) {
-        const newData = listData.map((e) => {
-          const newChild = e?.child.map((ce) => {
-            return { ...ce, tax: value };
-          });
-          return { ...e, child: newChild };
-        });
-        sListData(newData);
-      }
-    } else if (type == "chietkhautong") {
-      sChietkhautong(value?.value);
-      if (listData?.length > 0) {
-        const newData = listData.map((e) => {
-          const newChild = e?.child.map((ce) => {
-            return { ...ce, chietKhau: value?.value };
-          });
-          return { ...e, child: newChild };
-        });
-        sListData(newData);
       }
     }
   };
@@ -481,12 +383,15 @@ const Index = (props) => {
     const hasNullKho = listData.some((item) =>
       item.child?.some((childItem) => childItem.kho === null)
     );
-    const hasNullAmount = listData.some((item) =>
+    const hasNullUnit = listData.some((item) =>
+      item.child?.some((childItem) => childItem.donViTinh === null)
+    );
+    const hasNullQty = listData.some((item) =>
       item.child?.some(
         (childItem) =>
-          childItem.amount === null ||
-          childItem.amount === "" ||
-          childItem.amount == 0
+          childItem.soluongxuat === null ||
+          childItem.soluongxuat === "" ||
+          childItem.soluongxuat == 0
       )
     );
     const isTotalExceeded = listData?.some(
@@ -501,33 +406,33 @@ const Index = (props) => {
 
     const isEmpty = listData?.length === 0 ? true : false;
     if (
-      idSupplier == null ||
       idBranch == null ||
-      idTreatment == null ||
       hasNullKho ||
-      hasNullAmount ||
-      isTotalExceeded ||
+      hasNullUnit ||
+      hasNullQty ||
+      // isTotalExceeded ||
       isEmpty
     ) {
-      idSupplier == null && sErrSupplier(true);
       idBranch == null && sErrBranch(true);
-      idTreatment == null && sErrTreatment(true);
       hasNullKho && sErrWarehouse(true);
-      hasNullAmount && sErrAmount(true);
+      hasNullUnit && sErrUnit(true);
+      hasNullQty && sErrQty(true);
       if (isEmpty) {
         Toast.fire({
           icon: "error",
           title: `Chưa nhập thông tin mặt hàng`,
         });
-      } else if (isTotalExceeded) {
-        sErrSurvive(true);
-        Toast.fire({
-          icon: "error",
-          title: `${
-            dataLang?.returns_err_QtyNotQexceed || "returns_err_QtyNotQexceed"
-          }`,
-        });
-      } else {
+      }
+      // else if (isTotalExceeded) {
+      //   sErrSurvive(true);
+      //   Toast.fire({
+      //     icon: "error",
+      //     title: `${
+      //       dataLang?.returns_err_QtyNotQexceed || "returns_err_QtyNotQexceed"
+      //     }`,
+      //   });
+      // }
+      else {
         Toast.fire({
           icon: "error",
           title: `${dataLang?.required_field_null}`,
@@ -536,17 +441,14 @@ const Index = (props) => {
     } else {
       sErrSurvive(false);
       sErrWarehouse(false);
-      sErrAmount(false);
+      sErrUnit(false);
+      sErrQty(false);
       sOnSending(true);
     }
   };
   useEffect(() => {
     sErrDate(false);
   }, [date != null]);
-
-  useEffect(() => {
-    sErrSupplier(false);
-  }, [idSupplier != null]);
 
   useEffect(() => {
     sErrBranch(false);
@@ -560,7 +462,7 @@ const Index = (props) => {
     sOnLoadingChild(true);
     Axios(
       "GET",
-      `/api_web/Api_import/quantityStock/${idParen}?csrf_protection=true`,
+      `/api_web/Api_stock/quantityStock/${idParen}?csrf_protection=true`,
       {
         params: {
           "filter[branch_id]": idBranch?.value,
@@ -583,6 +485,28 @@ const Index = (props) => {
     );
     sOnFetchingWarehouse(false);
   };
+  const _ServerFetching_Unit = () => {
+    sOnLoadingChild(true);
+    Axios(
+      "GET",
+      `/api_web/Api_stock/itemUnit/${idParen}?csrf_protection=true`,
+      {},
+      (err, response) => {
+        if (!err) {
+          var result = response.data;
+          sDataWareUnit(
+            result?.map((e) => ({
+              label: e?.unit,
+              value: e?.unit_id,
+              coefficient: e?.coefficient,
+            }))
+          );
+          sOnLoadingChild(false);
+        }
+      }
+    );
+    sOnFetchingUnit(false);
+  };
 
   useEffect(() => {
     router.query && sOnFetching(true);
@@ -591,124 +515,39 @@ const Index = (props) => {
   useEffect(() => {
     onFetchingWarehouser && _ServerFetching_Warehouse();
   }, [onFetchingWarehouser]);
+  useEffect(() => {
+    onFetchingUnit && _ServerFetching_Unit();
+  }, [onFetchingUnit]);
 
   useEffect(() => {
     idParen != null && sOnFetchingWarehouse(true);
+    idParen != null && sOnFetchingUnit(true);
   }, [idParen]);
-
-  useEffect(() => {
-    onFetchingSupplier && _ServerFetching_Supplier();
-  }, [onFetchingSupplier]);
-  useEffect(() => {
-    idBranch != null && sOnFetchingSupplier(true);
-  }, [idBranch]);
 
   useEffect(() => {
     onFetchingItemsAll && _ServerFetching_ItemsAll();
   }, [onFetchingItemsAll]);
 
   useEffect(() => {
-    idSupplier != null && sOnFetchingItemsAll(true);
-  }, [idSupplier]);
-
-  const taxOptions = [
-    { label: "Miễn thuế", value: "0", tax_rate: "0" },
-    ...dataTasxes,
-  ];
+    idBranch != null && sOnFetchingItemsAll(true);
+  }, [idBranch]);
 
   const formatNumber = (number) => {
     const integerPart = Math.floor(number);
     return integerPart.toLocaleString("en");
   };
 
-  const tinhTongTien = (option) => {
-    const tongTien = option?.reduce((accumulator, item) => {
-      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-        const product = Number(childItem?.price) * Number(childItem?.amount);
-        return childAccumulator + product;
-      }, 0);
-      return accumulator + childTotal;
-    }, 0);
-
-    const tienChietKhau = option?.reduce((accumulator, item) => {
-      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-        const product =
-          Number(childItem?.price) *
-          (Number(childItem?.chietKhau) / 100) *
-          Number(childItem?.amount);
-        return childAccumulator + product;
-      }, 0);
-      return accumulator + childTotal;
-    }, 0);
-
-    const tongTienSauCK = option?.reduce((accumulator, item) => {
-      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-        const product =
-          Number(childItem?.priceAfter) * Number(childItem?.amount);
-        return childAccumulator + product;
-      }, 0);
-      return accumulator + childTotal;
-    }, 0);
-
-    const tienThue = option?.reduce((accumulator, item) => {
-      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-        const product =
-          Number(childItem?.priceAfter) *
-          (isNaN(childItem?.tax?.tax_rate)
-            ? 0
-            : Number(childItem?.tax?.tax_rate) / 100) *
-          Number(childItem?.amount);
-        return childAccumulator + product;
-      }, 0);
-      return accumulator + childTotal;
-    }, 0);
-
-    const tongThanhTien = option?.reduce((accumulator, item) => {
-      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-        const product =
-          Number(childItem?.priceAfter) *
-          (1 + Number(childItem?.tax?.tax_rate) / 100) *
-          Number(childItem?.amount);
-        return childAccumulator + product;
-      }, 0);
-      return accumulator + childTotal;
-    }, 0);
-
-    return {
-      tongTien: tongTien || 0,
-      tienChietKhau: tienChietKhau || 0,
-      tongTienSauCK: tongTienSauCK || 0,
-      tienThue: tienThue || 0,
-      tongThanhTien: tongThanhTien || 0,
-    };
-  };
-
-  const [tongTienState, setTongTienState] = useState({
-    tongTien: 0,
-    tienChietKhau: 0,
-    tongTienSauCK: 0,
-    tienThue: 0,
-    tongThanhTien: 0,
-  });
-
-  useEffect(() => {
-    const tongTien = tinhTongTien(listData);
-    setTongTienState(tongTien);
-  }, [listData]);
-
   const _ServerSending = () => {
     var formData = new FormData();
     formData.append("code", code);
     formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
     formData.append("branch_id", idBranch?.value);
-    formData.append("supplier_id", idSupplier?.value);
-    formData.append("treatment_methods", idTreatment?.value);
     formData.append("note", note);
     listData.forEach((item, index) => {
       formData.append(`items[${index}][id]`, item?.id);
       formData.append(`items[${index}][item]`, item?.matHang?.value);
-      // formData.append(`items[${index}][purchase_order_item_id]`, item?.matHang?.e?.purchase_order_item_id);
       item?.child?.forEach((childItem, childIndex) => {
+        console.log("ghgigi", childItem);
         formData.append(
           `items[${index}][child][${childIndex}][id]`,
           childItem?.id
@@ -721,35 +560,20 @@ const Index = (props) => {
             );
         }
         formData.append(
-          `items[${index}][child][${childIndex}][quantity]`,
-          childItem?.amount
-        );
-        // formData.append(`items[${index}][child][${childIndex}][serial]`, childItem?.serial === null ? "" : childItem?.serial);
-        // formData.append(`items[${index}][child][${childIndex}][lot]`, childItem?.lot === null ? "" : childItem?.lot);
-        // formData.append(`items[${index}][child][${childIndex}][expiration_date]`, childItem?.date === null ? "" : moment(childItem?.date).format("YYYY-MM-DD HH:mm:ss"));
-        formData.append(
-          `items[${index}][child][${childIndex}][unit_name]`,
-          childItem?.donViTinh
+          `items[${index}][child][${childIndex}][unit]`,
+          childItem?.donViTinh[0].value
         );
         formData.append(
           `items[${index}][child][${childIndex}][note]`,
-          childItem?.note
-        );
-        formData.append(
-          `items[${index}][child][${childIndex}][tax_id]`,
-          childItem?.tax?.value
-        );
-        formData.append(
-          `items[${index}][child][${childIndex}][price]`,
-          childItem?.price
+          childItem?.note ? childItem?.note : ""
         );
         formData.append(
           `items[${index}][child][${childIndex}][location_warehouses_id]`,
           childItem?.kho?.value
         );
         formData.append(
-          `items[${index}][child][${childIndex}][discount_percent]`,
-          childItem?.chietKhau
+          `items[${index}][child][${childIndex}][quantity]`,
+          childItem?.soluongxuat
         );
       });
     });
@@ -757,8 +581,8 @@ const Index = (props) => {
       "POST",
       `${
         id
-          ? `/api_web/Api_return_supplier/returnSupplier/${id}?csrf_protection=true`
-          : "/api_web/Api_return_supplier/returnSupplier/?csrf_protection=true"
+          ? `/api_web/Api_stock/exportProduction/?csrf_protection=true`
+          : `/api_web/Api_stock/exportProduction/?csrf_protection=true`
       }`,
       {
         data: formData,
@@ -774,24 +598,16 @@ const Index = (props) => {
             });
             sCode("");
             sStartDate(new Date());
-            sIdSupplier(null);
+
             sIdBranch(null);
             sIdTreatment(null);
             sNote("");
             sErrBranch(false);
             sErrDate(false);
-            sErrTreatment(false);
-            sErrSupplier(false);
             //new
             sListData([]);
-            router.push("/purchase_order/returns?tab=all");
+            router.push("/manufacture/production_warehouse?tab=all");
           } else {
-            // if(listData?.length == 0){
-            //   Toast.fire({
-            //     icon: 'error',
-            //     title: `Chưa nhập thông tin mặt hàng`
-            // })
-            //  }
             Toast.fire({
               icon: "error",
               title: `${dataLang[message]}`,
@@ -831,23 +647,22 @@ const Index = (props) => {
           soluongdt: Number(value?.e?.quantity_returned),
           soluongdn: Number(value?.e?.quantity_create),
           kho: null,
-          donViTinh: value?.e?.unit_name,
-          price: Number(value?.e?.price),
-          // amount: Number(value?.e?.quantity_create) || 1,
+          donViTinh: null,
+          dataWarehouse: value?.e?.warehouse.map((e) => ({
+            label: e?.name,
+            value: e?.id,
+            warehouse_name: e?.warehouse_name,
+            qty: e?.quantity,
+          })),
+          dataUnit: value?.e?.unit.map((e) => ({
+            label: e?.unit,
+            value: e?.id,
+            coefficient: e?.coefficient,
+          })),
+          soluongxuat: null,
+          giatriquydoi: null,
+          soluongquydoi: null,
           amount: null,
-          chietKhau: chietkhautong
-            ? chietkhautong
-            : Number(value?.e?.discount_percent),
-          priceAfter: Number(value?.e?.price_after_discount),
-          tax: thuetong
-            ? thuetong
-            : {
-                label:
-                  value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
-                value: value?.e?.tax_id,
-                tax_rate: value?.e?.tax_rate,
-              },
-          thanhTien: Number(value?.e?.amount),
           note: value?.e?.note,
         };
 
@@ -884,27 +699,32 @@ const Index = (props) => {
                 dataProductExpiry?.is_enable === "0" &&
                 true),
             kho: null,
-            donViTinh: value?.e?.unit_name,
+            dataWarehouse: value?.e?.warehouse.map((e) => ({
+              label: e?.name,
+              value: e?.id,
+              warehouse_name: e?.warehouse_name,
+              qty: e?.quantity,
+            })),
+            // donViTinh: null,
+            donViTinh: [
+              {
+                label: value?.e?.unit[0].unit,
+                value: value?.e?.unit[0].id,
+                coefficient: value?.e?.unit[0].coefficient,
+              },
+            ],
+            dataUnit: value?.e?.unit.map((e) => ({
+              label: e?.unit,
+              value: e?.id,
+              coefficient: e?.coefficient,
+            })),
             soluongcl: Number(value?.e?.quantity_left),
             soluongdt: Number(value?.e?.quantity_returned),
             soluongdn: Number(value?.e?.quantity_create),
-            price: Number(value?.e?.price),
+            soluongxuat: null,
+            giatriquydoi: value?.e?.unit[0].coefficient,
+            soluongquydoi: null,
             amount: Number(value?.e?.quantity_left),
-            chietKhau: chietkhautong
-              ? chietkhautong
-              : Number(value?.e?.discount_percent),
-            priceAfter: Number(value?.e?.price_after_discount),
-            tax: thuetong
-              ? thuetong
-              : {
-                  label:
-                    value?.e?.tax_name == null
-                      ? "Miễn thuế"
-                      : value?.e?.tax_name,
-                  value: value?.e?.tax_id,
-                  tax_rate: value?.e?.tax_rate,
-                },
-            thanhTien: Number(value?.e?.amount),
             note: value?.e?.note,
           },
         ],
@@ -919,7 +739,6 @@ const Index = (props) => {
       });
     }
   };
-
   const _HandleDeleteChild = (parentId, childId) => {
     const newData = listData
       .map((e) => {
@@ -947,122 +766,32 @@ const Index = (props) => {
   };
 
   const _HandleChangeChild = (parentId, childId, type, value) => {
-    const newData = listData.map((e) => {
+    let newData = [...listData];
+    newData = newData.map((e) => {
       if (e?.id === parentId) {
         const newChild = e.child?.map((ce) => {
-          var index = e.child.findIndex((x) => x?.id === childId);
           if (ce?.id === childId) {
-            if (type === "amount") {
-              sErrSurvive(false);
-              ce.amount = Number(value?.value);
-              const totalSoLuong = e.child.reduce(
-                (sum, opt) => sum + parseFloat(opt?.amount || 0),
-                0
-              );
-              if (totalSoLuong > qtyHouse) {
-                e.child.forEach((opt, optIndex) => {
-                  const currentValue = ce.amount; // Lưu giá trị hiện tại
-                  ce.amount = "";
-                  if (optIndex === index) {
-                    ce.amount = currentValue; // Gán lại giá trị hiện tại
-                  }
-                });
-                Toast.fire({
-                  title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                    qtyHouse
-                  )} số lượng còn lại`,
-                  icon: "error",
-                  confirmButtonColor: "#296dc1",
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: dataLang?.aler_yes,
-                  timer: 3000,
-                });
-                ce.amount = "" || null;
+            if (type === "soluongxuat") {
+              const newSoluongxuat = Number(value?.value);
+              const newSoluongquydoi =
+                newSoluongxuat * Number(ce?.giatriquydoi);
+              if (newSoluongquydoi > +ce?.kho?.qty) {
+                handleQuantityError(ce?.kho?.qty);
                 setTimeout(() => {
                   sLoad(true);
                 }, 500);
                 setTimeout(() => {
                   sLoad(false);
                 }, 1000);
-                return { ...ce };
+                return { ...ce, soluongxuat: null, soluongquydoi: null };
               } else {
                 sLoad(false);
-                return { ...ce };
+                return {
+                  ...ce,
+                  soluongxuat: newSoluongxuat,
+                  soluongquydoi: newSoluongquydoi,
+                };
               }
-            } else if (type === "increase") {
-              sErrSurvive(false);
-
-              const totalSoLuong = e.child.reduce(
-                (sum, opt) => sum + parseFloat(opt?.amount || 0),
-                0
-              );
-
-              if (ce?.id === childId && totalSoLuong == qtyHouse) {
-                Toast.fire({
-                  title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                    qtyHouse
-                  )} số lượng còn lại`,
-                  icon: "error",
-                  confirmButtonColor: "#296dc1",
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: dataLang?.aler_yes,
-                  timer: 3000,
-                });
-                return { ...ce };
-              } else if (
-                ce?.id === childId &&
-                totalSoLuong == Number(ce?.kho?.qty)
-              ) {
-                Toast.fire({
-                  title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                    Number(ce?.kho?.qty)
-                  )} số lượng còn lại`,
-                  icon: "error",
-                  confirmButtonColor: "#296dc1",
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: dataLang?.aler_yes,
-                  timer: 3000,
-                });
-                return { ...ce };
-              } else if (
-                ce?.id === childId &&
-                totalSoLuong > Number(ce?.kho?.qty)
-              ) {
-                Toast.fire({
-                  title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                    Number(ce?.kho?.qty)
-                  )} số lượng tồn`,
-                  icon: "error",
-                  confirmButtonColor: "#296dc1",
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: dataLang?.aler_yes,
-                  timer: 3000,
-                });
-                return { ...ce };
-              } else if (ce?.id === childId && totalSoLuong > qtyHouse) {
-                Toast.fire({
-                  title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                    qtyHouse
-                  )} số lượng tồn`,
-                  icon: "error",
-                  confirmButtonColor: "#296dc1",
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: dataLang?.aler_yes,
-                  timer: 3000,
-                });
-                return { ...ce };
-              } else {
-                return { ...ce, amount: Number(Number(ce?.amount) + 1) };
-              }
-            } else if (type === "decrease") {
-              sErrSurvive(false);
-              return { ...ce, amount: Number(Number(ce?.amount) - 1) };
-            } else if (type === "price") {
-              return { ...ce, price: Number(value?.value) };
-            } else if (type === "chietKhau") {
-              return { ...ce, chietKhau: Number(value?.value) };
-            } else if (type === "note") {
-              return { ...ce, note: value?.target.value };
             } else if (type === "kho") {
               const checkKho = e?.child
                 ?.map((house) => house)
@@ -1070,29 +799,56 @@ const Index = (props) => {
               sSurvive(Number(value?.qty));
               sErrSurvive(false);
               if (checkKho) {
-                Toast.fire({
-                  title: `${
-                    dataLang?.returns_err_Warehouse || "returns_err_Warehouse"
-                  }`,
-                  icon: "error",
-                });
+                handleKhoError();
                 return { ...ce };
               } else {
                 return { ...ce, kho: value };
               }
-            } else if (type === "tax") {
-              return { ...ce, tax: value };
+            } else if (type === "donViTinh") {
+              return {
+                ...ce,
+                donViTinh: value,
+                giatriquydoi: Number(value?.coefficient),
+              };
+            } else if (type === "note") {
+              return { ...ce, note: value?.target.value };
             }
-          } else {
-            return ce;
           }
+          return ce;
         });
         return { ...e, child: newChild };
       } else {
         return e;
       }
     });
-    sListData([...newData]);
+    sListData(newData);
+    // sListData([...newData]);
+  };
+
+  const handleQuantityError = (e) => {
+    Toast.fire({
+      title: `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+        e
+      )} số lượng tồn kho`,
+      icon: "error",
+      confirmButtonColor: "#296dc1",
+      cancelButtonColor: "#d33",
+      confirmButtonText: dataLang?.aler_yes,
+      timer: 3000,
+    });
+    setTimeout(() => {
+      sLoad(true);
+    }, 500);
+    setTimeout(() => {
+      sLoad(false);
+    }, 1000);
+  };
+
+  const handleKhoError = () => {
+    Toast.fire({
+      title: `${"Kho xuất và vị trí xuất đã được chọn"}`,
+      icon: "error",
+    });
   };
 
   const _HandleChangeValue = (parentId, value) => {
@@ -1108,6 +864,12 @@ const Index = (props) => {
               {
                 id: uuidv4(),
                 kho: khotong ? khotong : null,
+                dataWarehouse: value?.e?.warehouse.map((e) => ({
+                  label: e?.name,
+                  value: e?.id,
+                  warehouse_name: e?.warehouse_name,
+                  qty: e?.quantity,
+                })),
                 disabledDate:
                   (value?.e?.text_type === "material" &&
                     dataMaterialExpiry?.is_enable === "1" &&
@@ -1121,27 +883,26 @@ const Index = (props) => {
                   (value?.e?.text_type === "products" &&
                     dataProductExpiry?.is_enable === "0" &&
                     true),
-                donViTinh: value?.e?.unit_name,
-                price: value?.e?.price,
+                // donViTinh: null,
+                donViTinh: [
+                  {
+                    label: value?.e?.unit[0].unit,
+                    value: value?.e?.unit[0].id,
+                    coefficient: value?.e?.unit[0].coefficient,
+                  },
+                ],
+                dataUnit: value?.e?.unit.map((e) => ({
+                  label: e?.unit,
+                  value: e?.id,
+                  coefficient: e?.coefficient,
+                })),
                 amount: Number(value?.e?.quantity_create),
                 soluongcl: Number(value?.e?.quantity_left),
                 soluongdt: Number(value?.e?.quantity_returned),
                 soluongdn: Number(value?.e?.quantity_create),
-                chietKhau: chietkhautong
-                  ? chietkhautong
-                  : Number(value?.e?.discount_percent),
-                priceAfter: Number(value?.e?.price_after_discount),
-                tax: thuetong
-                  ? thuetong
-                  : {
-                      label:
-                        value?.e?.tax_name == null
-                          ? "Miễn thuế"
-                          : value?.e?.tax_name,
-                      value: value?.e?.tax_id,
-                      tax_rate: value?.e?.tax_rate,
-                    },
-                thanhTien: Number(value?.e?.amount),
+                soluongxuat: null,
+                giatriquydoi: value?.e?.unit[0].coefficient,
+                soluongquydoi: null,
                 note: value?.e?.note,
               },
             ],
@@ -1167,29 +928,25 @@ const Index = (props) => {
         <title>
           {id
             ? dataLang?.returns_title_edit || "returns_title_edit"
-            : dataLang?.returns_title_child || "returns_title_child"}
+            : "Thêm mới xuất kho"}
         </title>
       </Head>
       <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
         <div className="h-[97%] space-y-3 overflow-hidden">
           <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-            <h6 className="text-[#141522]/40">
-              {dataLang?.returns_title || "returns_title"}
-            </h6>
+            <h6 className="text-[#141522]/40">{"Xuất kho"}</h6>
             <span className="text-[#141522]/40">/</span>
             <h6>
               {id
                 ? dataLang?.returns_title_edit || "returns_title_edit"
-                : dataLang?.returns_title_child || "returns_title_child"}
+                : "Thêm mới xuất kho"}
             </h6>
           </div>
           <div className="flex justify-between items-center">
-            <h2 className="xl:text-2xl text-xl ">
-              {dataLang?.returns_title || "returns_title"}
-            </h2>
+            <h2 className="xl:text-2xl text-xl ">{"Xuất kho sản xuất"}</h2>
             <div className="flex justify-end items-center">
               <button
-                onClick={() => router.push("/purchase_order/returns")}
+                onClick={() => router.push("/manufacture/production_warehouse")}
                 className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
               >
                 {dataLang?.import_comeback || "import_comeback"}
@@ -1203,7 +960,7 @@ const Index = (props) => {
                 {dataLang?.purchase_order_detail_general_informatione ||
                   "purchase_order_detail_general_informatione"}
               </h2>
-              <div className="grid grid-cols-10  gap-3 items-center mt-2">
+              <div className="grid grid-cols-8  gap-3 items-center mt-2">
                 <div className="col-span-2">
                   <label className="text-[#344054] font-normal text-sm mb-1 ">
                     {dataLang?.import_code_vouchers || "import_code_vouchers"}{" "}
@@ -1270,6 +1027,9 @@ const Index = (props) => {
                     closeMenuOnSelect={true}
                     hideSelectedOptions={false}
                     placeholder={dataLang?.import_branch || "import_branch"}
+                    noOptionsMessage={() =>
+                      dataLang?.returns_nodata || "returns_nodata"
+                    }
                     className={`${
                       errBranch ? "border-red-500" : "border-transparent"
                     } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
@@ -1314,80 +1074,14 @@ const Index = (props) => {
                     </label>
                   )}
                 </div>
-                <div className="col-span-2">
-                  <label className="text-[#344054] font-normal text-sm mb-1 ">
-                    {dataLang?.import_supplier || "import_supplier"}{" "}
-                    <span className="text-red-500">*</span>
-                  </label>
-                  <Select
-                    options={dataSupplier}
-                    onChange={_HandleChangeInput.bind(this, "supplier")}
-                    value={idSupplier}
-                    isLoading={onLoading}
-                    placeholder={dataLang?.import_supplier || "import_supplier"}
-                    hideSelectedOptions={false}
-                    isClearable={true}
-                    className={`${
-                      errSupplier ? "border-red-500" : "border-transparent"
-                    } placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                    isSearchable={true}
-                    noOptionsMessage={() =>
-                      dataLang?.returns_nodata || "returns_nodata"
-                    }
-                    menuPortalTarget={document.body}
-                    closeMenuOnSelect={true}
-                    style={{
-                      border: "none",
-                      boxShadow: "none",
-                      outline: "none",
-                    }}
-                    theme={(theme) => ({
-                      ...theme,
-                      colors: {
-                        ...theme.colors,
-                        primary25: "#EBF5FF",
-                        primary50: "#92BFF7",
-                        primary: "#0F4F9E",
-                      },
-                    })}
-                    styles={{
-                      placeholder: (base) => ({
-                        ...base,
-                        color: "#cbd5e1",
-                      }),
-                      menuPortal: (base) => ({
-                        ...base,
-                        zIndex: 20,
-                      }),
-                      control: (base, state) => ({
-                        ...base,
-                        boxShadow: "none",
-                        padding: "2.7px",
-                        ...(state.isFocused && {
-                          border: "0 0 0 1px #92BFF7",
-                        }),
-                      }),
-                    }}
-                  />
-                  {errSupplier && (
-                    <label className="text-sm text-red-500">
-                      {dataLang?.purchase_order_errSupplier ||
-                        "purchase_order_errSupplier"}
-                    </label>
-                  )}
-                </div>
                 <div className="col-span-2 ">
                   <label className="text-[#344054] font-normal text-sm mb-1 ">
-                    {dataLang?.returns_treatment_methods ||
-                      "returns_treatment_methods"}{" "}
-                    <span className="text-red-500">*</span>
+                    {"Số lệnh sản xuất chi tiết"}
                   </label>
                   <Select
-                    options={data_Treatmentr}
+                    options={[]}
                     onChange={_HandleChangeInput.bind(this, "treatment")}
-                    isLoading={
-                      idBranch || idSupplier != null ? false : onLoading
-                    }
+                    isLoading={idBranch != null ? false : onLoading}
                     value={idTreatment}
                     isClearable={true}
                     noOptionsMessage={() =>
@@ -1395,13 +1089,8 @@ const Index = (props) => {
                     }
                     closeMenuOnSelect={true}
                     hideSelectedOptions={false}
-                    placeholder={
-                      dataLang?.returns_treatment_methods ||
-                      "returns_treatment_methods"
-                    }
-                    className={`${
-                      errTreatment ? "border-red-500" : "border-transparent"
-                    } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                    placeholder={"Số lệnh sản xuất chi tiết"}
+                    className={`${"border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                     isSearchable={true}
                     style={{
                       border: "none",
@@ -1436,12 +1125,6 @@ const Index = (props) => {
                       }),
                     }}
                   />
-                  {errTreatment && (
-                    <label className="text-sm text-red-500">
-                      {dataLang?.returns_treatment_methods_err ||
-                        "returns_treatment_methods_err"}
-                    </label>
-                  )}
                 </div>
               </div>
             </div>
@@ -1452,37 +1135,28 @@ const Index = (props) => {
             </div>
           </div>
           <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10">
-            <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2 text-center truncate font-[400]">
+            <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-3 text-center truncate font-[400]">
               {dataLang?.import_from_items || "import_from_items"}
             </h4>
-            <div className="col-span-10">
-              <div className="grid grid-cols-11">
-                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]">
-                  {dataLang?.returns_point || "returns_point"}
+            <div className="col-span-9">
+              <div className="grid grid-cols-7">
+                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
+                  {"Kho xuất - Vị trí xuất"}
                 </h4>
                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                   {"ĐVT"}
                 </h4>
                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                  {dataLang?.import_from_quantity || "import_from_quantity"}
+                  {"Số lượng xuất"}
                 </h4>
                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                  {dataLang?.import_from_unit_price || "import_from_unit_price"}
+                  {"Giá trị quy đổi"}
                 </h4>
                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                  {dataLang?.import_from_discount || "import_from_discount"}
+                  {"Số lượng quy đổi"}
                 </h4>
                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                  {dataLang?.returns_sck || "returns_sck"}
-                </h4>
-                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                  {dataLang?.import_from_tax || "import_from_tax"}
-                </h4>
-                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
-                  {dataLang?.import_into_money || "import_into_money"}
-                </h4>
-                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
-                  {dataLang?.import_from_note || "import_from_note"}
+                  {"Ghi chú"}
                 </h4>
                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
                   {dataLang?.import_from_operation || "import_from_operation"}
@@ -1491,7 +1165,7 @@ const Index = (props) => {
             </div>
           </div>
           <div className="grid grid-cols-12 items-center gap-1 py-2">
-            <div className="col-span-2">
+            <div className="col-span-3">
               <Select
                 options={options}
                 value={null}
@@ -1536,11 +1210,8 @@ const Index = (props) => {
                         </div>
                         <div className="flex items-center gap-1">
                           <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                            {option.e?.import_code} -{" "}
+                            {option.e?.import_code}
                           </h5>
-                          <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">{`(ĐGSCK: ${formatNumber(
-                            option.e?.price_after_discount
-                          )}) -`}</h5>
                           <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                             {dataLang[option.e?.text_type]}
                           </h5>
@@ -1602,63 +1273,40 @@ const Index = (props) => {
                   }),
                   menu: (provided, state) => ({
                     ...provided,
-                    width: "125%",
+                    width: "100%",
                   }),
                 }}
               />
             </div>
-            <div className="col-span-10">
-              <div className="grid grid-cols-11  divide-x border-t border-b border-r border-l">
-                <div className="col-span-2">
+            <div className="col-span-9">
+              <div className="grid grid-cols-7  divide-x border-t border-b border-r border-l">
+                <div className="col-span-1">
                   {" "}
                   <Select
                     classNamePrefix="customDropdowDefault"
-                    placeholder={dataLang?.returns_point || "returns_point"}
+                    placeholder={"Kho xuất - Vị trí xuất"}
                     className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                     isDisabled={true}
                   />
                 </div>
-                <div className="col-span-1"></div>
-                <div className="col-span-1 flex  justify-center items-center">
-                  <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                    <Minus
-                      className="2xl:scale-100 xl:scale-100 scale-50"
-                      size="16"
-                    />
-                  </button>
-                  <div className="text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b-2 border-gray-200">
-                    1
-                  </div>
-                  <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                    <Add
-                      className="2xl:scale-100 xl:scale-100 scale-50"
-                      size="16"
-                    />
-                  </button>
-                </div>
-                <div className="col-span-1 justify-center flex items-center">
-                  <div className="border-b-2 border-gray-200 3xl:text-[12px] w-full 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50 text-black">
-                    1
-                  </div>
-                </div>
-                <div className="col-span-1 justify-center flex items-center">
-                  <div className="border-b-2 border-gray-200 w-full 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50">
-                    0
-                  </div>
-                </div>
-                <div className="col-span-1 text-right 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black flex items-center justify-end">
-                  0
-                </div>
-                <div className="col-span-1 flex items-center w-full">
+                <div className="col-span-1">
                   <Select
                     classNamePrefix="customDropdowDefault"
-                    placeholder={dataLang?.returns_tax || "returns_tax"}
-                    className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full"
+                    placeholder={"Đơn vị tính"}
+                    className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                     isDisabled={true}
                   />
                 </div>
+                <input
+                  placeholder={"Số lượng sản xuất"}
+                  disabled
+                  className=" disabled:bg-gray-50 text-center col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 "
+                />
+                <div className="col-span-1 text-right 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black flex items-center justify-end">
+                  0
+                </div>
                 <div className="col-span-1 text-right 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black  flex items-center justify-end">
-                  1.00
+                  1
                 </div>
                 <input
                   placeholder={dataLang?.returns_note || "returns_note"}
@@ -1686,7 +1334,7 @@ const Index = (props) => {
                       key={e?.id?.toString()}
                       className="grid grid-cols-12 items-start"
                     >
-                      <div className="col-span-2 border border-r p-2 pb-1 h-full">
+                      <div className="col-span-3 border border-r p-2 pb-1 h-full">
                         <div className="relative mt-5">
                           <Select
                             options={options}
@@ -1695,34 +1343,6 @@ const Index = (props) => {
                             onChange={_HandleChangeValue.bind(this, e?.id)}
                             menuPortalTarget={document.body}
                             formatOptionLabel={(option) => (
-                              // <div className='flex items-center gap-2 py-2'>
-                              //   <div className='flex flex-col'>
-                              //     <div className='w-[40px] h-[40px]'>
-                              //       {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='object-cover rounded' />):
-                              //             <div className='object-cover   rounded w-[40px] h-[40px]'>
-                              //               <img src="/no_img.png" alt="Product Image"  className='object-cover rounded w-full h-full' />
-                              //           </div>
-                              //           }
-                              //     </div>
-                              //     {/* <div className='flex items-center gap-2'>
-                              //       <h5 className='text-gray-400 font-normal text-[10px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium text-[10px]'>{qtyHouse?.quantity ?? 0}</h5>
-                              //     </div> */}
-                              //   </div>
-                              //   <div>
-                              //     <h3 className='font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.name}</h3>
-                              //     <h5 className='text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]' >{option.e?.code}</h5>
-                              //     <h5 className='font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.product_variation}</h5>
-                              //     <h5 className='text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.import_code} - {dataLang[option.e?.text_type]}</h5>
-                              //   </div>
-                              //   {/* <div className=''>
-                              //     <div className='text-right opacity-0'>{"0"}</div>
-                              //     <div className='flex gap-2'>
-                              //       <div className='flex items-center gap-2'>
-                              //         <h5 className='text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{qtyHouse?.quantity ?? 0}</h5>
-                              //       </div>
-                              //       </div>
-                              //   </div> */}
-                              // </div>
                               <div className="py-2">
                                 <div className="flex items-center gap-1">
                                   <div className="w-[40px] h-[50px]">
@@ -1756,11 +1376,8 @@ const Index = (props) => {
                                     </div>
                                     <div className="flex items-center gap-1">
                                       <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                        {option.e?.import_code} -{" "}
+                                        {option.e?.import_code}
                                       </h5>
-                                      <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">{`(ĐGSCK: ${formatNumber(
-                                        option.e?.price_after_discount
-                                      )}) -`}</h5>
                                       <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                         {dataLang[option.e?.text_type]}
                                       </h5>
@@ -1814,6 +1431,9 @@ const Index = (props) => {
                                 </div> */}
                               </div>
                             )}
+                            noOptionsMessage={() =>
+                              dataLang?.returns_nodata || "returns_nodata"
+                            }
                             classNamePrefix="customDropdow"
                             style={{
                               border: "none",
@@ -1847,7 +1467,7 @@ const Index = (props) => {
                               }),
                               menu: (provided, state) => ({
                                 ...provided,
-                                width: "125%",
+                                width: "100%",
                               }),
                             }}
                           />
@@ -1881,19 +1501,19 @@ const Index = (props) => {
                           </button>
                         )}
                       </div>
-                      <div className="col-span-10  items-center">
-                        <div className="grid grid-cols-11  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
+                      <div className="col-span-9  items-center">
+                        <div className="grid grid-cols-7  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
                           {load ? (
                             <Loading
-                              className="h-2 col-span-11"
+                              className="h-2 col-span-7"
                               color="#0f4f9e"
                             />
                           ) : (
-                            e?.child?.map((ce) => (
+                            e?.child?.map((ce, index) => (
                               <React.Fragment key={ce?.id?.toString()}>
-                                <div className="p-0.5 border-t border-l  flex flex-col col-span-2 justify-center h-full">
+                                <div className="p-0.5 border-t border-l  flex flex-col col-span-1 justify-center h-full">
                                   <Select
-                                    options={warehouse}
+                                    options={ce?.dataWarehouse}
                                     value={ce?.kho}
                                     isLoading={
                                       ce?.kho == null ? onLoadingChild : false
@@ -1912,17 +1532,19 @@ const Index = (props) => {
                                     placeholder={
                                       onLoadingChild
                                         ? ""
-                                        : dataLang?.returns_point ||
+                                        : "Kho xuất - Vị trí xuất" ||
                                           "returns_point"
+                                    }
+                                    noOptionsMessage={() =>
+                                      dataLang?.returns_nodata ||
+                                      "returns_nodata"
                                     }
                                     menuPortalTarget={document.body}
                                     formatOptionLabel={(option) => (
                                       <div className="">
                                         <div className="flex gap-1">
                                           <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                            {dataLang?.returns_wareshoue ||
-                                              "returns_wareshoue"}
-                                            :
+                                            {"Kho xuất"}:
                                           </h2>
                                           <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
                                             {option?.warehouse_name}
@@ -1930,9 +1552,7 @@ const Index = (props) => {
                                         </div>
                                         <div className="flex gap-1">
                                           <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                            {dataLang?.returns_wareshouePosition ||
-                                              "returns_wareshouePosition"}
-                                            :
+                                            {"Vị trí xuất"}:
                                           </h2>
                                           <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
                                             {option?.label}
@@ -1964,205 +1584,34 @@ const Index = (props) => {
                                         primary: "#0F4F9E",
                                       },
                                     })}
-                                    // styles={{
-                                    //   menu: (provided, state) => ({
-                                    //     ...provided,
-                                    //     width: "200%",
-                                    //   }),
-                                    // }}
                                     classNamePrefix="customDropdow"
                                   />
                                 </div>
-                                <div className="text-center  p-0.5 pr-2.5 h-full flex flex-col justify-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                  {ce?.donViTinh}
-                                </div>
-                                <div className="relative">
-                                  <div className="flex items-center justify-center h-full p-0.5">
-                                    <button
-                                      disabled={
-                                        ce?.amount === 1 ||
-                                        ce?.amount === "" ||
-                                        ce?.amount === null ||
-                                        ce?.amount === 0
-                                      }
-                                      className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                      onClick={_HandleChangeChild.bind(
-                                        this,
-                                        e?.id,
-                                        ce?.id,
-                                        "decrease"
-                                      )}
-                                    >
-                                      <Minus
-                                        className="2xl:scale-100 xl:scale-100 scale-50"
-                                        size="16"
-                                      />
-                                    </button>
-                                    <NumericFormat
-                                      onValueChange={_HandleChangeChild.bind(
-                                        this,
-                                        e?.id,
-                                        ce?.id,
-                                        "amount"
-                                      )}
-                                      value={ce?.amount || null}
-                                      className={`${
-                                        errAmount &&
-                                        (ce?.amount == null ||
-                                          ce?.amount == "" ||
-                                          ce?.amount == 0)
-                                          ? "border-b-2 border-red-500"
-                                          : errSurvive
-                                          ? "border-b-2 border-red-500"
-                                          : "border-b-2 border-gray-200"
-                                      } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
-                                      allowNegative={false}
-                                      decimalScale={0}
-                                      isNumericString={true}
-                                      thousandSeparator=","
-                                      // isAllowed={(values) => {
-                                      //    const {floatValue} = values;
-                                      //    return floatValue > 0
-                                      //   }}
-                                      isAllowed={(values) => {
-                                        if (!values.value) return true;
-                                        const { floatValue } = values;
-                                        if (
-                                          floatValue > ce?.soluongcl ||
-                                          floatValue > qtyHouse
-                                        ) {
-                                          Toast.fire({
-                                            icon: "error",
-                                            title: `${
-                                              props.dataLang?.returns_err_Qty ||
-                                              "returns_err_Qty"
-                                            } ${ce?.soluongcl?.toLocaleString(
-                                              "en"
-                                            )}`,
-                                          });
-                                        }
-                                        return floatValue <= ce?.soluongcl;
-                                      }}
-                                    />
-                                    <button
-                                      className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                      onClick={_HandleChangeChild.bind(
-                                        this,
-                                        e?.id,
-                                        ce?.id,
-                                        "increase"
-                                      )}
-                                    >
-                                      <Add
-                                        className="2xl:scale-100 xl:scale-100 scale-50"
-                                        size="16"
-                                      />
-                                    </button>
-                                  </div>
-                                  <div className="absolute top-0 right-0 p-1 cursor-pointer ">
-                                    <Popup
-                                      className=""
-                                      trigger={
-                                        <div className="relative ">
-                                          <TableDocument
-                                            size="18"
-                                            color="#4f46e5"
-                                            className="font-medium"
-                                          />
-                                          <span className="h-2 w-2  absolute top-0 left-1/2  translate-x-[50%] -translate-y-[50%]">
-                                            <span className="inline-flex relative rounded-full h-2 w-2 bg-indigo-500">
-                                              <span className="animate-ping  inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75 absolute"></span>
-                                            </span>
-                                          </span>
-                                        </div>
-                                      }
-                                      position="left center"
-                                      on={["hover", "focus"]}
-                                    >
-                                      <div className="flex flex-col bg-gray-300 px-2.5 py-0.5 rounded-sm">
-                                        <span className="font-medium text-xs">
-                                          {dataLang?.returns_sldn ||
-                                            "returns_sldn"}
-                                          : {formatNumber(ce?.soluongdn)}{" "}
-                                        </span>
-                                        <span className="font-medium text-xs">
-                                          {dataLang?.returns_sldt ||
-                                            "returns_sldt"}
-                                          : {formatNumber(ce?.soluongdt)}
-                                        </span>
-                                        <span className="font-medium text-xs">
-                                          {dataLang?.returns_slcl ||
-                                            "returns_slcl"}
-                                          : {formatNumber(ce?.soluongcl)}
-                                        </span>
-                                      </div>
-                                    </Popup>
-                                  </div>
-                                </div>
-                                <div className="flex justify-center  h-full p-0.5 flex-col items-center">
-                                  <NumericFormat
-                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px]  text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b-2 border-gray-200 h-fit"
-                                    onValueChange={_HandleChangeChild.bind(
-                                      this,
-                                      e?.id,
-                                      ce?.id,
-                                      "price"
-                                    )}
-                                    value={ce?.price}
-                                    allowNegative={false}
-                                    decimalScale={0}
-                                    isNumericString={true}
-                                    thousandSeparator=","
-                                    isAllowed={(values) => {
-                                      const { floatValue } = values;
-                                      return floatValue > 0;
-                                    }}
-                                  />
-                                </div>
-                                <div className="flex justify-center  h-full p-0.5 flex-col items-center">
-                                  <NumericFormat
-                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
-                                    onValueChange={_HandleChangeChild.bind(
-                                      this,
-                                      e?.id,
-                                      ce?.id,
-                                      "chietKhau"
-                                    )}
-                                    value={ce?.chietKhau}
-                                    allowNegative={false}
-                                    decimalScale={0}
-                                    isNumericString={true}
-                                    thousandSeparator=","
-                                    isAllowed={(values) => {
-                                      const { floatValue } = values;
-                                      return floatValue >= 0;
-                                    }}
-                                  />
-                                </div>
-                                {/* <div>{ce?.priceAfter}</div> */}
-                                <div className="col-span-1 text-right flex items-center justify-end  h-full p-0.5">
-                                  <h3 className="px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                    {formatNumber(
-                                      Number(ce?.price) *
-                                        (1 - Number(ce?.chietKhau) / 100)
-                                    )}
-                                  </h3>
-                                </div>
                                 <div className=" flex flex-col items-center p-0.5 h-full justify-center">
                                   <Select
-                                    options={taxOptions}
-                                    value={ce?.tax}
+                                    options={ce?.dataUnit}
+                                    value={ce?.donViTinh}
+                                    isLoading={
+                                      ce?.donViTinh == null
+                                        ? onLoadingChild
+                                        : false
+                                    }
                                     onChange={_HandleChangeChild.bind(
                                       this,
                                       e?.id,
                                       ce?.id,
-                                      "tax"
+                                      "donViTinh"
                                     )}
-                                    placeholder={
-                                      dataLang?.import_from_tax ||
-                                      "import_from_tax"
+                                    noOptionsMessage={() =>
+                                      dataLang?.returns_nodata ||
+                                      "returns_nodata"
                                     }
-                                    className={`  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                                    placeholder={"Đơn vị tính"}
+                                    className={`${
+                                      errUnit && ce?.donViTinh == null
+                                        ? "border-red-500"
+                                        : ""
+                                    } border my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal`}
                                     menuPortalTarget={document.body}
                                     style={{
                                       border: "none",
@@ -2170,11 +1619,11 @@ const Index = (props) => {
                                       outline: "none",
                                     }}
                                     formatOptionLabel={(option) => (
-                                      <div className="flex justify-start items-center gap-1 ">
-                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                          {option?.label}
+                                      <div className="flex justify-start flex-wrap items-center">
+                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full py-1.5">
+                                          Đơn vị tính: {option?.label}
                                         </h2>
-                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">{`(${option?.tax_rate})`}</h2>
+                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-1">{`Giá trị quy đổi: (${option?.coefficient})`}</h2>
                                       </div>
                                     )}
                                     theme={(theme) => ({
@@ -2186,19 +1635,50 @@ const Index = (props) => {
                                         primary: "#0F4F9E",
                                       },
                                     })}
-                                    classNamePrefix="customDropdowTax"
+                                    classNamePrefix="customDropdow"
                                   />
                                 </div>
-                                {/* <div>{ce?.thanhTien}</div> */}
+                                <div className="col-span-1 flex items-center justify-center p-0.5">
+                                  <NumericFormat
+                                    //
+                                    className={`${
+                                      errQty &&
+                                      (ce?.soluongxuat == null ||
+                                        ce?.soluongxuat == "" ||
+                                        ce?.soluongxuat == 0)
+                                        ? "border-red-500 border"
+                                        : ""
+                                    } text-center py-[20px] w-full placeholder:text-[9px] rounded font-medium  focus:outline-none  border border-gray-300`}
+                                    thousandSeparator=","
+                                    allowNegative={false}
+                                    value={ce?.soluongxuat}
+                                    onValueChange={_HandleChangeChild.bind(
+                                      this,
+                                      e?.id,
+                                      ce?.id,
+                                      "soluongxuat"
+                                    )}
+                                    placeholder={
+                                      (ce?.kho == null ||
+                                        ce?.donViTinh == null) &&
+                                      "Chọn kho và đơn vị tính trước"
+                                    }
+                                    disabled={
+                                      ce?.kho == null || ce?.donViTinh == null
+                                    }
+                                    decimalScale={0}
+                                    isNumericString={true}
+                                  />
+                                </div>
+                                <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                  {ce?.giatriquydoi}
+                                </div>
                                 <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                   {formatNumber(
-                                    ce?.price *
-                                      (1 - Number(ce?.chietKhau) / 100) *
-                                      (1 + Number(ce?.tax?.tax_rate) / 100) *
-                                      Number(ce?.amount)
+                                    // ce?.soluongxuat * Number(ce?.giatriquydoi)
+                                    ce?.soluongxuat * ce?.giatriquydoi
                                   )}
                                 </div>
-                                {/* <div>{ce?.note}</div> */}
                                 <div className="col-span-1 flex items-center justify-center  h-full p-0.5">
                                   <input
                                     value={ce?.note}
@@ -2210,7 +1690,7 @@ const Index = (props) => {
                                     )}
                                     placeholder="Ghi chú"
                                     type="text"
-                                    className="  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
+                                    className="  placeholder:text-slate-300 w-full bg-white rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
                                   />
                                 </div>
                                 <div className=" h-full p-0.5 flex flex-col items-center justify-center">
@@ -2237,86 +1717,8 @@ const Index = (props) => {
               )}
             </div>
           </div>
-          <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
-            <div className="col-span-2  flex items-center gap-2">
-              <h2>
-                {dataLang?.purchase_order_detail_discount ||
-                  "purchase_order_detail_discount"}
-              </h2>
-              <div className="col-span-1 text-center flex items-center justify-center">
-                <NumericFormat
-                  value={chietkhautong}
-                  onValueChange={_HandleChangeInput.bind(this, "chietkhautong")}
-                  className=" text-center py-1 px-2 bg-transparent font-medium w-20 focus:outline-none border-b-2 border-gray-300"
-                  thousandSeparator=","
-                  allowNegative={false}
-                  decimalScale={0}
-                  isNumericString={true}
-                />
-              </div>
-            </div>
-            <div className="col-span-2 flex items-center gap-2 ">
-              <h2>
-                {dataLang?.purchase_order_detail_tax ||
-                  "purchase_order_detail_tax"}
-              </h2>
-              <Select
-                options={taxOptions}
-                onChange={_HandleChangeInput.bind(this, "thuetong")}
-                value={thuetong}
-                formatOptionLabel={(option) => (
-                  <div className="flex justify-start items-center gap-1 ">
-                    <h2>{option?.label}</h2>
-                    <h2>{`(${option?.tax_rate})`}</h2>
-                  </div>
-                )}
-                placeholder={
-                  dataLang?.purchase_order_detail_tax ||
-                  "purchase_order_detail_tax"
-                }
-                hideSelectedOptions={false}
-                className={` "border-transparent placeholder:text-slate-300 w-[70%] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                isSearchable={true}
-                noOptionsMessage={() =>
-                  dataLang?.returns_nodata || "returns_nodata"
-                }
-                //  dangerouslySetInnerHTML={{__html: option.label}}
-                menuPortalTarget={document.body}
-                closeMenuOnSelect={true}
-                style={{ border: "none", boxShadow: "none", outline: "none" }}
-                theme={(theme) => ({
-                  ...theme,
-                  colors: {
-                    ...theme.colors,
-                    primary25: "#EBF5FF",
-                    primary50: "#92BFF7",
-                    primary: "#0F4F9E",
-                  },
-                })}
-                styles={{
-                  placeholder: (base) => ({
-                    ...base,
-                    color: "#cbd5e1",
-                  }),
-                  menuPortal: (base) => ({
-                    ...base,
-                    zIndex: 20,
-                  }),
-                  control: (base, state) => ({
-                    ...base,
-                    boxShadow: "none",
-                    padding: "2.7px",
-                    ...(state.isFocused && {
-                      border: "0 0 0 1px #92BFF7",
-                    }),
-                  }),
-                }}
-              />
-            </div>
-          </div>
           <h2 className="font-normal bg-[white]  p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]">
-            {dataLang?.purchase_order_table_total_outside ||
-              "purchase_order_table_total_outside"}{" "}
+            {"Lưu ý"}
           </h2>
         </div>
         <div className="grid grid-cols-12">
@@ -2335,7 +1737,7 @@ const Index = (props) => {
           </div>
           <div className="text-right mt-5 space-y-4 col-span-3 flex-col justify-between ">
             <div className="flex justify-between "></div>
-            <div className="flex justify-between ">
+            {/* <div className="flex justify-between ">
               <div className="font-normal ">
                 <h3>
                   {dataLang?.purchase_order_table_total ||
@@ -2344,7 +1746,6 @@ const Index = (props) => {
               </div>
               <div className="font-normal">
                 <h3 className="text-blue-600">
-                  {/* {formatNumber(tongTienState.tongTien)} */}
                   {formatNumber(
                     listData?.reduce((accumulator, item) => {
                       const childTotal = item.child?.reduce(
@@ -2371,7 +1772,6 @@ const Index = (props) => {
               </div>
               <div className="font-normal">
                 <h3 className="text-blue-600">
-                  {/* {formatNumber(tongTienState.tienChietKhau)} */}
                   {formatNumber(
                     listData?.reduce((accumulator, item) => {
                       const childTotal = item.child?.reduce(
@@ -2399,7 +1799,6 @@ const Index = (props) => {
               </div>
               <div className="font-normal">
                 <h3 className="text-blue-600">
-                  {/* {formatNumber(tongTienState.tongTienSauCK)} */}
                   {formatNumber(
                     listData?.reduce((accumulator, item) => {
                       const childTotal = item.child?.reduce(
@@ -2428,7 +1827,6 @@ const Index = (props) => {
               </div>
               <div className="font-normal">
                 <h3 className="text-blue-600">
-                  {/* {formatNumber(tongTienState.tienThue)} */}
                   {formatNumber(
                     listData?.reduce((accumulator, item) => {
                       const childTotal = item.child?.reduce(
@@ -2461,7 +1859,6 @@ const Index = (props) => {
               </div>
               <div className="font-normal">
                 <h3 className="text-blue-600">
-                  {/* {formatNumber(tongTienState.tongThanhTien)} */}
                   {formatNumber(
                     listData?.reduce((accumulator, item) => {
                       const childTotal = item.child?.reduce(
@@ -2482,7 +1879,7 @@ const Index = (props) => {
                   )}
                 </h3>
               </div>
-            </div>
+            </div> */}
             <div className="space-x-2">
               <button
                 onClick={() => router.push("/purchase_order/returns")}
