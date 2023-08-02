@@ -1648,7 +1648,7 @@ const Index = (props) => {
                                         ce?.soluongxuat == 0)
                                         ? "border-red-500 border"
                                         : ""
-                                    } text-center py-[20px] w-full placeholder:text-[9px] rounded font-medium  focus:outline-none  border border-gray-300`}
+                                    } text-center py-[20px] w-full placeholder:3xl:text-[12px] placeholder:xxl:text-[10px] placeholder:2xl:text-[9.5px] placeholder:xl:text-[8px] placeholder:lg:text-[6.6px] placeholder:text-[10px] rounded font-medium  focus:outline-none  border border-gray-300`}
                                     thousandSeparator=","
                                     allowNegative={false}
                                     value={ce?.soluongxuat}
