@@ -50,7 +50,7 @@ const Popup_bom = (props) => {
       lockScroll={sroll}
       repositionOnResiz={repositionOnResiz}
     >
-      <div className="mt-4 space-x-5 3xl:w-[750px] 2xl:w-[730px] xl:w-[720px] lg:w-[720px] w-[700px] h-auto">
+      <div className="mt-4 space-x-5 3xl:w-[850px] xxl:w-[840px] 2xl:w-[830px] xl:w-[820px] lg:w-[810px] w-[810px] h-auto">
         <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
           <div className="flex items-center justify-between p-1 bg-gray-50">
             <div className="flex items-center gap-2">
