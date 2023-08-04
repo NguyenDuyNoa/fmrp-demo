@@ -814,7 +814,7 @@ const Index = (props) => {
     3: dataLang?.import_materials || "import_materials",
     4: dataLang?.import_finished_product || "import_finished_product",
     5: dataLang?.import_stage || "import_stage",
-    6: "Định mức BOM",
+    6: dataLang?.importBOM || "importBOM",
   };
 
   // validate dữ liệu rồi post
@@ -1583,11 +1583,11 @@ const Index = (props) => {
                 </div>
 
                 <Radio
-                    dataLang={dataLang}
-                    valueCheck={valueCheck}
-                    _HandleChange={_HandleChange.bind(this)}
-                    tabPage={tabPage}
-                  />
+                  dataLang={dataLang}
+                  valueCheck={valueCheck}
+                  _HandleChange={_HandleChange.bind(this)}
+                  tabPage={tabPage}
+                />
 
                 <div className="col-span-2"></div>
                 <div className="col-span-2"></div>

@@ -2829,7 +2829,7 @@ const Popup_ThongTin = React.memo((props) => {
       onClose={_ToggleModal.bind(this, false)}
       nested
     >
-      <div className="py-4 w-[800px] space-y-5">
+      <div className="py-4 w-[900px] space-y-5">
         <div className="flex items-center space-x-4 border-[#E7EAEE] border-opacity-70 border-b-[1px]">
           <button
             onClick={_HandleSelectTab.bind(this, 0)}
@@ -3150,31 +3150,31 @@ const Popup_ThongTin = React.memo((props) => {
                           ))}
                         </div>
                         <div
-                          className={`flex px-2 py-1.5 bg-slate-100/40 rounded items-center text-[14px]`}
+                          className={`grid grid-cols-13 px-2 py-1.5 bg-slate-100/40 rounded items-center text-[14px]`}
                         >
-                          <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center w-[5%]">
+                          {/* <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-1">
                             {props.dataLang?.no || "no"}
-                          </h5>
-                          <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[18%]">
+                          </h5> */}
+                          <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2">
                             {props.dataLang?.warehouses_detail_type ||
                               "warehouses_detail_type"}
                           </h5>
-                          <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[18%]">
+                          <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2">
                             {props.dataLang?.name || "name"}
                           </h5>
-                          <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center w-[10%]">
+                          <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center text-center col-span-2">
                             {props.dataLang?.unit}
                           </h5>
-                          <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[12%]">
+                          <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2">
                             {props.dataLang?.norm_finishedProduct ||
                               "norm_finishedProduct"}
                           </h5>
-                          <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[14%]">
+                          <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2">
                             %
                             {props.dataLang?.loss_finishedProduct ||
                               "loss_finishedProduct"}
                           </h5>
-                          <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] w-[23%]">
+                          <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-3">
                             {props.dataLang?.stage_usage_finishedProduct}
                           </h5>
                         </div>
@@ -3187,27 +3187,32 @@ const Popup_ThongTin = React.memo((props) => {
                             {selectedListBom?.items?.map((e, index) => (
                               <div
                                 key={e?.id.toString()}
-                                className={`flex px-2 py-2.5 hover:bg-slate-50 items-center`}
+                                className={`grid grid-cols-13 px-2 py-2.5 hover:bg-slate-50 items-center`}
                               >
-                                <h6 className="px-2 xl:text-base text-xs text-center w-[5%]">
+                                {/* <h6 className="px-2 xl:text-base text-xs text-center col-span-1">
                                   {index + 1}
-                                </h6>
-                                <h6 className="px-2 xl:text-[15px] text-xs w-[18%]">
+                                </h6> */}
+                                <h6 className="px-2 xl:text-[15px] text-xs col-span-2">
                                   {e?.str_type_item}
                                 </h6>
-                                <h6 className="px-2 xl:text-base text-xs w-[18%]">
-                                  {e?.item_name}
+                                <h6 className="px-2 xl:text-base text-xs col-span-2">
+                                  <div className="grid grid-cols-1">
+                                    <h5>{e?.item_name}</h5>
+                                    <h5 className="text-xs italic">
+                                      {e?.variation_name}
+                                    </h5>
+                                  </div>
                                 </h6>
-                                <h6 className="px-2 xl:text-base text-xs w-[10%] text-center">
+                                <h6 className="px-2 xl:text-base text-xs col-span-2 text-center">
                                   {e?.unit_name}
                                 </h6>
-                                <h6 className="px-2 xl:text-base text-xs w-[12%]">
+                                <h6 className="px-2 xl:text-base text-xs  col-span-2 text-center">
                                   {Number(e?.quota).toLocaleString()}
                                 </h6>
-                                <h6 className="px-2 xl:text-base text-xs w-[14%]">
+                                <h6 className="px-2 xl:text-base text-xs  col-span-2 text-center">
                                   {Number(e?.loss).toLocaleString()}%
                                 </h6>
-                                <h6 className="px-2 xl:text-base text-xs w-[23%]">
+                                <h6 className="px-2 xl:text-base text-xs col-span-3">
                                   {e?.stage_name}
                                 </h6>
                               </div>
