@@ -1,46 +1,14 @@
-import React, { useRef, useState } from "react";
-import Head from "next/head";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
-import Link from "next/link";
-import ModalImage from "react-modal-image";
-import "react-datepicker/dist/react-datepicker.css";
-
-import {
-    Grid6 as IconExcel,
-    Filter as IconFilter,
-    Calendar as IconCalendar,
-    SearchNormal1 as IconSearch,
-    ArrowDown2 as IconDown,
-} from "iconsax-react";
-
-import Select from "react-select";
-import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
-import Popup from "reactjs-popup";
-import moment from "moment/moment";
-import vi from "date-fns/locale/vi";
-registerLocale("vi", vi);
-
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-
+import React, { useEffect, useState } from "react";
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
+import Popup from "reactjs-popup";
+import { SearchNormal1 as IconSearch } from "iconsax-react";
 import { _ServerInstance as Axios } from "/services/axios";
-
-import Swal from "sweetalert2";
-
-import { useEffect } from "react";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
+import dynamic from "next/dynamic";
+import moment from "moment";
+import ModalImage from "react-modal-image";
+const ScrollArea = dynamic(() => import("react-scrollbar"), {
+    ssr: false,
 });
 
 const Popup_status = (props) => {
@@ -115,7 +83,7 @@ const Popup_status = (props) => {
         >
             <div className=" space-x-5 3xl:w-[1250px] 2xl:w-[1100px] w-[1050px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">
                 <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                    <div className="pr-2 ">
+                    <div className="pr-2 w-[100%] lx:w-[120%] ">
                         <div
                             className={`${
                                 dataProductSerial.is_enable == "1"
@@ -179,7 +147,7 @@ const Popup_status = (props) => {
                             </h4>
                         </div>
                         {onFetching ? (
-                            <Loading className="h-24" color="#0f4f9e" />
+                            <Loading className="h-50" color="#0f4f9e" />
                         ) : data?.length > 0 ? (
                             <>
                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[500px] mt-2 ">

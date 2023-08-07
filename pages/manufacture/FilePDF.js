@@ -243,7 +243,7 @@ const FilePDF = ({
                         fontSize: 10,
                     },
                     {
-                        text: `${""}`,
+                        text: `${formatNumber(data?.grand_total)}`,
                         bold: true,
                         fontSize: 10,
                     },

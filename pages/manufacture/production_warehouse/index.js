@@ -493,6 +493,7 @@ const Index = (props) => {
     useEffect(() => {
         checkedWare.id != null && sOnSending(true);
     }, [checkedWare]);
+
     useEffect(() => {
         checkedWare.id != null && sOnSending(true);
     }, [checkedWare.id != null]);
@@ -954,43 +955,56 @@ const Index = (props) => {
                                                                 {/* {formatNumber(e.total_price)} */}
                                                             </h6>
 
-                                                            <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1"></h6>
+                                                            <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-center flex items-center justify-end space-x-1">
+                                                                {formatNumber(
+                                                                    e?.grand_total
+                                                                )}
+                                                            </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left truncate">
                                                                 {e?.note}
                                                             </h6>
                                                             <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
                                                                 <div className="relative">
-                                                                    {/* <ModalImage
-                                    small={
-                                      e?.staff_create?.profile_image
-                                        ? e?.staff_create?.profile_image
-                                        : "/user-placeholder.jpg"
-                                    }
-                                    large={
-                                      e?.staff_create?.profile_image
-                                        ? e?.staff_create?.profile_image
-                                        : "/user-placeholder.jpg"
-                                    }
-                                    className="h-6 w-6 rounded-full object-cover "
-                                  /> */}
-                                                                    <div className="]">
-                                                                        <ImageErrors
-                                                                            src={
-                                                                                e
-                                                                                    ?.staff_create
-                                                                                    ?.profile_image
-                                                                            }
-                                                                            width={
-                                                                                25
-                                                                            }
-                                                                            height={
-                                                                                25
-                                                                            }
-                                                                            defaultSrc="/user-placeholder.jpg"
-                                                                            alt="Image"
-                                                                            className="object-cover  rounded-[100%] text-left cursor-pointer"
-                                                                        />
-                                                                    </div>
+                                                                    <ModalImage
+                                                                        small={
+                                                                            e
+                                                                                ?.staff_create
+                                                                                ?.profile_image
+                                                                                ? e
+                                                                                      ?.staff_create
+                                                                                      ?.profile_image
+                                                                                : "/user-placeholder.jpg"
+                                                                        }
+                                                                        large={
+                                                                            e
+                                                                                ?.staff_create
+                                                                                ?.profile_image
+                                                                                ? e
+                                                                                      ?.staff_create
+                                                                                      ?.profile_image
+                                                                                : "/user-placeholder.jpg"
+                                                                        }
+                                                                        className="h-6 w-6 rounded-full object-cover "
+                                                                    >
+                                                                        <div className="">
+                                                                            <ImageErrors
+                                                                                src={
+                                                                                    e
+                                                                                        ?.staff_create
+                                                                                        ?.profile_image
+                                                                                }
+                                                                                width={
+                                                                                    25
+                                                                                }
+                                                                                height={
+                                                                                    25
+                                                                                }
+                                                                                defaultSrc="/user-placeholder.jpg"
+                                                                                alt="Image"
+                                                                                className="object-cover  rounded-[100%] text-left cursor-pointer"
+                                                                            />
+                                                                        </div>
+                                                                    </ModalImage>
                                                                     <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
                                                                         <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
                                                                             <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>

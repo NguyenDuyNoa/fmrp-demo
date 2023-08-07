@@ -1,19 +1,15 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { _ServerInstance as Axios } from "/services/axios";
 import { v4 as uuidv4 } from "uuid";
-import dynamic from "next/dynamic";
 import Loading from "components/UI/loading";
 
 import { MdClear } from "react-icons/md";
 import { BsCalendarEvent } from "react-icons/bs";
 import DatePicker from "react-datepicker";
 
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import Select, { components, MenuListProps } from "react-select";
+import Select, { components } from "react-select";
 
 import {
     Add,
@@ -40,12 +36,6 @@ const Index = (props) => {
     const id = router.query?.id;
 
     const dataLang = props?.dataLang;
-    const scrollAreaRef = useRef(null);
-
-    const handleMenuOpen = () => {
-        const menuPortalTarget = scrollAreaRef.current;
-        return { menuPortalTarget };
-    };
 
     const [onFetching, sOnFetching] = useState(false);
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
@@ -371,15 +361,17 @@ const Index = (props) => {
             hasNullUnit && sErrUnit(true);
             hasNullQty && sErrQty(true);
             if (isEmpty) {
-                Toast.fire({
-                    icon: "error",
-                    title: `Chưa nhập thông tin mặt hàng`,
-                });
+                // Toast.fire({
+                //     icon: "error",
+                //     title: `Chưa nhập thông tin mặt hàng`,
+                // });
+                handleCheckError("Chưa nhập thông tin mặt hàng");
             } else {
-                Toast.fire({
-                    icon: "error",
-                    title: `${dataLang?.required_field_null}`,
-                });
+                // Toast.fire({
+                //     icon: "error",
+                //     title: `${dataLang?.required_field_null}`,
+                // });
+                handleCheckError(dataLang?.required_field_null);
             }
         } else {
             sErrWarehouse(false);
@@ -482,10 +474,11 @@ const Index = (props) => {
                             "/manufacture/production_warehouse?tab=all"
                         );
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${dataLang[message]}`,
-                        });
+                        // Toast.fire({
+                        //     icon: "error",
+                        //     title: `${dataLang[message]}`,
+                        // });
+                        handleCheckError(dataLang[message]);
                     }
                 }
                 sOnSending(false);
@@ -586,13 +579,11 @@ const Index = (props) => {
                             value: value?.e?.unit[0].id,
                             coefficient: value?.e?.unit[0].coefficient,
                         },
-
                         dataUnit: value?.e?.unit.map((e) => ({
                             label: e?.unit,
                             value: e?.id,
                             coefficient: e?.coefficient,
                         })),
-
                         exportQuantity: null,
                         exchangeValue: value?.e?.unit[0].coefficient,
                         numberOfConversions: null,
@@ -605,12 +596,15 @@ const Index = (props) => {
             }, 500);
             sListData([newData, ...listData]);
         } else {
-            Toast.fire({
-                title: `${
-                    dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
-                }`,
-                icon: "error",
-            });
+            handleCheckError(
+                dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
+            );
+            // Toast.fire({
+            //     title: `${
+            //         dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
+            //     }`,
+            //     icon: "error",
+            // });
         }
     };
     const _HandleDeleteChild = (parentId, childId) => {
@@ -680,7 +674,9 @@ const Index = (props) => {
                         .map((house) => house)
                         .some((i) => i?.kho?.value === value?.value);
                     if (checkKho) {
-                        handleKhoError("Kho xuất và vị trí xuất đã được chọn");
+                        handleCheckError(
+                            "Kho xuất và vị trí xuất đã được chọn"
+                        );
                     } else {
                         updatedChild.kho = value;
                     }
@@ -689,9 +685,9 @@ const Index = (props) => {
                     updatedChild.exchangeValue = Number(value?.coefficient);
                 } else if (type === "increase") {
                     if (updatedChild.kho == null) {
-                        handleKhoError("Vui lòng chọn kho trước");
+                        handleCheckError("Vui lòng chọn kho trước");
                     } else if (updatedChild.unit == null) {
-                        handleKhoError("Vui lòng chọn đơn vị tính trước");
+                        handleCheckError("Vui lòng chọn đơn vị tính trước");
                     } else if (
                         updatedChild.numberOfConversions ==
                         updatedChild.kho?.qty
@@ -706,9 +702,9 @@ const Index = (props) => {
                     }
                 } else if (type === "decrease") {
                     if (updatedChild.kho == null) {
-                        handleKhoError("Vui lòng chọn kho trước");
+                        handleCheckError("Vui lòng chọn kho trước");
                     } else if (updatedChild.unit == null) {
-                        handleKhoError("Vui lòng chọn đơn vị tính trước");
+                        handleCheckError("Vui lòng chọn đơn vị tính trước");
                     } else if (updatedChild.exportQuantity >= 2) {
                         updatedChild.exportQuantity =
                             Number(updatedChild.exportQuantity) - 1;
@@ -742,13 +738,6 @@ const Index = (props) => {
         setTimeout(() => {
             sLoad(false);
         }, 1000);
-    };
-
-    const handleKhoError = (e) => {
-        Toast.fire({
-            title: `${e}`,
-            icon: "error",
-        });
     };
 
     const _HandleChangeValue = (parentId, value) => {
@@ -813,13 +802,23 @@ const Index = (props) => {
             }, 500);
             sListData([...newData]);
         } else {
-            Toast.fire({
-                title: `${
-                    dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
-                }`,
-                icon: "error",
-            });
+            // Toast.fire({
+            //     title: `${
+            //         dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
+            //     }`,
+            //     icon: "error",
+            // });
+            handleCheckError(
+                dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
+            );
         }
+    };
+
+    const handleCheckError = (e) => {
+        Toast.fire({
+            title: `${e}`,
+            icon: "error",
+        });
     };
 
     return (
@@ -1820,12 +1819,13 @@ const Index = (props) => {
                                                                             allowNegative={
                                                                                 false
                                                                             }
-                                                                            decimalScale={
-                                                                                0
-                                                                            }
+                                                                            // decimalScale={
+                                                                            //     0
+                                                                            // }
                                                                             isNumericString={
                                                                                 true
                                                                             }
+                                                                            // decimalSeparator=","
                                                                             thousandSeparator=","
                                                                         />
 

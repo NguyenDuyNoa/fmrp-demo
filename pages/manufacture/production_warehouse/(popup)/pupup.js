@@ -261,7 +261,9 @@ const Popup_chitiet = (props) => {
                                                     "production_warehouse_Total_value"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
-                                                {data?.supplier_name}
+                                                {formatNumber(
+                                                    data?.grand_total
+                                                )}
                                             </h3>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">

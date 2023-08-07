@@ -84,7 +84,6 @@ const Index = (props) => {
                     sData(rResult);
                     sTotalItem(output);
                     sData_ex(rResult);
-                    console.log(rResult);
                 }
                 sOnFetching(false);
             }
@@ -217,6 +216,7 @@ const Index = (props) => {
             }));
         })
         .flat();
+
     const multiDataSet = [
         {
             columns: [
@@ -384,7 +384,12 @@ const Index = (props) => {
                 },
                 {
                     value: `${
-                        dataProductExpiry.is_enable === "1"
+                        // dataProductExpiry.is_enable === "1"
+                        //     ? e?.detail.expiration_date != null
+                        //         ? e?.detail.expiration_date
+                        //         : ""
+                        //     : ""
+                        dataMaterialExpiry.is_enable === "1"
                             ? e?.detail.expiration_date != null
                                 ? e?.detail.expiration_date
                                 : ""
