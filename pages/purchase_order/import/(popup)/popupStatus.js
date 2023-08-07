@@ -250,7 +250,7 @@ const Popup_status = (props) => {
                                                                 ? moment(
                                                                       e.expiration_date
                                                                   ).format(
-                                                                      "DD-MM-YYYY"
+                                                                      "DD/MM/YYYY"
                                                                   )
                                                                 : "-"}
                                                         </h6>
