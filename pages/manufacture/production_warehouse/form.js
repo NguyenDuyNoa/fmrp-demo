@@ -79,7 +79,7 @@ const Index = (props) => {
         router.query && sNote("");
     }, [router.query]);
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         sOnLoading(true);
         Axios(
             "GET",
@@ -95,7 +95,6 @@ const Index = (props) => {
                 }
             }
         );
-
         sOnFetching(false);
     };
 
