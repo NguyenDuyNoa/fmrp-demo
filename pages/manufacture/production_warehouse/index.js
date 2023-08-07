@@ -400,7 +400,9 @@ const Index = (props) => {
                 { value: `${e?.code ? e?.code : ""}` },
                 { value: `${"Số LSX chi tiết"}` },
                 {
-                    value: `${"Tổng giá trị"}`,
+                    value: `${
+                        e?.grand_total ? formatNumber(e?.grand_total) : ""
+                    }`,
                 },
                 { value: `${e?.note ? e?.note : ""}` },
                 {
