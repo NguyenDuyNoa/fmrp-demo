@@ -25,6 +25,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 });
 import ModalImage from "react-modal-image";
 import ExpandableContent from "components/UI/more";
+import ImageErrors from "components/UI/imageErrors";
 
 const Popup_chitietThere = (props) => {
     const scrollAreaRef = useRef(null);
@@ -272,6 +273,43 @@ const Popup_chitietThere = (props) => {
                                                 <h3 className="text-[13px] font-normal">
                                                     {data?.supplier_name}
                                                 </h3>
+                                            </div>
+                                            <div className="grid grid-cols-2 col-span-2">
+                                                <h3 className="col-span-1 text-[13px] font-medium">
+                                                    {props.dataLang
+                                                        ?.production_warehouse_creator ||
+                                                        "production_warehouse_creator"}
+                                                </h3>
+                                                {/* <h3 className="col-span-1 text-[13px] font-normal">
+                                                {data?.user_create_name}
+                                            </h3> */}
+                                                <div className="flex items-center gap-2">
+                                                    <div className="relative">
+                                                        <ImageErrors
+                                                            src={
+                                                                data
+                                                                    ?.staff_create
+                                                                    ?.profile_image
+                                                            }
+                                                            width={25}
+                                                            height={25}
+                                                            defaultSrc="/user-placeholder.jpg"
+                                                            alt="Image"
+                                                            className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                        />
+                                                        <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
+                                                            <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
+                                                                <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                    <h6 className="capitalize">
+                                                        {
+                                                            data?.staff_create
+                                                                ?.full_name
+                                                        }
+                                                    </h6>
+                                                </div>{" "}
                                             </div>
                                             <div className="my-4 font-medium grid grid-cols-2">
                                                 <h3 className="text-[13px]">
@@ -718,16 +756,7 @@ const Popup_chitietThere = (props) => {
                                                 </div>
                                             </div>
                                             <div className="col-span-3 ">
-                                                <div className="my-4 font-semibold grid grid-cols-2">
-                                                    <h3 className="text-[13px]">
-                                                        {props.dataLang
-                                                            ?.purchase_order_table_branch ||
-                                                            "purchase_order_table_branch"}
-                                                    </h3>
-                                                    <h3 className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase w-fit">
-                                                        {data?.branch_name}
-                                                    </h3>
-                                                </div>
+                                                {" "}
                                                 <div className="my-4 font-semibold grid grid-cols-2">
                                                     <h3 className="text-[13px] ">
                                                         {props.dataLang
@@ -736,6 +765,54 @@ const Popup_chitietThere = (props) => {
                                                     </h3>
                                                     <h3 className="text-[13px] font-medium ">
                                                         {data?.supplier_name}
+                                                    </h3>
+                                                </div>
+                                                <div className="grid grid-cols-2 col-span-2">
+                                                    <h3 className="col-span-1 text-[13px] font-medium">
+                                                        {props.dataLang
+                                                            ?.production_warehouse_creator ||
+                                                            "production_warehouse_creator"}
+                                                    </h3>
+                                                    {/* <h3 className="col-span-1 text-[13px] font-normal">
+                                                {data?.user_create_name}
+                                            </h3> */}
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="relative">
+                                                            <ImageErrors
+                                                                src={
+                                                                    data
+                                                                        ?.staff_create
+                                                                        ?.profile_image
+                                                                }
+                                                                width={25}
+                                                                height={25}
+                                                                defaultSrc="/user-placeholder.jpg"
+                                                                alt="Image"
+                                                                className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                            />
+                                                            <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
+                                                                <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
+                                                                    <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                        <h6 className="capitalize">
+                                                            {
+                                                                data
+                                                                    ?.staff_create
+                                                                    ?.full_name
+                                                            }
+                                                        </h6>
+                                                    </div>{" "}
+                                                </div>
+                                                <div className="my-4 font-semibold grid grid-cols-2">
+                                                    <h3 className="text-[13px]">
+                                                        {props.dataLang
+                                                            ?.purchase_order_table_branch ||
+                                                            "purchase_order_table_branch"}
+                                                    </h3>
+                                                    <h3 className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase w-fit">
+                                                        {data?.branch_name}
                                                     </h3>
                                                 </div>
                                             </div>
@@ -1124,6 +1201,44 @@ const Popup_chitietThere = (props) => {
                                                     <h3 className="text-[13px] font-medium">
                                                         {data?.supplier_name}
                                                     </h3>
+                                                </div>
+                                                <div className="grid grid-cols-2 col-span-2">
+                                                    <h3 className="col-span-1 text-[13px] font-medium">
+                                                        {props.dataLang
+                                                            ?.production_warehouse_creator ||
+                                                            "production_warehouse_creator"}
+                                                    </h3>
+                                                    {/* <h3 className="col-span-1 text-[13px] font-normal">
+                                                {data?.user_create_name}
+                                            </h3> */}
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="relative">
+                                                            <ImageErrors
+                                                                src={
+                                                                    data
+                                                                        ?.staff_create
+                                                                        ?.profile_image
+                                                                }
+                                                                width={25}
+                                                                height={25}
+                                                                defaultSrc="/user-placeholder.jpg"
+                                                                alt="Image"
+                                                                className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                            />
+                                                            <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
+                                                                <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
+                                                                    <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                        <h6 className="capitalize">
+                                                            {
+                                                                data
+                                                                    ?.staff_create
+                                                                    ?.full_name
+                                                            }
+                                                        </h6>
+                                                    </div>{" "}
                                                 </div>
                                                 <div className="my-4 font-semibold grid grid-cols-2">
                                                     <h3 className="text-[13px]">
@@ -1579,9 +1694,37 @@ const Popup_chitietThere = (props) => {
                                                             ?.purchase_propnent ||
                                                             "purchase_propnent"}
                                                     </h3>
-                                                    <h3 className="col-span-1 text-[13px] font-normal">
+                                                    {/* <h3 className="col-span-1 text-[13px] font-normal">
                                                         {data?.user_create_name}
-                                                    </h3>
+                                                    </h3> */}
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="relative">
+                                                            <ImageErrors
+                                                                src={
+                                                                    data
+                                                                        ?.staff_create
+                                                                        ?.profile_image
+                                                                }
+                                                                width={25}
+                                                                height={25}
+                                                                defaultSrc="/user-placeholder.jpg"
+                                                                alt="Image"
+                                                                className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                            />
+                                                            <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
+                                                                <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
+                                                                    <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                        <h6 className="capitalize">
+                                                            {
+                                                                data
+                                                                    ?.staff_create
+                                                                    ?.full_name
+                                                            }
+                                                        </h6>
+                                                    </div>{" "}
                                                 </div>
                                                 <div className="my-4 font-semibold grid grid-cols-2">
                                                     <h3 className="col-span-1 text-[13px]">
@@ -1981,6 +2124,46 @@ const Popup_chitietThere = (props) => {
                                                     <h3 className="text-[13px] font-medium">
                                                         {data?.supplier_name}
                                                     </h3>
+                                                </div>
+                                                <div className="grid grid-cols-2 col-span-2">
+                                                    <h3 className="col-span-1 text-[13px] font-medium">
+                                                        {props.dataLang
+                                                            ?.production_warehouse_creator ||
+                                                            "production_warehouse_creator"}
+                                                    </h3>
+                                                    {/* <h3 className="col-span-1 text-[13px] font-normal">
+                                                {data?.user_create_name}
+                                            </h3> */}
+                                                    <div className="my-2 font-medium grid grid-cols-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="relative">
+                                                                <ImageErrors
+                                                                    src={
+                                                                        data
+                                                                            ?.staff_create
+                                                                            ?.profile_image
+                                                                    }
+                                                                    width={25}
+                                                                    height={25}
+                                                                    defaultSrc="/user-placeholder.jpg"
+                                                                    alt="Image"
+                                                                    className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                                />
+                                                                <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
+                                                                    <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
+                                                                        <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                            <h6 className="capitalize">
+                                                                {
+                                                                    data
+                                                                        ?.staff_create
+                                                                        ?.full_name
+                                                                }
+                                                            </h6>
+                                                        </div>
+                                                    </div>{" "}
                                                 </div>
                                                 <div className="my-4 font-semibold grid grid-cols-2">
                                                     <h3 className="text-[13px]">

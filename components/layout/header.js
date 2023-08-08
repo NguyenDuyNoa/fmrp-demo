@@ -617,7 +617,7 @@ const Header = () => {
             },
             {
                 id: 6,
-                title: "Thêm",
+                title: "Khác",
                 sub: [],
                 link: "#",
                 more: "Xem tất cả thông báo",

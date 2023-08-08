@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { NotificationBing } from "iconsax-react";
 import moment from "moment";
 import { useDispatch } from "react-redux";
+import { useRouter } from "next/router";
 
 const Expirred = () => {
+    const router = useRouter();
     const data = {
         dateStart: moment(new Date()).format("DD/MM/YYYY"),
         dateEnd: 10,
@@ -19,7 +21,7 @@ const Expirred = () => {
     const [checkDate, sCheckDate] = useState(true);
     const [extend, sExtend] = useState(false);
     const _HandleExtend = () => {
-        alert("Chức năng đang phát triển !");
+        router.push("/settings/service-information");
     };
 
     useEffect(() => {
@@ -68,7 +70,7 @@ const Expirred = () => {
                             </button>
                         </div>
                     </div>
-                    <span className="h-3 w-3 absolute top-0 -translate-y-2/5  left-0 -translate-x-2/4">
+                    <span className="h-3 w-3 absolute bottom-1/2 -translate-y-1/5  left-0 -translate-x-2/4">
                         <span className="inline-flex relative rounded-full h-3 w-3 bg-red-500">
                             <span className="animate-ping  inline-flex h-full w-full rounded-full bg-red-400 opacity-75 absolute"></span>
                         </span>
