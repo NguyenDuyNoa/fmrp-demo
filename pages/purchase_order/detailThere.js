@@ -1701,9 +1701,7 @@ const Popup_chitietThere = (props) => {
                                                         <div className="relative">
                                                             <ImageErrors
                                                                 src={
-                                                                    data
-                                                                        ?.staff_create
-                                                                        ?.profile_image
+                                                                    data?.profile_image
                                                                 }
                                                                 width={25}
                                                                 height={25}
@@ -1719,9 +1717,7 @@ const Popup_chitietThere = (props) => {
                                                         </div>
                                                         <h6 className="capitalize">
                                                             {
-                                                                data
-                                                                    ?.staff_create
-                                                                    ?.full_name
+                                                                data?.user_create_name
                                                             }
                                                         </h6>
                                                     </div>{" "}

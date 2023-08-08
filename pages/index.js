@@ -34,7 +34,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 const Index = () => {
     const dispatch = useDispatch();
     const dataPstWH = useSelector((state) => state.trangthai);
-    const trangthaiExprired = useSelector((state) => state.trangthaiExprired);
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
 
     const _HandleExample = () => {
         dispatch({
