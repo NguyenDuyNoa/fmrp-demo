@@ -68,7 +68,7 @@ const Expirred = () => {
                             </button>
                         </div>
                     </div>
-                    <span className="h-3 w-3 absolute top-0 -translate-y-2/4  left-0 -translate-x-2/4">
+                    <span className="h-3 w-3 absolute top-0 -translate-y-2/5  left-0 -translate-x-2/4">
                         <span className="inline-flex relative rounded-full h-3 w-3 bg-red-500">
                             <span className="animate-ping  inline-flex h-full w-full rounded-full bg-red-400 opacity-75 absolute"></span>
                         </span>
