@@ -709,6 +709,41 @@ const Popup_chitietThere = (props) => {
                                                             : ""}
                                                     </h3>
                                                 </div>
+                                                <div className="my-2 items-center font-medium grid grid-cols-2">
+                                                    <h3 className=" text-[13px] ">
+                                                        {props?.dataLang
+                                                            ?.production_warehouse_creator ||
+                                                            "production_warehouse_creator"}
+                                                    </h3>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="relative">
+                                                            <ImageErrors
+                                                                src={
+                                                                    data
+                                                                        ?.staff_create
+                                                                        ?.profile_image
+                                                                }
+                                                                width={25}
+                                                                height={25}
+                                                                defaultSrc="/user-placeholder.jpg"
+                                                                alt="Image"
+                                                                className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                            />
+                                                            <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
+                                                                <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
+                                                                    <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                        <h6 className="capitalize">
+                                                            {
+                                                                data
+                                                                    ?.staff_create
+                                                                    ?.full_name
+                                                            }
+                                                        </h6>
+                                                    </div>
+                                                </div>{" "}
                                                 <div className="my-4 font-semibold grid grid-cols-2">
                                                     <h3 className=" text-[13px] ">
                                                         {props.dataLang
@@ -766,44 +801,6 @@ const Popup_chitietThere = (props) => {
                                                     <h3 className="text-[13px] font-medium ">
                                                         {data?.supplier_name}
                                                     </h3>
-                                                </div>
-                                                <div className="grid grid-cols-2 col-span-2">
-                                                    <h3 className="col-span-1 text-[13px] font-medium">
-                                                        {props.dataLang
-                                                            ?.production_warehouse_creator ||
-                                                            "production_warehouse_creator"}
-                                                    </h3>
-                                                    {/* <h3 className="col-span-1 text-[13px] font-normal">
-                                                {data?.user_create_name}
-                                            </h3> */}
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="relative">
-                                                            <ImageErrors
-                                                                src={
-                                                                    data
-                                                                        ?.staff_create
-                                                                        ?.profile_image
-                                                                }
-                                                                width={25}
-                                                                height={25}
-                                                                defaultSrc="/user-placeholder.jpg"
-                                                                alt="Image"
-                                                                className="object-cover rounded-[100%] text-left cursor-pointer"
-                                                            />
-                                                            <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                                <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                    <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
-                                                                </span>
-                                                            </span>
-                                                        </div>
-                                                        <h6 className="capitalize">
-                                                            {
-                                                                data
-                                                                    ?.staff_create
-                                                                    ?.full_name
-                                                            }
-                                                        </h6>
-                                                    </div>{" "}
                                                 </div>
                                                 <div className="my-4 font-semibold grid grid-cols-2">
                                                     <h3 className="text-[13px]">
