@@ -265,10 +265,7 @@ export const DropdownThongBao = (props) => {
                                             }
                                             checkStt={checkStt}
                                         />
-                                        {console.log(
-                                            "props.data?.tab[tab]?.link",
-                                            props.data?.tab[tab]?.link
-                                        )}
+
                                         {props.data?.tab.find(
                                             (e) => e.id === tab
                                         )?.sub?.length > 0 && (
@@ -357,7 +354,7 @@ const TabContent = ({ subItems, checkStt }) => {
                                                     )}
                                                 </h5>
 
-                                                <h5 className="text-xs text-gray-400 italic">
+                                                <h5 className="text-xs text-gray-600 italic">
                                                     {ce.time}
                                                 </h5>
                                             </div>
