@@ -1,31 +1,31 @@
-import vi from "date-fns/locale/vi"
-import React, { useState } from 'react';
-import Select from 'react-select';
+import vi from "date-fns/locale/vi";
+import React, { useState } from "react";
+import Select from "react-select";
 // import PopupDetailQuote from '../priceQuote/(PopupDetail)/PopupDetailQuote';
 // import PopupDetailProduct from './(PopupDetail)/PopupDetailProduct';
-import BtnAction from '../../../components/UI/BtnAction';
-import TabFilter from '../../../components/UI/TabFilter';
-import Pagination from '/components/UI/pagination';
+import BtnAction from "../../../components/UI/BtnAction";
+import TabFilter from "../../../components/UI/TabFilter";
+import Pagination from "/components/UI/pagination";
 import Loading from "components/UI/loading";
 import Swal from "sweetalert2";
 import ReactExport from "react-data-export";
-import Head from 'next/head';
-import dynamic from 'next/dynamic';
-import Link from 'next/link';
-import moment from 'moment/moment';
-import Datepicker from 'react-tailwindcss-datepicker'
-import { useRouter } from 'next/router';
+import Head from "next/head";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import moment from "moment/moment";
+import Datepicker from "react-tailwindcss-datepicker";
+import { useRouter } from "next/router";
 import { registerLocale } from "react-datepicker";
-import { _ServerInstance as Axios } from '/services/axios';
-import { useEffect } from 'react';
-import { debounce } from 'lodash';
+import { _ServerInstance as Axios } from "/services/axios";
+import { useEffect } from "react";
+import { debounce } from "lodash";
 import {
     Grid6 as IconExcel,
     SearchNormal1 as IconSearch,
     TickCircle,
 } from "iconsax-react";
-import { IoIosArrowDropright } from 'react-icons/io'
-import 'react-datepicker/dist/react-datepicker.css';
+import { IoIosArrowDropright } from "react-icons/io";
+import "react-datepicker/dist/react-datepicker.css";
 registerLocale("vi", vi);
 
 const ExcelFile = ReactExport.ExcelFile;
@@ -33,12 +33,11 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const Toast = Swal.mixin({
     toast: true,
-    position: 'top-end',
+    position: "top-end",
     showConfirmButton: false,
     timer: 2000,
     timerProgressBar: true,
-})
-
+});
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -49,147 +48,201 @@ const Index = (props) => {
     const [onFetching, sOnFetching] = useState(false);
     const [onFetching_filter, sOnFetching_filter] = useState(false);
     const [totalItems, sTotalItems] = useState([]);
-    const [keySearch, sKeySearch] = useState("")
+    const [keySearch, sKeySearch] = useState("");
     const [limit, sLimit] = useState(15);
-    const [total, setTotal] = useState({})
-    const [listBr, sListBr] = useState([])
-    const [listQuoteCode, sListQuoteCode] = useState([])
-    const [listCustomer, sListCustomer] = useState([])
+    const [total, setTotal] = useState({});
+    const [listBr, sListBr] = useState([]);
+    const [listQuoteCode, sListQuoteCode] = useState([]);
+    const [listCustomer, sListCustomer] = useState([]);
     const [idBranch, sIdBranch] = useState(null);
     const [idQuoteCode, sIdQuoteCode] = useState(null);
     const [idCustomer, sIdCustomer] = useState(null);
-    const [listTabStatus, sListTabStatus] = useState()
+    const [listTabStatus, sListTabStatus] = useState();
     const [valueDate, sValueDate] = useState({
         startDate: null,
-        endDate: null
+        endDate: null,
     });
 
     const _HandleSelectTab = (e) => {
         router.push({
             pathname: router.route,
-            query: { tab: e }
-        })
-    }
+            query: { tab: e },
+        });
+    };
     useEffect(() => {
         router.push({
             pathname: router.route,
-            query: { tab: router.query?.tab ? router.query?.tab : "all" }
-        })
+            query: { tab: router.query?.tab ? router.query?.tab : "all" },
+        });
     }, []);
 
     const _ServerFetching = () => {
         const tabPage = router.query?.tab;
-        setLoading(true)
+        setLoading(true);
         console.log("router.query?.page : ", router.query?.page);
-        Axios("GET", `/api_web/Api_sale_order/saleOrder/?csrf_protection=true`, {
-            params: {
-                search: keySearch,
-                limit: limit,
-                page: router.query?.page || 1,
-                // page: keySearch || idQuoteCode != null || idCustomer || valueDate?.startDate != null && valueDate?.endDate ? 1 : router.query?.page || 1,
-                "filter[branch_id]": idBranch != null ? idBranch.value : null,
-                "filter[id]": idQuoteCode != null ? idQuoteCode?.value : null,
-                "filter[status_bar]": tabPage ?? null,
-                "filter[client_id]": idCustomer != null ? idCustomer.value : null,
-                "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
-                "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
+        Axios(
+            "GET",
+            `/api_web/Api_sale_order/saleOrder/?csrf_protection=true`,
+            {
+                params: {
+                    search: keySearch,
+                    limit: limit,
+                    page: router.query?.page || 1,
+                    // page: keySearch || idQuoteCode != null || idCustomer || valueDate?.startDate != null && valueDate?.endDate ? 1 : router.query?.page || 1,
+                    "filter[branch_id]":
+                        idBranch != null ? idBranch.value : null,
+                    "filter[id]":
+                        idQuoteCode != null ? idQuoteCode?.value : null,
+                    "filter[status_bar]": tabPage ?? null,
+                    "filter[client_id]":
+                        idCustomer != null ? idCustomer.value : null,
+                    "filter[start_date]":
+                        valueDate?.startDate != null
+                            ? valueDate?.startDate
+                            : null,
+                    "filter[end_date]":
+                        valueDate?.endDate != null ? valueDate?.endDate : null,
+                },
+            },
+            (err, response) => {
+                if (!err && response && response.data) {
+                    var { rResult, output, rTotal } = response.data;
+                    setLoading(false);
+                    setData(rResult.map((e) => ({ ...e, show: false })));
+                    sTotalItems(output);
+                    sDataExcel(rResult);
+                    setTotal(rTotal);
+                    sOnFetching(false);
+                }
             }
-        }, (err, response) => {
-            if (!err && response && response.data) {
-                var { rResult, output, rTotal } = response.data
-                setLoading(false)
-                setData(rResult.map(e => ({ ...e, show: false })))
-                sTotalItems(output)
-                sDataExcel(rResult)
-                setTotal(rTotal)
-                sOnFetching(false)
-            }
-
-        })
-    }
+        );
+    };
     // fetch tab filter
     const _ServerFetching_group = async () => {
-        await Axios("GET", `/api_web/Api_sale_order/filterBar?csrf_protection=true`, {
-            params: {
-                limit: 0,
-                search: keySearch,
-                "filter[branch_id]": idBranch != null ? idBranch.value : null,
+        await Axios(
+            "GET",
+            `/api_web/Api_sale_order/filterBar?csrf_protection=true`,
+            {
+                params: {
+                    limit: 0,
+                    search: keySearch,
+                    "filter[branch_id]":
+                        idBranch != null ? idBranch.value : null,
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    var data = response.data;
+                    sListTabStatus(data);
+                }
+                sOnFetching(false);
             }
-        }, (err, response) => {
-            if (!err) {
-                var data = response.data
-                sListTabStatus(data)
-            }
-            sOnFetching(false)
-        })
-    }
+        );
+    };
 
     // filter
     const _ServerFetching_filter = async () => {
-        await Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var { rResult } = response.data
-                sListBr(rResult)
+        await Axios(
+            "GET",
+            `/api_web/Api_Branch/branch/?csrf_protection=true`,
+            {},
+            (err, response) => {
+                if (!err) {
+                    var { rResult } = response.data;
+                    sListBr(rResult);
+                }
             }
-        })
-        await Axios("GET", `/api_web/Api_sale_order/saleOrderCombobox?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var rResult = response.data.result
-                sListQuoteCode(rResult)
+        );
+        await Axios(
+            "GET",
+            `/api_web/Api_sale_order/saleOrderCombobox?csrf_protection=true`,
+            {},
+            (err, response) => {
+                if (!err) {
+                    var rResult = response.data.result;
+                    sListQuoteCode(rResult);
+                }
             }
-        })
-        await Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var db = response.data.rResult
-                sListCustomer(db?.map(e => ({ label: e.name, value: e.id })))
+        );
+        await Axios(
+            "GET",
+            "/api_web/api_client/client_option/?csrf_protection=true",
+            {},
+            (err, response) => {
+                if (!err) {
+                    var db = response.data.rResult;
+                    sListCustomer(
+                        db?.map((e) => ({ label: e.name, value: e.id }))
+                    );
+                }
             }
-        })
-        sOnFetching_filter(false)
-    }
-
+        );
+        sOnFetching_filter(false);
+    };
 
     useEffect(() => {
-        onFetching && _ServerFetching() || onFetching && _ServerFetching_group()
+        (onFetching && _ServerFetching()) ||
+            (onFetching && _ServerFetching_group());
     }, [onFetching]);
     useEffect(() => {
-        onFetching_filter && _ServerFetching_filter()
-    }, [onFetching_filter])
+        onFetching_filter && _ServerFetching_filter();
+    }, [onFetching_filter]);
 
     // useEffect(() => {
     //     router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query?.tab && sOnFetching_filter(true) || idBranch != null && sOnFetching(true) || idQuoteCode != null && sOnFetching(true) || idCustomer != null && sOnFetching(true) || valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)
     // }, [limit, router.query?.page, router.query?.tab, idBranch, idQuoteCode, idCustomer, valueDate.endDate, valueDate.startDate]);
     useEffect(() => {
-        router.query.tab && sOnFetching(true) || router.query?.tab && sOnFetching_filter(true)
+        (router.query.tab && sOnFetching(true)) ||
+            (router.query?.tab && sOnFetching_filter(true));
     }, [limit, router.query?.page, router.query?.tab]);
 
     useEffect(() => {
-        if (idBranch != null || valueDate.startDate != null && valueDate.endDate != null || idCustomer != null || idQuoteCode != null) {
+        if (
+            idBranch != null ||
+            (valueDate.startDate != null && valueDate.endDate != null) ||
+            idCustomer != null ||
+            idQuoteCode != null
+        ) {
             router.push({
                 pathname: router.route,
                 query: {
-                    tab: router.query?.tab
-                }
-            })
+                    tab: router.query?.tab,
+                },
+            });
             setTimeout(() => {
-                idBranch != null && sOnFetching(true) || valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true) || idCustomer != null && sOnFetching(true) || idQuoteCode != null && sOnFetching(true) || (keySearch && sOnFetching(true))
-            }, 300)
+                (idBranch != null && sOnFetching(true)) ||
+                    (valueDate.startDate != null &&
+                        valueDate.endDate != null &&
+                        sOnFetching(true)) ||
+                    (idCustomer != null && sOnFetching(true)) ||
+                    (idQuoteCode != null && sOnFetching(true)) ||
+                    (keySearch && sOnFetching(true));
+            }, 300);
+        } else {
+            sOnFetching(true);
         }
-        else {
-            sOnFetching(true)
-        }
+    }, [
+        limit,
+        idBranch,
+        idQuoteCode,
+        idCustomer,
+        valueDate.endDate,
+        valueDate.startDate,
+    ]);
 
+    const listBr_filter = listBr
+        ? listBr?.map((e) => ({ label: e.name, value: e.id }))
+        : [];
 
-    }, [limit, idBranch, idQuoteCode, idCustomer, valueDate.endDate, valueDate.startDate]);
-
-    const listBr_filter = listBr ? listBr?.map(e => ({ label: e.name, value: e.id })) : []
-
-    const listCode_filter = listQuoteCode ? listQuoteCode?.map(e => ({ label: e.code, value: e.id })) : []
+    const listCode_filter = listQuoteCode
+        ? listQuoteCode?.map((e) => ({ label: e.code, value: e.id }))
+        : [];
 
     const typeChange = {
-        "branch": sIdBranch,
-        "code": sIdQuoteCode,
-        "customer": sIdCustomer,
-        "date": sValueDate,
+        branch: sIdBranch,
+        code: sIdQuoteCode,
+        customer: sIdCustomer,
+        date: sValueDate,
     };
 
     const onChangeFilter = async (type, value) => {
@@ -197,93 +250,211 @@ const Index = (props) => {
         if (updateFunction) {
             updateFunction(value);
         }
-    }
+    };
 
-    const paginate = pageNumber => {
+    const paginate = (pageNumber) => {
         router.push({
             pathname: router.route,
             query: {
                 tab: router.query?.tab,
-                page: pageNumber
-            }
-        })
-    }
+                page: pageNumber,
+            },
+        });
+    };
 
     const handleOnChangeKeySearch = debounce(({ target: { value } }) => {
-        sKeySearch(value)
+        sKeySearch(value);
         router.replace({
             pathname: router.route,
             query: {
-                tab: router.query?.tab
-            }
+                tab: router.query?.tab,
+            },
         });
-        sOnFetching(true)
-
-    }, 500)
+        sOnFetching(true);
+    }, 500);
 
     const formatNumber = (number) => {
         if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number)
-        return integerPart.toLocaleString("en")
-    }
+        const integerPart = Math.floor(number);
+        return integerPart.toLocaleString("en");
+    };
     // excel
     const multiDataSet = [
         {
             columns: [
-                { title: "ID", width: { wch: 4 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.sales_product_date || "sales_product_date"}`, width: { wpx: 100 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.sales_product_code || "sales_product_code"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.customer || "customer"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.sales_product_type_order || "sales_product_type_order"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.sales_product_quote || "sales_product_quote"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.sales_product_total || "sales_product_total"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.sales_product_staff_in_charge || "sales_product_staff_in_charge"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.status_table || "status_table"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.sales_product_order_process || "sales_product_order_process"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.note || "note"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
-                { title: `${dataLang?.branch || "branch"}`, width: { wch: 40 }, style: { fill: { fgColor: { rgb: "C7DFFB" } }, font: { bold: true } } },
+                {
+                    title: "ID",
+                    width: { wch: 4 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${
+                        dataLang?.sales_product_date || "sales_product_date"
+                    }`,
+                    width: { wpx: 100 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${
+                        dataLang?.sales_product_code || "sales_product_code"
+                    }`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.customer || "customer"}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${
+                        dataLang?.sales_product_type_order ||
+                        "sales_product_type_order"
+                    }`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${
+                        dataLang?.sales_product_quote || "sales_product_quote"
+                    }`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${
+                        dataLang?.sales_product_total || "sales_product_total"
+                    }`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${
+                        dataLang?.sales_product_staff_in_charge ||
+                        "sales_product_staff_in_charge"
+                    }`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.status_table || "status_table"}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${
+                        dataLang?.sales_product_order_process ||
+                        "sales_product_order_process"
+                    }`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.note || "note"}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${dataLang?.branch || "branch"}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
             ],
-            data: dataExcel?.map((e) =>
-                [
-                    { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
-                    { value: `${e?.date ? e?.date : ""}` },
-                    { value: `${e?.code ? e?.code : ""}` },
-                    { value: `${e?.client_name ? e?.client_name : ""}` },
-                    { value: `${e?.quote_code !== null && e?.quote_id !== "0" ? "Phiếu báo giá" : "Tạo mới"}` },
-                    { value: `${e?.quote_code ? e?.quote_code : ""}` },
+            data: dataExcel?.map((e) => [
+                { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
+                { value: `${e?.date ? e?.date : ""}` },
+                { value: `${e?.code ? e?.code : ""}` },
+                { value: `${e?.client_name ? e?.client_name : ""}` },
+                {
+                    value: `${
+                        e?.quote_code !== null && e?.quote_id !== "0"
+                            ? "Phiếu báo giá"
+                            : "Tạo mới"
+                    }`,
+                },
+                { value: `${e?.quote_code ? e?.quote_code : ""}` },
 
-                    { value: `${e?.total_amount ? formatNumber(e?.total_amount) : 0}` },
-                    { value: `${e?.staff_name ? e?.staff_name : ""}` },
-                    { value: `${e?.status ? e?.status === "un_approved" && "Chưa duyệt" || e?.status === "approved" && "Đã duyệt" : ""}` },
+                {
+                    value: `${
+                        e?.total_amount ? formatNumber(e?.total_amount) : 0
+                    }`,
+                },
+                { value: `${e?.staff_name ? e?.staff_name : ""}` },
+                {
+                    value: `${
+                        e?.status
+                            ? (e?.status === "un_approved" && "Chưa duyệt") ||
+                              (e?.status === "approved" && "Đã duyệt")
+                            : ""
+                    }`,
+                },
 
-                    { value: `${e?.process ? e?.process : ""}` },
-                    { value: `${e?.note ? e?.note : ""}` },
+                { value: `${e?.process ? e?.process : ""}` },
+                { value: `${e?.note ? e?.note : ""}` },
 
-                    { value: `${e?.branch_name ? e?.branch_name : ""}` },
-
-                ]
-            ),
-        }
+                { value: `${e?.branch_name ? e?.branch_name : ""}` },
+            ]),
+        },
     ];
 
     // chuyen doi trang thai don bao gia
     const toggleStatus = (id) => {
-        const index = data.findIndex(x => x.id === id);
+        const index = data.findIndex((x) => x.id === id);
 
         Swal.fire({
             title: `${"Thay đổi trạng thái"}`,
-            icon: 'warning',
+            icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: '#0F4F9E',
-            cancelButtonColor: '#d33',
-            confirmButtonText: `${data[index].status === 'approved' ? dataLang?.aler_not_yet_approved : dataLang?.aler_approved}`,
+            confirmButtonColor: "#0F4F9E",
+            cancelButtonColor: "#d33",
+            confirmButtonText: `${
+                data[index].status === "approved"
+                    ? dataLang?.aler_not_yet_approved
+                    : dataLang?.aler_approved
+            }`,
             cancelButtonText: `${dataLang?.aler_cancel}`,
             didOpen: () => {
-                const confirmButton = document.querySelector('.swal2-confirm');
-                confirmButton.classList.add('w-32');
-                const cancelButton = document.querySelector('.swal2-cancel');
-                cancelButton.classList.add('w-32');
-            }
+                const confirmButton = document.querySelector(".swal2-confirm");
+                confirmButton.classList.add("w-32");
+                const cancelButton = document.querySelector(".swal2-cancel");
+                cancelButton.classList.add("w-32");
+            },
         }).then((result) => {
             if (result.isConfirmed) {
                 let newStatus = "";
@@ -305,56 +476,79 @@ const Index = (props) => {
         formData.append("id", id);
         formData.append("status", newStatus);
 
-        Axios("POST", `/api_web/Api_sale_order/confirm/${id}/${newStatus}?csrf_protection=true`, {
-            data: formData,
-            headers: { "Content-Type": "multipart/form-data" }
-        }, (err, response) => {
-            if (!err) {
-                var { isSuccess } = response.data;
+        Axios(
+            "POST",
+            `/api_web/Api_sale_order/confirm/${id}/${newStatus}?csrf_protection=true`,
+            {
+                data: formData,
+                headers: { "Content-Type": "multipart/form-data" },
+            },
+            (err, response) => {
+                if (!err) {
+                    var { isSuccess } = response.data;
 
-                if (isSuccess !== false) {
-                    Toast.fire({
-                        icon: 'success',
-                        title: `${dataLang?.change_status_when_order || 'change_status_when_order'}`
-                    })
+                    if (isSuccess !== false) {
+                        Toast.fire({
+                            icon: "success",
+                            title: `${
+                                dataLang?.change_status_when_order ||
+                                "change_status_when_order"
+                            }`,
+                        });
+                    }
+                    _ServerFetching();
+                    _ServerFetching_group();
                 }
-                _ServerFetching()
-                _ServerFetching_group()
             }
-        })
-    }
+        );
+    };
 
     // toggle show process product
     const handleToggleShowProcessProduct = (id) => {
-        const newData = data.map(e => {
+        const newData = data.map((e) => {
             if (e?.id == id) {
-                return ({ ...e, show: !e.show })
+                return { ...e, show: !e.show };
             }
-            return e
-        })
-        setData([...newData])
-    }
+            return e;
+        });
+        setData([...newData]);
+    };
 
     return (
         <React.Fragment>
             <Head>
-                <title>{dataLang?.delivery_receipt_list || "delivery_receipt_list"} </title>
+                <title>
+                    {dataLang?.delivery_receipt_list || "delivery_receipt_list"}{" "}
+                </title>
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
-                <div className="flex space-x-1 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                    <h6 className="text-[#141522]/40">{dataLang?.delivery_receipt_list || "delivery_receipt_list"}</h6>
+                <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                    {/* <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
+                <div className="flex space-x-1 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]"> */}
+                    <h6 className="text-[#141522]/40">
+                        {dataLang?.delivery_receipt_list ||
+                            "delivery_receipt_list"}
+                    </h6>
                     <span className="text-[#141522]/40">/</span>
-                    <h6 >{dataLang?.delivery_receipt_list || "delivery_receipt_list"}</h6>
+                    <h6>
+                        {dataLang?.delivery_receipt_list ||
+                            "delivery_receipt_list"}
+                    </h6>
                 </div>
 
                 <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
-
-                            <div className='flex justify-between'>
-                                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">{dataLang?.delivery_receipt_list || "delivery_receipt_list"}</h2>
+                            <div className="flex justify-between">
+                                <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
+                                    {dataLang?.delivery_receipt_list ||
+                                        "delivery_receipt_list"}
+                                </h2>
                                 <div className="flex justify-end items-center">
-                                    <Link href="/sales_export_product/deliveryReceipt/form" className='3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105'>
+                                    <Link
+                                        href="/sales_export_product/deliveryReceipt/form"
+                                        className="3xl:text-sm 2xl:text-xs xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                    >
                                         {dataLang?.btn_new || "btn_new"}
                                     </Link>
                                 </div>
@@ -809,8 +1003,8 @@ const Index = (props) => {
                     </div>
                 </div>
             </div>
-        </React.Fragment >
+        </React.Fragment>
     );
-}
+};
 
 export default Index;
