@@ -180,7 +180,7 @@ const ZoomableElement = (props) => {
 };
 
 export const DropdownThongBao = (props) => {
-    const [tab, sTab] = useState(1);
+    const [tab, sTab] = useState(0);
     const [onFetching, sOnFetching] = useState(false);
     const [checkStt, sCheckStt] = useState(false);
     const _HandleSelectTab = (e) => {
