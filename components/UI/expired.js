@@ -33,7 +33,7 @@ const Expirred = () => {
         <React.Fragment>
             {checkDate ? (
                 <div className="rounded relative">
-                    <div className="flex justify-between items-center bg-gray-100 3xl:p-1  xxl:p-0 2xl:p-0.5 xl:p-0 lg:p-0 p-2">
+                    <div className="flex justify-between items-center bg-gray-100 p-2.5">
                         <div className="flex items-center gap-1">
                             <h2 className="font-medium text-[14px] px-2">
                                 Phiên bản dùng thử dành cho FOSO từ ngày
