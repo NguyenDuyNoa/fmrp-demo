@@ -237,7 +237,7 @@ const Header = () => {
                 {
                     title: "Nhập kho thành phẩm",
                     img: "/icon/header/kho/nhapkho.png",
-                    link: "#",
+                    link: "/manufacture/productsWarehouse",
                 },
                 {
                     title: "Thu hồi nguyên vật liệu",

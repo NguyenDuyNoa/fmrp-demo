@@ -26,6 +26,7 @@ import {
 } from "iconsax-react";
 import { IoIosArrowDropright } from "react-icons/io";
 import "react-datepicker/dist/react-datepicker.css";
+import { useSelector } from "react-redux";
 registerLocale("vi", vi);
 
 const ExcelFile = ReactExport.ExcelFile;
@@ -513,7 +514,7 @@ const Index = (props) => {
         });
         setData([...newData]);
     };
-
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
     return (
         <React.Fragment>
             <Head>
@@ -522,19 +523,23 @@ const Index = (props) => {
                 </title>
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
-                <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                    {/* <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
+                {trangthaiExprired ? (
+                    <div className="p-4"></div>
+                ) : (
+                    <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
+                        {/* <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 <div className="flex space-x-1 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]"> */}
-                    <h6 className="text-[#141522]/40">
-                        {dataLang?.delivery_receipt_list ||
-                            "delivery_receipt_list"}
-                    </h6>
-                    <span className="text-[#141522]/40">/</span>
-                    <h6>
-                        {dataLang?.delivery_receipt_list ||
-                            "delivery_receipt_list"}
-                    </h6>
-                </div>
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.delivery_receipt_list ||
+                                "delivery_receipt_list"}
+                        </h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6>
+                            {dataLang?.delivery_receipt_list ||
+                                "delivery_receipt_list"}
+                        </h6>
+                    </div>
+                )}
 
                 <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">

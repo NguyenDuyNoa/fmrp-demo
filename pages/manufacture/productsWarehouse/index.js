@@ -505,9 +505,7 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>
-                    {dataLang?.production_warehouse || "production_warehouse"}{" "}
-                </title>
+                <title>{"Nhập kho thành phẩm"}</title>
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 {/* {data_export.length > 0 && <Popup_status className="hidden" data_export={data_export} dataLang={dataLang}/>} */}
@@ -519,14 +517,10 @@ const Index = (props) => {
                         className={` flex space-x-3  xl:text-[14.5px] text-[12px]`}
                     >
                         <h6 className="text-[#141522]/40">
-                            {dataLang?.production_warehouse ||
-                                "production_warehouse"}
+                            {"Nhập kho thành phẩm"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>
-                            {dataLang?.production_warehouse ||
-                                "production_warehouse"}
-                        </h6>
+                        <h6>{"Nhập kho thành phẩm"}</h6>
                     </div>
                 )}
 
@@ -535,12 +529,11 @@ const Index = (props) => {
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className="flex justify-between">
                                 <h2 className="text-2xl text-[#52575E] capitalize">
-                                    {dataLang?.production_warehouse ||
-                                        "production_warehouse"}
+                                    {"Nhập kho thành phẩm"}
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Link
-                                        href="/manufacture/production_warehouse/form"
+                                        href="/manufacture/productsWarehouse/form"
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.purchase_order_new ||
@@ -549,7 +542,7 @@ const Index = (props) => {
                                 </div>
                             </div>
 
-                            <div className="flex space-x-3 m-0 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            {/* <div className="flex space-x-3 m-0 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 {listDs &&
                                     listDs.map((e) => {
                                         return (
@@ -577,8 +570,8 @@ const Index = (props) => {
                                             </div>
                                         );
                                     })}
-                            </div>
-                            <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
+                            </div> */}
+                            {/* <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded-lg grid grid-cols-6 justify-between xl:p-3 p-2">
                                         <div className="col-span-5">
@@ -962,9 +955,7 @@ const Index = (props) => {
                                                                     id={e?.id}
                                                                 />
                                                             </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {/* {formatNumber(e.total_price)} */}
-                                                            </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right"></h6>
 
                                                             <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-center flex items-center justify-end space-x-1">
                                                                 {formatNumber(
@@ -1159,31 +1150,9 @@ const Index = (props) => {
                                         )}
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
-                        {/* <div className="grid grid-cols-10 bg-gray-100 items-center rounded-md">
-              <div className="col-span-3 p-2 text-center">
-                <h3 className="uppercase text-gray-600 font-medium 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
-                  {dataLang?.import_total || "import_total"}
-                </h3>
-              </div>
-              <div className="col-span-1 text-right">
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                  {formatNumber(total?.total_price)}
-                </h3>
-              </div>
-              <div className="col-span-1 text-right ">
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                  {formatNumber(total?.total_tax_price)}
-                </h3>
-              </div>
-              <div className="col-span-1 text-right">
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                  {formatNumber(total?.total_amount)}
-                </h3>
-              </div>
-            </div> */}
-                        {data?.length != 0 && (
+                        {/* {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6 className="">
                                     {dataLang?.display}{" "}
@@ -1201,7 +1170,7 @@ const Index = (props) => {
                                     currentPage={router.query?.page || 1}
                                 />
                             </div>
-                        )}
+                        )} */}
                     </div>
                 </div>
             </div>
