@@ -58,6 +58,7 @@ import ReactExport from "react-data-export";
 import FilePDF from "../FilePDF";
 import ExpandableContent from "components/UI/more";
 import Popup_chitiet from "./(popup)/popup";
+import { useSelector } from "react-redux";
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -512,6 +513,8 @@ const Index = (props) => {
         return integerPart.toLocaleString("en");
     };
     const _HandleFresh = () => sOnFetching(true);
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+
     return (
         <React.Fragment>
             <Head>
@@ -519,13 +522,17 @@ const Index = (props) => {
             </Head>
             <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between">
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    <div className="flex space-x-3 text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.purchase_title}
-                        </h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6 className="">{dataLang?.purchase_title}</h6>
-                    </div>
+                    {trangthaiExprired ? (
+                        <div className="p-2"></div>
+                    ) : (
+                        <div className="flex space-x-3 text-[12px]">
+                            <h6 className="text-[#141522]/40">
+                                {dataLang?.purchase_title}
+                            </h6>
+                            <span className="text-[#141522]/40">/</span>
+                            <h6 className="">{dataLang?.purchase_title}</h6>
+                        </div>
+                    )}
                     <div className="flex justify-between items-center">
                         <h2 className="text-2xl text-[#52575E] capitalize ">
                             {dataLang?.purchase_title}

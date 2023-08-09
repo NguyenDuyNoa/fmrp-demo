@@ -297,6 +297,8 @@ const Index = (props) => {
         },
     ];
     const _HandleFresh = () => sOnFetching(true);
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+
     return (
         <React.Fragment>
             <Head>
@@ -307,20 +309,24 @@ const Index = (props) => {
             </Head>
             <div className="px-10 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between">
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.list_btn_seting_category}
-                        </h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.header_category_material}
-                        </h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>
-                            {dataLang?.header_category_finishedProduct_group ||
-                                "header_category_finishedProduct_group"}
-                        </h6>
-                    </div>
+                    {trangthaiExprired ? (
+                        <div className="p-2"></div>
+                    ) : (
+                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
+                            <h6 className="text-[#141522]/40">
+                                {dataLang?.list_btn_seting_category}
+                            </h6>
+                            <span className="text-[#141522]/40">/</span>
+                            <h6 className="text-[#141522]/40">
+                                {dataLang?.header_category_material}
+                            </h6>
+                            <span className="text-[#141522]/40">/</span>
+                            <h6>
+                                {dataLang?.header_category_finishedProduct_group ||
+                                    "header_category_finishedProduct_group"}
+                            </h6>
+                        </div>
+                    )}
                     <div className="flex justify-between items-center">
                         <h2 className="xl:text-3xl text-xl font-medium ">
                             {dataLang?.catagory_finishedProduct_group_title ||

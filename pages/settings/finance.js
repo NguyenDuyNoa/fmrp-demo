@@ -16,6 +16,7 @@ import {
 } from "iconsax-react";
 import Loading from "components/UI/loading";
 import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
 
 const Index = (props) => {
   const dataLang = props.dataLang;
@@ -122,18 +123,21 @@ useEffect(() => {
     timer: 2000,
     timerProgressBar: true,
   })
-
+  const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
   return (
   <React.Fragment>
     <Head>
         <title>{dataLang?.btn_seting_finance}</title>
     </Head>
     <div className='px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen'>
+    {trangthaiExprired ? (
+                    <div className="p-2"></div>
+                ) :
         <div className='flex space-x-3 xl:text-[14.5px] text-[12px]'>
             <h6 className='text-[#141522]/40'>{dataLang?.branch_seting}</h6>
             <span className='text-[#141522]/40'>/</span>
             <h6>{dataLang?.list_btn_seting_finance}</h6>
-        </div>
+        </div>}
         <div className='grid grid-cols-9 gap-5 h-[99%]'>
             <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
                 <ListBtn_Setting dataLang={dataLang} />

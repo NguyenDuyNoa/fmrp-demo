@@ -4,6 +4,7 @@ import Head from "next/head";
 import { ListBtn_Setting } from "./information";
 
 import {Money2 as IconMoney, Refresh as IconRefresh, Clock as IconClock} from "iconsax-react"
+import { useSelector } from "react-redux";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -29,18 +30,19 @@ const Index = (props) => {
             expDate: "12/12/2023"
         }
     ]
-
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
     return ( 
         <>
             <Head>
                 <title>Thông tin dịch vụ FMRP</title>
             </Head>
             <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 min-h-screen">
+            {trangthaiExprired ?<div className='p-2'></div>:
                 <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
                     <h6 className="text-[#141522]/40">{dataLang?.branch_seting}</h6>
                     <span className="text-[#141522]/40">/</span>
                     <h6>Thông Tin Dịch Vụ FMRP</h6>
-                </div>
+                </div>}
                 <div className="grid grid-cols-9 gap-5 h-[99%]">
                     <div className="col-span-2 h-fit p-5 rounded bg-[#E2F0FE] space-y-3 sticky ">
                         <ListBtn_Setting dataLang={dataLang} />

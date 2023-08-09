@@ -47,6 +47,7 @@ import FilePDF from "../FilePDF";
 import ExpandableContent from "components/UI/more";
 import Popup_chitiet from "./(popup)/pupup";
 import ImageErrors from "components/UI/imageErrors";
+import { useSelector } from "react-redux";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -89,6 +90,7 @@ const Index = (props) => {
         startDate: null,
         endDate: null,
     });
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -509,7 +511,12 @@ const Index = (props) => {
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 {/* {data_export.length > 0 && <Popup_status className="hidden" data_export={data_export} dataLang={dataLang}/>} */}
-                <div className="flex space-x-3 mt-3 xl:text-[14.5px] text-[12px]">
+                {/* trangthaiExprired */}
+                <div
+                    className={`${
+                        trangthaiExprired ? "mt-4" : ""
+                    } flex space-x-3  xl:text-[14.5px] text-[12px]`}
+                >
                     <h6 className="text-[#141522]/40">
                         {dataLang?.production_warehouse ||
                             "production_warehouse"}

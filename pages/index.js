@@ -42,7 +42,6 @@ const Index = () => {
             payload: !dataPstWH,
         });
     };
-    console.log("trangthaiExprired", trangthaiExprired);
     return (
         <React.Fragment>
             <Head>

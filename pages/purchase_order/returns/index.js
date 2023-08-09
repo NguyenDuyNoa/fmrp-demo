@@ -547,17 +547,20 @@ const Index = (props) => {
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 {/* {data_export.length > 0 && <Popup_status className="hidden" data_export={data_export} dataLang={dataLang}/>} */}
-                <div
-                    className={`${
-                        trangthaiExprired ? "mt-3" : ""
-                    } flex space-x-3 mt-3 xl:text-[14.5px] text-[12px]`}
-                >
-                    <h6 className="text-[#141522]/40">
-                        {dataLang?.returns_title || "returns_title"}
-                    </h6>
-                    <span className="text-[#141522]/40">/</span>
-                    <h6>{dataLang?.returns_list || "returns_list"}</h6>
-                </div>
+                {trangthaiExprired ? (
+                    <div className="p-4"></div>
+                ) : (
+                    <div
+                        className={`
+                    flex space-x-3  xl:text-[14.5px] text-[12px]`}
+                    >
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.returns_title || "returns_title"}
+                        </h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6>{dataLang?.returns_list || "returns_list"}</h6>
+                    </div>
+                )}
 
                 <div className="grid grid-cols gap-1 h-[100%] overflow-hidden ">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">

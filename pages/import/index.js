@@ -48,6 +48,7 @@ import SampleImport from "./(sample_guide)/sample";
 import Row from "./(row)/row";
 import Radio from "./(radio)/radio";
 import Popup_bom from "./(popup)/popupBom";
+import { useSelector } from "react-redux";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -135,6 +136,8 @@ const Index = (props) => {
         main: false,
         extra: false,
     });
+
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
 
     const _ServerFetching = () => {
         sOnLoading(true);
@@ -1471,13 +1474,19 @@ const Index = (props) => {
                 <title>{dataLang?.import_data || "import_data"}</title>
             </Head>
             <div className="px-10 xl:pt-24 pt-[88px] pb-10 ">
-                <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                    <h6 className="text-[#141522]/40">
-                        {dataLang?.import_data || "import_data"}
-                    </h6>
-                    <span className="text-[#141522]/40">/</span>
-                    <h6>{dataLang?.import_category || "import_category"}</h6>
-                </div>
+                {trangthaiExprired ? (
+                    <div className="p-2"></div>
+                ) : (
+                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.import_data || "import_data"}
+                        </h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6>
+                            {dataLang?.import_category || "import_category"}
+                        </h6>
+                    </div>
+                )}
                 {(tabPage != 5 && tabPage != 6 && (
                     <Popup_status
                         dataLang={dataLang}

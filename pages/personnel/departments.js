@@ -19,6 +19,7 @@ import Swal from "sweetalert2";
 import "react-phone-input-2/lib/style.css";
 import Select, { components } from "react-select";
 import Popup_phongban from "./(popupDepartments)/popup";
+import { useSelector } from "react-redux";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -203,6 +204,8 @@ const Index = (props) => {
             ]),
         },
     ];
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+
     const _HandleFresh = () => sOnFetching(true);
     return (
         <React.Fragment>
@@ -210,13 +213,17 @@ const Index = (props) => {
                 <title>{dataLang?.personnels_deparrtments_title}</title>
             </Head>
             <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
-                <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                    <h6 className="text-[#141522]/40">
-                        {dataLang?.personnels_deparrtments_title}
-                    </h6>
-                    <span className="text-[#141522]/40">/</span>
-                    <h6>{dataLang?.personnels_deparrtments_title}</h6>
-                </div>
+                {trangthaiExprired ? (
+                    <div className="p-2"></div>
+                ) : (
+                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.personnels_deparrtments_title}
+                        </h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6>{dataLang?.personnels_deparrtments_title}</h6>
+                    </div>
+                )}
                 <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-3 h-[96%] overflow-hidden">

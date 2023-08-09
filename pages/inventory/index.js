@@ -29,6 +29,7 @@ import Loading from "components/UI/loading";
 import { useRef } from "react";
 import Popup_chitiet from "./(popup)/popupDetail";
 import Popup_status from "./(popup)/popupStatus";
+import { useSelector } from "react-redux";
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
@@ -310,7 +311,7 @@ const Index = (props) => {
     ];
 
     const _HandleFresh = () => sOnFetching(true);
-
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
     return (
         <>
             <Head>
@@ -324,14 +325,20 @@ const Index = (props) => {
                         dataLang={dataLang}
                     />
                 )}
-                <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                    <h6 className="text-[#141522]/40">
-                        {dataLang?.inventory_title_head ||
-                            "inventory_title_head"}
-                    </h6>
-                    <span className="text-[#141522]/40">/</span>
-                    <h6>{dataLang?.inventory_title || "inventory_title"}</h6>
-                </div>
+                {trangthaiExprired ? (
+                    <div className="p-2"></div>
+                ) : (
+                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
+                        <h6 className="text-[#141522]/40">
+                            {dataLang?.inventory_title_head ||
+                                "inventory_title_head"}
+                        </h6>
+                        <span className="text-[#141522]/40">/</span>
+                        <h6>
+                            {dataLang?.inventory_title || "inventory_title"}
+                        </h6>
+                    </div>
+                )}
                 <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden pb-1">
                         <div className="space-y-3 h-[96%] overflow-hidden">
