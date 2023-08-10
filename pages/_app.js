@@ -696,7 +696,7 @@ const LoginPage = React.memo((props) => {
                                 </h6>
                             </div>
                         </div>
-                        <div className="col-span-3 bg-white h-full flex flex-col items-center 2xl:mt-8 mt-5">
+                        <div className="col-span-3 bg-white h-full flex flex-col items-center xxl:mt-0 2xl:mt-8 mt-1">
                             <h1 className="text-[#11315B] 2xl:text-4xl text-2xl font-[500]">
                                 Đăng ký
                             </h1>
@@ -705,7 +705,7 @@ const LoginPage = React.memo((props) => {
                                     ? "Bước 1/2: Lựa chọn ngành hàng của bạn"
                                     : "Bước 2/2: Nhập thông tin của bạn để đăng ký"}
                             </h3>
-                            <div className="3xl:w-[50%] 2xl:w-[50%] [@media(min-width:1440px)]:w-[50%] xl:w-[55%] mt-5">
+                            <div className="3xl:w-[50%] 2xl:w-[50%] [@media(min-width:1440px)]:w-[50%] xl:w-[55%] 3xl:mt-5 xxl:mt-1 mt-1">
                                 <div className="grid grid-cols-2 gap-1">
                                     <div className="w-full h-1.5 rounded-full bg-[#3276FA]" />
                                     <div className="w-full h-1.5 rounded-full bg-[#F3F4F6] relative overflow-hidden">
@@ -719,7 +719,7 @@ const LoginPage = React.memo((props) => {
                                     </div>
                                 </div>
                                 {stepRegister == 0 ? (
-                                    <div className="grid grid-cols-3 2xl:gap-5 gap-3 mt-5">
+                                    <div className="grid grid-cols-3 2xl:gap-5 gap-3 3xl:mt-5 xxl:mt-1 mt-2">
                                         {listMajor.map((e, index) => (
                                             <label
                                                 key={e?.id?.toString()}
@@ -1014,11 +1014,11 @@ const LoginPage = React.memo((props) => {
                                                 this,
                                                 1
                                             )}
-                                            className="hover:bg-blue-600 transition-all duration-200 ease-linear w-full py-4 text-center rounded bg bg-[#0F4F9E] text-white 2xl:mt-8 mt-5"
+                                            className="hover:bg-blue-600 transition-all duration-200 ease-linear w-full py-4 text-center rounded bg bg-[#0F4F9E] text-white 3xl:mt-5 xl:mt-2 2xl:mt-2 mt-5"
                                         >
                                             Tiếp theo
                                         </button>
-                                        <div className="flex justify-center space-x-2 2xl:mt-5 mt-3">
+                                        <div className="flex justify-center space-x-2 3xl:mt-5 xxl:mt-1 mt-1 2xl:mt-5">
                                             <span className="font-[300] ">
                                                 Bạn đã có tài khoản?
                                             </span>
@@ -1043,7 +1043,7 @@ const LoginPage = React.memo((props) => {
                                                 loadingRegester
                                                     ? "relative"
                                                     : ""
-                                            } w-full 2xl:py-4 py-3 text-center rounded hover:bg-blue-600 transition-all duration-200 ease-linear bg bg-[#0F4F9E] text-white 2xl:mt-8 mt-5`}
+                                            } w-full 2xl:py-4 py-3 text-center rounded hover:bg-blue-600 transition-all duration-200 ease-linear bg bg-[#0F4F9E] text-white 3xl:mt-5 xxl:mt-1  2xl:mt-8 mt-1`}
                                         >
                                             {loadingRegester ? (
                                                 <div>
