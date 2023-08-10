@@ -105,9 +105,9 @@ const Index = (props) => {
         });
     }, []);
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         const tabPage = router.query?.tab;
-        Axios(
+        await Axios(
             "GET",
             `/api_web/Api_stock/exportProduction/?csrf_protection=true`,
             {
@@ -141,8 +141,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_group = () => {
-        Axios(
+    const _ServerFetching_group = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_stock/exportProductionFilterBar/?csrf_protection=true`,
             {
@@ -170,8 +170,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_filter = () => {
-        Axios(
+    const _ServerFetching_filter = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,
             {},
@@ -182,7 +182,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true",
             {},
@@ -1300,7 +1300,7 @@ const BtnTacVu = React.memo((props) => {
 
     const fetchDataSettingsCompany = async () => {
         if (props?.id) {
-            Axios(
+            await Axios(
                 "GET",
                 `/api_web/Api_setting/CompanyInfo?csrf_protection=true`,
                 {},
@@ -1313,7 +1313,7 @@ const BtnTacVu = React.memo((props) => {
             );
         }
         if (props?.id) {
-            Axios(
+            await Axios(
                 "GET",
                 `/api_web/Api_stock/exportProduction/${props?.id}?csrf_protection=true`,
                 {},

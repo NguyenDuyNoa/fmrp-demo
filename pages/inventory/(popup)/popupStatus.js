@@ -30,8 +30,8 @@ const Popup_status = (props) => {
         return roundedNumber.toLocaleString("en");
     };
 
-    const _ServerFetching = () => {
-        Axios(
+    const _ServerFetching = async () => {
+        await Axios(
             "GET",
             "/api_web/api_setting/feature/?csrf_protection=true",
             {},

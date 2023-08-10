@@ -83,7 +83,7 @@ const Index = (props) => {
 
     const _ServerFetching = async () => {
         sOnLoading(true);
-        Axios(
+        await Axios(
             "GET",
             "/api_web/Api_Branch/branchCombobox/?csrf_protection=true",
             {},
@@ -104,8 +104,8 @@ const Index = (props) => {
         onFetching && _ServerFetching();
     }, [onFetching]);
 
-    const _ServerFetchingCondition = () => {
-        Axios(
+    const _ServerFetchingCondition = async () => {
+        await Axios(
             "GET",
             "/api_web/api_setting/feature/?csrf_protection=true",
             {},
@@ -158,8 +158,8 @@ const Index = (props) => {
         e,
     }));
 
-    const _ServerFetchingDetailPage = () => {
-        Axios(
+    const _ServerFetchingDetailPage = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_stock/getExportProductionDetail/${id}?csrf_protection=true`,
             {},
@@ -265,8 +265,8 @@ const Index = (props) => {
             JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
-    const _ServerFetching_ItemsAll = () => {
-        Axios(
+    const _ServerFetching_ItemsAll = async () => {
+        await Axios(
             "GET",
             "/api_web/Api_stock/getSemiItems/?csrf_protection=true",
             {
@@ -406,7 +406,7 @@ const Index = (props) => {
         return integerPart.toLocaleString("en");
     };
 
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         var formData = new FormData();
         formData.append("code", code);
         formData.append(
@@ -444,7 +444,7 @@ const Index = (props) => {
                 );
             });
         });
-        Axios(
+        await Axios(
             "POST",
             `${
                 id

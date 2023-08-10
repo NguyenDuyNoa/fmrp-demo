@@ -64,8 +64,8 @@ const Index = (props) => {
         endDate: null,
     });
 
-    const _ServerFetching = () => {
-        Axios(
+    const _ServerFetching = async () => {
+        await Axios(
             "GET",
             "/api_web/api_inventory/inventory",
             {
@@ -149,8 +149,8 @@ const Index = (props) => {
         ? listBr?.map((e) => ({ label: e.name, value: e.id }))
         : [];
 
-    const _ServerFetching_filter = () => {
-        Axios(
+    const _ServerFetching_filter = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {},

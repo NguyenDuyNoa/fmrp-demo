@@ -104,9 +104,9 @@ const Index = (props) => {
         });
     }, []);
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         const tabPage = router.query?.tab;
-        Axios(
+        await Axios(
             "GET",
             `/api_web/Api_return_supplier/returnSupplier/?csrf_protection=true`,
             {
@@ -140,8 +140,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_group = () => {
-        Axios(
+    const _ServerFetching_group = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_return_supplier/filterBar/?csrf_protection=true`,
             {
@@ -170,8 +170,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_filter = () => {
-        Axios(
+    const _ServerFetching_filter = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,
             {},
@@ -182,7 +182,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/api_supplier/supplier/?csrf_protection=true",
             {},
@@ -195,7 +195,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/Api_return_supplier/returnsupplierCombobox/?csrf_protection=true",
             {},
@@ -209,8 +209,8 @@ const Index = (props) => {
         sOnFetching_filter(false);
     };
 
-    const _HandleSeachApi = (inputValue) => {
-        Axios(
+    const _HandleSeachApi = async (inputValue) => {
+        await Axios(
             "POST",
             `/api_web/Api_import/importCombobox/?csrf_protection=true`,
             {
@@ -1523,8 +1523,8 @@ const Popup_Pdf = (props) => {
     const [dataProductExpiry, sDataProductExpiry] = useState({});
     const [dataProductSerial, sDataProductSerial] = useState({});
 
-    const _ServerFetching = () => {
-        Axios(
+    const _ServerFetching = async () => {
+        await Axios(
             "GET",
             "/api_web/api_setting/feature/?csrf_protection=true",
             {},

@@ -60,8 +60,8 @@ const Popup_chitiet = (props) => {
         return integerPart.toLocaleString("en");
     };
 
-    const _ServerFetching_detailUser = () => {
-        Axios(
+    const _ServerFetching_detailUser = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_service/service/${props?.id}?csrf_protection=true`,
             {},

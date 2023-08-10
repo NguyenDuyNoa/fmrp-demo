@@ -74,9 +74,9 @@ const Index = (props) => {
         });
     }, []);
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         const id = Number(tabPage);
-        Axios(
+        await Axios(
             "GET",
             `/api_web/${
                 tabPage === "0" || tabPage === "-1"
@@ -108,8 +108,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_brand = () => {
-        Axios(
+    const _ServerFetching_brand = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {
@@ -141,8 +141,8 @@ const Index = (props) => {
         ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value))
         : [];
 
-    const _ServerFetching_group = () => {
-        Axios(
+    const _ServerFetching_group = async () => {
+        await Axios(
             "GET",
             `/api_web/api_client/group_count/?csrf_protection=true`,
             {
@@ -165,8 +165,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_selectct = () => {
-        Axios(
+    const _ServerFetching_selectct = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_address/province?limit=0`,
             {

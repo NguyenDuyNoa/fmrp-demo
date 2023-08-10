@@ -144,8 +144,8 @@ const Popup_servie = (props) => {
     props?.id && sOnFetchingDetail(true);
   }, [open]);
 
-  const _ServerFetching_detailUser = () => {
-    Axios(
+  const _ServerFetching_detailUser = async () => {
+    await Axios(
       "GET",
       `/api_web/Api_service/service/${props?.id}?csrf_protection=true`,
       {},
@@ -186,8 +186,8 @@ const Popup_servie = (props) => {
     onFetchingDetail && props?.id && _ServerFetching_detailUser();
   }, [open]);
 
-  const _ServerFetching = () => {
-    Axios(
+  const _ServerFetching = async () => {
+    await  Axios(
       "GET",
       "/api_web/Api_Branch/branchCombobox/?csrf_protection=true",
       {},
@@ -198,7 +198,7 @@ const Popup_servie = (props) => {
         }
       }
     );
-    Axios(
+    await  Axios(
       "GET",
       "/api_web/Api_tax/tax?csrf_protection=true",
       {},
@@ -231,8 +231,8 @@ const Popup_servie = (props) => {
     open && sOnFetching(true);
   }, [open]);
 
-  const _ServerFetching_Supplier = () => {
-    Axios(
+  const _ServerFetching_Supplier = async () => {
+    await Axios(
       "GET",
       "/api_web/api_supplier/supplier/?csrf_protection=true",
       {
@@ -601,7 +601,7 @@ const Popup_servie = (props) => {
     setTongTienState(tongTien);
   }, [option]);
 
-  const _ServerSending = () => {
+  const _ServerSending = async () => {
     var formData = new FormData();
     formData.append("code", code);
     formData.append("date", moment(date).format("YYYY-MM-DD HH:mm:ss"));
@@ -635,7 +635,7 @@ const Popup_servie = (props) => {
         item?.ghichu ? item?.ghichu : ""
       );
     });
-    Axios(
+    await Axios(
       "POST",
       `${
         id

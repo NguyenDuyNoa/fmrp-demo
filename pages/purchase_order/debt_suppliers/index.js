@@ -84,8 +84,8 @@ const Index = (props) => {
         });
     }, []);
 
-    const _ServerFetching = () => {
-        Axios(
+    const _ServerFetching = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_debt_supplier/GetDebtSuppliers?csrf_protection=true&cong=true`,
             {
@@ -119,8 +119,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_filter = () => {
-        Axios(
+    const _ServerFetching_filter = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,
             {},
@@ -131,7 +131,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/api_supplier/supplier/?csrf_protection=true",
             {},

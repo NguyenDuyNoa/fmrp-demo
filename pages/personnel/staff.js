@@ -74,8 +74,9 @@ const Index = (props) => {
     const [onFetchingOpt, sOnFetchingOpt] = useState(false);
 
     const [room, sRoom] = useState([]);
-    const _ServerFetching_room = () => {
-        Axios(
+
+    const _ServerFetching_room = async () => {
+        await Axios(
             "GET",
             `/api_web/api_staff/department/?csrf_protection=true`,
             {},
@@ -88,8 +89,8 @@ const Index = (props) => {
             }
         );
     };
-    const _ServerFetching = () => {
-        Axios(
+    const _ServerFetching = async () => {
+        await Axios(
             "GET",
             `/api_web/api_staff/staff/?csrf_protection=true" }`,
             {
@@ -117,8 +118,8 @@ const Index = (props) => {
     };
 
     const [listBr, sListBr] = useState();
-    const _ServerFetching_brand = () => {
-        Axios(
+    const _ServerFetching_brand = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {
@@ -141,8 +142,8 @@ const Index = (props) => {
         }
     };
 
-    const _ServerFetchingOtp = () => {
-        Axios(
+    const _ServerFetchingOtp = async () => {
+        await Axios(
             "GET",
             "/api_web/api_staff/positionOption",
             {},
@@ -294,11 +295,11 @@ const Index = (props) => {
             }
         });
     };
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         let id = status;
         var data = new FormData();
         data.append("active", active);
-        Axios(
+        await Axios(
             "POST",
             `${
                 id &&

@@ -51,8 +51,8 @@ const Index = (props) => {
     const [data_ex, sData_ex] = useState([]);
     const [idKho, sIdKho] = useState(null);
     const [onSending, sOnSending] = useState(false);
-    const _ServerFetching = () => {
-        Axios(
+    const _ServerFetching = async () => {
+        await Axios(
             "GET",
             `/api_web/api_warehouse/location/?csrf_protection=true`,
             {
@@ -75,8 +75,8 @@ const Index = (props) => {
         );
     };
     const [listKho, sListKho] = useState();
-    const _ServerFetching_kho = () => {
-        Axios(
+    const _ServerFetching_kho = async () => {
+        await Axios(
             "GET",
             `/api_web/api_warehouse/warehouse/?csrf_protection=true`,
             {
@@ -171,11 +171,11 @@ const Index = (props) => {
             }
         });
     };
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         let id = active;
         var data = new FormData();
         data.append("status", status);
-        Axios(
+        await Axios(
             "POST",
             `${
                 id &&

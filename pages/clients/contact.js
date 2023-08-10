@@ -46,8 +46,8 @@ const Index = (props) => {
     const [onFetching, sOnFetching] = useState(false);
     const [data, sData] = useState({});
     const [data_ex, sData_ex] = useState([]);
-    const _ServerFetching = () => {
-        Axios(
+    const _ServerFetching = async () => {
+        await Axios(
             "GET",
             "/api_web/api_client/contact/?csrf_protection=true",
             {
@@ -79,8 +79,8 @@ const Index = (props) => {
     };
 
     const [listBr, sListBr] = useState();
-    const _ServerFetching_brand = () => {
-        Axios(
+    const _ServerFetching_brand = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {
@@ -105,8 +105,8 @@ const Index = (props) => {
         : [];
 
     const [listClient, sListClient] = useState();
-    const _ServerFetching_client = () => {
-        Axios(
+    const _ServerFetching_client = async () => {
+        await Axios(
             "GET",
             `/api_web/api_client/client_option/?csrf_protection=true`,
             {

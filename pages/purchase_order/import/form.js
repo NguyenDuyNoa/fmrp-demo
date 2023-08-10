@@ -117,8 +117,8 @@ const Index = (props) => {
         router.query && sNote("");
     }, [router.query]);
 
-    const _ServerFetchingDetail = () => {
-        Axios(
+    const _ServerFetchingDetail = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_import/import/${id}?csrf_protection=true`,
             {},
@@ -183,8 +183,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching = () => {
-        Axios(
+    const _ServerFetching = async () => {
+        await Axios(
             "GET",
             "/api_web/Api_Branch/branchCombobox/?csrf_protection=true",
             {},
@@ -197,7 +197,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/Api_tax/tax?csrf_protection=true",
             {},
@@ -222,8 +222,8 @@ const Index = (props) => {
         onFetching && _ServerFetching();
     }, [onFetching]);
 
-    const _ServerFetchingCondition = () => {
-        Axios(
+    const _ServerFetchingCondition = async () => {
+        await Axios(
             "GET",
             "/api_web/api_setting/feature/?csrf_protection=true",
             {},
@@ -264,8 +264,8 @@ const Index = (props) => {
         JSON.stringify(dataProductSerial) === "{}",
     ]);
 
-    const _ServerFetchingDetailPage = () => {
-        Axios(
+    const _ServerFetchingDetailPage = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_import/getImport/${id}?csrf_protection=true`,
             {},
@@ -365,8 +365,8 @@ const Index = (props) => {
             JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
-    const _ServerFetching_TheOrder = () => {
-        Axios(
+    const _ServerFetching_TheOrder = async () => {
+        await Axios(
             "GET",
             "/api_web/Api_purchase_order/purchase_order_not_stock_combobox/?csrf_protection=true",
             {
@@ -396,8 +396,8 @@ const Index = (props) => {
         (idSupplier === null && sDataThe_order([])) || sIdTheOrder(null);
     }, []);
 
-    const _ServerFetching_Supplier = () => {
-        Axios(
+    const _ServerFetching_Supplier = async () => {
+        await Axios(
             "GET",
             "/api_web/api_supplier/supplier/?csrf_protection=true",
             {
@@ -1267,7 +1267,7 @@ const Index = (props) => {
         sStartDate(date);
     };
 
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         var formData = new FormData();
         formData.append("code", code);
         formData.append(
@@ -1341,7 +1341,7 @@ const Index = (props) => {
                 );
             });
         });
-        Axios(
+        await Axios(
             "POST",
             `${
                 id
@@ -2661,6 +2661,7 @@ const Index = (props) => {
                                                                             <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                                 {dataLang?.purchase_survive ||
                                                                                     "purchase_survive"}
+
                                                                                 :
                                                                             </h5>
                                                                             <h5 className="text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
@@ -2789,6 +2790,7 @@ const Index = (props) => {
                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
                                                                                 {dataLang?.import_Warehouse ||
                                                                                     "import_Warehouse"}
+
                                                                                 :{" "}
                                                                                 {
                                                                                     option?.warehouse_name

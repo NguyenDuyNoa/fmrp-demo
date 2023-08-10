@@ -183,6 +183,7 @@ const LoginPage = React.memo((props) => {
     const [listMajor, sListMajor] = useState([]);
     const [listPosition, sListPosition] = useState([]);
     const [checkMajior, sCheckMajior] = useState(null);
+
     const [loadingRegester, sLoadingRegester] = useState(false);
 
     const _HandleInputChange = (type, value) => {
@@ -322,6 +323,7 @@ const LoginPage = React.memo((props) => {
         sPassword(data?.password);
         // /api_web/Api_Login/SignUpMain?csrf_protection=true
         const dataSubmit = new FormData();
+
         dataSubmit.append("career", data?.major);
         dataSubmit.append("company_name", data?.companyName);
         dataSubmit.append("fullname", data?.fullName);
@@ -718,7 +720,7 @@ const LoginPage = React.memo((props) => {
                                 </div>
                                 {stepRegister == 0 ? (
                                     <div className="grid grid-cols-3 2xl:gap-5 gap-3 mt-5">
-                                        {listMajor.map((e) => (
+                                        {listMajor.map((e, index) => (
                                             <label
                                                 key={e?.id?.toString()}
                                                 htmlFor={`major ${e?.id}`}
@@ -728,13 +730,20 @@ const LoginPage = React.memo((props) => {
                                                     <input
                                                         type="radio"
                                                         id={`major ${e?.id}`}
-                                                        {...register("major", {
-                                                            onChange: (e) =>
-                                                                sCheckMajior(
-                                                                    e?.target
-                                                                        ?.checked
-                                                                ),
-                                                        })}
+                                                        // {...register("major", {
+                                                        //     onChange: (e) => {
+                                                        //         sCheckMajior(
+                                                        //             e?.target
+                                                        //                 ?.checked
+                                                        //         );
+                                                        //     },
+                                                        // })}
+                                                        {...register(`major`)}
+                                                        onChange={(e) => {
+                                                            sCheckMajior(
+                                                                e.target.checked
+                                                            );
+                                                        }}
                                                         value={e?.id}
                                                         // name="major register"
                                                         className="2xl:w-5 w-3.5 2xl:h-5 h-3.5 accent-[#1847ED] peer relative z-[1]"

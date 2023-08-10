@@ -44,8 +44,8 @@ const Index = (props) => {
     const [limit, sLimit] = useState(15);
     const [totalItem, sTotalItem] = useState([]);
 
-    const _ServerFetching = () => {
-        Axios(
+    const _ServerFetching = async () => {
+        await Axios(
             "GET",
             `/api_web/api_staff/department/?csrf_protection=true`,
             {
@@ -71,8 +71,8 @@ const Index = (props) => {
         );
     };
     const [listBr, sListBr] = useState();
-    const _ServerFetching_brand = () => {
-        Axios(
+    const _ServerFetching_brand = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {

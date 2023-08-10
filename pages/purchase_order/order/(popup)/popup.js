@@ -44,8 +44,8 @@ const Popup_chitiet = (props) => {
         return parseFloat(roundedNum).toLocaleString("en");
     };
 
-    const _ServerFetching_detailUser = () => {
-        Axios(
+    const _ServerFetching_detailUser = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`,
             {},

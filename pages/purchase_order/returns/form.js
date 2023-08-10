@@ -114,9 +114,9 @@ const Index = (props) => {
         router.query && sNote("");
     }, [router.query]);
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         sOnLoading(true);
-        Axios(
+        await Axios(
             "GET",
             "/api_web/Api_Branch/branchCombobox/?csrf_protection=true",
             {},
@@ -130,7 +130,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/Api_tax/tax?csrf_protection=true",
             {},
@@ -148,7 +148,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/Api_return_supplier/treatment_methods/?csrf_protection=true",
             {},
@@ -173,8 +173,8 @@ const Index = (props) => {
         onFetching && _ServerFetching();
     }, [onFetching]);
 
-    const _ServerFetchingCondition = () => {
-        Axios(
+    const _ServerFetchingCondition = async () => {
+        await Axios(
             "GET",
             "/api_web/api_setting/feature/?csrf_protection=true",
             {},
@@ -226,8 +226,8 @@ const Index = (props) => {
         value: e.id,
         e,
     }));
-    const _ServerFetchingDetailPage = () => {
-        Axios(
+    const _ServerFetchingDetailPage = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_return_supplier/getDetail/${id}?csrf_protection=true`,
             {},
@@ -340,8 +340,8 @@ const Index = (props) => {
             JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
-    const _ServerFetching_ItemsAll = () => {
-        Axios(
+    const _ServerFetching_ItemsAll = async () => {
+        await Axios(
             "GET",
             "/api_web/Api_return_supplier/getImportItems/?csrf_protection=true",
             {
@@ -362,9 +362,9 @@ const Index = (props) => {
         sOnFetchingItemsAll(false);
     };
 
-    const _ServerFetching_Supplier = () => {
+    const _ServerFetching_Supplier = async () => {
         sOnLoading(true);
-        Axios(
+        await Axios(
             "GET",
             "/api_web/api_supplier/supplier/?csrf_protection=true",
             {
@@ -582,9 +582,9 @@ const Index = (props) => {
         sErrTreatment(false);
     }, [idTreatment != null]);
 
-    const _ServerFetching_Warehouse = () => {
+    const _ServerFetching_Warehouse = async () => {
         sOnLoadingChild(true);
-        Axios(
+        await Axios(
             "GET",
             `/api_web/Api_import/quantityStock/${idParen}?csrf_protection=true`,
             {
@@ -739,7 +739,7 @@ const Index = (props) => {
         setTongTienState(tongTien);
     }, [listData]);
 
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         var formData = new FormData();
         formData.append("code", code);
         formData.append(
@@ -799,7 +799,7 @@ const Index = (props) => {
                 );
             });
         });
-        Axios(
+        await Axios(
             "POST",
             `${
                 id

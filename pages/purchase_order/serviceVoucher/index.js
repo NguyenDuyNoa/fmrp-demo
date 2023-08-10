@@ -107,9 +107,9 @@ const Index = (props) => {
         });
     }, []);
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         const tabPage = router.query?.tab;
-        Axios(
+        await Axios(
             "GET",
             `/api_web/Api_service/service/?csrf_protection=true`,
             {
@@ -151,8 +151,8 @@ const Index = (props) => {
         }
     };
 
-    const _ServerFetching_filter = () => {
-        Axios(
+    const _ServerFetching_filter = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,
             {},
@@ -165,7 +165,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             `/api_web/Api_service/serviceCombobox/?csrf_protection=true`,
             {},
@@ -178,7 +178,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             `/api_web/Api_staff/staffOption?csrf_protection=true`,
             {},
@@ -196,8 +196,8 @@ const Index = (props) => {
         onFetching_filter && _ServerFetching_filter();
     }, [onFetching_filter]);
 
-    const _HandleSeachApi = (inputValue) => {
-        Axios(
+    const _HandleSeachApi = async (inputValue) => {
+        await Axios(
             "POST",
             `/api_web/Api_service/serviceCombobox/?csrf_protection=true`,
             {
@@ -216,8 +216,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_group = () => {
-        Axios(
+    const _ServerFetching_group = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_service/filterBar/?csrf_protection=true`,
             {

@@ -81,8 +81,8 @@ const Index = (props) => {
     const [limit, sLimit] = useState(15);
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
 
-    const _ServerFetching = () => {
-        Axios(
+    const _ServerFetching = async () => {
+        await Axios(
             "GET",
             "/api_web/api_material/material?csrf_protection=true",
             {
@@ -108,7 +108,7 @@ const Index = (props) => {
                 sOnFetching(false);
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/api_setting/feature/?csrf_protection=true",
             {},
@@ -135,8 +135,8 @@ const Index = (props) => {
             (router.query?.page && sOnFetching(true));
     }, [limit, router.query?.page, idCategory, idBranch]);
 
-    const _ServerFetchingUnit = () => {
-        Axios(
+    const _ServerFetchingUnit = async () => {
+        await Axios(
             "GET",
             "/api_web/Api_unit/unit/?csrf_protection=true",
             {},
@@ -153,7 +153,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/Api_Branch/branch/?csrf_protection=true",
             {},
@@ -173,7 +173,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/api_material/categoryOption?csrf_protection=true",
             {},
@@ -192,7 +192,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/Api_variation/variation?csrf_protection=true",
             {},
@@ -1279,8 +1279,8 @@ const Popup_NVL = React.memo((props) => {
         sErrBranch(false);
     }, [branch.length > 0]);
 
-    const _ServerFetchingGroup = () => {
-        Axios(
+    const _ServerFetchingGroup = async () => {
+        await Axios(
             "GET",
             "/api_web/api_material/categoryOption?csrf_protection=true",
             {
@@ -1314,8 +1314,8 @@ const Popup_NVL = React.memo((props) => {
         }, 500);
     }, [branch]);
 
-    const _ServerFetching = () => {
-        Axios(
+    const _ServerFetching = async () => {
+        await Axios(
             "GET",
             `/api_web/api_material/material/${props?.id}?csrf_protection=true`,
             {},

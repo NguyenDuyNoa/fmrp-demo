@@ -108,9 +108,9 @@ const Index = (props) => {
             query: { tab: router.query?.tab ? router.query?.tab : "all" },
         });
     }, []);
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         const tabPage = router.query?.tab;
-        Axios(
+        await Axios(
             "GET",
             `/api_web/Api_purchase_order/purchase_order/?csrf_protection=true`,
             {
@@ -148,8 +148,8 @@ const Index = (props) => {
             }
         );
     };
-    const _ServerFetching_group = () => {
-        Axios(
+    const _ServerFetching_group = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_purchase_order/filterBar/?csrf_protection=true`,
             {
@@ -181,8 +181,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_filter = () => {
-        Axios(
+    const _ServerFetching_filter = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {},
@@ -193,7 +193,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             `/api_web/Api_purchase_order/purchase_order/?csrf_protection=true`,
             {},
@@ -204,7 +204,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/api_supplier/supplier/?csrf_protection=true",
             {},
@@ -217,7 +217,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/Api_purchase_order/order_type_option/?csrf_protection=true",
             {},
@@ -1386,7 +1386,7 @@ const BtnTacVu = React.memo((props) => {
 
     const fetchDataSettingsCompany = async () => {
         if (props?.id) {
-            Axios(
+            await Axios(
                 "GET",
                 `/api_web/Api_setting/CompanyInfo?csrf_protection=true`,
                 {},
@@ -1399,7 +1399,7 @@ const BtnTacVu = React.memo((props) => {
             );
         }
         if (props?.id) {
-            Axios(
+            await Axios(
                 "GET",
                 `/api_web/Api_purchase_order/purchase_order/${props?.id}?csrf_protection=true`,
                 {},
@@ -1416,8 +1416,8 @@ const BtnTacVu = React.memo((props) => {
         openTacvu && fetchDataSettingsCompany();
     }, [openTacvu]);
 
-    const _ServerFetching_ValidatePayment = () => {
-        Axios(
+    const _ServerFetching_ValidatePayment = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_purchase_order/paymentStatus/${props?.id}?csrf_protection=true`,
             {},

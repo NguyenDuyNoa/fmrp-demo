@@ -42,8 +42,8 @@ const Popup_chitiet = (props) => {
         props?.id && sOnFetching(true);
     }, [open]);
 
-    const _ServerFetching_detailUser = () => {
-        Axios(
+    const _ServerFetching_detailUser = async () => {
+        await Axios(
             "GET",
             `/api_web/api_client/client/${props?.id}?csrf_protection=true`,
             {},

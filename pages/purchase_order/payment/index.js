@@ -117,8 +117,8 @@ const Index = (props) => {
         });
     }, []);
 
-    const _ServerFetching = () => {
-        Axios(
+    const _ServerFetching = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_expense_voucher/expenseVoucher/?csrf_protection=true`,
             {
@@ -152,8 +152,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_filter = () => {
-        Axios(
+    const _ServerFetching_filter = async () => {
+        await Axios(
             "GET",
             `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,
             {},
@@ -166,7 +166,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/Api_payment_method/payment_method/?csrf_protection=true",
             {},
@@ -179,7 +179,7 @@ const Index = (props) => {
                 }
             }
         );
-        Axios(
+        await Axios(
             "GET",
             "/api_web/Api_expense_voucher/object/?csrf_protection=true",
             {},
@@ -1218,7 +1218,7 @@ const BtnTacVu = React.memo((props) => {
 
     const fetchDataSettingsCompany = async () => {
         if (props?.id) {
-            Axios(
+            await Axios(
                 "GET",
                 `/api_web/Api_setting/CompanyInfo?csrf_protection=true`,
                 {},
@@ -1231,7 +1231,7 @@ const BtnTacVu = React.memo((props) => {
             );
         }
         if (props?.id) {
-            Axios(
+            await Axios(
                 "GET",
                 `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
                 {},

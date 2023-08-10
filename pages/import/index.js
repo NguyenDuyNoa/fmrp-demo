@@ -139,7 +139,7 @@ const Index = (props) => {
 
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         sOnLoading(true);
 
         const apiDataFields = {
@@ -151,7 +151,7 @@ const Index = (props) => {
         };
 
         const apiUrls = apiDataFields[tabPage] || "";
-        Axios("GET", `${apiUrls}`, {}, (err, response) => {
+        await Axios("GET", `${apiUrls}`, {}, (err, response) => {
             if (!err) {
                 var db = response.data;
                 if (tabPage == 1) {
@@ -196,7 +196,7 @@ const Index = (props) => {
         };
 
         const apiUrlComLumn = apiDataComlumn[tabPage] || "";
-        Axios("GET", `${apiUrlComLumn}`, {}, (err, response) => {
+        await Axios("GET", `${apiUrlComLumn}`, {}, (err, response) => {
             if (!err) {
                 var db = response.data;
                 sDataColumn(db?.map((e) => ({ label: e, value: e })));
@@ -213,7 +213,7 @@ const Index = (props) => {
         };
 
         const apiUrlConditionColumn = apiDataConditionColumn[tabPage] || "";
-        Axios("GET", `${apiUrlConditionColumn}`, {}, (err, response) => {
+        await Axios("GET", `${apiUrlConditionColumn}`, {}, (err, response) => {
             if (!err) {
                 var db = response.data;
                 sDataConditionColumn(
@@ -236,7 +236,7 @@ const Index = (props) => {
 
         const apiUrlSampleImport = apiDataSampleImport[tabPage] || "";
 
-        Axios(
+        await Axios(
             "GET",
             `${apiUrlSampleImport}`,
             {
@@ -1307,7 +1307,7 @@ const Index = (props) => {
             formData.append("file", fileImport);
             formData.append("actions", valueCheck);
 
-            Axios(
+            await Axios(
                 "POST",
                 `${apiUrl}`,
                 {
@@ -1339,7 +1339,7 @@ const Index = (props) => {
             );
         } else {
             for (const data of dataChunks) {
-                Axios(
+                await Axios(
                     "POST",
                     `${apiUrl}`,
                     {
@@ -1399,7 +1399,7 @@ const Index = (props) => {
         }
     };
 
-    const _ServerSendingImporTemplate = () => {
+    const _ServerSendingImporTemplate = async () => {
         var formData = new FormData();
         listData.forEach((e, index) => {
             formData.append(`setup_colums[data][${index}]`, JSON.stringify(e));
@@ -1427,7 +1427,7 @@ const Index = (props) => {
             });
         }
         formData.append(`tab`, tabPage);
-        Axios(
+        await Axios(
             "POST",
             `${"/api_web/Api_import_data/add_tempate_import?csrf_protection=true"}`,
             {
