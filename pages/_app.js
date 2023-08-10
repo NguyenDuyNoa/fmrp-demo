@@ -90,7 +90,7 @@ function MainPage({ Component, pageProps }) {
     const auth = useSelector((state) => state.auth);
 
     const [onChecking, sOnChecking] = useState(false);
-    const [dataView, sDataView] = useState(null);
+
     const ServerFetching = async () => {
         await Axios(
             "GET",
@@ -102,7 +102,6 @@ function MainPage({ Component, pageProps }) {
                 } else {
                     var { isSuccess, info } = response.data;
                     if (isSuccess) {
-                        // sDataView(info);
                         dispatch({ type: "auth/update", payload: info });
                     } else {
                         dispatch({ type: "auth/update", payload: false });
@@ -112,10 +111,6 @@ function MainPage({ Component, pageProps }) {
             }
         );
     };
-    // dataView
-    // useEffect(() => {
-
-    // }, [dataView]);
 
     useEffect(() => {
         onChecking && ServerFetching();
@@ -380,8 +375,8 @@ const LoginPage = React.memo((props) => {
                     <div className="bg-[#EEF1F8]">
                         <div className="bg-[url('/Logo-BG.png')] relative bg-repeat-round h-screen w-screen flex flex-col justify-center items-center overflow-hidden">
                             <div className="flex justify-center space-x-20 w-full z-10">
-                                <div className="space-y-8">
-                                    <div className="bg-white px-16 pt-20 pb-12 rounded-lg space-y-10 w-[600px]">
+                                <div className="3xl:space-y-8 xxl:space-y-2 2xl:space-y-3 xl:space-y-2 lg:space-y-1 space-y-1">
+                                    <div className="bg-white px-16 pt-20 pb-12 xxl:pb-10 xxl:pt-4 2xl:pb-15 2xl:pt-10 xl:pb-8 lg:pt-2 xl:pt-4 rounded-lg space-y-10 w-[600px]">
                                         <div className="space-y-3">
                                             <h1 className="text-[#11315B] font-medium text-3xl text-center">
                                                 {dataLang?.auth_login ||
@@ -418,7 +413,7 @@ const LoginPage = React.memo((props) => {
                                                 </button>
                                             </div>
                                         </div>
-                                        <div className="space-y-3">
+                                        <div className="space-y-2">
                                             <input
                                                 type="text"
                                                 placeholder="Mã công ty"
