@@ -374,20 +374,28 @@ const Index = (props) => {
                                                 className="border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full"
                                             />
                                         </div>
-                                        <div className="space-y-1">
+                                        <div className="">
                                             <h6 className="text-[14.5px]">
                                                 Địa chỉ Doanh Nghiệp
                                             </h6>
                                             <textarea
                                                 type="text"
                                                 placeholder="Nhập địa chỉ Doanh Nghiệp"
-                                                rows={3}
+                                                rows={1}
                                                 value={data?.company_address}
-                                                onChange={_HandleChangeValue.bind(
-                                                    this,
-                                                    "address"
-                                                )}
                                                 className="border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full resize-none"
+                                            />
+                                        </div>
+                                        <div className="space-y-0.5">
+                                            <h6 className="text-[14.5px]">
+                                                Mã công ty
+                                            </h6>
+                                            <input
+                                                type="text"
+                                                placeholder="Nhập số điện thoại Doanh Nghiệp"
+                                                value={data?.code_company}
+                                                disabled={true}
+                                                className="border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-2.5 rounded-md w-full"
                                             />
                                         </div>
                                     </div>

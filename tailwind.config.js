@@ -20,6 +20,9 @@ module.exports = {
                 14: "repeat(14, minmax(0, 1fr))",
                 26: "repeat(26, minmax(0, 1fr))",
             },
+            backgroundImage: {
+                logo: "url('/logo_1.png')",
+            },
         },
     },
     plugins: [

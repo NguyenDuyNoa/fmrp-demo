@@ -22,6 +22,7 @@ import { useEffect } from "react";
 import { NumericFormat } from "react-number-format";
 import Link from "next/link";
 import moment from "moment/moment";
+import { useSelector } from "react-redux";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -60,6 +61,9 @@ const Index = (props) => {
     const [dataProductExpiry, sDataProductExpiry] = useState({});
     const [dataProductSerial, sDataProductSerial] = useState({});
     //new
+
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+
     const [listData, sListData] = useState([]);
 
     const [idBranch, sIdBranch] = useState(null);
@@ -825,35 +829,38 @@ const Index = (props) => {
             <Head>
                 <title>
                     {id
-                        ? dataLang?.production_warehouse_edit
-                        : dataLang?.production_warehouse_add}
+                        ? "Sửa nhập kho thành phẩm"
+                        : "Thêm nhập kho thành phẩm"}
                 </title>
             </Head>
             <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
                 <div className="h-[97%] space-y-3 overflow-hidden">
-                    <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.production_warehouse ||
-                                "production_warehouse"}
-                        </h6>
-                        <span className="text-[#141522]/40">/</span>
-                        <h6>
-                            {id
-                                ? dataLang?.production_warehouse_edit
-                                : dataLang?.production_warehouse_add}
-                        </h6>
-                    </div>
+                    {trangthaiExprired ? (
+                        <div className="p-2"></div>
+                    ) : (
+                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
+                            <h6 className="text-[#141522]/40">
+                                {"Nhập kho thành phẩm"}
+                            </h6>
+                            <span className="text-[#141522]/40">/</span>
+                            <h6>
+                                {id
+                                    ? "Sửa nhập kho thành phẩm"
+                                    : "Thêm nhập kho thành phẩm"}
+                            </h6>
+                        </div>
+                    )}
                     <div className="flex justify-between items-center">
                         <h2 className="xl:text-2xl text-xl ">
                             {id
-                                ? dataLang?.production_warehouse_edit
-                                : dataLang?.production_warehouse_add}
+                                ? "Sửa nhập kho thành phẩm"
+                                : "Thêm nhập kho thành phẩm"}
                         </h2>
                         <div className="flex justify-end items-center">
                             <button
                                 onClick={() =>
                                     router.push(
-                                        "/manufacture/production_warehouse?tab=all"
+                                        "/manufacture/productsWarehouse?tab=all"
                                     )
                                 }
                                 className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
@@ -1084,27 +1091,25 @@ const Index = (props) => {
                             {dataLang?.import_from_items || "import_from_items"}
                         </h4>
                         <div className="col-span-9">
-                            <div className="grid grid-cols-8">
+                            <div className="grid grid-cols-7">
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_location ||
-                                        "production_warehouse_location"}
+                                    {"Kho nhập - Vị trí nhập"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {"ĐVT"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_export_quantity ||
-                                        "production_warehouse_export_quantity"}
+                                    {"Số lượng nhập"}
                                 </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                                {/* <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {dataLang?.production_warehouse_exchange_value ||
                                         "production_warehouse_exchange_value"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {dataLang?.production_warehouse_amount_of_conversion ||
                                         "production_warehouse_amount_of_conversion"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                                </h4> */}
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2    text-center  truncate font-[400]">
                                     {dataLang?.production_warehouse_note ||
                                         "production_warehouse_note"}
                                 </h4>
@@ -1254,15 +1259,12 @@ const Index = (props) => {
                             />
                         </div>
                         <div className="col-span-9">
-                            <div className="grid grid-cols-8 divide-x border-t border-b border-r border-l">
+                            <div className="grid grid-cols-7 divide-x border-t border-b border-r border-l">
                                 <div className="col-span-2">
                                     {" "}
                                     <Select
                                         classNamePrefix="customDropdowDefault"
-                                        placeholder={
-                                            dataLang?.production_warehouse_location ||
-                                            "production_warehouse_location"
-                                        }
+                                        placeholder={"Kho nhập - Vị trí nhập"}
                                         className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
                                     />
@@ -1278,11 +1280,7 @@ const Index = (props) => {
                                         isDisabled={true}
                                     />
                                 </div>
-                                {/* <input
-                  placeholder={"Số lượng xuất"}
-                  disabled
-                  className=" disabled:bg-gray-50 text-center col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 "
-                /> */}
+
                                 <div className="col-span-1 flex items-center justify-center">
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
                                         <Minus
@@ -1301,18 +1299,18 @@ const Index = (props) => {
                                     </button>
                                 </div>
 
-                                <div className="col-span-1 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black flex items-center justify-center">
+                                {/* <div className="col-span-1 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black flex items-center justify-center">
                                     0
                                 </div>
                                 <div className="col-span-1 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black  flex items-center justify-center">
                                     1
-                                </div>
+                                </div> */}
                                 <input
                                     placeholder={
                                         dataLang?.returns_note || "returns_note"
                                     }
                                     disabled
-                                    className=" disabled:bg-gray-50 col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 "
+                                    className=" disabled:bg-gray-50 col-span-2 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 "
                                 />
                                 <button
                                     title={
@@ -1561,10 +1559,10 @@ const Index = (props) => {
                                                 )}
                                             </div>
                                             <div className="col-span-9  items-center">
-                                                <div className="grid grid-cols-8  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
+                                                <div className="grid grid-cols-7  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
                                                     {load ? (
                                                         <Loading
-                                                            className="h-2 col-span-8"
+                                                            className="h-2 col-span-7"
                                                             color="#0f4f9e"
                                                         />
                                                     ) : (
@@ -1682,7 +1680,7 @@ const Index = (props) => {
                                                                             classNamePrefix="customDropdow"
                                                                         />
                                                                     </div>
-                                                                    <div className=" flex flex-col items-center p-0.5 h-full justify-center">
+                                                                    <div className=" flex flex-col items-center col-span-1 p-0.5 h-full justify-center">
                                                                         <Select
                                                                             options={
                                                                                 ce?.dataUnit
@@ -1843,7 +1841,7 @@ const Index = (props) => {
                                                                             />
                                                                         </button>
                                                                     </div>
-                                                                    <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                    {/* <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                         {
                                                                             ce?.exchangeValue
                                                                         }
@@ -1854,8 +1852,8 @@ const Index = (props) => {
                                                                             ce?.exportQuantity *
                                                                                 ce?.exchangeValue
                                                                         )}
-                                                                    </div>
-                                                                    <div className="col-span-1 flex items-center justify-center  h-full p-0.5">
+                                                                    </div> */}
+                                                                    <div className="col-span-2 flex items-center justify-center  h-full p-0.5">
                                                                         <input
                                                                             value={
                                                                                 ce?.note
@@ -1866,7 +1864,7 @@ const Index = (props) => {
                                                                                 ce?.id,
                                                                                 "note"
                                                                             )}
-                                                                            placeholder="Ghi chú"
+                                                                            placeholder="Ghi  chú"
                                                                             type="text"
                                                                             className="  placeholder:text-slate-300 w-full bg-white rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
                                                                         />
@@ -1933,10 +1931,7 @@ const Index = (props) => {
                         </div>
                         <div className="flex justify-between ">
                             <div className="font-normal">
-                                <h3>
-                                    {dataLang?.production_warehouse_totalEx ||
-                                        "production_warehouse_totalEx"}
-                                </h3>
+                                <h3>{"Tổng số lượng nhập"}</h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
@@ -1965,7 +1960,7 @@ const Index = (props) => {
                             <button
                                 onClick={() =>
                                     router.push(
-                                        "/manufacture/production_warehouse?tab=all"
+                                        "/manufacture/productsWarehouse?tab=all"
                                     )
                                 }
                                 className="button text-[#344054] font-normal text-base hover:bg-blue-500 hover:text-white hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
