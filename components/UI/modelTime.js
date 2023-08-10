@@ -2,14 +2,15 @@ import React, { useState, useEffect } from "react";
 import PopupEdit from "/components/UI/popup";
 import moment from "moment/moment";
 import { Cd, Verify } from "iconsax-react";
+import { useSelector } from "react-redux";
 
 const PopupModelTime = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
-
+    const data = useSelector((state) => state.auth);
     useEffect(() => {
-        props?.data?.fail_expiration && sOpen(props?.data?.fail_expiration);
-    }, [props?.data]);
+        data?.fail_expiration && sOpen(data?.fail_expiration);
+    }, [data]);
 
     return (
         <>

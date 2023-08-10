@@ -21,7 +21,7 @@ import {
 } from "iconsax-react";
 import { Lexend_Deca } from "@next/font/google";
 import { useRouter } from "next/router";
-import PopupModelTime from "./(modelTime)/modelTime";
+import PopupModelTime from "../components/UI/modelTime";
 
 const deca = Lexend_Deca({
     subsets: ["latin"],
@@ -102,7 +102,7 @@ function MainPage({ Component, pageProps }) {
                 } else {
                     var { isSuccess, info } = response.data;
                     if (isSuccess) {
-                        sDataView(info);
+                        // sDataView(info);
                         dispatch({ type: "auth/update", payload: info });
                     } else {
                         dispatch({ type: "auth/update", payload: false });
@@ -112,6 +112,10 @@ function MainPage({ Component, pageProps }) {
             }
         );
     };
+    // dataView
+    // useEffect(() => {
+
+    // }, [dataView]);
 
     useEffect(() => {
         onChecking && ServerFetching();
@@ -132,7 +136,7 @@ function MainPage({ Component, pageProps }) {
     return (
         <Layout>
             <Component dataLang={data} {...pageProps} />
-            <PopupModelTime data={dataView} />
+            {/* <PopupModelTime data={dataView} /> */}
         </Layout>
     );
 }
