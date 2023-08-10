@@ -26,8 +26,8 @@ const Expirred = () => {
     //     startDate.getMonth() + 1
     // }/${startDate.getFullYear()}`;
 
-    const _ServerLang = async () => {
-        await Axios(
+    const _ServerLang = () => {
+        Axios(
             "GET",
             `/api_web/Api_Authentication/authentication?csrf_protection=true`,
             {},

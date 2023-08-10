@@ -12,6 +12,7 @@ import { ArrowUp, ArrowDown2 as IconDown } from "iconsax-react";
 import { Tooltip } from "react-tippy";
 import "react-tippy/dist/tippy.css";
 import Expirred from "components/UI/expired";
+import PopupModelTime from "components/UI/modelTime";
 
 const Header = () => {
     const ListDanhMuc = [
@@ -1042,6 +1043,7 @@ const Header = () => {
             </div>
             <div className="px-10 py-0  pt-1 overflow-x-auto">
                 <Expirred />
+                <PopupModelTime />
             </div>
         </header>
     );

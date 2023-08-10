@@ -91,8 +91,8 @@ function MainPage({ Component, pageProps }) {
 
     const [onChecking, sOnChecking] = useState(false);
 
-    const ServerFetching = async () => {
-        await Axios(
+    const ServerFetching = () => {
+        Axios(
             "GET",
             "/api_web/Api_Authentication/authentication?csrf_protection=true",
             {},
@@ -194,8 +194,8 @@ const LoginPage = React.memo((props) => {
             sPassword(value.target?.value);
         }
     };
-    const _ServerSending = async () => {
-        await Axios(
+    const _ServerSending = () => {
+        Axios(
             "POST",
             "/api_web/Api_Login/loginMain?csrf_protection=true",
             {
@@ -267,8 +267,8 @@ const LoginPage = React.memo((props) => {
         !e && sOnFechingRegister(true);
     };
 
-    const _ServerFetching_Majior = async () => {
-        await Axios(
+    const _ServerFetching_Majior = () => {
+        Axios(
             "GET",
             "/api_web/Api_Login/get_list_data?csrf_protection=true",
             {},

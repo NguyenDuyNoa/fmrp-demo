@@ -9,10 +9,12 @@ const PopupModelTime = (props) => {
     const _ToggleModal = (e) => sOpen(e);
     const data = useSelector((state) => state.auth);
     useEffect(() => {
-        data?.fail_expiration && sOpen(data?.fail_expiration);
+        data.fail_expiration && sOpen(data.fail_expiration);
     }, [data]);
+    console.log("data", data);
 
     return (
+        // <div className={`${open ? props?.hidden : props?.hidden}`}>
         <>
             <PopupEdit
                 // title={"Khởi đầu chuyển đổi số ngay với phần mềm FMRP !"}
