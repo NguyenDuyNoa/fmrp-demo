@@ -50,8 +50,6 @@ function adminReducer(state = adminState, action) {
             return { ...state, trangthai: action.payload };
         case "trangthaiExprired":
             return { ...state, trangthaiExprired: action.payload };
-        // case "dataView":
-        //     return { ...state, dataView: action.payload };
         default:
             return state;
     }

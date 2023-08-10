@@ -601,7 +601,7 @@ const LoginPage = React.memo((props) => {
                                         <h1 className="text-[#344054] font-medium text-xl">
                                             Trợ lý sản xuất
                                         </h1>
-                                        <div className="space-y-1">
+                                        <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
                                             <p className="text-[#667085] font-light text-[16px]">
                                                 Giải pháp phần mềm cho doanh
                                                 nghiệp
@@ -695,16 +695,16 @@ const LoginPage = React.memo((props) => {
                                 </h6>
                             </div>
                         </div>
-                        <div className="col-span-3 bg-white h-full flex flex-col items-center xxl:mt-0 2xl:mt-8 mt-1">
-                            <h1 className="text-[#11315B] 2xl:text-4xl text-2xl font-[500]">
+                        <div className="col-span-3 bg-white h-full flex flex-col items-center xxl:mt-0 2xl:mt-1 mt-1 3xl:p-0 2xl:p-0 p-0">
+                            <h1 className="text-[#11315B] 3xl:text-4xl xxl:text-3xl 2xl:text-3xl text-2xl font-[500]">
                                 Đăng ký
                             </h1>
-                            <h3 className="2xl:mt-8 mt-4 text-[#667085] 2xl:text-lg">
+                            <h3 className="3xl:mt-8 xxl:mt-0 2xl:mt-0 mt-1 text-[#667085] 2xl:text-lg">
                                 {stepRegister == 0
                                     ? "Bước 1/2: Lựa chọn ngành hàng của bạn"
                                     : "Bước 2/2: Nhập thông tin của bạn để đăng ký"}
                             </h3>
-                            <div className="3xl:w-[50%] 2xl:w-[50%] [@media(min-width:1440px)]:w-[50%] xl:w-[55%] 3xl:mt-5 xxl:mt-1 mt-1">
+                            <div className="3xl:w-[50%] 2xl:w-[50%] [@media(min-width:1440px)]:w-[50%] xl:w-[55%] lg:w-[70%] 3xl:mt-5 xxl:mt-1 mt-1">
                                 <div className="grid grid-cols-2 gap-1">
                                     <div className="w-full h-1.5 rounded-full bg-[#3276FA]" />
                                     <div className="w-full h-1.5 rounded-full bg-[#F3F4F6] relative overflow-hidden">
@@ -718,12 +718,12 @@ const LoginPage = React.memo((props) => {
                                     </div>
                                 </div>
                                 {stepRegister == 0 ? (
-                                    <div className="grid grid-cols-3 2xl:gap-5 gap-3 3xl:mt-5 xxl:mt-1 mt-2">
+                                    <div className="grid grid-cols-3  2xl:gap-5 gap-3 3xl:mt-5 xxl:mt-1 mt-2">
                                         {listMajor.map((e, index) => (
                                             <label
                                                 key={e?.id?.toString()}
                                                 htmlFor={`major ${e?.id}`}
-                                                className="w-full h-full xl:aspect-w-1 aspect-w-[5] xl:aspect-h-1 aspect-h-[4] rounded-md border border-[#DDDDE2] relative"
+                                                className="w-full h-full cursor-pointer xl:aspect-w-1 lg:aspect-w-3 lg:aspect-h-4 aspect-w-[5] xl:aspect-h-1 aspect-h-[4] rounded-md border border-[#DDDDE2] relative"
                                             >
                                                 <div className="w-full h-full flex flex-col items-center justify-between 2xl:p-5 p-3 select-none">
                                                     <input
@@ -764,8 +764,8 @@ const LoginPage = React.memo((props) => {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="2xl:space-y-5 space-y-2 2xl:mt-5 mt-3">
-                                        <div className="space-y-1">
+                                    <div className="3xl:space-y-5 xxl:space-y-1 2xl:space-y-3 space-y-2 2xl:mt-0 xl:mt-0 lg:mt-0 mt-3">
+                                        <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
                                             <label className="2xl:text-base text-sm">
                                                 Họ và tên của bạn
                                                 <span className="text-red-500 p-1">
@@ -782,8 +782,8 @@ const LoginPage = React.memo((props) => {
                                                 className={`${
                                                     errors.fullName
                                                         ? "border-red-500 border"
-                                                        : "border-[#D0D5DD] border focus:border-[#3276FA]"
-                                                } w-full   p-3 outline-none  rounded`}
+                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                             />
                                             {errors.fullName && (
                                                 <span className="text-red-500 text-[13px]">
@@ -791,7 +791,7 @@ const LoginPage = React.memo((props) => {
                                                 </span>
                                             )}
                                         </div>
-                                        <div className="space-y-1">
+                                        <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
                                             <label className="2xl:text-base text-sm">
                                                 Tên công ty
                                                 <span className="text-red-500 p-1">
@@ -808,8 +808,8 @@ const LoginPage = React.memo((props) => {
                                                 className={`${
                                                     errors.companyName
                                                         ? "border-red-500 border"
-                                                        : "border-[#D0D5DD] border focus:border-[#3276FA]"
-                                                } w-full   p-3 outline-none  rounded`}
+                                                        : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                             />
                                             {errors.fullName && (
                                                 <span className="text-red-500 text-[13px]">
@@ -818,7 +818,7 @@ const LoginPage = React.memo((props) => {
                                             )}
                                         </div>
                                         <div className="grid grid-cols-2 gap-5">
-                                            <div className="space-y-1">
+                                            <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
                                                 <label className="2xl:text-base text-sm">
                                                     Email của bạn
                                                     <span className="text-red-500 p-1">
@@ -840,8 +840,8 @@ const LoginPage = React.memo((props) => {
                                                     className={`${
                                                         errors.email
                                                             ? "border-red-500 border"
-                                                            : "border-[#D0D5DD] border focus:border-[#3276FA]"
-                                                    } w-full   p-3 outline-none  rounded`}
+                                                            : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                    } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.email && (
                                                     <span
@@ -853,7 +853,7 @@ const LoginPage = React.memo((props) => {
                                                     </span>
                                                 )}
                                             </div>
-                                            <div className="space-y-1">
+                                            <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
                                                 <label className="2xl:text-base text-sm">
                                                     Số điện thoại
                                                     <span className="text-red-500 p-1">
@@ -872,8 +872,8 @@ const LoginPage = React.memo((props) => {
                                                     className={`${
                                                         errors.phone
                                                             ? "border-red-500 border"
-                                                            : "border-[#D0D5DD] border focus:border-[#3276FA]"
-                                                    } w-full   p-3 outline-none  rounded`}
+                                                            : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                    } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.phone &&
                                                     errors.phone.type ===
@@ -898,7 +898,7 @@ const LoginPage = React.memo((props) => {
                                                         </span>
                                                     )}
                                             </div>
-                                            <div className="space-y-1">
+                                            <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
                                                 <label className="2xl:text-base text-sm">
                                                     Tỉnh / Thành phố
                                                 </label>
@@ -907,11 +907,11 @@ const LoginPage = React.memo((props) => {
                                                     name="city"
                                                     {...register("city")}
                                                     placeholder="Nhập tỉnh / Thành phố"
-                                                    className="w-full border border-[#D0D5DD] p-3 outline-none focus:border-[#3276FA] rounded"
+                                                    className="w-full border placeholder:text-[13px] border-[#D0D5DD] 3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none focus:border-[#3276FA] rounded"
                                                 />
                                             </div>
-                                            <div className="space-y-1">
-                                                <label className="2xl:text-base text-sm">
+                                            <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
+                                                <label className="2xl:text-base text-sm placeholder:text-[13px]">
                                                     Mật khẩu
                                                     <span className="text-red-500 p-1">
                                                         *
@@ -928,8 +928,8 @@ const LoginPage = React.memo((props) => {
                                                     className={`${
                                                         errors.password
                                                             ? "border-red-500 border"
-                                                            : "border-[#D0D5DD] border focus:border-[#3276FA]"
-                                                    } w-full   p-3 outline-none  rounded`}
+                                                            : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
+                                                    } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.password &&
                                                     errors.password.type ===
@@ -1001,7 +1001,7 @@ const LoginPage = React.memo((props) => {
                                             <input
                                                 type="text"
                                                 placeholder="Nhập mã xác thực"
-                                                className="w-full border border-[#D0D5DD] p-3 outline-none focus:border-[#3276FA] rounded"
+                                                className="w-full border border-[#D0D5DD] 3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none focus:border-[#3276FA] rounded placeholder:text-[13px]"
                                             />
                                         </div>
                                     </div>
@@ -1042,7 +1042,7 @@ const LoginPage = React.memo((props) => {
                                                 loadingRegester
                                                     ? "relative"
                                                     : ""
-                                            } w-full 2xl:py-4 py-3 text-center rounded hover:bg-blue-600 transition-all duration-200 ease-linear bg bg-[#0F4F9E] text-white 3xl:mt-5 xxl:mt-1  2xl:mt-8 mt-1`}
+                                            } w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded hover:bg-blue-600 transition-all duration-200 ease-linear bg bg-[#0F4F9E] text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
                                         >
                                             {loadingRegester ? (
                                                 <div>
@@ -1078,7 +1078,7 @@ const LoginPage = React.memo((props) => {
                                                 this,
                                                 0
                                             )}
-                                            className="w-full 2xl:py-4 py-3 text-center rounded bg bg-white text-[#667085] mt-3 border border-[#D0D5DD]"
+                                            className="w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded bg bg-white text-[#667085] mt-3 border border-[#D0D5DD]"
                                         >
                                             Quay lại
                                         </button>
