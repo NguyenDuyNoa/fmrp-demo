@@ -52,8 +52,8 @@ const Popup_chitiet = (props) => {
         return roundedNumber.toLocaleString("en");
     };
 
-    const _ServerFetching_detailOrder = async () => {
-        await Axios(
+    const _ServerFetching_detailOrder = () => {
+        Axios(
             "GET",
             `/api_web/Api_import/import/${props?.id}?csrf_protection=true`,
             {},
@@ -91,8 +91,8 @@ const Popup_chitiet = (props) => {
     const [dataProductExpiry, sDataProductExpiry] = useState({});
     const [dataProductSerial, sDataProductSerial] = useState({});
 
-    const _ServerFetching = async () => {
-        await Axios(
+    const _ServerFetching = () => {
+        Axios(
             "GET",
             "/api_web/api_setting/feature/?csrf_protection=true",
             {},

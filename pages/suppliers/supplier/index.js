@@ -76,9 +76,9 @@ const Index = (props) => {
             query: { tab: router.query?.tab ? router.query?.tab : 0 },
         });
     }, []);
-    const _ServerFetching = async () => {
+    const _ServerFetching = () => {
         const id = Number(tabPage);
-        await Axios(
+        Axios(
             "GET",
             `/api_web/api_supplier/supplier/?csrf_protection=true`,
             {
@@ -106,8 +106,8 @@ const Index = (props) => {
         );
     };
     const [listBr, sListBr] = useState();
-    const _ServerFetching_brand = async () => {
-        await Axios(
+    const _ServerFetching_brand = () => {
+        Axios(
             "GET",
             `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {
@@ -139,8 +139,8 @@ const Index = (props) => {
         (x) => !hiddenOptions.includes(x.value)
     );
 
-    const _ServerFetching_group = async () => {
-        await Axios(
+    const _ServerFetching_group = () => {
+        Axios(
             "GET",
             `/api_web/api_supplier/group_count/?csrf_protection=true`,
             {
@@ -163,8 +163,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_selectct = async () => {
-        await Axios(
+    const _ServerFetching_selectct = () => {
+        Axios(
             "GET",
             `/api_web/Api_address/province?limit=0`,
             {

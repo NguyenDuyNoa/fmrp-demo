@@ -117,8 +117,8 @@ const Index = (props) => {
         });
     }, []);
 
-    const _ServerFetching = async () => {
-        await Axios(
+    const _ServerFetching = () => {
+        Axios(
             "GET",
             `/api_web/Api_expense_voucher/expenseVoucher/?csrf_protection=true`,
             {
@@ -152,8 +152,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_filter = async () => {
-        await Axios(
+    const _ServerFetching_filter = () => {
+        Axios(
             "GET",
             `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,
             {},
@@ -166,7 +166,7 @@ const Index = (props) => {
                 }
             }
         );
-        await Axios(
+        Axios(
             "GET",
             "/api_web/Api_payment_method/payment_method/?csrf_protection=true",
             {},
@@ -179,7 +179,7 @@ const Index = (props) => {
                 }
             }
         );
-        await Axios(
+        Axios(
             "GET",
             "/api_web/Api_expense_voucher/object/?csrf_protection=true",
             {},
@@ -1216,9 +1216,9 @@ const BtnTacVu = React.memo((props) => {
     const [dataCompany, setDataCompany] = useState();
     const [data, setData] = useState();
 
-    const fetchDataSettingsCompany = async () => {
+    const fetchDataSettingsCompany = () => {
         if (props?.id) {
-            await Axios(
+            Axios(
                 "GET",
                 `/api_web/Api_setting/CompanyInfo?csrf_protection=true`,
                 {},
@@ -1231,7 +1231,7 @@ const BtnTacVu = React.memo((props) => {
             );
         }
         if (props?.id) {
-            await Axios(
+            Axios(
                 "GET",
                 `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
                 {},
@@ -1376,9 +1376,9 @@ const Popup_Pdf = (props) => {
     const [dataPDF, setData] = useState();
     const [dataCompany, setDataCompany] = useState();
 
-    const fetchDataSettingsCompany = async () => {
+    const fetchDataSettingsCompany = () => {
         if (props?.id) {
-            await Axios(
+            Axios(
                 "GET",
                 `/api_web/Api_setting/CompanyInfo?csrf_protection=true`,
                 {},
@@ -1391,7 +1391,7 @@ const Popup_Pdf = (props) => {
             );
         }
         if (props?.id) {
-            await Axios(
+            Axios(
                 "GET",
                 `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
                 {},

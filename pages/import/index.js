@@ -139,7 +139,7 @@ const Index = (props) => {
 
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
 
-    const _ServerFetching = async () => {
+    const _ServerFetching = () => {
         sOnLoading(true);
 
         const apiDataFields = {
@@ -151,7 +151,7 @@ const Index = (props) => {
         };
 
         const apiUrls = apiDataFields[tabPage] || "";
-        await Axios("GET", `${apiUrls}`, {}, (err, response) => {
+        Axios("GET", `${apiUrls}`, {}, (err, response) => {
             if (!err) {
                 var db = response.data;
                 if (tabPage == 1) {
@@ -196,7 +196,7 @@ const Index = (props) => {
         };
 
         const apiUrlComLumn = apiDataComlumn[tabPage] || "";
-        await Axios("GET", `${apiUrlComLumn}`, {}, (err, response) => {
+        Axios("GET", `${apiUrlComLumn}`, {}, (err, response) => {
             if (!err) {
                 var db = response.data;
                 sDataColumn(db?.map((e) => ({ label: e, value: e })));
@@ -213,7 +213,7 @@ const Index = (props) => {
         };
 
         const apiUrlConditionColumn = apiDataConditionColumn[tabPage] || "";
-        await Axios("GET", `${apiUrlConditionColumn}`, {}, (err, response) => {
+        Axios("GET", `${apiUrlConditionColumn}`, {}, (err, response) => {
             if (!err) {
                 var db = response.data;
                 sDataConditionColumn(
@@ -236,7 +236,7 @@ const Index = (props) => {
 
         const apiUrlSampleImport = apiDataSampleImport[tabPage] || "";
 
-        await Axios(
+        Axios(
             "GET",
             `${apiUrlSampleImport}`,
             {
@@ -1033,7 +1033,7 @@ const Index = (props) => {
         sErrFileImport(false);
     }, [fileImport != null]);
 
-    // const _ServerSending = async () => {
+    // const _ServerSending =  () => {
 
     //   const data = dataImport.map((item) => {
     //     const result = {};
@@ -1052,7 +1052,7 @@ const Index = (props) => {
     //     }
     //     return result;
     //   });
-    // await Promise.all(
+    //  Promise.all(
     //   data.map((item) => {
     //         return Axios("POST",`/api_web/Api_import_data/action_add_client?csrf_protection=true`, {
     //                   data: item,
@@ -1101,7 +1101,7 @@ const Index = (props) => {
         columnDelivery: tabPage == 1 && listDataDelivery[index]?.columnDelivery,
     }));
 
-    const _ServerSending = async () => {
+    const _ServerSending = () => {
         // lọc ra cột dữ liệu và cột excel
 
         const chunkSize = 50; // Kích thước mỗi mảng con
@@ -1307,7 +1307,7 @@ const Index = (props) => {
             formData.append("file", fileImport);
             formData.append("actions", valueCheck);
 
-            await Axios(
+            Axios(
                 "POST",
                 `${apiUrl}`,
                 {
@@ -1339,7 +1339,7 @@ const Index = (props) => {
             );
         } else {
             for (const data of dataChunks) {
-                await Axios(
+                Axios(
                     "POST",
                     `${apiUrl}`,
                     {
@@ -1399,7 +1399,7 @@ const Index = (props) => {
         }
     };
 
-    const _ServerSendingImporTemplate = async () => {
+    const _ServerSendingImporTemplate = () => {
         var formData = new FormData();
         listData.forEach((e, index) => {
             formData.append(`setup_colums[data][${index}]`, JSON.stringify(e));
@@ -1427,7 +1427,7 @@ const Index = (props) => {
             });
         }
         formData.append(`tab`, tabPage);
-        await Axios(
+        Axios(
             "POST",
             `${"/api_web/Api_import_data/add_tempate_import?csrf_protection=true"}`,
             {

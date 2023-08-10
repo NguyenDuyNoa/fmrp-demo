@@ -63,8 +63,8 @@ const Popup_chitiet = (props) => {
   useEffect(() => {
     props?.id && sOnFetching(true);
   }, [open]);
-  const _ServerFetching_detailUser = async () => {
-    await Axios(
+  const _ServerFetching_detailUser =  () => {
+     Axios(
       "GET",
       `/api_web/api_supplier/supplier/${props?.id}?csrf_protection=true`,
       {},

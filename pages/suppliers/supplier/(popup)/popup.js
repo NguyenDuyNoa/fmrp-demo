@@ -128,8 +128,8 @@ const Popup_dsncc = (props) => {
         sValueGr([]);
     }, [open]);
 
-    const _ServerFetching_detailUser = async () => {
-        await Axios(
+    const _ServerFetching_detailUser = () => {
+        Axios(
             "GET",
             `/api_web/api_supplier/supplier/${props?.id}?csrf_protection=true`,
             {},
@@ -218,8 +218,8 @@ const Popup_dsncc = (props) => {
     // group
 
     const [listGr, sListGr] = useState();
-    const _ServerFetching_Gr = async () => {
-        await Axios(
+    const _ServerFetching_Gr = () => {
+        Axios(
             "GET",
             `/api_web/api_supplier/group/?csrf_protection=true`,
             {
@@ -283,8 +283,8 @@ const Popup_dsncc = (props) => {
 
     // fecht distric
     const [ditrict, sDistricts] = useState();
-    const _ServerFetching_distric = async () => {
-        await Axios(
+    const _ServerFetching_distric = () => {
+        Axios(
             "GET",
             "/api_web/Api_address/district?limit=0",
             {
@@ -317,8 +317,8 @@ const Popup_dsncc = (props) => {
 
     //fecth ward
     const [ward_id, sWard] = useState();
-    const _ServerFetching_war = async () => {
-        await Axios(
+    const _ServerFetching_war = () => {
+        Axios(
             "GET",
             "/api_web/Api_address/ward?limit=0",
             {
@@ -349,7 +349,7 @@ const Popup_dsncc = (props) => {
     };
 
     //post db
-    const _ServerSending = async () => {
+    const _ServerSending = () => {
         let id = props?.id;
         var data = new FormData();
         data.append("name", name ? name : "");
@@ -387,7 +387,7 @@ const Popup_dsncc = (props) => {
             data.append(`contact[${index}][address]`, e?.address);
             data.append(`contact[${index}][phone_number]`, e?.phone_number);
         });
-        await Axios(
+        Axios(
             "POST",
             `${
                 id

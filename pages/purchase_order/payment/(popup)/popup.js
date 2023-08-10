@@ -163,8 +163,8 @@ const Popup_dspc = (props) => {
         props?.id && sOnFetchingDetail(true);
     }, [open]);
 
-    const _ServerFetching_detail = async () => {
-        await Axios(
+    const _ServerFetching_detail = () => {
+        Axios(
             "GET",
             `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
             {},
@@ -232,8 +232,8 @@ const Popup_dspc = (props) => {
     }, [open]);
 
     // Chi nhánh, PTTT, Đối tượng
-    const _ServerFetching = async () => {
-        await Axios(
+    const _ServerFetching = () => {
+        Axios(
             "GET",
             "/api_web/Api_Branch/branchCombobox/?csrf_protection=true",
             {},
@@ -246,7 +246,7 @@ const Popup_dspc = (props) => {
                 }
             }
         );
-        await Axios(
+        Axios(
             "GET",
             "/api_web/Api_expense_voucher/object/?csrf_protection=true",
             {},
@@ -262,7 +262,7 @@ const Popup_dspc = (props) => {
                 }
             }
         );
-        await Axios(
+        Axios(
             "GET",
             "/api_web/Api_payment_method/payment_method/?csrf_protection=true",
             {},
@@ -289,8 +289,8 @@ const Popup_dspc = (props) => {
     //Danh sách đối tượng
     //Api Danh sách đối tượng: truyền Đối tượng vào biến type, truyền Chi nhánh vào biến filter[branch_id]
 
-    const _ServerFetching_LisObject = async () => {
-        await Axios(
+    const _ServerFetching_LisObject = () => {
+        Axios(
             "GET",
             "/api_web/Api_expense_voucher/objectList/?csrf_protection=true",
             {
@@ -322,8 +322,8 @@ const Popup_dspc = (props) => {
     // Loại chứng từ
     //Api Loại chứng từ: truyền Đối tượng vào biến type
 
-    const _ServerFetching_TypeOfDocument = async () => {
-        await Axios(
+    const _ServerFetching_TypeOfDocument = () => {
+        Axios(
             "GET",
             "/api_web/Api_expense_voucher/voucher_type/?csrf_protection=true",
             {
@@ -358,8 +358,8 @@ const Popup_dspc = (props) => {
     //Danh sách chứng từ
     //Api Danh sách chứng từ: truyền Đối tượng vào biến type, truyền Loại chứng từ vào biến voucher_type, truyền Danh sách đối tượng vào object_id
 
-    const _ServerFetching_ListTypeOfDocument = async () => {
-        await Axios(
+    const _ServerFetching_ListTypeOfDocument = () => {
+        Axios(
             "GET",
             "/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true",
             {
@@ -396,8 +396,8 @@ const Popup_dspc = (props) => {
         typeOfDocument != null && sOnFetching_ListTypeOfDocument(true);
     }, [typeOfDocument]);
 
-    const _HandleSeachApi = async (inputValue) => {
-        await Axios(
+    const _HandleSeachApi = (inputValue) => {
+        Axios(
             "POST",
             `/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true`,
             {
@@ -430,8 +430,8 @@ const Popup_dspc = (props) => {
     };
 
     //Loại chi phí
-    const _ServerFetching_ListCost = async () => {
-        await Axios(
+    const _ServerFetching_ListCost = () => {
+        Axios(
             "GET",
             "/api_web/Api_cost/costCombobox/?csrf_protection=true",
             {
@@ -851,7 +851,7 @@ const Popup_dspc = (props) => {
         );
     };
 
-    const _ServerSending = async () => {
+    const _ServerSending = () => {
         var formData = new FormData();
         formData.append("code", code == null ? "" : code);
         formData.append("date", moment(date).format("YYYY-MM-DD HH:mm:ss"));
@@ -882,7 +882,7 @@ const Popup_dspc = (props) => {
                 item?.sotien ? item?.sotien : ""
             );
         });
-        await Axios(
+        Axios(
             "POST",
             `${
                 id

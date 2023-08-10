@@ -89,8 +89,8 @@ const Form = (props) => {
     //     }
     // },[])
 
-    const _ServerFetching = async () => {
-        await Axios(
+    const _ServerFetching = () => {
+        Axios(
             "GET",
             `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {
@@ -107,7 +107,7 @@ const Form = (props) => {
                 }
             }
         );
-        await Axios(
+        Axios(
             "GET",
             "/api_web/api_setting/feature/?csrf_protection=true",
             {},
@@ -155,8 +155,8 @@ const Form = (props) => {
         }
     };
 
-    const _ServerFetchingWH = async () => {
-        await Axios(
+    const _ServerFetchingWH = () => {
+        Axios(
             "GET",
             `api_web/api_warehouse/warehouse?csrf_protection=true&filter[is_system]=2&filter[branch_id]=${branch?.value}`,
             {},
@@ -180,8 +180,8 @@ const Form = (props) => {
         branch !== null && sOnFetchingWH(true); //chọn chi nhánh để Get data Kho hàng
     }, [branch]);
 
-    const _ServerFetchingPstWH = async () => {
-        await Axios(
+    const _ServerFetchingPstWH = () => {
+        Axios(
             "GET",
             `/api_web/api_warehouse/LocationInWarehouse/${warehouse?.value}?csrf_protection=true`,
             {},
@@ -598,7 +598,7 @@ const Form = (props) => {
         }, 500);
     };
 
-    const _ServerSending = async () => {
+    const _ServerSending = () => {
         var formData = new FormData();
 
         formData.append("code", code);
@@ -650,7 +650,7 @@ const Form = (props) => {
             });
         });
 
-        await  Axios(
+        Axios(
             "POST",
             "/api_web/api_inventory/addDetail?csrf_protection=true",
             {

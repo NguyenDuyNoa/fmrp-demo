@@ -117,8 +117,8 @@ const Index = (props) => {
         router.query && sNote("");
     }, [router.query]);
 
-    const _ServerFetchingDetail = async () => {
-        await Axios(
+    const _ServerFetchingDetail = () => {
+        Axios(
             "GET",
             `/api_web/Api_import/import/${id}?csrf_protection=true`,
             {},
@@ -183,8 +183,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching = async () => {
-        await Axios(
+    const _ServerFetching = () => {
+        Axios(
             "GET",
             "/api_web/Api_Branch/branchCombobox/?csrf_protection=true",
             {},
@@ -197,7 +197,7 @@ const Index = (props) => {
                 }
             }
         );
-        await Axios(
+        Axios(
             "GET",
             "/api_web/Api_tax/tax?csrf_protection=true",
             {},
@@ -222,8 +222,8 @@ const Index = (props) => {
         onFetching && _ServerFetching();
     }, [onFetching]);
 
-    const _ServerFetchingCondition = async () => {
-        await Axios(
+    const _ServerFetchingCondition = () => {
+        Axios(
             "GET",
             "/api_web/api_setting/feature/?csrf_protection=true",
             {},
@@ -264,8 +264,8 @@ const Index = (props) => {
         JSON.stringify(dataProductSerial) === "{}",
     ]);
 
-    const _ServerFetchingDetailPage = async () => {
-        await Axios(
+    const _ServerFetchingDetailPage = () => {
+        Axios(
             "GET",
             `/api_web/Api_import/getImport/${id}?csrf_protection=true`,
             {},
@@ -365,8 +365,8 @@ const Index = (props) => {
             JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
-    const _ServerFetching_TheOrder = async () => {
-        await Axios(
+    const _ServerFetching_TheOrder = () => {
+        Axios(
             "GET",
             "/api_web/Api_purchase_order/purchase_order_not_stock_combobox/?csrf_protection=true",
             {
@@ -396,8 +396,8 @@ const Index = (props) => {
         (idSupplier === null && sDataThe_order([])) || sIdTheOrder(null);
     }, []);
 
-    const _ServerFetching_Supplier = async () => {
-        await Axios(
+    const _ServerFetching_Supplier = () => {
+        Axios(
             "GET",
             "/api_web/api_supplier/supplier/?csrf_protection=true",
             {
@@ -1267,7 +1267,7 @@ const Index = (props) => {
         sStartDate(date);
     };
 
-    const _ServerSending = async () => {
+    const _ServerSending = () => {
         var formData = new FormData();
         formData.append("code", code);
         formData.append(
@@ -1341,7 +1341,7 @@ const Index = (props) => {
                 );
             });
         });
-        await Axios(
+        Axios(
             "POST",
             `${
                 id

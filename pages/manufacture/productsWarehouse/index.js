@@ -105,9 +105,9 @@ const Index = (props) => {
         });
     }, []);
 
-    const _ServerFetching = async () => {
+    const _ServerFetching = () => {
         const tabPage = router.query?.tab;
-        await Axios(
+        Axios(
             "GET",
             `/api_web/Api_stock/exportProduction/?csrf_protection=true`,
             {
@@ -141,8 +141,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_group = async () => {
-        await Axios(
+    const _ServerFetching_group = () => {
+        Axios(
             "GET",
             `/api_web/Api_stock/exportProductionFilterBar/?csrf_protection=true`,
             {
@@ -170,8 +170,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_filter = async () => {
-        await Axios(
+    const _ServerFetching_filter = () => {
+        Axios(
             "GET",
             `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,
             {},
@@ -182,7 +182,7 @@ const Index = (props) => {
                 }
             }
         );
-        await Axios(
+        Axios(
             "GET",
             "/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true",
             {},
@@ -196,8 +196,8 @@ const Index = (props) => {
         sOnFetching_filter(false);
     };
 
-    const _HandleSeachApi = async (inputValue) => {
-        await Axios(
+    const _HandleSeachApi = (inputValue) => {
+        Axios(
             "POST",
             `/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true`,
             {
@@ -454,14 +454,14 @@ const Index = (props) => {
             });
         }
     };
-    const _ServerSending = async () => {
+    const _ServerSending = () => {
         var data = new FormData();
         data.append(
             "warehouseman_id",
             checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : ""
         );
         data.append("id", checkedWare?.id);
-        await Axios(
+        Axios(
             "POST",
             `/api_web/Api_stock/confirmWarehouse?csrf_protection=true`,
             {
@@ -1267,9 +1267,9 @@ const BtnTacVu = React.memo((props) => {
         }
     };
 
-    const fetchDataSettingsCompany = async () => {
+    const fetchDataSettingsCompany = () => {
         if (props?.id) {
-            await Axios(
+            Axios(
                 "GET",
                 `/api_web/Api_setting/CompanyInfo?csrf_protection=true`,
                 {},
@@ -1282,7 +1282,7 @@ const BtnTacVu = React.memo((props) => {
             );
         }
         if (props?.id) {
-            await Axios(
+            Axios(
                 "GET",
                 `/api_web/Api_stock/exportProduction/${props?.id}?csrf_protection=true`,
                 {},

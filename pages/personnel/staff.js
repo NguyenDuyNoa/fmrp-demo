@@ -75,8 +75,8 @@ const Index = (props) => {
 
     const [room, sRoom] = useState([]);
 
-    const _ServerFetching_room = async () => {
-        await Axios(
+    const _ServerFetching_room = () => {
+        Axios(
             "GET",
             `/api_web/api_staff/department/?csrf_protection=true`,
             {},
@@ -89,8 +89,8 @@ const Index = (props) => {
             }
         );
     };
-    const _ServerFetching = async () => {
-        await Axios(
+    const _ServerFetching = () => {
+        Axios(
             "GET",
             `/api_web/api_staff/staff/?csrf_protection=true" }`,
             {
@@ -118,8 +118,8 @@ const Index = (props) => {
     };
 
     const [listBr, sListBr] = useState();
-    const _ServerFetching_brand = async () => {
-        await Axios(
+    const _ServerFetching_brand = () => {
+        Axios(
             "GET",
             `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {
@@ -142,8 +142,8 @@ const Index = (props) => {
         }
     };
 
-    const _ServerFetchingOtp = async () => {
-        await Axios(
+    const _ServerFetchingOtp = () => {
+        Axios(
             "GET",
             "/api_web/api_staff/positionOption",
             {},
@@ -295,11 +295,11 @@ const Index = (props) => {
             }
         });
     };
-    const _ServerSending = async () => {
+    const _ServerSending = () => {
         let id = status;
         var data = new FormData();
         data.append("active", active);
-        await Axios(
+        Axios(
             "POST",
             `${
                 id &&

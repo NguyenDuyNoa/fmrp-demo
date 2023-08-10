@@ -94,11 +94,11 @@ const Popup_groupKh = (props) => {
         sErrInputBr(false);
     }, [branch_id?.length > 0]);
 
-    const _ServerSending = async () => {
+    const _ServerSending = () => {
         const id = props.id;
         var data = new FormData();
         data.append("name", name);
-        await Axios(
+        Axios(
             "POST",
             `${
                 props.id

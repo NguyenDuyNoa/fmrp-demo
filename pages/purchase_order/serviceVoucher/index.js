@@ -107,9 +107,9 @@ const Index = (props) => {
         });
     }, []);
 
-    const _ServerFetching = async () => {
+    const _ServerFetching = () => {
         const tabPage = router.query?.tab;
-        await Axios(
+        Axios(
             "GET",
             `/api_web/Api_service/service/?csrf_protection=true`,
             {
@@ -151,8 +151,8 @@ const Index = (props) => {
         }
     };
 
-    const _ServerFetching_filter = async () => {
-        await Axios(
+    const _ServerFetching_filter = () => {
+        Axios(
             "GET",
             `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,
             {},
@@ -165,7 +165,7 @@ const Index = (props) => {
                 }
             }
         );
-        await Axios(
+        Axios(
             "GET",
             `/api_web/Api_service/serviceCombobox/?csrf_protection=true`,
             {},
@@ -178,7 +178,7 @@ const Index = (props) => {
                 }
             }
         );
-        await Axios(
+        Axios(
             "GET",
             `/api_web/Api_staff/staffOption?csrf_protection=true`,
             {},
@@ -196,8 +196,8 @@ const Index = (props) => {
         onFetching_filter && _ServerFetching_filter();
     }, [onFetching_filter]);
 
-    const _HandleSeachApi = async (inputValue) => {
-        await Axios(
+    const _HandleSeachApi = (inputValue) => {
+        Axios(
             "POST",
             `/api_web/Api_service/serviceCombobox/?csrf_protection=true`,
             {
@@ -216,8 +216,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_group = async () => {
-        await Axios(
+    const _ServerFetching_group = () => {
+        Axios(
             "GET",
             `/api_web/Api_service/filterBar/?csrf_protection=true`,
             {
@@ -1076,9 +1076,9 @@ const BtnTacVu = React.memo((props) => {
     const [dataPDF, setData] = useState();
     const [dataCompany, setDataCompany] = useState();
 
-    const fetchDataSettingsCompany = async () => {
+    const fetchDataSettingsCompany = () => {
         if (props?.id) {
-            await Axios(
+            Axios(
                 "GET",
                 `/api_web/Api_setting/CompanyInfo?csrf_protection=true`,
                 {},
@@ -1091,7 +1091,7 @@ const BtnTacVu = React.memo((props) => {
             );
         }
         if (props?.id) {
-            await Axios(
+            Axios(
                 "GET",
                 `/api_web/Api_service/service/${props?.id}?csrf_protection=true`,
                 {},

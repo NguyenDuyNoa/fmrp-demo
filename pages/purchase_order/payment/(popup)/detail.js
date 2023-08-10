@@ -71,8 +71,8 @@ const Popup_chitiet = (props) => {
         return roundedNumber.toLocaleString("en");
     };
 
-    const _ServerFetching_detailThere = async () => {
-        await Axios(
+    const _ServerFetching_detailThere = () => {
+        Axios(
             "GET",
             `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
             {},

@@ -144,8 +144,8 @@ const Popup_dsnd = (props) => {
         // sManage([])
     }, [open]);
 
-    const _ServerFetching_detailUser = async () => {
-        await Axios(
+    const _ServerFetching_detailUser = () => {
+        Axios(
             "GET",
             `/api_web/api_staff/staff/${props?.id}?csrf_protection=true`,
             {},
@@ -228,7 +228,7 @@ const Popup_dsnd = (props) => {
         return e?.value;
     });
     //post db
-    const _ServerSending = async () => {
+    const _ServerSending = () => {
         let id = props?.id;
         var data = new FormData();
         data.append("name", name);
@@ -244,7 +244,7 @@ const Popup_dsnd = (props) => {
         data.append("position_id", idPos);
         data.append("is_delete_image ", isDeleteThumb);
         data.append("manage ", manageV);
-        await Axios(
+        Axios(
             "POST",
             `${
                 id
@@ -312,8 +312,8 @@ const Popup_dsnd = (props) => {
     }, [onSending]);
 
     const [manage, sManage] = useState([]);
-    const _ServerFetching__Manage = async () => {
-        await Axios(
+    const _ServerFetching__Manage = () => {
+        Axios(
             "GET",
             `/api_web/api_staff/staffManage/${
                 idPos ? idPos : -1

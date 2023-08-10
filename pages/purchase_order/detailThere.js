@@ -47,8 +47,8 @@ const Popup_chitietThere = (props) => {
         return roundedNumber.toLocaleString("en");
     };
 
-    const _ServerFetching_detailThere = async () => {
-        await Axios(
+    const _ServerFetching_detailThere = () => {
+        Axios(
             "GET",
             `${
                 (props?.type == "import" &&

@@ -99,8 +99,8 @@ const Index = (props) => {
     const [keySearch, sKeySearch] = useState("");
     const [limit, sLimit] = useState(15);
 
-    const _ServerFetching = async () => {
-        await Axios(
+    const _ServerFetching = () => {
+        Axios(
             "GET",
             "/api_web/api_staff/position/?csrf_protection=true",
             {
@@ -162,8 +162,8 @@ const Index = (props) => {
         }, 1500);
     };
 
-    const _ServerFetchingSub = async () => {
-        await Axios(
+    const _ServerFetchingSub = () => {
+        Axios(
             "GET",
             "/api_web/api_staff/positionOption?csrf_protection=true",
             {},
@@ -195,8 +195,8 @@ const Index = (props) => {
         onFetchingSub && _ServerFetchingSub();
     }, [onFetchingSub]);
 
-    const _ServerFetchingAnother = async () => {
-        await Axios(
+    const _ServerFetchingAnother = () => {
+        Axios(
             "GET",
             "/api_web/Api_Branch/branch/?csrf_protection=true",
             {},
@@ -216,7 +216,7 @@ const Index = (props) => {
                 }
             }
         );
-        await Axios(
+        Axios(
             "GET",
             "/api_web/api_staff/department/?csrf_protection=true",
             {},

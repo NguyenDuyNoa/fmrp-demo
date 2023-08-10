@@ -110,9 +110,9 @@ const Index = (props) => {
             query: { tab: router.query?.tab ? router.query?.tab : "" },
         });
     }, []);
-    const _ServerFetching = async () => {
+    const _ServerFetching = () => {
         const id = Number(tabPage);
-        await Axios(
+        Axios(
             "GET",
             "/api_web/Api_purchases/purchases/?csrf_protection=true",
             {
@@ -144,8 +144,8 @@ const Index = (props) => {
         );
     };
 
-    const _ServerFetching_filter = async () => {
-        await Axios(
+    const _ServerFetching_filter = () => {
+        Axios(
             "GET",
             `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {},
@@ -156,7 +156,7 @@ const Index = (props) => {
                 }
             }
         );
-        await Axios(
+        Axios(
             "GET",
             `/api_web/Api_purchases/purchases/?csrf_protection=true`,
             {},
@@ -167,7 +167,7 @@ const Index = (props) => {
                 }
             }
         );
-        await Axios(
+        Axios(
             "GET",
             `/api_web/Api_staff/staffOption?csrf_protection=true`,
             {},
@@ -204,8 +204,8 @@ const Index = (props) => {
         }
     };
 
-    const _ServerFetching_group = async () => {
-        await Axios(
+    const _ServerFetching_group = () => {
+        Axios(
             "GET",
             `/api_web/Api_purchases/purchasesFilterBar/?csrf_protection=true`,
             {
@@ -328,9 +328,9 @@ const Index = (props) => {
             }
         });
     };
-    const _ServerSending = async (id, newStatus) => {
+    const _ServerSending = (id, newStatus) => {
         // let id = status
-        await Axios(
+        Axios(
             "POST",
             `${`/api_web/Api_purchases/updateStatus/${id}/${newStatus}?csrf_protection=true`}`,
             {
@@ -1200,9 +1200,9 @@ const BtnTacVu = React.memo((props) => {
         }
     };
 
-    const fetchDataSettingsCompany = async () => {
+    const fetchDataSettingsCompany = () => {
         if (props?.id) {
-            await Axios(
+            Axios(
                 "GET",
                 `/api_web/Api_setting/CompanyInfo?csrf_protection=true`,
                 {},
@@ -1215,7 +1215,7 @@ const BtnTacVu = React.memo((props) => {
             );
         }
         if (props?.id) {
-            await Axios(
+            Axios(
                 "GET",
                 `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`,
                 {},

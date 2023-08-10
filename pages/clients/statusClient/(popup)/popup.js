@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { _ServerInstance as Axios } from "/services/axios";
 import {
     Edit as IconEdit,
     Trash as IconDelete,
@@ -87,13 +88,13 @@ const Popup_status = (props) => {
         sErrInputBr(false);
     }, [branch_id?.length > 0]);
 
-    const _ServerSending = async () => {
+    const _ServerSending = () => {
         const id = props.id;
         console.log(id);
         var data = new FormData();
         data.append("name", name);
         data.append("color", color);
-        await Axios(
+        Axios(
             "POST",
             `${
                 props.id
@@ -279,6 +280,7 @@ const Popup_status = (props) => {
                         </div>
                         <div className="text-right mt-5 space-x-2">
                             <button
+                                type="button"
                                 onClick={_ToggleModal.bind(this, false)}
                                 className="button text-[#344054] font-normal text-base py-2 px-4 rounded-lg border border-solid border-[#D0D5DD]"
                             >

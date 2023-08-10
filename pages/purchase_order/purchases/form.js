@@ -100,8 +100,8 @@ const Index = (props) => {
     const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
     sortedArr.unshift(option[0]);
 
-    const _ServerFetching = async () => {
-        await Axios(
+    const _ServerFetching = () => {
+        Axios(
             "GET",
             "/api_web/api_product/searchItemsVariant?csrf_protection=true",
             {},
@@ -119,7 +119,7 @@ const Index = (props) => {
                 }
             }
         );
-        await Axios(
+        Axios(
             "GET",
             `/api_web/Api_Branch/branch/?csrf_protection=true`,
             {
@@ -136,8 +136,8 @@ const Index = (props) => {
         );
         sOnFetching(false);
     };
-    const _ServerFetchingDetail = async () => {
-        await Axios(
+    const _ServerFetchingDetail = () => {
+        Axios(
             "GET",
             `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`,
             {},
@@ -341,7 +341,7 @@ const Index = (props) => {
     const newDataOption = dataOption?.filter((e) => e?.data !== undefined);
     const readOnlyFirst = true;
 
-    const _ServerSending = async () => {
+    const _ServerSending = () => {
         var formData = new FormData();
         formData.append("code", code);
         formData.append("name", namePromis);
@@ -359,7 +359,7 @@ const Index = (props) => {
             );
             formData.append(`items[${index}][note]`, item?.ghichu);
         });
-        await Axios(
+        Axios(
             "POST",
             `${
                 id
@@ -419,8 +419,8 @@ const Index = (props) => {
             }
         );
     };
-    const _HandleSeachApi = async (inputValue) => {
-        await Axios(
+    const _HandleSeachApi = (inputValue) => {
+        Axios(
             "POST",
             `/api_web/api_product/searchItemsVariant?csrf_protection=true`,
             {

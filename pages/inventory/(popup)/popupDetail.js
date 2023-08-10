@@ -25,8 +25,8 @@ const Popup_chitiet = (props) => {
         props?.id && sOnFetching(true);
     }, [open]);
 
-    const _ServerFetching = async () => {
-        await Axios(
+    const _ServerFetching =  () => {
+         Axios(
             "GET",
             "/api_web/api_setting/feature/?csrf_protection=true",
             {},
@@ -48,8 +48,8 @@ const Popup_chitiet = (props) => {
         );
     };
 
-    const _ServerFetching_detailUser = async () => {
-        await Axios(
+    const _ServerFetching_detailUser =  () => {
+         Axios(
             "GET",
             `/api_web/api_inventory/inventory/${props?.id}`,
             {},
