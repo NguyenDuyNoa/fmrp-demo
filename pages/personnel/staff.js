@@ -923,7 +923,23 @@ const Index = (props) => {
                                                                     <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                                                                 </label>
                                                             </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]   px-2 py-0.5 w-[20%] rounded-md text-left flex justify-start flex-wrap ">
+                                                            <h6 className="w-[20%] flex  gap-1 flex-wrap">
+                                                                {e.branch?.map(
+                                                                    (i) => (
+                                                                        <span
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            className="cursor-default w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2"
+                                                                        >
+                                                                            {
+                                                                                i.name
+                                                                            }
+                                                                        </span>
+                                                                    )
+                                                                )}
+                                                            </h6>
+                                                            {/* <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]   px-2 py-0.5 w-[20%] rounded-md text-left flex justify-start flex-wrap ">
                                                                 {e.branch?.map(
                                                                     (i) => (
                                                                         <span
@@ -938,7 +954,7 @@ const Index = (props) => {
                                                                         </span>
                                                                     )
                                                                 )}
-                                                            </h6>
+                                                            </h6> */}
                                                             <div className="space-x-2 w-[10%] text-center">
                                                                 <Popup_dsnd
                                                                     room={room}
