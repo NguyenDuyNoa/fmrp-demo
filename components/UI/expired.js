@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { NotificationBing } from "iconsax-react";
 import moment from "moment";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { _ServerInstance as Axios } from "/services/axios";
 
@@ -26,31 +26,40 @@ const Expirred = () => {
     //     startDate.getMonth() + 1
     // }/${startDate.getFullYear()}`;
 
-    const _ServerLang = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Authentication/authentication?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response?.data?.info;
-                    sCheckDate(data?.fail_expiration);
-                    sDate({
-                        dateStart: moment(data?.start_date).format(
-                            "DD/MM/YYYY"
-                        ),
-                        dateEnd: moment(data?.expiration_date).format(
-                            "DD/MM/YYYY"
-                        ),
-                        dateLimit: data?.day_expiration,
-                    });
-                }
-            }
-        );
-    };
+    const data = useSelector((state) => state.auth);
     useEffect(() => {
-        _ServerLang();
-    }, []);
+        sCheckDate(data?.fail_expiration);
+        sDate({
+            dateStart: moment(data?.start_date).format("DD/MM/YYYY"),
+            dateEnd: moment(data?.expiration_date).format("DD/MM/YYYY"),
+            dateLimit: data?.day_expiration,
+        });
+    }, [data]);
+    // const _ServerLang = () => {
+    //     Axios(
+    //         "GET",
+    //         `/api_web/Api_Authentication/authentication?csrf_protection=true`,
+    //         {},
+    //         (err, response) => {
+    //             if (!err) {
+    //                 var data = response?.data?.info;
+    //                 sCheckDate(data?.fail_expiration);
+    //                 sDate({
+    //                     dateStart: moment(data?.start_date).format(
+    //                         "DD/MM/YYYY"
+    //                     ),
+    //                     dateEnd: moment(data?.expiration_date).format(
+    //                         "DD/MM/YYYY"
+    //                     ),
+    //                     dateLimit: data?.day_expiration,
+    //                 });
+    //             }
+    //         }
+    //     );
+    // };
+    // useEffect(() => {
+    //     _ServerLang();
+    // }, []);
 
     const [extend, sExtend] = useState(false);
     const _HandleExtend = () => {
