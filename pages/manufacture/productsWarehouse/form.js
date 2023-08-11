@@ -8,6 +8,7 @@ import Loading from "components/UI/loading";
 import { MdClear } from "react-icons/md";
 import { BsCalendarEvent } from "react-icons/bs";
 import DatePicker from "react-datepicker";
+import { useForm } from "react-hook-form";
 
 import Select, { components } from "react-select";
 
@@ -75,7 +76,9 @@ const Index = (props) => {
     const [errUnit, sErrUnit] = useState(false);
     const [errQty, sErrQty] = useState(false);
     const [khotong, sKhotong] = useState(null);
-
+    const [errLot, sErrLot] = useState(false);
+    const [errDateList, sErrDateList] = useState(false);
+    const [errSerial, sErrSerial] = useState(false);
     useEffect(() => {
         router.query && sErrDate(false);
         router.query && sErrBranch(false);
@@ -195,12 +198,12 @@ const Index = (props) => {
                                 idChildBackEnd: Number(ce?.id),
                                 id: Number(ce?.id),
                                 disabledDate:
-                                    (e.item?.text_type == "material" &&
-                                        dataMaterialExpiry?.is_enable == "1" &&
-                                        false) ||
-                                    (e.item?.text_type == "material" &&
-                                        dataMaterialExpiry?.is_enable == "0" &&
-                                        true) ||
+                                    // (e.item?.text_type == "material" &&
+                                    //     dataMaterialExpiry?.is_enable == "1" &&
+                                    //     false) ||
+                                    // (e.item?.text_type == "material" &&
+                                    //     dataMaterialExpiry?.is_enable == "0" &&
+                                    //     true) ||
                                     (e.item?.text_type == "products" &&
                                         dataProductExpiry?.is_enable == "1" &&
                                         false) ||
@@ -221,23 +224,15 @@ const Index = (props) => {
                                     ce?.expiration_date != null
                                         ? moment(ce?.expiration_date).toDate()
                                         : null,
-                                unit: {
-                                    label: ce?.unit_data.unit,
-                                    value: ce?.unit_data.id,
-                                    coefficient: +ce?.unit_data.coefficient,
-                                },
+                                unit: e?.unit_name,
+
                                 dataWarehouse: e?.item?.warehouse.map((ye) => ({
                                     label: ye?.location_name,
                                     value: ye?.id,
                                     warehouse_name: ye?.warehouse_name,
-                                    qty: +ye?.quantity,
                                 })),
-                                dataUnit: e?.item?.unit?.map((e) => ({
-                                    label: e?.unit,
-                                    value: e?.id,
-                                    coefficient: +ce?.coefficient,
-                                })),
-                                exportQuantity: +ce?.quantity,
+
+                                importQuantity: +ce?.quantity,
                                 exchangeValue: +ce?.coefficient,
                                 numberOfConversions: +ce?.quantity_exchange,
                                 note: ce?.note,
@@ -270,7 +265,7 @@ const Index = (props) => {
     const _ServerFetching_ItemsAll = () => {
         Axios(
             "GET",
-            "/api_web/Api_stock/getSemiItems/?csrf_protection=true",
+            "/api_web/Api_product_receipt/getProduct/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
@@ -284,6 +279,28 @@ const Index = (props) => {
             }
         );
         sOnFetchingItemsAll(false);
+    };
+
+    const _HandleSeachApi = (inputValue) => {
+        Axios(
+            "POST",
+            `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`,
+            {
+                params: {
+                    "filter[branch_id]": idBranch ? idBranch?.value : null,
+                },
+
+                data: {
+                    term: inputValue,
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    var { result } = response.data.data;
+                    sDataItems(result);
+                }
+            }
+        );
     };
 
     const _HandleChangeInput = (type, value) => {
@@ -340,15 +357,39 @@ const Index = (props) => {
         const hasNullKho = listData.some((item) =>
             item.child?.some((childItem) => childItem.kho === null)
         );
+
+        const hasNullSerial = listData.some(
+            (item) =>
+                item?.matHang.e?.text_type === "products" &&
+                item.child?.some(
+                    (childItem) =>
+                        childItem.serial === "" || childItem.serial == null
+                )
+        );
+        // const hasNullLot = listData.some(item => item?.matHang.e?.text_type === "material" && item.child?.some(childItem => (childItem.lot === '')));
+        const hasNullLot = listData.some((item) =>
+            item.child?.some(
+                (childItem) =>
+                    !childItem.disabledDate &&
+                    (childItem.lot === "" || childItem.lot == null)
+            )
+        );
+        const hasNullDate = listData.some((item) =>
+            item.child?.some(
+                (childItem) =>
+                    !childItem.disabledDate && childItem.date === null
+            )
+        );
+
         const hasNullUnit = listData.some((item) =>
             item.child?.some((childItem) => childItem.unit === null)
         );
         const hasNullQty = listData.some((item) =>
             item.child?.some(
                 (childItem) =>
-                    childItem.exportQuantity === null ||
-                    childItem.exportQuantity === "" ||
-                    childItem.exportQuantity == 0
+                    childItem.importQuantity === null ||
+                    childItem.importQuantity === "" ||
+                    childItem.importQuantity == 0
             )
         );
         const isEmpty = listData?.length === 0 ? true : false;
@@ -357,29 +398,31 @@ const Index = (props) => {
             hasNullKho ||
             hasNullUnit ||
             hasNullQty ||
-            isEmpty
+            isEmpty ||
+            (dataProductSerial?.is_enable == "1" && hasNullSerial) ||
+            (dataProductExpiry?.is_enable == "1" && hasNullLot) ||
+            (dataProductExpiry?.is_enable == "1" && hasNullDate)
         ) {
             idBranch == null && sErrBranch(true);
             hasNullKho && sErrWarehouse(true);
             hasNullUnit && sErrUnit(true);
             hasNullQty && sErrQty(true);
+            hasNullKho && sErrWarehouse(true);
+            hasNullLot && sErrLot(true);
+            hasNullSerial && sErrSerial(true);
+            hasNullDate && sErrDateList(true);
             if (isEmpty) {
-                // Toast.fire({
-                //     icon: "error",
-                //     title: `Chưa nhập thông tin mặt hàng`,
-                // });
                 handleCheckError("Chưa nhập thông tin mặt hàng");
             } else {
-                // Toast.fire({
-                //     icon: "error",
-                //     title: `${dataLang?.required_field_null}`,
-                // });
                 handleCheckError(dataLang?.required_field_null);
             }
         } else {
             sErrWarehouse(false);
             sErrUnit(false);
             sErrQty(false);
+            sErrLot(false);
+            sErrSerial(false);
+            sErrDateList(false);
             sOnSending(true);
         }
     };
@@ -429,20 +472,30 @@ const Index = (props) => {
                     id ? childItem?.idChildBackEnd : ""
                 );
                 formData.append(
-                    `items[${index}][child][${childIndex}][unit]`,
-                    childItem?.unit?.value
+                    `items[${index}][child][${childIndex}][serial]`,
+                    childItem?.serial === null ? "" : childItem?.serial
                 );
                 formData.append(
-                    `items[${index}][child][${childIndex}][note]`,
-                    childItem?.note ? childItem?.note : ""
+                    `items[${index}][child][${childIndex}][lot]`,
+                    childItem?.lot === null ? "" : childItem?.lot
+                );
+                formData.append(
+                    `items[${index}][child][${childIndex}][expiration_date]`,
+                    childItem?.date === null
+                        ? ""
+                        : moment(childItem?.date).format("YYYY-MM-DD HH:mm:ss")
                 );
                 formData.append(
                     `items[${index}][child][${childIndex}][location_warehouses_id]`,
                     childItem?.kho?.value
                 );
                 formData.append(
+                    `items[${index}][child][${childIndex}][note]`,
+                    childItem?.note ? childItem?.note : ""
+                );
+                formData.append(
                     `items[${index}][child][${childIndex}][quantity]`,
-                    childItem?.exportQuantity
+                    childItem?.importQuantity
                 );
             });
         });
@@ -450,8 +503,8 @@ const Index = (props) => {
             "POST",
             `${
                 id
-                    ? `/api_web/Api_stock/exportProduction/${id}?csrf_protection=true`
-                    : `/api_web/Api_stock/exportProduction/?csrf_protection=true`
+                    ? `/api_web/Api_product_receipt/productReceipt/${id}?csrf_protection=true`
+                    : `/api_web/Api_product_receipt/productReceipt/?csrf_protection=true`
             }`,
             {
                 data: formData,
@@ -473,14 +526,8 @@ const Index = (props) => {
                         sErrDate(false);
                         //new
                         sListData([]);
-                        router.push(
-                            "/manufacture/production_warehouse?tab=all"
-                        );
+                        router.push("/manufacture/productsWarehouse?tab=all");
                     } else {
-                        // Toast.fire({
-                        //     icon: "error",
-                        //     title: `${dataLang[message]}`,
-                        // });
                         handleCheckError(dataLang[message]);
                     }
                 }
@@ -501,12 +548,6 @@ const Index = (props) => {
                 const newChild = {
                     id: uuidv4(),
                     disabledDate:
-                        (value?.e?.text_type === "material" &&
-                            dataMaterialExpiry?.is_enable === "1" &&
-                            false) ||
-                        (value?.e?.text_type === "material" &&
-                            dataMaterialExpiry?.is_enable === "0" &&
-                            true) ||
                         (value?.e?.text_type === "products" &&
                             dataProductExpiry?.is_enable === "1" &&
                             false) ||
@@ -514,19 +555,17 @@ const Index = (props) => {
                             dataProductExpiry?.is_enable === "0" &&
                             true),
                     kho: null,
-                    unit: null,
+                    unit: value?.e?.unit_name,
+                    serial: "",
+                    lot: "",
+                    date: null,
                     dataWarehouse: value?.e?.warehouse.map((e) => ({
                         label: e?.location_name,
                         value: e?.id,
                         warehouse_name: e?.warehouse_name,
                         qty: e?.quantity,
                     })),
-                    dataUnit: value?.e?.unit.map((e) => ({
-                        label: e?.unit,
-                        value: e?.id,
-                        coefficient: e?.coefficient,
-                    })),
-                    exportQuantity: null,
+                    importQuantity: null,
                     exchangeValue: null,
                     numberOfConversions: null,
                     note: "",
@@ -558,12 +597,6 @@ const Index = (props) => {
                         idChildBackEnd: null,
                         id: uuidv4(),
                         disabledDate:
-                            (value?.e?.text_type === "material" &&
-                                dataMaterialExpiry?.is_enable === "1" &&
-                                false) ||
-                            (value?.e?.text_type === "material" &&
-                                dataMaterialExpiry?.is_enable === "0" &&
-                                true) ||
                             (value?.e?.text_type === "products" &&
                                 dataProductExpiry?.is_enable === "1" &&
                                 false) ||
@@ -571,24 +604,17 @@ const Index = (props) => {
                                 dataProductExpiry?.is_enable === "0" &&
                                 true),
                         kho: null,
+                        serial: "",
+                        lot: "",
+                        date: null,
                         dataWarehouse: value?.e?.warehouse.map((e) => ({
                             label: e?.location_name,
                             value: e?.id,
                             warehouse_name: e?.warehouse_name,
-                            qty: e?.quantity,
                         })),
-                        unit: {
-                            label: value?.e?.unit[0].unit,
-                            value: value?.e?.unit[0].id,
-                            coefficient: value?.e?.unit[0].coefficient,
-                        },
-                        dataUnit: value?.e?.unit.map((e) => ({
-                            label: e?.unit,
-                            value: e?.id,
-                            coefficient: e?.coefficient,
-                        })),
-                        exportQuantity: null,
-                        exchangeValue: value?.e?.unit[0].coefficient,
+                        unit: value?.e?.unit_name,
+                        importQuantity: null,
+                        exchangeValue: null,
                         numberOfConversions: null,
                         note: "",
                     },
@@ -602,12 +628,6 @@ const Index = (props) => {
             handleCheckError(
                 dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
             );
-            // Toast.fire({
-            //     title: `${
-            //         dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
-            //     }`,
-            //     icon: "error",
-            // });
         }
     };
     const _HandleDeleteChild = (parentId, childId) => {
@@ -653,66 +673,70 @@ const Index = (props) => {
                 const updatedChild = {
                     ...newData[parentIndex].child[childIndex],
                 };
-                if (type === "exportQuantity") {
-                    const newSoluongxuat = Number(value?.value);
-                    const newSoluongquydoi =
-                        newSoluongxuat * Number(updatedChild?.exchangeValue);
-                    if (newSoluongquydoi > +updatedChild?.kho?.qty) {
-                        handleQuantityError(updatedChild?.kho?.qty);
-                        setTimeout(() => {
-                            sLoad(true);
-                        }, 500);
-                        setTimeout(() => {
-                            sLoad(false);
-                        }, 1000);
-                        updatedChild.exportQuantity = null;
-                        updatedChild.numberOfConversions = null;
-                    } else {
-                        sLoad(false);
-                        updatedChild.exportQuantity = newSoluongxuat;
-                        updatedChild.numberOfConversions = newSoluongquydoi;
-                    }
+                if (type === "importQuantity") {
+                    const newQtyImport = Number(value?.value);
+                    updatedChild.importQuantity = newQtyImport;
                 } else if (type === "kho") {
                     const checkKho = newData[parentIndex].child
                         .map((house) => house)
                         .some((i) => i?.kho?.value === value?.value);
                     if (checkKho) {
                         handleCheckError(
-                            "Kho xuất và vị trí xuất đã được chọn"
+                            "Kho nhập và vị trí nhập đã được chọn"
                         );
                     } else {
                         updatedChild.kho = value;
                     }
-                } else if (type === "unit") {
-                    updatedChild.unit = value;
-                    updatedChild.exchangeValue = Number(value?.coefficient);
-                } else if (type === "increase") {
-                    if (updatedChild.kho == null) {
-                        handleCheckError("Vui lòng chọn kho trước");
-                    } else if (updatedChild.unit == null) {
-                        handleCheckError("Vui lòng chọn đơn vị tính trước");
-                    } else if (
-                        updatedChild.numberOfConversions ==
-                        updatedChild.kho?.qty
-                    ) {
-                        handleQuantityError(updatedChild?.kho?.qty);
+                }
+                // else if (type === "lot") {
+                //     const isLotExists = newData[parentIndex].child.find(
+                //         (ce, idx) =>
+                //             idx !== childIndex && ce.lot === value?.target.value
+                //     );
+
+                //     if (isLotExists) {
+                //         handleQuantityError("Giá trị Lot đã tồn tại");
+                //     } else {
+                //         updatedChild.lot = value?.target.value;
+                //     }
+                // } else if (type === "serial") {
+                //     const isLotExists = newData[parentIndex].child.find(
+                //         (ce, idx) =>
+                //             idx !== childIndex &&
+                //             ce.serial === value?.target.value
+                //     );
+                //     if (isLotExists) {
+                //         handleQuantityError("Giá trị serial đã tồn tại");
+                //     } else {
+                //         updatedChild.serial = value?.target.value;
+                //     }
+                // }
+                else if (type === "lot" || type === "serial") {
+                    const isValueExists = newData[parentIndex].child.find(
+                        (ce, idx) =>
+                            idx !== childIndex &&
+                            ce[type] === value?.target.value
+                    );
+
+                    if (isValueExists) {
+                        handleQuantityError(`Giá trị ${type} đã tồn tại`);
                     } else {
-                        updatedChild.exportQuantity =
-                            Number(updatedChild.exportQuantity) + 1;
-                        updatedChild.numberOfConversions =
-                            Number(updatedChild.exportQuantity) *
-                            Number(updatedChild.exchangeValue);
+                        updatedChild[type] = value?.target.value;
                     }
+                } else if (type === "date") {
+                    updatedChild.date = value;
+                } else if (type === "increase") {
+                    updatedChild.importQuantity =
+                        Number(updatedChild.importQuantity) + 1;
+                    updatedChild.numberOfConversions =
+                        Number(updatedChild.importQuantity) *
+                        Number(updatedChild.exchangeValue);
                 } else if (type === "decrease") {
-                    if (updatedChild.kho == null) {
-                        handleCheckError("Vui lòng chọn kho trước");
-                    } else if (updatedChild.unit == null) {
-                        handleCheckError("Vui lòng chọn đơn vị tính trước");
-                    } else if (updatedChild.exportQuantity >= 2) {
-                        updatedChild.exportQuantity =
-                            Number(updatedChild.exportQuantity) - 1;
+                    if (updatedChild.importQuantity >= 2) {
+                        updatedChild.importQuantity =
+                            Number(updatedChild.importQuantity) - 1;
                         updatedChild.numberOfConversions =
-                            Number(updatedChild.exportQuantity) *
+                            Number(updatedChild.importQuantity) *
                             Number(updatedChild.exchangeValue);
                     }
                 } else if (type === "note") {
@@ -726,21 +750,13 @@ const Index = (props) => {
 
     const handleQuantityError = (e) => {
         Toast.fire({
-            title: `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                e
-            )} số lượng tồn kho`,
+            title: e,
             icon: "error",
             confirmButtonColor: "#296dc1",
             cancelButtonColor: "#d33",
             confirmButtonText: dataLang?.aler_yes,
             timer: 3000,
         });
-        setTimeout(() => {
-            sLoad(true);
-        }, 500);
-        setTimeout(() => {
-            sLoad(false);
-        }, 1000);
     };
 
     const _HandleChangeValue = (parentId, value) => {
@@ -763,34 +779,16 @@ const Index = (props) => {
                                     label: e?.location_name,
                                     value: e?.id,
                                     warehouse_name: e?.warehouse_name,
-                                    qty: e?.quantity,
                                 })),
                                 disabledDate:
-                                    (value?.e?.text_type === "material" &&
-                                        dataMaterialExpiry?.is_enable === "1" &&
-                                        false) ||
-                                    (value?.e?.text_type === "material" &&
-                                        dataMaterialExpiry?.is_enable === "0" &&
-                                        true) ||
                                     (value?.e?.text_type === "products" &&
                                         dataProductExpiry?.is_enable === "1" &&
                                         false) ||
                                     (value?.e?.text_type === "products" &&
                                         dataProductExpiry?.is_enable === "0" &&
                                         true),
-                                unit: {
-                                    label: value?.e?.unit[0].unit,
-                                    value: value?.e?.unit[0].id,
-                                    coefficient: value?.e?.unit[0].coefficient,
-                                },
-
-                                dataUnit: value?.e?.unit.map((e) => ({
-                                    label: e?.unit,
-                                    value: e?.id,
-                                    coefficient: e?.coefficient,
-                                })),
-                                exportQuantity: null,
-                                exchangeValue: value?.e?.unit[0].coefficient,
+                                unit: value?.e?.unit_name,
+                                importQuantity: null,
                                 numberOfConversions: null,
                                 note: "",
                             },
@@ -1086,32 +1084,74 @@ const Index = (props) => {
                                 "import_item_information"}
                         </div>
                     </div>
+
                     <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10">
-                        <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-3 text-center truncate font-[400]">
+                        <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2 text-center truncate font-[400]">
                             {dataLang?.import_from_items || "import_from_items"}
                         </h4>
-                        <div className="col-span-9">
-                            <div className="grid grid-cols-7">
-                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]">
-                                    {"Kho nhập - Vị trí nhập"}
+                        <div className="col-span-10">
+                            {/* ${
+                                    dataProductSerial.is_enable == "1"
+                                        ? dataMaterialExpiry.is_enable !=
+                                          dataProductExpiry.is_enable
+                                            ? "grid-cols-8"
+                                            : dataMaterialExpiry.is_enable ==
+                                              "1"
+                                            ? "grid-cols-[repeat(13_minmax(0_1fr))]"
+                                            : "grid-cols-6"
+                                        : dataMaterialExpiry.is_enable !=
+                                          dataProductExpiry.is_enable
+                                        ? "grid-cols-7"
+                                        : dataMaterialExpiry.is_enable == "1"
+                                        ? "grid-cols-7"
+                                        : "grid-cols-9"
+                                } */}
+                            <div
+                                className={`${
+                                    dataProductSerial.is_enable == "1"
+                                        ? dataProductExpiry.is_enable
+                                            ? "grid-cols-6"
+                                            : "grid-cols-4"
+                                        : dataProductExpiry.is_enable
+                                        ? "grid-cols-7"
+                                        : "grid-cols-9"
+                                } grid `}
+                            >
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
+                                    {"Kho nhập - vị trí nhập"}
                                 </h4>
+                                {dataProductSerial.is_enable === "1" && (
+                                    <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
+                                        {"Serial"}
+                                    </h4>
+                                )}
+                                {
+                                    // dataMaterialExpiry.is_enable === "1" ||
+                                    dataProductExpiry.is_enable === "1" ? (
+                                        <>
+                                            <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
+                                                {"Lot"}
+                                            </h4>
+                                            <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
+                                                {props.dataLang
+                                                    ?.warehouses_detail_date ||
+                                                    "warehouses_detail_date"}
+                                            </h4>
+                                        </>
+                                    ) : (
+                                        ""
+                                    )
+                                }
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {"ĐVT"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {"Số lượng nhập"}
+                                    {dataLang?.import_from_quantity ||
+                                        "import_from_quantity"}
                                 </h4>
-                                {/* <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_exchange_value ||
-                                        "production_warehouse_exchange_value"}
-                                </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_amount_of_conversion ||
-                                        "production_warehouse_amount_of_conversion"}
-                                </h4> */}
-                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2    text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_note ||
-                                        "production_warehouse_note"}
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
+                                    {dataLang?.import_from_note ||
+                                        "import_from_note"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
                                     {dataLang?.import_from_operation ||
@@ -1121,10 +1161,11 @@ const Index = (props) => {
                         </div>
                     </div>
                     <div className="grid grid-cols-12 items-center gap-1 py-2">
-                        <div className="col-span-3">
+                        <div className="col-span-2">
                             <Select
                                 options={options}
                                 value={null}
+                                onInputChange={_HandleSeachApi.bind(this)}
                                 onChange={_HandleAddParent.bind(this)}
                                 className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                 placeholder={
@@ -1176,47 +1217,6 @@ const Index = (props) => {
                                                         ]
                                                     }
                                                 </h5>
-                                                <div className="flex items-center gap-2 italic">
-                                                    {dataProductSerial.is_enable ===
-                                                        "1" && (
-                                                        <div className="text-[11px] text-[#667085] font-[500]">
-                                                            Serial:{" "}
-                                                            {option.e?.serial
-                                                                ? option.e
-                                                                      ?.serial
-                                                                : "-"}
-                                                        </div>
-                                                    )}
-                                                    {dataMaterialExpiry.is_enable ===
-                                                        "1" ||
-                                                    dataProductExpiry.is_enable ===
-                                                        "1" ? (
-                                                        <>
-                                                            <div className="text-[11px] text-[#667085] font-[500]">
-                                                                Lot:{" "}
-                                                                {option.e?.lot
-                                                                    ? option.e
-                                                                          ?.lot
-                                                                    : "-"}
-                                                            </div>
-                                                            <div className="text-[11px] text-[#667085] font-[500]">
-                                                                Date:{" "}
-                                                                {option.e
-                                                                    ?.expiration_date
-                                                                    ? moment(
-                                                                          option
-                                                                              .e
-                                                                              ?.expiration_date
-                                                                      ).format(
-                                                                          "DD/MM/YYYY"
-                                                                      )
-                                                                    : "-"}
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        ""
-                                                    )}
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1253,34 +1253,85 @@ const Index = (props) => {
                                     }),
                                     menu: (provided, state) => ({
                                         ...provided,
-                                        width: "100%",
+                                        width: "130%",
                                     }),
                                 }}
                             />
                         </div>
-                        <div className="col-span-9">
-                            <div className="grid grid-cols-7 divide-x border-t border-b border-r border-l">
-                                <div className="col-span-2">
+
+                        <div className="col-span-10">
+                            <div
+                                className={`${
+                                    dataProductSerial.is_enable == "1"
+                                        ? dataProductExpiry.is_enable
+                                            ? "grid-cols-6"
+                                            : "grid-cols-4"
+                                        : dataProductExpiry.is_enable
+                                        ? "grid-cols-7"
+                                        : "grid-cols-9"
+                                } grid  divide-x border-t border-b border-r border-l`}
+                            >
+                                <div className="col-span-1">
                                     {" "}
                                     <Select
                                         classNamePrefix="customDropdowDefault"
-                                        placeholder={"Kho nhập - Vị trí nhập"}
-                                        className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
+                                        placeholder="Kho nhập - vị trí nhập"
+                                        className="3xl:text-[12px] border-none outline-none 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
                                     />
                                 </div>
-                                <div className="col-span-1">
-                                    <Select
-                                        classNamePrefix="customDropdowDefault"
-                                        placeholder={
-                                            dataLang?.production_warehouse_unit ||
-                                            "production_warehouse_unit"
-                                        }
-                                        className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
-                                        isDisabled={true}
-                                    />
-                                </div>
-
+                                {dataProductSerial.is_enable === "1" ? (
+                                    <div className=" col-span-1 ">
+                                        <NumericFormat
+                                            className="w-full appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal  focus:outline-none border-b-2 border-gray-200"
+                                            allowNegative={false}
+                                            decimalScale={0}
+                                            isNumericString={true}
+                                            thousandSeparator=","
+                                            disabled
+                                        />
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
+                                {
+                                    // dataMaterialExpiry.is_enable === "1" ||
+                                    dataProductExpiry.is_enable === "1" ? (
+                                        <>
+                                            <div className=" col-span-1 flex items-center">
+                                                <NumericFormat
+                                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal w-[100%]  focus:outline-none border-b-2 border-gray-200"
+                                                    allowNegative={false}
+                                                    decimalScale={0}
+                                                    isNumericString={true}
+                                                    thousandSeparator=","
+                                                    disabled
+                                                />
+                                            </div>
+                                            <div className=" col-span-1 flex items-center ">
+                                                <DatePicker
+                                                    // selected={effectiveDate}
+                                                    // blur
+                                                    placeholderText="dd/mm/yyyy"
+                                                    // dateFormat="dd/MM/yyyy"
+                                                    // onSelect={(date) => sEffectiveDate(date)}
+                                                    // placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                                    disabled
+                                                    className={`3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b placeholder:text-slate-300 w-full bg-gray-50 rounded text-[#52575E] font-light px-2 py-1.5 text-center outline-none cursor-pointer  `}
+                                                />
+                                                {/* {effectiveDate && (
+                                  <>
+                                    <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('effectiveDate')} />
+                                  </>
+                                )}
+                                <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" /> */}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        ""
+                                    )
+                                }
+                                <div></div>
                                 <div className="col-span-1 flex items-center justify-center">
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
                                         <Minus
@@ -1298,27 +1349,15 @@ const Index = (props) => {
                                         />
                                     </button>
                                 </div>
-
-                                {/* <div className="col-span-1 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black flex items-center justify-center">
-                                    0
-                                </div>
-                                <div className="col-span-1 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black  flex items-center justify-center">
-                                    1
-                                </div> */}
                                 <input
-                                    placeholder={
-                                        dataLang?.returns_note || "returns_note"
-                                    }
+                                    placeholder="Ghi chú"
                                     disabled
-                                    className=" disabled:bg-gray-50 col-span-2 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 "
+                                    className=" disabled:bg-gray-50 col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 "
                                 />
                                 <button
-                                    title={
-                                        dataLang?.returns_delete ||
-                                        "returns_delete"
-                                    }
+                                    title="Xóa"
                                     disabled
-                                    className="col-span-1 disabled:opacity-50 transition w-full h-full bg-slate-100  rounded-[5.5px] text-red-500 flex flex-col justify-center items-center"
+                                    className="col-span-1  disabled:opacity-50 transition w-full h-full bg-slate-100  rounded-[5.5px] text-red-500 flex flex-col justify-center items-center"
                                 >
                                     <IconDelete />
                                 </button>
@@ -1339,9 +1378,12 @@ const Index = (props) => {
                                             key={e?.id?.toString()}
                                             className="grid grid-cols-12 items-start"
                                         >
-                                            <div className="col-span-3 border border-r p-2 pb-1 h-full">
-                                                <div className="relative mt-5">
+                                            <div className="col-span-2 border border-r p-0.5 pb-1 h-full">
+                                                <div className="relative mr-5 mt-5">
                                                     <Select
+                                                        onInputChange={_HandleSeachApi.bind(
+                                                            this
+                                                        )}
                                                         options={options}
                                                         value={e?.matHang}
                                                         className=""
@@ -1369,14 +1411,14 @@ const Index = (props) => {
                                                                                         ?.images
                                                                                 }
                                                                                 alt="Product Image"
-                                                                                className="max-w-[30px] h-[40px] text-[8px] object-cover rounded"
+                                                                                className="object-cover rounded"
                                                                             />
                                                                         ) : (
-                                                                            <div className=" w-[30px] h-[40px] object-cover  flex items-center justify-center rounded">
+                                                                            <div className=" object-cover  flex items-center justify-center rounded w-[40px] h-h-[60px]">
                                                                                 <img
                                                                                     src="/no_img.png"
                                                                                     alt="Product Image"
-                                                                                    className="w-[30px] h-[30px] object-cover rounded"
+                                                                                    className="object-cover rounded "
                                                                                 />
                                                                             </div>
                                                                         )}
@@ -1389,22 +1431,20 @@ const Index = (props) => {
                                                                                     ?.name
                                                                             }
                                                                         </h3>
-                                                                        <div className="flex gap-2">
-                                                                            <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                                {
-                                                                                    option
-                                                                                        .e
-                                                                                        ?.code
-                                                                                }
-                                                                            </h5>
-                                                                            <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                                {
-                                                                                    option
-                                                                                        .e
-                                                                                        ?.product_variation
-                                                                                }
-                                                                            </h5>
-                                                                        </div>
+                                                                        <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                            {
+                                                                                option
+                                                                                    .e
+                                                                                    ?.code
+                                                                            }
+                                                                        </h5>
+                                                                        <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                            {
+                                                                                option
+                                                                                    .e
+                                                                                    ?.product_variation
+                                                                            }
+                                                                        </h5>
                                                                         <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                             {
                                                                                 dataLang[
@@ -1414,62 +1454,10 @@ const Index = (props) => {
                                                                                 ]
                                                                             }
                                                                         </h5>
-                                                                        <div className="flex items-center gap-2 italic">
-                                                                            {dataProductSerial.is_enable ===
-                                                                                "1" && (
-                                                                                <div className="text-[11px] text-[#667085] font-[500]">
-                                                                                    Serial:{" "}
-                                                                                    {option
-                                                                                        .e
-                                                                                        ?.serial
-                                                                                        ? option
-                                                                                              .e
-                                                                                              ?.serial
-                                                                                        : "-"}
-                                                                                </div>
-                                                                            )}
-                                                                            {dataMaterialExpiry.is_enable ===
-                                                                                "1" ||
-                                                                            dataProductExpiry.is_enable ===
-                                                                                "1" ? (
-                                                                                <>
-                                                                                    <div className="text-[11px] text-[#667085] font-[500]">
-                                                                                        Lot:{" "}
-                                                                                        {option
-                                                                                            .e
-                                                                                            ?.lot
-                                                                                            ? option
-                                                                                                  .e
-                                                                                                  ?.lot
-                                                                                            : "-"}
-                                                                                    </div>
-                                                                                    <div className="text-[11px] text-[#667085] font-[500]">
-                                                                                        Date:{" "}
-                                                                                        {option
-                                                                                            .e
-                                                                                            ?.expiration_date
-                                                                                            ? moment(
-                                                                                                  option
-                                                                                                      .e
-                                                                                                      ?.expiration_date
-                                                                                              ).format(
-                                                                                                  "DD/MM/YYYY"
-                                                                                              )
-                                                                                            : "-"}
-                                                                                    </div>
-                                                                                </>
-                                                                            ) : (
-                                                                                ""
-                                                                            )}
-                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         )}
-                                                        noOptionsMessage={() =>
-                                                            dataLang?.returns_nodata ||
-                                                            "returns_nodata"
-                                                        }
                                                         classNamePrefix="customDropdow"
                                                         style={{
                                                             border: "none",
@@ -1517,7 +1505,7 @@ const Index = (props) => {
                                                                 state
                                                             ) => ({
                                                                 ...provided,
-                                                                width: "100%",
+                                                                width: "130%",
                                                             }),
                                                         }}
                                                     />
@@ -1527,365 +1515,394 @@ const Index = (props) => {
                                                             e?.id,
                                                             e?.matHang
                                                         )}
-                                                        className="w-10 h-10 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-5 right-5 hover:rotate-45 hover:bg-slate-200 transition hover:scale-105 hover:text-red-500 ease-in-out"
+                                                        className="w-8 h-8 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-4 right-2 hover:rotate-45 hover:bg-slate-200 transition hover:scale-105 hover:text-red-500 ease-in-out"
                                                     >
-                                                        <Add className="" />
+                                                        <Add />
                                                     </button>
+                                                    {e?.child?.filter(
+                                                        (e) => e?.kho == null
+                                                    ).length >= 2 && (
+                                                        <button
+                                                            onClick={_HandleDeleteAllChild.bind(
+                                                                this,
+                                                                e?.id,
+                                                                e?.matHang
+                                                            )}
+                                                            className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
+                                                        >
+                                                            <span className="absolute right-0 w-full h-full -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
+                                                            <span className="relative text-xs">
+                                                                Xóa{" "}
+                                                                {
+                                                                    e?.child?.filter(
+                                                                        (e) =>
+                                                                            e?.kho ==
+                                                                            null
+                                                                    ).length
+                                                                }{" "}
+                                                                hàng chưa chọn
+                                                                kho
+                                                            </span>
+                                                        </button>
+                                                    )}
                                                 </div>
-                                                {e?.child?.filter(
-                                                    (e) => e?.kho == null
-                                                ).length >= 2 && (
-                                                    <button
-                                                        onClick={_HandleDeleteAllChild.bind(
-                                                            this,
-                                                            e?.id,
-                                                            e?.matHang
-                                                        )}
-                                                        className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
-                                                    >
-                                                        <span className="absolute right-0 w-full h-full -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
-                                                        <span className="relative text-xs">
-                                                            Xóa{" "}
-                                                            {
-                                                                e?.child?.filter(
-                                                                    (e) =>
-                                                                        e?.kho ==
-                                                                        null
-                                                                ).length
-                                                            }{" "}
-                                                            hàng chưa chọn kho
-                                                        </span>
-                                                    </button>
-                                                )}
                                             </div>
-                                            <div className="col-span-9  items-center">
-                                                <div className="grid grid-cols-7  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
-                                                    {load ? (
-                                                        <Loading
-                                                            className="h-2 col-span-7"
-                                                            color="#0f4f9e"
-                                                        />
-                                                    ) : (
-                                                        e?.child?.map(
-                                                            (ce, index) => (
-                                                                <React.Fragment
-                                                                    key={ce?.id?.toString()}
-                                                                >
-                                                                    <div className="p-0.5 border-t border-l  flex flex-col col-span-2 justify-center h-full">
-                                                                        <Select
-                                                                            options={
-                                                                                ce?.dataWarehouse
-                                                                            }
-                                                                            value={
-                                                                                ce?.kho
-                                                                            }
-                                                                            isLoading={
-                                                                                ce?.kho !=
-                                                                                null
-                                                                                    ? false
-                                                                                    : onLoadingChild
-                                                                            }
-                                                                            onChange={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "kho"
-                                                                            )}
-                                                                            className={`${
-                                                                                errWarehouse &&
-                                                                                ce?.kho ==
-                                                                                    null
-                                                                                    ? "border-red-500"
-                                                                                    : ""
-                                                                            } border my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
-                                                                            placeholder={
-                                                                                onLoadingChild
-                                                                                    ? ""
-                                                                                    : dataLang?.production_warehouse_location ||
-                                                                                      "production_warehouse_location"
-                                                                            }
-                                                                            noOptionsMessage={() =>
-                                                                                dataLang?.returns_nodata ||
-                                                                                "returns_nodata"
-                                                                            }
-                                                                            menuPortalTarget={
-                                                                                document.body
-                                                                            }
-                                                                            formatOptionLabel={(
-                                                                                option
-                                                                            ) => (
-                                                                                <div className="">
-                                                                                    <div className="flex gap-1">
-                                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                            {dataLang?.production_warehouse_expWarehouse ||
-                                                                                                "production_warehouse_expWarehouse"}
+                                            <div className="col-span-10  items-center">
+                                                <div
+                                                    className={`${
+                                                        dataProductSerial.is_enable ==
+                                                        "1"
+                                                            ? dataProductExpiry.is_enable
+                                                                ? "grid-cols-6"
+                                                                : "grid-cols-4"
+                                                            : dataProductExpiry.is_enable
+                                                            ? "grid-cols-7"
+                                                            : "grid-cols-9"
+                                                    }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r grid `}
+                                                >
+                                                    {e?.child?.map((ce) => (
+                                                        <React.Fragment
+                                                            key={ce?.id?.toString()}
+                                                        >
+                                                            <div className="flex justify-center border-t border-l  h-full p-0.5 flex-col items-center ">
+                                                                <Select
+                                                                    options={
+                                                                        ce?.dataWarehouse
+                                                                    }
+                                                                    value={
+                                                                        ce?.kho
+                                                                    }
+                                                                    isLoading={
+                                                                        ce?.kho !=
+                                                                        null
+                                                                            ? false
+                                                                            : onLoadingChild
+                                                                    }
+                                                                    onChange={_HandleChangeChild.bind(
+                                                                        this,
+                                                                        e?.id,
+                                                                        ce?.id,
+                                                                        "kho"
+                                                                    )}
+                                                                    className={`${
+                                                                        errWarehouse &&
+                                                                        ce?.kho ==
+                                                                            null
+                                                                            ? "border-red-500"
+                                                                            : ""
+                                                                    } border my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                    placeholder={
+                                                                        onLoadingChild
+                                                                            ? ""
+                                                                            : dataLang?.production_warehouse_location ||
+                                                                              "production_warehouse_location"
+                                                                    }
+                                                                    noOptionsMessage={() =>
+                                                                        dataLang?.returns_nodata ||
+                                                                        "returns_nodata"
+                                                                    }
+                                                                    menuPortalTarget={
+                                                                        document.body
+                                                                    }
+                                                                    formatOptionLabel={(
+                                                                        option
+                                                                    ) => (
+                                                                        <div className="">
+                                                                            <div className="flex gap-1">
+                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                                    {dataLang?.production_warehouse_expWarehouse ||
+                                                                                        "production_warehouse_expWarehouse"}
 
-                                                                                            :
-                                                                                        </h2>
-                                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
-                                                                                            {
-                                                                                                option?.warehouse_name
-                                                                                            }
-                                                                                        </h2>
-                                                                                    </div>
-                                                                                    <div className="flex gap-1">
-                                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                            {dataLang?.production_warehouse_expLoca ||
-                                                                                                "production_warehouse_expLoca"}
+                                                                                    :
+                                                                                </h2>
+                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
+                                                                                    {
+                                                                                        option?.warehouse_name
+                                                                                    }
+                                                                                </h2>
+                                                                            </div>
+                                                                            <div className="flex gap-1">
+                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                                    {dataLang?.production_warehouse_expLoca ||
+                                                                                        "production_warehouse_expLoca"}
 
-                                                                                            :
-                                                                                        </h2>
-                                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
-                                                                                            {
-                                                                                                option?.label
-                                                                                            }
-                                                                                        </h2>
-                                                                                    </div>
-                                                                                    <div className="flex gap-1">
-                                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                            {dataLang?.returns_survive ||
-                                                                                                "returns_survive"}
-
-                                                                                            :
-                                                                                        </h2>
-                                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
-                                                                                            {formatNumber(
-                                                                                                option?.qty
-                                                                                            )}
-                                                                                        </h2>
-                                                                                    </div>
-                                                                                </div>
-                                                                            )}
-                                                                            style={{
-                                                                                border: "none",
-                                                                                boxShadow:
-                                                                                    "none",
-                                                                                outline:
-                                                                                    "none",
-                                                                            }}
-                                                                            theme={(
-                                                                                theme
-                                                                            ) => ({
-                                                                                ...theme,
-                                                                                colors: {
-                                                                                    ...theme.colors,
-                                                                                    primary25:
-                                                                                        "#EBF5FF",
-                                                                                    primary50:
-                                                                                        "#92BFF7",
-                                                                                    primary:
-                                                                                        "#0F4F9E",
-                                                                                },
-                                                                            })}
-                                                                            classNamePrefix="customDropdow"
-                                                                        />
-                                                                    </div>
-                                                                    <div className=" flex flex-col items-center col-span-1 p-0.5 h-full justify-center">
-                                                                        <Select
-                                                                            options={
-                                                                                ce?.dataUnit
-                                                                            }
-                                                                            value={
-                                                                                ce?.unit
-                                                                            }
-                                                                            isLoading={
-                                                                                ce?.unit ==
-                                                                                null
-                                                                                    ? onLoadingChild
-                                                                                    : false
-                                                                            }
-                                                                            onChange={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "unit"
-                                                                            )}
-                                                                            noOptionsMessage={() =>
-                                                                                dataLang?.returns_nodata ||
-                                                                                "returns_nodata"
-                                                                            }
-                                                                            placeholder={
-                                                                                dataLang?.production_warehouse_unit ||
-                                                                                "production_warehouse_unit"
-                                                                            }
-                                                                            className={`${
-                                                                                errUnit &&
-                                                                                ce?.unit ==
-                                                                                    null
-                                                                                    ? "border-red-500"
-                                                                                    : ""
-                                                                            } border my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal`}
-                                                                            menuPortalTarget={
-                                                                                document.body
-                                                                            }
-                                                                            style={{
-                                                                                border: "none",
-                                                                                boxShadow:
-                                                                                    "none",
-                                                                                outline:
-                                                                                    "none",
-                                                                            }}
-                                                                            formatOptionLabel={(
-                                                                                option
-                                                                            ) => (
-                                                                                <div className="flex justify-start flex-wrap items-center">
-                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full py-1.5">
-                                                                                        {dataLang?.production_warehouse_unit ||
-                                                                                            "production_warehouse_unit"}
-
-                                                                                        :{" "}
-                                                                                        {
-                                                                                            option?.label
-                                                                                        }
-                                                                                    </h2>
-                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-1">{`${
-                                                                                        dataLang?.production_warehouse_exchange_value ||
-                                                                                        "production_warehouse_exchange_value"
-                                                                                    }: (${
-                                                                                        option?.coefficient
-                                                                                    })`}</h2>
-                                                                                </div>
-                                                                            )}
-                                                                            theme={(
-                                                                                theme
-                                                                            ) => ({
-                                                                                ...theme,
-                                                                                colors: {
-                                                                                    ...theme.colors,
-                                                                                    primary25:
-                                                                                        "#EBF5FF",
-                                                                                    primary50:
-                                                                                        "#92BFF7",
-                                                                                    primary:
-                                                                                        "#0F4F9E",
-                                                                                },
-                                                                            })}
-                                                                            classNamePrefix="customDropdow"
-                                                                        />
-                                                                    </div>
-                                                                    <div className="flex items-center justify-center  h-full p-0.5">
-                                                                        <button
-                                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                                            onClick={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "decrease"
-                                                                            )}
-                                                                        >
-                                                                            <Minus
-                                                                                className="2xl:scale-100 xl:scale-100 scale-50"
-                                                                                size="16"
-                                                                            />
-                                                                        </button>
-
-                                                                        <NumericFormat
-                                                                            placeholder={
-                                                                                (ce?.kho ==
-                                                                                    null ||
-                                                                                    ce?.unit ==
-                                                                                        null) &&
-                                                                                "Chọn kho và đơn vị tính trước"
-                                                                            }
-                                                                            disabled={
-                                                                                ce?.kho ==
-                                                                                    null ||
-                                                                                ce?.unit ==
-                                                                                    null
-                                                                            }
-                                                                            className={`${
-                                                                                errQty &&
-                                                                                (ce?.exportQuantity ==
-                                                                                    null ||
-                                                                                    ce?.exportQuantity ==
-                                                                                        "" ||
-                                                                                    ce?.exportQuantity ==
-                                                                                        0)
-                                                                                    ? "border-red-500 border-b"
-                                                                                    : ""
-                                                                            } placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b-2 border-gray-200 `}
-                                                                            onValueChange={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "exportQuantity"
-                                                                            )}
-                                                                            value={
-                                                                                ce?.exportQuantity
-                                                                            }
-                                                                            allowNegative={
-                                                                                false
-                                                                            }
-                                                                            // decimalScale={
-                                                                            //     0
-                                                                            // }
-                                                                            isNumericString={
-                                                                                true
-                                                                            }
-                                                                            // decimalSeparator=","
-                                                                            thousandSeparator=","
-                                                                        />
-
-                                                                        <button
-                                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                                            onClick={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "increase"
-                                                                            )}
-                                                                        >
-                                                                            <Add
-                                                                                className="2xl:scale-100 xl:scale-100 scale-50"
-                                                                                size="16"
-                                                                            />
-                                                                        </button>
-                                                                    </div>
-                                                                    {/* <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                        {
-                                                                            ce?.exchangeValue
-                                                                        }
-                                                                    </div>
-                                                                    <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                        {formatNumber(
-                                                                            // ce?.exportQuantity * Number(ce?.exchangeValue)
-                                                                            ce?.exportQuantity *
-                                                                                ce?.exchangeValue
-                                                                        )}
-                                                                    </div> */}
-                                                                    <div className="col-span-2 flex items-center justify-center  h-full p-0.5">
+                                                                                    :
+                                                                                </h2>
+                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
+                                                                                    {
+                                                                                        option?.label
+                                                                                    }
+                                                                                </h2>
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                    style={{
+                                                                        border: "none",
+                                                                        boxShadow:
+                                                                            "none",
+                                                                        outline:
+                                                                            "none",
+                                                                    }}
+                                                                    theme={(
+                                                                        theme
+                                                                    ) => ({
+                                                                        ...theme,
+                                                                        colors: {
+                                                                            ...theme.colors,
+                                                                            primary25:
+                                                                                "#EBF5FF",
+                                                                            primary50:
+                                                                                "#92BFF7",
+                                                                            primary:
+                                                                                "#0F4F9E",
+                                                                        },
+                                                                    })}
+                                                                    styles={{
+                                                                        menu: (
+                                                                            provided,
+                                                                            state
+                                                                        ) => ({
+                                                                            ...provided,
+                                                                            width: "150%",
+                                                                        }),
+                                                                    }}
+                                                                    classNamePrefix="customDropdow"
+                                                                />
+                                                            </div>
+                                                            {dataProductSerial.is_enable ===
+                                                            "1" ? (
+                                                                <div className=" col-span-1 ">
+                                                                    <div className="flex justify-center  h-full p-0.5 flex-col items-center">
                                                                         <input
                                                                             value={
-                                                                                ce?.note
+                                                                                ce?.serial
                                                                             }
+                                                                            disabled={
+                                                                                e
+                                                                                    ?.matHang
+                                                                                    ?.e
+                                                                                    ?.text_type !=
+                                                                                "products"
+                                                                            }
+                                                                            className={`border ${
+                                                                                e
+                                                                                    ?.matHang
+                                                                                    ?.e
+                                                                                    ?.text_type !=
+                                                                                "products"
+                                                                                    ? "bg-gray-50"
+                                                                                    : errSerial &&
+                                                                                      (ce?.serial ==
+                                                                                          "" ||
+                                                                                          ce?.serial ==
+                                                                                              null)
+                                                                                    ? "border-red-500"
+                                                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
                                                                             onChange={_HandleChangeChild.bind(
                                                                                 this,
                                                                                 e?.id,
                                                                                 ce?.id,
-                                                                                "note"
+                                                                                "serial"
                                                                             )}
-                                                                            placeholder="Ghi  chú"
-                                                                            type="text"
-                                                                            className="  placeholder:text-slate-300 w-full bg-white rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
                                                                         />
                                                                     </div>
-                                                                    <div className=" h-full p-0.5 flex flex-col items-center justify-center">
-                                                                        <button
-                                                                            title="Xóa"
-                                                                            onClick={_HandleDeleteChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id
-                                                                            )}
-                                                                            className=" text-red-500 flex flex-col justify-center items-center hover:scale-110 bg-red-50 p-2 rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
-                                                                        >
-                                                                            <IconDelete />
-                                                                        </button>
-                                                                    </div>
-                                                                </React.Fragment>
-                                                            )
-                                                        )
-                                                    )}
+                                                                </div>
+                                                            ) : (
+                                                                ""
+                                                            )}
+                                                            {
+                                                                // dataMaterialExpiry.is_enable ===
+                                                                //     "1" ||
+                                                                dataProductExpiry.is_enable ===
+                                                                "1" ? (
+                                                                    <>
+                                                                        <div className=" col-span-1  ">
+                                                                            <div className="flex justify-center  h-full p-0.5 flex-col items-center">
+                                                                                <input
+                                                                                    value={
+                                                                                        ce?.lot
+                                                                                    }
+                                                                                    disabled={
+                                                                                        ce?.disabledDate
+                                                                                    }
+                                                                                    className={`border ${
+                                                                                        ce?.disabledDate
+                                                                                            ? "bg-gray-50"
+                                                                                            : errLot &&
+                                                                                              (ce?.lot ==
+                                                                                                  "" ||
+                                                                                                  ce?.lot ==
+                                                                                                      null)
+                                                                                            ? "border-red-500"
+                                                                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
+                                                                                    onChange={_HandleChangeChild.bind(
+                                                                                        this,
+                                                                                        e?.id,
+                                                                                        ce?.id,
+                                                                                        "lot"
+                                                                                    )}
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className=" col-span-1  ">
+                                                                            <div className="custom-date-picker flex justify-center h-full p-0.5 flex-col items-center w-full">
+                                                                                <div className="col-span-4 relative">
+                                                                                    <div className="custom-date-picker flex flex-row">
+                                                                                        <DatePicker
+                                                                                            selected={
+                                                                                                ce?.date
+                                                                                            }
+                                                                                            blur
+                                                                                            disabled={
+                                                                                                ce?.disabledDate
+                                                                                            }
+                                                                                            placeholderText="DD/MM/YYYY"
+                                                                                            dateFormat="dd/MM/yyyy"
+                                                                                            onSelect={(
+                                                                                                date
+                                                                                            ) =>
+                                                                                                _HandleChangeChild(
+                                                                                                    e?.id,
+                                                                                                    ce?.id,
+                                                                                                    "date",
+                                                                                                    date
+                                                                                                )
+                                                                                            }
+                                                                                            placeholder={
+                                                                                                dataLang?.price_quote_system_default ||
+                                                                                                "price_quote_system_default"
+                                                                                            }
+                                                                                            className={`border ${
+                                                                                                ce?.disabledDate
+                                                                                                    ? "bg-gray-50"
+                                                                                                    : errDateList &&
+                                                                                                      ce?.date ==
+                                                                                                          null
+                                                                                                    ? "border-red-500"
+                                                                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
+                                                                                        />
+                                                                                        {effectiveDate && (
+                                                                                            <>
+                                                                                                <MdClear
+                                                                                                    className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
+                                                                                                    onClick={() =>
+                                                                                                        handleClearDate(
+                                                                                                            "effectiveDate"
+                                                                                                        )
+                                                                                                    }
+                                                                                                />
+                                                                                            </>
+                                                                                        )}
+                                                                                        <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </>
+                                                                ) : (
+                                                                    ""
+                                                                )
+                                                            }
+                                                            <div className="flex items-center justify-center">
+                                                                {ce?.unit}
+                                                            </div>
+                                                            <div className="flex items-center justify-center  h-full p-0.5">
+                                                                <button
+                                                                    className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
+                                                                    onClick={_HandleChangeChild.bind(
+                                                                        this,
+                                                                        e?.id,
+                                                                        ce?.id,
+                                                                        "decrease"
+                                                                    )}
+                                                                >
+                                                                    <Minus
+                                                                        className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                        size="16"
+                                                                    />
+                                                                </button>
+
+                                                                <NumericFormat
+                                                                    className={`${
+                                                                        errQty &&
+                                                                        (ce?.importQuantity ==
+                                                                            null ||
+                                                                            ce?.importQuantity ==
+                                                                                "" ||
+                                                                            ce?.importQuantity ==
+                                                                                0)
+                                                                            ? "border-red-500 border-b"
+                                                                            : ""
+                                                                    } placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b-2 border-gray-200 `}
+                                                                    onValueChange={_HandleChangeChild.bind(
+                                                                        this,
+                                                                        e?.id,
+                                                                        ce?.id,
+                                                                        "importQuantity"
+                                                                    )}
+                                                                    value={
+                                                                        ce?.importQuantity
+                                                                    }
+                                                                    allowNegative={
+                                                                        false
+                                                                    }
+                                                                    isNumericString={
+                                                                        true
+                                                                    }
+                                                                    thousandSeparator=","
+                                                                />
+
+                                                                <button
+                                                                    className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
+                                                                    onClick={_HandleChangeChild.bind(
+                                                                        this,
+                                                                        e?.id,
+                                                                        ce?.id,
+                                                                        "increase"
+                                                                    )}
+                                                                >
+                                                                    <Add
+                                                                        className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                        size="16"
+                                                                    />
+                                                                </button>
+                                                            </div>
+
+                                                            <div className="col-span-1  flex items-center justify-center  h-full p-0.5">
+                                                                <input
+                                                                    value={
+                                                                        ce?.note
+                                                                    }
+                                                                    onChange={_HandleChangeChild.bind(
+                                                                        this,
+                                                                        e?.id,
+                                                                        ce?.id,
+                                                                        "note"
+                                                                    )}
+                                                                    placeholder="Ghi chú"
+                                                                    type="text"
+                                                                    className="  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
+                                                                />
+                                                            </div>
+                                                            <div className=" h-full p-0.5 flex flex-col items-center justify-center ">
+                                                                <button
+                                                                    title="Xóa"
+                                                                    onClick={_HandleDeleteChild.bind(
+                                                                        this,
+                                                                        e?.id,
+                                                                        ce?.id
+                                                                    )}
+                                                                    className=" text-red-500 flex flex-col justify-center items-center"
+                                                                >
+                                                                    <IconDelete />
+                                                                </button>
+                                                            </div>
+                                                        </React.Fragment>
+                                                    ))}
                                                 </div>
                                             </div>
                                         </div>
@@ -1940,13 +1957,13 @@ const Index = (props) => {
                                             item?.child?.forEach(
                                                 (childItem) => {
                                                     if (
-                                                        childItem.exportQuantity !==
+                                                        childItem.importQuantity !==
                                                             undefined &&
-                                                        childItem.exportQuantity !==
+                                                        childItem.importQuantity !==
                                                             null
                                                     ) {
                                                         total +=
-                                                            childItem.exportQuantity;
+                                                            childItem.importQuantity;
                                                     }
                                                 }
                                             );
