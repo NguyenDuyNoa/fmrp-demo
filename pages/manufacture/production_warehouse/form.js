@@ -1884,7 +1884,8 @@ const Index = (props) => {
                                                                         {formatNumber(
                                                                             // ce?.exportQuantity * Number(ce?.exchangeValue)
                                                                             ce?.exportQuantity /
-                                                                                ce?.exchangeValue
+                                                                                ce?.exchangeValue ||
+                                                                                0
                                                                         )}{" "}
                                                                         {
                                                                             ce
