@@ -284,6 +284,28 @@ const Index = (props) => {
         sOnFetchingItemsAll(false);
     };
 
+    const _HandleSeachApi = (inputValue) => {
+        Axios(
+            "POST",
+            `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
+            {
+                params: {
+                    "filter[branch_id]": idBranch ? idBranch?.value : null,
+                },
+
+                data: {
+                    term: inputValue,
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    var { result } = response.data.data;
+                    sDataItems(result);
+                }
+            }
+        );
+    };
+
     const _HandleChangeInput = (type, value) => {
         if (type == "code") {
             sCode(value.target.value);
@@ -1124,6 +1146,7 @@ const Index = (props) => {
                     <div className="grid grid-cols-12 items-center gap-1 py-2">
                         <div className="col-span-3">
                             <Select
+                                onInputChange={_HandleSeachApi.bind(this)}
                                 options={options}
                                 value={null}
                                 onChange={_HandleAddParent.bind(this)}
@@ -1353,6 +1376,9 @@ const Index = (props) => {
                                                         options={options}
                                                         value={e?.matHang}
                                                         className=""
+                                                        onInputChange={_HandleSeachApi.bind(
+                                                            this
+                                                        )}
                                                         onChange={_HandleChangeValue.bind(
                                                             this,
                                                             e?.id
