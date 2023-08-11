@@ -55,7 +55,7 @@ const PopupModelTime = (props) => {
                                         <h1 className="col-span-9 pb-2 px-2 text-gray-700 font-semibold text-[14px]">
                                             Chào mừng
                                             <span className="text-blue-500 uppercase mx-1">
-                                                {props?.data?.user_full_name}
+                                                {data?.user_full_name}
                                             </span>
                                             đến với FMRP! Hãy dành thời gian để
                                             khám phá các tính năng hữu ích mà
@@ -88,18 +88,18 @@ const PopupModelTime = (props) => {
                                             Thời gian dùng thử: Bắt đầu từ ngày
                                             <span className="text-blue-500 mx-1">
                                                 {moment(
-                                                    props?.data?.start_date
+                                                    data?.start_date
                                                 ).format("DD/MM/YYYY")}
                                             </span>
                                             đến ngày
                                             <span className="text-blue-500 mx-1">
                                                 {moment(
-                                                    props?.data?.expiration_date
+                                                    data?.expiration_date
                                                 ).format("DD/MM/YYYY")}
                                             </span>
                                             và kết thúc sau
                                             <span className="text-red-500 mx-1">
-                                                {props?.data?.day_expiration}
+                                                {data?.day_expiration}
                                             </span>
                                             ngày.
                                         </h2>
@@ -116,13 +116,13 @@ const PopupModelTime = (props) => {
                                             <span>
                                                 Mã công ty:
                                                 <span className="capitalize mx-1 text-blue-500">
-                                                    {props?.data?.code_company}
+                                                    {data?.code_company}
                                                 </span>
                                             </span>
                                             <span>
                                                 Tên truy cập:
                                                 <span className="capitalize mx-1 text-blue-500">
-                                                    {props?.data?.user_email}
+                                                    {data?.user_email}
                                                 </span>
                                             </span>
                                         </h2>
