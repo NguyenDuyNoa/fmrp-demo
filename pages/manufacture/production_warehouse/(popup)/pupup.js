@@ -67,10 +67,10 @@ const Popup_chitiet = (props) => {
     const formatNumber = (number) => {
         if (!number && number !== 0) return 0;
         const integerPart = Math.floor(number);
-        const decimalPart = number - integerPart;
-        const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-        const roundedNumber = integerPart + roundedDecimalPart;
-        return roundedNumber.toLocaleString("en");
+        // const decimalPart = number - integerPart;
+        // const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
+        // const roundedNumber = integerPart + roundedDecimalPart;
+        return integerPart?.toLocaleString("en");
     };
 
     const _ServerFetching_detailOrder = () => {
@@ -507,7 +507,11 @@ const Popup_chitiet = (props) => {
                                                             <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center ">
                                                                 {formatNumber(
                                                                     e?.quantity_exchange
-                                                                )}
+                                                                )}{" "}
+                                                                {
+                                                                    e?.item
+                                                                        ?.unit_name
+                                                                }
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-2 font-medium text-left ml-3.5">
                                                                 {e?.note !=

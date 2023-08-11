@@ -571,7 +571,7 @@ const Index = (props) => {
                     if (isSuccess) {
                         Toast.fire({
                             icon: "success",
-                            title: `${dataLang[message]}`,
+                            title: `${dataLang[message] || message}`,
                         });
                         setTimeout(() => {
                             sOnFetching(true);
@@ -579,7 +579,7 @@ const Index = (props) => {
                     } else {
                         Toast.fire({
                             icon: "error",
-                            title: `${dataLang[message]}`,
+                            title: `${dataLang[message] || message}`,
                         });
                     }
                     if (data_export?.length > 0) {
