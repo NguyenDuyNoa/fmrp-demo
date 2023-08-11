@@ -346,8 +346,8 @@ const FilePDF = ({
                         // Data rows
                         ...(data &&
                         props?.type == "production_warehouse" &&
-                        data?.items.length > 0
-                            ? data?.items.map((item, index) => {
+                        data?.items?.length > 0
+                            ? data?.items?.map((item, index) => {
                                   const stack = [];
                                   stack.push({
                                       text: item?.item?.name
