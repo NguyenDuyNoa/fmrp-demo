@@ -9,7 +9,7 @@ const PopupModelTime = (props) => {
     const _ToggleModal = (e) => sOpen(e);
     const data = useSelector((state) => state.auth);
     useEffect(() => {
-        data.fail_expiration && sOpen(data.fail_expiration);
+        data.trial && sOpen(data.trial);
     }, [data]);
     console.log("data", data);
 
@@ -29,7 +29,7 @@ const PopupModelTime = (props) => {
             >
                 <div className=" space-x-5 w-[900px] h-auto">
                     <div>
-                        <div className="w-[900px] ">
+                        <div className="w-[900px]">
                             <div className="flex items-center justify-between gap-5 ">
                                 <div className="rounded-tl-xl rounded-bl-xl 3xl:max-w-[520px] 3xl:w-[520px] xxl:max-w-[530px] xxl:w-[500px] 2xl:max-w-[500px] 2xl:w-[500px] max-w-[500px] w-[500px]  h-full max-h-full z-10">
                                     <img
@@ -37,14 +37,14 @@ const PopupModelTime = (props) => {
                                         className="w-full h-full object-cover rounded-tl-xl  rounded-bl-xl"
                                     />
                                 </div>
-                                <div className=" flex flex-col gap-4 ">
-                                    <div className="flex items-center pt-2 gap-2">
-                                        <h1 className=" text-gray-700 font-semibold text-[20px]">
+                                <div className=" flex flex-col gap-6">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <h1 className="text-gray-700 font-semibold text-[20px]">
                                             Khởi đầu chuyển đổi số ngay với phần
                                             mềm FMRP !
                                         </h1>
                                     </div>
-                                    <div className="flex items-center">
+                                    <div className="flex items-center gap-2">
                                         <div>
                                             <Verify
                                                 size="18"
@@ -52,7 +52,7 @@ const PopupModelTime = (props) => {
                                                 className="animate-bounce"
                                             />
                                         </div>
-                                        <h1 className="col-span-9 pb-2 px-2 text-gray-700 font-semibold text-[14px]">
+                                        <h1 className="col-span-9 pb-2  text-gray-700 font-semibold text-[14px] text-ju">
                                             Chào mừng
                                             <span className="text-blue-500 uppercase mx-1">
                                                 {data?.user_full_name}
@@ -62,7 +62,7 @@ const PopupModelTime = (props) => {
                                             FMRP mang lại nhé.
                                         </h1>
                                     </div>
-                                    <div className="flex items-center">
+                                    <div className="flex items-center gap-2">
                                         <div>
                                             <Verify
                                                 size="18"
@@ -70,13 +70,13 @@ const PopupModelTime = (props) => {
                                                 className="animate-bounce"
                                             />
                                         </div>
-                                        <h2 className="px-2 py-1 text-gray-700 font-semibold text-[14px]">
+                                        <h2 className=" py-1 text-gray-700 font-semibold text-[14px] text-ju">
                                             FMRP mong rằng bạn sẽ tìm được giải
                                             pháp hiệu quả cho quá trình quản lý
                                             sản xuất của doanh nghiệp bạn.
                                         </h2>
                                     </div>
-                                    <div className="flex items-center">
+                                    <div className="flex items-center gap-2">
                                         <div>
                                             <Verify
                                                 size="18"
@@ -84,7 +84,7 @@ const PopupModelTime = (props) => {
                                                 className="animate-bounce"
                                             />
                                         </div>
-                                        <h2 className="px-2 py-1 text-gray-700 font-semibold text-[14px]">
+                                        <h2 className=" py-1 text-gray-700 font-semibold text-[14px] text-ju">
                                             Thời gian dùng thử: Bắt đầu từ ngày
                                             <span className="text-blue-500 mx-1">
                                                 {moment(
@@ -104,7 +104,7 @@ const PopupModelTime = (props) => {
                                             ngày.
                                         </h2>
                                     </div>
-                                    <div className="flex items-center">
+                                    <div className="flex items-center gap-2">
                                         <div>
                                             <Verify
                                                 size="18"
@@ -112,7 +112,7 @@ const PopupModelTime = (props) => {
                                                 className="animate-bounce"
                                             />
                                         </div>
-                                        <h2 className="px-2 py-1 text-gray-700 font-semibold text-[14px] flex flex-col ">
+                                        <h2 className=" py-1 text-gray-700 font-semibold text-[14px] text-ju flex flex-col ">
                                             <span>
                                                 Mã công ty:
                                                 <span className="capitalize mx-1 text-blue-500">
@@ -127,7 +127,7 @@ const PopupModelTime = (props) => {
                                             </span>
                                         </h2>
                                     </div>
-                                    <div className="flex justify-end p-2">
+                                    <div className="flex justify-end p-1 mt-10">
                                         {/* <button>Bắt đầu trải nghiệm</button> */}
                                         <button
                                             type="button"
