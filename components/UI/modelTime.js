@@ -27,17 +27,17 @@ const PopupModelTime = (props) => {
                 classNameBtn={props?.className + "relative"}
                 type={true}
             >
-                <div className=" space-x-5 w-[830px] h-auto">
+                <div className=" space-x-5 w-[900px] h-auto">
                     <div>
-                        <div className="w-[830px] ">
+                        <div className="w-[900px] ">
                             <div className="flex items-center justify-between gap-5 ">
-                                <div className="rounded-tl-xl rounded-bl-xl max-w-[420px] w-[420px] h-[400px] max-h-[400px] z-10">
+                                <div className="rounded-tl-xl rounded-bl-xl 3xl:max-w-[520px] 3xl:w-[520px] xxl:max-w-[530px] xxl:w-[500px] 2xl:max-w-[500px] 2xl:w-[500px] max-w-[500px] w-[500px]  h-full max-h-full z-10">
                                     <img
                                         srcSet="/modelTime.png"
                                         className="w-full h-full object-cover rounded-tl-xl  rounded-bl-xl"
                                     />
                                 </div>
-                                <div className=" flex flex-col gap-4">
+                                <div className=" flex flex-col gap-4 ">
                                     <div className="flex items-center pt-2 gap-2">
                                         <h1 className=" text-gray-700 font-semibold text-[20px]">
                                             Khởi đầu chuyển đổi số ngay với phần
@@ -135,7 +135,7 @@ const PopupModelTime = (props) => {
                                                 this,
                                                 false
                                             )}
-                                            className="px-5 py-2.5 font-medium bg-blue-50 hover:bg-blue-100 hover:text-blue-600 text-blue-500 rounded-lg text-sm"
+                                            className="px-7 py-3 font-medium bg-blue-50 hover:bg-blue-100 hover:text-blue-600 text-blue-500 rounded-lg text-sm"
                                         >
                                             Bắt đầu trải nghiệm
                                         </button>
