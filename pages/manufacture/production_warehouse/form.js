@@ -1266,7 +1266,7 @@ const Index = (props) => {
                                     }),
                                     menuPortal: (base) => ({
                                         ...base,
-                                        zIndex: 9999,
+                                        // zIndex: 9999,
                                     }),
                                     control: (base, state) => ({
                                         ...base,
@@ -1533,7 +1533,7 @@ const Index = (props) => {
                                                                 base
                                                             ) => ({
                                                                 ...base,
-                                                                zIndex: 9999,
+                                                                // zIndex: 9999,
                                                             }),
                                                             control: (
                                                                 base,
