@@ -1829,7 +1829,7 @@ const Index = (props) => {
                                             }),
                                             menu: (provided) => ({
                                                 ...provided,
-                                                zIndex: 9999, // Giá trị z-index tùy chỉnh
+                                                // zIndex: 9999, // Giá trị z-index tùy chỉnh
                                             }),
                                             control: (base, state) => ({
                                                 ...base,
@@ -2146,7 +2146,7 @@ const Index = (props) => {
                                     }),
                                     menuPortal: (base) => ({
                                         ...base,
-                                        zIndex: 100,
+                                        // zIndex: 100,
                                     }),
                                     control: (base, state) => ({
                                         ...base,
@@ -2219,7 +2219,7 @@ const Index = (props) => {
                                     }),
                                     menuPortal: (base) => ({
                                         ...base,
-                                        zIndex: 999,
+                                        // zIndex: 999,
                                     }),
                                     control: (base, state) => ({
                                         ...base,
@@ -2704,7 +2704,7 @@ const Index = (props) => {
                                                                 base
                                                             ) => ({
                                                                 ...base,
-                                                                zIndex: 9999,
+                                                                // zIndex: 9999,
                                                             }),
                                                             control: (
                                                                 base,
