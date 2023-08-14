@@ -1548,10 +1548,47 @@ const Index = (props) => {
                             return { ...ce, kho: value };
                         } else if (type === "tax") {
                             return { ...ce, tax: value };
-                        } else if (type === "serial") {
-                            return { ...ce, serial: value?.target.value };
-                        } else if (type === "lot") {
-                            return { ...ce, lot: value?.target.value };
+                        }
+                        //  else if (type === "serial") {
+                        //     return { ...ce, serial: value?.target.value };
+                        // } else if (type === "lot") {
+                        //     return { ...ce, lot: value?.target.value };
+                        // }
+                        else if (type === "serial" || type === "lot") {
+                            const isValueExists = e.child.some(
+                                (otherCe) =>
+                                    otherCe[type] === value?.target.value &&
+                                    otherCe.id !== childId
+                            );
+
+                            if (isValueExists) {
+                                handleQuantityError(
+                                    `Giá trị ${type} đã tồn tại`
+                                );
+                                return ce; // Trả về giá trị ban đầu nếu đã tồn tại
+                            } else {
+                                const otherElements = listData.filter(
+                                    (otherE) =>
+                                        otherE.id !== parentId &&
+                                        otherE.child.some(
+                                            (otherCe) =>
+                                                otherCe[type] ===
+                                                value?.target.value
+                                        )
+                                );
+
+                                if (otherElements.length > 0) {
+                                    handleQuantityError(
+                                        `Giá trị ${type} đã tồn tại ở các phần tử khác`
+                                    );
+                                    return ce; // Trả về giá trị ban đầu nếu đã tồn tại ở phần tử khác
+                                } else {
+                                    return {
+                                        ...ce,
+                                        [type]: value?.target.value,
+                                    };
+                                }
+                            }
                         } else if (type === "date") {
                             return { ...ce, date: value };
                         }
@@ -1565,6 +1602,17 @@ const Index = (props) => {
             }
         });
         sListData([...newData]);
+    };
+
+    const handleQuantityError = (e) => {
+        Toast.fire({
+            title: e,
+            icon: "error",
+            confirmButtonColor: "#296dc1",
+            cancelButtonColor: "#d33",
+            confirmButtonText: dataLang?.aler_yes,
+            timer: 3000,
+        });
     };
 
     const _HandleChangeValue = (parentId, value) => {
