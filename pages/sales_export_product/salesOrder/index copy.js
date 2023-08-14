@@ -957,7 +957,7 @@ const Index = (props) => {
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lg:w-[100%] ">
                                         <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10">
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center whitespace-nowrap">
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-left whitespace-nowrap">
                                                 {dataLang?.sales_product_date ||
                                                     "sales_product_date"}
                                             </h4>
@@ -974,21 +974,33 @@ const Index = (props) => {
                                                 {dataLang?.sales_product_type_order ||
                                                     "sales_product_type_order"}
                                             </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
+                                                {dataLang?.sales_product_quote ||
+                                                    "sales_product_quote"}
+                                            </h4>
 
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
                                                 {dataLang?.sales_product_total_into_money ||
                                                     "sales_product_total_into_money"}
                                             </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center whitespace-nowrap">
+                                                {dataLang?.sales_product_staff_in_charge ||
+                                                    "sales_product_staff_in_charge"}
+                                            </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
                                                 {dataLang?.status_table ||
                                                     "status_table"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.branch || "branch"}
-                                            </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-4 font-[600] text-center">
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center whitespace-nowrap">
                                                 {dataLang?.sales_product_order_process ||
                                                     "sales_product_order_process"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
+                                                {dataLang?.sales_product_note ||
+                                                    "sales_product_note"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
+                                                {dataLang?.branch || "branch"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
                                                 {dataLang?.sales_product_action ||
@@ -1010,6 +1022,23 @@ const Index = (props) => {
                                                                 className="relative grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40"
                                                                 key={e.id.toString()}
                                                             >
+                                                                <div
+                                                                    className="transition hover:bg-green-600 hover:animate-pulse absolute 3xl:scale-125 2xl:scale-100 lg:scale-90 3xl:left-3 2xl:left-2 lg:left-1 cursor-pointer bg-green-500 rounded-full text-white"
+                                                                    onClick={() =>
+                                                                        handleToggleShowProcessProduct(
+                                                                            e?.id
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <IoIosArrowDropright
+                                                                        className={`${
+                                                                            e.show
+                                                                                ? "rotate-90 "
+                                                                                : ""
+                                                                        } `}
+                                                                    />
+                                                                </div>
+
                                                                 <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center">
                                                                     {e?.date !=
                                                                     null
@@ -1050,32 +1079,10 @@ const Index = (props) => {
                                                                         null &&
                                                                     e?.quote_id !==
                                                                         "0" ? (
-                                                                        <div className="border  rounded-xl mx-auto w-2/3 group  bg-lime-200 border-lime-200 text-lime-500">
-                                                                            <div>
-                                                                                Phiếu
-                                                                                báo
-                                                                                giá
-                                                                            </div>
-                                                                            {
-                                                                                "("
-                                                                            }
-                                                                            <PopupDetailQuote
-                                                                                dataLang={
-                                                                                    dataLang
-                                                                                }
-                                                                                className="text-left group-hover:text-green-500"
-                                                                                name={
-                                                                                    e?.quote_code
-                                                                                        ? e.quote_code
-                                                                                        : ""
-                                                                                }
-                                                                                id={
-                                                                                    e?.quote_id
-                                                                                }
-                                                                            />
-                                                                            {
-                                                                                ")"
-                                                                            }
+                                                                        <div className="border flex justify-center items-center rounded-2xl mx-auto 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-16 3xl:h-6 2xl:h-6 xl:h-6 lg:h-5 px-1 bg-lime-200 border-lime-200 text-lime-500">
+                                                                            Phiếu
+                                                                            báo
+                                                                            giá
                                                                         </div>
                                                                     ) : (
                                                                         <div className="border flex justify-center items-center rounded-2xl mx-auto 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-16 3xl:h-6 2xl:h-6 xl:h-6 lg:h-5 px-1 bg-red-200 border-red-200 text-red-500">
@@ -1084,10 +1091,34 @@ const Index = (props) => {
                                                                         </div>
                                                                     )}
                                                                 </div>
+                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer ">
+                                                                    <PopupDetailQuote
+                                                                        dataLang={
+                                                                            dataLang
+                                                                        }
+                                                                        className="text-left"
+                                                                        name={
+                                                                            e?.quote_code
+                                                                                ? e.quote_code
+                                                                                : ""
+                                                                        }
+                                                                        id={
+                                                                            e?.quote_id
+                                                                        }
+                                                                    />
+                                                                </h6>
+                                                                {/* fix */}
+
                                                                 <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right">
                                                                     {formatNumber(
                                                                         e.total_amount
                                                                     )}
+                                                                </h6>
+
+                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right">
+                                                                    {
+                                                                        e.staff_name
+                                                                    }
                                                                 </h6>
 
                                                                 <h6 className="px-2 col-span-1 flex items-center justify-center text-center ">
@@ -1124,115 +1155,30 @@ const Index = (props) => {
                                                                             ))}
                                                                     </h6>
                                                                 </h6>
-                                                                <h6 className="col-span-1 w-fit mx-auto">
+
+                                                                <h6 className="px-2 col-span-1 flex flex-col items-center justify-center text-center ">
+                                                                    <div className="flex items-center">
+                                                                        {/* <div className={`${item?.active === false ? `h-3 w-3 rounded-full bg-gray-400` : `h-3 w-3 rounded-full bg-green-500`} `} /> */}
+                                                                        <div
+                                                                            className={`3xl:h-3 3xl:w-3 2xl:h-2.5 2xl:w-2.5 xl:h-2 xl:w-2 h-2 w-2 rounded-full bg-gray-400`}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]  ">
+                                                                        Giữ kho
+                                                                    </div>
+                                                                </h6>
+
+                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-left h-60px truncate ">
+                                                                    {e?.note}
+                                                                </h6>
+
+                                                                <h6 className="col-span-1 w-fit ">
                                                                     <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#086FFC] font-[300] px-1.5 py-0.5 border border-[#086FFC] bg-white rounded-[5.5px] uppercase">
                                                                         {
                                                                             e?.branch_name
                                                                         }
                                                                     </div>
                                                                 </h6>
-                                                                {!e?.show && (
-                                                                    <div className="items-center flex  mb-8 col-span-4 justify-center ml-11">
-                                                                        {e?.process.map(
-                                                                            (
-                                                                                item,
-                                                                                i
-                                                                            ) => {
-                                                                                return (
-                                                                                    <>
-                                                                                        <div
-                                                                                            className="relative py-8"
-                                                                                            key={`process-${i}`}
-                                                                                        >
-                                                                                            {item?.code && (
-                                                                                                <>
-                                                                                                    <div className="flex items-center  ">
-                                                                                                        <div
-                                                                                                            className={`${
-                                                                                                                item?.code ==
-                                                                                                                    "production_plan" ||
-                                                                                                                item?.code ==
-                                                                                                                    "produced_at_company" ||
-                                                                                                                item?.code ==
-                                                                                                                    "import_warehouse" ||
-                                                                                                                item?.code ==
-                                                                                                                    "delivery"
-                                                                                                                    ? `h-2 w-2 rounded-full bg-green-500`
-                                                                                                                    : `h-2 w-2 rounded-full bg-gray-400`
-                                                                                                            } `}
-                                                                                                        />
-                                                                                                        {item?.code !==
-                                                                                                        "delivery" ? (
-                                                                                                            <div
-                                                                                                                className={`${
-                                                                                                                    item?.code ==
-                                                                                                                        "production_plan" ||
-                                                                                                                    item?.code ==
-                                                                                                                        "produced_at_company" ||
-                                                                                                                    item?.code ==
-                                                                                                                        "import_warehouse" ||
-                                                                                                                    item?.code ==
-                                                                                                                        "delivery"
-                                                                                                                        ? `sm:flex w-full bg-green-500 h-0.5 `
-                                                                                                                        : `sm:flex w-full bg-gray-200 h-0.5 dark:bg-gray-400`
-                                                                                                                }`}
-                                                                                                            />
-                                                                                                        ) : null}
-                                                                                                    </div>
-                                                                                                    <div className="mt-2 w-[90px]">
-                                                                                                        <div
-                                                                                                            className={`${
-                                                                                                                item?.code ==
-                                                                                                                    "production_plan" ||
-                                                                                                                item?.code ==
-                                                                                                                    "produced_at_company" ||
-                                                                                                                item?.code ==
-                                                                                                                    "import_warehouse" ||
-                                                                                                                item?.code ==
-                                                                                                                    "delivery"
-                                                                                                                    ? "text-green-500"
-                                                                                                                    : "text-slate-500"
-                                                                                                            } mb-2 text-[11px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
-                                                                                                        >
-                                                                                                            {
-                                                                                                                dataLang[
-                                                                                                                    item
-                                                                                                                        ?.name
-                                                                                                                ]
-                                                                                                            }
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </>
-                                                                                            )}
-                                                                                            {/* {item?.code ===
-                                                                                                "keep_stock" ||
-                                                                                            item?.code ===
-                                                                                                "delivery" ? (
-                                                                                                <p className="font-medium my-3 3xl:max-w-[180px] 2xl:max-w-[150px] xl:max-w-[130px] max-w-[100px] text-[10px] absolute left-0 3xl:translate-x-[-40%] 2xl:translate-x-[-45%] xl:translate-x-[-45%] translate-x-[-45%] 3xl:translate-y-[100%] 2xl:translate-y-[120%] xl:translate-y-[110%] translate-y-[120%] p-0.5 border border-amber-600 text-amber-600 rounded ">
-                                                                                                    Chưa
-                                                                                                    giữ
-                                                                                                    kho
-                                                                                                </p>
-                                                                                            ) : null} */}
-                                                                                            {item?.code ==
-                                                                                                "production_plan" ||
-                                                                                            item?.code ==
-                                                                                                "produced_at_company" ||
-                                                                                            item?.code ==
-                                                                                                "import_warehouse" ||
-                                                                                            item?.code ==
-                                                                                                "delivery" ? (
-                                                                                                <p className="text-indigo-700 3xl:w-[100px] 2xl:w-[100px] xl:w-[100px] w-[100px] text-[9.5px] absolute left-0 3xl:translate-x-[-25%] 2xl:translate-x-[-20%] xl:translate-x-[-25%] translate-x-[-25%] 3xl:translate-y-[100%] 2xl:translate-y-[120%] xl:translate-y-110%] translate-y-[120%] font-semibold">
-                                                                                                    KHSX-030623012
-                                                                                                </p>
-                                                                                            ) : null}
-                                                                                        </div>
-                                                                                    </>
-                                                                                );
-                                                                            }
-                                                                        )}
-                                                                    </div>
-                                                                )}
 
                                                                 <div className="col-span-1 flex justify-center">
                                                                     <BtnAction
@@ -1359,9 +1305,9 @@ const Index = (props) => {
                                     {dataLang?.total_outside || "total_outside"}
                                 </h3>
                             </div>
-                            {/* <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
+                            <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
                                 <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]"></h3>
-                            </div> */}
+                            </div>
                             <div className="col-span-2 text-right justify-end pr-4 flex gap-2 flex-wrap ">
                                 <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
                                     {formatNumber(total?.total_amount)}
