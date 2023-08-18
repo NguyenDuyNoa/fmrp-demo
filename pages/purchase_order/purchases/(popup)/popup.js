@@ -339,7 +339,7 @@ const Popup_chitiet = (props) => {
                                                             <h6 className="text-[13px] font-medium  px-2 py-0.5 col-span-1 text-left">
                                                                 {e?.item?.name}
                                                             </h6>
-                                                            <h6 className="text-[13px] font-medium  px-2 py-0.5 col-span-1 text-center break-words">
+                                                            <h6 className="text-[13px] font-medium  px-2 py-0.5 col-span-1 text-left break-words">
                                                                 {
                                                                     e?.item
                                                                         ?.product_variation

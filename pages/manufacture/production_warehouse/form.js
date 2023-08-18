@@ -161,6 +161,7 @@ const Index = (props) => {
     const _ServerFetchingDetailPage = () => {
         Axios(
             "GET",
+
             `/api_web/Api_stock/getExportProductionDetail/${id}?csrf_protection=true`,
             {},
             (err, response) => {
@@ -193,16 +194,16 @@ const Index = (props) => {
                                 idChildBackEnd: Number(ce?.id),
                                 id: Number(ce?.id),
                                 disabledDate:
-                                    (e.item?.text_type == "material" &&
+                                    (ce?.text_type == "material" &&
                                         dataMaterialExpiry?.is_enable == "1" &&
                                         false) ||
-                                    (e.item?.text_type == "material" &&
+                                    (ce?.text_type == "material" &&
                                         dataMaterialExpiry?.is_enable == "0" &&
                                         true) ||
-                                    (e.item?.text_type == "products" &&
+                                    (ce?.text_type == "products" &&
                                         dataProductExpiry?.is_enable == "1" &&
                                         false) ||
-                                    (e.item?.text_type == "products" &&
+                                    (ce?.text_type == "products" &&
                                         dataProductExpiry?.is_enable == "0" &&
                                         true),
                                 kho: {
@@ -233,7 +234,7 @@ const Index = (props) => {
                                 dataUnit: e?.item?.unit?.map((e) => ({
                                     label: e?.unit,
                                     value: e?.id,
-                                    coefficient: +ce?.coefficient,
+                                    coefficient: +e?.coefficient,
                                 })),
                                 exportQuantity: +ce?.quantity,
                                 exchangeValue: +ce?.coefficient,
@@ -425,7 +426,7 @@ const Index = (props) => {
 
     const formatNumber = (number) => {
         const integerPart = Math.floor(number);
-        return number.toLocaleString("en");
+        return integerPart.toLocaleString("en");
     };
 
     const _ServerSending = () => {
@@ -479,7 +480,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message } = response.data;
+                    var { isSuccess, message, item } = response.data;
                     if (isSuccess) {
                         Toast.fire({
                             icon: "success",
@@ -501,7 +502,15 @@ const Index = (props) => {
                         //     icon: "error",
                         //     title: `${dataLang[message]}`,
                         // });
-                        handleCheckError(dataLang[message]);
+                        handleCheckError(
+                            `${dataLang[message]} ${
+                                item !== undefined &&
+                                item !== null &&
+                                item !== ""
+                                    ? item
+                                    : ""
+                            }`
+                        );
                     }
                 }
                 sOnSending(false);
@@ -713,7 +722,10 @@ const Index = (props) => {
                         handleCheckError("Vui lòng chọn đơn vị tính trước");
                     } else if (
                         updatedChild.numberOfConversions ==
-                        updatedChild.kho?.qty
+                            updatedChild.kho?.qty ||
+                        (id &&
+                            updatedChild.numberOfConversions >=
+                                updatedChild.kho?.qty)
                     ) {
                         handleQuantityError(updatedChild?.kho?.qty);
                     } else {

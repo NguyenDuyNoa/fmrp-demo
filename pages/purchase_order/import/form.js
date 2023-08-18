@@ -1551,10 +1551,9 @@ const Index = (props) => {
                         }
                         //  else if (type === "serial") {
                         //     return { ...ce, serial: value?.target.value };
-                        // } else if (type === "lot") {
-                        //     return { ...ce, lot: value?.target.value };
-                        // }
-                        else if (type === "serial" || type === "lot") {
+                        else if (type === "lot") {
+                            return { ...ce, lot: value?.target.value };
+                        } else if (type === "serial") {
                             const isValueExists = e.child.some(
                                 (otherCe) =>
                                     otherCe[type] === value?.target.value &&
@@ -2050,7 +2049,7 @@ const Index = (props) => {
                         </div>
                     </div>
                     <div className="grid grid-cols-10 items-end gap-3">
-                        <div div className="col-span-2   my-auto">
+                        <div div className="col-span-2   my-auto ">
                             <label className="text-[#344054] font-normal text-sm mb-1 ">
                                 {dataLang?.import_click_items ||
                                     "import_click_items"}{" "}
@@ -2085,7 +2084,7 @@ const Index = (props) => {
                                         );
                                     } else {
                                         return (
-                                            <div className="flex items-center justify-between py-2">
+                                            <div className="flex items-center justify-between py-2 z-20">
                                                 <div className="flex items-center gap-2">
                                                     <div>
                                                         {option.e?.images !=
@@ -2207,7 +2206,7 @@ const Index = (props) => {
                                 }}
                             />
                         </div>
-                        <div className="col-span-2 z-[10]">
+                        <div className="col-span-2 ">
                             <label className="text-[#344054] font-normal text-sm mb-1 ">
                                 {dataLang?.import_click_house ||
                                     "import_click_house"}{" "}
@@ -2220,7 +2219,7 @@ const Index = (props) => {
                                 )}
                                 value={khotong}
                                 formatOptionLabel={(option) => (
-                                    <div className="">
+                                    <div className="z-20">
                                         <h2>
                                             {dataLang?.import_Warehouse ||
                                                 "import_Warehouse"}
@@ -2281,7 +2280,7 @@ const Index = (props) => {
                             />
                         </div>
                     </div>
-                    <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10">
+                    <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-1">
                         <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2 text-center truncate font-[400]">
                             {dataLang?.import_from_items || "import_from_items"}
                         </h4>
@@ -2469,6 +2468,10 @@ const Index = (props) => {
                                             border: "0 0 0 1px #92BFF7",
                                             boxShadow: "none",
                                         }),
+                                    }),
+                                    menu: (provided, state) => ({
+                                        ...provided,
+                                        width: "130%",
                                     }),
                                 }}
                             />
@@ -2765,6 +2768,13 @@ const Index = (props) => {
                                                                         "none",
                                                                 }),
                                                             }),
+                                                            menu: (
+                                                                provided,
+                                                                state
+                                                            ) => ({
+                                                                ...provided,
+                                                                width: "130%",
+                                                            }),
                                                         }}
                                                     />
                                                     <button
@@ -2872,6 +2882,15 @@ const Index = (props) => {
                                                                                 "#0F4F9E",
                                                                         },
                                                                     })}
+                                                                    styles={{
+                                                                        menu: (
+                                                                            provided,
+                                                                            state
+                                                                        ) => ({
+                                                                            ...provided,
+                                                                            width: "150%",
+                                                                        }),
+                                                                    }}
                                                                     classNamePrefix="customDropdow"
                                                                 />
                                                             </div>

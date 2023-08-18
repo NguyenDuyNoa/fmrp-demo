@@ -90,7 +90,6 @@ const Index = (props) => {
         startDate: null,
         endDate: null,
     });
-
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
 
     const _HandleSelectTab = (e) => {
@@ -110,7 +109,7 @@ const Index = (props) => {
         const tabPage = router.query?.tab;
         Axios(
             "GET",
-            `/api_web/Api_stock/exportProduction/?csrf_protection=true`,
+            `/api_web/Api_material_recall/materialRecall/?csrf_protection=true`,
             {
                 params: {
                     search: keySearch,
@@ -145,7 +144,7 @@ const Index = (props) => {
     const _ServerFetching_group = () => {
         Axios(
             "GET",
-            `/api_web/Api_stock/exportProductionFilterBar/?csrf_protection=true`,
+            `/api_web/Api_material_recall/filterBar/?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -185,7 +184,7 @@ const Index = (props) => {
         );
         Axios(
             "GET",
-            "/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true",
+            "/api_web/Api_material_recall/materialRecallCombobox/?csrf_protection=true",
             {},
             (err, response) => {
                 if (!err) {
@@ -200,7 +199,7 @@ const Index = (props) => {
     const _HandleSeachApi = (inputValue) => {
         Axios(
             "POST",
-            `/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true`,
+            `/api_web/Api_material_recall/materialRecallCombobox/?csrf_protection=true`,
             {
                 data: {
                     term: inputValue,
@@ -346,10 +345,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.production_warehouse_Total_value ||
-                        "production_warehouse_Total_value"
-                    }`,
+                    title: `${dataLang?.recall_totalQty || "recall_totalQty"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -404,7 +400,7 @@ const Index = (props) => {
                 { value: `${"Số LSX chi tiết"}` },
                 {
                     value: `${
-                        e?.grand_total ? formatNumber(e?.grand_total) : ""
+                        e?.total_quantity ? formatNumber(e?.total_quantity) : ""
                     }`,
                 },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -506,9 +502,7 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>
-                    {dataLang?.production_warehouse || "production_warehouse"}{" "}
-                </title>
+                <title>{dataLang?.recall_title || "recall_title"}</title>
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 {/* {data_export.length > 0 && <Popup_status className="hidden" data_export={data_export} dataLang={dataLang}/>} */}
@@ -520,14 +514,10 @@ const Index = (props) => {
                         className={` flex space-x-3  xl:text-[14.5px] text-[12px]`}
                     >
                         <h6 className="text-[#141522]/40">
-                            {dataLang?.production_warehouse ||
-                                "production_warehouse"}
+                            {dataLang?.recall_title || "recall_title"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>
-                            {dataLang?.production_warehouse ||
-                                "production_warehouse"}
-                        </h6>
+                        <h6>{dataLang?.recall_title || "recall_title"}</h6>
                     </div>
                 )}
 
@@ -536,12 +526,11 @@ const Index = (props) => {
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className="flex justify-between">
                                 <h2 className="text-2xl text-[#52575E] capitalize">
-                                    {dataLang?.production_warehouse ||
-                                        "production_warehouse"}
+                                    {dataLang?.recall_title || "recall_title"}
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Link
-                                        href="/manufacture/production_warehouse/form"
+                                        href="/manufacture/recall/form"
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.purchase_order_new ||
@@ -807,9 +796,9 @@ const Index = (props) => {
                                                     {dataExcel?.length > 0 && (
                                                         <ExcelFile
                                                             filename={
-                                                                "Danh sách xuất kho sản xuất"
+                                                                "Danh sách thu hồi nguyên vật liệu"
                                                             }
-                                                            title="DSXKSX"
+                                                            title="DSTHNVL"
                                                             element={
                                                                 <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
                                                                     <IconExcel
@@ -905,8 +894,8 @@ const Index = (props) => {
                                                     "production_warehouse_LSX"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.production_warehouse_Total_value ||
-                                                    "production_warehouse_Total_value"}
+                                                {dataLang?.productsWarehouse_total ||
+                                                    "productsWarehouse_total"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.production_warehouse_note ||
@@ -963,13 +952,11 @@ const Index = (props) => {
                                                                     id={e?.id}
                                                                 />
                                                             </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {/* {formatNumber(e.total_price)} */}
-                                                            </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right"></h6>
 
                                                             <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-center flex items-center justify-end space-x-1">
                                                                 {formatNumber(
-                                                                    e?.grand_total
+                                                                    e?.total_quantity
                                                                 )}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left truncate">
@@ -1120,7 +1107,7 @@ const Index = (props) => {
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
                                                                 <BtnTacVu
-                                                                    type="production_warehouse"
+                                                                    type="recall"
                                                                     onRefresh={_ServerFetching.bind(
                                                                         this
                                                                     )}
@@ -1162,28 +1149,19 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </div>
-                        {/* <div className="grid grid-cols-10 bg-gray-100 items-center rounded-md">
-              <div className="col-span-3 p-2 text-center">
-                <h3 className="uppercase text-gray-600 font-medium 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
-                  {dataLang?.import_total || "import_total"}
-                </h3>
-              </div>
-              <div className="col-span-1 text-right">
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                  {formatNumber(total?.total_price)}
-                </h3>
-              </div>
-              <div className="col-span-1 text-right ">
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                  {formatNumber(total?.total_tax_price)}
-                </h3>
-              </div>
-              <div className="col-span-1 text-right">
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                  {formatNumber(total?.total_amount)}
-                </h3>
-              </div>
-            </div> */}
+                        <div className="grid grid-cols-9 bg-gray-100 items-center">
+                            <div className="col-span-3 p-2 text-center">
+                                <h3 className="uppercase      font-medium  text-zinc-600 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
+                                    {dataLang?.productsWarehouse_total ||
+                                        "productsWarehouse_total"}
+                                </h3>
+                            </div>
+                            <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
+                                <h3 className="     font-medium  text-zinc-600 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px] ">
+                                    {formatNumber(total?.total_quantity)}
+                                </h3>
+                            </div>
+                        </div>
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6 className="">
@@ -1262,7 +1240,7 @@ const BtnTacVu = React.memo((props) => {
             if (result.isConfirmed) {
                 Axios(
                     "DELETE",
-                    `/api_web/Api_stock/exportProduction/${id}?csrf_protection=true`,
+                    `/api_web/Api_material_recall/materialRecall/${id}?csrf_protection=true`,
                     {},
                     (err, response) => {
                         if (!err) {
@@ -1297,9 +1275,7 @@ const BtnTacVu = React.memo((props) => {
                 }`,
             });
         } else {
-            router.push(
-                `/manufacture/production_warehouse/form?id=${props.id}`
-            );
+            router.push(`/manufacture/recall/form?id=${props.id}`);
         }
     };
 
@@ -1320,7 +1296,7 @@ const BtnTacVu = React.memo((props) => {
         if (props?.id) {
             Axios(
                 "GET",
-                `/api_web/Api_stock/exportProduction/${props?.id}?csrf_protection=true`,
+                `/api_web/Api_material_recall/materialRecall/${props?.id}?csrf_protection=true`,
                 {},
                 (err, response) => {
                     if (!err) {
@@ -1329,26 +1305,26 @@ const BtnTacVu = React.memo((props) => {
                     }
                 }
             );
-            Axios(
-                "GET",
-                "/api_web/api_setting/feature/?csrf_protection=true",
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var data = response.data;
-                        sDataMaterialExpiry(
-                            data.find((x) => x.code == "material_expiry")
-                        );
-                        sDataProductExpiry(
-                            data.find((x) => x.code == "product_expiry")
-                        );
-                        sDataProductSerial(
-                            data.find((x) => x.code == "product_serial")
-                        );
-                    }
-                }
-            );
         }
+        Axios(
+            "GET",
+            "/api_web/api_setting/feature/?csrf_protection=true",
+            {},
+            (err, response) => {
+                if (!err) {
+                    var data = response.data;
+                    sDataMaterialExpiry(
+                        data.find((x) => x.code == "material_expiry")
+                    );
+                    sDataProductExpiry(
+                        data.find((x) => x.code == "product_expiry")
+                    );
+                    sDataProductSerial(
+                        data.find((x) => x.code == "product_serial")
+                    );
+                }
+            }
+        );
     };
     useEffect(() => {
         openTacvu && fetchDataSettingsCompany();
@@ -1393,16 +1369,16 @@ const BtnTacVu = React.memo((props) => {
                                     "purchase_order_table_edit"}
                             </p>
                         </button>
-                        <FilePDF
+                        {/* <FilePDF
                             props={props}
                             openAction={openTacvu}
                             setOpenAction={sOpenTacvu}
                             dataCompany={dataCompany}
-                            data={dataPDF}
                             dataProductExpiry={dataProductExpiry}
                             dataProductSerial={dataProductSerial}
                             dataMaterialExpiry={dataMaterialExpiry}
-                        />
+                            data={dataPDF}
+                        /> */}
                         <button
                             onClick={_HandleDelete.bind(this, props.id)}
                             className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"

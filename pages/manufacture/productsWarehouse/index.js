@@ -48,6 +48,7 @@ import ExpandableContent from "components/UI/more";
 import Popup_chitiet from "./(popup)/pupup";
 import ImageErrors from "components/UI/imageErrors";
 import { useSelector } from "react-redux";
+import Popup_status from "./(popup)/popupStatus";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -109,7 +110,7 @@ const Index = (props) => {
         const tabPage = router.query?.tab;
         Axios(
             "GET",
-            `/api_web/Api_stock/exportProduction/?csrf_protection=true`,
+            `/api_web/Api_product_receipt/productReceipt/?csrf_protection=true`,
             {
                 params: {
                     search: keySearch,
@@ -144,7 +145,7 @@ const Index = (props) => {
     const _ServerFetching_group = () => {
         Axios(
             "GET",
-            `/api_web/Api_stock/exportProductionFilterBar/?csrf_protection=true`,
+            `/api_web/Api_product_receipt/filterBar/?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -184,7 +185,7 @@ const Index = (props) => {
         );
         Axios(
             "GET",
-            "/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true",
+            "/api_web/Api_product_receipt/productReceiptCombobox/?csrf_protection=true",
             {},
             (err, response) => {
                 if (!err) {
@@ -199,7 +200,7 @@ const Index = (props) => {
     const _HandleSeachApi = (inputValue) => {
         Axios(
             "POST",
-            `/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true`,
+            `/api_web/Api_product_receipt/productReceiptCombobox/?csrf_protection=true`,
             {
                 data: {
                     term: inputValue,
@@ -346,8 +347,8 @@ const Index = (props) => {
                 },
                 {
                     title: `${
-                        dataLang?.production_warehouse_Total_value ||
-                        "production_warehouse_Total_value"
+                        dataLang?.productsWarehouse_QtyImport ||
+                        "productsWarehouse_QtyImport"
                     }`,
                     width: { wch: 40 },
                     style: {
@@ -403,7 +404,7 @@ const Index = (props) => {
                 { value: `${"Số LSX chi tiết"}` },
                 {
                     value: `${
-                        e?.grand_total ? formatNumber(e?.grand_total) : ""
+                        e?.count_item ? formatNumber(e?.count_item) : ""
                     }`,
                 },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -428,6 +429,7 @@ const Index = (props) => {
 
     const [errOpen, sErrOpen] = useState(false);
     const [checkedWare, sCheckedWare] = useState({});
+    const [data_export, sData_export] = useState([]);
     const _HandleChangeInput = (id, checkedUn, type, value) => {
         if (type === "browser") {
             Swal.fire({
@@ -463,7 +465,7 @@ const Index = (props) => {
         data.append("id", checkedWare?.id);
         Axios(
             "POST",
-            `/api_web/Api_stock/confirmWarehouse?csrf_protection=true`,
+            `/api_web/Api_product_receipt/ConfirmWarehous?csrf_protection=true`,
             {
                 data: data,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -474,7 +476,7 @@ const Index = (props) => {
                     if (isSuccess) {
                         Toast.fire({
                             icon: "success",
-                            title: `${dataLang[message]}`,
+                            title: `${dataLang[message] || message}`,
                         });
                         setTimeout(() => {
                             sOnFetching(true);
@@ -482,8 +484,11 @@ const Index = (props) => {
                     } else {
                         Toast.fire({
                             icon: "error",
-                            title: `${dataLang[message]}`,
+                            title: `${dataLang[message] || message}`,
                         });
+                    }
+                    if (data_export?.length > 0) {
+                        sData_export(data_export);
                     }
                 }
                 sOnSending(false);
@@ -505,11 +510,21 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{"Nhập kho thành phẩm"}</title>
+                <title>
+                    {dataLang?.productsWarehouse_title ||
+                        "productsWarehouse_title"}
+                </title>
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 {/* {data_export.length > 0 && <Popup_status className="hidden" data_export={data_export} dataLang={dataLang}/>} */}
                 {/* trangthaiExprired */}
+                {data_export.length > 0 && (
+                    <Popup_status
+                        className="hidden"
+                        data_export={data_export}
+                        dataLang={dataLang}
+                    />
+                )}
                 {trangthaiExprired ? (
                     <div className="p-4"></div>
                 ) : (
@@ -517,10 +532,14 @@ const Index = (props) => {
                         className={` flex space-x-3  xl:text-[14.5px] text-[12px]`}
                     >
                         <h6 className="text-[#141522]/40">
-                            {"Nhập kho thành phẩm"}
+                            {dataLang?.productsWarehouse_title ||
+                                "productsWarehouse_title"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{"Nhập kho thành phẩm"}</h6>
+                        <h6>
+                            {dataLang?.productsWarehouse_title ||
+                                "productsWarehouse_title"}
+                        </h6>
                     </div>
                 )}
 
@@ -529,7 +548,8 @@ const Index = (props) => {
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className="flex justify-between">
                                 <h2 className="text-2xl text-[#52575E] capitalize">
-                                    {"Nhập kho thành phẩm"}
+                                    {dataLang?.productsWarehouse_title ||
+                                        "productsWarehouse_title"}
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Link
@@ -542,7 +562,7 @@ const Index = (props) => {
                                 </div>
                             </div>
 
-                            {/* <div className="flex space-x-3 m-0 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                            <div className="flex space-x-3 m-0 items-center  h-[8vh] justify-start overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 {listDs &&
                                     listDs.map((e) => {
                                         return (
@@ -570,8 +590,8 @@ const Index = (props) => {
                                             </div>
                                         );
                                     })}
-                            </div> */}
-                            {/* <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
+                            </div>
+                            <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded-lg grid grid-cols-6 justify-between xl:p-3 p-2">
                                         <div className="col-span-5">
@@ -799,9 +819,9 @@ const Index = (props) => {
                                                     {dataExcel?.length > 0 && (
                                                         <ExcelFile
                                                             filename={
-                                                                "Danh sách xuất kho sản xuất"
+                                                                "Danh sách nhập kho thành phẩm"
                                                             }
-                                                            title="DSXKSX"
+                                                            title="DSNKTP"
                                                             element={
                                                                 <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
                                                                     <IconExcel
@@ -897,8 +917,8 @@ const Index = (props) => {
                                                     "production_warehouse_LSX"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.production_warehouse_Total_value ||
-                                                    "production_warehouse_Total_value"}
+                                                {dataLang?.productsWarehouse_total ||
+                                                    "productsWarehouse_total"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.production_warehouse_note ||
@@ -959,7 +979,7 @@ const Index = (props) => {
 
                                                             <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-center flex items-center justify-end space-x-1">
                                                                 {formatNumber(
-                                                                    e?.grand_total
+                                                                    e?.count_item
                                                                 )}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left truncate">
@@ -1110,7 +1130,7 @@ const Index = (props) => {
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
                                                                 <BtnTacVu
-                                                                    type="production_warehouse"
+                                                                    type="productsWarehouse"
                                                                     onRefresh={_ServerFetching.bind(
                                                                         this
                                                                     )}
@@ -1150,9 +1170,22 @@ const Index = (props) => {
                                         )}
                                     </div>
                                 </div>
-                            </div> */}
+                            </div>
                         </div>
-                        {/* {data?.length != 0 && (
+                        <div className="grid grid-cols-9 bg-gray-100 items-center">
+                            <div className="col-span-3 p-2 text-center">
+                                <h3 className="uppercase      font-medium  text-zinc-600 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
+                                    {dataLang?.productsWarehouse_total ||
+                                        "productsWarehouse_total"}
+                                </h3>
+                            </div>
+                            <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
+                                <h3 className="     font-medium  text-zinc-600 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px] ">
+                                    {formatNumber(total?.total_count_item)}
+                                </h3>
+                            </div>
+                        </div>
+                        {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6 className="">
                                     {dataLang?.display}{" "}
@@ -1170,7 +1203,7 @@ const Index = (props) => {
                                     currentPage={router.query?.page || 1}
                                 />
                             </div>
-                        )} */}
+                        )}
                     </div>
                 </div>
             </div>
@@ -1213,6 +1246,10 @@ const BtnTacVu = React.memo((props) => {
     const [dataPDF, setData] = useState();
     const [dataCompany, setDataCompany] = useState();
 
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+    const [dataProductExpiry, sDataProductExpiry] = useState({});
+    const [dataProductSerial, sDataProductSerial] = useState({});
+
     const _HandleDelete = (id) => {
         Swal.fire({
             title: `${props.dataLang?.aler_ask}`,
@@ -1226,7 +1263,7 @@ const BtnTacVu = React.memo((props) => {
             if (result.isConfirmed) {
                 Axios(
                     "DELETE",
-                    `/api_web/Api_stock/exportProduction/${id}?csrf_protection=true`,
+                    `/api_web/Api_product_receipt/productReceipt/${id}?csrf_protection=true`,
                     {},
                     (err, response) => {
                         if (!err) {
@@ -1261,9 +1298,7 @@ const BtnTacVu = React.memo((props) => {
                 }`,
             });
         } else {
-            router.push(
-                `/manufacture/production_warehouse/form?id=${props.id}`
-            );
+            router.push(`/manufacture/productsWarehouse/form?id=${props.id}`);
         }
     };
 
@@ -1284,7 +1319,7 @@ const BtnTacVu = React.memo((props) => {
         if (props?.id) {
             Axios(
                 "GET",
-                `/api_web/Api_stock/exportProduction/${props?.id}?csrf_protection=true`,
+                `/api_web/Api_product_receipt/productReceipt/${props?.id}?csrf_protection=true`,
                 {},
                 (err, response) => {
                     if (!err) {
@@ -1294,6 +1329,25 @@ const BtnTacVu = React.memo((props) => {
                 }
             );
         }
+        Axios(
+            "GET",
+            "/api_web/api_setting/feature/?csrf_protection=true",
+            {},
+            (err, response) => {
+                if (!err) {
+                    var data = response.data;
+                    sDataMaterialExpiry(
+                        data.find((x) => x.code == "material_expiry")
+                    );
+                    sDataProductExpiry(
+                        data.find((x) => x.code == "product_expiry")
+                    );
+                    sDataProductSerial(
+                        data.find((x) => x.code == "product_serial")
+                    );
+                }
+            }
+        );
     };
     useEffect(() => {
         openTacvu && fetchDataSettingsCompany();
@@ -1343,6 +1397,9 @@ const BtnTacVu = React.memo((props) => {
                             openAction={openTacvu}
                             setOpenAction={sOpenTacvu}
                             dataCompany={dataCompany}
+                            dataProductExpiry={dataProductExpiry}
+                            dataProductSerial={dataProductSerial}
+                            dataMaterialExpiry={dataMaterialExpiry}
                             data={dataPDF}
                         />
                         <button

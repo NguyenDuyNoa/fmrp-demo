@@ -320,7 +320,7 @@ const TabContent = ({ subItems, checkStt }) => {
                     className={`3xl:px-2 3xl:py-1 2xl:px-3 2xl:py-1 xl:px-0.5 xl:py-0.5 lg:px-0.5 lg:py-0.5 2xl:space-y-2 lg:space-y-1 min-w-[200px]`}
                 >
                     {subItems.map((ce, index) => (
-                        <React.Fragment>
+                        <React.Fragment key={index}>
                             <Link title={ce.title} href={`${ce?.link}`}>
                                 <ZoomableElements className="border-b  items-center 2xl:space-x-2 2xl:mb-2 2xl:px-3 2xl:py-2 xl:space-x-1 xl:mb-2 xl:px-3 xl:py-1 lg:space-x-1 lg:mb-1 lg:px-1 lg:py-1 rounded hover:bg-[#ececee87] text-[#344054]">
                                     <div className="flex items-center gap-2">

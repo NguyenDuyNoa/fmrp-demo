@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { _ServerInstance as Axios } from "/services/axios";
@@ -43,6 +43,7 @@ const Index = (props) => {
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
     const [onFetchingCondition, sOnFetchingCondition] = useState(false);
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
+    const [onFetchingWarehouser, sOnFetchingWarehouse] = useState(false);
 
     const [onLoading, sOnLoading] = useState(false);
     const [onLoadingChild, sOnLoadingChild] = useState(false);
@@ -66,6 +67,7 @@ const Index = (props) => {
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
 
     const [listData, sListData] = useState([]);
+    const [warehouse, sDataWarehouse] = useState([]);
 
     const [idBranch, sIdBranch] = useState(null);
 
@@ -73,10 +75,9 @@ const Index = (props) => {
     const [errBranch, sErrBranch] = useState(false);
     const [errWarehouse, sErrWarehouse] = useState(false);
     const [errQty, sErrQty] = useState(false);
-    const [khotong, sKhotong] = useState(null);
     const [errLot, sErrLot] = useState(false);
     const [errDateList, sErrDateList] = useState(false);
-    const [errSerial, sErrSerial] = useState(false);
+
     useEffect(() => {
         router.query && sErrDate(false);
         router.query && sErrBranch(false);
@@ -84,9 +85,9 @@ const Index = (props) => {
         router.query && sNote("");
     }, [router.query]);
 
-    const _ServerFetching = () => {
+    const _ServerFetching = async () => {
         sOnLoading(true);
-        Axios(
+        await Axios(
             "GET",
             "/api_web/Api_Branch/branchCombobox/?csrf_protection=true",
             {},
@@ -164,7 +165,7 @@ const Index = (props) => {
     const _ServerFetchingDetailPage = () => {
         Axios(
             "GET",
-            `/api_web/Api_product_receipt/getProductReceiptDetail/${id}?csrf_protection=true`,
+            `/api_web/Api_material_recall/getMaterialRecallDetail/${id}?csrf_protection=true`,
             {},
             (err, response) => {
                 if (!err) {
@@ -193,35 +194,27 @@ const Index = (props) => {
                                 idChildBackEnd: Number(ce?.id),
                                 id: Number(ce?.id),
                                 disabledDate:
-                                    (e.item?.text_type == "products" &&
-                                        dataProductExpiry?.is_enable == "1" &&
+                                    (e.item?.text_type == "material" &&
+                                        dataMaterialExpiry?.is_enable == "1" &&
                                         false) ||
-                                    (e.item?.text_type == "products" &&
-                                        dataProductExpiry?.is_enable == "0" &&
+                                    (e.item?.text_type == "material" &&
+                                        dataMaterialExpiry?.is_enable == "0" &&
                                         true),
                                 kho: {
-                                    label: ce?.warehouse_location
-                                        ?.location_name,
-                                    value: ce?.warehouse_location?.id,
+                                    label: ce?.warehouse?.location_name,
+                                    value: ce?.warehouse?.id,
                                     warehouse_name:
-                                        ce?.warehouse_location?.warehouse_name,
+                                        ce?.warehouse?.warehouse_name,
                                 },
+                                price: ce?.price,
                                 serial: ce?.serial == null ? "" : ce?.serial,
                                 lot: ce?.lot == null ? "" : ce?.lot,
                                 date:
                                     ce?.expiration_date != null
                                         ? moment(ce?.expiration_date).toDate()
                                         : null,
-                                unit: e.item?.unit_name,
-
-                                dataWarehouse: e?.item?.warehouse.map((ye) => ({
-                                    label: ye?.location_name,
-                                    value: ye?.id,
-                                    warehouse_name: ye?.warehouse_name,
-                                })),
-                                importQuantity: +ce?.quantity,
-                                exchangeValue: +ce?.coefficient,
-                                numberOfConversions: +ce?.quantity_exchange,
+                                unit: e.item?.unit,
+                                recallQuantity: +ce?.quantity,
                                 note: ce?.note,
                             })),
                         }))
@@ -255,7 +248,7 @@ const Index = (props) => {
     const _ServerFetching_ItemsAll = () => {
         Axios(
             "GET",
-            "/api_web/Api_product_receipt/getProduct/?csrf_protection=true",
+            "/api_web/Api_material_recall/itemCombobox/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
@@ -271,26 +264,54 @@ const Index = (props) => {
         sOnFetchingItemsAll(false);
     };
 
-    const _HandleSeachApi = (inputValue) => {
+    const _ServerFetching_Warehouse = () => {
+        sOnLoadingChild(true);
         Axios(
-            "POST",
-            `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`,
+            "GET",
+            `/api_web/Api_warehouse/warehouseLocationCombobox/?csrf_protection=true`,
             {
                 params: {
-                    "filter[branch_id]": idBranch ? idBranch?.value : null,
-                },
-
-                data: {
-                    term: inputValue,
+                    "filter[branch_id]": idBranch?.value,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { result } = response.data.data;
-                    sDataItems(result);
+                    var result = response.data;
+                    sDataWarehouse(
+                        result?.map((e) => ({
+                            label: e?.location_name,
+                            value: e?.id,
+                            warehouse_name: e?.warehouse_name,
+                        }))
+                    );
+                    sOnLoadingChild(false);
                 }
             }
         );
+        sOnFetchingWarehouse(false);
+    };
+
+    const _HandleSeachApi = (inputValue) => {
+        idBranch != null &&
+            Axios(
+                "POST",
+                `/api_web/Api_material_recall/itemCombobox/?csrf_protection=true`,
+                {
+                    params: {
+                        "filter[branch_id]": idBranch ? idBranch?.value : null,
+                    },
+
+                    data: {
+                        term: inputValue,
+                    },
+                },
+                (err, response) => {
+                    if (!err) {
+                        var { result } = response.data.data;
+                        sDataItems(result);
+                    }
+                }
+            );
     };
 
     const _HandleChangeInput = (type, value) => {
@@ -326,10 +347,10 @@ const Index = (props) => {
                 }
             } else {
                 sIdBranch(value);
-                sKhotong(null);
             }
         }
     };
+
     const handleClearDate = (type) => {
         if (type === "effectiveDate") {
             sEffectiveDate(null);
@@ -344,41 +365,6 @@ const Index = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        // const hasNullKho = listData.some((item) =>
-        //     item.child?.some((childItem) => childItem.kho === null)
-        // );
-
-        // const hasNullSerial = listData.some(
-        //     (item) =>
-        //         item?.matHang.e?.text_type === "products" &&
-        //         item.child?.some(
-        //             (childItem) =>
-        //                 childItem.serial === "" || childItem.serial == null
-        //         )
-        // );
-        // const hasNullLot = listData.some((item) =>
-        //     item.child?.some(
-        //         (childItem) =>
-        //             !childItem.disabledDate &&
-        //             (childItem.lot === "" || childItem.lot == null)
-        //     )
-        // );
-        // const hasNullDate = listData.some((item) =>
-        //     item.child?.some(
-        //         (childItem) =>
-        //             !childItem.disabledDate && childItem.date === null
-        //     )
-        // );
-
-        // const hasNullQty = listData.some((item) =>
-        //     item.child?.some(
-        //         (childItem) =>
-        //             childItem.importQuantity === null ||
-        //             childItem.importQuantity === "" ||
-        //             childItem.importQuantity == 0
-        //     )
-        // );
-        // const isEmpty = listData?.length === 0 ? true : false;
         const hasNullOrCondition = (data, conditionFn) =>
             data.some((item) =>
                 item.child?.some((childItem) => conditionFn(item, childItem))
@@ -412,9 +398,12 @@ const Index = (props) => {
         const hasNullQty = hasNullOrCondition(
             listData,
             (item, childItem) =>
-                childItem.importQuantity === null ||
-                childItem.importQuantity === "" ||
-                childItem.importQuantity == 0
+                childItem.recallQuantity === null ||
+                childItem.recallQuantity === "" ||
+                childItem.recallQuantity == 0 ||
+                childItem.price === null ||
+                childItem.price === "" ||
+                childItem.price == 0
         );
 
         const isEmpty = listData?.length === 0;
@@ -424,9 +413,8 @@ const Index = (props) => {
             hasNullKho ||
             hasNullQty ||
             isEmpty ||
-            (dataProductSerial?.is_enable == "1" && hasNullSerial) ||
-            (dataProductExpiry?.is_enable == "1" && hasNullLot) ||
-            (dataProductExpiry?.is_enable == "1" && hasNullDate)
+            (dataMaterialExpiry?.is_enable == "1" && hasNullLot) ||
+            (dataMaterialExpiry?.is_enable == "1" && hasNullDate)
         ) {
             idBranch == null && sErrBranch(true);
             hasNullKho && sErrWarehouse(true);
@@ -434,7 +422,6 @@ const Index = (props) => {
             hasNullQty && sErrQty(true);
             hasNullKho && sErrWarehouse(true);
             hasNullLot && sErrLot(true);
-            hasNullSerial && sErrSerial(true);
             hasNullDate && sErrDateList(true);
             if (isEmpty) {
                 handleCheckError("Chưa nhập thông tin mặt hàng");
@@ -445,7 +432,6 @@ const Index = (props) => {
             sErrWarehouse(false);
             sErrQty(false);
             sErrLot(false);
-            sErrSerial(false);
             sErrDateList(false);
             sOnSending(true);
         }
@@ -463,11 +449,16 @@ const Index = (props) => {
     }, [router.query]);
 
     useEffect(() => {
+        onFetchingWarehouser && _ServerFetching_Warehouse();
+    }, [onFetchingWarehouser]);
+
+    useEffect(() => {
         onFetchingItemsAll && _ServerFetching_ItemsAll();
     }, [onFetchingItemsAll]);
 
     useEffect(() => {
-        idBranch != null && sOnFetchingItemsAll(true);
+        (idBranch != null && sOnFetchingItemsAll(true)) ||
+            (idBranch != null && sOnFetchingWarehouse(true));
     }, [idBranch]);
 
     const formatNumber = (number) => {
@@ -496,8 +487,8 @@ const Index = (props) => {
                     id ? childItem?.idChildBackEnd : ""
                 );
                 formData.append(
-                    `items[${index}][child][${childIndex}][serial]`,
-                    childItem?.serial === null ? "" : childItem?.serial
+                    `items[${index}][child][${childIndex}][price]`,
+                    childItem?.price ? childItem?.price : ""
                 );
                 formData.append(
                     `items[${index}][child][${childIndex}][lot]`,
@@ -507,7 +498,7 @@ const Index = (props) => {
                     `items[${index}][child][${childIndex}][expiration_date]`,
                     childItem?.date === null
                         ? ""
-                        : moment(childItem?.date).format("YYYY-MM-DD HH:mm:ss")
+                        : moment(childItem?.date).format("YYYY-MM-DD")
                 );
                 formData.append(
                     `items[${index}][child][${childIndex}][location_warehouses_id]`,
@@ -519,7 +510,7 @@ const Index = (props) => {
                 );
                 formData.append(
                     `items[${index}][child][${childIndex}][quantity]`,
-                    childItem?.importQuantity
+                    childItem?.recallQuantity
                 );
             });
         });
@@ -527,8 +518,8 @@ const Index = (props) => {
             "POST",
             `${
                 id
-                    ? `/api_web/Api_product_receipt/productReceipt/${id}?csrf_protection=true`
-                    : `/api_web/Api_product_receipt/productReceipt/?csrf_protection=true`
+                    ? `/api_web/Api_material_recall/materialRecall/${id}?csrf_protection=true`
+                    : `/api_web/Api_material_recall/materialRecall/?csrf_protection=true`
             }`,
             {
                 data: formData,
@@ -550,7 +541,7 @@ const Index = (props) => {
                         sErrDate(false);
                         //new
                         sListData([]);
-                        router.push("/manufacture/productsWarehouse?tab=all");
+                        router.push("/manufacture/recall?tab=all");
                     } else {
                         handleCheckError(dataLang[message]);
                     }
@@ -572,26 +563,19 @@ const Index = (props) => {
                 const newChild = {
                     id: uuidv4(),
                     disabledDate:
-                        (value?.e?.text_type === "products" &&
-                            dataProductExpiry?.is_enable === "1" &&
+                        (value?.e?.text_type === "material" &&
+                            dataMaterialExpiry?.is_enable === "1" &&
                             false) ||
-                        (value?.e?.text_type === "products" &&
-                            dataProductExpiry?.is_enable === "0" &&
+                        (value?.e?.text_type === "material" &&
+                            dataMaterialExpiry?.is_enable === "0" &&
                             true),
                     kho: null,
-                    unit: value?.e?.unit_name,
+                    unit: value?.e?.unit_name || value?.e?.unit,
                     serial: "",
                     lot: "",
                     date: null,
-                    dataWarehouse: value?.e?.warehouse.map((e) => ({
-                        label: e?.location_name,
-                        value: e?.id,
-                        warehouse_name: e?.warehouse_name,
-                        qty: e?.quantity,
-                    })),
-                    importQuantity: null,
-                    exchangeValue: null,
-                    numberOfConversions: null,
+                    recallQuantity: null,
+                    price: null,
                     note: "",
                     idChildBackEnd: null,
                 };
@@ -606,178 +590,157 @@ const Index = (props) => {
         sListData(newData);
     };
 
-    const _HandleAddParent = (value) => {
-        sOnLoadingChild(true);
-        const checkData = listData?.some(
-            (e) => e?.matHang?.value === value?.value
-        );
-        if (!checkData) {
-            const newData = {
-                id: Date.now(),
-                idParenBackend: null,
-                matHang: value,
-                child: [
-                    {
-                        idChildBackEnd: null,
-                        id: uuidv4(),
-                        disabledDate:
-                            (value?.e?.text_type === "products" &&
-                                dataProductExpiry?.is_enable === "1" &&
-                                false) ||
-                            (value?.e?.text_type === "products" &&
-                                dataProductExpiry?.is_enable === "0" &&
-                                true),
-                        kho: null,
-                        serial: "",
-                        lot: "",
-                        date: null,
-                        dataWarehouse: value?.e?.warehouse.map((e) => ({
-                            label: e?.location_name,
-                            value: e?.id,
-                            warehouse_name: e?.warehouse_name,
-                        })),
-                        unit: value?.e?.unit_name,
-                        importQuantity: null,
-                        exchangeValue: null,
-                        numberOfConversions: null,
-                        note: "",
-                    },
-                ],
-            };
-            setTimeout(() => {
-                sOnLoadingChild(false);
-            }, 500);
-            sListData([newData, ...listData]);
-        } else {
-            handleCheckError(
-                dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
+    const _HandleAddParent = useCallback(
+        (value) => {
+            sOnLoadingChild(true);
+
+            const checkData = listData?.some(
+                (e) => e?.matHang?.value === value?.value
             );
-        }
-    };
-    const _HandleDeleteChild = (parentId, childId) => {
-        const newData = listData
-            .map((e) => {
-                if (e.id === parentId) {
-                    const newChild = e.child?.filter(
-                        (ce) => ce?.id !== childId
-                    );
-                    return { ...e, child: newChild };
-                }
-                return e;
-            })
-            .filter((e) => e.child?.length > 0);
-        sListData([...newData]);
-    };
-
-    const _HandleDeleteAllChild = (parentId) => {
-        const newData = listData
-            .map((e) => {
-                if (e.id === parentId) {
-                    const newChild = e.child?.filter((ce) => ce?.kho !== null);
-                    return { ...e, child: newChild };
-                }
-                return e;
-            })
-            .filter((e) => e.child?.length > 0);
-        sListData([...newData]);
-    };
-
-    const _HandleChangeChild = (parentId, childId, type, value) => {
-        // Tạo một bản sao của listData để thay đổi
-        const newData = [...listData];
-
-        // Tìm vị trí của phần tử cần cập nhật trong mảng newData
-        const parentIndex = newData.findIndex((e) => e.id === parentId);
-        if (parentIndex !== -1) {
-            const childIndex = newData[parentIndex].child.findIndex(
-                (ce) => ce.id === childId
-            );
-            if (childIndex !== -1) {
-                // Thực hiện cập nhật dữ liệu tại vị trí tìm thấy
-                const updatedChild = {
-                    ...newData[parentIndex].child[childIndex],
+            if (!checkData) {
+                const newData = {
+                    id: Date.now(),
+                    idParenBackend: null,
+                    matHang: value,
+                    child: [
+                        {
+                            idChildBackEnd: null,
+                            id: uuidv4(),
+                            disabledDate:
+                                (value?.e?.text_type === "material" &&
+                                    dataMaterialExpiry?.is_enable === "1" &&
+                                    false) ||
+                                (value?.e?.text_type === "material" &&
+                                    dataMaterialExpiry?.is_enable === "0" &&
+                                    true),
+                            kho: null,
+                            serial: "",
+                            lot: "",
+                            date: null,
+                            unit: value?.e?.unit_name,
+                            price: null,
+                            recallQuantity: null,
+                            note: "",
+                        },
+                    ],
                 };
-                if (type === "importQuantity") {
-                    const newQtyImport = Number(value?.value);
-                    updatedChild.importQuantity = newQtyImport;
-                } else if (type === "kho") {
-                    const checkKho = newData[parentIndex].child
-                        .map((house) => house)
-                        .some((i) => i?.kho?.value === value?.value);
-                    if (checkKho) {
-                        handleCheckError(
-                            "Kho nhập và vị trí nhập đã được chọn"
-                        );
-                    } else {
-                        updatedChild.kho = value;
-                    }
-                }
-                // else if (type === "lot") {
-                //     const isLotExists = newData[parentIndex].child.find(
-                //         (ce, idx) =>
-                //             idx !== childIndex && ce.lot === value?.target.value
-                //     );
-
-                //     if (isLotExists) {
-                //         handleQuantityError("Giá trị Lot đã tồn tại");
-                //     } else {
-                //         updatedChild.lot = value?.target.value;
-                //     }
-                // } else if (type === "serial") {
-                //     const isLotExists = newData[parentIndex].child.find(
-                //         (ce, idx) =>
-                //             idx !== childIndex &&
-                //             ce.serial === value?.target.value
-                //     );
-                //     if (isLotExists) {
-                //         handleQuantityError("Giá trị serial đã tồn tại");
-                //     } else {
-                //         updatedChild.serial = value?.target.value;
-                //     }
-                // }
-                else if (type === "serial") {
-                    const newTypeValue = value?.target.value;
-                    // Kiểm tra xem giá trị mới đã tồn tại trong cả phần tử cha và các phần tử con
-                    const existsInParent = newData[parentIndex].child.some(
-                        (ce) => ce[type] === newTypeValue
-                    );
-                    const existsInOtherParents = newData.some(
-                        (e) =>
-                            e.id !== parentId &&
-                            e.child.some((ce) => ce[type] === newTypeValue)
-                    );
-                    if (existsInParent || existsInOtherParents) {
-                        handleQuantityError(`Giá trị ${type} đã tồn tại`);
-                        return; // Dừng việc cập nhật nếu có lỗi
-                    }
-
-                    updatedChild[type] = newTypeValue;
-                } else if (type === "lot") {
-                    updatedChild.lot = value?.target.value;
-                } else if (type === "date") {
-                    updatedChild.date = value;
-                } else if (type === "increase") {
-                    updatedChild.importQuantity =
-                        Number(updatedChild.importQuantity) + 1;
-                    updatedChild.numberOfConversions =
-                        Number(updatedChild.importQuantity) *
-                        Number(updatedChild.exchangeValue);
-                } else if (type === "decrease") {
-                    if (updatedChild.importQuantity >= 2) {
-                        updatedChild.importQuantity =
-                            Number(updatedChild.importQuantity) - 1;
-                        updatedChild.numberOfConversions =
-                            Number(updatedChild.importQuantity) *
-                            Number(updatedChild.exchangeValue);
-                    }
-                } else if (type === "note") {
-                    updatedChild.note = value?.target.value;
-                }
-                newData[parentIndex].child[childIndex] = updatedChild;
+                setTimeout(() => {
+                    sOnLoadingChild(false);
+                }, 500);
+                sListData([newData, ...listData]);
+            } else {
+                handleCheckError(
+                    dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
+                );
             }
-        }
-        sListData(newData);
-    };
+        },
+        [listData]
+    );
+    const _HandleDeleteChild = useCallback(
+        (parentId, childId) => {
+            const newData = listData
+                .map((e) => {
+                    if (e.id === parentId) {
+                        const newChild = e.child?.filter(
+                            (ce) => ce?.id !== childId
+                        );
+                        return { ...e, child: newChild };
+                    }
+                    return e;
+                })
+                .filter((e) => e.child?.length > 0);
+            sListData([...newData]);
+        },
+        [listData]
+    );
+
+    const _HandleDeleteAllChild = useCallback(
+        (parentId) => {
+            const newData = listData
+                .map((e) => {
+                    if (e.id === parentId) {
+                        const newChild = e.child?.filter(
+                            (ce) => ce?.kho !== null
+                        );
+                        return { ...e, child: newChild };
+                    }
+                    return e;
+                })
+                .filter((e) => e.child?.length > 0);
+            sListData([...newData]);
+        },
+        [listData]
+    );
+
+    const _HandleChangeChild = useCallback(
+        (parentId, childId, type, value) => {
+            const newData = [...listData];
+            const parentIndex = newData.findIndex((e) => e.id === parentId);
+            if (parentIndex !== -1) {
+                const childIndex = newData[parentIndex].child.findIndex(
+                    (ce) => ce.id === childId
+                );
+                if (childIndex !== -1) {
+                    // Thực hiện cập nhật dữ liệu tại vị trí tìm thấy
+                    const updatedChild = {
+                        ...newData[parentIndex].child[childIndex],
+                    };
+                    if (type === "recallQuantity") {
+                        const newQtyImport = Number(value?.value);
+                        updatedChild.recallQuantity = newQtyImport;
+                    } else if (type === "kho") {
+                        const checkKho = newData[parentIndex].child
+                            .map((house) => house)
+                            .some((i) => i?.kho?.value === value?.value);
+                        if (checkKho) {
+                            handleCheckError(
+                                "Kho thu hồi và vị trí thu hồi đã được chọn"
+                            );
+                        } else {
+                            updatedChild.kho = value;
+                        }
+                    } else if (type === "serial") {
+                        const newTypeValue = value?.target.value;
+                        // Kiểm tra xem giá trị mới đã tồn tại trong cả phần tử cha và các phần tử con
+                        const existsInParent = newData[parentIndex].child.some(
+                            (ce) => ce[type] === newTypeValue
+                        );
+                        const existsInOtherParents = newData.some(
+                            (e) =>
+                                e.id !== parentId &&
+                                e.child.some((ce) => ce[type] === newTypeValue)
+                        );
+                        if (existsInParent || existsInOtherParents) {
+                            handleQuantityError(`Giá trị ${type} đã tồn tại`);
+                            return; // Dừng việc cập nhật nếu có lỗi
+                        }
+
+                        updatedChild[type] = newTypeValue;
+                    } else if (type === "lot") {
+                        updatedChild.lot = value?.target.value;
+                    } else if (type === "date") {
+                        updatedChild.date = value;
+                    } else if (type === "increase") {
+                        updatedChild.recallQuantity =
+                            Number(updatedChild.recallQuantity) + 1;
+                    } else if (type === "decrease") {
+                        if (updatedChild.recallQuantity >= 2) {
+                            updatedChild.recallQuantity =
+                                Number(updatedChild.recallQuantity) - 1;
+                        }
+                    } else if (type === "price") {
+                        const newPrice = Number(value?.value);
+                        updatedChild.price = newPrice;
+                    } else if (type === "note") {
+                        updatedChild.note = value?.target.value;
+                    }
+                    newData[parentIndex].child[childIndex] = updatedChild;
+                }
+            }
+            sListData(newData);
+        },
+        [listData]
+    );
 
     const handleQuantityError = (e) => {
         Toast.fire({
@@ -789,56 +752,52 @@ const Index = (props) => {
             timer: 3000,
         });
     };
-
-    const _HandleChangeValue = (parentId, value) => {
-        sOnLoadingChild(true);
-        const checkData = listData?.some(
-            (e) => e?.matHang?.value === value?.value
-        );
-        if (!checkData) {
-            const newData = listData?.map((e) => {
-                if (e?.id === parentId) {
-                    return {
-                        ...e,
-                        matHang: value,
-                        child: [
-                            {
-                                idChildBackEnd: null,
-                                id: uuidv4(),
-                                kho: khotong ? khotong : null,
-                                dataWarehouse: value?.e?.warehouse.map((e) => ({
-                                    label: e?.location_name,
-                                    value: e?.id,
-                                    warehouse_name: e?.warehouse_name,
-                                })),
-                                disabledDate:
-                                    (value?.e?.text_type === "products" &&
-                                        dataProductExpiry?.is_enable === "1" &&
-                                        false) ||
-                                    (value?.e?.text_type === "products" &&
-                                        dataProductExpiry?.is_enable === "0" &&
-                                        true),
-                                unit: value?.e?.unit_name,
-                                importQuantity: null,
-                                numberOfConversions: null,
-                                note: "",
-                            },
-                        ],
-                    };
-                } else {
-                    return e;
-                }
-            });
-            setTimeout(() => {
-                sOnLoadingChild(false);
-            }, 500);
-            sListData([...newData]);
-        } else {
-            handleCheckError(
-                dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
+    const _HandleChangeValue = useCallback(
+        (parentId, value) => {
+            // sOnLoadingChild(true);
+            const checkData = listData?.some(
+                (e) => e?.matHang?.value === value?.value
             );
-        }
-    };
+            if (!checkData) {
+                const newData = listData?.map((e) => {
+                    if (e?.id === parentId) {
+                        return {
+                            ...e,
+                            matHang: value,
+                            child: [
+                                {
+                                    idChildBackEnd: null,
+                                    id: uuidv4(),
+                                    kho: null,
+                                    disabledDate:
+                                        (value?.e?.text_type === "material" &&
+                                            dataMaterialExpiry?.is_enable ===
+                                                "1" &&
+                                            false) ||
+                                        (value?.e?.text_type === "material" &&
+                                            dataMaterialExpiry?.is_enable ===
+                                                "0" &&
+                                            true),
+                                    unit: value?.e?.unit_name,
+                                    price: null,
+                                    recallQuantity: null,
+                                    note: "",
+                                },
+                            ],
+                        };
+                    } else {
+                        return e;
+                    }
+                });
+                sListData([...newData]);
+            } else {
+                handleCheckError(
+                    dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
+                );
+            }
+        },
+        [listData]
+    );
 
     const handleCheckError = (e) => {
         Toast.fire({
@@ -846,16 +805,13 @@ const Index = (props) => {
             icon: "error",
         });
     };
-
     return (
         <React.Fragment>
             <Head>
                 <title>
                     {id
-                        ? dataLang?.productsWarehouse_edit ||
-                          "productsWarehouse_edit"
-                        : dataLang?.productsWarehouse_add ||
-                          "productsWarehouse_add"}
+                        ? dataLang?.recall_title_edit || "recall_title_edit"
+                        : dataLang?.recall_title_add || "recall_title_add"}
                 </title>
             </Head>
             <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
@@ -865,26 +821,25 @@ const Index = (props) => {
                     ) : (
                         <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
                             <h6 className="text-[#141522]/40">
-                                {dataLang?.productsWarehouse_title ||
-                                    "productsWarehouse_title"}
+                                {dataLang?.recall_title || "recall_title"}
                             </h6>
                             <span className="text-[#141522]/40">/</span>
                             <h6>
                                 {id
-                                    ? dataLang?.productsWarehouse_edit ||
-                                      "productsWarehouse_edit"
-                                    : dataLang?.productsWarehouse_add ||
-                                      "productsWarehouse_add"}
+                                    ? dataLang?.recall_title_edit ||
+                                      "recall_title_edit"
+                                    : dataLang?.recall_title_add ||
+                                      "recall_title_add"}
                             </h6>
                         </div>
                     )}
                     <div className="flex justify-between items-center">
                         <h2 className="xl:text-2xl text-xl ">
                             {id
-                                ? dataLang?.productsWarehouse_edit ||
-                                  "productsWarehouse_edit"
-                                : dataLang?.productsWarehouse_add ||
-                                  "productsWarehouse_add"}
+                                ? dataLang?.recall_title_edit ||
+                                  "recall_title_edit"
+                                : dataLang?.recall_title_add ||
+                                  "recall_title_add"}
                         </h2>
                         <div className="flex justify-end items-center">
                             <button
@@ -902,11 +857,11 @@ const Index = (props) => {
 
                     <div className=" w-full rounded">
                         <div className="">
-                            <h2 className="font-normal bg-[#ECF0F4] p-2">
+                            <h2 className="font-normal bg-[#ECF0F4] p-2 ">
                                 {dataLang?.purchase_order_detail_general_informatione ||
                                     "purchase_order_detail_general_informatione"}
                             </h2>
-                            <div className="grid grid-cols-8  gap-3 items-center mt-2">
+                            <div className="grid grid-cols-8  gap-3 items-center mt-2 	">
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_code_vouchers ||
@@ -1117,68 +1072,49 @@ const Index = (props) => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-13 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10">
-                        <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-3 text-center truncate font-[400]">
+                    <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10">
+                        <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2 text-center truncate font-[400]">
                             {dataLang?.import_from_items || "import_from_items"}
                         </h4>
                         <div className="col-span-10">
-                            {/* ${
-                                    dataProductSerial.is_enable == "1"
-                                        ? dataMaterialExpiry.is_enable !=
-                                          dataProductExpiry.is_enable
-                                            ? "grid-cols-8"
-                                            : dataMaterialExpiry.is_enable ==
-                                              "1"
-                                            ? "grid-cols-[repeat(13_minmax(0_1fr))]"
-                                            : "grid-cols-6"
-                                        : dataMaterialExpiry.is_enable !=
-                                          dataProductExpiry.is_enable
-                                        ? "grid-cols-5"
-                                        : dataMaterialExpiry.is_enable == "1"
-                                        ? "grid-cols-5"
-                                        : "grid-cols-9"
-                                } */}
                             <div
                                 className={`${
-                                    dataProductSerial.is_enable == "1"
-                                        ? "grid-cols-6"
-                                        : dataProductExpiry.is_enable == "1"
-                                        ? "grid-cols-7"
-                                        : "grid-cols-5"
+                                    dataMaterialExpiry.is_enable == "1"
+                                        ? "grid-cols-9"
+                                        : "grid-cols-7"
                                 } grid `}
                             >
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
-                                    {dataLang?.productsWarehouse_warehouse ||
-                                        "productsWarehouse_warehouse"}
+                                    {dataLang?.recall_warehouse ||
+                                        "recall_warehouse"}
                                 </h4>
-                                {dataProductSerial.is_enable === "1" && (
-                                    <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
-                                        {"Serial"}
-                                    </h4>
+
+                                {dataMaterialExpiry.is_enable === "1" ? (
+                                    <>
+                                        <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
+                                            {"Lot"}
+                                        </h4>
+                                        <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
+                                            {props.dataLang
+                                                ?.warehouses_detail_date ||
+                                                "warehouses_detail_date"}
+                                        </h4>
+                                    </>
+                                ) : (
+                                    ""
                                 )}
-                                {
-                                    // dataMaterialExpiry.is_enable === "1" ||
-                                    dataProductExpiry.is_enable === "1" ? (
-                                        <>
-                                            <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
-                                                {"Lot"}
-                                            </h4>
-                                            <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
-                                                {props.dataLang
-                                                    ?.warehouses_detail_date ||
-                                                    "warehouses_detail_date"}
-                                            </h4>
-                                        </>
-                                    ) : (
-                                        ""
-                                    )
-                                }
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {"ĐVT"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.productsWarehouse_QtyImport ||
-                                        "productsWarehouse_QtyImport"}
+                                    {dataLang?.recall_amountRecall ||
+                                        "recall_amountRecall"}
+                                </h4>
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                                    {dataLang?.recall_price || "recall_price"}
+                                </h4>
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                                    {dataLang?.recall_money || "recall_money"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
                                     {dataLang?.import_from_note ||
@@ -1191,8 +1127,8 @@ const Index = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="grid grid-cols-13 items-center gap-1 py-2">
-                        <div className="col-span-3">
+                    <div className="grid grid-cols-12 items-center gap-1 py-2">
+                        <div className="col-span-2">
                             <Select
                                 options={options}
                                 value={null}
@@ -1207,7 +1143,7 @@ const Index = (props) => {
                                 }
                                 menuPortalTarget={document.body}
                                 formatOptionLabel={(option) => (
-                                    <div className="flex items-center  justify-between py-2">
+                                    <div className="flex items-center  justify-between py-2 cursor-pointer">
                                         <div className="flex items-center gap-2">
                                             <div className="w-[40px] h-h-[60px]">
                                                 {option.e?.images != null ? (
@@ -1284,7 +1220,7 @@ const Index = (props) => {
                                     }),
                                     menu: (provided, state) => ({
                                         ...provided,
-                                        // width: "130%",
+                                        width: "130%",
                                     }),
                                 }}
                             />
@@ -1293,11 +1229,9 @@ const Index = (props) => {
                         <div className="col-span-10">
                             <div
                                 className={`${
-                                    dataProductSerial.is_enable == "1"
-                                        ? "grid-cols-6"
-                                        : dataProductExpiry.is_enable == "1"
-                                        ? "grid-cols-7"
-                                        : "grid-cols-5"
+                                    dataMaterialExpiry.is_enable == "1"
+                                        ? "grid-cols-9"
+                                        : "grid-cols-7"
                                 } grid  divide-x border-t border-b border-r border-l`}
                             >
                                 <div className="col-span-1">
@@ -1305,64 +1239,41 @@ const Index = (props) => {
                                     <Select
                                         classNamePrefix="customDropdowDefault"
                                         placeholder={
-                                            dataLang?.productsWarehouse_warehouse ||
-                                            "productsWarehouse_warehouse"
+                                            dataLang?.recall_warehouse ||
+                                            "recall_warehouse"
                                         }
                                         className="3xl:text-[12px] border-none outline-none 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
                                     />
                                 </div>
-                                {dataProductSerial.is_enable === "1" ? (
-                                    <div className=" col-span-1 ">
-                                        <NumericFormat
-                                            className="w-full appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal  focus:outline-none border-b-2 border-gray-200"
-                                            allowNegative={false}
-                                            decimalScale={0}
-                                            isNumericString={true}
-                                            thousandSeparator=","
-                                            disabled
-                                        />
-                                    </div>
+                                {dataMaterialExpiry.is_enable === "1" ? (
+                                    <>
+                                        <div className=" col-span-1 flex items-center">
+                                            <NumericFormat
+                                                className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal w-[100%]  focus:outline-none border-b-2 border-gray-200"
+                                                allowNegative={false}
+                                                decimalScale={0}
+                                                isNumericString={true}
+                                                thousandSeparator=","
+                                                disabled
+                                            />
+                                        </div>
+                                        <div className=" col-span-1 flex items-center ">
+                                            <DatePicker
+                                                // selected={effectiveDate}
+                                                // blur
+                                                placeholderText="dd/mm/yyyy"
+                                                // dateFormat="dd/MM/yyyy"
+                                                // onSelect={(date) => sEffectiveDate(date)}
+                                                // placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
+                                                disabled
+                                                className={`3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b placeholder:text-slate-300 w-full bg-gray-50 rounded text-[#52575E] font-light px-2 py-1.5 text-center outline-none cursor-pointer  `}
+                                            />
+                                        </div>
+                                    </>
                                 ) : (
                                     ""
                                 )}
-                                {
-                                    // dataMaterialExpiry.is_enable === "1" ||
-                                    dataProductExpiry.is_enable === "1" ? (
-                                        <>
-                                            <div className=" col-span-1 flex items-center">
-                                                <NumericFormat
-                                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal w-[100%]  focus:outline-none border-b-2 border-gray-200"
-                                                    allowNegative={false}
-                                                    decimalScale={0}
-                                                    isNumericString={true}
-                                                    thousandSeparator=","
-                                                    disabled
-                                                />
-                                            </div>
-                                            <div className=" col-span-1 flex items-center ">
-                                                <DatePicker
-                                                    // selected={effectiveDate}
-                                                    // blur
-                                                    placeholderText="dd/mm/yyyy"
-                                                    // dateFormat="dd/MM/yyyy"
-                                                    // onSelect={(date) => sEffectiveDate(date)}
-                                                    // placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
-                                                    disabled
-                                                    className={`3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b placeholder:text-slate-300 w-full bg-gray-50 rounded text-[#52575E] font-light px-2 py-1.5 text-center outline-none cursor-pointer  `}
-                                                />
-                                                {/* {effectiveDate && (
-                                  <>
-                                    <MdClear className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer" onClick={() => handleClearDate('effectiveDate')} />
-                                  </>
-                                )}
-                                <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" /> */}
-                                            </div>
-                                        </>
-                                    ) : (
-                                        ""
-                                    )
-                                }
                                 <div></div>
                                 <div className="col-span-1 flex items-center justify-center">
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
@@ -1371,7 +1282,7 @@ const Index = (props) => {
                                             size="16"
                                         />
                                     </button>
-                                    <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b-2 w-full border-gray-200">
+                                    <div className="mb-0.5 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b-2 w-full border-gray-200">
                                         1
                                     </div>
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
@@ -1381,8 +1292,17 @@ const Index = (props) => {
                                         />
                                     </button>
                                 </div>
+                                <div className="col-span-1 mb-0.5 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b-2 w-full border-gray-200">
+                                    1
+                                </div>
+                                <div className="col-span-1 mb-0.5 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b-2 w-full border-gray-200">
+                                    1
+                                </div>
                                 <input
-                                    placeholder="Ghi chú"
+                                    placeholder={
+                                        dataLang?.recall_noteChild ||
+                                        "recall_noteChild"
+                                    }
                                     disabled
                                     className=" disabled:bg-gray-50 col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 "
                                 />
@@ -1396,7 +1316,7 @@ const Index = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                    <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 ">
                         <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
                             {onFetchingDetail ? (
                                 <Loading
@@ -1408,9 +1328,9 @@ const Index = (props) => {
                                     {listData?.map((e) => (
                                         <div
                                             key={e?.id?.toString()}
-                                            className="grid grid-cols-13 items-start"
+                                            className="grid grid-cols-12 items-start"
                                         >
-                                            <div className="col-span-3 border border-r p-0.5 pb-1 h-full">
+                                            <div className="col-span-2 border border-r p-0.5 pb-1 h-full">
                                                 <div className="relative mr-5 mt-5">
                                                     <Select
                                                         onInputChange={_HandleSeachApi.bind(
@@ -1429,7 +1349,7 @@ const Index = (props) => {
                                                         formatOptionLabel={(
                                                             option
                                                         ) => (
-                                                            <div className="flex items-center  justify-between py-2">
+                                                            <div className="flex items-center  justify-between py-2 cursor-pointer">
                                                                 <div className="flex items-center gap-2">
                                                                     <div className="w-[40px] h-h-[60px]">
                                                                         {option
@@ -1537,7 +1457,7 @@ const Index = (props) => {
                                                                 state
                                                             ) => ({
                                                                 ...provided,
-                                                                // width: "130%",
+                                                                width: "130%",
                                                             }),
                                                         }}
                                                     />
@@ -1582,13 +1502,10 @@ const Index = (props) => {
                                             <div className="col-span-10  items-center">
                                                 <div
                                                     className={`${
-                                                        dataProductSerial.is_enable ==
+                                                        dataMaterialExpiry.is_enable ==
                                                         "1"
-                                                            ? "grid-cols-6"
-                                                            : dataProductExpiry.is_enable ==
-                                                              "1"
-                                                            ? "grid-cols-7"
-                                                            : "grid-cols-5"
+                                                            ? "grid-cols-9"
+                                                            : "grid-cols-7"
                                                     }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r grid `}
                                                 >
                                                     {e?.child?.map((ce) => (
@@ -1598,7 +1515,7 @@ const Index = (props) => {
                                                             <div className="flex justify-center border-t border-l  h-full p-0.5 flex-col items-center ">
                                                                 <Select
                                                                     options={
-                                                                        ce?.dataWarehouse
+                                                                        warehouse
                                                                     }
                                                                     value={
                                                                         ce?.kho
@@ -1621,12 +1538,12 @@ const Index = (props) => {
                                                                             null
                                                                             ? "border-red-500"
                                                                             : ""
-                                                                    } border my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                    } border my-1 3xl:text-[12px] 2xl:text-[10px] cursor-pointer xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                     placeholder={
                                                                         onLoadingChild
                                                                             ? ""
-                                                                            : dataLang?.productsWarehouse_warehouse ||
-                                                                              "productsWarehouse_warehouse"
+                                                                            : dataLang?.recall_warehouse ||
+                                                                              "recall_warehouse"
                                                                     }
                                                                     noOptionsMessage={() =>
                                                                         dataLang?.returns_nodata ||
@@ -1638,11 +1555,11 @@ const Index = (props) => {
                                                                     formatOptionLabel={(
                                                                         option
                                                                     ) => (
-                                                                        <div className="">
+                                                                        <div className="cursor-pointer">
                                                                             <div className="flex gap-1">
                                                                                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                    {dataLang?.productsWarehouse_warehouseImport ||
-                                                                                        "productsWarehouse_warehouseImport"}
+                                                                                    {dataLang?.recall_wareChild ||
+                                                                                        "recall_wareChild"}
 
                                                                                     :
                                                                                 </h2>
@@ -1654,8 +1571,8 @@ const Index = (props) => {
                                                                             </div>
                                                                             <div className="flex gap-1">
                                                                                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                    {dataLang?.productsWarehouse_warehouseLocaImport ||
-                                                                                        "productsWarehouse_warehouseLocaImport"}
+                                                                                    {dataLang?.recall_locationChild ||
+                                                                                        "recall_locationChild"}
 
                                                                                     :
                                                                                 </h2>
@@ -1700,144 +1617,99 @@ const Index = (props) => {
                                                                     classNamePrefix="customDropdow"
                                                                 />
                                                             </div>
-                                                            {dataProductSerial.is_enable ===
-                                                            "1" ? (
-                                                                <div className=" col-span-1 ">
-                                                                    <div className="flex justify-center  h-full p-0.5 flex-col items-center">
-                                                                        <input
-                                                                            value={
-                                                                                ce?.serial
-                                                                            }
-                                                                            disabled={
-                                                                                e
-                                                                                    ?.matHang
-                                                                                    ?.e
-                                                                                    ?.text_type !=
-                                                                                "products"
-                                                                            }
-                                                                            className={`border ${
-                                                                                e
-                                                                                    ?.matHang
-                                                                                    ?.e
-                                                                                    ?.text_type !=
-                                                                                "products"
-                                                                                    ? "bg-gray-50"
-                                                                                    : errSerial &&
-                                                                                      (ce?.serial ==
-                                                                                          "" ||
-                                                                                          ce?.serial ==
-                                                                                              null)
-                                                                                    ? "border-red-500"
-                                                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] "
-                                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
-                                                                            onChange={_HandleChangeChild.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                ce?.id,
-                                                                                "serial"
-                                                                            )}
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                            ) : (
-                                                                ""
-                                                            )}
-                                                            {
-                                                                // dataMaterialExpiry.is_enable ===
-                                                                //     "1" ||
-                                                                dataProductExpiry.is_enable ===
-                                                                "1" ? (
-                                                                    <>
-                                                                        <div className=" col-span-1  ">
-                                                                            <div className="flex justify-center  h-full p-0.5 flex-col items-center">
-                                                                                <input
-                                                                                    value={
-                                                                                        ce?.lot
-                                                                                    }
-                                                                                    disabled={
-                                                                                        ce?.disabledDate
-                                                                                    }
-                                                                                    className={`border ${
-                                                                                        ce?.disabledDate
-                                                                                            ? "bg-gray-50"
-                                                                                            : errLot &&
-                                                                                              (ce?.lot ==
-                                                                                                  "" ||
-                                                                                                  ce?.lot ==
-                                                                                                      null)
-                                                                                            ? "border-red-500"
-                                                                                            : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                                                    } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
-                                                                                    onChange={_HandleChangeChild.bind(
-                                                                                        this,
-                                                                                        e?.id,
-                                                                                        ce?.id,
-                                                                                        "lot"
-                                                                                    )}
-                                                                                />
-                                                                            </div>
-                                                                        </div>
 
-                                                                        <div className=" col-span-1  ">
-                                                                            <div className="custom-date-picker flex justify-center h-full p-0.5 flex-col items-center w-full">
-                                                                                <div className="col-span-4 relative">
-                                                                                    <div className="custom-date-picker flex flex-row">
-                                                                                        <DatePicker
-                                                                                            selected={
-                                                                                                ce?.date
-                                                                                            }
-                                                                                            blur
-                                                                                            disabled={
-                                                                                                ce?.disabledDate
-                                                                                            }
-                                                                                            placeholderText="DD/MM/YYYY"
-                                                                                            dateFormat="dd/MM/yyyy"
-                                                                                            onSelect={(
+                                                            {dataMaterialExpiry.is_enable ==
+                                                            "1" ? (
+                                                                <>
+                                                                    <div className=" col-span-1  ">
+                                                                        <div className="flex justify-center  h-full p-0.5 flex-col items-center ">
+                                                                            <input
+                                                                                value={
+                                                                                    ce?.lot
+                                                                                }
+                                                                                disabled={
+                                                                                    ce?.disabledDate
+                                                                                }
+                                                                                className={`border ${
+                                                                                    ce?.disabledDate
+                                                                                        ? "bg-gray-50"
+                                                                                        : errLot &&
+                                                                                          (ce?.lot ==
+                                                                                              "" ||
+                                                                                              ce?.lot ==
+                                                                                                  null)
+                                                                                        ? "border-red-500"
+                                                                                        : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                                                                } placeholder:text-slate-300 w-full  bg-[#ffffff]  rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
+                                                                                onChange={_HandleChangeChild.bind(
+                                                                                    this,
+                                                                                    e?.id,
+                                                                                    ce?.id,
+                                                                                    "lot"
+                                                                                )}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className=" col-span-1  ">
+                                                                        <div className="custom-date-picker flex justify-center h-full p-0.5 flex-col items-center w-full">
+                                                                            <div className="col-span-4 relative">
+                                                                                <div className="custom-date-picker flex flex-row">
+                                                                                    <DatePicker
+                                                                                        selected={
+                                                                                            ce?.date
+                                                                                        }
+                                                                                        blur
+                                                                                        disabled={
+                                                                                            ce?.disabledDate
+                                                                                        }
+                                                                                        placeholderText="DD/MM/YYYY"
+                                                                                        dateFormat="dd/MM/yyyy"
+                                                                                        onSelect={(
+                                                                                            date
+                                                                                        ) =>
+                                                                                            _HandleChangeChild(
+                                                                                                e?.id,
+                                                                                                ce?.id,
+                                                                                                "date",
                                                                                                 date
-                                                                                            ) =>
-                                                                                                _HandleChangeChild(
-                                                                                                    e?.id,
-                                                                                                    ce?.id,
-                                                                                                    "date",
-                                                                                                    date
-                                                                                                )
-                                                                                            }
-                                                                                            placeholder={
-                                                                                                dataLang?.price_quote_system_default ||
-                                                                                                "price_quote_system_default"
-                                                                                            }
-                                                                                            className={`border ${
-                                                                                                ce?.disabledDate
-                                                                                                    ? "bg-gray-50"
-                                                                                                    : errDateList &&
-                                                                                                      ce?.date ==
-                                                                                                          null
-                                                                                                    ? "border-red-500"
-                                                                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                                                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
-                                                                                        />
-                                                                                        {effectiveDate && (
-                                                                                            <>
-                                                                                                <MdClear
-                                                                                                    className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
-                                                                                                    onClick={() =>
-                                                                                                        handleClearDate(
-                                                                                                            "effectiveDate"
-                                                                                                        )
-                                                                                                    }
-                                                                                                />
-                                                                                            </>
-                                                                                        )}
-                                                                                        <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[150%] text-[#CCCCCC] scale-110 cursor-pointer" />
-                                                                                    </div>
+                                                                                            )
+                                                                                        }
+                                                                                        placeholder={
+                                                                                            dataLang?.price_quote_system_default ||
+                                                                                            "price_quote_system_default"
+                                                                                        }
+                                                                                        className={`border ${
+                                                                                            ce?.disabledDate
+                                                                                                ? "bg-gray-50"
+                                                                                                : errDateList &&
+                                                                                                  ce?.date ==
+                                                                                                      null
+                                                                                                ? "border-red-500"
+                                                                                                : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-4 outline-none cursor-pointer`}
+                                                                                    />
+                                                                                    {effectiveDate && (
+                                                                                        <>
+                                                                                            <MdClear
+                                                                                                className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
+                                                                                                onClick={() =>
+                                                                                                    handleClearDate(
+                                                                                                        "effectiveDate"
+                                                                                                    )
+                                                                                                }
+                                                                                            />
+                                                                                        </>
+                                                                                    )}
+                                                                                    <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[150%] text-[#CCCCCC] scale-110 cursor-pointer" />
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                    </>
-                                                                ) : (
-                                                                    ""
-                                                                )
-                                                            }
+                                                                    </div>
+                                                                </>
+                                                            ) : (
+                                                                ""
+                                                            )}
                                                             <div className="flex items-center justify-center">
                                                                 {ce?.unit}
                                                             </div>
@@ -1860,11 +1732,11 @@ const Index = (props) => {
                                                                 <NumericFormat
                                                                     className={`${
                                                                         errQty &&
-                                                                        (ce?.importQuantity ==
+                                                                        (ce?.recallQuantity ==
                                                                             null ||
-                                                                            ce?.importQuantity ==
+                                                                            ce?.recallQuantity ==
                                                                                 "" ||
-                                                                            ce?.importQuantity ==
+                                                                            ce?.recallQuantity ==
                                                                                 0)
                                                                             ? "border-red-500 border-b"
                                                                             : ""
@@ -1873,10 +1745,10 @@ const Index = (props) => {
                                                                         this,
                                                                         e?.id,
                                                                         ce?.id,
-                                                                        "importQuantity"
+                                                                        "recallQuantity"
                                                                     )}
                                                                     value={
-                                                                        ce?.importQuantity
+                                                                        ce?.recallQuantity
                                                                     }
                                                                     allowNegative={
                                                                         false
@@ -1902,7 +1774,43 @@ const Index = (props) => {
                                                                     />
                                                                 </button>
                                                             </div>
-
+                                                            <div className="flex justify-center  h-full p-0.5 flex-col items-center">
+                                                                <NumericFormat
+                                                                    className={`${
+                                                                        errQty &&
+                                                                        (ce?.price ==
+                                                                            null ||
+                                                                            ce?.price ==
+                                                                                "" ||
+                                                                            ce?.price ==
+                                                                                0)
+                                                                            ? "border-red-500 border-b"
+                                                                            : ""
+                                                                    } placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b-2 border-gray-200 `}
+                                                                    onValueChange={_HandleChangeChild.bind(
+                                                                        this,
+                                                                        e?.id,
+                                                                        ce?.id,
+                                                                        "price"
+                                                                    )}
+                                                                    value={
+                                                                        ce?.price
+                                                                    }
+                                                                    allowNegative={
+                                                                        false
+                                                                    }
+                                                                    isNumericString={
+                                                                        true
+                                                                    }
+                                                                    thousandSeparator=","
+                                                                />
+                                                            </div>
+                                                            <div className="flex items-center justify-center">
+                                                                {formatNumber(
+                                                                    ce?.recallQuantity *
+                                                                        ce?.price
+                                                                )}
+                                                            </div>
                                                             <div className="col-span-1  flex items-center justify-center  h-full p-0.5">
                                                                 <input
                                                                     value={
@@ -1914,9 +1822,12 @@ const Index = (props) => {
                                                                         ce?.id,
                                                                         "note"
                                                                     )}
-                                                                    placeholder="Ghi chú"
+                                                                    placeholder={
+                                                                        dataLang?.recall_noteChild ||
+                                                                        "recall_noteChild"
+                                                                    }
                                                                     type="text"
-                                                                    className="  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
+                                                                    className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
                                                                 />
                                                             </div>
                                                             <div className=" h-full p-0.5 flex flex-col items-center justify-center ">
@@ -1927,7 +1838,7 @@ const Index = (props) => {
                                                                         e?.id,
                                                                         ce?.id
                                                                     )}
-                                                                    className=" text-red-500 flex flex-col justify-center items-center"
+                                                                    className="transition-all duration-200 ease-linear hover:scale-105 text-red-500 flex flex-col justify-center items-center"
                                                                 >
                                                                     <IconDelete />
                                                                 </button>
@@ -1979,7 +1890,10 @@ const Index = (props) => {
                         </div>
                         <div className="flex justify-between ">
                             <div className="font-normal">
-                                <h3>{"Tổng số lượng nhập"}</h3>
+                                <h3>
+                                    {dataLang?.recall_totalQty ||
+                                        "recall_totalQty"}
+                                </h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
@@ -1988,13 +1902,44 @@ const Index = (props) => {
                                             item?.child?.forEach(
                                                 (childItem) => {
                                                     if (
-                                                        childItem.importQuantity !==
+                                                        childItem.recallQuantity !==
                                                             undefined &&
-                                                        childItem.importQuantity !==
+                                                        childItem.recallQuantity !==
                                                             null
                                                     ) {
                                                         total +=
-                                                            childItem.importQuantity;
+                                                            childItem.recallQuantity;
+                                                    }
+                                                }
+                                            );
+                                            return total;
+                                        }, 0)
+                                    )}
+                                </h3>
+                            </div>
+                        </div>
+                        <div className="flex justify-between ">
+                            <div className="font-normal">
+                                <h3>
+                                    {dataLang?.recall_totalAmount ||
+                                        "recall_totalAmount"}
+                                </h3>
+                            </div>
+                            <div className="font-normal">
+                                <h3 className="text-blue-600">
+                                    {formatNumber(
+                                        listData?.reduce((total, item) => {
+                                            item?.child?.forEach(
+                                                (childItem) => {
+                                                    if (
+                                                        childItem.recallQuantity !==
+                                                            undefined &&
+                                                        childItem.recallQuantity !==
+                                                            null
+                                                    ) {
+                                                        total +=
+                                                            childItem.recallQuantity *
+                                                            childItem.price;
                                                     }
                                                 }
                                             );
@@ -2007,9 +1952,7 @@ const Index = (props) => {
                         <div className="space-x-2">
                             <button
                                 onClick={() =>
-                                    router.push(
-                                        "/manufacture/productsWarehouse?tab=all"
-                                    )
+                                    router.push("/manufacture/recall?tab=all")
                                 }
                                 className="button text-[#344054] font-normal text-base hover:bg-blue-500 hover:text-white hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
                             >

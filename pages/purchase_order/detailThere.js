@@ -504,7 +504,7 @@ const Popup_chitietThere = (props) => {
                                                                             )}
                                                                         </div>
                                                                     </h6>
-                                                                    <h6 className="text-[13px] font-medium   px-2 py-0.5 col-span-1 text-center break-words">
+                                                                    <h6 className="text-[13px] font-medium   px-2 py-0.5 col-span-1 text-left break-words">
                                                                         {
                                                                             e
                                                                                 ?.item
@@ -1365,7 +1365,7 @@ const Popup_chitietThere = (props) => {
                                                                                     ?.name
                                                                             }
                                                                         </h6>
-                                                                        <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-center break-words">
+                                                                        <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-left break-words">
                                                                             {
                                                                                 e
                                                                                     ?.item
@@ -1833,7 +1833,7 @@ const Popup_chitietThere = (props) => {
                                                                                     ?.name
                                                                             }
                                                                         </h6>
-                                                                        <h6 className="text-[13px] font-medium  px-2 py-0.5 col-span-1 text-center break-words">
+                                                                        <h6 className="text-[13px] font-medium  px-2 py-0.5 col-span-1 text-left break-words">
                                                                             {
                                                                                 e
                                                                                     ?.item
@@ -2286,7 +2286,7 @@ const Popup_chitietThere = (props) => {
                                                                                     ?.name
                                                                             }
                                                                         </h6>
-                                                                        <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-center break-words">
+                                                                        <h6 className="text-[13px]   py-0.5 col-span-1 font-medium  text-left break-words">
                                                                             {
                                                                                 e
                                                                                     ?.item

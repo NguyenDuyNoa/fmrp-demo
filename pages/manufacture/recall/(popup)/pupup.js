@@ -64,20 +64,34 @@ const Popup_chitiet = (props) => {
         props?.id && sOnFetching(true);
     }, [open]);
 
+    // const formatNumber = (number) => {
+    //     if (!number && number !== 0) return 0;
+    //     const integerPart = Math.floor(number);
+    //     const decimalPart = number - integerPart;
+    //     const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
+    //     const roundedNumber = integerPart + roundedDecimalPart;
+    //     return roundedNumber?.toLocaleString("en");
+    // };
     const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        const decimalPart = number - integerPart;
-        const roundedDecimalPart = decimalPart >= 0.05 ? 1 : 0;
-        const roundedNumber = integerPart + roundedDecimalPart;
-        return roundedNumber.toLocaleString("en");
+        if (!number && number !== 0) return "0";
+
+        const roundedNumber = Math.round(number * 100) / 100;
+        const [integerPart, decimalPart] = roundedNumber.toFixed(2).split(".");
+
+        const formattedIntegerPart = integerPart.replace(
+            /\B(?=(\d{3})+(?!\d))/g,
+            ","
+        );
+        const formattedDecimalPart =
+            decimalPart === "00" ? "" : `.${decimalPart}`;
+
+        return `${formattedIntegerPart}${formattedDecimalPart}`;
     };
 
     const _ServerFetching_detailOrder = () => {
         Axios(
             "GET",
-            `/api_web/Api_product_receipt/productReceipt/${props?.id}?csrf_protection=true`,
-            // `/api_web/Api_product_receipt/productReceipt/${props?.id}?csrf_protection=true`,
+            `/api_web/Api_material_recall/materialRecall/${props?.id}?csrf_protection=true`,
             {},
             (err, response) => {
                 if (!err) {
@@ -126,8 +140,7 @@ const Popup_chitiet = (props) => {
         <>
             <PopupEdit
                 title={
-                    props?.dataLang?.productsWarehouse_titleDetail ||
-                    "productsWarehouse_titleDetail"
+                    props.dataLang?.recall_title_detail || "recall_title_detail"
                 }
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -259,29 +272,36 @@ const Popup_chitiet = (props) => {
                       (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
                        (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow-lg  z-10`}> */}
                                     <div
-                                        className={`grid-cols-12  grid sticky top-0 bg-white shadow-lg  z-10 rounded `}
+                                        className={`grid-cols-13  grid sticky top-0 bg-white shadow-lg  z-10 rounded `}
                                     >
                                         {/* <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_image || "import_detail_image"}</h4> */}
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-4 text-center whitespace-nowrap">
+                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-3 text-center whitespace-nowrap">
                                             {props.dataLang
                                                 ?.import_detail_items ||
                                                 "import_detail_items"}
                                         </h4>
                                         {/* <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4>  */}
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {props.dataLang
-                                                ?.productsWarehouse_warehouse ||
-                                                "productsWarehouse_warehouse"}
+                                            {props.dataLang?.recall_warehouse ||
+                                                "recall_warehouse"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                                             {"ĐVT"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                                             {props.dataLang
-                                                ?.productsWarehouse_QtyImport ||
-                                                "productsWarehouse_QtyImport"}
+                                                ?.recall_revenueQty ||
+                                                "recall_revenueQty"}
                                         </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-3 text-center whitespace-nowrap">
+                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                                            {props.dataLang?.recall_price ||
+                                                "recall_price"}
+                                        </h4>
+                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                            {props.dataLang?.recall_money ||
+                                                "recall_money"}
+                                        </h4>
+                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                                             {props.dataLang?.import_from_note ||
                                                 "import_from_note"}
                                         </h4>
@@ -301,10 +321,10 @@ const Popup_chitiet = (props) => {
                                                 <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
                                                     {data?.items?.map((e) => (
                                                         <div
-                                                            className="grid grid-cols-12 hover:bg-slate-50 items-center border-b"
+                                                            className="grid grid-cols-13 hover:bg-slate-50 items-center border-b"
                                                             key={e.id?.toString()}
                                                         >
-                                                            <h6 className="text-[13px]  px-2 py-2 col-span-4 text-left ">
+                                                            <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left ">
                                                                 <div className="flex items-center gap-2">
                                                                     <div>
                                                                         {e?.item
@@ -352,31 +372,7 @@ const Popup_chitiet = (props) => {
                                                                             }
                                                                         </h6>
                                                                         <div className="flex items-center font-oblique flex-wrap">
-                                                                            {dataProductSerial.is_enable ===
-                                                                            "1" ? (
-                                                                                <div className="flex gap-0.5">
-                                                                                    <h6 className="text-[12px]">
-                                                                                        Serial:
-                                                                                    </h6>
-                                                                                    <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                        {e
-                                                                                            ?.item
-                                                                                            ?.serial ==
-                                                                                            null ||
-                                                                                        e
-                                                                                            ?.item
-                                                                                            ?.serial ==
-                                                                                            ""
-                                                                                            ? "-"
-                                                                                            : e
-                                                                                                  ?.item
-                                                                                                  ?.serial}
-                                                                                    </h6>
-                                                                                </div>
-                                                                            ) : (
-                                                                                ""
-                                                                            )}
-                                                                            {dataProductExpiry.is_enable ===
+                                                                            {dataMaterialExpiry.is_enable ===
                                                                             "1" ? (
                                                                                 <>
                                                                                     <div className="flex gap-0.5">
@@ -417,28 +413,38 @@ const Popup_chitiet = (props) => {
                                                             <h6 className="text-[13px]   px-2 py-2 col-span-2 text-left break-words">
                                                                 <h6 className="font-medium">
                                                                     {
-                                                                        e?.warehouse_name
+                                                                        e
+                                                                            ?.warehouse
+                                                                            ?.warehouse_name
                                                                     }
                                                                 </h6>
                                                                 <h6 className="font-medium">
                                                                     {
-                                                                        e?.location_name
+                                                                        e
+                                                                            ?.warehouse
+                                                                            ?.location_name
                                                                     }
                                                                 </h6>
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
-                                                                {
-                                                                    e?.item
-                                                                        ?.unit_name
-                                                                }
+                                                                {e?.item?.unit}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-2 font-medium text-center mr-1">
                                                                 {formatNumber(
                                                                     e?.quantity
                                                                 )}
                                                             </h6>
-
-                                                            <h6 className="text-[13px]   py-2 col-span-3 font-medium text-left ml-3.5">
+                                                            <h6 className="text-[13px]   py-2 col-span-1 font-medium text-right mr-1">
+                                                                {formatNumber(
+                                                                    e?.price
+                                                                )}
+                                                            </h6>
+                                                            <h6 className="text-[13px]   py-2 col-span-2 font-medium text-right mr-1">
+                                                                {formatNumber(
+                                                                    e?.amount
+                                                                )}
+                                                            </h6>
+                                                            <h6 className="text-[13px]   py-2 col-span-2 font-medium text-left ml-3.5">
                                                                 {e?.note !=
                                                                 undefined ? (
                                                                     <ExpandableContent
@@ -498,7 +504,18 @@ const Popup_chitiet = (props) => {
                                             </h3>
                                         </div>
                                         <div className="font-medium text-left text-[13px]">
-                                            <h3>{"Tổng số lượng nhập"}</h3>
+                                            <h3>
+                                                {props.dataLang
+                                                    ?.recall_totalQty ||
+                                                    "recall_totalQty"}
+                                            </h3>
+                                        </div>
+                                        <div className="font-medium text-left text-[13px]">
+                                            <h3>
+                                                {props.dataLang
+                                                    ?.recall_totalAmount ||
+                                                    "recall_totalAmount"}
+                                            </h3>
                                         </div>
                                     </div>
                                     <div className="col-span-3 space-y-1 text-right">
@@ -518,6 +535,20 @@ const Popup_chitiet = (props) => {
                                                             Number(
                                                                 item.quantity
                                                             ),
+                                                        0
+                                                    )
+                                                )}
+                                            </h3>
+                                        </div>
+                                        <div className="font-medium mr-2.5">
+                                            <h3 className="text-right text-blue-600 text-[13px]">
+                                                {formatNumber(
+                                                    data?.items?.reduce(
+                                                        (total, item) =>
+                                                            (total += Number(
+                                                                item.quantity *
+                                                                    item.price
+                                                            )),
                                                         0
                                                     )
                                                 )}

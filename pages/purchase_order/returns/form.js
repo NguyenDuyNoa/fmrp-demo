@@ -1687,45 +1687,49 @@ const Index = (props) => {
                                                         }
                                                     </h5>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2 italic">
-                                            {dataProductSerial.is_enable ===
-                                                "1" && (
-                                                <div className="text-[11px] text-[#667085] font-[500]">
-                                                    Serial:{" "}
-                                                    {option.e?.serial
-                                                        ? option.e?.serial
-                                                        : "-"}
+
+                                                <div className="flex items-center gap-2 italic">
+                                                    {dataProductSerial.is_enable ===
+                                                        "1" && (
+                                                        <div className="text-[11px] text-[#667085] font-[500]">
+                                                            Serial:{" "}
+                                                            {option.e?.serial
+                                                                ? option.e
+                                                                      ?.serial
+                                                                : "-"}
+                                                        </div>
+                                                    )}
+                                                    {dataMaterialExpiry.is_enable ===
+                                                        "1" ||
+                                                    dataProductExpiry.is_enable ===
+                                                        "1" ? (
+                                                        <>
+                                                            <div className="text-[11px] text-[#667085] font-[500]">
+                                                                Lot:{" "}
+                                                                {option.e?.lot
+                                                                    ? option.e
+                                                                          ?.lot
+                                                                    : "-"}
+                                                            </div>
+                                                            <div className="text-[11px] text-[#667085] font-[500]">
+                                                                Date:{" "}
+                                                                {option.e
+                                                                    ?.expiration_date
+                                                                    ? moment(
+                                                                          option
+                                                                              .e
+                                                                              ?.expiration_date
+                                                                      ).format(
+                                                                          "DD/MM/YYYY"
+                                                                      )
+                                                                    : "-"}
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        ""
+                                                    )}
                                                 </div>
-                                            )}
-                                            {dataMaterialExpiry.is_enable ===
-                                                "1" ||
-                                            dataProductExpiry.is_enable ===
-                                                "1" ? (
-                                                <>
-                                                    <div className="text-[11px] text-[#667085] font-[500]">
-                                                        Lot:{" "}
-                                                        {option.e?.lot
-                                                            ? option.e?.lot
-                                                            : "-"}
-                                                    </div>
-                                                    <div className="text-[11px] text-[#667085] font-[500]">
-                                                        Date:{" "}
-                                                        {option.e
-                                                            ?.expiration_date
-                                                            ? moment(
-                                                                  option.e
-                                                                      ?.expiration_date
-                                                              ).format(
-                                                                  "DD/MM/YYYY"
-                                                              )
-                                                            : "-"}
-                                                    </div>
-                                                </>
-                                            ) : (
-                                                ""
-                                            )}
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -1761,7 +1765,7 @@ const Index = (props) => {
                                     }),
                                     menu: (provided, state) => ({
                                         ...provided,
-                                        width: "125%",
+                                        width: "150%",
                                     }),
                                 }}
                             />
@@ -1788,7 +1792,7 @@ const Index = (props) => {
                                             size="16"
                                         />
                                     </button>
-                                    <div className="text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b-2 border-gray-200">
+                                    <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b-2 border-gray-200">
                                         1
                                     </div>
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
@@ -1903,8 +1907,152 @@ const Index = (props) => {
                                                             //       </div>
                                                             //   </div> */}
                                                             // </div>
+                                                            //                             <div className="py-2">
+                                                            //                                 <div className="flex items-center gap-1">
+                                                            //                                     <div className="w-[40px] h-[50px]">
+                                                            //                                         {option
+                                                            //                                             .e
+                                                            //                                             ?.images !=
+                                                            //                                         null ? (
+                                                            //                                             <img
+                                                            //                                                 src={
+                                                            //                                                     option
+                                                            //                                                         .e
+                                                            //                                                         ?.images
+                                                            //                                                 }
+                                                            //                                                 alt="Product Image"
+                                                            //                                                 className="max-w-[40px] max-h-[50px] text-[8px] object-cover rounded"
+                                                            //                                             />
+                                                            //                                         ) : (
+                                                            //                                             <div className=" w-[40px] h-[50px] object-cover  flex items-center justify-center  rounded">
+                                                            //                                                 <img
+                                                            //                                                     src="/no_img.png"
+                                                            //                                                     alt="Product Image"
+                                                            //                                                     className=" object-cover rounded"
+                                                            //                                                 />
+                                                            //                                             </div>
+                                                            //                                         )}
+                                                            //                                     </div>
+                                                            //                                     <div>
+                                                            //                                         <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                            //                                             {
+                                                            //                                                 option
+                                                            //                                                     .e
+                                                            //                                                     ?.name
+                                                            //                                             }
+                                                            //                                         </h3>
+                                                            //                                         <div className="flex gap-2">
+                                                            //                                             <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                            //                                                 {
+                                                            //                                                     option
+                                                            //                                                         .e
+                                                            //                                                         ?.code
+                                                            //                                                 }
+                                                            //                                             </h5>
+                                                            //                                             <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                            //                                                 {
+                                                            //                                                     option
+                                                            //                                                         .e
+                                                            //                                                         ?.product_variation
+                                                            //                                                 }
+                                                            //                                             </h5>
+                                                            //                                         </div>
+                                                            //                                         <div className="flex items-center gap-1">
+                                                            //                                             <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                            //                                                 {
+                                                            //                                                     option
+                                                            //                                                         .e
+                                                            //                                                         ?.import_code
+                                                            //                                                 }{" "}
+                                                            //                                                 -{" "}
+                                                            //                                             </h5>
+                                                            //                                             <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">{`(ĐGSCK: ${formatNumber(
+                                                            //                                                 option
+                                                            //                                                     .e
+                                                            //                                                     ?.price_after_discount
+                                                            //                                             )}) -`}</h5>
+                                                            //                                             <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                            //                                                 {
+                                                            //                                                     dataLang[
+                                                            //                                                         option
+                                                            //                                                             .e
+                                                            //                                                             ?.text_type
+                                                            //                                                     ]
+                                                            //                                                 }
+                                                            //                                             </h5>
+                                                            //                                         </div>
+                                                            //                                     </div>
+                                                            //                                 </div>
+                                                            //                                 <div
+                                                            //                                     className={`${
+                                                            //                                         option.e
+                                                            //                                             ?.serial ||
+                                                            //                                         option.e
+                                                            //                                             ?.lot ||
+                                                            //                                         option.e
+                                                            //                                             ?.expiration_date
+                                                            //                                             ? ""
+                                                            //                                             : ""
+                                                            //                                     } flex items-center gap-2 italic`}
+                                                            //                                 >
+                                                            //                                     {dataProductSerial.is_enable ===
+                                                            //                                         "1" && (
+                                                            //                                         <div className="text-[11px] text-[#667085] font-[500]">
+                                                            //                                             Serial:{" "}
+                                                            //                                             {option
+                                                            //                                                 .e
+                                                            //                                                 ?.serial
+                                                            //                                                 ? option
+                                                            //                                                       .e
+                                                            //                                                       ?.serial
+                                                            //                                                 : "-"}
+                                                            //                                         </div>
+                                                            //                                     )}
+                                                            //                                     {dataMaterialExpiry.is_enable ===
+                                                            //                                         "1" ||
+                                                            //                                     dataProductExpiry.is_enable ===
+                                                            //                                         "1" ? (
+                                                            //                                         <>
+                                                            //                                             <div className="text-[11px] text-[#667085] font-[500]">
+                                                            //                                                 Lot:{" "}
+                                                            //                                                 {option
+                                                            //                                                     .e
+                                                            //                                                     ?.lot
+                                                            //                                                     ? option
+                                                            //                                                           .e
+                                                            //                                                           ?.lot
+                                                            //                                                     : "-"}
+                                                            //                                             </div>
+                                                            //                                             <div className="text-[11px] text-[#667085] font-[500]">
+                                                            //                                                 Date:{" "}
+                                                            //                                                 {option
+                                                            //                                                     .e
+                                                            //                                                     ?.expiration_date
+                                                            //                                                     ? moment(
+                                                            //                                                           option
+                                                            //                                                               .e
+                                                            //                                                               ?.expiration_date
+                                                            //                                                       ).format(
+                                                            //                                                           "DD/MM/YYYY"
+                                                            //                                                       )
+                                                            //                                                     : "-"}
+                                                            //                                             </div>
+                                                            //                                         </>
+                                                            //                                     ) : (
+                                                            //                                         ""
+                                                            //                                     )}
+                                                            //                                 </div>
+                                                            //                                 {/* <div className=''>
+                                                            //    <div className='text-right opacity-0'>{"0"}</div>
+                                                            //    <div className='flex gap-2'>
+                                                            //      <div className='flex items-center gap-2'>
+                                                            //        <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{qtyHouse?.quantity ?? 0}</h5>
+                                                            //      </div>
+                                                            //     </div>
+                                                            // </div> */}
+                                                            //                             </div>
                                                             <div className="py-2">
-                                                                <div className="flex items-center gap-1">
+                                                                <div className="flex items-center ">
                                                                     <div className="w-[40px] h-[50px]">
                                                                         {option
                                                                             .e
@@ -1917,14 +2065,14 @@ const Index = (props) => {
                                                                                         ?.images
                                                                                 }
                                                                                 alt="Product Image"
-                                                                                className="max-w-[40px] max-h-[50px] text-[8px] object-cover rounded"
+                                                                                className="max-w-[40px] h-[50px] text-[8px] object-cover rounded"
                                                                             />
                                                                         ) : (
-                                                                            <div className=" w-[40px] h-[50px] object-cover  flex items-center justify-center  rounded">
+                                                                            <div className=" w-[40px] h-[50px] object-cover  flex items-center justify-center rounded">
                                                                                 <img
                                                                                     src="/no_img.png"
                                                                                     alt="Product Image"
-                                                                                    className=" object-cover rounded"
+                                                                                    className="w-[30px] h-[30px] object-cover rounded"
                                                                                 />
                                                                             </div>
                                                                         )}
@@ -1977,75 +2125,57 @@ const Index = (props) => {
                                                                                 }
                                                                             </h5>
                                                                         </div>
+
+                                                                        <div className="flex items-center gap-2 italic">
+                                                                            {dataProductSerial.is_enable ===
+                                                                                "1" && (
+                                                                                <div className="text-[11px] text-[#667085] font-[500]">
+                                                                                    Serial:{" "}
+                                                                                    {option
+                                                                                        .e
+                                                                                        ?.serial
+                                                                                        ? option
+                                                                                              .e
+                                                                                              ?.serial
+                                                                                        : "-"}
+                                                                                </div>
+                                                                            )}
+                                                                            {dataMaterialExpiry.is_enable ===
+                                                                                "1" ||
+                                                                            dataProductExpiry.is_enable ===
+                                                                                "1" ? (
+                                                                                <>
+                                                                                    <div className="text-[11px] text-[#667085] font-[500]">
+                                                                                        Lot:{" "}
+                                                                                        {option
+                                                                                            .e
+                                                                                            ?.lot
+                                                                                            ? option
+                                                                                                  .e
+                                                                                                  ?.lot
+                                                                                            : "-"}
+                                                                                    </div>
+                                                                                    <div className="text-[11px] text-[#667085] font-[500]">
+                                                                                        Date:{" "}
+                                                                                        {option
+                                                                                            .e
+                                                                                            ?.expiration_date
+                                                                                            ? moment(
+                                                                                                  option
+                                                                                                      .e
+                                                                                                      ?.expiration_date
+                                                                                              ).format(
+                                                                                                  "DD/MM/YYYY"
+                                                                                              )
+                                                                                            : "-"}
+                                                                                    </div>
+                                                                                </>
+                                                                            ) : (
+                                                                                ""
+                                                                            )}
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                                <div
-                                                                    className={`${
-                                                                        option.e
-                                                                            ?.serial ||
-                                                                        option.e
-                                                                            ?.lot ||
-                                                                        option.e
-                                                                            ?.expiration_date
-                                                                            ? ""
-                                                                            : ""
-                                                                    } flex items-center gap-2 italic`}
-                                                                >
-                                                                    {dataProductSerial.is_enable ===
-                                                                        "1" && (
-                                                                        <div className="text-[11px] text-[#667085] font-[500]">
-                                                                            Serial:{" "}
-                                                                            {option
-                                                                                .e
-                                                                                ?.serial
-                                                                                ? option
-                                                                                      .e
-                                                                                      ?.serial
-                                                                                : "-"}
-                                                                        </div>
-                                                                    )}
-                                                                    {dataMaterialExpiry.is_enable ===
-                                                                        "1" ||
-                                                                    dataProductExpiry.is_enable ===
-                                                                        "1" ? (
-                                                                        <>
-                                                                            <div className="text-[11px] text-[#667085] font-[500]">
-                                                                                Lot:{" "}
-                                                                                {option
-                                                                                    .e
-                                                                                    ?.lot
-                                                                                    ? option
-                                                                                          .e
-                                                                                          ?.lot
-                                                                                    : "-"}
-                                                                            </div>
-                                                                            <div className="text-[11px] text-[#667085] font-[500]">
-                                                                                Date:{" "}
-                                                                                {option
-                                                                                    .e
-                                                                                    ?.expiration_date
-                                                                                    ? moment(
-                                                                                          option
-                                                                                              .e
-                                                                                              ?.expiration_date
-                                                                                      ).format(
-                                                                                          "DD/MM/YYYY"
-                                                                                      )
-                                                                                    : "-"}
-                                                                            </div>
-                                                                        </>
-                                                                    ) : (
-                                                                        ""
-                                                                    )}
-                                                                </div>
-                                                                {/* <div className=''>
-                                   <div className='text-right opacity-0'>{"0"}</div>
-                                   <div className='flex gap-2'>
-                                     <div className='flex items-center gap-2'>
-                                       <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{qtyHouse?.quantity ?? 0}</h5>
-                                     </div>
-                                    </div>
-                                </div> */}
                                                             </div>
                                                         )}
                                                         classNamePrefix="customDropdow"
@@ -2095,7 +2225,7 @@ const Index = (props) => {
                                                                 state
                                                             ) => ({
                                                                 ...provided,
-                                                                width: "125%",
+                                                                width: "150%",
                                                             }),
                                                         }}
                                                     />

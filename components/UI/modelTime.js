@@ -11,8 +11,6 @@ const PopupModelTime = (props) => {
     useEffect(() => {
         data.trial && sOpen(data.trial);
     }, [data]);
-    console.log("data", data);
-
     return (
         // <div className={`${open ? props?.hidden : props?.hidden}`}>
         <>

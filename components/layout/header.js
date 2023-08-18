@@ -243,7 +243,7 @@ const Header = () => {
                 {
                     title: "Thu hồi nguyên vật liệu",
                     img: "/icon/header/kho/thuhoi.png",
-                    link: "#",
+                    link: "/manufacture/recall",
                 },
                 {
                     title: "Xuất kho khác",
