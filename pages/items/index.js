@@ -2820,7 +2820,7 @@ const Popup_ThongTin = React.memo((props) => {
                                             {props.dataLang?.avatar || "avatar"}
                                             :
                                         </h5>
-                                        {list?.created_by_avatar == null ? (
+                                        {list?.images == null ? (
                                             <img
                                                 src="/no_image.png"
                                                 className="w-48 h-48 rounded object-contain select-none pointer-events-none"
@@ -2830,7 +2830,7 @@ const Popup_ThongTin = React.memo((props) => {
                                                 width={200}
                                                 height={200}
                                                 quality={100}
-                                                src={list?.created_by_avatar}
+                                                src={list?.images}
                                                 alt="thumb type"
                                                 className="w-48 h-48 rounded object-contain select-none pointer-events-none"
                                                 loading="lazy"
