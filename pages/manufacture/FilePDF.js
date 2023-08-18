@@ -23,8 +23,6 @@ const FilePDF = ({
     dataProductExpiry,
     dataProductSerial,
 }) => {
-    console.log("dataProductExpiry", dataProductExpiry);
-    console.log("dataProductSerial", dataProductSerial);
     // var docDefinition = {
     //     pageSize: 'A5',
     //     pageOrientation: 'landscape',
@@ -326,8 +324,8 @@ const FilePDF = ({
                             uppercaseTextHeaderTabel(
                                 `${
                                     props?.dataLang
-                                        ?.production_warehouse_export_sl ||
-                                    "production_warehouse_export_sl"
+                                        ?.production_warehouse_export_slPDF ||
+                                    "production_warehouse_export_slPDF"
                                 }`,
                                 "headerTable",
                                 "center"
