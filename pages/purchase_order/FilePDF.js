@@ -5551,13 +5551,18 @@ const FilePDF = ({
                         "auto",
                         "auto",
                         "auto",
+                        "auto",
                         "*",
                     ],
                     body: [
                         // Header row
                         [
-                            uppercaseText("STT", "headerTable", "center"),
-                            uppercaseText(
+                            uppercaseTextHeaderTabel(
+                                "STT",
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(
                                 `${
                                     props.dataLang?.inventory_items ||
                                     "inventory_items"
@@ -5565,14 +5570,30 @@ const FilePDF = ({
                                 "headerTables",
                                 "center"
                             ),
-                            uppercaseText(
+                            uppercaseTextHeaderTabel(
+                                `${
+                                    props.dataLang?.PDF_infoItem ||
+                                    "PDF_infoItem"
+                                }`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(
                                 `${props.dataLang?.PDF_house || "PDF_house"}`,
                                 "headerTable",
                                 "center"
                             ),
-                            uppercaseText(`${"ĐVT"}`, "headerTable", "center"),
-                            uppercaseText(`${"SL"}`, "headerTable", "center"),
-                            uppercaseText(
+                            uppercaseTextHeaderTabel(
+                                `${"ĐVT"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(
+                                `${"SL"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(
                                 `${
                                     props.dataLang?.serviceVoucher_note ||
                                     "serviceVoucher_note"
@@ -5588,6 +5609,7 @@ const FilePDF = ({
                         data?.items.length > 0
                             ? data?.items.map((item, index) => {
                                   const stack = [];
+                                  const stackSub = [];
                                   stack.push({
                                       text: item?.item?.name
                                           ? item?.item?.name
@@ -5595,7 +5617,7 @@ const FilePDF = ({
                                       fontSize: 10,
                                       margin: styleMarginChild,
                                   });
-                                  stack.push({
+                                  stackSub.push({
                                       text: `Biến thể: ${item?.item?.product_variation}`,
                                       fontSize: 9,
                                       italics: true,
@@ -5624,7 +5646,7 @@ const FilePDF = ({
                                               ],
                                           },
                                       ];
-                                      stack.push(serialStack);
+                                      stackSub.push(serialStack);
                                   }
 
                                   if (
@@ -5679,7 +5701,7 @@ const FilePDF = ({
                                               margin: [0, 5, 0, 0],
                                           },
                                       ];
-                                      stack.push(subStack);
+                                      stackSub.push(subStack);
                                   }
                                   return [
                                       {
@@ -5690,6 +5712,9 @@ const FilePDF = ({
                                       },
                                       {
                                           stack: stack,
+                                      },
+                                      {
+                                          stack: stackSub,
                                       },
                                       //   location_name
 
@@ -5752,10 +5777,11 @@ const FilePDF = ({
                                 text: `${formatNumber(data?.items?.length)}`,
                                 bold: true,
                                 alignment: "right",
-                                colSpan: 4,
+                                colSpan: 5,
                                 fontSize: 10,
                                 margin: styleMarginChildTotal,
                             },
+                            "",
                             "",
                             "",
                             "",
@@ -5783,10 +5809,11 @@ const FilePDF = ({
                                 )}`,
                                 bold: true,
                                 alignment: "right",
-                                colSpan: 4,
+                                colSpan: 5,
                                 fontSize: 10,
                                 margin: styleMarginChildTotal,
                             },
+                            "",
                             "",
                             "",
                             "",
