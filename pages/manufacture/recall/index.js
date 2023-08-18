@@ -460,7 +460,7 @@ const Index = (props) => {
         data.append("id", checkedWare?.id);
         Axios(
             "POST",
-            `/api_web/Api_stock/confirmWarehouse?csrf_protection=true`,
+            `/api_web/Api_material_recall/confirmWarehouse/?csrf_protection=true`,
             {
                 data: data,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -1329,6 +1329,7 @@ const BtnTacVu = React.memo((props) => {
     useEffect(() => {
         openTacvu && fetchDataSettingsCompany();
     }, [openTacvu]);
+
     return (
         <div>
             <Popup
@@ -1369,7 +1370,7 @@ const BtnTacVu = React.memo((props) => {
                                     "purchase_order_table_edit"}
                             </p>
                         </button>
-                        {/* <FilePDF
+                        <FilePDF
                             props={props}
                             openAction={openTacvu}
                             setOpenAction={sOpenTacvu}
@@ -1378,7 +1379,7 @@ const BtnTacVu = React.memo((props) => {
                             dataProductSerial={dataProductSerial}
                             dataMaterialExpiry={dataMaterialExpiry}
                             data={dataPDF}
-                        /> */}
+                        />
                         <button
                             onClick={_HandleDelete.bind(this, props.id)}
                             className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"

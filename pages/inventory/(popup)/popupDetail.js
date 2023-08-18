@@ -25,8 +25,8 @@ const Popup_chitiet = (props) => {
         props?.id && sOnFetching(true);
     }, [open]);
 
-    const _ServerFetching =  () => {
-         Axios(
+    const _ServerFetching = () => {
+        Axios(
             "GET",
             "/api_web/api_setting/feature/?csrf_protection=true",
             {},
@@ -48,8 +48,8 @@ const Popup_chitiet = (props) => {
         );
     };
 
-    const _ServerFetching_detailUser =  () => {
-         Axios(
+    const _ServerFetching_detailUser = () => {
+        Axios(
             "GET",
             `/api_web/api_inventory/inventory/${props?.id}`,
             {},
@@ -645,18 +645,12 @@ const Popup_chitiet = (props) => {
                                                                                         Serial:
                                                                                     </h6>
                                                                                     <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                        {e
-                                                                                            ?.item
-                                                                                            ?.serial ==
+                                                                                        {e?.serial ==
                                                                                             null ||
-                                                                                        e
-                                                                                            ?.item
-                                                                                            ?.serial ==
+                                                                                        e?.serial ==
                                                                                             ""
                                                                                             ? "-"
-                                                                                            : e
-                                                                                                  ?.item
-                                                                                                  ?.serial}
+                                                                                            : e?.serial}
                                                                                     </h6>
                                                                                 </div>
                                                                             ) : (
@@ -672,18 +666,12 @@ const Popup_chitiet = (props) => {
                                                                                             Lot:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                            {e
-                                                                                                ?.item
-                                                                                                ?.lot ==
+                                                                                            {e?.lot ==
                                                                                                 null ||
-                                                                                            e
-                                                                                                ?.item
-                                                                                                ?.lot ==
+                                                                                            e?.lot ==
                                                                                                 ""
                                                                                                 ? "-"
-                                                                                                : e
-                                                                                                      ?.item
-                                                                                                      ?.lot}
+                                                                                                : e?.lot}
                                                                                         </h6>
                                                                                     </div>
                                                                                     <div className="flex gap-0.5">
@@ -691,13 +679,9 @@ const Popup_chitiet = (props) => {
                                                                                             Date:
                                                                                         </h6>{" "}
                                                                                         <h6 className="text-[12px]  px-2   w-[full] text-center ">
-                                                                                            {e
-                                                                                                ?.item
-                                                                                                ?.expiration_date
+                                                                                            {e?.expiration_date
                                                                                                 ? moment(
-                                                                                                      e
-                                                                                                          ?.item
-                                                                                                          ?.expiration_date
+                                                                                                      e?.expiration_date
                                                                                                   ).format(
                                                                                                       "DD/MM/YYYY"
                                                                                                   )
