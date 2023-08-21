@@ -1,7 +1,5 @@
-import React, { useRef, useState } from "react";
-import Head from "next/head";
+import React, { useState } from "react";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
 import Link from "next/link";
 import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,16 +10,11 @@ import {
     Calendar as IconCalendar,
     SearchNormal1 as IconSearch,
     ArrowDown2 as IconDown,
+    House,
 } from "iconsax-react";
 
-import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
-import Popup from "reactjs-popup";
 import moment from "moment/moment";
-import vi from "date-fns/locale/vi";
-registerLocale("vi", vi);
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
@@ -31,17 +24,8 @@ import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 
-import Swal from "sweetalert2";
-
 import { useEffect } from "react";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import randomColor from "components/UI/radomColor/radomcolor";
 
 const Popup_status = (props) => {
     const dataLang = props?.dataLang;
@@ -105,7 +89,6 @@ const Popup_status = (props) => {
             }, 1000);
         }
     }, [props?.data_export]);
-
     return (
         <PopupEdit
             title={props.dataLang?.inventory_votes || "inventory_votes"}
@@ -113,33 +96,33 @@ const Popup_status = (props) => {
             onClose={() => sOpen(false)}
             classNameBtn={props.className}
         >
-            <div className=" space-x-5 3xl:w-[1250px] 2xl:w-[1100px] w-[1050px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">
+            <div className="space-x-5 3xl:w-[1000px] 2xl:w-[1000px]  xl:w-[1000px] lg:w-[900px] w-[1000px] 3xl:h-auto xxl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">
                 <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                    <div className="pr-2 ">
+                    <div className="">
                         <div
-                            className={`grid-cols-8 grid sticky top-0 bg-white shadow mt-1 rounded items-center z-10 divide-x `}
+                            className={`grid-cols-8   grid sticky top-0 bg-white shadow items-center z-10 divide-x rounded`}
                         >
-                            <h4 className="text-[13px] px-2 py-1.5 text-gray-600 uppercase  font-semibold  whitespace-nowrap col-span-1  text-center">
+                            <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-semibold  whitespace-nowrap col-span-1  text-center">
                                 {props.dataLang?.inventory_dayvouchers ||
                                     "inventory_dayvouchers"}
                             </h4>
-                            <h4 className="text-[13px]  px-2 py-1.5 text-gray-600 uppercase col-span-1 font-semibold text-center whitespace-nowrap">
+                            <h4 className="text-[13px]  px-2 py-2 text-gray-600 uppercase col-span-1 font-semibold text-center whitespace-nowrap">
                                 {props.dataLang?.inventory_vouchercode ||
                                     "inventory_vouchercode"}
                             </h4>
-                            <h4 className="text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-semibold text-center whitespace-nowrap">
+                            <h4 className="text-[13px]  px-2 py-2 text-gray-600 uppercase col-span-1 font-semibold text-center whitespace-nowrap">
                                 {props.dataLang?.import_ballot ||
                                     "import_ballot"}
                             </h4>
-                            <h4 className="text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-semibold text-center whitespace-nowrap">
+                            <h4 className="text-[13px]  px-2 py-2 text-gray-600 uppercase col-span-2 font-semibold text-center whitespace-nowrap">
                                 {props.dataLang
                                     ?.purchase_order_purchase_from_item ||
                                     "purchase_order_purchase_from_item"}
                             </h4>
-                            <h4 className="text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-2 font-semibold text-center whitespace-nowrap">
+                            <h4 className="text-[13px]  px-2 py-2 text-gray-600 uppercase col-span-2 font-semibold text-center whitespace-nowrap">
                                 {props.dataLang?.PDF_house || "PDF_house"}
                             </h4>
-                            <h4 className="text-[13px]  px-2 py-1.5 text-[#667085] uppercase col-span-1 font-semibold text-center whitespace-nowrap">
+                            <h4 className="text-[13px]  px-2 py-2 text-gray-600 uppercase col-span-1 font-semibold text-center whitespace-nowrap">
                                 {props.dataLang?.purchase_quantity ||
                                     "purchase_quantity"}
                             </h4>
@@ -160,33 +143,38 @@ const Popup_status = (props) => {
                                                       ).format("DD/MM/YYYY")
                                                     : ""}
                                             </h6>
-                                            <h6 className="text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer">
+                                            <h6 className="text-[13px] px-2 py-1.5 col-span-1 text-center cursor-pointer text-blue-600 font-semibold">
                                                 {e?.code_coupon}
                                             </h6>
-                                            <h6 className="text-[13px] px-2 py-1.5 col-span-1 text-left hover:font-normal cursor-pointer">
+                                            <h6
+                                                className={`3xl:text-[12px] relative 2xl:text-[10px] text-[10px] px-2 ${randomColor} rounded-2xl text-center text-white py-1 col-span-1  hover:font-normal cursor-pointer`}
+                                            >
                                                 {dataLang[e?.type_text]}
+                                                <div className="absolute inset-0 bg-white opacity-10 "></div>
                                             </h6>
 
                                             <h6 className="text-[13px] px-2 py-1.5 col-span-2   hover:font-normal cursor-pointer">
                                                 <div className="">
-                                                    <div className="">
-                                                        <h4 className="text-[13px]   w-[full] ">
+                                                    <div className="flex flex-col">
+                                                        <h4 className="text-[13px] w-[full] ">
                                                             {e?.name}
                                                         </h4>
-                                                        <h4 className="text-[13px]   w-[full] ">
+                                                        <h4 className="text-[13px] w-[full] ">
                                                             {
                                                                 e?.product_variation
                                                             }
                                                         </h4>
                                                     </div>
                                                     <div className="flex items-center gap-1">
-                                                        {dataProductSerial.is_enable ===
-                                                        "1" ? (
+                                                        {props.type ==
+                                                            "productsWarehouse" &&
+                                                        dataProductSerial.is_enable ===
+                                                            "1" ? (
                                                             <div className="flex gap-1 items-center italic font-normal text-[12px]">
                                                                 <h6>
                                                                     Serial:{" "}
                                                                 </h6>
-                                                                <h6 className=" w-[full] text-center">
+                                                                <h6 className="px-2 w-[full] text-center">
                                                                     {e.serial ==
                                                                         null ||
                                                                     e.serial ==
@@ -198,10 +186,14 @@ const Popup_status = (props) => {
                                                         ) : (
                                                             ""
                                                         )}
-                                                        {dataMaterialExpiry.is_enable ===
-                                                            "1" ||
-                                                        dataProductExpiry.is_enable ===
-                                                            "1" ? (
+                                                        {(props.type ==
+                                                            "productsWarehouse" &&
+                                                            dataProductExpiry.is_enable ===
+                                                                "1") ||
+                                                        (props.type ==
+                                                            "recall" &&
+                                                            dataMaterialExpiry.is_enable ===
+                                                                "1") ? (
                                                             <div className="flex">
                                                                 <div className="flex gap-1 items-center italic font-normal text-[12px]">
                                                                     <h6>
@@ -238,13 +230,21 @@ const Popup_status = (props) => {
                                                 </div>
                                             </h6>
                                             <h6 className="text-[13px] px-2 py-1.5 col-span-2 text-left hover:font-normal cursor-pointer">
-                                                <div className="flex flex-col">
-                                                    <span className="">
-                                                        {e?.warehouse_name}
-                                                    </span>
-                                                    <span className="">
-                                                        {e?.local_name}
-                                                    </span>
+                                                <div className="flex items-center gap-1">
+                                                    <div>
+                                                        <House
+                                                            size="30"
+                                                            color="#4f46e5"
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="">
+                                                            {e?.warehouse_name}
+                                                        </span>
+                                                        <span className="">
+                                                            {e?.local_name}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </h6>
                                             <h6 className="text-[13px] px-2 py-1.5 col-span-1 text-center hover:font-normal cursor-pointer">

@@ -48,6 +48,8 @@ import ExpandableContent from "components/UI/more";
 import Popup_chitiet from "./(popup)/pupup";
 import ImageErrors from "components/UI/imageErrors";
 import { useSelector } from "react-redux";
+// import Popup_status from "./(popup)/popupStatus";
+import Popup_status from "../(popupStatus)/popupStatus";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -423,6 +425,7 @@ const Index = (props) => {
         },
     ];
 
+    const [data_export, sData_export] = useState([]);
     const [errOpen, sErrOpen] = useState(false);
     const [checkedWare, sCheckedWare] = useState({});
     const _HandleChangeInput = (id, checkedUn, type, value) => {
@@ -482,6 +485,9 @@ const Index = (props) => {
                             title: `${dataLang[message]}`,
                         });
                     }
+                    if (data_export?.length > 0) {
+                        sData_export(data_export);
+                    }
                 }
                 sOnSending(false);
             }
@@ -507,6 +513,14 @@ const Index = (props) => {
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 {/* {data_export.length > 0 && <Popup_status className="hidden" data_export={data_export} dataLang={dataLang}/>} */}
                 {/* trangthaiExprired */}
+                {data_export.length > 0 && (
+                    <Popup_status
+                        type="recall"
+                        className="hidden"
+                        data_export={data_export}
+                        dataLang={dataLang}
+                    />
+                )}
                 {trangthaiExprired ? (
                     <div className="p-4"></div>
                 ) : (

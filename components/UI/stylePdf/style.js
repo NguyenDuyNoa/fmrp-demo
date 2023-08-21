@@ -1,11 +1,3 @@
-// export const styleHeaderTable = {
-//     noWrap: true,
-//     bold: true,
-//     color: "black",
-//     fontSize: 10,
-//     margin: [5, 15, 5, 15],
-// };
-
 export const styleMarginChild = [0, 4, 0, 4];
 
 export const styleMarginChildTotal = [0, 4, 0, 4];
@@ -34,7 +26,6 @@ export const styles = {
         color: "black",
         fontSize: 10,
         margin: [5, 10, 5, 10],
-        // alignment: 'center',
     },
     headerInfo: {
         alignment: "right",

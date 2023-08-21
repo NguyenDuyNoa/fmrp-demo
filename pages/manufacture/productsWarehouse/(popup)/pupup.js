@@ -359,18 +359,12 @@ const Popup_chitiet = (props) => {
                                                                                         Serial:
                                                                                     </h6>
                                                                                     <h6 className="text-[12px]  px-2   w-[full] text-left ">
-                                                                                        {e
-                                                                                            ?.item
-                                                                                            ?.serial ==
+                                                                                        {e?.serial ==
                                                                                             null ||
-                                                                                        e
-                                                                                            ?.item
-                                                                                            ?.serial ==
+                                                                                        e?.serial ==
                                                                                             ""
                                                                                             ? "-"
-                                                                                            : e
-                                                                                                  ?.item
-                                                                                                  ?.serial}
+                                                                                            : e?.serial}
                                                                                     </h6>
                                                                                 </div>
                                                                             ) : (

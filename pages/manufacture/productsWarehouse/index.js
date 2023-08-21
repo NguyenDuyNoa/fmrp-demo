@@ -48,7 +48,7 @@ import ExpandableContent from "components/UI/more";
 import Popup_chitiet from "./(popup)/pupup";
 import ImageErrors from "components/UI/imageErrors";
 import { useSelector } from "react-redux";
-import Popup_status from "./(popup)/popupStatus";
+import Popup_status from "../(popupStatus)/popupStatus";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -520,6 +520,7 @@ const Index = (props) => {
                 {/* trangthaiExprired */}
                 {data_export.length > 0 && (
                     <Popup_status
+                        type="productsWarehouse"
                         className="hidden"
                         data_export={data_export}
                         dataLang={dataLang}
