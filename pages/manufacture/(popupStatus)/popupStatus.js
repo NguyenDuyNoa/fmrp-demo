@@ -33,6 +33,8 @@ const Popup_status = (props) => {
     const [open, sOpen] = useState(false);
     const [data, sData] = useState([]);
 
+    const [currentColor, sCurrentColor] = useState("");
+
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
     const [dataProductExpiry, sDataProductExpiry] = useState({});
     const [dataProductSerial, sDataProductSerial] = useState({});
@@ -74,6 +76,8 @@ const Popup_status = (props) => {
 
     useEffect(() => {
         open && sOnFetching(true);
+        open && sCurrentColor(randomColor());
+
         setTimeout(() => {
             sOnFetching(false);
         }, 800);
@@ -89,6 +93,7 @@ const Popup_status = (props) => {
             }, 1000);
         }
     }, [props?.data_export]);
+
     return (
         <PopupEdit
             title={props.dataLang?.inventory_votes || "inventory_votes"}
@@ -96,7 +101,7 @@ const Popup_status = (props) => {
             onClose={() => sOpen(false)}
             classNameBtn={props.className}
         >
-            <div className="space-x-5 3xl:w-[1000px] 2xl:w-[1000px]  xl:w-[1000px] lg:w-[900px] w-[1000px] 3xl:h-auto xxl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">
+            <div className=" space-x-5 3xl:w-[1000px] 2xl:w-[1000px]  xl:w-[1000px] lg:w-[700px] w-[1000px] 3xl:h-auto xxl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">
                 <div className="min:h-[200px] h-[82%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                     <div className="">
                         <div
@@ -147,7 +152,7 @@ const Popup_status = (props) => {
                                                 {e?.code_coupon}
                                             </h6>
                                             <h6
-                                                className={`3xl:text-[12px] relative 2xl:text-[10px] text-[10px] px-2 ${randomColor} rounded-2xl text-center text-white py-1 col-span-1  hover:font-normal cursor-pointer`}
+                                                className={`3xl:text-[12px] relative 2xl:text-[10px] text-[10px] px-2 ${currentColor} rounded-2xl text-center text-white py-1 col-span-1  hover:font-normal cursor-pointer`}
                                             >
                                                 {dataLang[e?.type_text]}
                                                 <div className="absolute inset-0 bg-white opacity-10 "></div>
