@@ -1143,7 +1143,7 @@ const Index = (props) => {
                                     />
                                     {errRecallWarehouse && (
                                         <label className="text-sm text-red-500">
-                                            {"Vui lòng chọn location"}
+                                            {"Vui lòng chọn vị trí"}
                                         </label>
                                     )}
                                 </div>
