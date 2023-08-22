@@ -1236,8 +1236,8 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.production_warehouse_orderNumber ||
-                                            "production_warehouse_orderNumber"}
+                                        {dataLang?.production_warehouse_LSX ||
+                                            "production_warehouse_LSX"}
                                     </label>
                                     <Select
                                         options={[]}
@@ -1257,8 +1257,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={
-                                            dataLang?.production_warehouse_orderNumber ||
-                                            "production_warehouse_orderNumber"
+                                            dataLang?.production_warehouse_LSX ||
+                                            "production_warehouse_LSX"
                                         }
                                         className={`${"border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
