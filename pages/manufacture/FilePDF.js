@@ -1574,7 +1574,7 @@ const FilePDF = ({
                 table: {
                     widths: "100%",
                     headerRows: 0,
-                    widths: props?.type == "production_warehouse" && [
+                    widths: props?.type == "recall" && [
                         "auto",
                         "auto",
                         "auto",
