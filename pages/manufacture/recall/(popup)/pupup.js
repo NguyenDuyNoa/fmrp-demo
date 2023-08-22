@@ -533,13 +533,13 @@ const Popup_chitiet = (props) => {
                                                     "recall_totalQty"}
                                             </h3>
                                         </div>
-                                        <div className="font-medium text-left text-[13px]">
+                                        {/* <div className="font-medium text-left text-[13px]">
                                             <h3>
                                                 {props.dataLang
                                                     ?.recall_totalAmount ||
                                                     "recall_totalAmount"}
                                             </h3>
-                                        </div>
+                                        </div> */}
                                     </div>
                                     <div className="col-span-3 space-y-1 text-right">
                                         <div className="font-medium mr-2.5">
@@ -563,7 +563,7 @@ const Popup_chitiet = (props) => {
                                                 )}
                                             </h3>
                                         </div>
-                                        <div className="font-medium mr-2.5">
+                                        {/* <div className="font-medium mr-2.5">
                                             <h3 className="text-right text-blue-600 text-[13px]">
                                                 {formatNumber(
                                                     data?.items?.reduce(
@@ -576,7 +576,7 @@ const Popup_chitiet = (props) => {
                                                     )
                                                 )}
                                             </h3>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             </div>

@@ -2066,7 +2066,7 @@ const Index = (props) => {
                                 </h3>
                             </div>
                         </div>
-                        <div className="flex justify-between ">
+                        {/* <div className="flex justify-between ">
                             <div className="font-normal">
                                 <h3>
                                     {dataLang?.recall_totalAmount ||
@@ -2096,7 +2096,7 @@ const Index = (props) => {
                                     )}
                                 </h3>
                             </div>
-                        </div>
+                        </div> */}
                         <div className="space-x-2">
                             <button
                                 onClick={() =>
