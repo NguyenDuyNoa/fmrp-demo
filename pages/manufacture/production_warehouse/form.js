@@ -1977,7 +1977,7 @@ const Index = (props) => {
                                                                                     null ||
                                                                                     ce?.unit ==
                                                                                         null) &&
-                                                                                "Chọn location và đơn vị tính trước"
+                                                                                "Chọn vị trí và Đvt trước"
                                                                             }
                                                                             disabled={
                                                                                 ce?.location ==
