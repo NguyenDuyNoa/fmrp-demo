@@ -77,7 +77,6 @@ const Popup_status = (props) => {
     useEffect(() => {
         open && sOnFetching(true);
         open && sCurrentColor(randomColor());
-
         setTimeout(() => {
             sOnFetching(false);
         }, 800);

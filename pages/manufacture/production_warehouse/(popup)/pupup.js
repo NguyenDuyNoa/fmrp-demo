@@ -210,19 +210,6 @@ const Popup_chitiet = (props) => {
                                                     ?.production_warehouse_LSX ||
                                                     "production_warehouse_LSX"}
                                             </h3>
-                                            {/* <div className="flex flex-wrap  gap-2 items-center">
-                        {(data?.treatment_methods === "1" && (
-                          <div className="cursor-default min-w-[135px] min-w-auto text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-lime-500 bg-lime-200  border-lime-200  px-2 py-1 border  rounded-2xl">
-                            {props.dataLang?.pay_down || "pay_down"}
-                          </div>
-                        )) ||
-                          (data?.treatment_methods === "2" && (
-                            <div className="cursor-default min-w-[135px] text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-orange-500 bg-orange-200  border-orange-200 px-2 py-1 border   rounded-2xl">
-                              {props.dataLang?.debt_reduction ||
-                                "debt_reduction"}
-                            </div>
-                          ))}
-                      </div> */}
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
@@ -251,6 +238,16 @@ const Popup_chitiet = (props) => {
                                                         </div>
                                                     ))}
                                             </div>
+                                        </div>
+                                        <div className="my-2 font-medium grid grid-cols-2">
+                                            <h3 className="text-[13px]">
+                                                {props?.dataLang
+                                                    ?.production_warehouse_expWarehouse ||
+                                                    "production_warehouse_expWarehouse"}
+                                            </h3>
+                                            <h3 className="text-[13px] font-medium capitalize">
+                                                {data?.warehouse_name}
+                                            </h3>
                                         </div>
                                     </div>
                                     <div className="col-span-3 ">
@@ -294,8 +291,8 @@ const Popup_chitiet = (props) => {
                                         {/* <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4>  */}
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                                             {props?.dataLang
-                                                ?.production_warehouse_location ||
-                                                "production_warehouse_location"}
+                                                ?.production_warehouse_expLoca ||
+                                                "production_warehouse_expLoca"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                                             {props.dataLang
@@ -466,13 +463,13 @@ const Popup_chitiet = (props) => {
                                                                 </div>
                                                             </h6>
                                                             <h6 className="text-[13px]   px-2 py-2 col-span-2 text-left break-words">
-                                                                <h6 className="font-medium">
+                                                                {/* <h6 className="font-medium">
                                                                     {
                                                                         e
                                                                             ?.warehouse_location
                                                                             ?.warehouse_name
                                                                     }
-                                                                </h6>
+                                                                </h6> */}
                                                                 <h6 className="font-medium">
                                                                     {
                                                                         e

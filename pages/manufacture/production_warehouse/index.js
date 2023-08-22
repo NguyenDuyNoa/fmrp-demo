@@ -80,6 +80,8 @@ const Index = (props) => {
     const [listBr, sListBr] = useState([]);
     const [lisCode, sListCode] = useState([]);
     const [listSupplier, sListSupplier] = useState([]);
+    const [idExportWarehouse, sIdExportWarehouse] = useState(null);
+    const [dataWarehouse, sDataWarehouse] = useState([]);
 
     const [listDs, sListDs] = useState();
 
@@ -126,6 +128,10 @@ const Index = (props) => {
                             : null,
                     "filter[end_date]":
                         valueDate?.endDate != null ? valueDate?.endDate : null,
+                    "filter[warehouse_id]":
+                        idExportWarehouse != null
+                            ? idExportWarehouse?.value
+                            : null,
                 },
             },
             (err, response) => {
@@ -159,6 +165,10 @@ const Index = (props) => {
                             : null,
                     "filter[end_date]":
                         valueDate?.endDate != null ? valueDate?.endDate : null,
+                    "filter[warehouse_id]":
+                        idExportWarehouse != null
+                            ? idExportWarehouse?.value
+                            : null,
                 },
             },
             (err, response) => {
@@ -179,7 +189,9 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     var { isSuccess, result } = response.data;
-                    sListBr(result);
+                    sListBr(
+                        result?.map((e) => ({ label: e.name, value: e.id }))
+                    );
                 }
             }
         );
@@ -190,7 +202,28 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     var { isSuccess, result } = response?.data;
-                    sListCode(result);
+                    sListCode(
+                        result?.map((e) => ({
+                            label: `${e.code}`,
+                            value: e.id,
+                        }))
+                    );
+                }
+            }
+        );
+        Axios(
+            "GET",
+            "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
+            {},
+            (err, response) => {
+                if (!err) {
+                    var data = response?.data;
+                    sDataWarehouse(
+                        data?.map((e) => ({
+                            label: e?.warehouse_name,
+                            value: e?.id,
+                        }))
+                    );
                 }
             }
         );
@@ -233,7 +266,8 @@ const Index = (props) => {
                 valueDate.endDate != null &&
                 sOnFetching(true)) ||
             (idSupplier != null && sOnFetching(true)) ||
-            (idCode != null && sOnFetching(true));
+            (idCode != null && sOnFetching(true)) ||
+            (idExportWarehouse != null && sOnFetching(true));
     }, [
         limit,
         router.query?.page,
@@ -243,6 +277,7 @@ const Index = (props) => {
         valueDate.startDate,
         idSupplier,
         idCode,
+        idExportWarehouse,
     ]);
 
     const formatNumber = (number) => {
@@ -280,13 +315,6 @@ const Index = (props) => {
         });
     };
 
-    const listBr_filter = listBr
-        ? listBr?.map((e) => ({ label: e.name, value: e.id }))
-        : [];
-    const listCode_filter = lisCode
-        ? lisCode?.map((e) => ({ label: `${e.code}`, value: e.id }))
-        : [];
-
     const onchang_filter = (type, value) => {
         if (type == "branch") {
             sIdBranch(value);
@@ -296,6 +324,8 @@ const Index = (props) => {
             sIdSupplier(value);
         } else if (type == "code") {
             sIdCode(value);
+        } else if (type == "idExportWarehouse") {
+            sIdExportWarehouse(value);
         }
     };
 
@@ -612,7 +642,7 @@ const Index = (props) => {
                                                                     "purchase_order_branch",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listBr_filter,
+                                                            ...listBr,
                                                         ]}
                                                         onChange={onchang_filter.bind(
                                                             this,
@@ -688,7 +718,7 @@ const Index = (props) => {
                                                                     "purchase_order_vouchercode",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listCode_filter,
+                                                            ...lisCode,
                                                         ]}
                                                         onChange={onchang_filter.bind(
                                                             this,
@@ -698,6 +728,80 @@ const Index = (props) => {
                                                         placeholder={
                                                             dataLang?.purchase_order_table_code ||
                                                             "purchase_order_table_code"
+                                                        }
+                                                        hideSelectedOptions={
+                                                            false
+                                                        }
+                                                        isClearable={true}
+                                                        className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
+                                                        isSearchable={true}
+                                                        noOptionsMessage={() =>
+                                                            dataLang?.returns_nodata ||
+                                                            "returns_nodata"
+                                                        }
+                                                        style={{
+                                                            border: "none",
+                                                            boxShadow: "none",
+                                                            outline: "none",
+                                                        }}
+                                                        theme={(theme) => ({
+                                                            ...theme,
+                                                            colors: {
+                                                                ...theme.colors,
+                                                                primary25:
+                                                                    "#EBF5FF",
+                                                                primary50:
+                                                                    "#92BFF7",
+                                                                primary:
+                                                                    "#0F4F9E",
+                                                            },
+                                                        })}
+                                                        styles={{
+                                                            placeholder: (
+                                                                base
+                                                            ) => ({
+                                                                ...base,
+                                                                color: "#cbd5e1",
+                                                            }),
+                                                            control: (
+                                                                base,
+                                                                state
+                                                            ) => ({
+                                                                ...base,
+                                                                border: "none",
+                                                                outline: "none",
+                                                                boxShadow:
+                                                                    "none",
+                                                                ...(state.isFocused && {
+                                                                    boxShadow:
+                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                }),
+                                                            }),
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className="ml-1 col-span-1">
+                                                    <Select
+                                                        options={[
+                                                            {
+                                                                value: "",
+                                                                label:
+                                                                    dataLang?.production_warehouse_expWarehouse ||
+                                                                    "production_warehouse_expWarehouse",
+                                                                isDisabled: true,
+                                                            },
+                                                            ...dataWarehouse,
+                                                        ]}
+                                                        onChange={onchang_filter.bind(
+                                                            this,
+                                                            "idExportWarehouse"
+                                                        )}
+                                                        value={
+                                                            idExportWarehouse
+                                                        }
+                                                        placeholder={
+                                                            dataLang?.production_warehouse_expWarehouse ||
+                                                            "production_warehouse_expWarehouse"
                                                         }
                                                         hideSelectedOptions={
                                                             false
@@ -891,7 +995,7 @@ const Index = (props) => {
                                 </div>
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%]">
-                                        <div className="grid grid-cols-9 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
+                                        <div className="grid grid-cols-10 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.import_day_vouchers ||
                                                     "import_day_vouchers"}
@@ -903,6 +1007,10 @@ const Index = (props) => {
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.production_warehouse_LSX ||
                                                     "production_warehouse_LSX"}
+                                            </h4>
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.production_warehouse_expWarehouse ||
+                                                    "production_warehouse_expWarehouse"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.production_warehouse_Total_value ||
@@ -939,7 +1047,7 @@ const Index = (props) => {
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                                     {data?.map((e) => (
                                                         <div
-                                                            className="relative  grid grid-cols-9 items-center py-1.5  hover:bg-slate-100/40 group"
+                                                            className="relative  grid grid-cols-10 items-center py-1.5  hover:bg-slate-100/40 group"
                                                             key={e.id.toString()}
                                                         >
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
@@ -965,6 +1073,11 @@ const Index = (props) => {
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
                                                                 {/* {formatNumber(e.total_price)} */}
+                                                            </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left">
+                                                                {
+                                                                    e?.warehouse_name
+                                                                }
                                                             </h6>
 
                                                             <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-center flex items-center justify-end space-x-1">

@@ -240,6 +240,25 @@ const FilePDF = ({
                 ],
                 margin: [0, 0, 0, 2],
             },
+
+            {
+                text: [
+                    {
+                        text: `${
+                            props.dataLang?.production_warehouse_expWarehouse +
+                                ": " || "production_warehouse_expWarehouse"
+                        } `,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text: `${data?.warehouse_name}`,
+                        bold: true,
+                        fontSize: 10,
+                    },
+                ],
+                margin: [0, 2, 0, 2],
+            },
             {
                 text: [
                     {
@@ -312,7 +331,7 @@ const FilePDF = ({
                                 "center"
                             ),
                             uppercaseTextHeaderTabel(
-                                `${"KX - VTX"}`,
+                                `${"VTX"}`,
                                 "headerTable",
                                 "center"
                             ),
@@ -470,22 +489,11 @@ const FilePDF = ({
                                           stack: stackBt,
                                       },
                                       {
-                                          stack: [
-                                              {
-                                                  text: item?.warehouse_location
-                                                      ?.warehouse_name
-                                                      ? `${item?.warehouse_location?.warehouse_name}`
-                                                      : "",
-                                              },
-                                              {
-                                                  text: item?.warehouse_location
-                                                      ?.location_name
-                                                      ? `(${item?.warehouse_location?.location_name})`
-                                                      : "",
-                                                  italics: true,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                          ],
+                                          text: item?.warehouse_location
+                                              ?.location_name
+                                              ? `${item?.warehouse_location?.location_name}`
+                                              : "",
+                                          margin: [0, 5, 0, 0],
                                           fontSize: 10,
                                           alignment: "left",
                                           margin: styleMarginChild,
@@ -894,6 +902,42 @@ const FilePDF = ({
                 text: [
                     {
                         text: `${
+                            props.dataLang?.productsWarehouse_warehouseImport +
+                                ": " || "productsWarehouse_warehouseImport"
+                        } `,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text: `${data?.warehouse_name}`,
+                        bold: true,
+                        fontSize: 10,
+                    },
+                ],
+                margin: [0, 2, 0, 2],
+            },
+            {
+                text: [
+                    {
+                        text: `${
+                            props.dataLang?.production_warehouse_Total_value +
+                                ": " || "production_warehouse_Total_value"
+                        }`,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text: `${formatNumber(data?.grand_total)}`,
+                        bold: true,
+                        fontSize: 10,
+                    },
+                ],
+                margin: [0, 0, 0, 2],
+            },
+            {
+                text: [
+                    {
+                        text: `${
                             props.dataLang?.purchase_order_note + ": " ||
                             "purchase_order_note"
                         } `,
@@ -944,8 +988,8 @@ const FilePDF = ({
                             uppercaseTextHeaderTabel(
                                 `${
                                     props.dataLang
-                                        ?.productsWarehouse_warehouse ||
-                                    "productsWarehouse_warehouse"
+                                        ?.productsWarehouse_warehouseLocaImport ||
+                                    "productsWarehouse_warehouseLocaImport"
                                 }`,
                                 "headerTable",
                                 "center"
@@ -1085,18 +1129,18 @@ const FilePDF = ({
                                       },
                                       {
                                           stack: [
-                                              {
-                                                  text: item?.warehouse_location
-                                                      ?.warehouse_name
-                                                      ? `${item?.warehouse_location?.warehouse_name}`
-                                                      : "",
-                                              },
+                                              //   {
+                                              //       text: item?.warehouse_location
+                                              //           ?.warehouse_name
+                                              //           ? `${item?.warehouse_location?.warehouse_name}`
+                                              //           : "",
+                                              //   },
                                               {
                                                   text: item?.warehouse_location
                                                       ?.location_name
-                                                      ? `(${item?.warehouse_location?.location_name})`
+                                                      ? `${item?.warehouse_location?.location_name}`
                                                       : "",
-                                                  italics: true,
+                                                  //   italics: true,
                                                   margin: [0, 5, 0, 0],
                                               },
                                           ],
@@ -1480,6 +1524,42 @@ const FilePDF = ({
                 text: [
                     {
                         text: `${
+                            props.dataLang?.recall_wareChild + ": " ||
+                            "recall_wareChild"
+                        } `,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text: `${data?.warehouse_name}`,
+                        bold: true,
+                        fontSize: 10,
+                    },
+                ],
+                margin: [0, 2, 0, 2],
+            },
+            {
+                text: [
+                    {
+                        text: `${
+                            props.dataLang?.production_warehouse_Total_value +
+                                ": " || "production_warehouse_Total_value"
+                        }`,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text: `${formatNumber(data?.grand_total)}`,
+                        bold: true,
+                        fontSize: 10,
+                    },
+                ],
+                margin: [0, 0, 0, 2],
+            },
+            {
+                text: [
+                    {
+                        text: `${
                             props.dataLang?.purchase_order_note + ": " ||
                             "purchase_order_note"
                         } `,
@@ -1501,8 +1581,8 @@ const FilePDF = ({
                         "auto",
                         "auto",
                         "auto",
-                        "auto",
-                        "auto",
+                        // "auto",
+                        // "auto",
                         "*",
                     ],
                     body: [
@@ -1530,39 +1610,45 @@ const FilePDF = ({
                                 "center"
                             ),
                             uppercaseTextHeaderTabel(
-                                `${"KT - VTT"}`,
-                                "headerTable",
-                                "center"
-                            ),
-                            uppercaseTextHeaderTabel(
-                                `${"ĐVT"}`,
-                                "headerTable",
-                                "center"
-                            ),
-                            uppercaseTextHeaderTabel(
                                 `${
-                                    props?.dataLang?.recall_revenueSL ||
-                                    "recall_revenueSL"
+                                    props.dataLang?.recall_locationChild ||
+                                    "recall_locationChild"
                                 }`,
                                 "headerTable",
                                 "center"
                             ),
                             uppercaseTextHeaderTabel(
                                 `${
-                                    props?.dataLang?.recall_price ||
-                                    "recall_price"
+                                    props.dataLang?.production_warehouse_unit ||
+                                    "production_warehouse_unit"
                                 }`,
                                 "headerTable",
                                 "center"
                             ),
                             uppercaseTextHeaderTabel(
                                 `${
-                                    props?.dataLang?.recall_money ||
-                                    "recall_money"
+                                    props?.dataLang?.recall_revenueQty ||
+                                    "recall_revenueQty"
                                 }`,
                                 "headerTable",
                                 "center"
                             ),
+                            // uppercaseTextHeaderTabel(
+                            //     `${
+                            //         props?.dataLang?.recall_price ||
+                            //         "recall_price"
+                            //     }`,
+                            //     "headerTable",
+                            //     "center"
+                            // ),
+                            // uppercaseTextHeaderTabel(
+                            //     `${
+                            //         props?.dataLang?.recall_money ||
+                            //         "recall_money"
+                            //     }`,
+                            //     "headerTable",
+                            //     "center"
+                            // ),
                             uppercaseTextHeaderTabel(
                                 `${
                                     props.dataLang?.serviceVoucher_note ||
@@ -1685,22 +1771,11 @@ const FilePDF = ({
                                           stack: stackBt,
                                       },
                                       {
-                                          stack: [
-                                              {
-                                                  text: item?.warehouse
-                                                      ?.warehouse_name
-                                                      ? `${item?.warehouse?.warehouse_name}`
-                                                      : "",
-                                              },
-                                              {
-                                                  text: item?.warehouse
-                                                      ?.location_name
-                                                      ? `(${item?.warehouse?.location_name})`
-                                                      : "",
-                                                  italics: true,
-                                                  margin: [0, 5, 0, 0],
-                                              },
-                                          ],
+                                          text: item?.warehouse?.location_name
+                                              ? `${item?.warehouse?.location_name}`
+                                              : "",
+                                          //   italics: true,
+                                          margin: [0, 5, 0, 0],
                                           fontSize: 10,
                                           alignment: "left",
                                           margin: styleMarginChild,
@@ -1724,22 +1799,22 @@ const FilePDF = ({
                                           fontSize: 10,
                                           margin: styleMarginChild,
                                       },
-                                      {
-                                          text: item?.price
-                                              ? `${formatNumber(+item?.price)}`
-                                              : "",
-                                          alignment: "center",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      },
-                                      {
-                                          text: item?.amount
-                                              ? `${formatNumber(+item?.amount)}`
-                                              : "",
-                                          alignment: "center",
-                                          fontSize: 10,
-                                          margin: styleMarginChild,
-                                      },
+                                      //   {
+                                      //       text: item?.price
+                                      //           ? `${formatNumber(+item?.price)}`
+                                      //           : "",
+                                      //       alignment: "center",
+                                      //       fontSize: 10,
+                                      //       margin: styleMarginChild,
+                                      //   },
+                                      //   {
+                                      //       text: item?.amount
+                                      //           ? `${formatNumber(+item?.amount)}`
+                                      //           : "",
+                                      //       alignment: "center",
+                                      //       fontSize: 10,
+                                      //       margin: styleMarginChild,
+                                      //   },
 
                                       {
                                           text: item?.note ? item?.note : "",
@@ -1766,13 +1841,13 @@ const FilePDF = ({
                                 text: `${formatNumber(data?.items?.length)}`,
                                 bold: true,
                                 alignment: "right",
-                                colSpan: 7,
+                                colSpan: 5,
                                 fontSize: 10,
                                 margin: styleMarginChildTotal,
                             },
                             "",
-                            "",
-                            "",
+                            // "",
+                            // "",
                             "",
                             "",
                         ],
@@ -1792,22 +1867,23 @@ const FilePDF = ({
                                 text: `${formatNumber(
                                     data?.items?.reduce(
                                         (total, item) =>
-                                            (total += Number(
-                                                item.quantity * item.price
-                                            )),
+                                            // (total += Number(
+                                            //     item.quantity * item.price
+                                            // )),
+                                            (total += item.quantity),
                                         0
                                     )
                                 )}`,
                                 bold: true,
                                 alignment: "right",
-                                colSpan: 7,
+                                colSpan: 5,
                                 fontSize: 10,
                                 margin: styleMarginChildTotal,
                             },
                             "",
                             "",
-                            "",
-                            "",
+                            // "",
+                            // "",
                             "",
                             "",
                         ],

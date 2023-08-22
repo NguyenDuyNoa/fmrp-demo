@@ -207,8 +207,30 @@ const Popup_chitiet = (props) => {
                                                     ))}
                                             </div>
                                         </div>
+                                        <div className="my-2 font-medium grid grid-cols-2">
+                                            <h3 className="text-[13px]">
+                                                {props?.dataLang
+                                                    ?.productsWarehouse_warehouseImport ||
+                                                    "productsWarehouse_warehouseImport"}
+                                            </h3>
+                                            <h3 className="text-[13px] font-medium capitalize">
+                                                {data?.warehouse_name}
+                                            </h3>
+                                        </div>
                                     </div>
                                     <div className="col-span-3 ">
+                                        <div className="my-2 font-medium grid grid-cols-2">
+                                            <h3 className="text-[13px]">
+                                                {props?.dataLang
+                                                    ?.production_warehouse_Total_value ||
+                                                    "production_warehouse_Total_value"}
+                                            </h3>
+                                            <h3 className="text-[13px] font-medium capitalize">
+                                                {formatNumber(
+                                                    data?.grand_total
+                                                )}
+                                            </h3>
+                                        </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
                                                 {props?.dataLang
@@ -242,6 +264,7 @@ const Popup_chitiet = (props) => {
                                                 </h6>
                                             </div>
                                         </div>
+
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
                                                 {props.dataLang
@@ -270,8 +293,8 @@ const Popup_chitiet = (props) => {
                                         {/* <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4>  */}
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                                             {props.dataLang
-                                                ?.productsWarehouse_warehouse ||
-                                                "productsWarehouse_warehouse"}
+                                                ?.productsWarehouse_warehouseLocaImport ||
+                                                "productsWarehouse_warehouseLocaImport"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                                             {"ĐVT"}
@@ -409,11 +432,11 @@ const Popup_chitiet = (props) => {
                                                                 </div>
                                                             </h6>
                                                             <h6 className="text-[13px]   px-2 py-2 col-span-2 text-left break-words">
-                                                                <h6 className="font-medium">
+                                                                {/* <h6 className="font-medium">
                                                                     {
                                                                         e?.warehouse_name
                                                                     }
-                                                                </h6>
+                                                                </h6> */}
                                                                 <h6 className="font-medium">
                                                                     {
                                                                         e?.location_name

@@ -44,6 +44,7 @@ const Index = (props) => {
     const [onFetchingCondition, sOnFetchingCondition] = useState(false);
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
     const [onFetchingWarehouser, sOnFetchingWarehouse] = useState(false);
+    const [onFetchingLocation, sOnFetchingLocation] = useState(false);
 
     const [onLoading, sOnLoading] = useState(false);
     const [onLoadingChild, sOnLoadingChild] = useState(false);
@@ -58,6 +59,7 @@ const Index = (props) => {
 
     const [dataBranch, sDataBranch] = useState([]);
     const [dataItems, sDataItems] = useState([]);
+    const [dataLocation, sDataLocation] = useState([]);
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
     const [dataProductExpiry, sDataProductExpiry] = useState({});
@@ -70,6 +72,7 @@ const Index = (props) => {
     const [warehouse, sDataWarehouse] = useState([]);
 
     const [idBranch, sIdBranch] = useState(null);
+    const [idRecalltWarehouse, sIdRecalltWarehouse] = useState(null);
 
     const [errDate, sErrDate] = useState(false);
     const [errBranch, sErrBranch] = useState(false);
@@ -77,10 +80,11 @@ const Index = (props) => {
     const [errQty, sErrQty] = useState(false);
     const [errLot, sErrLot] = useState(false);
     const [errDateList, sErrDateList] = useState(false);
-
+    const [errRecallWarehouse, sErrRecallWarehouse] = useState(false);
     useEffect(() => {
         router.query && sErrDate(false);
         router.query && sErrBranch(false);
+        router.query && sErrRecallWarehouse(false);
         router.query && sStartDate(new Date());
         router.query && sNote("");
     }, [router.query]);
@@ -174,6 +178,10 @@ const Index = (props) => {
                         label: rResult?.branch_name,
                         value: rResult?.branch_id,
                     });
+                    sIdRecalltWarehouse({
+                        label: rResult?.warehouse_name,
+                        value: rResult?.warehouse_id,
+                    });
                     sListData(
                         rResult?.items.map((e) => ({
                             id: e?.item?.id,
@@ -200,7 +208,7 @@ const Index = (props) => {
                                     (e.item?.text_type == "material" &&
                                         dataMaterialExpiry?.is_enable == "0" &&
                                         true),
-                                kho: {
+                                location: {
                                     label: ce?.warehouse?.location_name,
                                     value: ce?.warehouse?.id,
                                     warehouse_name:
@@ -265,7 +273,6 @@ const Index = (props) => {
     };
 
     const _ServerFetching_Warehouse = () => {
-        sOnLoadingChild(true);
         Axios(
             "GET",
             `/api_web/Api_warehouse/warehouseLocationCombobox/?csrf_protection=true`,
@@ -279,12 +286,11 @@ const Index = (props) => {
                     var result = response.data;
                     sDataWarehouse(
                         result?.map((e) => ({
-                            label: e?.location_name,
+                            label: e?.warehouse_name,
                             value: e?.id,
-                            warehouse_name: e?.warehouse_name,
+                            // warehouse_name: e?.warehouse_name,
                         }))
                     );
-                    sOnLoadingChild(false);
                 }
             }
         );
@@ -314,6 +320,34 @@ const Index = (props) => {
             );
     };
 
+    const _ServerFetching_Location = async () => {
+        await Axios(
+            "GET",
+            "/api_web/Api_warehouse/warehouseLocationCombobox/?csrf_protection=true",
+            {
+                params: {
+                    "filter[branch_id]": idBranch ? idBranch?.value : null,
+                    "filter[warehouse_id]": idRecalltWarehouse
+                        ? idRecalltWarehouse?.value
+                        : null,
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    var data = response.data;
+                    // console.log("result", data);
+                    sDataLocation(
+                        data?.map((e) => ({
+                            label: e?.location_name,
+                            value: e?.id,
+                        }))
+                    );
+                }
+            }
+        );
+        sOnFetchingLocation(false);
+    };
+
     const _HandleChangeInput = (type, value) => {
         if (type == "code") {
             sCode(value.target.value);
@@ -340,6 +374,8 @@ const Index = (props) => {
                             sDataItems([]);
                             sListData([]);
                             sIdBranch(value);
+                            sIdRecalltWarehouse(null);
+                            sDataWarehouse([]);
                         } else {
                             sIdBranch({ ...idBranch });
                         }
@@ -347,6 +383,34 @@ const Index = (props) => {
                 }
             } else {
                 sIdBranch(value);
+            }
+        } else if (
+            type == "idRecalltWarehouse" &&
+            idRecalltWarehouse != value
+        ) {
+            if (listData?.length > 0) {
+                Swal.fire({
+                    title: `${
+                        dataLang?.returns_err_DeleteItem ||
+                        "returns_err_DeleteItem"
+                    }`,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#296dc1",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: `${dataLang?.aler_yes}`,
+                    cancelButtonText: `${dataLang?.aler_cancel}`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        sDataItems([]);
+                        sListData([]);
+                        sIdRecalltWarehouse(value);
+                    } else {
+                        sIdRecalltWarehouse({ ...idRecalltWarehouse });
+                    }
+                });
+            } else {
+                sIdRecalltWarehouse(value);
             }
         }
     };
@@ -372,7 +436,7 @@ const Index = (props) => {
 
         const hasNullKho = hasNullOrCondition(
             listData,
-            (item, childItem) => childItem.kho === null
+            (item, childItem) => childItem.location === null
         );
 
         const hasNullSerial = hasNullOrCondition(
@@ -400,10 +464,11 @@ const Index = (props) => {
             (item, childItem) =>
                 childItem.recallQuantity === null ||
                 childItem.recallQuantity === "" ||
-                childItem.recallQuantity == 0 ||
-                childItem.price === null ||
-                childItem.price === "" ||
-                childItem.price == 0
+                childItem.recallQuantity == 0
+            // ||
+            // childItem.price === null ||
+            // childItem.price === "" ||
+            // childItem.price == 0
         );
 
         const isEmpty = listData?.length === 0;
@@ -413,12 +478,13 @@ const Index = (props) => {
             hasNullKho ||
             hasNullQty ||
             isEmpty ||
+            idRecalltWarehouse == null ||
             (dataMaterialExpiry?.is_enable == "1" && hasNullLot) ||
             (dataMaterialExpiry?.is_enable == "1" && hasNullDate)
         ) {
             idBranch == null && sErrBranch(true);
             hasNullKho && sErrWarehouse(true);
-
+            idRecalltWarehouse == null && sErrRecallWarehouse(true);
             hasNullQty && sErrQty(true);
             hasNullKho && sErrWarehouse(true);
             hasNullLot && sErrLot(true);
@@ -430,6 +496,7 @@ const Index = (props) => {
             }
         } else {
             sErrWarehouse(false);
+
             sErrQty(false);
             sErrLot(false);
             sErrDateList(false);
@@ -443,6 +510,9 @@ const Index = (props) => {
     useEffect(() => {
         sErrBranch(false);
     }, [idBranch != null]);
+    useEffect(() => {
+        sErrRecallWarehouse(false);
+    }, [idRecalltWarehouse != null]);
 
     useEffect(() => {
         router.query && sOnFetching(true);
@@ -457,15 +527,21 @@ const Index = (props) => {
     }, [onFetchingItemsAll]);
 
     useEffect(() => {
+        onFetchingLocation && _ServerFetching_Location();
+    }, [onFetchingLocation]);
+    ``;
+
+    useEffect(() => {
         (idBranch != null && sOnFetchingItemsAll(true)) ||
-            (idBranch != null && sOnFetchingWarehouse(true));
-    }, [idBranch]);
+            (idBranch != null && sOnFetchingWarehouse(true)) ||
+            (idRecalltWarehouse && sOnFetchingLocation(true));
+    }, [idBranch, idRecalltWarehouse]);
 
     const formatNumber = (number) => {
         // const integerPart = Math.floor(number);
         return number.toLocaleString("en");
     };
-
+    console.log("listData", listData);
     const _ServerSending = () => {
         var formData = new FormData();
         formData.append("code", code);
@@ -474,6 +550,7 @@ const Index = (props) => {
             moment(startDate).format("YYYY-MM-DD HH:mm:ss")
         );
         formData.append("branch_id", idBranch?.value);
+        formData.append("warehouse_id", idRecalltWarehouse?.value);
         formData.append("note", note);
         listData.forEach((item, index) => {
             formData.append(
@@ -486,10 +563,10 @@ const Index = (props) => {
                     `items[${index}][child][${childIndex}][row_id]`,
                     id ? childItem?.idChildBackEnd : ""
                 );
-                formData.append(
-                    `items[${index}][child][${childIndex}][price]`,
-                    childItem?.price ? childItem?.price : ""
-                );
+                // formData.append(
+                //     `items[${index}][child][${childIndex}][price]`,
+                //     childItem?.price ? childItem?.price : ""
+                // );
                 formData.append(
                     `items[${index}][child][${childIndex}][lot]`,
                     childItem?.lot === null ? "" : childItem?.lot
@@ -502,7 +579,7 @@ const Index = (props) => {
                 );
                 formData.append(
                     `items[${index}][child][${childIndex}][location_warehouses_id]`,
-                    childItem?.kho?.value
+                    childItem?.location?.value
                 );
                 formData.append(
                     `items[${index}][child][${childIndex}][note]`,
@@ -569,7 +646,7 @@ const Index = (props) => {
                         (value?.e?.text_type === "material" &&
                             dataMaterialExpiry?.is_enable === "0" &&
                             true),
-                    kho: null,
+                    location: null,
                     unit: value?.e?.unit_name || value?.e?.unit,
                     serial: "",
                     lot: "",
@@ -613,7 +690,7 @@ const Index = (props) => {
                                 (value?.e?.text_type === "material" &&
                                     dataMaterialExpiry?.is_enable === "0" &&
                                     true),
-                            kho: null,
+                            location: null,
                             serial: "",
                             lot: "",
                             date: null,
@@ -660,7 +737,7 @@ const Index = (props) => {
                 .map((e) => {
                     if (e.id === parentId) {
                         const newChild = e.child?.filter(
-                            (ce) => ce?.kho !== null
+                            (ce) => ce?.location !== null
                         );
                         return { ...e, child: newChild };
                     }
@@ -688,16 +765,14 @@ const Index = (props) => {
                     if (type === "recallQuantity") {
                         const newQtyImport = Number(value?.value);
                         updatedChild.recallQuantity = newQtyImport;
-                    } else if (type === "kho") {
+                    } else if (type === "location") {
                         const checkKho = newData[parentIndex].child
                             .map((house) => house)
-                            .some((i) => i?.kho?.value === value?.value);
+                            .some((i) => i?.location?.value === value?.value);
                         if (checkKho) {
-                            handleCheckError(
-                                "Kho thu hồi và vị trí thu hồi đã được chọn"
-                            );
+                            handleCheckError("Vị trí thu hồi đã được chọn");
                         } else {
-                            updatedChild.kho = value;
+                            updatedChild.location = value;
                         }
                     } else if (type === "serial") {
                         const newTypeValue = value?.target.value;
@@ -768,7 +843,7 @@ const Index = (props) => {
                                 {
                                     idChildBackEnd: null,
                                     id: uuidv4(),
-                                    kho: null,
+                                    location: null,
                                     disabledDate:
                                         (value?.e?.text_type === "material" &&
                                             dataMaterialExpiry?.is_enable ===
@@ -861,7 +936,7 @@ const Index = (props) => {
                                 {dataLang?.purchase_order_detail_general_informatione ||
                                     "purchase_order_detail_general_informatione"}
                             </h2>
-                            <div className="grid grid-cols-8  gap-3 items-center mt-2 	">
+                            <div className="grid grid-cols-10  gap-3 items-center mt-2 	">
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_code_vouchers ||
@@ -1002,6 +1077,78 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {dataLang?.recall_wareChild ||
+                                            "recall_wareChild"}{" "}
+                                        <span className="text-red-500">*</span>
+                                    </label>
+                                    <Select
+                                        options={warehouse}
+                                        onChange={_HandleChangeInput.bind(
+                                            this,
+                                            "idRecalltWarehouse"
+                                        )}
+                                        isLoading={
+                                            idBranch != null ? false : onLoading
+                                        }
+                                        value={idRecalltWarehouse}
+                                        isClearable={true}
+                                        noOptionsMessage={() =>
+                                            dataLang?.returns_nodata ||
+                                            "returns_nodata"
+                                        }
+                                        closeMenuOnSelect={true}
+                                        hideSelectedOptions={false}
+                                        placeholder={
+                                            dataLang?.recall_wareChild ||
+                                            "recall_wareChild"
+                                        }
+                                        className={`${
+                                            errRecallWarehouse
+                                                ? "border-red-500"
+                                                : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        isSearchable={true}
+                                        style={{
+                                            border: "none",
+                                            boxShadow: "none",
+                                            outline: "none",
+                                        }}
+                                        theme={(theme) => ({
+                                            ...theme,
+                                            colors: {
+                                                ...theme.colors,
+                                                primary25: "#EBF5FF",
+                                                primary50: "#92BFF7",
+                                                primary: "#0F4F9E",
+                                            },
+                                        })}
+                                        styles={{
+                                            placeholder: (base) => ({
+                                                ...base,
+                                                color: "#cbd5e1",
+                                            }),
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                zIndex: 9999, // Giá trị z-index tùy chỉnh
+                                            }),
+                                            control: (base, state) => ({
+                                                ...base,
+                                                boxShadow: "none",
+                                                padding: "2.7px",
+                                                ...(state.isFocused && {
+                                                    border: "0 0 0 1px #92BFF7",
+                                                }),
+                                            }),
+                                        }}
+                                    />
+                                    {errRecallWarehouse && (
+                                        <label className="text-sm text-red-500">
+                                            {"Vui lòng chọn location"}
+                                        </label>
+                                    )}
+                                </div>
+                                <div className="col-span-2 ">
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.production_warehouse_orderNumber ||
                                             "production_warehouse_orderNumber"}
                                     </label>
@@ -1073,20 +1220,20 @@ const Index = (props) => {
                     </div>
 
                     <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10">
-                        <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2 text-center truncate font-[400]">
+                        <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-3 text-center truncate font-[400]">
                             {dataLang?.import_from_items || "import_from_items"}
                         </h4>
-                        <div className="col-span-10">
+                        <div className="col-span-9">
                             <div
                                 className={`${
                                     dataMaterialExpiry.is_enable == "1"
-                                        ? "grid-cols-9"
-                                        : "grid-cols-7"
+                                        ? "grid-cols-7"
+                                        : "grid-cols-5"
                                 } grid `}
                             >
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
-                                    {dataLang?.recall_warehouse ||
-                                        "recall_warehouse"}
+                                    {dataLang?.recall_locationChild ||
+                                        "recall_locationChild"}
                                 </h4>
 
                                 {dataMaterialExpiry.is_enable === "1" ? (
@@ -1110,12 +1257,12 @@ const Index = (props) => {
                                     {dataLang?.recall_amountRecall ||
                                         "recall_amountRecall"}
                                 </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                                {/* <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {dataLang?.recall_price || "recall_price"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {dataLang?.recall_money || "recall_money"}
-                                </h4>
+                                </h4> */}
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
                                     {dataLang?.import_from_note ||
                                         "import_from_note"}
@@ -1128,7 +1275,7 @@ const Index = (props) => {
                         </div>
                     </div>
                     <div className="grid grid-cols-12 items-center gap-1 py-2">
-                        <div className="col-span-2">
+                        <div className="col-span-3">
                             <Select
                                 options={options}
                                 value={null}
@@ -1220,18 +1367,18 @@ const Index = (props) => {
                                     }),
                                     menu: (provided, state) => ({
                                         ...provided,
-                                        width: "130%",
+                                        // width: "130%",
                                     }),
                                 }}
                             />
                         </div>
 
-                        <div className="col-span-10">
+                        <div className="col-span-9">
                             <div
                                 className={`${
                                     dataMaterialExpiry.is_enable == "1"
-                                        ? "grid-cols-9"
-                                        : "grid-cols-7"
+                                        ? "grid-cols-7"
+                                        : "grid-cols-5"
                                 } grid  divide-x border-t border-b border-r border-l`}
                             >
                                 <div className="col-span-1">
@@ -1239,8 +1386,8 @@ const Index = (props) => {
                                     <Select
                                         classNamePrefix="customDropdowDefault"
                                         placeholder={
-                                            dataLang?.recall_warehouse ||
-                                            "recall_warehouse"
+                                            dataLang?.recall_locationChild ||
+                                            "recall_locationChild"
                                         }
                                         className="3xl:text-[12px] border-none outline-none 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
@@ -1292,12 +1439,12 @@ const Index = (props) => {
                                         />
                                     </button>
                                 </div>
-                                <div className="col-span-1 mb-0.5 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b-2 w-full border-gray-200">
+                                {/* <div className="col-span-1 mb-0.5 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b-2 w-full border-gray-200">
                                     1
                                 </div>
                                 <div className="col-span-1 mb-0.5 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b-2 w-full border-gray-200">
                                     1
-                                </div>
+                                </div> */}
                                 <input
                                     placeholder={
                                         dataLang?.recall_noteChild ||
@@ -1330,7 +1477,7 @@ const Index = (props) => {
                                             key={e?.id?.toString()}
                                             className="grid grid-cols-12 items-start"
                                         >
-                                            <div className="col-span-2 border border-r p-0.5 pb-1 h-full">
+                                            <div className="col-span-3 border border-r p-0.5 pb-1 h-full">
                                                 <div className="relative mr-5 mt-5">
                                                     <Select
                                                         onInputChange={_HandleSeachApi.bind(
@@ -1457,7 +1604,7 @@ const Index = (props) => {
                                                                 state
                                                             ) => ({
                                                                 ...provided,
-                                                                width: "130%",
+                                                                // width: "130%",
                                                             }),
                                                         }}
                                                     />
@@ -1472,7 +1619,8 @@ const Index = (props) => {
                                                         <Add />
                                                     </button>
                                                     {e?.child?.filter(
-                                                        (e) => e?.kho == null
+                                                        (e) =>
+                                                            e?.location == null
                                                     ).length >= 2 && (
                                                         <button
                                                             onClick={_HandleDeleteAllChild.bind(
@@ -1488,24 +1636,24 @@ const Index = (props) => {
                                                                 {
                                                                     e?.child?.filter(
                                                                         (e) =>
-                                                                            e?.kho ==
+                                                                            e?.location ==
                                                                             null
                                                                     ).length
                                                                 }{" "}
                                                                 hàng chưa chọn
-                                                                kho
+                                                                vị trí
                                                             </span>
                                                         </button>
                                                     )}
                                                 </div>
                                             </div>
-                                            <div className="col-span-10  items-center">
+                                            <div className="col-span-9  items-center">
                                                 <div
                                                     className={`${
                                                         dataMaterialExpiry.is_enable ==
                                                         "1"
-                                                            ? "grid-cols-9"
-                                                            : "grid-cols-7"
+                                                            ? "grid-cols-7"
+                                                            : "grid-cols-5"
                                                     }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r grid `}
                                                 >
                                                     {e?.child?.map((ce) => (
@@ -1515,13 +1663,13 @@ const Index = (props) => {
                                                             <div className="flex justify-center border-t border-l  h-full p-0.5 flex-col items-center ">
                                                                 <Select
                                                                     options={
-                                                                        warehouse
+                                                                        dataLocation
                                                                     }
                                                                     value={
-                                                                        ce?.kho
+                                                                        ce?.location
                                                                     }
                                                                     isLoading={
-                                                                        ce?.kho !=
+                                                                        ce?.location !=
                                                                         null
                                                                             ? false
                                                                             : onLoadingChild
@@ -1530,11 +1678,11 @@ const Index = (props) => {
                                                                         this,
                                                                         e?.id,
                                                                         ce?.id,
-                                                                        "kho"
+                                                                        "location"
                                                                     )}
                                                                     className={`${
                                                                         errWarehouse &&
-                                                                        ce?.kho ==
+                                                                        ce?.location ==
                                                                             null
                                                                             ? "border-red-500"
                                                                             : ""
@@ -1542,8 +1690,8 @@ const Index = (props) => {
                                                                     placeholder={
                                                                         onLoadingChild
                                                                             ? ""
-                                                                            : dataLang?.recall_warehouse ||
-                                                                              "recall_warehouse"
+                                                                            : dataLang?.recall_locationChild ||
+                                                                              "recall_locationChild"
                                                                     }
                                                                     noOptionsMessage={() =>
                                                                         dataLang?.returns_nodata ||
@@ -1556,7 +1704,7 @@ const Index = (props) => {
                                                                         option
                                                                     ) => (
                                                                         <div className="cursor-pointer">
-                                                                            <div className="flex gap-1">
+                                                                            {/* <div className="flex gap-1">
                                                                                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
                                                                                     {dataLang?.recall_wareChild ||
                                                                                         "recall_wareChild"}
@@ -1568,14 +1716,14 @@ const Index = (props) => {
                                                                                         option?.warehouse_name
                                                                                     }
                                                                                 </h2>
-                                                                            </div>
+                                                                            </div> */}
                                                                             <div className="flex gap-1">
-                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                                {/* <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
                                                                                     {dataLang?.recall_locationChild ||
                                                                                         "recall_locationChild"}
 
                                                                                     :
-                                                                                </h2>
+                                                                                </h2> */}
                                                                                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
                                                                                     {
                                                                                         option?.label
@@ -1611,7 +1759,7 @@ const Index = (props) => {
                                                                             state
                                                                         ) => ({
                                                                             ...provided,
-                                                                            width: "150%",
+                                                                            // width: "150%",
                                                                         }),
                                                                     }}
                                                                     classNamePrefix="customDropdow"
@@ -1774,7 +1922,7 @@ const Index = (props) => {
                                                                     />
                                                                 </button>
                                                             </div>
-                                                            <div className="flex justify-center  h-full p-0.5 flex-col items-center">
+                                                            {/* <div className="flex justify-center  h-full p-0.5 flex-col items-center">
                                                                 <NumericFormat
                                                                     className={`${
                                                                         errQty &&
@@ -1810,7 +1958,7 @@ const Index = (props) => {
                                                                     ce?.recallQuantity *
                                                                         ce?.price
                                                                 )}
-                                                            </div>
+                                                            </div> */}
                                                             <div className="col-span-1  flex items-center justify-center  h-full p-0.5">
                                                                 <input
                                                                     value={

@@ -43,7 +43,9 @@ const Index = (props) => {
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
     const [onFetchingCondition, sOnFetchingCondition] = useState(false);
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
-
+    const [onFetchingExportWarehouse, sOnFetchingExportWarehouse] =
+        useState(false);
+    const [onFetchingLocation, sOnFetchingLocation] = useState(false);
     const [onLoading, sOnLoading] = useState(false);
     const [onLoadingChild, sOnLoadingChild] = useState(false);
 
@@ -66,14 +68,19 @@ const Index = (props) => {
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
 
     const [listData, sListData] = useState([]);
+    const [dataWarehouse, sDataWarehouse] = useState([]);
+    const [dataLocation, sDataLocation] = useState([]);
 
     const [idBranch, sIdBranch] = useState(null);
+    const [idImportWarehouse, sIdImportWarehouse] = useState(null);
 
     const [errDate, sErrDate] = useState(false);
     const [errBranch, sErrBranch] = useState(false);
     const [errWarehouse, sErrWarehouse] = useState(false);
+    const [errExportWarehouse, sErrExportWarehouse] = useState(false);
+
     const [errQty, sErrQty] = useState(false);
-    const [khotong, sKhotong] = useState(null);
+    const [locationtong, sKhotong] = useState(null);
     const [errLot, sErrLot] = useState(false);
     const [errDateList, sErrDateList] = useState(false);
     const [errSerial, sErrSerial] = useState(false);
@@ -173,6 +180,10 @@ const Index = (props) => {
                         label: rResult?.branch_name,
                         value: rResult?.branch_id,
                     });
+                    sIdImportWarehouse({
+                        label: rResult?.warehouse_name,
+                        value: rResult?.warehouse_id,
+                    });
                     sListData(
                         rResult?.items.map((e) => ({
                             id: e?.item?.id,
@@ -199,7 +210,7 @@ const Index = (props) => {
                                     (e.item?.text_type == "products" &&
                                         dataProductExpiry?.is_enable == "0" &&
                                         true),
-                                kho: {
+                                location: {
                                     label: ce?.warehouse_location
                                         ?.location_name,
                                     value: ce?.warehouse_location?.id,
@@ -214,11 +225,11 @@ const Index = (props) => {
                                         : null,
                                 unit: e.item?.unit_name,
 
-                                dataWarehouse: e?.item?.warehouse.map((ye) => ({
-                                    label: ye?.location_name,
-                                    value: ye?.id,
-                                    warehouse_name: ye?.warehouse_name,
-                                })),
+                                // dataWarehouse: e?.item?.warehouse.map((ye) => ({
+                                //     label: ye?.location_name,
+                                //     value: ye?.id,
+                                //     warehouse_name: ye?.warehouse_name,
+                                // })),
                                 importQuantity: +ce?.quantity,
                                 exchangeValue: +ce?.coefficient,
                                 numberOfConversions: +ce?.quantity_exchange,
@@ -270,27 +281,83 @@ const Index = (props) => {
         );
         sOnFetchingItemsAll(false);
     };
-
-    const _HandleSeachApi = (inputValue) => {
-        Axios(
-            "POST",
-            `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`,
+    const _ServerFetching_ExportWarehouse = async () => {
+        await Axios(
+            "GET",
+            "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
-                },
-
-                data: {
-                    term: inputValue,
+                    "filter[warehouse_id]": idImportWarehouse
+                        ? idImportWarehouse?.value
+                        : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { result } = response.data.data;
-                    sDataItems(result);
+                    var data = response.data;
+                    sDataWarehouse(
+                        data?.map((e) => ({
+                            label: e?.warehouse_name,
+                            value: e?.id,
+                        }))
+                    );
                 }
             }
         );
+        sOnFetchingExportWarehouse(false);
+    };
+    const _ServerFetching_Location = async () => {
+        await Axios(
+            "GET",
+            "/api_web/Api_warehouse/warehouseLocationCombobox/?csrf_protection=true",
+            {
+                params: {
+                    "filter[branch_id]": idBranch ? idBranch?.value : null,
+                    "filter[warehouse_id]": idImportWarehouse
+                        ? idImportWarehouse?.value
+                        : null,
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    var data = response.data;
+                    // console.log("result", data);
+                    sDataLocation(
+                        data?.map((e) => ({
+                            label: e?.location_name,
+                            value: e?.id,
+                        }))
+                    );
+                }
+            }
+        );
+        sOnFetchingLocation(false);
+    };
+    const _HandleSeachApi = (inputValue) => {
+        if (idBranch == null || idImportWarehouse == null) {
+            sDataItems([]);
+        } else {
+            Axios(
+                "POST",
+                `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`,
+                {
+                    params: {
+                        "filter[branch_id]": idBranch ? idBranch?.value : null,
+                    },
+
+                    data: {
+                        term: inputValue,
+                    },
+                },
+                (err, response) => {
+                    if (!err) {
+                        var { result } = response.data.data;
+                        sDataItems(result);
+                    }
+                }
+            );
+        }
     };
 
     const _HandleChangeInput = (type, value) => {
@@ -318,15 +385,42 @@ const Index = (props) => {
                         if (result.isConfirmed) {
                             sDataItems([]);
                             sListData([]);
+                            sIdImportWarehouse(null);
                             sIdBranch(value);
+                            sDataWarehouse([]);
                         } else {
                             sIdBranch({ ...idBranch });
+                            sIdImportWarehouse({ ...idImportWarehouse });
                         }
                     });
                 }
             } else {
                 sIdBranch(value);
-                sKhotong(null);
+            }
+        } else if (type == "idImportWarehouse" && idImportWarehouse != value) {
+            if (listData?.length > 0) {
+                Swal.fire({
+                    title: `${
+                        dataLang?.returns_err_DeleteItem ||
+                        "returns_err_DeleteItem"
+                    }`,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#296dc1",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: `${dataLang?.aler_yes}`,
+                    cancelButtonText: `${dataLang?.aler_cancel}`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        sDataItems([]);
+                        sListData([]);
+                        sIdImportWarehouse(value);
+                    } else {
+                        sIdImportWarehouse({ ...idImportWarehouse });
+                    }
+                });
+            } else {
+                sIdImportWarehouse(value);
             }
         }
     };
@@ -345,7 +439,7 @@ const Index = (props) => {
     const _HandleSubmit = (e) => {
         e.preventDefault();
         // const hasNullKho = listData.some((item) =>
-        //     item.child?.some((childItem) => childItem.kho === null)
+        //     item.child?.some((childItem) => childItem.location === null)
         // );
 
         // const hasNullSerial = listData.some(
@@ -386,7 +480,7 @@ const Index = (props) => {
 
         const hasNullKho = hasNullOrCondition(
             listData,
-            (item, childItem) => childItem.kho === null
+            (item, childItem) => childItem.location === null
         );
 
         const hasNullSerial = hasNullOrCondition(
@@ -424,11 +518,13 @@ const Index = (props) => {
             hasNullKho ||
             hasNullQty ||
             isEmpty ||
+            idImportWarehouse == null ||
             (dataProductSerial?.is_enable == "1" && hasNullSerial) ||
             (dataProductExpiry?.is_enable == "1" && hasNullLot) ||
             (dataProductExpiry?.is_enable == "1" && hasNullDate)
         ) {
             idBranch == null && sErrBranch(true);
+            idImportWarehouse == null && sErrExportWarehouse(true);
             hasNullKho && sErrWarehouse(true);
 
             hasNullQty && sErrQty(true);
@@ -443,6 +539,7 @@ const Index = (props) => {
             }
         } else {
             sErrWarehouse(false);
+            sErrExportWarehouse(false);
             sErrQty(false);
             sErrLot(false);
             sErrSerial(false);
@@ -457,18 +554,35 @@ const Index = (props) => {
     useEffect(() => {
         sErrBranch(false);
     }, [idBranch != null]);
+    useEffect(() => {
+        sErrExportWarehouse(false);
+    }, [idImportWarehouse != null]);
 
     useEffect(() => {
         router.query && sOnFetching(true);
     }, [router.query]);
 
     useEffect(() => {
+        onFetchingExportWarehouse && _ServerFetching_ExportWarehouse();
         onFetchingItemsAll && _ServerFetching_ItemsAll();
-    }, [onFetchingItemsAll]);
+        onFetchingLocation && _ServerFetching_Location();
+    }, [onFetchingItemsAll, onFetchingExportWarehouse, onFetchingLocation]);
 
     useEffect(() => {
-        idBranch != null && sOnFetchingItemsAll(true);
+        idBranch != null && sOnFetchingExportWarehouse(true);
     }, [idBranch]);
+
+    useEffect(() => {
+        idImportWarehouse != null && sOnFetchingItemsAll(true);
+        idImportWarehouse != null && sOnFetchingLocation(true);
+    }, [idImportWarehouse]);
+    // useEffect(() => {
+    //     onFetchingItemsAll && _ServerFetching_ItemsAll();
+    // }, [onFetchingItemsAll]);
+
+    // useEffect(() => {
+    //     idBranch != null && sOnFetchingItemsAll(true);
+    // }, [idBranch]);
 
     const formatNumber = (number) => {
         // const integerPart = Math.floor(number);
@@ -483,6 +597,7 @@ const Index = (props) => {
             moment(startDate).format("YYYY-MM-DD HH:mm:ss")
         );
         formData.append("branch_id", idBranch?.value);
+        formData.append("warehouse_id", idImportWarehouse?.value);
         formData.append("note", note);
         listData.forEach((item, index) => {
             formData.append(
@@ -511,7 +626,7 @@ const Index = (props) => {
                 );
                 formData.append(
                     `items[${index}][child][${childIndex}][location_warehouses_id]`,
-                    childItem?.kho?.value
+                    childItem?.location?.value
                 );
                 formData.append(
                     `items[${index}][child][${childIndex}][note]`,
@@ -545,9 +660,11 @@ const Index = (props) => {
                         sCode("");
                         sStartDate(new Date());
                         sIdBranch(null);
+                        sIdImportWarehouse(null);
                         sNote("");
                         sErrBranch(false);
                         sErrDate(false);
+                        sErrExportWarehouse(false);
                         //new
                         sListData([]);
                         router.push("/manufacture/productsWarehouse?tab=all");
@@ -578,17 +695,17 @@ const Index = (props) => {
                         (value?.e?.text_type === "products" &&
                             dataProductExpiry?.is_enable === "0" &&
                             true),
-                    kho: null,
+                    location: null,
                     unit: value?.e?.unit_name,
                     serial: "",
                     lot: "",
                     date: null,
-                    dataWarehouse: value?.e?.warehouse.map((e) => ({
-                        label: e?.location_name,
-                        value: e?.id,
-                        warehouse_name: e?.warehouse_name,
-                        qty: e?.quantity,
-                    })),
+                    // dataWarehouse: value?.e?.warehouse.map((e) => ({
+                    //     label: e?.location_name,
+                    //     value: e?.id,
+                    //     warehouse_name: e?.warehouse_name,
+                    //     qty: e?.quantity,
+                    // })),
                     importQuantity: null,
                     exchangeValue: null,
                     numberOfConversions: null,
@@ -627,15 +744,15 @@ const Index = (props) => {
                             (value?.e?.text_type === "products" &&
                                 dataProductExpiry?.is_enable === "0" &&
                                 true),
-                        kho: null,
+                        location: null,
                         serial: "",
                         lot: "",
                         date: null,
-                        dataWarehouse: value?.e?.warehouse.map((e) => ({
-                            label: e?.location_name,
-                            value: e?.id,
-                            warehouse_name: e?.warehouse_name,
-                        })),
+                        // dataWarehouse: value?.e?.warehouse.map((e) => ({
+                        //     label: e?.location_name,
+                        //     value: e?.id,
+                        //     warehouse_name: e?.warehouse_name,
+                        // })),
                         unit: value?.e?.unit_name,
                         importQuantity: null,
                         exchangeValue: null,
@@ -673,7 +790,9 @@ const Index = (props) => {
         const newData = listData
             .map((e) => {
                 if (e.id === parentId) {
-                    const newChild = e.child?.filter((ce) => ce?.kho !== null);
+                    const newChild = e.child?.filter(
+                        (ce) => ce?.location !== null
+                    );
                     return { ...e, child: newChild };
                 }
                 return e;
@@ -700,16 +819,14 @@ const Index = (props) => {
                 if (type === "importQuantity") {
                     const newQtyImport = Number(value?.value);
                     updatedChild.importQuantity = newQtyImport;
-                } else if (type === "kho") {
+                } else if (type === "location") {
                     const checkKho = newData[parentIndex].child
                         .map((house) => house)
-                        .some((i) => i?.kho?.value === value?.value);
+                        .some((i) => i?.location?.value === value?.value);
                     if (checkKho) {
-                        handleCheckError(
-                            "Kho nhập và vị trí nhập đã được chọn"
-                        );
+                        handleCheckError("Vị trí nhập đã được chọn");
                     } else {
-                        updatedChild.kho = value;
+                        updatedChild.location = value;
                     }
                 }
                 // else if (type === "lot") {
@@ -805,12 +922,12 @@ const Index = (props) => {
                             {
                                 idChildBackEnd: null,
                                 id: uuidv4(),
-                                kho: khotong ? khotong : null,
-                                dataWarehouse: value?.e?.warehouse.map((e) => ({
-                                    label: e?.location_name,
-                                    value: e?.id,
-                                    warehouse_name: e?.warehouse_name,
-                                })),
+                                location: locationtong ? locationtong : null,
+                                // dataWarehouse: value?.e?.warehouse.map((e) => ({
+                                //     label: e?.location_name,
+                                //     value: e?.id,
+                                //     warehouse_name: e?.warehouse_name,
+                                // })),
                                 disabledDate:
                                     (value?.e?.text_type === "products" &&
                                         dataProductExpiry?.is_enable === "1" &&
@@ -906,7 +1023,7 @@ const Index = (props) => {
                                 {dataLang?.purchase_order_detail_general_informatione ||
                                     "purchase_order_detail_general_informatione"}
                             </h2>
-                            <div className="grid grid-cols-8  gap-3 items-center mt-2">
+                            <div className="grid grid-cols-10  gap-3 items-center mt-2">
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_code_vouchers ||
@@ -1047,6 +1164,78 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {dataLang?.productsWarehouse_warehouseImport ||
+                                            "productsWarehouse_warehouseImport"}{" "}
+                                        <span className="text-red-500">*</span>
+                                    </label>
+                                    <Select
+                                        options={dataWarehouse}
+                                        onChange={_HandleChangeInput.bind(
+                                            this,
+                                            "idImportWarehouse"
+                                        )}
+                                        isLoading={
+                                            idBranch != null ? false : onLoading
+                                        }
+                                        value={idImportWarehouse}
+                                        isClearable={true}
+                                        noOptionsMessage={() =>
+                                            dataLang?.returns_nodata ||
+                                            "returns_nodata"
+                                        }
+                                        closeMenuOnSelect={true}
+                                        hideSelectedOptions={false}
+                                        placeholder={
+                                            dataLang?.productsWarehouse_warehouseImport ||
+                                            "productsWarehouse_warehouseImport"
+                                        }
+                                        className={`${
+                                            errExportWarehouse
+                                                ? "border-red-500"
+                                                : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        isSearchable={true}
+                                        style={{
+                                            border: "none",
+                                            boxShadow: "none",
+                                            outline: "none",
+                                        }}
+                                        theme={(theme) => ({
+                                            ...theme,
+                                            colors: {
+                                                ...theme.colors,
+                                                primary25: "#EBF5FF",
+                                                primary50: "#92BFF7",
+                                                primary: "#0F4F9E",
+                                            },
+                                        })}
+                                        styles={{
+                                            placeholder: (base) => ({
+                                                ...base,
+                                                color: "#cbd5e1",
+                                            }),
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                zIndex: 9999, // Giá trị z-index tùy chỉnh
+                                            }),
+                                            control: (base, state) => ({
+                                                ...base,
+                                                boxShadow: "none",
+                                                padding: "2.7px",
+                                                ...(state.isFocused && {
+                                                    border: "0 0 0 1px #92BFF7",
+                                                }),
+                                            }),
+                                        }}
+                                    />
+                                    {errExportWarehouse && (
+                                        <label className="text-sm text-red-500">
+                                            {"Vui lòng chọn kho"}
+                                        </label>
+                                    )}
+                                </div>
+                                <div className="col-span-2 ">
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.production_warehouse_orderNumber ||
                                             "production_warehouse_orderNumber"}
                                     </label>
@@ -1148,8 +1337,8 @@ const Index = (props) => {
                                 } grid `}
                             >
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
-                                    {dataLang?.productsWarehouse_warehouse ||
-                                        "productsWarehouse_warehouse"}
+                                    {dataLang?.productsWarehouse_warehouseLocaImport ||
+                                        "productsWarehouse_warehouseLocaImport"}
                                 </h4>
                                 {dataProductSerial.is_enable === "1" && (
                                     <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  col-span-1  text-[#667085] uppercase  font-[400] text-center">
@@ -1305,8 +1494,8 @@ const Index = (props) => {
                                     <Select
                                         classNamePrefix="customDropdowDefault"
                                         placeholder={
-                                            dataLang?.productsWarehouse_warehouse ||
-                                            "productsWarehouse_warehouse"
+                                            dataLang?.productsWarehouse_warehouseLocaImport ||
+                                            "productsWarehouse_warehouseLocaImport"
                                         }
                                         className="3xl:text-[12px] border-none outline-none 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
@@ -1552,7 +1741,8 @@ const Index = (props) => {
                                                         <Add />
                                                     </button>
                                                     {e?.child?.filter(
-                                                        (e) => e?.kho == null
+                                                        (e) =>
+                                                            e?.location == null
                                                     ).length >= 2 && (
                                                         <button
                                                             onClick={_HandleDeleteAllChild.bind(
@@ -1568,12 +1758,12 @@ const Index = (props) => {
                                                                 {
                                                                     e?.child?.filter(
                                                                         (e) =>
-                                                                            e?.kho ==
+                                                                            e?.location ==
                                                                             null
                                                                     ).length
                                                                 }{" "}
                                                                 hàng chưa chọn
-                                                                kho
+                                                                vị trí
                                                             </span>
                                                         </button>
                                                     )}
@@ -1598,13 +1788,13 @@ const Index = (props) => {
                                                             <div className="flex justify-center border-t border-l  h-full p-0.5 flex-col items-center ">
                                                                 <Select
                                                                     options={
-                                                                        ce?.dataWarehouse
+                                                                        dataLocation
                                                                     }
                                                                     value={
-                                                                        ce?.kho
+                                                                        ce?.location
                                                                     }
                                                                     isLoading={
-                                                                        ce?.kho !=
+                                                                        ce?.location !=
                                                                         null
                                                                             ? false
                                                                             : onLoadingChild
@@ -1613,11 +1803,11 @@ const Index = (props) => {
                                                                         this,
                                                                         e?.id,
                                                                         ce?.id,
-                                                                        "kho"
+                                                                        "location"
                                                                     )}
                                                                     className={`${
                                                                         errWarehouse &&
-                                                                        ce?.kho ==
+                                                                        ce?.location ==
                                                                             null
                                                                             ? "border-red-500"
                                                                             : ""
@@ -1625,8 +1815,8 @@ const Index = (props) => {
                                                                     placeholder={
                                                                         onLoadingChild
                                                                             ? ""
-                                                                            : dataLang?.productsWarehouse_warehouse ||
-                                                                              "productsWarehouse_warehouse"
+                                                                            : dataLang?.productsWarehouse_warehouseLocaImport ||
+                                                                              "productsWarehouse_warehouseLocaImport"
                                                                     }
                                                                     noOptionsMessage={() =>
                                                                         dataLang?.returns_nodata ||
@@ -1639,7 +1829,7 @@ const Index = (props) => {
                                                                         option
                                                                     ) => (
                                                                         <div className="">
-                                                                            <div className="flex gap-1">
+                                                                            {/* <div className="flex gap-1">
                                                                                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
                                                                                     {dataLang?.productsWarehouse_warehouseImport ||
                                                                                         "productsWarehouse_warehouseImport"}
@@ -1651,14 +1841,14 @@ const Index = (props) => {
                                                                                         option?.warehouse_name
                                                                                     }
                                                                                 </h2>
-                                                                            </div>
+                                                                            </div> */}
                                                                             <div className="flex gap-1">
-                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                                {/* <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
                                                                                     {dataLang?.productsWarehouse_warehouseLocaImport ||
                                                                                         "productsWarehouse_warehouseLocaImport"}
 
                                                                                     :
-                                                                                </h2>
+                                                                                </h2> */}
                                                                                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
                                                                                     {
                                                                                         option?.label

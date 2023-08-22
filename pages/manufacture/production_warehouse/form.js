@@ -42,6 +42,8 @@ const Index = (props) => {
     const [onFetchingDetail, sOnFetchingDetail] = useState(false);
     const [onFetchingCondition, sOnFetchingCondition] = useState(false);
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
+    const [onFetchingExportWarehouse, sOnFetchingExportWarehouse] =
+        useState(false);
 
     const [onLoading, sOnLoading] = useState(false);
     const [onLoadingChild, sOnLoadingChild] = useState(false);
@@ -56,6 +58,7 @@ const Index = (props) => {
 
     const [dataBranch, sDataBranch] = useState([]);
     const [dataItems, sDataItems] = useState([]);
+    const [dataWarehouse, sDataWarehouse] = useState([]);
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
     const [dataProductExpiry, sDataProductExpiry] = useState({});
@@ -64,14 +67,15 @@ const Index = (props) => {
     const [listData, sListData] = useState([]);
 
     const [idBranch, sIdBranch] = useState(null);
+    const [idExportWarehouse, sIdExportWarehouse] = useState(null);
     const [load, sLoad] = useState(false);
 
     const [errDate, sErrDate] = useState(false);
     const [errBranch, sErrBranch] = useState(false);
     const [errWarehouse, sErrWarehouse] = useState(false);
+    const [errExportWarehouse, sErrExportWarehouse] = useState(false);
     const [errUnit, sErrUnit] = useState(false);
     const [errQty, sErrQty] = useState(false);
-    const [khotong, sKhotong] = useState(null);
 
     useEffect(() => {
         router.query && sErrDate(false);
@@ -171,6 +175,10 @@ const Index = (props) => {
                         label: rResult?.branch_name,
                         value: rResult?.branch_id,
                     });
+                    sIdExportWarehouse({
+                        label: rResult?.warehouse_name,
+                        value: rResult?.warehouse_id,
+                    });
                     sCode(rResult?.code);
                     sStartDate(moment(rResult?.date).toDate());
                     sNote(rResult?.note);
@@ -206,7 +214,7 @@ const Index = (props) => {
                                     (ce?.text_type == "products" &&
                                         dataProductExpiry?.is_enable == "0" &&
                                         true),
-                                kho: {
+                                location: {
                                     label: ce?.warehouse_location
                                         ?.location_name,
                                     value: ce?.warehouse_location?.id,
@@ -266,13 +274,16 @@ const Index = (props) => {
             JSON.stringify(dataProductSerial) !== "{}",
     ]);
 
-    const _ServerFetching_ItemsAll = () => {
-        Axios(
+    const _ServerFetching_ItemsAll = async () => {
+        await Axios(
             "GET",
             "/api_web/Api_stock/getSemiItems/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
+                    "filter[warehouse_id]": idExportWarehouse
+                        ? idExportWarehouse?.value
+                        : null,
                 },
             },
             (err, response) => {
@@ -284,27 +295,57 @@ const Index = (props) => {
         );
         sOnFetchingItemsAll(false);
     };
-
-    const _HandleSeachApi = (inputValue) => {
-        Axios(
-            "POST",
-            `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
+    const _ServerFetching_ExportWarehouse = async () => {
+        await Axios(
+            "GET",
+            "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
-                },
-
-                data: {
-                    term: inputValue,
+                    "filter[warehouse_id]": idExportWarehouse
+                        ? idExportWarehouse?.value
+                        : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { result } = response.data.data;
-                    sDataItems(result);
+                    var data = response.data;
+                    console.log("result", data);
+                    sDataWarehouse(
+                        data?.map((e) => ({
+                            label: e?.warehouse_name,
+                            value: e?.id,
+                        }))
+                    );
                 }
             }
         );
+        sOnFetchingExportWarehouse(false);
+    };
+    const _HandleSeachApi = (inputValue) => {
+        if (idBranch == null || idExportWarehouse == null) {
+            sDataItems([]);
+        } else {
+            Axios(
+                "POST",
+                `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
+                {
+                    params: {
+                        "filter[branch_id]": idBranch ? idBranch?.value : null,
+                    },
+
+                    data: {
+                        term: inputValue,
+                    },
+                },
+                (err, response) => {
+                    if (!err) {
+                        var { result } = response.data.data;
+                        sDataItems(result);
+                    }
+                }
+            );
+        }
     };
 
     const _HandleChangeInput = (type, value) => {
@@ -333,14 +374,42 @@ const Index = (props) => {
                             sDataItems([]);
                             sListData([]);
                             sIdBranch(value);
+                            sIdExportWarehouse(null);
                         } else {
                             sIdBranch({ ...idBranch });
+                            sIdExportWarehouse({ ...idExportWarehouse });
                         }
                     });
                 }
             } else {
                 sIdBranch(value);
-                sKhotong(null);
+            }
+        } else if (type == "idExportWarehouse" && idExportWarehouse != value) {
+            if (listData?.length > 0) {
+                if (type === "idExportWarehouse" && idBranch != value) {
+                    Swal.fire({
+                        title: `${
+                            dataLang?.returns_err_DeleteItem ||
+                            "returns_err_DeleteItem"
+                        }`,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#296dc1",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: `${dataLang?.aler_yes}`,
+                        cancelButtonText: `${dataLang?.aler_cancel}`,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            sDataItems([]);
+                            sListData([]);
+                            sIdExportWarehouse(value);
+                        } else {
+                            sIdExportWarehouse({ ...idExportWarehouse });
+                        }
+                    });
+                }
+            } else {
+                sIdExportWarehouse(value);
             }
         }
     };
@@ -359,7 +428,7 @@ const Index = (props) => {
     const _HandleSubmit = (e) => {
         e.preventDefault();
         const hasNullKho = listData.some((item) =>
-            item.child?.some((childItem) => childItem.kho === null)
+            item.child?.some((childItem) => childItem.location === null)
         );
         const hasNullUnit = listData.some((item) =>
             item.child?.some((childItem) => childItem.unit === null)
@@ -378,23 +447,17 @@ const Index = (props) => {
             hasNullKho ||
             hasNullUnit ||
             hasNullQty ||
-            isEmpty
+            isEmpty ||
+            idExportWarehouse == null
         ) {
             idBranch == null && sErrBranch(true);
+            idExportWarehouse == null && sErrExportWarehouse(true);
             hasNullKho && sErrWarehouse(true);
             hasNullUnit && sErrUnit(true);
             hasNullQty && sErrQty(true);
             if (isEmpty) {
-                // Toast.fire({
-                //     icon: "error",
-                //     title: `Chưa nhập thông tin mặt hàng`,
-                // });
                 handleCheckError("Chưa nhập thông tin mặt hàng");
             } else {
-                // Toast.fire({
-                //     icon: "error",
-                //     title: `${dataLang?.required_field_null}`,
-                // });
                 handleCheckError(dataLang?.required_field_null);
             }
         } else {
@@ -411,18 +474,31 @@ const Index = (props) => {
     useEffect(() => {
         sErrBranch(false);
     }, [idBranch != null]);
+    useEffect(() => {
+        sErrExportWarehouse(false);
+    }, [idExportWarehouse != null]);
 
     useEffect(() => {
         router.query && sOnFetching(true);
     }, [router.query]);
 
     useEffect(() => {
+        onFetchingExportWarehouse && _ServerFetching_ExportWarehouse();
         onFetchingItemsAll && _ServerFetching_ItemsAll();
-    }, [onFetchingItemsAll]);
+    }, [onFetchingItemsAll, onFetchingExportWarehouse]);
 
     useEffect(() => {
-        idBranch != null && sOnFetchingItemsAll(true);
+        idBranch != null && sOnFetchingExportWarehouse(true);
     }, [idBranch]);
+
+    useEffect(() => {
+        idExportWarehouse != null && sOnFetchingItemsAll(true);
+    }, [idExportWarehouse]);
+    // useEffect(() => {
+    //     idBranch != null &&
+    //         idExportWarehouse != null &&
+    //         sOnFetchingItemsAll(true);
+    // }, [idBranch, idExportWarehouse]);
 
     const formatNumber = (number) => {
         const integerPart = Math.floor(number);
@@ -437,6 +513,7 @@ const Index = (props) => {
             moment(startDate).format("YYYY-MM-DD HH:mm:ss")
         );
         formData.append("branch_id", idBranch?.value);
+        formData.append("warehouse_id", idExportWarehouse?.value);
         formData.append("note", note);
         listData.forEach((item, index) => {
             formData.append(
@@ -459,7 +536,7 @@ const Index = (props) => {
                 );
                 formData.append(
                     `items[${index}][child][${childIndex}][location_warehouses_id]`,
-                    childItem?.kho?.value
+                    childItem?.location?.value
                 );
                 formData.append(
                     `items[${index}][child][${childIndex}][quantity]`,
@@ -489,8 +566,10 @@ const Index = (props) => {
                         sCode("");
                         sStartDate(new Date());
                         sIdBranch(null);
+                        sIdExportWarehouse(null);
                         sNote("");
                         sErrBranch(false);
+                        sErrExportWarehouse(false);
                         sErrDate(false);
                         //new
                         sListData([]);
@@ -498,10 +577,6 @@ const Index = (props) => {
                             "/manufacture/production_warehouse?tab=all"
                         );
                     } else {
-                        // Toast.fire({
-                        //     icon: "error",
-                        //     title: `${dataLang[message]}`,
-                        // });
                         handleCheckError(
                             `${dataLang[message]} ${
                                 item !== undefined &&
@@ -542,7 +617,7 @@ const Index = (props) => {
                         (value?.e?.text_type === "products" &&
                             dataProductExpiry?.is_enable === "0" &&
                             true),
-                    kho: null,
+                    location: null,
                     unit: null,
                     dataWarehouse: value?.e?.warehouse.map((e) => ({
                         label: e?.location_name,
@@ -599,7 +674,7 @@ const Index = (props) => {
                             (value?.e?.text_type === "products" &&
                                 dataProductExpiry?.is_enable === "0" &&
                                 true),
-                        kho: null,
+                        location: null,
                         dataWarehouse: value?.e?.warehouse.map((e) => ({
                             label: e?.location_name,
                             value: e?.id,
@@ -631,12 +706,6 @@ const Index = (props) => {
             handleCheckError(
                 dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
             );
-            // Toast.fire({
-            //     title: `${
-            //         dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
-            //     }`,
-            //     icon: "error",
-            // });
         }
     };
     const _HandleDeleteChild = (parentId, childId) => {
@@ -658,7 +727,9 @@ const Index = (props) => {
         const newData = listData
             .map((e) => {
                 if (e.id === parentId) {
-                    const newChild = e.child?.filter((ce) => ce?.kho !== null);
+                    const newChild = e.child?.filter(
+                        (ce) => ce?.location !== null
+                    );
                     return { ...e, child: newChild };
                 }
                 return e;
@@ -686,8 +757,8 @@ const Index = (props) => {
                     const newSoluongxuat = Number(value?.value);
                     const newSoluongquydoi =
                         newSoluongxuat / Number(updatedChild?.exchangeValue);
-                    if (newSoluongquydoi > +updatedChild?.kho?.qty) {
-                        handleQuantityError(updatedChild?.kho?.qty);
+                    if (newSoluongquydoi > +updatedChild?.location?.qty) {
+                        handleQuantityError(updatedChild?.location?.qty);
                         setTimeout(() => {
                             sLoad(true);
                         }, 500);
@@ -701,33 +772,31 @@ const Index = (props) => {
                         updatedChild.exportQuantity = newSoluongxuat;
                         updatedChild.numberOfConversions = newSoluongquydoi;
                     }
-                } else if (type === "kho") {
+                } else if (type === "location") {
                     const checkKho = newData[parentIndex].child
                         .map((house) => house)
-                        .some((i) => i?.kho?.value === value?.value);
+                        .some((i) => i?.location?.value === value?.value);
                     if (checkKho) {
-                        handleCheckError(
-                            "Kho xuất và vị trí xuất đã được chọn"
-                        );
+                        handleCheckError("Vị trí xuất đã được chọn");
                     } else {
-                        updatedChild.kho = value;
+                        updatedChild.location = value;
                     }
                 } else if (type === "unit") {
                     updatedChild.unit = value;
                     updatedChild.exchangeValue = Number(value?.coefficient);
                 } else if (type === "increase") {
-                    if (updatedChild.kho == null) {
-                        handleCheckError("Vui lòng chọn kho trước");
+                    if (updatedChild.location == null) {
+                        handleCheckError("Vui lòng chọn vị trí trước");
                     } else if (updatedChild.unit == null) {
                         handleCheckError("Vui lòng chọn đơn vị tính trước");
                     } else if (
                         updatedChild.numberOfConversions ==
-                            updatedChild.kho?.qty ||
+                            updatedChild.location?.qty ||
                         (id &&
                             updatedChild.numberOfConversions >=
-                                updatedChild.kho?.qty)
+                                updatedChild.location?.qty)
                     ) {
-                        handleQuantityError(updatedChild?.kho?.qty);
+                        handleQuantityError(updatedChild?.location?.qty);
                     } else {
                         updatedChild.exportQuantity =
                             Number(updatedChild.exportQuantity) + 1;
@@ -736,8 +805,8 @@ const Index = (props) => {
                             Number(updatedChild.exchangeValue);
                     }
                 } else if (type === "decrease") {
-                    if (updatedChild.kho == null) {
-                        handleCheckError("Vui lòng chọn kho trước");
+                    if (updatedChild.location == null) {
+                        handleCheckError("Vui lòng chọn vị trí trước");
                     } else if (updatedChild.unit == null) {
                         handleCheckError("Vui lòng chọn đơn vị tính trước");
                     } else if (updatedChild.exportQuantity >= 2) {
@@ -760,7 +829,7 @@ const Index = (props) => {
         Toast.fire({
             title: `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
                 e
-            )} số lượng tồn kho`,
+            )} số lượng tồn location`,
             icon: "error",
             confirmButtonColor: "#296dc1",
             cancelButtonColor: "#d33",
@@ -790,7 +859,7 @@ const Index = (props) => {
                             {
                                 idChildBackEnd: null,
                                 id: uuidv4(),
-                                kho: khotong ? khotong : null,
+                                location: null,
                                 dataWarehouse: value?.e?.warehouse.map((e) => ({
                                     label: e?.location_name,
                                     value: e?.id,
@@ -909,7 +978,7 @@ const Index = (props) => {
                                 {dataLang?.purchase_order_detail_general_informatione ||
                                     "purchase_order_detail_general_informatione"}
                             </h2>
-                            <div className="grid grid-cols-8  gap-3 items-center mt-2">
+                            <div className="grid grid-cols-10  gap-3 items-center mt-2">
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_code_vouchers ||
@@ -1050,8 +1119,80 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.production_warehouse_orderNumber ||
-                                            "production_warehouse_orderNumber"}
+                                        {dataLang?.production_warehouse_expWarehouse ||
+                                            "production_warehouse_expWarehouse"}{" "}
+                                        <span className="text-red-500">*</span>
+                                    </label>
+                                    <Select
+                                        options={dataWarehouse}
+                                        onChange={_HandleChangeInput.bind(
+                                            this,
+                                            "idExportWarehouse"
+                                        )}
+                                        isLoading={
+                                            idBranch != null ? false : onLoading
+                                        }
+                                        value={idExportWarehouse}
+                                        isClearable={true}
+                                        noOptionsMessage={() =>
+                                            dataLang?.returns_nodata ||
+                                            "returns_nodata"
+                                        }
+                                        closeMenuOnSelect={true}
+                                        hideSelectedOptions={false}
+                                        placeholder={
+                                            dataLang?.production_warehouse_expWarehouse ||
+                                            "production_warehouse_expWarehouse"
+                                        }
+                                        className={`${
+                                            errExportWarehouse
+                                                ? "border-red-500"
+                                                : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        isSearchable={true}
+                                        style={{
+                                            border: "none",
+                                            boxShadow: "none",
+                                            outline: "none",
+                                        }}
+                                        theme={(theme) => ({
+                                            ...theme,
+                                            colors: {
+                                                ...theme.colors,
+                                                primary25: "#EBF5FF",
+                                                primary50: "#92BFF7",
+                                                primary: "#0F4F9E",
+                                            },
+                                        })}
+                                        styles={{
+                                            placeholder: (base) => ({
+                                                ...base,
+                                                color: "#cbd5e1",
+                                            }),
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                zIndex: 9999, // Giá trị z-index tùy chỉnh
+                                            }),
+                                            control: (base, state) => ({
+                                                ...base,
+                                                boxShadow: "none",
+                                                padding: "2.7px",
+                                                ...(state.isFocused && {
+                                                    border: "0 0 0 1px #92BFF7",
+                                                }),
+                                            }),
+                                        }}
+                                    />
+                                    {errExportWarehouse && (
+                                        <label className="text-sm text-red-500">
+                                            {"Vui lòng chọn kho"}
+                                        </label>
+                                    )}
+                                </div>
+                                <div className="col-span-2 ">
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {dataLang?.production_warehouse_LSX ||
+                                            "production_warehouse_LSX"}
                                     </label>
                                     <Select
                                         options={[]}
@@ -1071,8 +1212,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={
-                                            dataLang?.production_warehouse_orderNumber ||
-                                            "production_warehouse_orderNumber"
+                                            dataLang?.production_warehouse_LSX ||
+                                            "production_warehouse_LSX"
                                         }
                                         className={`${"border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
@@ -1126,8 +1267,8 @@ const Index = (props) => {
                         <div className="col-span-9">
                             <div className="grid grid-cols-8">
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]">
-                                    {dataLang?.production_warehouse_location ||
-                                        "production_warehouse_location"}
+                                    {dataLang?.production_warehouse_expLoca ||
+                                        "production_warehouse_expLoca"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {"ĐVT"}
@@ -1301,8 +1442,8 @@ const Index = (props) => {
                                     <Select
                                         classNamePrefix="customDropdowDefault"
                                         placeholder={
-                                            dataLang?.production_warehouse_location ||
-                                            "production_warehouse_location"
+                                            dataLang?.production_warehouse_expLoca ||
+                                            "production_warehouse_expLoca"
                                         }
                                         className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
@@ -1579,7 +1720,7 @@ const Index = (props) => {
                                                     </button>
                                                 </div>
                                                 {e?.child?.filter(
-                                                    (e) => e?.kho == null
+                                                    (e) => e?.location == null
                                                 ).length >= 2 && (
                                                     <button
                                                         onClick={_HandleDeleteAllChild.bind(
@@ -1592,14 +1733,19 @@ const Index = (props) => {
                                                         <span className="absolute right-0 w-full h-full -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
                                                         <span className="relative text-xs">
                                                             Xóa{" "}
+                                                            {console.log(
+                                                                " e?.child",
+                                                                e?.child
+                                                            )}
                                                             {
                                                                 e?.child?.filter(
                                                                     (e) =>
-                                                                        e?.kho ==
+                                                                        e?.location ==
                                                                         null
                                                                 ).length
                                                             }{" "}
-                                                            hàng chưa chọn kho
+                                                            hàng chưa chọn vị
+                                                            trí
                                                         </span>
                                                     </button>
                                                 )}
@@ -1623,10 +1769,10 @@ const Index = (props) => {
                                                                                 ce?.dataWarehouse
                                                                             }
                                                                             value={
-                                                                                ce?.kho
+                                                                                ce?.location
                                                                             }
                                                                             isLoading={
-                                                                                ce?.kho !=
+                                                                                ce?.location !=
                                                                                 null
                                                                                     ? false
                                                                                     : onLoadingChild
@@ -1635,11 +1781,11 @@ const Index = (props) => {
                                                                                 this,
                                                                                 e?.id,
                                                                                 ce?.id,
-                                                                                "kho"
+                                                                                "location"
                                                                             )}
                                                                             className={`${
                                                                                 errWarehouse &&
-                                                                                ce?.kho ==
+                                                                                ce?.location ==
                                                                                     null
                                                                                     ? "border-red-500"
                                                                                     : ""
@@ -1647,8 +1793,8 @@ const Index = (props) => {
                                                                             placeholder={
                                                                                 onLoadingChild
                                                                                     ? ""
-                                                                                    : dataLang?.production_warehouse_location ||
-                                                                                      "production_warehouse_location"
+                                                                                    : dataLang?.production_warehouse_expLoca ||
+                                                                                      "production_warehouse_expLoca"
                                                                             }
                                                                             noOptionsMessage={() =>
                                                                                 dataLang?.returns_nodata ||
@@ -1662,7 +1808,7 @@ const Index = (props) => {
                                                                             ) => (
                                                                                 <div className="">
                                                                                     <div className="flex gap-1">
-                                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                                        {/* <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
                                                                                             {dataLang?.production_warehouse_expWarehouse ||
                                                                                                 "production_warehouse_expWarehouse"}
 
@@ -1672,15 +1818,15 @@ const Index = (props) => {
                                                                                             {
                                                                                                 option?.warehouse_name
                                                                                             }
-                                                                                        </h2>
+                                                                                        </h2> */}
                                                                                     </div>
                                                                                     <div className="flex gap-1">
-                                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                                        {/* <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
                                                                                             {dataLang?.production_warehouse_expLoca ||
                                                                                                 "production_warehouse_expLoca"}
 
                                                                                             :
-                                                                                        </h2>
+                                                                                        </h2> */}
                                                                                         <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
                                                                                             {
                                                                                                 option?.label
@@ -1775,7 +1921,7 @@ const Index = (props) => {
                                                                                 option
                                                                             ) => (
                                                                                 <div className="flex justify-start flex-wrap items-center">
-                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full py-1.5">
+                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full ">
                                                                                         {dataLang?.production_warehouse_unit ||
                                                                                             "production_warehouse_unit"}
 
@@ -1784,7 +1930,7 @@ const Index = (props) => {
                                                                                             option?.label
                                                                                         }
                                                                                     </h2>
-                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-1">{`${
+                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] ">{`${
                                                                                         dataLang?.production_warehouse_exchange_value ||
                                                                                         "production_warehouse_exchange_value"
                                                                                     }: (${
@@ -1827,14 +1973,14 @@ const Index = (props) => {
 
                                                                         <NumericFormat
                                                                             placeholder={
-                                                                                (ce?.kho ==
+                                                                                (ce?.location ==
                                                                                     null ||
                                                                                     ce?.unit ==
                                                                                         null) &&
-                                                                                "Chọn kho và đơn vị tính trước"
+                                                                                "Chọn location và đơn vị tính trước"
                                                                             }
                                                                             disabled={
-                                                                                ce?.kho ==
+                                                                                ce?.location ==
                                                                                     null ||
                                                                                 ce?.unit ==
                                                                                     null
