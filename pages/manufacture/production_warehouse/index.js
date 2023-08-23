@@ -377,6 +377,17 @@ const Index = (props) => {
                 },
                 {
                     title: `${
+                        dataLang?.production_warehouse_expWarehouse ||
+                        "production_warehouse_expWarehouse"
+                    }`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${
                         dataLang?.production_warehouse_Total_value ||
                         "production_warehouse_Total_value"
                     }`,
@@ -432,6 +443,7 @@ const Index = (props) => {
                 { value: `${e?.date ? e?.date : ""}` },
                 { value: `${e?.code ? e?.code : ""}` },
                 { value: `${"Số LSX chi tiết"}` },
+                { value: `${e?.warehouse_name ? e?.warehouse_name : ""}` },
                 {
                     value: `${
                         e?.grand_total ? formatNumber(e?.grand_total) : ""
