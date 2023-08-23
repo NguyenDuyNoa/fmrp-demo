@@ -529,7 +529,6 @@ const Index = (props) => {
     useEffect(() => {
         onFetchingLocation && _ServerFetching_Location();
     }, [onFetchingLocation]);
-    ``;
 
     useEffect(() => {
         (idBranch != null && sOnFetchingItemsAll(true)) ||
