@@ -243,7 +243,12 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     var { isSuccess, result } = response?.data;
-                    sListCode(result);
+                    sListCode(
+                        result?.map((e) => ({
+                            label: `${e.code}`,
+                            value: e.id,
+                        }))
+                    );
                 }
             }
         );

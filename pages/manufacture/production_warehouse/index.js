@@ -213,6 +213,7 @@ const Index = (props) => {
         );
         Axios(
             "GET",
+
             "/api_web/Api_warehouse/warehouseCombobox/?csrf_protection=true",
             {},
             (err, response) => {
@@ -242,7 +243,12 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     var { isSuccess, result } = response?.data;
-                    sListCode(result);
+                    sListCode(
+                        result?.map((e) => ({
+                            label: `${e.code}`,
+                            value: e.id,
+                        }))
+                    );
                 }
             }
         );
