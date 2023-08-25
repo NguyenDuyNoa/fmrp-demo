@@ -218,6 +218,7 @@ const Popup_chitiet = (props) => {
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 {/* {data?.warehouse_name} */}
                                                 <LinkWarehouse
+                                                    open={open}
                                                     warehouse_id={
                                                         data?.warehouse_id
                                                     }
