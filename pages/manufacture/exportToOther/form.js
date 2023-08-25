@@ -249,7 +249,7 @@ const Index = (props) => {
                                     value: ce?.warehouse_location?.id,
                                     warehouse_name:
                                         ce?.warehouse_location?.warehouse_name,
-                                    qty: ce?.quantity,
+                                    qty: ce?.warehouse_location?.quantity,
                                 },
                                 dataWarehouse: e?.item?.warehouseList.map(
                                     (ye) => ({
