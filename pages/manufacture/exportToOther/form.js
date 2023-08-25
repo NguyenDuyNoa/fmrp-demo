@@ -460,6 +460,7 @@ const Index = (props) => {
                     }
                 });
             } else {
+                sDataItems([]);
                 sDataListObject([]);
                 sListObject(null);
                 sIdExportWarehouse(null);
@@ -488,6 +489,7 @@ const Index = (props) => {
                     }
                 });
             } else {
+                sDataItems([]);
                 sIdExportWarehouse(value);
             }
         } else if (type == "object" && object != value) {
@@ -498,8 +500,7 @@ const Index = (props) => {
             sListObject(value);
         }
     };
-    console.log("sListObject", listObject);
-    console.log("sObject", object);
+
     const handleClearDate = (type) => {
         if (type === "effectiveDate") {
             sEffectiveDate(null);
@@ -842,6 +843,9 @@ const Index = (props) => {
         idBranch != null &&
             idExportWarehouse != null &&
             sOnFetchingItemsAll(true);
+        idBranch == null &&
+            idExportWarehouse == null &&
+            sOnFetchingItemsAll(false);
     }, [idBranch, idExportWarehouse]);
 
     useEffect(() => {
