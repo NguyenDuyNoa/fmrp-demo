@@ -383,6 +383,8 @@ const Index = (props) => {
                     });
                 }
             } else {
+                sIdRecalltWarehouse(null);
+                sDataItems([]);
                 sIdBranch(value);
             }
         } else if (
@@ -411,6 +413,7 @@ const Index = (props) => {
                     }
                 });
             } else {
+                sDataItems([]);
                 sIdRecalltWarehouse(value);
             }
         }
