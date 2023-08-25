@@ -356,7 +356,7 @@ const Index = (props) => {
                     sDataWarehouse(
                         result?.map((e) => ({
                             label: e?.warehouse_name,
-                            value: e?.warehouse_id,
+                            value: e?.id,
                         }))
                     );
                 }
