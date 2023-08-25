@@ -535,16 +535,20 @@ const Index = (props) => {
     }, [onFetchingLocation]);
 
     useEffect(() => {
-        (idBranch != null && sOnFetchingItemsAll(true)) ||
+        (idBranch != null &&
+            idRecalltWarehouse != null &&
+            sOnFetchingItemsAll(true)) ||
             (idBranch != null && sOnFetchingWarehouse(true)) ||
             (idRecalltWarehouse && sOnFetchingLocation(true));
+        idBranch == null &&
+            idRecalltWarehouse == null &&
+            sOnFetchingItemsAll(false);
     }, [idBranch, idRecalltWarehouse]);
 
     const formatNumber = (number) => {
         // const integerPart = Math.floor(number);
         return number.toLocaleString("en");
     };
-    console.log("listData", listData);
     const _ServerSending = () => {
         var formData = new FormData();
         formData.append("code", code);
