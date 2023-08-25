@@ -103,12 +103,18 @@ const Popup_chitiet = (props) => {
         );
     };
 
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         (onFetching && _ServerFetching_detailOrder()) ||
+    //             (onFetching && _ServerFetching());
+    //     }, 400);
+    // }, [open, props.id, onFetching]);
     useEffect(() => {
         setTimeout(() => {
             (onFetching && _ServerFetching_detailOrder()) ||
                 (onFetching && _ServerFetching());
         }, 400);
-    }, [open, props.id, onFetching]);
+    }, [open]);
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
     const [dataProductExpiry, sDataProductExpiry] = useState({});

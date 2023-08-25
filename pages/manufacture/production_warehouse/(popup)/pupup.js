@@ -93,7 +93,13 @@ const Popup_chitiet = (props) => {
             (onFetching && _ServerFetching_detailOrder()) ||
                 (onFetching && _ServerFetching());
         }, 400);
-    }, [open, props.id, onFetching]);
+    }, [open]);
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         (onFetching && _ServerFetching_detailOrder()) ||
+    //             (onFetching && _ServerFetching());
+    //     }, 400);
+    // }, [open, props.id, onFetching]);
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
     const [dataProductExpiry, sDataProductExpiry] = useState({});

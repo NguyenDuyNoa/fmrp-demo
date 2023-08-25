@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import Header from "./header";
 import PopupModelTime from "components/UI/modelTime";
 import { useSelector } from "react-redux";
-
 const Index = (props) => {
     // const [open, sOpen] = useState(false);
     // const data = useSelector((state) => state.auth);

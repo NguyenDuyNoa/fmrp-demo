@@ -267,7 +267,7 @@ const Index = (props) => {
             //     sDelivery_date(moment(value.target.value).format('YYYY-MM-DD'))
         } else if (type === "delivery_dateNew") {
             sDelivery_dateNew(value);
-        } else if (type === "purchases") {
+        } else if (type === "purchases" && idPurchases != value) {
             if (option?.length > 1) {
                 Swal.fire({
                     title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
@@ -302,7 +302,7 @@ const Index = (props) => {
             }
         } else if (type === "note") {
             sNote(value.target.value);
-        } else if (type == "branch") {
+        } else if (type == "branch" && idBranch != value) {
             if (sortedArr?.slice(1)?.length > 0) {
                 Swal.fire({
                     title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó"}`,
@@ -584,7 +584,7 @@ const Index = (props) => {
     }, [onFetchingItems]);
 
     useEffect(() => {
-        _ServerFetching_Items();
+        idPurchases?.length > 0 && _ServerFetching_Items();
     }, [idPurchases]);
 
     const _ServerFetching_ItemsAll = () => {
@@ -629,7 +629,7 @@ const Index = (props) => {
 
     ///Đang lỗi
     useEffect(() => {
-        idBranch && sOnFetchingItemsAll(true);
+        idBranch != null && sOnFetchingItemsAll(true);
     }, [idBranch]);
 
     useEffect(() => {
@@ -702,7 +702,7 @@ const Index = (props) => {
     }, [idPurchases?.length > 0]);
 
     const _HandleSeachApi = (inputValue) => {
-        if (loai === "0")
+        if (loai === "0" && inputValue != "")
             Axios(
                 "POST",
                 `/api_web/Api_product/searchItemsVariant?csrf_protection=true`,

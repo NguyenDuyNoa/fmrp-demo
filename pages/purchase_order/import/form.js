@@ -1684,27 +1684,28 @@ const Index = (props) => {
     };
 
     const _HandleSeachApi = (inputValue) => {
-        Axios(
-            "POST",
-            `/api_web/Api_purchase_order/purchase_order_not_stock_combobox/?csrf_protection=true`,
-            {
-                data: {
-                    term: inputValue,
+        inputValue != "" &&
+            Axios(
+                "POST",
+                `/api_web/Api_purchase_order/purchase_order_not_stock_combobox/?csrf_protection=true`,
+                {
+                    data: {
+                        term: inputValue,
+                    },
+                    params: {
+                        "filter[supplier_id]": idSupplier
+                            ? idSupplier?.value
+                            : null,
+                        import_id: id ? id : "",
+                    },
                 },
-                params: {
-                    "filter[supplier_id]": idSupplier
-                        ? idSupplier?.value
-                        : null,
-                    import_id: id ? id : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { result } = response?.data.data;
-                    sDataItems(result);
+                (err, response) => {
+                    if (!err) {
+                        var { result } = response?.data.data;
+                        sDataItems(result);
+                    }
                 }
-            }
-        );
+            );
     };
 
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);

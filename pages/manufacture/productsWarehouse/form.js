@@ -335,7 +335,7 @@ const Index = (props) => {
         sOnFetchingLocation(false);
     };
     const _HandleSeachApi = (inputValue) => {
-        if (idBranch == null || idImportWarehouse == null) {
+        if (idBranch == null || idImportWarehouse == null || inputValue == "") {
             sDataItems([]);
         } else {
             Axios(

@@ -1436,8 +1436,11 @@ const BtnTacVu = React.memo((props) => {
     }, [onFetching]);
 
     useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [props?.id]);
+        open && sOnFetching(true);
+    }, [open]);
+    // useEffect(() => {
+    //     props?.id && sOnFetching(true);
+    // }, [props?.id]);
 
     const _HandleDelete = (id) => {
         Swal.fire({

@@ -449,12 +449,14 @@ const Index = (props) => {
                                     </h2>
                                 </div>
                                 <div className="flex justify-end items-center">
-                                    <Link
-                                        href={"/warehouses/warehouse"}
+                                    <button
+                                        type="button"
+                                        // href={"/warehouses/warehouse"}
+                                        onClick={() => router.back()}
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.warehouses_detail_back}
-                                    </Link>
+                                    </button>
                                 </div>
                             </div>
                             <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">

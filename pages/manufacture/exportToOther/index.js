@@ -83,8 +83,7 @@ const Index = (props) => {
 
     const [listBr, sListBr] = useState([]);
     const [lisCode, sListCode] = useState([]);
-    const [listSupplier, sListSupplier] = useState([]);
-
+    const [lisObject, sListObject] = useState([]);
     const [listDs, sListDs] = useState();
     const [dataWarehouse, sDataWarehouse] = useState([]);
 
@@ -92,6 +91,7 @@ const Index = (props) => {
     const [idRecallWarehouse, sIdRecallWarehouse] = useState(null);
     const [idSupplier, sIdSupplier] = useState(null);
     const [idBranch, sIdBranch] = useState(null);
+    const [idObject, sIdObject] = useState(null);
     const [valueDate, sValueDate] = useState({
         startDate: null,
         endDate: null,
@@ -115,7 +115,7 @@ const Index = (props) => {
         const tabPage = router.query?.tab;
         Axios(
             "GET",
-            `/api_web/Api_material_recall/materialRecall/?csrf_protection=true`,
+            `/api_web/Api_export_other/exportOther/?csrf_protection=true`,
             {
                 params: {
                     search: keySearch,
@@ -135,6 +135,7 @@ const Index = (props) => {
                         idRecallWarehouse != null
                             ? idRecallWarehouse?.value
                             : null,
+                    "filter[object]": idObject != null ? idObject?.value : null,
                 },
             },
             (err, response) => {
@@ -154,7 +155,7 @@ const Index = (props) => {
     const _ServerFetching_group = () => {
         Axios(
             "GET",
-            `/api_web/Api_material_recall/filterBar/?csrf_protection=true`,
+            `/api_web/Api_export_other/filterBar/?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -172,6 +173,7 @@ const Index = (props) => {
                         idRecallWarehouse != null
                             ? idRecallWarehouse?.value
                             : null,
+                    "filter[object]": idObject != null ? idObject?.value : null,
                 },
             },
             (err, response) => {
@@ -200,14 +202,14 @@ const Index = (props) => {
         );
         Axios(
             "GET",
-            "/api_web/Api_material_recall/materialRecallCombobox/?csrf_protection=true",
+            "/api_web/Api_export_other/exportOtherCombobox/?csrf_protection=true",
             {},
             (err, response) => {
                 if (!err) {
                     var { isSuccess, result } = response?.data;
                     sListCode(
                         result?.map((e) => ({
-                            label: `${e.code}`,
+                            label: e?.code,
                             value: e.id,
                         }))
                     );
@@ -230,30 +232,48 @@ const Index = (props) => {
                 }
             }
         );
-        sOnFetching_filter(false);
-    };
-
-    const _HandleSeachApi = (inputValue) => {
         Axios(
-            "POST",
-            `/api_web/Api_material_recall/materialRecallCombobox/?csrf_protection=true`,
-            {
-                data: {
-                    term: inputValue,
-                },
-            },
+            "GET",
+            "/api_web/Api_export_other/object/?csrf_protection=true",
+            {},
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, result } = response?.data;
-                    sListCode(
-                        result?.map((e) => ({
-                            label: `${e.code}`,
-                            value: e.id,
+                    var data = response?.data;
+                    sListObject(
+                        data?.map((e) => ({
+                            label: dataLang[e?.name],
+                            value: e?.id,
                         }))
                     );
                 }
             }
         );
+        sOnFetching_filter(false);
+    };
+
+    const _HandleSeachApi = (inputValue) => {
+        inputValue != "" &&
+            Axios(
+                "POST",
+                `/api_web/Api_export_other/exportOtherCombobox/?csrf_protection=true`,
+                {
+                    data: {
+                        term: inputValue,
+                    },
+                },
+                (err, response) => {
+                    if (!err) {
+                        var { isSuccess, result } = response?.data;
+
+                        sListCode(
+                            result?.map((e) => ({
+                                label: e?.code,
+                                value: e.id,
+                            }))
+                        );
+                    }
+                }
+            );
     };
 
     useEffect(() => {
@@ -275,7 +295,8 @@ const Index = (props) => {
                 sOnFetching(true)) ||
             (idSupplier != null && sOnFetching(true)) ||
             (idCode != null && sOnFetching(true)) ||
-            (idRecallWarehouse != null && sOnFetching(true));
+            (idRecallWarehouse != null && sOnFetching(true)) ||
+            (idObject != null && sOnFetching(true));
     }, [
         limit,
         router.query?.page,
@@ -286,6 +307,7 @@ const Index = (props) => {
         idSupplier,
         idCode,
         idRecallWarehouse,
+        idObject,
     ]);
 
     const formatNumber = (number) => {
@@ -341,6 +363,8 @@ const Index = (props) => {
             sIdCode(value);
         } else if (type == "idRecallWarehouse") {
             sIdRecallWarehouse(value);
+        } else if (type == "idObject") {
+            sIdObject(value);
         }
     };
 
@@ -381,6 +405,17 @@ const Index = (props) => {
                 },
                 {
                     title: `${
+                        dataLang?.exportToOthe_objectType ||
+                        "exportToOthe_objectType"
+                    }`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
+                {
+                    title: `${
                         dataLang?.production_warehouse_orderNumber ||
                         "production_warehouse_orderNumber"
                     }`,
@@ -402,7 +437,10 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.recall_totalQty || "recall_totalQty"}`,
+                    title: `${
+                        dataLang?.production_warehouse_Total_value ||
+                        "production_warehouse_Total_value"
+                    }`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -455,11 +493,11 @@ const Index = (props) => {
                 { value: `${e?.date ? e?.date : ""}` },
                 { value: `${e?.code ? e?.code : ""}` },
                 { value: `${"Số LSX chi tiết"}` },
+                { value: `${e?.object ? dataLang[e?.object] : ""}` },
                 { value: `${e?.warehouse_name ? e?.warehouse_name : ""}` },
+
                 {
-                    value: `${
-                        e?.total_quantity ? formatNumber(e?.total_quantity) : ""
-                    }`,
+                    value: `${e?.amount ? formatNumber(e?.amount) : ""}`,
                 },
                 { value: `${e?.note ? e?.note : ""}` },
                 {
@@ -482,7 +520,6 @@ const Index = (props) => {
     ];
 
     const [data_export, sData_export] = useState([]);
-    const [errOpen, sErrOpen] = useState(false);
     const [checkedWare, sCheckedWare] = useState({});
     const _HandleChangeInput = (id, checkedUn, type, value) => {
         if (type === "browser") {
@@ -519,7 +556,8 @@ const Index = (props) => {
         data.append("id", checkedWare?.id);
         Axios(
             "POST",
-            `/api_web/Api_material_recall/confirmWarehouse/?csrf_protection=true`,
+            `/api_web/Api_export_other/confirmWarehouse?csrf_protection=true
+            `,
             {
                 data: data,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -549,6 +587,7 @@ const Index = (props) => {
             }
         );
     };
+
     useEffect(() => {
         onSending && _ServerSending();
     }, [onSending]);
@@ -561,14 +600,53 @@ const Index = (props) => {
         checkedWare.id != null && sOnSending(true);
     }, [checkedWare.id != null]);
 
+    const typeInfo = {
+        client: {
+            colorClassName: "text-sky-500 bg-sky-200",
+            textColorClassName: "text-sky-500",
+        },
+        supplier: {
+            colorClassName: "text-orange-500 bg-orange-200",
+            textColorClassName: "text-orange-500",
+        },
+        other: {
+            colorClassName: "text-lime-500 bg-lime-200",
+            textColorClassName: "text-lime-500",
+        },
+        staff: {
+            colorClassName: "text-rose-500 bg-rose-200",
+            textColorClassName: "text-rose-500",
+        },
+        // Add more types as needed
+    };
+
+    const RenderColoredSpan = ({ objectType, objectKey }) => {
+        const typeInfoItem = typeInfo[objectType];
+        if (!typeInfoItem) return null; // Bỏ qua nếu không có thông tin tương ứng
+
+        return (
+            <span
+                key={objectKey}
+                className={`flex items-center justify-center gap-1 font-normal rounded-xl py-1  text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] ${typeInfoItem.colorClassName}`}
+            >
+                <span
+                    className={`flex items-center justify-center ${typeInfoItem.textColorClassName}`}
+                >
+                    {dataLang[objectKey] || objectKey}
+                </span>
+            </span>
+        );
+    };
+
     return (
         <React.Fragment>
             <Head>
-                <title>{dataLang?.recall_title || "recall_title"}</title>
+                <title>
+                    {dataLang?.exportToOthe_exporttoOther ||
+                        "exportToOthe_exporttoOther"}
+                </title>
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
-                {/* {data_export.length > 0 && <Popup_status className="hidden" data_export={data_export} dataLang={dataLang}/>} */}
-                {/* trangthaiExprired */}
                 {data_export.length > 0 && (
                     <Popup_status
                         type="recall"
@@ -584,10 +662,13 @@ const Index = (props) => {
                         className={` flex space-x-3  xl:text-[14.5px] text-[12px]`}
                     >
                         <h6 className="text-[#141522]/40">
-                            {dataLang?.recall_title || "recall_title"}
+                            {dataLang?.exportToOthe_exporttoOther ||
+                                "exportToOthe_exporttoOther"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.recall_title || "recall_title"}</h6>
+                        <h6>
+                            {dataLang?.exportToOthe_list || "exportToOthe_list"}
+                        </h6>
                     </div>
                 )}
 
@@ -596,11 +677,12 @@ const Index = (props) => {
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className="flex justify-between">
                                 <h2 className="text-2xl text-[#52575E] capitalize">
-                                    {dataLang?.recall_title || "recall_title"}
+                                    {dataLang?.exportToOthe_list ||
+                                        "exportToOthe_list"}
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Link
-                                        href="/manufacture/recall/form"
+                                        href="/manufacture/exportToOther/form"
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.purchase_order_new ||
@@ -642,7 +724,7 @@ const Index = (props) => {
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded-lg grid grid-cols-6 justify-between xl:p-3 p-2">
                                         <div className="col-span-5">
-                                            <div className="grid grid-cols-5 items-center">
+                                            <div className="grid grid-cols-6 items-center">
                                                 <div className="col-span-1">
                                                     <form className="flex items-center relative">
                                                         <IconSearch
@@ -736,6 +818,79 @@ const Index = (props) => {
                                                 </div>
                                                 <div className="ml-1 col-span-1">
                                                     <Select
+                                                        options={[
+                                                            {
+                                                                value: "",
+                                                                label:
+                                                                    dataLang?.exportToOthe_objectType ||
+                                                                    "exportToOthe_objectType",
+                                                                isDisabled: true,
+                                                            },
+                                                            ...lisObject,
+                                                        ]}
+                                                        onChange={onchang_filter.bind(
+                                                            this,
+                                                            "idObject"
+                                                        )}
+                                                        value={idObject}
+                                                        placeholder={
+                                                            dataLang?.exportToOthe_objectType ||
+                                                            "exportToOthe_objectType"
+                                                        }
+                                                        hideSelectedOptions={
+                                                            false
+                                                        }
+                                                        isClearable={true}
+                                                        className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
+                                                        isSearchable={true}
+                                                        noOptionsMessage={() =>
+                                                            dataLang?.returns_nodata ||
+                                                            "returns_nodata"
+                                                        }
+                                                        style={{
+                                                            border: "none",
+                                                            boxShadow: "none",
+                                                            outline: "none",
+                                                        }}
+                                                        theme={(theme) => ({
+                                                            ...theme,
+                                                            colors: {
+                                                                ...theme.colors,
+                                                                primary25:
+                                                                    "#EBF5FF",
+                                                                primary50:
+                                                                    "#92BFF7",
+                                                                primary:
+                                                                    "#0F4F9E",
+                                                            },
+                                                        })}
+                                                        styles={{
+                                                            placeholder: (
+                                                                base
+                                                            ) => ({
+                                                                ...base,
+                                                                color: "#cbd5e1",
+                                                            }),
+                                                            control: (
+                                                                base,
+                                                                state
+                                                            ) => ({
+                                                                ...base,
+                                                                border: "none",
+                                                                outline: "none",
+                                                                boxShadow:
+                                                                    "none",
+                                                                ...(state.isFocused && {
+                                                                    boxShadow:
+                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                }),
+                                                            }),
+                                                        }}
+                                                    />
+                                                </div>
+
+                                                <div className="ml-1 col-span-1">
+                                                    <Select
                                                         onInputChange={_HandleSeachApi.bind(
                                                             this
                                                         )}
@@ -815,8 +970,8 @@ const Index = (props) => {
                                                             {
                                                                 value: "",
                                                                 label:
-                                                                    dataLang?.productsWarehouse_warehouseImport ||
-                                                                    "productsWarehouse_warehouseImport",
+                                                                    dataLang?.exportToOthe_warehouse ||
+                                                                    "exportToOthe_warehouse",
                                                                 isDisabled: true,
                                                             },
                                                             ...dataWarehouse,
@@ -829,8 +984,8 @@ const Index = (props) => {
                                                             idRecallWarehouse
                                                         }
                                                         placeholder={
-                                                            dataLang?.productsWarehouse_warehouseImport ||
-                                                            "productsWarehouse_warehouseImport"
+                                                            dataLang?.exportToOthe_warehouse ||
+                                                            "exportToOthe_warehouse"
                                                         }
                                                         hideSelectedOptions={
                                                             false
@@ -940,9 +1095,9 @@ const Index = (props) => {
                                                     {dataExcel?.length > 0 && (
                                                         <ExcelFile
                                                             filename={
-                                                                "Danh sách thu hồi nguyên vật liệu"
+                                                                "Danh sách xuất kho khác"
                                                             }
-                                                            title="DSTHNVL"
+                                                            title="DSXKK"
                                                             element={
                                                                 <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
                                                                     <IconExcel
@@ -1023,8 +1178,8 @@ const Index = (props) => {
                                     </div>
                                 </div>
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                    <div className="pr-2 w-[100%]">
-                                        <div className="grid grid-cols-10 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
+                                    <div className="pr-2 w-[100%] ">
+                                        <div className="grid grid-cols-11 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.import_day_vouchers ||
                                                     "import_day_vouchers"}
@@ -1034,16 +1189,20 @@ const Index = (props) => {
                                                     "import_code_vouchers"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.exportToOthe_objectType ||
+                                                    "exportToOthe_objectType"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.production_warehouse_LSX ||
                                                     "production_warehouse_LSX"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.recall_wareChild ||
-                                                    "recall_wareChild"}
+                                                {dataLang?.exportToOthe_warehouse ||
+                                                    "exportToOthe_warehouse"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.productsWarehouse_total ||
-                                                    "productsWarehouse_total"}
+                                                {dataLang?.exportToOthe_totalValue ||
+                                                    "exportToOthe_totalValue"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.production_warehouse_note ||
@@ -1076,7 +1235,7 @@ const Index = (props) => {
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                                     {data?.map((e) => (
                                                         <div
-                                                            className="relative  grid grid-cols-10 items-center py-1.5  hover:bg-slate-100/40 group"
+                                                            className="relative  grid grid-cols-11 items-center py-1.5  hover:bg-slate-100/40 group"
                                                             key={e.id.toString()}
                                                         >
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
@@ -1100,8 +1259,62 @@ const Index = (props) => {
                                                                     id={e?.id}
                                                                 />
                                                             </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left truncate">
+                                                                {/* <div className="mx-auto">
+                                                                    {(e?.object ===
+                                                                        "client" && (
+                                                                        <span className="flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
+                                                                            {dataLang[
+                                                                                e
+                                                                                    ?.object
+                                                                            ] ||
+                                                                                e?.object}
+                                                                        </span>
+                                                                    )) ||
+                                                                        (e?.object ===
+                                                                            "supplier" && (
+                                                                            <span className=" flex items-center justify-center font-normal text-orange-500 rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-orange-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
+                                                                                {dataLang[
+                                                                                    e
+                                                                                        ?.object
+                                                                                ] ||
+                                                                                    e?.object}
+                                                                            </span>
+                                                                        )) ||
+                                                                        (e?.object ===
+                                                                            "other" && (
+                                                                            <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-lime-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
+                                                                                {dataLang[
+                                                                                    e
+                                                                                        ?.object
+                                                                                ] ||
+                                                                                    e?.object}
+                                                                            </span>
+                                                                        )) ||
+                                                                        (e?.object ===
+                                                                            "staff" && (
+                                                                            <span className="flex items-center justify-center gap-1 font-normal text-rose-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-rose-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
+                                                                                {dataLang[
+                                                                                    e
+                                                                                        ?.object
+                                                                                ] ||
+                                                                                    e?.object}
+                                                                            </span>
+                                                                        ))}
+                                                                </div> */}
+                                                                <div className="mx-auto">
+                                                                    <RenderColoredSpan
+                                                                        objectType={
+                                                                            e.object
+                                                                        }
+                                                                        objectKey={
+                                                                            e.object
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right"></h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  col-span-1 text-left truncate">
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-1 text-left truncate">
                                                                 <LinkWarehouse
                                                                     warehouse_id={
                                                                         e?.warehouse_id
@@ -1114,7 +1327,7 @@ const Index = (props) => {
 
                                                             <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-center flex items-center justify-end space-x-1">
                                                                 {formatNumber(
-                                                                    e?.total_quantity
+                                                                    e?.amount
                                                                 )}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left truncate">
@@ -1246,7 +1459,7 @@ const Index = (props) => {
                                                                                 "0"
                                                                                     ? "text-[#6366f1]"
                                                                                     : "text-lime-500"
-                                                                            }  3xl:text-[14px] 2xl:text-[10px] xl:text-[10px] text-[8px] font-medium cursor-pointer`}
+                                                                            }  3xl:text-[13px] 2xl:text-[10px] xl:text-[10px] text-[8px] font-medium cursor-pointer`}
                                                                         >
                                                                             {e?.warehouseman_id ==
                                                                             "0"
@@ -1265,7 +1478,7 @@ const Index = (props) => {
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
                                                                 <BtnTacVu
-                                                                    type="recall"
+                                                                    type="exportToOther"
                                                                     onRefresh={_ServerFetching.bind(
                                                                         this
                                                                     )}
@@ -1307,16 +1520,16 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="grid grid-cols-9 bg-gray-100 items-center">
-                            <div className="col-span-3 p-2 text-center">
+                        <div className="grid grid-cols-11 bg-gray-100 items-center">
+                            <div className="col-span-5 p-2 text-center">
                                 <h3 className="uppercase      font-medium  text-zinc-600 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
-                                    {dataLang?.productsWarehouse_total ||
-                                        "productsWarehouse_total"}
+                                    {dataLang?.exportToOthe_totalValue ||
+                                        "exportToOthe_totalValue"}
                                 </h3>
                             </div>
                             <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
-                                <h3 className="     font-medium  text-zinc-600 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px] ">
-                                    {formatNumber(total?.total_quantity)}
+                                <h3 className="px-2 font-medium  text-zinc-600 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px] ">
+                                    {formatNumber(total?.amount)}
                                 </h3>
                             </div>
                         </div>
@@ -1374,7 +1587,7 @@ const BtnTacVu = React.memo((props) => {
             if (result.isConfirmed) {
                 Axios(
                     "DELETE",
-                    `/api_web/Api_material_recall/materialRecall/${id}?csrf_protection=true`,
+                    `/api_web/Api_export_other/exportOther/${id}?csrf_protection=true`,
                     {},
                     (err, response) => {
                         if (!err) {
@@ -1409,7 +1622,7 @@ const BtnTacVu = React.memo((props) => {
                 }`,
             });
         } else {
-            router.push(`/manufacture/recall/form?id=${props.id}`);
+            router.push(`/manufacture/exportToOther/form?id=${props.id}`);
         }
     };
 
@@ -1430,7 +1643,7 @@ const BtnTacVu = React.memo((props) => {
         if (props?.id) {
             Axios(
                 "GET",
-                `/api_web/Api_material_recall/materialRecall/${props?.id}?csrf_protection=true`,
+                `/api_web/Api_export_other/exportOther/${props?.id}?csrf_protection=true`,
                 {},
                 (err, response) => {
                     if (!err) {

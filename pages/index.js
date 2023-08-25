@@ -48,7 +48,7 @@ const Index = () => {
                 <title>Tổng quan</title>
             </Head>
 
-            <div className="px-10 py-8 space-y-5 pt-24 overflow-x-auto text">
+            <div className="px-10 py-8 space-y-5 pt-24 overflow-x-auto text ">
                 {dataPstWH && (
                     <div
                         style={{

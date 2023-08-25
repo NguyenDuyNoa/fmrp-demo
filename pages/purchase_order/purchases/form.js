@@ -420,27 +420,28 @@ const Index = (props) => {
         );
     };
     const _HandleSeachApi = (inputValue) => {
-        Axios(
-            "POST",
-            `/api_web/api_product/searchItemsVariant?csrf_protection=true`,
-            {
-                data: {
-                    term: inputValue,
+        inputValue != "" &&
+            Axios(
+                "POST",
+                `/api_web/api_product/searchItemsVariant?csrf_protection=true`,
+                {
+                    data: {
+                        term: inputValue,
+                    },
                 },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { result } = response?.data.data;
-                    sData(
-                        result?.map((e) => ({
-                            label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
-                            value: e.id,
-                            e,
-                        }))
-                    );
+                (err, response) => {
+                    if (!err) {
+                        var { result } = response?.data.data;
+                        sData(
+                            result?.map((e) => ({
+                                label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+                                value: e.id,
+                                e,
+                            }))
+                        );
+                    }
                 }
-            }
-        );
+            );
     };
 
     useEffect(() => {

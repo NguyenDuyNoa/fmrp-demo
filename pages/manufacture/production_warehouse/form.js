@@ -323,7 +323,7 @@ const Index = (props) => {
         sOnFetchingExportWarehouse(false);
     };
     const _HandleSeachApi = (inputValue) => {
-        if (idBranch == null || idExportWarehouse == null) {
+        if (idBranch == null || idExportWarehouse == null || inputValue == "") {
             sDataItems([]);
         } else {
             Axios(
