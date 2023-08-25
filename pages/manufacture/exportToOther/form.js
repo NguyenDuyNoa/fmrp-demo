@@ -407,7 +407,10 @@ const Index = (props) => {
                 if (!err) {
                     var { isSuccess, rResult } = response.data;
                     sDataListObject(
-                        rResult?.map((e) => ({ label: e.name, value: e.id }))
+                        rResult?.map((e) => ({
+                            label: e.name,
+                            value: e.staffid,
+                        }))
                     );
                 }
             }
@@ -495,7 +498,8 @@ const Index = (props) => {
             sListObject(value);
         }
     };
-
+    console.log("sListObject", listObject);
+    console.log("sObject", object);
     const handleClearDate = (type) => {
         if (type === "effectiveDate") {
             sEffectiveDate(null);
