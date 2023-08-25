@@ -1094,7 +1094,7 @@ const Index = (props) => {
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
                                                                 {/* {formatNumber(e.total_price)} */}
                                                             </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-1 text-left">
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-1 text-left truncate">
                                                                 <LinkWarehouse
                                                                     warehouse_id={
                                                                         e?.warehouse_id
