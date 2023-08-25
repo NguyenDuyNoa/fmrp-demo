@@ -44,6 +44,7 @@ import { useEffect } from "react";
 
 import ExpandableContent from "components/UI/more";
 import ImageErrors from "components/UI/imageErrors";
+import LinkWarehouse from "pages/manufacture/(linkWarehouse)/linkWarehouse";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -233,7 +234,16 @@ const Popup_chitiet = (props) => {
                                                     "recall_wareChild"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
-                                                {data?.warehouse_name}
+                                                {/* {data?.warehouse_name} */}
+                                                <LinkWarehouse
+                                                    open={open}
+                                                    warehouse_id={
+                                                        data?.warehouse_id
+                                                    }
+                                                    warehouse_name={
+                                                        data?.warehouse_name
+                                                    }
+                                                />
                                             </h3>
                                         </div>
                                     </div>
