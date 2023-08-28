@@ -817,7 +817,7 @@ const Index = (props) => {
     const _ServerFetching_Warehouse = () => {
         Axios(
             "GET",
-            "/api_web/api_warehouse/location/?csrf_protection=true",
+            "/api_web/api_warehouse/Getcomboboxlocation/?csrf_protection=true",
             {
                 params: {
                     "filter[branch_id]": idBranch.value,

@@ -19,6 +19,7 @@ import {
     LocationTick,
     User,
     House2,
+    Refresh2,
 } from "iconsax-react";
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
@@ -316,7 +317,9 @@ const Index = (props) => {
         },
     ];
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
-
+    const _HandleFresh = () => {
+        sOnFetching(true);
+    };
     return (
         <React.Fragment>
             <Head>
@@ -380,25 +383,27 @@ const Index = (props) => {
                 </div> */}
                             <div className="space-y-2 2xl:h-[100%] h-[75%] overflow-hidden">
                                 <div className="xl:space-y-3 space-y-2">
-                                    <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
-                                        <div className="flex gap-2">
-                                            <form className="flex items-center relative">
-                                                <IconSearch
-                                                    size={20}
-                                                    className="absolute left-3 z-10 text-[#cccccc]"
-                                                />
-                                                <input
-                                                    className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-1.5 rounded-md w-[400px]"
-                                                    type="text"
-                                                    onChange={_HandleOnChangeKeySearch.bind(
-                                                        this
-                                                    )}
-                                                    placeholder={
-                                                        dataLang?.branch_search
-                                                    }
-                                                />
-                                            </form>
-                                            <div className="ml-1 w-[23vw]">
+                                    <div className="bg-slate-100 w-full rounded grid grid-cols-6 items-center justify-between xl:p-3 p-2">
+                                        <div className="col-span-5 grid grid-cols-5 ">
+                                            <div className="col-span-1">
+                                                <form className="flex items-center relative">
+                                                    <IconSearch
+                                                        size={20}
+                                                        className="absolute left-3 z-10 text-[#cccccc]"
+                                                    />
+                                                    <input
+                                                        className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-1.5 rounded-md w-[400px]"
+                                                        type="text"
+                                                        onChange={_HandleOnChangeKeySearch.bind(
+                                                            this
+                                                        )}
+                                                        placeholder={
+                                                            dataLang?.branch_search
+                                                        }
+                                                    />
+                                                </form>
+                                            </div>
+                                            <div className="ml-1 col-span-1">
                                                 <Select
                                                     placeholder={"Chọn kho"}
                                                     menuPlacement="auto"
@@ -472,58 +477,96 @@ const Index = (props) => {
                                                 ></Select>
                                             </div>
                                         </div>
-
-                                        <div className="flex space-x-2 items-center">
-                                            {data_ex?.length > 0 && (
-                                                <ExcelFile
-                                                    filename="Vị trí kho"
-                                                    title="Vtk"
-                                                    element={
-                                                        <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                            <IconExcel
-                                                                size={18}
-                                                            />
-                                                            <span>
-                                                                {
-                                                                    dataLang?.client_list_exportexcel
-                                                                }
-                                                            </span>
-                                                        </button>
-                                                    }
+                                        <div className="col-span-1">
+                                            <div className="flex space-x-2 items-center justify-end">
+                                                <button
+                                                    onClick={_HandleFresh.bind(
+                                                        this
+                                                    )}
+                                                    type="button"
+                                                    className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none"
                                                 >
-                                                    <ExcelSheet
-                                                        dataSet={multiDataSet}
-                                                        data={multiDataSet}
-                                                        name="Organization"
+                                                    <Refresh2
+                                                        className="group-hover:-rotate-45 transition-all ease-in-out "
+                                                        size="22"
+                                                        color="green"
                                                     />
-                                                </ExcelFile>
-                                            )}
-                                            <label className="font-[300] text-slate-400">
-                                                {dataLang?.display}
-                                            </label>
-                                            <select
-                                                className="outline-none"
-                                                onChange={(e) =>
-                                                    sLimit(e.target.value)
-                                                }
-                                                value={limit}
-                                            >
-                                                <option
-                                                    disabled
-                                                    className="hidden"
-                                                >
-                                                    {limit == -1
-                                                        ? "Tất cả"
-                                                        : limit}
-                                                </option>
-                                                <option value={15}>15</option>
-                                                <option value={20}>20</option>
-                                                <option value={40}>40</option>
-                                                <option value={60}>60</option>
-                                                <option value={-1}>
-                                                    Tất cả
-                                                </option>
-                                            </select>
+                                                </button>
+                                                {data_ex?.length > 0 && (
+                                                    <ExcelFile
+                                                        filename="Vị trí kho"
+                                                        title="Vtk"
+                                                        element={
+                                                            <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
+                                                                <IconExcel
+                                                                    size={18}
+                                                                />
+                                                                <span>
+                                                                    {
+                                                                        dataLang?.client_list_exportexcel
+                                                                    }
+                                                                </span>
+                                                            </button>
+                                                        }
+                                                    >
+                                                        <ExcelSheet
+                                                            dataSet={
+                                                                multiDataSet
+                                                            }
+                                                            data={multiDataSet}
+                                                            name="Organization"
+                                                        />
+                                                    </ExcelFile>
+                                                )}
+                                                <div className="">
+                                                    <div className="font-[300] text-slate-400 2xl:text-xs xl:text-sm text-[8px]">
+                                                        {dataLang?.display}
+                                                    </div>
+                                                    <select
+                                                        className="outline-none  text-[10px] xl:text-xs 2xl:text-sm"
+                                                        onChange={(e) =>
+                                                            sLimit(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        value={limit}
+                                                    >
+                                                        <option
+                                                            className="text-[10px] xl:text-xs 2xl:text-sm hidden"
+                                                            disabled
+                                                        >
+                                                            {limit == -1
+                                                                ? "Tất cả"
+                                                                : limit}
+                                                        </option>
+                                                        <option
+                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
+                                                            value={15}
+                                                        >
+                                                            15
+                                                        </option>
+                                                        <option
+                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
+                                                            value={20}
+                                                        >
+                                                            20
+                                                        </option>
+                                                        <option
+                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
+                                                            value={40}
+                                                        >
+                                                            40
+                                                        </option>
+                                                        <option
+                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
+                                                            value={60}
+                                                        >
+                                                            60
+                                                        </option>
+                                                        {/* <option value={-1}>Tất cả</option> */}
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
