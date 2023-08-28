@@ -230,8 +230,8 @@ const Popup_chitiet = (props) => {
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
                                                 {props?.dataLang
-                                                    ?.recall_wareChild ||
-                                                    "recall_wareChild"}
+                                                    ?.productsWarehouse_warehouseImport ||
+                                                    "productsWarehouse_warehouseImport"}
                                             </h3>
                                             <h3 className="text-[13px] font-medium capitalize">
                                                 {/* {data?.warehouse_name} */}
@@ -306,23 +306,18 @@ const Popup_chitiet = (props) => {
                                     </div>
                                 </div>
                                 <div className=" w-[100%]">
-                                    {/* <div className={`${dataProductSerial.is_enable == "1" ? 
-                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
-                       (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow-lg  z-10`}> */}
                                     <div
                                         className={`grid-cols-11  grid sticky top-0 bg-white shadow-lg  z-10 rounded `}
                                     >
-                                        {/* <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_image || "import_detail_image"}</h4> */}
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-3 text-center whitespace-nowrap">
                                             {props.dataLang
                                                 ?.import_detail_items ||
                                                 "import_detail_items"}
                                         </h4>
-                                        {/* <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4>  */}
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                                             {props.dataLang
-                                                ?.recall_locationChild ||
-                                                "recall_locationChild"}
+                                                ?.productsWarehouse_warehouseLocaImport ||
+                                                "productsWarehouse_warehouseLocaImport"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                                             {"ĐVT"}
@@ -332,14 +327,6 @@ const Popup_chitiet = (props) => {
                                                 ?.recall_revenueQty ||
                                                 "recall_revenueQty"}
                                         </h4>
-                                        {/* <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                            {props.dataLang?.recall_price ||
-                                                "recall_price"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {props.dataLang?.recall_money ||
-                                                "recall_money"}
-                                        </h4> */}
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                                             {props.dataLang?.import_from_note ||
                                                 "import_from_note"}
@@ -450,13 +437,6 @@ const Popup_chitiet = (props) => {
                                                                 </div>
                                                             </h6>
                                                             <h6 className="text-[13px]   px-2 py-2 col-span-2 text-center break-words">
-                                                                {/* <h6 className="font-medium">
-                                                                    {
-                                                                        e
-                                                                            ?.warehouse
-                                                                            ?.warehouse_name
-                                                                    }
-                                                                </h6> */}
                                                                 <h6 className="font-medium">
                                                                     {
                                                                         e
@@ -473,16 +453,6 @@ const Popup_chitiet = (props) => {
                                                                     e?.quantity
                                                                 )}
                                                             </h6>
-                                                            {/* <h6 className="text-[13px]   py-2 col-span-1 font-medium text-right mr-1">
-                                                                {formatNumber(
-                                                                    e?.price
-                                                                )}
-                                                            </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-2 font-medium text-right mr-1">
-                                                                {formatNumber(
-                                                                    e?.amount
-                                                                )}
-                                                            </h6> */}
                                                             <h6 className="text-[13px]   py-2 col-span-2 font-medium text-left ml-3.5">
                                                                 {e?.note !=
                                                                 undefined ? (
@@ -549,13 +519,6 @@ const Popup_chitiet = (props) => {
                                                     "recall_totalQty"}
                                             </h3>
                                         </div>
-                                        {/* <div className="font-medium text-left text-[13px]">
-                                            <h3>
-                                                {props.dataLang
-                                                    ?.recall_totalAmount ||
-                                                    "recall_totalAmount"}
-                                            </h3>
-                                        </div> */}
                                     </div>
                                     <div className="col-span-3 space-y-1 text-right">
                                         <div className="font-medium mr-2.5">
@@ -579,20 +542,6 @@ const Popup_chitiet = (props) => {
                                                 )}
                                             </h3>
                                         </div>
-                                        {/* <div className="font-medium mr-2.5">
-                                            <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatNumber(
-                                                    data?.items?.reduce(
-                                                        (total, item) =>
-                                                            (total += Number(
-                                                                item.quantity *
-                                                                    item.price
-                                                            )),
-                                                        0
-                                                    )
-                                                )}
-                                            </h3>
-                                        </div> */}
                                     </div>
                                 </div>
                             </div>

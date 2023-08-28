@@ -372,7 +372,6 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     var data = response.data;
-                    // console.log("result", data);
                     sDataLocation(
                         data?.map((e) => ({
                             label: e?.location_name,
@@ -1482,12 +1481,6 @@ const Index = (props) => {
                                         />
                                     </button>
                                 </div>
-                                {/* <div className="col-span-1 mb-0.5 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b-2 w-full border-gray-200">
-                                    1
-                                </div>
-                                <div className="col-span-1 mb-0.5 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b-2 w-full border-gray-200">
-                                    1
-                                </div> */}
                                 <input
                                     placeholder={
                                         dataLang?.recall_noteChild ||
@@ -1747,26 +1740,7 @@ const Index = (props) => {
                                                                         option
                                                                     ) => (
                                                                         <div className="cursor-pointer">
-                                                                            {/* <div className="flex gap-1">
-                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                    {dataLang?.recall_wareChild ||
-                                                                                        "recall_wareChild"}
-
-                                                                                    :
-                                                                                </h2>
-                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
-                                                                                    {
-                                                                                        option?.warehouse_name
-                                                                                    }
-                                                                                </h2>
-                                                                            </div> */}
                                                                             <div className="flex gap-1">
-                                                                                {/* <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                    {dataLang?.productsWarehouse_warehouseLocaImport ||
-                                                                                        "productsWarehouse_warehouseLocaImport"}
-
-                                                                                    :
-                                                                                </h2> */}
                                                                                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
                                                                                     {
                                                                                         option?.label
@@ -1965,43 +1939,6 @@ const Index = (props) => {
                                                                     />
                                                                 </button>
                                                             </div>
-                                                            {/* <div className="flex justify-center  h-full p-0.5 flex-col items-center">
-                                                                <NumericFormat
-                                                                    className={`${
-                                                                        errQty &&
-                                                                        (ce?.price ==
-                                                                            null ||
-                                                                            ce?.price ==
-                                                                                "" ||
-                                                                            ce?.price ==
-                                                                                0)
-                                                                            ? "border-red-500 border-b"
-                                                                            : ""
-                                                                    } placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b-2 border-gray-200 `}
-                                                                    onValueChange={_HandleChangeChild.bind(
-                                                                        this,
-                                                                        e?.id,
-                                                                        ce?.id,
-                                                                        "price"
-                                                                    )}
-                                                                    value={
-                                                                        ce?.price
-                                                                    }
-                                                                    allowNegative={
-                                                                        false
-                                                                    }
-                                                                    isNumericString={
-                                                                        true
-                                                                    }
-                                                                    thousandSeparator=","
-                                                                />
-                                                            </div>
-                                                            <div className="flex items-center justify-center">
-                                                                {formatNumber(
-                                                                    ce?.recallQuantity *
-                                                                        ce?.price
-                                                                )}
-                                                            </div> */}
                                                             <div className="col-span-1  flex items-center justify-center  h-full p-0.5">
                                                                 <input
                                                                     value={
@@ -2109,37 +2046,6 @@ const Index = (props) => {
                                 </h3>
                             </div>
                         </div>
-                        {/* <div className="flex justify-between ">
-                            <div className="font-normal">
-                                <h3>
-                                    {dataLang?.recall_totalAmount ||
-                                        "recall_totalAmount"}
-                                </h3>
-                            </div>
-                            <div className="font-normal">
-                                <h3 className="text-blue-600">
-                                    {formatNumber(
-                                        listData?.reduce((total, item) => {
-                                            item?.child?.forEach(
-                                                (childItem) => {
-                                                    if (
-                                                        childItem.recallQuantity !==
-                                                            undefined &&
-                                                        childItem.recallQuantity !==
-                                                            null
-                                                    ) {
-                                                        total +=
-                                                            childItem.recallQuantity *
-                                                            childItem.price;
-                                                    }
-                                                }
-                                            );
-                                            return total;
-                                        }, 0)
-                                    )}
-                                </h3>
-                            </div>
-                        </div> */}
                         <div className="space-x-2">
                             <button
                                 onClick={() =>
