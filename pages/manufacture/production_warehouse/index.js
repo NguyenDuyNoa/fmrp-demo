@@ -1317,7 +1317,7 @@ const Index = (props) => {
                             </div>
                             <div className="col-span-1 text-right">
                                 <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                                    {formatNumber(total?.total_price)}
+                                    {formatNumber(total?.grand_total)}
                                 </h3>
                             </div>
                         </div>
