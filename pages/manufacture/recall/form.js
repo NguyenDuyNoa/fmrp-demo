@@ -1084,8 +1084,8 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.recall_wareChild ||
-                                            "recall_wareChild"}{" "}
+                                        {dataLang?.productsWarehouse_warehouseImport ||
+                                            "productsWarehouse_warehouseImport"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <Select
@@ -1106,8 +1106,8 @@ const Index = (props) => {
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={
-                                            dataLang?.recall_wareChild ||
-                                            "recall_wareChild"
+                                            dataLang?.productsWarehouse_warehouseImport ||
+                                            "productsWarehouse_warehouseImport"
                                         }
                                         className={`${
                                             errRecallWarehouse
@@ -1239,8 +1239,8 @@ const Index = (props) => {
                                 } grid `}
                             >
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1   text-center  truncate font-[400]">
-                                    {dataLang?.recall_locationChild ||
-                                        "recall_locationChild"}
+                                    {dataLang?.productsWarehouse_warehouseLocaImport ||
+                                        "productsWarehouse_warehouseLocaImport"}
                                 </h4>
 
                                 {dataMaterialExpiry.is_enable === "1" ? (
@@ -1393,8 +1393,8 @@ const Index = (props) => {
                                     <Select
                                         classNamePrefix="customDropdowDefault"
                                         placeholder={
-                                            dataLang?.recall_locationChild ||
-                                            "recall_locationChild"
+                                            dataLang?.productsWarehouse_warehouseLocaImport ||
+                                            "productsWarehouse_warehouseLocaImport"
                                         }
                                         className="3xl:text-[12px] border-none outline-none 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
@@ -1697,8 +1697,8 @@ const Index = (props) => {
                                                                     placeholder={
                                                                         onLoadingChild
                                                                             ? ""
-                                                                            : dataLang?.recall_locationChild ||
-                                                                              "recall_locationChild"
+                                                                            : dataLang?.productsWarehouse_warehouseLocaImport ||
+                                                                              "productsWarehouse_warehouseLocaImport"
                                                                     }
                                                                     noOptionsMessage={() =>
                                                                         dataLang?.returns_nodata ||
@@ -1726,8 +1726,8 @@ const Index = (props) => {
                                                                             </div> */}
                                                                             <div className="flex gap-1">
                                                                                 {/* <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                    {dataLang?.recall_locationChild ||
-                                                                                        "recall_locationChild"}
+                                                                                    {dataLang?.productsWarehouse_warehouseLocaImport ||
+                                                                                        "productsWarehouse_warehouseLocaImport"}
 
                                                                                     :
                                                                                 </h2> */}

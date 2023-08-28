@@ -2163,25 +2163,6 @@ const FilePDF = ({
                 text: [
                     {
                         text: `${
-                            props.dataLang?.production_warehouse_LSX + ": " ||
-                            "production_warehouse_LSX"
-                        }`,
-                        inline: true,
-                        fontSize: 10,
-                    },
-                    {
-                        text: `${""}`,
-                        bold: true,
-                        fontSize: 10,
-                    },
-                ],
-                margin: [0, 0, 0, 2],
-            },
-
-            {
-                text: [
-                    {
-                        text: `${
                             props.dataLang?.production_warehouse_expWarehouse +
                                 ": " || "production_warehouse_expWarehouse"
                         } `,
@@ -2200,20 +2181,38 @@ const FilePDF = ({
                 text: [
                     {
                         text: `${
-                            props.dataLang?.production_warehouse_Total_value +
-                                ": " || "production_warehouse_Total_value"
+                            props.dataLang?.production_warehouse_LSX + ": " ||
+                            "production_warehouse_LSX"
                         }`,
                         inline: true,
                         fontSize: 10,
                     },
                     {
-                        text: `${formatNumber(data?.amount)}`,
+                        text: `${""}`,
                         bold: true,
                         fontSize: 10,
                     },
                 ],
                 margin: [0, 0, 0, 2],
             },
+            // {
+            //     text: [
+            //         {
+            //             text: `${
+            //                 props.dataLang?.production_warehouse_Total_value +
+            //                     ": " || "production_warehouse_Total_value"
+            //             }`,
+            //             inline: true,
+            //             fontSize: 10,
+            //         },
+            //         {
+            //             text: `${formatNumber(data?.amount)}`,
+            //             bold: true,
+            //             fontSize: 10,
+            //         },
+            //     ],
+            //     margin: [0, 0, 0, 2],
+            // },
             {
                 text: [
                     {
