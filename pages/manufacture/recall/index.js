@@ -595,14 +595,14 @@ const Index = (props) => {
                 <div className="grid grid-cols gap-1 h-[100%] overflow-hidden ">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
-                            <div className="flex justify-between">
+                            <div className="flex justify-between mt-1 mr-2">
                                 <h2 className="text-2xl text-[#52575E] capitalize">
                                     {dataLang?.recall_title || "recall_title"}
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Link
                                         href="/manufacture/recall/form"
-                                        className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
+                                        className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E]  via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.purchase_order_new ||
                                             "purchase_order_new"}
@@ -1023,12 +1023,12 @@ const Index = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                                <ScrollArea
+                                {/* <ScrollArea
                                     className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"
                                     speed={1}
                                     smoothScrolling={true}
-                                >
-                                    {/* <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"> */}
+                                > */}
+                                <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%]">
                                         <div className="grid grid-cols-10 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
@@ -1308,8 +1308,8 @@ const Index = (props) => {
                                             </div>
                                         )}
                                     </div>
-                                    {/* </div> */}
-                                </ScrollArea>
+                                </div>
+                                {/* </ScrollArea> */}
                             </div>
                         </div>
                         <div className="grid grid-cols-10 bg-gray-100 items-center">
