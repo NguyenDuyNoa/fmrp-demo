@@ -637,7 +637,6 @@ const Index = (props) => {
             </span>
         );
     };
-
     return (
         <React.Fragment>
             <Head>

@@ -322,32 +322,67 @@ const Index = (props) => {
         );
         sOnFetchingExportWarehouse(false);
     };
+    // const _HandleSeachApi = (inputValue) => {
+    //     if (idBranch == null || idExportWarehouse == null || inputValue == "") {
+    //         return;
+    //     } else {
+    //         Axios(
+    //             "POST",
+    //             `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
+    //             {
+    //                 params: {
+    //                     "filter[branch_id]": idBranch ? idBranch?.value : null,
+    //                 },
+
+    //                 data: {
+    //                     term: inputValue,
+    //                 },
+    //             },
+    //             (err, response) => {
+    //                 if (!err) {
+    //                     var { result } = response.data.data;
+    //                     sDataItems(result);
+    //                 }
+    //             }
+    //         );
+    //     }
+    // };
+    // Khai báo biến để theo dõi timeout
+    let searchTimeout;
+
     const _HandleSeachApi = (inputValue) => {
         if (idBranch == null || idExportWarehouse == null || inputValue == "") {
-            sDataItems([]);
+            return;
         } else {
-            Axios(
-                "POST",
-                `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
-                {
-                    params: {
-                        "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    },
+            // Hủy timeout cũ nếu có
+            clearTimeout(searchTimeout);
 
-                    data: {
-                        term: inputValue,
+            // Đặt timeout mới để thực hiện tìm kiếm sau 500ms
+            searchTimeout = setTimeout(() => {
+                Axios(
+                    "POST",
+                    `/api_web/Api_stock/getSemiItems/?csrf_protection=true`,
+                    {
+                        params: {
+                            "filter[branch_id]": idBranch
+                                ? idBranch?.value
+                                : null,
+                        },
+
+                        data: {
+                            term: inputValue,
+                        },
                     },
-                },
-                (err, response) => {
-                    if (!err) {
-                        var { result } = response.data.data;
-                        sDataItems(result);
+                    (err, response) => {
+                        if (!err) {
+                            var { result } = response.data.data;
+                            sDataItems(result);
+                        }
                     }
-                }
-            );
+                );
+            }, 500); // Đợi 500ms trước khi thực hiện tìm kiếm
         }
     };
-
     const _HandleChangeInput = (type, value) => {
         if (type == "code") {
             sCode(value.target.value);
@@ -382,6 +417,7 @@ const Index = (props) => {
                     });
                 }
             } else {
+                sDataItems([]);
                 sIdBranch(value);
             }
         } else if (type == "idExportWarehouse" && idExportWarehouse != value) {
@@ -1730,7 +1766,7 @@ const Index = (props) => {
                                                         )}
                                                         className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
                                                     >
-                                                        <span className="absolute right-0 w-full h-full -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
+                                                        <span className="absolute right-0 w-full h-full -mt-8 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
                                                         <span className="relative text-xs">
                                                             Xóa{" "}
                                                             {console.log(

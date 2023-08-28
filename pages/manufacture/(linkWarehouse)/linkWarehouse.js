@@ -5,9 +5,7 @@ import Link from "next/link";
 const LinkWarehouse = ({ warehouse_id, warehouse_name, open }) => {
     const wordsArray = warehouse_name?.split(" ");
     return (
-        <h6
-            className={`font-medium text-[9px] text-zinc-600 col-span-1 text-left`}
-        >
+        <h6 className="font-medium text-[9px] text-zinc-600 col-span-1 text-left">
             <Link
                 href={`/warehouses/warehouse/${warehouse_id}`}
                 className={`${

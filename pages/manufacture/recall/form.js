@@ -297,28 +297,64 @@ const Index = (props) => {
         sOnFetchingWarehouse(false);
     };
 
-    const _HandleSeachApi = (inputValue) => {
-        idBranch != null &&
-            inputValue != "" &&
-            Axios(
-                "POST",
-                `/api_web/Api_material_recall/itemCombobox/?csrf_protection=true`,
-                {
-                    params: {
-                        "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    },
+    // const _HandleSeachApi = (inputValue) => {
+    //     idBranch != null &&
+    //         inputValue != "" &&
+    //         Axios(
+    //             "POST",
+    //             `/api_web/Api_material_recall/itemCombobox/?csrf_protection=true`,
+    //             {
+    //                 params: {
+    //                     "filter[branch_id]": idBranch ? idBranch?.value : null,
+    //                 },
 
-                    data: {
-                        term: inputValue,
+    //                 data: {
+    //                     term: inputValue,
+    //                 },
+    //             },
+    //             (err, response) => {
+    //                 if (!err) {
+    //                     var { result } = response.data.data;
+    //                     sDataItems(result);
+    //                 }
+    //             }
+    //         );
+    // };
+    // Khai báo biến để theo dõi timeout
+    let searchTimeout;
+
+    const _HandleSeachApi = (inputValue) => {
+        if (idBranch == null || inputValue == "") {
+            return;
+        } else {
+            // Hủy timeout cũ nếu có
+            clearTimeout(searchTimeout);
+
+            // Đặt timeout mới để thực hiện tìm kiếm sau 500ms
+            searchTimeout = setTimeout(() => {
+                Axios(
+                    "POST",
+                    `/api_web/Api_material_recall/itemCombobox/?csrf_protection=true`,
+                    {
+                        params: {
+                            "filter[branch_id]": idBranch
+                                ? idBranch?.value
+                                : null,
+                        },
+
+                        data: {
+                            term: inputValue,
+                        },
                     },
-                },
-                (err, response) => {
-                    if (!err) {
-                        var { result } = response.data.data;
-                        sDataItems(result);
+                    (err, response) => {
+                        if (!err) {
+                            var { result } = response.data.data;
+                            sDataItems(result);
+                        }
                     }
-                }
-            );
+                );
+            }, 500); // Đợi 500ms trước khi thực hiện tìm kiếm
+        }
     };
 
     const _ServerFetching_Location = async () => {

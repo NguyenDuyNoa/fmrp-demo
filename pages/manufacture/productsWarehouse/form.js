@@ -334,29 +334,65 @@ const Index = (props) => {
         );
         sOnFetchingLocation(false);
     };
+    // const _HandleSeachApi = (inputValue) => {
+    //     if (idBranch == null || idImportWarehouse == null || inputValue == "") {
+    //         return;
+    //     } else {
+    //         Axios(
+    //             "POST",
+    //             `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`,
+    //             {
+    //                 params: {
+    //                     "filter[branch_id]": idBranch ? idBranch?.value : null,
+    //                 },
+
+    //                 data: {
+    //                     term: inputValue,
+    //                 },
+    //             },
+    //             (err, response) => {
+    //                 if (!err) {
+    //                     var { result } = response.data.data;
+    //                     sDataItems(result);
+    //                 }
+    //             }
+    //         );
+    //     }
+    // };
+    // Khai báo biến để theo dõi timeout
+    let searchTimeout;
+
     const _HandleSeachApi = (inputValue) => {
         if (idBranch == null || idImportWarehouse == null || inputValue == "") {
-            sDataItems([]);
+            return;
         } else {
-            Axios(
-                "POST",
-                `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`,
-                {
-                    params: {
-                        "filter[branch_id]": idBranch ? idBranch?.value : null,
-                    },
+            // Hủy timeout cũ nếu có
+            clearTimeout(searchTimeout);
 
-                    data: {
-                        term: inputValue,
+            // Đặt timeout mới để thực hiện tìm kiếm sau 500ms
+            searchTimeout = setTimeout(() => {
+                Axios(
+                    "POST",
+                    `/api_web/Api_product_receipt/getProduct/?csrf_protection=true`,
+                    {
+                        params: {
+                            "filter[branch_id]": idBranch
+                                ? idBranch?.value
+                                : null,
+                        },
+
+                        data: {
+                            term: inputValue,
+                        },
                     },
-                },
-                (err, response) => {
-                    if (!err) {
-                        var { result } = response.data.data;
-                        sDataItems(result);
+                    (err, response) => {
+                        if (!err) {
+                            var { result } = response.data.data;
+                            sDataItems(result);
+                        }
                     }
-                }
-            );
+                );
+            }, 500); // Đợi 500ms trước khi thực hiện tìm kiếm
         }
     };
 
@@ -575,6 +611,7 @@ const Index = (props) => {
     useEffect(() => {
         idImportWarehouse != null && sOnFetchingItemsAll(true);
         idImportWarehouse != null && sOnFetchingLocation(true);
+        idImportWarehouse == null && sDataItems([]);
     }, [idImportWarehouse]);
     // useEffect(() => {
     //     onFetchingItemsAll && _ServerFetching_ItemsAll();

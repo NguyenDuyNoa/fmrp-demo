@@ -365,34 +365,70 @@ const Index = (props) => {
         sOnFetchingWarehouse(false);
     };
 
+    // const _HandleSeachApi = (inputValue) => {
+    //     idBranch != null &&
+    //         idExportWarehouse != null &&
+    //         inputValue != "" &&
+    //         Axios(
+    //             "POST",
+    //             `/api_web/Api_export_other/itemCombobox/?csrf_protection=true`,
+    //             {
+    //                 params: {
+    //                     "filter[branch_id]": idBranch ? idBranch?.value : null,
+    //                     "filter[warehouse_id]": idExportWarehouse
+    //                         ? idExportWarehouse?.value
+    //                         : null,
+    //                 },
+
+    //                 data: {
+    //                     term: inputValue,
+    //                 },
+    //             },
+    //             (err, response) => {
+    //                 if (!err) {
+    //                     var { result } = response.data.data;
+    //                     sDataItems(result);
+    //                 }
+    //             }
+    //         );
+    // };
+    let searchTimeout;
+
     const _HandleSeachApi = (inputValue) => {
-        idBranch != null &&
-            idExportWarehouse != null &&
-            inputValue != "" &&
-            Axios(
-                "POST",
-                `/api_web/Api_export_other/itemCombobox/?csrf_protection=true`,
-                {
-                    params: {
-                        "filter[branch_id]": idBranch ? idBranch?.value : null,
-                        "filter[warehouse_id]": idExportWarehouse
-                            ? idExportWarehouse?.value
-                            : null,
-                    },
+        if (idBranch == null || idExportWarehouse == null || inputValue == "") {
+            return;
+        } else {
+            // Hủy timeout cũ nếu có
+            clearTimeout(searchTimeout);
 
-                    data: {
-                        term: inputValue,
+            // Đặt timeout mới để thực hiện tìm kiếm sau 500ms
+            searchTimeout = setTimeout(() => {
+                Axios(
+                    "POST",
+                    `/api_web/Api_export_other/itemCombobox/?csrf_protection=true`,
+                    {
+                        params: {
+                            "filter[branch_id]": idBranch
+                                ? idBranch?.value
+                                : null,
+                            "filter[warehouse_id]": idExportWarehouse
+                                ? idExportWarehouse?.value
+                                : null,
+                        },
+                        data: {
+                            term: inputValue,
+                        },
                     },
-                },
-                (err, response) => {
-                    if (!err) {
-                        var { result } = response.data.data;
-                        sDataItems(result);
+                    (err, response) => {
+                        if (!err) {
+                            var { result } = response.data.data;
+                            sDataItems(result);
+                        }
                     }
-                }
-            );
+                );
+            }, 500); // Đợi 500ms trước khi thực hiện tìm kiếm
+        }
     };
-
     const _ServerFetching_LisObject = async () => {
         await Axios(
             "GET",
