@@ -139,21 +139,6 @@ const Header = () => {
                 },
             ],
         },
-        {
-            title: "Công nợ bán",
-            sub: [
-                {
-                    title: "Công nợ bán",
-                    img: "/icon/header/banxuat/cnb.png",
-                    items: [
-                        { name: "Hóa đơn bán hàng" },
-                        { name: "Phiếu thu bán hàng" },
-                        { name: "Công nợ khách hàng" },
-                        { name: "Phiếu thu khác" },
-                    ],
-                },
-            ],
-        },
     ];
 
     const ListMuaNhapHang = [
@@ -186,22 +171,6 @@ const Header = () => {
                     items: [
                         { name: "Nhập hàng", link: "/purchase_order/import" },
                         { name: "Trả hàng", link: "/purchase_order/returns" },
-                    ],
-                },
-            ],
-        },
-        {
-            title: "Công nợ mua",
-            sub: [
-                {
-                    title: "Công nợ mua",
-                    img: "/icon/header/muanhap/cnm.png",
-                    items: [
-                        { name: "Phiếu chi", link: "/purchase_order/payment" },
-                        {
-                            name: "Công nợ nhà cung cấp",
-                            link: "/purchase_order/debt_suppliers",
-                        },
                     ],
                 },
             ],
@@ -673,6 +642,40 @@ const Header = () => {
         ],
     };
 
+    const ListKeToan = [
+        {
+            title: "Công nợ bán",
+            sub: [
+                {
+                    title: "Công nợ bán",
+                    img: "/icon/header/banxuat/cnb.png",
+                    items: [
+                        { name: "Hóa đơn bán hàng" },
+                        { name: "Phiếu thu bán hàng" },
+                        { name: "Công nợ khách hàng" },
+                        { name: "Phiếu thu khác" },
+                    ],
+                },
+            ],
+        },
+        {
+            title: "Công nợ mua",
+            sub: [
+                {
+                    title: "Công nợ mua",
+                    img: "/icon/header/muanhap/cnm.png",
+                    items: [
+                        { name: "Phiếu chi", link: "/purchase_order/payment" },
+                        {
+                            name: "Công nợ nhà cung cấp",
+                            link: "/purchase_order/debt_suppliers",
+                        },
+                    ],
+                },
+            ],
+        },
+    ];
+
     const dropdowns = [
         {
             data: ListDanhMuc,
@@ -685,7 +688,7 @@ const Header = () => {
             data: ListBanXuatHang,
             position: "bottom left",
             className: "popover-bottom-left arrow-banxuathang",
-            text: "Quản lý các model bán hàng, giao hàng, công nợ bán",
+            text: "Quản lý các model bán hàng, giao hàng",
             title: "Bán & Xuất hàng",
         },
         {
@@ -693,14 +696,22 @@ const Header = () => {
             position: "bottom left",
             className: "popover-bottom-left-muanhaphang arrow-muanhaphang",
             title: "Mua & Nhập hàng",
-            text: "Quản lý các model mua, nhập, trả hàng, công nợ",
+            text: "Quản lý các model mua, nhập, trả hàng",
         },
+
         {
             data: ListKhoSanXuat,
             // position: "",
             className: "popover-khosanxuat",
             title: "Kho & Sản xuất",
             text: "Quản lý các model kho, sản xuất, gia công, QC",
+        },
+        {
+            data: ListKeToan,
+            position: "bottom left",
+            className: "popover-bottom-left-muanhaphang arrow-muanhaphang",
+            title: "Kế toán",
+            text: "Quản lý các model công nợ",
         },
         {
             data: ListBaoCao,
