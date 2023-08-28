@@ -385,7 +385,7 @@ const Index = (props) => {
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded grid grid-cols-6 items-center justify-between xl:p-3 p-2">
                                         <div className="col-span-5 grid grid-cols-5 ">
-                                            <div className="col-span-1">
+                                            <div className="col-span-1 mr-2">
                                                 <form className="flex items-center relative">
                                                     <IconSearch
                                                         size={20}
