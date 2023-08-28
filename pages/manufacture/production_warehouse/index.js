@@ -234,26 +234,27 @@ const Index = (props) => {
     };
 
     const _HandleSeachApi = (inputValue) => {
-        Axios(
-            "POST",
-            `/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true`,
-            {
-                data: {
-                    term: inputValue,
+        inputValue != "" &&
+            Axios(
+                "POST",
+                `/api_web/Api_stock/exportProductionCombobox/?csrf_protection=true`,
+                {
+                    data: {
+                        term: inputValue,
+                    },
                 },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, result } = response?.data;
-                    sListCode(
-                        result?.map((e) => ({
-                            label: `${e.code}`,
-                            value: e.id,
-                        }))
-                    );
+                (err, response) => {
+                    if (!err) {
+                        var { isSuccess, result } = response?.data;
+                        sListCode(
+                            result?.map((e) => ({
+                                label: `${e.code}`,
+                                value: e.id,
+                            }))
+                        );
+                    }
                 }
-            }
-        );
+            );
     };
 
     useEffect(() => {
