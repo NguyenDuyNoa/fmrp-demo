@@ -1038,8 +1038,8 @@ const Index = (props) => {
                                                     "production_warehouse_LSX"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.recall_wareChild ||
-                                                    "recall_wareChild"}
+                                                {dataLang?.productsWarehouse_warehouseImport ||
+                                                    "productsWarehouse_warehouseImport"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.productsWarehouse_total ||
@@ -1101,16 +1101,14 @@ const Index = (props) => {
                                                                 />
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right"></h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  col-span-1 text-left truncate">
-                                                                <LinkWarehouse
-                                                                    warehouse_id={
-                                                                        e?.warehouse_id
-                                                                    }
-                                                                    warehouse_name={
-                                                                        e?.warehouse_name
-                                                                    }
-                                                                />
-                                                            </h6>
+                                                            <LinkWarehouse
+                                                                warehouse_id={
+                                                                    e?.warehouse_id
+                                                                }
+                                                                warehouse_name={
+                                                                    e?.warehouse_name
+                                                                }
+                                                            />
 
                                                             <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-center flex items-center justify-end space-x-1">
                                                                 {formatNumber(
@@ -1307,8 +1305,8 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="grid grid-cols-9 bg-gray-100 items-center">
-                            <div className="col-span-3 p-2 text-center">
+                        <div className="grid grid-cols-10 bg-gray-100 items-center">
+                            <div className="col-span-4 p-2 text-center">
                                 <h3 className="uppercase      font-medium  text-zinc-600 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
                                     {dataLang?.productsWarehouse_total ||
                                         "productsWarehouse_total"}

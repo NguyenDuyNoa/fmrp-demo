@@ -1112,16 +1112,14 @@ const Index = (props) => {
                                                                 />
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right"></h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-1 text-left truncate">
-                                                                <LinkWarehouse
-                                                                    warehouse_id={
-                                                                        e?.warehouse_id
-                                                                    }
-                                                                    warehouse_name={
-                                                                        e?.warehouse_name
-                                                                    }
-                                                                />
-                                                            </h6>
+                                                            <LinkWarehouse
+                                                                warehouse_id={
+                                                                    e?.warehouse_id
+                                                                }
+                                                                warehouse_name={
+                                                                    e?.warehouse_name
+                                                                }
+                                                            />
                                                             <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-center flex items-center justify-end space-x-1">
                                                                 {formatNumber(
                                                                     e?.count_item

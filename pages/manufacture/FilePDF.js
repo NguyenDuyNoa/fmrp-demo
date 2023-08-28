@@ -226,25 +226,6 @@ const FilePDF = ({
                 text: [
                     {
                         text: `${
-                            props.dataLang?.production_warehouse_LSX + ": " ||
-                            "production_warehouse_LSX"
-                        }`,
-                        inline: true,
-                        fontSize: 10,
-                    },
-                    {
-                        text: `${""}`,
-                        bold: true,
-                        fontSize: 10,
-                    },
-                ],
-                margin: [0, 0, 0, 2],
-            },
-
-            {
-                text: [
-                    {
-                        text: `${
                             props.dataLang?.production_warehouse_expWarehouse +
                                 ": " || "production_warehouse_expWarehouse"
                         } `,
@@ -263,20 +244,38 @@ const FilePDF = ({
                 text: [
                     {
                         text: `${
-                            props.dataLang?.production_warehouse_Total_value +
-                                ": " || "production_warehouse_Total_value"
+                            props.dataLang?.production_warehouse_LSX + ": " ||
+                            "production_warehouse_LSX"
                         }`,
                         inline: true,
                         fontSize: 10,
                     },
                     {
-                        text: `${formatNumber(data?.grand_total)}`,
+                        text: `${""}`,
                         bold: true,
                         fontSize: 10,
                     },
                 ],
                 margin: [0, 0, 0, 2],
             },
+            // {
+            //     text: [
+            //         {
+            //             text: `${
+            //                 props.dataLang?.production_warehouse_Total_value +
+            //                     ": " || "production_warehouse_Total_value"
+            //             }`,
+            //             inline: true,
+            //             fontSize: 10,
+            //         },
+            //         {
+            //             text: `${formatNumber(data?.grand_total)}`,
+            //             bold: true,
+            //             fontSize: 10,
+            //         },
+            //     ],
+            //     margin: [0, 0, 0, 2],
+            // },
             {
                 text: [
                     {
@@ -883,25 +882,6 @@ const FilePDF = ({
                 text: [
                     {
                         text: `${
-                            props.dataLang?.production_warehouse_LSX + ": " ||
-                            "production_warehouse_LSX"
-                        }`,
-                        inline: true,
-                        fontSize: 10,
-                    },
-                    {
-                        text: `${""}`,
-                        bold: true,
-                        fontSize: 10,
-                    },
-                ],
-                margin: [0, 0, 0, 2],
-            },
-
-            {
-                text: [
-                    {
-                        text: `${
                             props.dataLang?.productsWarehouse_warehouseImport +
                                 ": " || "productsWarehouse_warehouseImport"
                         } `,
@@ -920,20 +900,38 @@ const FilePDF = ({
                 text: [
                     {
                         text: `${
-                            props.dataLang?.production_warehouse_Total_value +
-                                ": " || "production_warehouse_Total_value"
+                            props.dataLang?.production_warehouse_LSX + ": " ||
+                            "production_warehouse_LSX"
                         }`,
                         inline: true,
                         fontSize: 10,
                     },
                     {
-                        text: `${formatNumber(data?.grand_total)}`,
+                        text: `${""}`,
                         bold: true,
                         fontSize: 10,
                     },
                 ],
                 margin: [0, 0, 0, 2],
             },
+            // {
+            //     text: [
+            //         {
+            //             text: `${
+            //                 props.dataLang?.production_warehouse_Total_value +
+            //                     ": " || "production_warehouse_Total_value"
+            //             }`,
+            //             inline: true,
+            //             fontSize: 10,
+            //         },
+            //         {
+            //             text: `${formatNumber(data?.grand_total)}`,
+            //             bold: true,
+            //             fontSize: 10,
+            //         },
+            //     ],
+            //     margin: [0, 0, 0, 2],
+            // },
             {
                 text: [
                     {
@@ -1501,7 +1499,24 @@ const FilePDF = ({
                 ],
                 columnGap: 2,
             },
-
+            {
+                text: [
+                    {
+                        text: `${
+                            props.dataLang?.productsWarehouse_warehouseImport +
+                                ": " || "productsWarehouse_warehouseImport"
+                        } `,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text: `${data?.warehouse_name}`,
+                        bold: true,
+                        fontSize: 10,
+                    },
+                ],
+                margin: [0, 2, 0, 2],
+            },
             {
                 text: [
                     {
@@ -1520,42 +1535,25 @@ const FilePDF = ({
                 ],
                 margin: [0, 0, 0, 2],
             },
-            {
-                text: [
-                    {
-                        text: `${
-                            props.dataLang?.recall_wareChild + ": " ||
-                            "recall_wareChild"
-                        } `,
-                        inline: true,
-                        fontSize: 10,
-                    },
-                    {
-                        text: `${data?.warehouse_name}`,
-                        bold: true,
-                        fontSize: 10,
-                    },
-                ],
-                margin: [0, 2, 0, 2],
-            },
-            {
-                text: [
-                    {
-                        text: `${
-                            props.dataLang?.production_warehouse_Total_value +
-                                ": " || "production_warehouse_Total_value"
-                        }`,
-                        inline: true,
-                        fontSize: 10,
-                    },
-                    {
-                        text: `${formatNumber(data?.grand_total)}`,
-                        bold: true,
-                        fontSize: 10,
-                    },
-                ],
-                margin: [0, 0, 0, 2],
-            },
+
+            // {
+            //     text: [
+            //         {
+            //             text: `${
+            //                 props.dataLang?.production_warehouse_Total_value +
+            //                     ": " || "production_warehouse_Total_value"
+            //             }`,
+            //             inline: true,
+            //             fontSize: 10,
+            //         },
+            //         {
+            //             text: `${formatNumber(data?.grand_total)}`,
+            //             bold: true,
+            //             fontSize: 10,
+            //         },
+            //     ],
+            //     margin: [0, 0, 0, 2],
+            // },
             {
                 text: [
                     {
@@ -1611,8 +1609,9 @@ const FilePDF = ({
                             ),
                             uppercaseTextHeaderTabel(
                                 `${
-                                    props.dataLang?.recall_locationChild ||
-                                    "recall_locationChild"
+                                    props.dataLang
+                                        ?.productsWarehouse_warehouseLocaImport ||
+                                    "productsWarehouse_warehouseLocaImport"
                                 }`,
                                 "headerTable",
                                 "center"

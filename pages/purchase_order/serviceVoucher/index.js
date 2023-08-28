@@ -79,6 +79,8 @@ const Index = (props) => {
     const [onSending, sOnSending] = useState(false);
 
     const [totalItems, sTotalItems] = useState([]);
+    const [total, sTotal] = useState({});
+
     const [keySearch, sKeySearch] = useState("");
     const [limit, sLimit] = useState(15);
 
@@ -134,6 +136,7 @@ const Index = (props) => {
                     var { rResult, output, rTotal } = response.data;
                     sData(rResult);
                     sTotalItems(output);
+                    sTotal(rTotal);
                     sDataExcel(rResult);
                 }
                 sOnFetching(false);
@@ -1015,6 +1018,29 @@ const Index = (props) => {
                                         )}
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-12 bg-gray-100 items-center">
+                            <div className="col-span-4 p-2 text-center">
+                                <h3 className="uppercase font-normal 2xl:text-base xl:text-xs text-[8px]">
+                                    {dataLang?.purchase_order_table_total_outside ||
+                                        "purchase_order_table_total_outside"}
+                                </h3>
+                            </div>
+                            <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
+                                <h3 className="font-normal 2xl:text-base xl:text-xs text-[8px]">
+                                    {formatNumber(total?.total_price)}
+                                </h3>
+                            </div>
+                            <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap ">
+                                <h3 className="font-normal 2xl:text-base xl:text-xs text-[8px]">
+                                    {formatNumber(total?.total_tax_price)}
+                                </h3>
+                            </div>
+                            <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
+                                <h3 className="font-normal 2xl:text-base xl:text-xs text-[8px]">
+                                    {formatNumber(total?.total_amount)}
+                                </h3>
                             </div>
                         </div>
                         {data?.length != 0 && (

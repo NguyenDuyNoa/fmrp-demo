@@ -1094,7 +1094,7 @@ const Index = (props) => {
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
                                                                 {/* {formatNumber(e.total_price)} */}
                                                             </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-1 text-left truncate">
+                                                            {/* <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-1 text-left truncate">
                                                                 <LinkWarehouse
                                                                     warehouse_id={
                                                                         e?.warehouse_id
@@ -1103,7 +1103,16 @@ const Index = (props) => {
                                                                         e?.warehouse_name
                                                                     }
                                                                 />
-                                                            </h6>
+                                                            </h6> */}
+
+                                                            <LinkWarehouse
+                                                                warehouse_id={
+                                                                    e?.warehouse_id
+                                                                }
+                                                                warehouse_name={
+                                                                    e?.warehouse_name
+                                                                }
+                                                            />
 
                                                             <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-center flex items-center justify-end space-x-1">
                                                                 {formatNumber(
@@ -1300,28 +1309,18 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </div>
-                        {/* <div className="grid grid-cols-10 bg-gray-100 items-center rounded-md">
-              <div className="col-span-3 p-2 text-center">
-                <h3 className="uppercase text-gray-600 font-medium 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
-                  {dataLang?.import_total || "import_total"}
-                </h3>
-              </div>
-              <div className="col-span-1 text-right">
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                  {formatNumber(total?.total_price)}
-                </h3>
-              </div>
-              <div className="col-span-1 text-right ">
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                  {formatNumber(total?.total_tax_price)}
-                </h3>
-              </div>
-              <div className="col-span-1 text-right">
-                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                  {formatNumber(total?.total_amount)}
-                </h3>
-              </div>
-            </div> */}
+                        <div className="grid grid-cols-10 bg-gray-100 items-center rounded-md">
+                            <div className="col-span-4 p-2 text-center">
+                                <h3 className="uppercase text-gray-600 font-medium 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
+                                    {dataLang?.import_total || "import_total"}
+                                </h3>
+                            </div>
+                            <div className="col-span-1 text-right">
+                                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
+                                    {formatNumber(total?.total_price)}
+                                </h3>
+                            </div>
+                        </div>
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6 className="">
