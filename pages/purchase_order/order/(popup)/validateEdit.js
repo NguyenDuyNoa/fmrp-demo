@@ -40,30 +40,24 @@ const Popup_TableValidateEdit = (props) => {
     useEffect(() => {
         props.isOpen && handleClick();
     }, [props.isOpen]);
+    console.log(props);
     const handleClick = () => {
-        if (props?.data?.status_pay != "not_spent") {
-            // Toast.fire({
-            //     icon: "error",
-            //     title: `${
-            //         (props?.data?.status_pay != "not_spent" &&
-            //             (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
-            //         (props?.status != "not_stocked" &&
-            //             "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")
-            //     }`,
-            // });
-            errShow(props.dataLang?.paid_cant_edit);
-        } else if (props?.status != "not_stocked") {
-            errShow("Đơn đặt hàng đã có phiếu Nhập. Không thể sửa");
+        if (
+            props?.status_pay != "not_spent" ||
+            props?.status != "not_stocked"
+        ) {
+            Toast.fire({
+                icon: "error",
+                title: `${
+                    (props?.status_pay != "not_spent" &&
+                        (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
+                    (props?.status != "not_stocked" &&
+                        "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")
+                }`,
+            });
         } else {
             router.push(`/purchase_order/order/form?id=${props.id}`);
         }
-    };
-
-    const errShow = (e) => {
-        Toast.fire({
-            icon: "error",
-            title: `${e}`,
-        });
     };
 
     return (

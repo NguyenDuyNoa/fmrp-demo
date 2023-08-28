@@ -1271,6 +1271,10 @@ const Index = (props) => {
                                                                     status={
                                                                         e?.import_status
                                                                     }
+                                                                    status_pay={
+                                                                        e?.status_pay
+                                                                    }
+                                                                    data={e}
                                                                     id={e?.id}
                                                                     className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
                                                                 />
@@ -1537,6 +1541,7 @@ const BtnTacVu = React.memo((props) => {
                                 isOpen={openEdit}
                                 dataLang={props?.dataLang}
                                 id={props?.id}
+                                status_pay={props?.status_pay}
                                 className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5 "
                             />
                         </div>
