@@ -1496,6 +1496,24 @@ const BtnTacVu = React.memo((props) => {
     //         router.push(`/purchase_order/order/form?id=${props.id}`);
     //       }
     //     };
+    // const handleClick = () => {
+    //     if (
+    //         props?.status_pay != "not_spent" ||
+    //         props?.status != "not_stocked"
+    //     ) {
+    //         Toast.fire({
+    //             icon: "error",
+    //             title: `${
+    //                 (props?.status_pay != "not_spent" &&
+    //                     (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
+    //                 (props?.status != "not_stocked" &&
+    //                     "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")
+    //             }`,
+    //         });
+    //     } else {
+    //         router.push(`/purchase_order/order/form?id=${props.id}`);
+    //     }
+    // };
     return (
         <div>
             <Popup
@@ -1538,6 +1556,7 @@ const BtnTacVu = React.memo((props) => {
                                 status={props?.status}
                                 data={data}
                                 setOpen={sOpenEdit}
+                                // onClick={handleClick.bind(this)}
                                 isOpen={openEdit}
                                 dataLang={props?.dataLang}
                                 id={props?.id}

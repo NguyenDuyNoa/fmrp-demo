@@ -37,10 +37,10 @@ const Popup_TableValidateEdit = (props) => {
     const router = useRouter();
     const [onFetching, sOnFetching] = useState(false);
     const _ToggleModal = (e) => props.setOpen(e);
-    useEffect(() => {
-        props.isOpen && handleClick();
-    }, [props.isOpen]);
-    console.log(props);
+    // useEffect(() => {
+    //     props.isOpen && handleClick();
+    // }, [props.isOpen]);
+    // console.log(props);
     const handleClick = () => {
         if (
             props?.status_pay != "not_spent" ||
@@ -68,8 +68,10 @@ const Popup_TableValidateEdit = (props) => {
                     "purchase_order_title"
                 }
                 button={
-                    props.dataLang?.purchase_order_table_edit ||
-                    "purchase_order_table_edit"
+                    <button onClick={handleClick.bind(this)} type="button">
+                        {props.dataLang?.purchase_order_table_edit ||
+                            "purchase_order_table_edit"}
+                    </button>
                 }
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={props.isOpen && props.data?.payment_code?.length > 0}
