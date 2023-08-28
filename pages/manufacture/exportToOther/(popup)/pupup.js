@@ -289,7 +289,7 @@ const Popup_chitiet = (props) => {
                                     <div
                                         className={`grid-cols-9  grid sticky top-0 bg-white shadow-lg  z-10 rounded `}
                                     >
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-3 text-center whitespace-nowrap">
                                             {props.dataLang
                                                 ?.import_detail_items ||
                                                 "import_detail_items"}
@@ -335,7 +335,7 @@ const Popup_chitiet = (props) => {
                                                             className="grid grid-cols-9 hover:bg-slate-50 items-center border-b"
                                                             key={e.id?.toString()}
                                                         >
-                                                            <h6 className="text-[13px]  px-2 py-2 col-span-2 text-left ">
+                                                            <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left ">
                                                                 <div className="flex items-center gap-2">
                                                                     <div>
                                                                         {e?.item
