@@ -578,6 +578,7 @@ const Index = (props) => {
         idBranch == null &&
             idRecalltWarehouse == null &&
             sOnFetchingItemsAll(false);
+        idBranch == null && sDataWarehouse([]);
     }, [idBranch, idRecalltWarehouse]);
 
     const formatNumber = (number) => {
