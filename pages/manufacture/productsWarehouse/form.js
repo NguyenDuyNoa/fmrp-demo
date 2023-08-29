@@ -606,6 +606,8 @@ const Index = (props) => {
 
     useEffect(() => {
         idBranch != null && sOnFetchingExportWarehouse(true);
+        idBranch == null && sIdImportWarehouse(null);
+        idBranch == null && sDataWarehouse([]);
     }, [idBranch]);
 
     useEffect(() => {

@@ -525,10 +525,13 @@ const Index = (props) => {
 
     useEffect(() => {
         idBranch != null && sOnFetchingExportWarehouse(true);
+        idBranch == null && sIdExportWarehouse(null);
+        idBranch == null && sDataWarehouse([]);
     }, [idBranch]);
 
     useEffect(() => {
         idExportWarehouse != null && sOnFetchingItemsAll(true);
+        idExportWarehouse == null && sDataItems([]);
     }, [idExportWarehouse]);
     // useEffect(() => {
     //     idBranch != null &&
