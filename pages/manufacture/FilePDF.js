@@ -256,7 +256,7 @@ const FilePDF = ({
                         fontSize: 10,
                     },
                 ],
-                margin: [0, 0, 0, 2],
+                margin: [0, 2, 0, 2],
             },
             // {
             //     text: [
@@ -912,7 +912,7 @@ const FilePDF = ({
                         fontSize: 10,
                     },
                 ],
-                margin: [0, 0, 0, 2],
+                margin: [0, 2, 0, 2],
             },
             // {
             //     text: [
@@ -1533,7 +1533,7 @@ const FilePDF = ({
                         fontSize: 10,
                     },
                 ],
-                margin: [0, 0, 0, 2],
+                margin: [0, 2, 0, 2],
             },
 
             // {
@@ -2193,7 +2193,7 @@ const FilePDF = ({
                         fontSize: 10,
                     },
                 ],
-                margin: [0, 0, 0, 2],
+                margin: [0, 2, 0, 2],
             },
             // {
             //     text: [

@@ -266,7 +266,6 @@ const Index = (props) => {
         },
     ];
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
-
     return (
         <React.Fragment>
             <Head>

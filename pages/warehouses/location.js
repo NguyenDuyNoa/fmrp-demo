@@ -71,7 +71,9 @@ const Index = (props) => {
                     sTotalItems(output);
                     sData_ex(rResult);
                 }
-                sOnFetching(false);
+                setTimeout(() => {
+                    sOnFetching(false);
+                }, 1000);
             }
         );
     };
@@ -147,9 +149,10 @@ const Index = (props) => {
         });
     };
 
-    const [status, sStatus] = useState("");
-    const [active, sActive] = useState("");
+    const [status, sStatus] = useState(null);
+    const [active, sActive] = useState(null);
 
+    // 1true 0 fal
     const _ToggleStatus = (id) => {
         Swal.fire({
             title: `${"Thay đổi trạng thái"}`,
@@ -168,15 +171,16 @@ const Index = (props) => {
                 } else if (index !== -1 && data[index].status === "1") {
                     sStatus((data[index].status = "0"));
                 }
-                sData([...data]);
+                _ServerSending();
+                // sData([...data]);
             }
         });
     };
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         let id = active;
         var data = new FormData();
         data.append("status", status);
-        Axios(
+        await Axios(
             "POST",
             `${
                 id &&
@@ -196,8 +200,14 @@ const Index = (props) => {
                             icon: "success",
                             title: `${dataLang[message]}`,
                         });
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: `${dataLang[message]}`,
+                        });
                     }
                 }
+                _ServerFetching(true);
                 sOnSending(false);
             }
         );
@@ -213,7 +223,6 @@ const Index = (props) => {
     useEffect(() => {
         sOnSending(true);
     }, [active]);
-
     const paginate = (pageNumber) => {
         router.push({
             pathname: "/warehouses/localtion",
@@ -615,7 +624,7 @@ const Index = (props) => {
                                                     {data?.map((e) => (
                                                         <div
                                                             className="flex items-center py-1.5 px-2 hover:bg-slate-100/40 "
-                                                            key={e?.id.toString()}
+                                                            key={e?.id?.toString()}
                                                         >
                                                             <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[20%]  rounded-md text-left">
                                                                 {
