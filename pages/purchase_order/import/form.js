@@ -161,7 +161,6 @@ const Index = (props) => {
                                 Number(e?.quantity),
                         }))
                     );
-                    sOption(item);
                     sCode(rResult?.code);
                     sIdBranch({
                         label: rResult?.branch_name,
@@ -711,7 +710,13 @@ const Index = (props) => {
     const _HandleSubmit = (e) => {
         e.preventDefault();
         const hasNullKho = listData.some((item) =>
-            item.child?.some((childItem) => childItem.kho === null)
+            item.child?.some(
+                (childItem) =>
+                    childItem.kho === null ||
+                    (id &&
+                        (childItem.kho?.label === null ||
+                            childItem.kho?.warehouse_name === null))
+            )
         );
         const hasNullSerial = listData.some(
             (item) =>
@@ -2509,7 +2514,7 @@ const Index = (props) => {
                                     <div className=" col-span-1 flex items-center">
                                         <div className="flex justify-center   p-0.5 flex-col items-center">
                                             <NumericFormat
-                                                className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal  focus:outline-none border-b-2 border-gray-200"
+                                                className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  2xl:px-2 xl:px-1 p-0 font-normal  focus:outline-none "
                                                 allowNegative={false}
                                                 decimalScale={0}
                                                 isNumericString={true}
@@ -2525,9 +2530,9 @@ const Index = (props) => {
                                 dataProductExpiry.is_enable === "1" ? (
                                     <>
                                         <div className=" col-span-1 flex items-center">
-                                            <div className="flex justify-center   p-0.5 flex-col items-center">
+                                            <div className="flex justify-center flex-col items-center">
                                                 <NumericFormat
-                                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal w-[100%]  focus:outline-none border-b-2 border-gray-200"
+                                                    className="py-2 appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 2xl:px-2 xl:px-1 p-0 font-normal w-[100%]  focus:outline-none "
                                                     allowNegative={false}
                                                     decimalScale={0}
                                                     isNumericString={true}
@@ -2541,12 +2546,11 @@ const Index = (props) => {
                                                 <DatePicker
                                                     // selected={effectiveDate}
                                                     // blur
-                                                    placeholderText="dd/mm/yyyy"
                                                     // dateFormat="dd/MM/yyyy"
                                                     // onSelect={(date) => sEffectiveDate(date)}
                                                     // placeholder={dataLang?.price_quote_system_default || "price_quote_system_default"}
                                                     disabled
-                                                    className={`3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b placeholder:text-slate-300 w-full bg-gray-50 rounded text-[#52575E] font-light px-2 py-1.5 text-center outline-none cursor-pointer  `}
+                                                    className={`3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  placeholder:text-slate-300 w-full  rounded text-[#52575E] font-light px-2 py-2 text-center outline-none cursor-pointer  `}
                                                 />
                                                 {/* {effectiveDate && (
                                   <>
@@ -2570,7 +2574,7 @@ const Index = (props) => {
                                             size="16"
                                         />
                                     </button>
-                                    <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b-2 w-full border-gray-200">
+                                    <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b w-full border-gray-200">
                                         1
                                     </div>
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
@@ -2581,12 +2585,12 @@ const Index = (props) => {
                                     </button>
                                 </div>
                                 <div className="col-span-1 justify-center flex items-center">
-                                    <div className="border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50 text-black">
+                                    <div className=" 2xl:w-24 xl:w-[75px] w-[70px] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-2 px-2 font-medium text-black">
                                         1
                                     </div>
                                 </div>
                                 <div className="col-span-1 justify-center flex items-center">
-                                    <div className="border-b-2 border-gray-200 2xl:w-24 xl:w-[75px] w-[70px] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50">
+                                    <div className=" 2xl:w-24 xl:w-[75px] w-[70px] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium">
                                         0
                                     </div>
                                 </div>
@@ -2627,7 +2631,7 @@ const Index = (props) => {
                                     {listData?.map((e) => (
                                         <div
                                             key={e?.id?.toString()}
-                                            className="grid grid-cols-12 items-start"
+                                            className="grid grid-cols-12 gap-1 my-1 items-start"
                                         >
                                             <div className="col-span-2 border border-r p-0.5 pb-1 h-full">
                                                 <div className="relative mr-5 mt-5">
@@ -2815,7 +2819,7 @@ const Index = (props) => {
                                                         <React.Fragment
                                                             key={ce?.id?.toString()}
                                                         >
-                                                            <div className="flex justify-center border-t border-l  h-full p-0.5 flex-col items-center ">
+                                                            <div className="flex justify-center border-t border-l  h-full p-1 flex-col items-center ">
                                                                 <Select
                                                                     options={
                                                                         warehouse
@@ -2830,12 +2834,21 @@ const Index = (props) => {
                                                                         "kho"
                                                                     )}
                                                                     className={`${
-                                                                        errWarehouse &&
-                                                                        ce?.kho ==
-                                                                            null
-                                                                            ? "border-red-500"
+                                                                        (errWarehouse &&
+                                                                            ce?.kho ==
+                                                                                null) ||
+                                                                        (errWarehouse &&
+                                                                            (ce
+                                                                                ?.kho
+                                                                                ?.label ==
+                                                                                null ||
+                                                                                ce
+                                                                                    ?.kho
+                                                                                    ?.warehouse_name ==
+                                                                                    null))
+                                                                            ? "border-red-500 border"
                                                                             : ""
-                                                                    } border my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                    }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                     placeholder={
                                                                         "Kho - vị trí kho"
                                                                     }
@@ -2844,24 +2857,29 @@ const Index = (props) => {
                                                                     }
                                                                     formatOptionLabel={(
                                                                         option
-                                                                    ) => (
-                                                                        <div className="z-[999]">
-                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
-                                                                                {dataLang?.import_Warehouse ||
-                                                                                    "import_Warehouse"}
+                                                                    ) => {
+                                                                        return (
+                                                                            (option?.warehouse_name ||
+                                                                                option?.label) && (
+                                                                                <div className="z-[999]">
+                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
+                                                                                        {dataLang?.import_Warehouse ||
+                                                                                            "import_Warehouse"}
 
-                                                                                :{" "}
-                                                                                {
-                                                                                    option?.warehouse_name
-                                                                                }
-                                                                            </h2>
-                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
-                                                                                {
-                                                                                    option?.label
-                                                                                }
-                                                                            </h2>
-                                                                        </div>
-                                                                    )}
+                                                                                        :{" "}
+                                                                                        {
+                                                                                            option?.warehouse_name
+                                                                                        }
+                                                                                    </h2>
+                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
+                                                                                        {
+                                                                                            option?.label
+                                                                                        }
+                                                                                    </h2>
+                                                                                </div>
+                                                                            )
+                                                                        );
+                                                                    }}
                                                                     style={{
                                                                         border: "none",
                                                                         boxShadow:
@@ -3077,7 +3095,7 @@ const Index = (props) => {
                                                                     />
                                                                 </button>
                                                                 <NumericFormat
-                                                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b-2 border-gray-200"
+                                                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200"
                                                                     onValueChange={_HandleChangeChild.bind(
                                                                         this,
                                                                         e?.id,
@@ -3128,7 +3146,7 @@ const Index = (props) => {
                                                             </div>
                                                             <div className="flex justify-center  h-full p-0.5 flex-col items-center">
                                                                 <NumericFormat
-                                                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b-2 border-gray-200 h-fit"
+                                                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b border-gray-200 h-fit"
                                                                     onValueChange={_HandleChangeChild.bind(
                                                                         this,
                                                                         e?.id,
@@ -3164,7 +3182,7 @@ const Index = (props) => {
                                                             </div>
                                                             <div className="flex justify-center  h-full p-0.5 flex-col items-center">
                                                                 <NumericFormat
-                                                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
+                                                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b border-gray-200"
                                                                     onValueChange={_HandleChangeChild.bind(
                                                                         this,
                                                                         e?.id,
@@ -3231,7 +3249,7 @@ const Index = (props) => {
                                                                         dataLang?.import_from_tax ||
                                                                         "import_from_tax"
                                                                     }
-                                                                    className={`  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                                                                    className={`  3xl:text-[12px] 2xl:text-[10px] p-1 xl:text-[9.5px] text-[9px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
                                                                     menuPortalTarget={
                                                                         document.body
                                                                     }

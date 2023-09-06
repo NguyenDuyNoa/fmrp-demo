@@ -504,7 +504,13 @@ const Index = (props) => {
     const _HandleSubmit = (e) => {
         e.preventDefault();
         const hasNullKho = listData.some((item) =>
-            item.child?.some((childItem) => childItem.kho === null)
+            item.child?.some(
+                (childItem) =>
+                    childItem.kho === null ||
+                    (id &&
+                        (childItem.kho?.label === null ||
+                            childItem.kho?.warehouse_name === null))
+            )
         );
         const hasNullAmount = listData.some((item) =>
             item.child?.some(
@@ -595,6 +601,7 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     var result = response.data;
+                    console.log("result", result);
                     sDataWarehouse(
                         result?.map((e) => ({
                             label: e?.name,
@@ -906,7 +913,6 @@ const Index = (props) => {
         });
         sListData(newData);
     };
-
     const _HandleAddParent = (value) => {
         const checkData = listData?.some(
             (e) => e?.matHang?.value === value?.value
@@ -1792,7 +1798,7 @@ const Index = (props) => {
                                             size="16"
                                         />
                                     </button>
-                                    <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b-2 border-gray-200">
+                                    <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b border-gray-200">
                                         1
                                     </div>
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
@@ -1803,12 +1809,12 @@ const Index = (props) => {
                                     </button>
                                 </div>
                                 <div className="col-span-1 justify-center flex items-center">
-                                    <div className="border-b-2 border-gray-200 3xl:text-[12px] w-full 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50 text-black">
+                                    <div className=" 3xl:text-[12px] w-full 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50 text-black">
                                         1
                                     </div>
                                 </div>
                                 <div className="col-span-1 justify-center flex items-center">
-                                    <div className="border-b-2 border-gray-200 w-full 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50">
+                                    <div className=" w-full 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50">
                                         0
                                     </div>
                                 </div>
@@ -1861,7 +1867,7 @@ const Index = (props) => {
                                     {listData?.map((e) => (
                                         <div
                                             key={e?.id?.toString()}
-                                            className="grid grid-cols-12 items-start"
+                                            className="grid grid-cols-12 gap-2 my-1 items-start"
                                         >
                                             <div className="col-span-2 border border-r p-2 pb-1 h-full">
                                                 <div className="relative mt-5">
@@ -1879,178 +1885,6 @@ const Index = (props) => {
                                                         formatOptionLabel={(
                                                             option
                                                         ) => (
-                                                            // <div className='flex items-center gap-2 py-2'>
-                                                            //   <div className='flex flex-col'>
-                                                            //     <div className='w-[40px] h-[40px]'>
-                                                            //       {option.e?.images != null ? (<img src={option.e?.images} alt="Product Image"  className='object-cover rounded' />):
-                                                            //             <div className='object-cover   rounded w-[40px] h-[40px]'>
-                                                            //               <img src="/no_img.png" alt="Product Image"  className='object-cover rounded w-full h-full' />
-                                                            //           </div>
-                                                            //           }
-                                                            //     </div>
-                                                            //     {/* <div className='flex items-center gap-2'>
-                                                            //       <h5 className='text-gray-400 font-normal text-[10px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium text-[10px]'>{qtyHouse?.quantity ?? 0}</h5>
-                                                            //     </div> */}
-                                                            //   </div>
-                                                            //   <div>
-                                                            //     <h3 className='font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.name}</h3>
-                                                            //     <h5 className='text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]' >{option.e?.code}</h5>
-                                                            //     <h5 className='font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.product_variation}</h5>
-                                                            //     <h5 className='text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{option.e?.import_code} - {dataLang[option.e?.text_type]}</h5>
-                                                            //   </div>
-                                                            //   {/* <div className=''>
-                                                            //     <div className='text-right opacity-0'>{"0"}</div>
-                                                            //     <div className='flex gap-2'>
-                                                            //       <div className='flex items-center gap-2'>
-                                                            //         <h5 className='text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{qtyHouse?.quantity ?? 0}</h5>
-                                                            //       </div>
-                                                            //       </div>
-                                                            //   </div> */}
-                                                            // </div>
-                                                            //                             <div className="py-2">
-                                                            //                                 <div className="flex items-center gap-1">
-                                                            //                                     <div className="w-[40px] h-[50px]">
-                                                            //                                         {option
-                                                            //                                             .e
-                                                            //                                             ?.images !=
-                                                            //                                         null ? (
-                                                            //                                             <img
-                                                            //                                                 src={
-                                                            //                                                     option
-                                                            //                                                         .e
-                                                            //                                                         ?.images
-                                                            //                                                 }
-                                                            //                                                 alt="Product Image"
-                                                            //                                                 className="max-w-[40px] max-h-[50px] text-[8px] object-cover rounded"
-                                                            //                                             />
-                                                            //                                         ) : (
-                                                            //                                             <div className=" w-[40px] h-[50px] object-cover  flex items-center justify-center  rounded">
-                                                            //                                                 <img
-                                                            //                                                     src="/no_img.png"
-                                                            //                                                     alt="Product Image"
-                                                            //                                                     className=" object-cover rounded"
-                                                            //                                                 />
-                                                            //                                             </div>
-                                                            //                                         )}
-                                                            //                                     </div>
-                                                            //                                     <div>
-                                                            //                                         <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                            //                                             {
-                                                            //                                                 option
-                                                            //                                                     .e
-                                                            //                                                     ?.name
-                                                            //                                             }
-                                                            //                                         </h3>
-                                                            //                                         <div className="flex gap-2">
-                                                            //                                             <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                            //                                                 {
-                                                            //                                                     option
-                                                            //                                                         .e
-                                                            //                                                         ?.code
-                                                            //                                                 }
-                                                            //                                             </h5>
-                                                            //                                             <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                            //                                                 {
-                                                            //                                                     option
-                                                            //                                                         .e
-                                                            //                                                         ?.product_variation
-                                                            //                                                 }
-                                                            //                                             </h5>
-                                                            //                                         </div>
-                                                            //                                         <div className="flex items-center gap-1">
-                                                            //                                             <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                            //                                                 {
-                                                            //                                                     option
-                                                            //                                                         .e
-                                                            //                                                         ?.import_code
-                                                            //                                                 }{" "}
-                                                            //                                                 -{" "}
-                                                            //                                             </h5>
-                                                            //                                             <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">{`(ĐGSCK: ${formatNumber(
-                                                            //                                                 option
-                                                            //                                                     .e
-                                                            //                                                     ?.price_after_discount
-                                                            //                                             )}) -`}</h5>
-                                                            //                                             <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                            //                                                 {
-                                                            //                                                     dataLang[
-                                                            //                                                         option
-                                                            //                                                             .e
-                                                            //                                                             ?.text_type
-                                                            //                                                     ]
-                                                            //                                                 }
-                                                            //                                             </h5>
-                                                            //                                         </div>
-                                                            //                                     </div>
-                                                            //                                 </div>
-                                                            //                                 <div
-                                                            //                                     className={`${
-                                                            //                                         option.e
-                                                            //                                             ?.serial ||
-                                                            //                                         option.e
-                                                            //                                             ?.lot ||
-                                                            //                                         option.e
-                                                            //                                             ?.expiration_date
-                                                            //                                             ? ""
-                                                            //                                             : ""
-                                                            //                                     } flex items-center gap-2 italic`}
-                                                            //                                 >
-                                                            //                                     {dataProductSerial.is_enable ===
-                                                            //                                         "1" && (
-                                                            //                                         <div className="text-[11px] text-[#667085] font-[500]">
-                                                            //                                             Serial:{" "}
-                                                            //                                             {option
-                                                            //                                                 .e
-                                                            //                                                 ?.serial
-                                                            //                                                 ? option
-                                                            //                                                       .e
-                                                            //                                                       ?.serial
-                                                            //                                                 : "-"}
-                                                            //                                         </div>
-                                                            //                                     )}
-                                                            //                                     {dataMaterialExpiry.is_enable ===
-                                                            //                                         "1" ||
-                                                            //                                     dataProductExpiry.is_enable ===
-                                                            //                                         "1" ? (
-                                                            //                                         <>
-                                                            //                                             <div className="text-[11px] text-[#667085] font-[500]">
-                                                            //                                                 Lot:{" "}
-                                                            //                                                 {option
-                                                            //                                                     .e
-                                                            //                                                     ?.lot
-                                                            //                                                     ? option
-                                                            //                                                           .e
-                                                            //                                                           ?.lot
-                                                            //                                                     : "-"}
-                                                            //                                             </div>
-                                                            //                                             <div className="text-[11px] text-[#667085] font-[500]">
-                                                            //                                                 Date:{" "}
-                                                            //                                                 {option
-                                                            //                                                     .e
-                                                            //                                                     ?.expiration_date
-                                                            //                                                     ? moment(
-                                                            //                                                           option
-                                                            //                                                               .e
-                                                            //                                                               ?.expiration_date
-                                                            //                                                       ).format(
-                                                            //                                                           "DD/MM/YYYY"
-                                                            //                                                       )
-                                                            //                                                     : "-"}
-                                                            //                                             </div>
-                                                            //                                         </>
-                                                            //                                     ) : (
-                                                            //                                         ""
-                                                            //                                     )}
-                                                            //                                 </div>
-                                                            //                                 {/* <div className=''>
-                                                            //    <div className='text-right opacity-0'>{"0"}</div>
-                                                            //    <div className='flex gap-2'>
-                                                            //      <div className='flex items-center gap-2'>
-                                                            //        <h5 className='text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{dataLang?.purchase_survive || "purchase_survive"}:</h5><h5 className='text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]'>{qtyHouse?.quantity ?? 0}</h5>
-                                                            //      </div>
-                                                            //     </div>
-                                                            // </div> */}
-                                                            //                             </div>
                                                             <div className="py-2">
                                                                 <div className="flex items-center ">
                                                                     <div className="w-[40px] h-[50px]">
@@ -2278,7 +2112,7 @@ const Index = (props) => {
                                                             <React.Fragment
                                                                 key={ce?.id?.toString()}
                                                             >
-                                                                <div className="p-0.5 border-t border-l  flex flex-col col-span-2 justify-center h-full">
+                                                                <div className="p-1 border-t border-l  flex flex-col col-span-2 justify-center h-full">
                                                                     <Select
                                                                         options={
                                                                             warehouse
@@ -2299,12 +2133,21 @@ const Index = (props) => {
                                                                             "kho"
                                                                         )}
                                                                         className={`${
-                                                                            errWarehouse &&
-                                                                            ce?.kho ==
-                                                                                null
-                                                                                ? "border-red-500"
+                                                                            (errWarehouse &&
+                                                                                ce?.kho ==
+                                                                                    null) ||
+                                                                            (errWarehouse &&
+                                                                                (ce
+                                                                                    ?.kho
+                                                                                    ?.label ==
+                                                                                    null ||
+                                                                                    ce
+                                                                                        ?.kho
+                                                                                        ?.warehouse_name ==
+                                                                                        null))
+                                                                                ? "border-red-500 border"
                                                                                 : ""
-                                                                        } border my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                         placeholder={
                                                                             onLoadingChild
                                                                                 ? ""
@@ -2316,49 +2159,55 @@ const Index = (props) => {
                                                                         }
                                                                         formatOptionLabel={(
                                                                             option
-                                                                        ) => (
-                                                                            <div className="">
-                                                                                <div className="flex gap-1">
-                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                        {dataLang?.returns_wareshoue ||
-                                                                                            "returns_wareshoue"}
+                                                                        ) => {
+                                                                            return (
+                                                                                (option?.warehouse_name ||
+                                                                                    option?.label ||
+                                                                                    option?.qty) && (
+                                                                                    <div className="">
+                                                                                        <div className="flex gap-1">
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                                                {dataLang?.returns_wareshoue ||
+                                                                                                    "returns_wareshoue"}
 
-                                                                                        :
-                                                                                    </h2>
-                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
-                                                                                        {
-                                                                                            option?.warehouse_name
-                                                                                        }
-                                                                                    </h2>
-                                                                                </div>
-                                                                                <div className="flex gap-1">
-                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                        {dataLang?.returns_wareshouePosition ||
-                                                                                            "returns_wareshouePosition"}
+                                                                                                :
+                                                                                            </h2>
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
+                                                                                                {
+                                                                                                    option?.warehouse_name
+                                                                                                }
+                                                                                            </h2>
+                                                                                        </div>
+                                                                                        <div className="flex gap-1">
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                                                {dataLang?.returns_wareshouePosition ||
+                                                                                                    "returns_wareshouePosition"}
 
-                                                                                        :
-                                                                                    </h2>
-                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
-                                                                                        {
-                                                                                            option?.label
-                                                                                        }
-                                                                                    </h2>
-                                                                                </div>
-                                                                                <div className="flex gap-1">
-                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                        {dataLang?.returns_survive ||
-                                                                                            "returns_survive"}
+                                                                                                :
+                                                                                            </h2>
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
+                                                                                                {
+                                                                                                    option?.label
+                                                                                                }
+                                                                                            </h2>
+                                                                                        </div>
+                                                                                        <div className="flex gap-1">
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                                                {dataLang?.returns_survive ||
+                                                                                                    "returns_survive"}
 
-                                                                                        :
-                                                                                    </h2>
-                                                                                    <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
-                                                                                        {formatNumber(
-                                                                                            option?.qty
-                                                                                        )}
-                                                                                    </h2>
-                                                                                </div>
-                                                                            </div>
-                                                                        )}
+                                                                                                :
+                                                                                            </h2>
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
+                                                                                                {formatNumber(
+                                                                                                    option?.qty
+                                                                                                )}
+                                                                                            </h2>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                )
+                                                                            );
+                                                                        }}
                                                                         style={{
                                                                             border: "none",
                                                                             boxShadow:
@@ -2439,11 +2288,11 @@ const Index = (props) => {
                                                                                         "" ||
                                                                                     ce?.amount ==
                                                                                         0)
-                                                                                    ? "border-b-2 border-red-500"
+                                                                                    ? "border-b border-red-500"
                                                                                     : errSurvive
-                                                                                    ? "border-b-2 border-red-500"
-                                                                                    : "border-b-2 border-gray-200"
-                                                                            } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
+                                                                                    ? "border-b border-red-500"
+                                                                                    : "border-b border-gray-200"
+                                                                            } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
                                                                             allowNegative={
                                                                                 false
                                                                             }
@@ -2567,7 +2416,7 @@ const Index = (props) => {
                                                                 </div>
                                                                 <div className="flex justify-center  h-full p-0.5 flex-col items-center">
                                                                     <NumericFormat
-                                                                        className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px]  text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b-2 border-gray-200 h-fit"
+                                                                        className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px]  text-[9px] 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b border-gray-200 h-fit"
                                                                         onValueChange={_HandleChangeChild.bind(
                                                                             this,
                                                                             e?.id,
@@ -2603,7 +2452,7 @@ const Index = (props) => {
                                                                 </div>
                                                                 <div className="flex justify-center  h-full p-0.5 flex-col items-center">
                                                                     <NumericFormat
-                                                                        className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b-2 border-gray-200"
+                                                                        className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b border-gray-200"
                                                                         onValueChange={_HandleChangeChild.bind(
                                                                             this,
                                                                             e?.id,
@@ -2652,7 +2501,7 @@ const Index = (props) => {
                                                                         )}
                                                                     </h3>
                                                                 </div>
-                                                                <div className=" flex flex-col items-center p-0.5 h-full justify-center">
+                                                                <div className=" flex flex-col items-center p-1 h-full justify-center">
                                                                     <Select
                                                                         options={
                                                                             taxOptions

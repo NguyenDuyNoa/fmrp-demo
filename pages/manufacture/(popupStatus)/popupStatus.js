@@ -170,8 +170,10 @@ const Popup_status = (props) => {
                                                         </h4>
                                                     </div>
                                                     <div className="flex items-center gap-1">
-                                                        {props.type ==
-                                                            "productsWarehouse" &&
+                                                        {(props.type ==
+                                                            "productsWarehouse" ||
+                                                            props.type ==
+                                                                "warehouseTransfer") &&
                                                         dataProductSerial.is_enable ===
                                                             "1" ? (
                                                             <div className="flex gap-1 items-center italic font-normal text-[12px]">
@@ -190,12 +192,16 @@ const Popup_status = (props) => {
                                                         ) : (
                                                             ""
                                                         )}
-                                                        {(props.type ==
-                                                            "productsWarehouse" &&
+                                                        {props.type ==
+                                                            "productsWarehouse" ||
+                                                        (props.type ==
+                                                            "warehouseTransfer" &&
                                                             dataProductExpiry.is_enable ===
                                                                 "1") ||
+                                                        props.type ==
+                                                            "recall" ||
                                                         (props.type ==
-                                                            "recall" &&
+                                                            "warehouseTransfer" &&
                                                             dataMaterialExpiry.is_enable ===
                                                                 "1") ? (
                                                             <div className="flex">

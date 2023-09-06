@@ -208,12 +208,20 @@ const Index = (props) => {
                                     (e.item?.text_type == "material" &&
                                         dataMaterialExpiry?.is_enable == "0" &&
                                         true),
-                                location: {
-                                    label: ce?.warehouse?.location_name,
-                                    value: ce?.warehouse?.id,
-                                    warehouse_name:
-                                        ce?.warehouse?.warehouse_name,
-                                },
+                                location:
+                                    ce?.warehouse?.location_name ||
+                                    ce?.warehouse?.id ||
+                                    ce?.warehouse?.warehouse_name
+                                        ? {
+                                              label:
+                                                  ce?.warehouse
+                                                      ?.location_name || null,
+                                              value: ce?.warehouse?.id || null,
+                                              warehouse_name:
+                                                  ce?.warehouse
+                                                      ?.warehouse_name || null,
+                                          }
+                                        : null,
                                 price: ce?.price,
                                 serial: ce?.serial == null ? "" : ce?.serial,
                                 lot: ce?.lot == null ? "" : ce?.lot,
@@ -622,7 +630,7 @@ const Index = (props) => {
                 );
                 formData.append(
                     `items[${index}][child][${childIndex}][location_warehouses_id]`,
-                    childItem?.location?.value
+                    childItem?.location?.value || 0
                 );
                 formData.append(
                     `items[${index}][child][${childIndex}][note]`,
@@ -959,6 +967,7 @@ const Index = (props) => {
                                 : dataLang?.recall_title_add ||
                                   "recall_title_add"}
                         </h2>
+
                         <div className="flex justify-end items-center">
                             <button
                                 onClick={() =>
@@ -1472,7 +1481,7 @@ const Index = (props) => {
                                             size="16"
                                         />
                                     </button>
-                                    <div className="mb-0.5 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b-2 w-full border-gray-200">
+                                    <div className="mb-0.5 text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal  focus:outline-none border-b w-full border-gray-200">
                                         1
                                     </div>
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
@@ -1512,10 +1521,10 @@ const Index = (props) => {
                                     {listData?.map((e) => (
                                         <div
                                             key={e?.id?.toString()}
-                                            className="grid grid-cols-12 items-start"
+                                            className="grid grid-cols-12 items-start gap-1 my-1"
                                         >
                                             <div className="col-span-3 border border-r p-0.5 pb-1 h-full">
-                                                <div className="relative mr-5 mt-5">
+                                                <div className="relative mr-1 mt-5">
                                                     <Select
                                                         onInputChange={_HandleSeachApi.bind(
                                                             this
@@ -1697,7 +1706,7 @@ const Index = (props) => {
                                                         <React.Fragment
                                                             key={ce?.id?.toString()}
                                                         >
-                                                            <div className="flex justify-center border-t border-l  h-full p-0.5 flex-col items-center ">
+                                                            <div className="flex justify-center border-t border-l  h-full p-1 flex-col items-center ">
                                                                 <Select
                                                                     options={
                                                                         dataLocation
@@ -1721,9 +1730,9 @@ const Index = (props) => {
                                                                         errWarehouse &&
                                                                         ce?.location ==
                                                                             null
-                                                                            ? "border-red-500"
+                                                                            ? "border-red-500 border"
                                                                             : ""
-                                                                    } border my-1 3xl:text-[12px] 2xl:text-[10px] cursor-pointer xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                    }  my-1 3xl:text-[12px] 2xl:text-[10px] cursor-pointer xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                     placeholder={
                                                                         onLoadingChild
                                                                             ? ""
@@ -1788,7 +1797,7 @@ const Index = (props) => {
                                                             "1" ? (
                                                                 <>
                                                                     <div className=" col-span-1  ">
-                                                                        <div className="flex justify-center  h-full p-0.5 flex-col items-center ">
+                                                                        <div className="flex justify-center  h-full p-1 flex-col items-center ">
                                                                             <input
                                                                                 value={
                                                                                     ce?.lot
@@ -1818,7 +1827,7 @@ const Index = (props) => {
                                                                     </div>
 
                                                                     <div className=" col-span-1  ">
-                                                                        <div className="custom-date-picker flex justify-center h-full p-0.5 flex-col items-center w-full">
+                                                                        <div className="custom-date-picker flex justify-center h-full p-1 flex-col items-center w-full">
                                                                             <div className="col-span-4 relative">
                                                                                 <div className="custom-date-picker flex flex-row">
                                                                                     <DatePicker
@@ -1906,7 +1915,7 @@ const Index = (props) => {
                                                                                 0)
                                                                             ? "border-red-500 border-b"
                                                                             : ""
-                                                                    } placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b-2 border-gray-200 `}
+                                                                    } placeholder:3xl:text-[11px] placeholder:xxl:text-[9px] placeholder:2xl:text-[8.5px] placeholder:xl:text-[7px] placeholder:lg:text-[6.3px] placeholder:text-[10px] appearance-none text-center  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200 `}
                                                                     onValueChange={_HandleChangeChild.bind(
                                                                         this,
                                                                         e?.id,
@@ -1956,7 +1965,7 @@ const Index = (props) => {
                                                                         "recall_noteChild"
                                                                     }
                                                                     type="text"
-                                                                    className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
+                                                                    className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 outline-none "
                                                                 />
                                                             </div>
                                                             <div className=" h-full p-0.5 flex flex-col items-center justify-center ">

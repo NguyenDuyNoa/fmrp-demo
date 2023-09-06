@@ -503,8 +503,8 @@ const Popup_chitiet = (props) => {
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
                                                                 {
-                                                                    e?.item
-                                                                        ?.unit_name
+                                                                    e?.unit_data
+                                                                        ?.unit
                                                                 }
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center mr-1">
@@ -522,8 +522,8 @@ const Popup_chitiet = (props) => {
                                                                     e?.quantity_exchange
                                                                 )}{" "}
                                                                 {
-                                                                    e?.item
-                                                                        ?.unit_name
+                                                                    e?.unit_data
+                                                                        ?.unit
                                                                 }
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 col-span-2 font-medium text-left ml-3.5">

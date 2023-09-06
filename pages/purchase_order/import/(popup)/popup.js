@@ -478,7 +478,17 @@ const Popup_chitiet = (props) => {
                                                                         ?.product_variation
                                                                 }
                                                             </h6>
-                                                            <h6 className="text-[13px] font-medium   px-2 py-0.5 col-span-1 text-left break-words">{`${e?.warehouse_name}-${e.location_name}`}</h6>
+                                                            <h6 className="text-[13px] font-medium   px-2 py-0.5 col-span-1 text-left break-words">
+                                                                {
+                                                                    e?.warehouse_name
+                                                                }
+                                                                {e?.warehouse_name
+                                                                    ? " - "
+                                                                    : ""}
+                                                                {
+                                                                    e.location_name
+                                                                }
+                                                            </h6>
                                                             <h6 className="text-[13px] font-medium   py-0.5 col-span-1 text-center break-words">
                                                                 {
                                                                     e?.item
