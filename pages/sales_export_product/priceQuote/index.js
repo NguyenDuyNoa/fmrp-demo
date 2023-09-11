@@ -18,13 +18,10 @@ import { registerLocale } from "react-datepicker";
 import { _ServerInstance as Axios } from "/services/axios";
 import { useEffect } from "react";
 import { debounce } from "lodash";
-import {
-    Grid6 as IconExcel,
-    SearchNormal1 as IconSearch,
-    TickCircle,
-} from "iconsax-react";
+import { Grid6 as IconExcel, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
+import OnResetData from "components/UI/btnResetData/btnReset";
 registerLocale("vi", vi);
 
 const ExcelFile = ReactExport.ExcelFile;
@@ -91,18 +88,12 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[branch_id]":
-                        idBranch != null ? idBranch.value : null,
-                    "filter[id]":
-                        idQuoteCode != null ? idQuoteCode?.value : null,
+                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
+                    "filter[id]": idQuoteCode != null ? idQuoteCode?.value : null,
                     "filter[status_bar]": tabPage ?? null,
                     "filter[client_id]": idCustomer ? idCustomer.value : null,
-                    "filter[start_date]":
-                        valueDate?.startDate != null
-                            ? valueDate?.startDate
-                            : null,
-                    "filter[end_date]":
-                        valueDate?.endDate != null ? valueDate?.endDate : null,
+                    "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
+                    "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
                 },
             },
             (err, response) => {
@@ -129,8 +120,7 @@ const Index = (props) => {
                 params: {
                     limit: 0,
                     search: keySearch,
-                    "filter[branch_id]":
-                        idBranch != null ? idBranch.value : null,
+                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
                 },
             },
             (err, response) => {
@@ -145,55 +135,36 @@ const Index = (props) => {
 
     // filter
     const _ServerFetching_filter = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch/?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sListBr(rResult);
-                }
+        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sListBr(rResult);
             }
-        );
-        Axios(
-            "GET",
-            `/api_web/Api_quotation/quotationCombobox/?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var rResult = response.data.result;
-                    sListQuoteCode(rResult);
-                }
+        });
+        Axios("GET", `/api_web/Api_quotation/quotationCombobox/?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var rResult = response.data.result;
+                sListQuoteCode(rResult);
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/api_client/client_option/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data.rResult;
-                    sListCustomer(
-                        db?.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                }
+        });
+        Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var db = response.data.rResult;
+                sListCustomer(db?.map((e) => ({ label: e.name, value: e.id })));
             }
-        );
+        });
         sOnFetching_filter(false);
     };
 
     useEffect(() => {
-        (onFetching && _ServerFetching()) ||
-            (onFetching && _ServerFetching_group());
+        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
     }, [onFetching]);
     useEffect(() => {
         onFetching_filter && _ServerFetching_filter();
     }, [onFetching_filter]);
 
     useEffect(() => {
-        (router.query.tab && sOnFetching(true)) ||
-            (router.query?.tab && sOnFetching_filter(true));
+        (router.query.tab && sOnFetching(true)) || (router.query?.tab && sOnFetching_filter(true));
     }, [limit, router.query?.page, router.query?.tab]);
 
     useEffect(() => {
@@ -210,15 +181,9 @@ const Index = (props) => {
                 },
             });
             setTimeout(() => {
-                (idBranch != null &&
-                    sOnFetching(true) &&
-                    _ServerFetching_group()) ||
-                    (idQuoteCode != null &&
-                        sOnFetching(true) &&
-                        _ServerFetching_group()) ||
-                    (idCustomer != null &&
-                        sOnFetching(true) &&
-                        _ServerFetching_group()) ||
+                (idBranch != null && sOnFetching(true) && _ServerFetching_group()) ||
+                    (idQuoteCode != null && sOnFetching(true) && _ServerFetching_group()) ||
+                    (idCustomer != null && sOnFetching(true) && _ServerFetching_group()) ||
                     (valueDate.startDate != null &&
                         valueDate.endDate != null &&
                         sOnFetching(true) &&
@@ -229,22 +194,11 @@ const Index = (props) => {
             sOnFetching(true);
             _ServerFetching_group();
         }
-    }, [
-        limit,
-        idBranch,
-        idQuoteCode,
-        idCustomer,
-        valueDate.endDate,
-        valueDate.startDate,
-    ]);
+    }, [limit, idBranch, idQuoteCode, idCustomer, valueDate.endDate, valueDate.startDate]);
 
-    const listBr_filter = listBr
-        ? listBr?.map((e) => ({ label: e.name, value: e.id }))
-        : [];
+    const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
 
-    const listCode_filter = listQuoteCode
-        ? listQuoteCode?.map((e) => ({ label: e.reference_no, value: e.id }))
-        : [];
+    const listCode_filter = listQuoteCode ? listQuoteCode?.map((e) => ({ label: e.reference_no, value: e.id })) : [];
 
     const typeChange = {
         branch: sIdBranch,
@@ -304,9 +258,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.price_quote_date || "price_quote_date"
-                    }`,
+                    title: `${dataLang?.price_quote_date || "price_quote_date"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -314,9 +266,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.price_quote_code || "price_quote_code"
-                    }`,
+                    title: `${dataLang?.price_quote_code || "price_quote_code"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -324,9 +274,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.price_quote_customer || "price_quote_customer"
-                    }`,
+                    title: `${dataLang?.price_quote_customer || "price_quote_customer"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -334,9 +282,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.price_quote_total || "price_quote_total"
-                    }`,
+                    title: `${dataLang?.price_quote_total || "price_quote_total"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -344,10 +290,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.price_quote_tax_money ||
-                        "price_quote_tax_money"
-                    }`,
+                    title: `${dataLang?.price_quote_tax_money || "price_quote_tax_money"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -355,10 +298,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.price_quote_into_money ||
-                        "price_quote_into_money"
-                    }`,
+                    title: `${dataLang?.price_quote_into_money || "price_quote_into_money"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -366,10 +306,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.price_quote_effective_date ||
-                        "price_quote_effective_date"
-                    }`,
+                    title: `${dataLang?.price_quote_effective_date || "price_quote_effective_date"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -377,10 +314,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.price_quote_order_status ||
-                        "price_quote_order_status"
-                    }`,
+                    title: `${dataLang?.price_quote_order_status || "price_quote_order_status"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -388,9 +322,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.price_quote_branch || "price_quote_branch"
-                    }`,
+                    title: `${dataLang?.price_quote_branch || "price_quote_branch"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -398,9 +330,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.price_quote_note || "price_quote_note"
-                    }`,
+                    title: `${dataLang?.price_quote_note || "price_quote_note"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -415,21 +345,13 @@ const Index = (props) => {
                 { value: `${e?.client_name ? e?.client_name : ""}` },
                 // tiền chưa!
                 {
-                    value: `${
-                        e?.total_price ? formatNumber(e?.total_price) : ""
-                    }`,
+                    value: `${e?.total_price ? formatNumber(e?.total_price) : ""}`,
                 },
                 {
-                    value: `${
-                        e?.total_tax_price
-                            ? formatNumber(e?.total_tax_price)
-                            : ""
-                    }`,
+                    value: `${e?.total_tax_price ? formatNumber(e?.total_tax_price) : ""}`,
                 },
                 {
-                    value: `${
-                        e?.total_amount ? formatNumber(e?.total_amount) : ""
-                    }`,
+                    value: `${e?.total_amount ? formatNumber(e?.total_amount) : ""}`,
                 },
 
                 { value: `${e?.validity ? e?.validity : ""}` },
@@ -465,14 +387,10 @@ const Index = (props) => {
             denyButtonColor: "#d33",
             cancelButtonColor: "gray",
             confirmButtonText: `${
-                data[index].status === "confirmed"
-                    ? dataLang?.aler_not_yet_approved
-                    : dataLang?.aler_approved
+                data[index].status === "confirmed" ? dataLang?.aler_not_yet_approved : dataLang?.aler_approved
             }`,
             denyButtonText: `${
-                data[index].status === "no_confirmed"
-                    ? dataLang?.aler_not_yet_approved
-                    : dataLang?.aler_no_approved
+                data[index].status === "no_confirmed" ? dataLang?.aler_not_yet_approved : dataLang?.aler_no_approved
             }`,
             cancelButtonText: `${dataLang?.aler_cancel}`,
             didOpen: () => {
@@ -494,10 +412,7 @@ const Index = (props) => {
                 _ServerPostStatus(id, newStatus);
             }
             if (result.isDenied) {
-                const newStatus =
-                    data[index].status === "no_confirmed"
-                        ? "not_confirmed"
-                        : "no_confirmed";
+                const newStatus = data[index].status === "no_confirmed" ? "not_confirmed" : "no_confirmed";
 
                 _ServerPostStatus(id, newStatus);
             }
@@ -510,10 +425,7 @@ const Index = (props) => {
         if (data[index].status === "ordered") {
             Toast.fire({
                 icon: "error",
-                title: `${
-                    dataLang?.no_change_status_when_order ||
-                    "no_change_status_when_order"
-                }`,
+                title: `${dataLang?.no_change_status_when_order || "no_change_status_when_order"}`,
             });
         }
     };
@@ -538,10 +450,7 @@ const Index = (props) => {
                     if (isSuccess !== false) {
                         Toast.fire({
                             icon: "success",
-                            title: `${
-                                dataLang?.change_status_when_order ||
-                                "change_status_when_order"
-                            }`,
+                            title: `${dataLang?.change_status_when_order || "change_status_when_order"}`,
                         });
                     }
                     sOnSending(false);
@@ -565,9 +474,7 @@ const Index = (props) => {
                     <div className="p-4"></div>
                 ) : (
                     <div className="flex space-x-1 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.price_quote || "price_quote"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.price_quote || "price_quote"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.price_quote_list || "price_quote"}</h6>
                     </div>
@@ -597,15 +504,11 @@ const Index = (props) => {
                                             <div>
                                                 <TabFilter
                                                     style={{
-                                                        backgroundColor:
-                                                            "#e2f0fe",
+                                                        backgroundColor: "#e2f0fe",
                                                     }}
                                                     dataLang={dataLang}
                                                     key={e?.id}
-                                                    onClick={_HandleSelectTab.bind(
-                                                        this,
-                                                        `${e?.id}`
-                                                    )}
+                                                    onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
                                                     total={e?.count}
                                                     active={e?.id}
                                                     className={"text-[#0F4F9E]"}
@@ -627,12 +530,8 @@ const Index = (props) => {
                                                         <input
                                                             className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  xl:py-2.5 lg:py-[11px] rounded 2xl:text-base text-xs xl:text-center text-center w-full  relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E] "
                                                             type="text"
-                                                            onChange={_HandleOnChangeKeySearch.bind(
-                                                                this
-                                                            )}
-                                                            placeholder={
-                                                                dataLang?.branch_search
-                                                            }
+                                                            onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                            placeholder={dataLang?.branch_search}
                                                         />
                                                     </form>
                                                 </div>
@@ -648,24 +547,17 @@ const Index = (props) => {
                                                             },
                                                             ...listBr_filter,
                                                         ]}
-                                                        onChange={onChangeFilter.bind(
-                                                            this,
-                                                            "branch"
-                                                        )}
+                                                        onChange={onChangeFilter.bind(this, "branch")}
                                                         value={idBranch}
                                                         placeholder={
                                                             dataLang?.price_quote_select_branch ||
                                                             "price_quote_select_branch"
                                                         }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-xl bg-white z-20"
                                                         isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
+                                                        noOptionsMessage={() => "Không có dữ liệu"}
                                                         // components={{ MultiValue }}
                                                         closeMenuOnSelect={true}
                                                         style={{
@@ -677,33 +569,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -721,24 +603,14 @@ const Index = (props) => {
                                                             },
                                                             ...listCode_filter,
                                                         ]}
-                                                        onChange={onChangeFilter.bind(
-                                                            this,
-                                                            "code"
-                                                        )}
+                                                        onChange={onChangeFilter.bind(this, "code")}
                                                         value={idQuoteCode}
-                                                        placeholder={
-                                                            dataLang?.price_quote_code ||
-                                                            "price_quote_code"
-                                                        }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        placeholder={dataLang?.price_quote_code || "price_quote_code"}
+                                                        hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
                                                         isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
+                                                        noOptionsMessage={() => "Không có dữ liệu"}
                                                         // components={{ MultiValue }}
                                                         style={{
                                                             border: "none",
@@ -749,33 +621,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -794,24 +656,16 @@ const Index = (props) => {
                                                             },
                                                             ...listCustomer,
                                                         ]}
-                                                        onChange={onChangeFilter.bind(
-                                                            this,
-                                                            "customer"
-                                                        )}
+                                                        onChange={onChangeFilter.bind(this, "customer")}
                                                         value={idCustomer}
                                                         placeholder={
-                                                            dataLang?.price_quote_customer ||
-                                                            "price_quote_customer"
+                                                            dataLang?.price_quote_customer || "price_quote_customer"
                                                         }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
                                                         isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
+                                                        noOptionsMessage={() => "Không có dữ liệu"}
                                                         style={{
                                                             border: "none",
                                                             boxShadow: "none",
@@ -821,33 +675,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -858,27 +702,16 @@ const Index = (props) => {
                                                         value={valueDate}
                                                         i18n={"vi"}
                                                         primaryColor={"blue"}
-                                                        onChange={onChangeFilter.bind(
-                                                            this,
-                                                            "date"
-                                                        )}
+                                                        onChange={onChangeFilter.bind(this, "date")}
                                                         showShortcuts={true}
-                                                        displayFormat={
-                                                            "DD/MM/YYYY"
-                                                        }
+                                                        displayFormat={"DD/MM/YYYY"}
                                                         configs={{
                                                             shortcuts: {
                                                                 today: "Hôm nay",
-                                                                yesterday:
-                                                                    "Hôm qua",
-                                                                past: (
-                                                                    period
-                                                                ) =>
-                                                                    `${period}  ngày qua`,
-                                                                currentMonth:
-                                                                    "Tháng này",
-                                                                pastMonth:
-                                                                    "Tháng trước",
+                                                                yesterday: "Hôm qua",
+                                                                past: (period) => `${period}  ngày qua`,
+                                                                currentMonth: "Tháng này",
+                                                                pastMonth: "Tháng trước",
                                                             },
                                                             footer: {
                                                                 cancel: "Từ bỏ",
@@ -893,6 +726,7 @@ const Index = (props) => {
                                         </div>
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
+                                                <OnResetData sOnFetching={sOnFetching} />
                                                 <div>
                                                     {dataExcel?.length > 0 && (
                                                         <ExcelFile
@@ -902,25 +736,15 @@ const Index = (props) => {
                                                                 <button className="3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-2 xl:py-2 lg:py-2.5 3xl:text-[15px] 2xl:text-[13px] xl:text-[12px] lg:text-[8px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
                                                                     <IconExcel
                                                                         className="3xl:scale-100 2xl:scale-100 xl:scale-100 lg:scale-75"
-                                                                        size={
-                                                                            18
-                                                                        }
+                                                                        size={18}
                                                                     />
-                                                                    <span>
-                                                                        {
-                                                                            dataLang?.client_list_exportexcel
-                                                                        }
-                                                                    </span>
+                                                                    <span>{dataLang?.client_list_exportexcel}</span>
                                                                 </button>
                                                             }
                                                         >
                                                             <ExcelSheet
-                                                                dataSet={
-                                                                    multiDataSet
-                                                                }
-                                                                data={
-                                                                    multiDataSet
-                                                                }
+                                                                dataSet={multiDataSet}
+                                                                data={multiDataSet}
                                                                 name="Organization"
                                                             />
                                                         </ExcelFile>
@@ -932,20 +756,14 @@ const Index = (props) => {
                                                     </div>
                                                     <select
                                                         className="outline-none text-[10px] xl:text-xs 2xl:text-sm"
-                                                        onChange={(e) =>
-                                                            sLimit(
-                                                                e.target.value
-                                                            )
-                                                        }
+                                                        onChange={(e) => sLimit(e.target.value)}
                                                         value={limit}
                                                     >
                                                         <option
                                                             className="text-[10px] xl:text-xs 2xl:text-sm hidden"
                                                             disabled
                                                         >
-                                                            {limit == -1
-                                                                ? "Tất cả"
-                                                                : limit}
+                                                            {limit == -1 ? "Tất cả" : limit}
                                                         </option>
                                                         <option
                                                             className="text-[10px] xl:text-xs 2xl:text-sm"
@@ -981,55 +799,42 @@ const Index = (props) => {
                                     <div className="pr-2 w-[100%] lg:w-[100%] ">
                                         <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10">
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center whitespace-nowrap">
-                                                {dataLang?.price_quote_date ||
-                                                    "price_quote_table_date"}
+                                                {dataLang?.price_quote_date || "price_quote_table_date"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_code ||
-                                                    "price_quote_table_code"}
+                                                {dataLang?.price_quote_code || "price_quote_table_code"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-2 font-[600] text-left">
-                                                {dataLang?.price_quote_customer ||
-                                                    "price_quote_table_customer"}
+                                                {dataLang?.price_quote_customer || "price_quote_table_customer"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_total ||
-                                                    "price_quote_table_total"}
+                                                {dataLang?.price_quote_total || "price_quote_table_total"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_tax_money ||
-                                                    "price_quote_tax_money"}
+                                                {dataLang?.price_quote_tax_money || "price_quote_tax_money"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_into_money ||
-                                                    "price_quote_into_money"}
+                                                {dataLang?.price_quote_into_money || "price_quote_into_money"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
                                                 {dataLang?.price_quote_effective_date ||
                                                     "price_quote_table_effective_date"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_order_status ||
-                                                    "price_quote_order_status"}
+                                                {dataLang?.price_quote_order_status || "price_quote_order_status"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-left">
-                                                {dataLang?.price_quote_note ||
-                                                    "price_quote_note"}
+                                                {dataLang?.price_quote_note || "price_quote_note"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_branch ||
-                                                    "price_quote_branch"}
+                                                {dataLang?.price_quote_branch || "price_quote_branch"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.price_quote_operations ||
-                                                    "price_quote_operations"}
+                                                {dataLang?.price_quote_operations || "price_quote_operations"}
                                             </h4>
                                         </div>
                                         {loading ? (
-                                            <Loading
-                                                className="h-80"
-                                                color="#0f4f9e"
-                                            />
+                                            <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
@@ -1040,23 +845,15 @@ const Index = (props) => {
                                                         >
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center">
                                                                 {e?.date != null
-                                                                    ? moment(
-                                                                          e?.date
-                                                                      ).format(
-                                                                          "DD/MM/YYYY"
-                                                                      )
+                                                                    ? moment(e?.date).format("DD/MM/YYYY")
                                                                     : ""}
                                                             </h6>
 
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer">
                                                                 <PopupDetailQuote
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
+                                                                    dataLang={dataLang}
                                                                     className="text-left"
-                                                                    name={
-                                                                        e?.reference_no
-                                                                    }
+                                                                    name={e?.reference_no}
                                                                     id={e?.id}
                                                                 />
                                                             </h6>
@@ -1066,96 +863,60 @@ const Index = (props) => {
                                                             </h6>
 
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right">
-                                                                {formatNumber(
-                                                                    e.total_price
-                                                                )}
+                                                                {formatNumber(e.total_price)}
                                                             </h6>
 
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right ">
-                                                                {formatNumber(
-                                                                    e.total_tax_price
-                                                                )}
+                                                                {formatNumber(e.total_tax_price)}
                                                             </h6>
 
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right">
-                                                                {formatNumber(
-                                                                    e.total_amount
-                                                                )}
+                                                                {formatNumber(e.total_amount)}
                                                             </h6>
 
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] col-span-1 text-center ">
-                                                                {e?.validity !=
-                                                                null
-                                                                    ? moment(
-                                                                          e?.validity
-                                                                      ).format(
-                                                                          "DD/MM/YYYY"
-                                                                      )
+                                                                {e?.validity != null
+                                                                    ? moment(e?.validity).format("DD/MM/YYYY")
                                                                     : ""}
                                                             </h6>
 
                                                             <h6 className="px-2 col-span-1 flex items-center justify-center text-center ">
                                                                 <h6 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer">
-                                                                    {(e?.status ===
-                                                                        "confirmed" && (
+                                                                    {(e?.status === "confirmed" && (
                                                                         <div
                                                                             className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-lime-500 text-lime-500 hover:bg-lime-500 hover:text-white hover:-translate-y-0.5 border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
-                                                                            onClick={() =>
-                                                                                _ToggleStatus(
-                                                                                    e?.id
-                                                                                )
-                                                                            }
+                                                                            onClick={() => _ToggleStatus(e?.id)}
                                                                         >
-                                                                            Đã
-                                                                            Duyệt
+                                                                            Đã Duyệt
                                                                             <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3 " />
                                                                         </div>
                                                                     )) ||
-                                                                        (e?.status ===
-                                                                            "not_confirmed" && (
+                                                                        (e?.status === "not_confirmed" && (
                                                                             <div
                                                                                 className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 hover:bg-red-500 hover:text-white hover:-translate-y-0.5 border border-red-500 px-0.5 py-1 rounded-md text-red-500 font-normal flex justify-center items-center gap-1"
-                                                                                onClick={() =>
-                                                                                    _ToggleStatus(
-                                                                                        e?.id
-                                                                                    )
-                                                                                }
+                                                                                onClick={() => _ToggleStatus(e?.id)}
                                                                             >
-                                                                                Chưa
-                                                                                Duyệt{" "}
+                                                                                Chưa Duyệt{" "}
                                                                                 <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3" />
                                                                             </div>
                                                                         )) ||
-                                                                        (e?.status ===
-                                                                            "no_confirmed" && (
+                                                                        (e?.status === "no_confirmed" && (
                                                                             <div
                                                                                 className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-sky-500 text-sky-500 hover:bg-sky-500 hover:text-white hover:-translate-y-0.5 border px-0.5 py-1 rounded-md font-normal flex justify-center items-center gap-1 "
-                                                                                onClick={() =>
-                                                                                    _ToggleStatus(
-                                                                                        e?.id
-                                                                                    )
-                                                                                }
+                                                                                onClick={() => _ToggleStatus(e?.id)}
                                                                             >
-                                                                                Không
-                                                                                Duyệt
+                                                                                Không Duyệt
                                                                                 <TickCircle className="text-right 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4  xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3" />
                                                                             </div>
                                                                         )) ||
-                                                                        (e?.status ===
-                                                                            "ordered" && (
+                                                                        (e?.status === "ordered" && (
                                                                             <div
                                                                                 className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-6 relative text-white border border-orange-400 rounded-md bg-orange-500 hover:bg-orange-600 text-left 3xl:px-3 3xl:py-5 3xl:pr-5 2xl:px-1 2xl:py-4 2xl:pr-5 xl:px-1 xl:py-3.5 xl:pr-4 lg:px-1 lg:py-2 lg:pr-3 font-normal flex justify-center items-center"
                                                                                 onClick={() =>
-                                                                                    handleToggleOrdered(
-                                                                                        e?.id
-                                                                                    )
+                                                                                    handleToggleOrdered(e?.id)
                                                                                 }
                                                                             >
-                                                                                Đã
-                                                                                Tạo
-                                                                                Đơn
-                                                                                Đặt
-                                                                                Hàng
+                                                                                Đã Tạo Đơn Đặt Hàng
                                                                                 <TickCircle className=" absolute 3xl:top-[30%] 3lx:-right-[-5%] 2xl:top-[25%] 2lx:-right-[-5%] xl:top-[25%] xl:-right-[-5%] lg:top-[30%] lg:-right-[-5%] 3xl:w-5 3xl:h-5 2xl:w-4 2xl:h-4 xl:w-3.5 xl:h-3.5 lg:w-3 lg:h-3 text-white border-orange-400" />
                                                                             </div>
                                                                         ))}
@@ -1168,23 +929,15 @@ const Index = (props) => {
 
                                                             <h6 className="col-span-1 w-fit ">
                                                                 <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#086FFC] font-[300] px-1.5 py-0.5 border border-[#086FFC] bg-white rounded-[5.5px] uppercase">
-                                                                    {
-                                                                        e?.branch_name
-                                                                    }
+                                                                    {e?.branch_name}
                                                                 </div>
                                                             </h6>
 
                                                             <div className="col-span-1 flex justify-center">
                                                                 <BtnAction
-                                                                    onRefresh={_ServerFetching.bind(
-                                                                        this
-                                                                    )}
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
-                                                                    status={
-                                                                        e?.status
-                                                                    }
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    dataLang={dataLang}
+                                                                    status={e?.status}
                                                                     id={e?.id}
                                                                     type="price_quote"
                                                                     className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
@@ -1215,8 +968,7 @@ const Index = (props) => {
                         <div className="grid grid-cols-12 bg-gray-100 items-center">
                             <div className="col-span-4 p-2 text-left">
                                 <h3 className="uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                    {dataLang?.price_quote_total_outside ||
-                                        "price_quote_total_outside"}
+                                    {dataLang?.price_quote_total_outside || "price_quote_total_outside"}
                                 </h3>
                             </div>
                             <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
@@ -1239,15 +991,12 @@ const Index = (props) => {
                             <div className="flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
                                 {/* <h6>{dataLang?.display}  {totalItems?.iTotalDisplayRecords}</h6> */}
                                 <h6>
-                                    {dataLang?.price_quote_total_outside}{" "}
-                                    {totalItems?.iTotalDisplayRecords} phiếu báo
+                                    {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} phiếu báo
                                     giá
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(
-                                        totalItems?.iTotalDisplayRecords
-                                    )}
+                                    totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />

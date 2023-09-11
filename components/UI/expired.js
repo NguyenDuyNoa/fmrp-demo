@@ -90,11 +90,7 @@ const Expirred = () => {
                                 </span>
                                 ngày. Một số tính năng của bạn sẽ bị đóng.
                             </h2>
-                            <NotificationBing
-                                size="20"
-                                color="red"
-                                className="animate-bounce"
-                            />
+                            <NotificationBing size="20" color="red" className="animate-bounce" />
                         </div>
                         <div>
                             <button

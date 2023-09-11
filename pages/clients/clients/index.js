@@ -29,6 +29,7 @@ import Popup_chitiet from "./(popup)/popupDetail";
 import ImageErrors from "components/UI/imageErrors";
 import { Tooltip } from "react-tippy";
 import { useSelector } from "react-redux";
+import OnResetData from "components/UI/btnResetData/btnReset";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -88,12 +89,8 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[client_group_id]":
-                        tabPage !== "0" ? (tabPage !== "-1" ? id : -1) : null,
-                    "filter[branch_id]":
-                        idBranch?.length > 0
-                            ? idBranch.map((e) => e.value)
-                            : null,
+                    "filter[client_group_id]": tabPage !== "0" ? (tabPage !== "-1" ? id : -1) : null,
+                    "filter[branch_id]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
                 },
             },
             (err, response) => {
@@ -137,9 +134,7 @@ const Index = (props) => {
 
     const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
 
-    const options = listBr_filter
-        ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value))
-        : [];
+    const options = listBr_filter ? listBr_filter?.filter((x) => !hiddenOptions.includes(x.value)) : [];
 
     const _ServerFetching_group = () => {
         Axios(
@@ -149,10 +144,7 @@ const Index = (props) => {
                 params: {
                     limit: 0,
                     search: keySearch,
-                    "filter[branch_id]":
-                        idBranch?.length > 0
-                            ? idBranch.map((e) => e.value)
-                            : null,
+                    "filter[branch_id]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
                 },
             },
             (err, response) => {
@@ -232,30 +224,22 @@ const Index = (props) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 const id = event;
-                Axios(
-                    "DELETE",
-                    `/api_web/api_client/client/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var isSuccess = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: dataLang?.aler_success_delete,
-                                });
-                            }
+                Axios("DELETE", `/api_web/api_client/client/${id}?csrf_protection=true`, {}, (err, response) => {
+                    if (!err) {
+                        var isSuccess = response.data;
+                        if (isSuccess) {
+                            Toast.fire({
+                                icon: "success",
+                                title: dataLang?.aler_success_delete,
+                            });
                         }
-                        _ServerFetching();
                     }
-                );
+                    _ServerFetching();
+                });
             }
         });
     };
 
-    const _HandleFresh = () => {
-        sOnFetching(true);
-    };
     //excel
     const multiDataSet = [
         {
@@ -359,16 +343,10 @@ const Index = (props) => {
                 { value: `${e.phone_number ? e.phone_number : ""}` },
                 { value: `${e.address ? e.address : ""}` },
                 {
-                    value: `${
-                        e.staff_charge
-                            ? e.staff_charge?.map((i) => i.full_name)
-                            : ""
-                    }`,
+                    value: `${e.staff_charge ? e.staff_charge?.map((i) => i.full_name) : ""}`,
                 },
                 {
-                    value: `${
-                        e.client_group ? e.client_group?.map((i) => i.name) : ""
-                    }`,
+                    value: `${e.client_group ? e.client_group?.map((i) => i.name) : ""}`,
                 },
                 { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
                 { value: `${e.date_create ? e.date_create : ""}` },
@@ -387,9 +365,7 @@ const Index = (props) => {
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.client_list_title}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.client_list_title}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.client_list_title}</h6>
                     </div>
@@ -399,9 +375,7 @@ const Index = (props) => {
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-3 h-[96%] overflow-hidden">
                             <div className="flex justify-between">
-                                <h2 className="text-2xl text-[#52575E] capitalize">
-                                    {dataLang?.client_list_title}
-                                </h2>
+                                <h2 className="text-2xl text-[#52575E] capitalize">{dataLang?.client_list_title}</h2>
                                 <div className="flex justify-end items-center gap-2">
                                     <Popup_dskh
                                         listBr={listBr}
@@ -419,20 +393,14 @@ const Index = (props) => {
                                             <div>
                                                 <TabFilter
                                                     style={{
-                                                        backgroundColor:
-                                                            e.color,
+                                                        backgroundColor: e.color,
                                                     }}
                                                     key={e.id}
-                                                    onClick={_HandleSelectTab.bind(
-                                                        this,
-                                                        `${e.id}`
-                                                    )}
+                                                    onClick={_HandleSelectTab.bind(this, `${e.id}`)}
                                                     total={e.count}
                                                     active={e.id}
                                                     className={`${
-                                                        e.color
-                                                            ? "text-white"
-                                                            : "text-[#0F4F9E] bg-[#e2f0fe] "
+                                                        e.color ? "text-white" : "text-[#0F4F9E] bg-[#e2f0fe] "
                                                     }`}
                                                 >
                                                     {e.name}
@@ -456,20 +424,14 @@ const Index = (props) => {
                                                         <input
                                                             className=" relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  py-2.5 rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
                                                             type="text"
-                                                            onChange={_HandleOnChangeKeySearch.bind(
-                                                                this
-                                                            )}
-                                                            placeholder={
-                                                                dataLang?.branch_search
-                                                            }
+                                                            onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                            placeholder={dataLang?.branch_search}
                                                         />
                                                     </form>
                                                 </div>
                                                 <div
                                                     className={`${
-                                                        idBranch?.length > 2
-                                                            ? "col-span-2"
-                                                            : "col-span-1"
+                                                        idBranch?.length > 2 ? "col-span-2" : "col-span-1"
                                                     } ml-1 `}
                                                 >
                                                     <Select
@@ -482,30 +444,19 @@ const Index = (props) => {
                                                             },
                                                             ...options,
                                                         ]}
-                                                        onChange={onchang_filterBr.bind(
-                                                            this,
-                                                            "branch"
-                                                        )}
+                                                        onChange={onchang_filterBr.bind(this, "branch")}
                                                         value={idBranch}
-                                                        placeholder={
-                                                            dataLang?.client_list_filterbrand
-                                                        }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        placeholder={dataLang?.client_list_filterbrand}
+                                                        hideSelectedOptions={false}
                                                         isMulti
                                                         isClearable={true}
                                                         className="rounded-md bg-white  xl:text-base text-[14.5px] z-20"
                                                         isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
+                                                        noOptionsMessage={() => "Không có dữ liệu"}
                                                         components={{
                                                             MultiValue,
                                                         }}
-                                                        closeMenuOnSelect={
-                                                            false
-                                                        }
+                                                        closeMenuOnSelect={false}
                                                         style={{
                                                             border: "none",
                                                             boxShadow: "none",
@@ -515,33 +466,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -551,78 +492,39 @@ const Index = (props) => {
                                         </div>
                                         <div className="col-span-2">
                                             <div className="flex space-x-2 items-center justify-end">
-                                                <button
-                                                    onClick={_HandleFresh.bind(
-                                                        this
-                                                    )}
-                                                    type="button"
-                                                    className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out"
-                                                >
-                                                    <Refresh2
-                                                        className="group-hover:-rotate-45 transition-all ease-in-out"
-                                                        size="22"
-                                                        color="green"
-                                                    />
-                                                </button>
+                                                <OnResetData sOnFetching={sOnFetching} />
                                                 {data_ex?.length > 0 && (
                                                     <ExcelFile
                                                         filename="Danh sách khách hàng"
                                                         title="Dskh"
                                                         element={
                                                             <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                                <IconExcel
-                                                                    size={18}
-                                                                />
-                                                                <span>
-                                                                    {
-                                                                        dataLang?.client_list_exportexcel
-                                                                    }
-                                                                </span>
+                                                                <IconExcel size={18} />
+                                                                <span>{dataLang?.client_list_exportexcel}</span>
                                                             </button>
                                                         }
                                                     >
                                                         <ExcelSheet
-                                                            dataSet={
-                                                                multiDataSet
-                                                            }
+                                                            dataSet={multiDataSet}
                                                             data={multiDataSet}
                                                             name="Organization"
                                                         />
                                                     </ExcelFile>
                                                 )}
-                                                <label className="font-[300] text-slate-400">
-                                                    {dataLang?.display}
-                                                </label>
+                                                <label className="font-[300] text-slate-400">{dataLang?.display}</label>
                                                 <select
                                                     className="outline-none"
-                                                    onChange={(e) =>
-                                                        sLimit(e.target.value)
-                                                    }
+                                                    onChange={(e) => sLimit(e.target.value)}
                                                     value={limit}
                                                 >
-                                                    <option
-                                                        disabled
-                                                        className="hidden"
-                                                    >
-                                                        {limit == -1
-                                                            ? "Tất cả"
-                                                            : limit}
+                                                    <option disabled className="hidden">
+                                                        {limit == -1 ? "Tất cả" : limit}
                                                     </option>
-                                                    <option value={15}>
-                                                        15
-                                                    </option>
-                                                    <option value={20}>
-                                                        20
-                                                    </option>
-                                                    <option value={40}>
-                                                        40
-                                                    </option>
-                                                    <option value={60}>
-                                                        60
-                                                    </option>
-                                                    <option value={-1}>
-                                                        Tất cả
-                                                    </option>
+                                                    <option value={15}>15</option>
+                                                    <option value={20}>20</option>
+                                                    <option value={40}>40</option>
+                                                    <option value={60}>60</option>
+                                                    <option value={-1}>Tất cả</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -656,16 +558,11 @@ const Index = (props) => {
                                                 {dataLang?.client_list_brand}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
-                                                {
-                                                    dataLang?.branch_popup_properties
-                                                }
+                                                {dataLang?.branch_popup_properties}
                                             </h4>
                                         </div>
                                         {onFetching ? (
-                                            <Loading
-                                                className="h-80"
-                                                color="#0f4f9e"
-                                            />
+                                            <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
@@ -679,13 +576,9 @@ const Index = (props) => {
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 py-0.5 w-[15%]  rounded-md text-left text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear">
                                                                 <Popup_chitiet
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
+                                                                    dataLang={dataLang}
                                                                     className="text-left"
-                                                                    name={
-                                                                        e.name
-                                                                    }
+                                                                    name={e.name}
                                                                     id={e?.id}
                                                                 />
                                                             </h6>
@@ -700,35 +593,24 @@ const Index = (props) => {
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[18%]   rounded-md text-left flex object-cover  justify-start items-center flex-wrap gap-2">
                                                                 {e?.staff_charge
-                                                                    ? e.staff_charge?.map(
-                                                                          (
-                                                                              d
-                                                                          ) => {
-                                                                              return (
-                                                                                  <>
-                                                                                      <Tooltip
-                                                                                          title={
-                                                                                              d.full_name
-                                                                                          }
-                                                                                          arrow
-                                                                                          theme="dark"
-                                                                                      >
-                                                                                          <ImageErrors
-                                                                                              src={
-                                                                                                  d.profile_image
-                                                                                              }
-                                                                                              width={
-                                                                                                  40
-                                                                                              }
-                                                                                              height={
-                                                                                                  40
-                                                                                              }
-                                                                                              defaultSrc="/user-placeholder.jpg"
-                                                                                              alt="Image"
-                                                                                              className="object-cover rounded-[100%] text-left cursor-pointer"
-                                                                                          />
-                                                                                      </Tooltip>
-                                                                                      {/* <Popup
+                                                                    ? e.staff_charge?.map((d) => {
+                                                                          return (
+                                                                              <>
+                                                                                  <Tooltip
+                                                                                      title={d.full_name}
+                                                                                      arrow
+                                                                                      theme="dark"
+                                                                                  >
+                                                                                      <ImageErrors
+                                                                                          src={d.profile_image}
+                                                                                          width={40}
+                                                                                          height={40}
+                                                                                          defaultSrc="/user-placeholder.jpg"
+                                                                                          alt="Image"
+                                                                                          className="object-cover rounded-[100%] text-left cursor-pointer"
+                                                                                      />
+                                                                                  </Tooltip>
+                                                                                  {/* <Popup
                                         className="dropdown-avt "
                                         key={d.id}
                                         trigger={(open) => (
@@ -755,138 +637,73 @@ const Index = (props) => {
                                           {d.full_name}
                                         </span>
                                       </Popup> */}
-                                                                                  </>
-                                                                              );
-                                                                          }
-                                                                      )
+                                                                              </>
+                                                                          );
+                                                                      })
                                                                     : ""}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 w-[15%]  rounded-md text-left flex justify-start flex-wrap ">
-                                                                {e.client_group?.map(
-                                                                    (h) => {
-                                                                        return (
-                                                                            <span
-                                                                                key={
-                                                                                    h.id
-                                                                                }
-                                                                                style={{
-                                                                                    backgroundColor: `${
-                                                                                        h.color ==
-                                                                                            "" ||
-                                                                                        h.color ==
-                                                                                            null
-                                                                                            ? "#e2f0fe"
-                                                                                            : h.color
-                                                                                    }`,
-                                                                                    color: `${
-                                                                                        h.color ==
-                                                                                            "" ||
-                                                                                        h.color ==
-                                                                                            null
-                                                                                            ? "#0F4F9E"
-                                                                                            : "white"
-                                                                                    }`,
-                                                                                }}
-                                                                                className={`  mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] px-2 rounded-md font-[300] py-0.5`}
-                                                                            >
-                                                                                {
-                                                                                    h.name
-                                                                                }
-                                                                            </span>
-                                                                        );
-                                                                    }
-                                                                )}
+                                                                {e.client_group?.map((h) => {
+                                                                    return (
+                                                                        <span
+                                                                            key={h.id}
+                                                                            style={{
+                                                                                backgroundColor: `${
+                                                                                    h.color == "" || h.color == null
+                                                                                        ? "#e2f0fe"
+                                                                                        : h.color
+                                                                                }`,
+                                                                                color: `${
+                                                                                    h.color == "" || h.color == null
+                                                                                        ? "#0F4F9E"
+                                                                                        : "white"
+                                                                                }`,
+                                                                            }}
+                                                                            className={`  mr-2 mb-1 w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] px-2 rounded-md font-[300] py-0.5`}
+                                                                        >
+                                                                            {h.name}
+                                                                        </span>
+                                                                    );
+                                                                })}
                                                             </h6>
                                                             <h6 className="w-[10%] flex  gap-1 flex-wrap">
-                                                                {e.branch?.map(
-                                                                    (i) => (
-                                                                        <span
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                            className="cursor-default w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2"
-                                                                        >
-                                                                            {
-                                                                                i.name
-                                                                            }
-                                                                        </span>
-                                                                    )
-                                                                )}
+                                                                {e.branch?.map((i) => (
+                                                                    <span
+                                                                        key={i}
+                                                                        className="cursor-default w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2"
+                                                                    >
+                                                                        {i.name}
+                                                                    </span>
+                                                                ))}
                                                             </h6>
                                                             <div className="space-x-2 w-[10%] text-center">
                                                                 <Popup_dskh
-                                                                    listBr={
-                                                                        listBr
-                                                                    }
-                                                                    listSelectCt={
-                                                                        listSelectCt
-                                                                    }
-                                                                    onRefresh={_ServerFetching.bind(
-                                                                        this
-                                                                    )}
+                                                                    listBr={listBr}
+                                                                    listSelectCt={listSelectCt}
+                                                                    onRefresh={_ServerFetching.bind(this)}
                                                                     className="xl:text-base text-xs "
-                                                                    listDs={
-                                                                        listDs
-                                                                    }
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
-                                                                    name={
-                                                                        e.name
-                                                                    }
-                                                                    representative={
-                                                                        e.representative
-                                                                    }
-                                                                    code={
-                                                                        e.code
-                                                                    }
-                                                                    tax_code={
-                                                                        e.tax_code
-                                                                    }
-                                                                    phone_number={
-                                                                        e.phone_number
-                                                                    }
-                                                                    address={
-                                                                        e.address
-                                                                    }
-                                                                    date_incorporation={
-                                                                        e.date_incorporation
-                                                                    }
-                                                                    note={
-                                                                        e.note
-                                                                    }
-                                                                    email={
-                                                                        e.email
-                                                                    }
-                                                                    website={
-                                                                        e.website
-                                                                    }
-                                                                    debt_limit={
-                                                                        e.debt_limit
-                                                                    }
-                                                                    debt_limit_day={
-                                                                        e.debt_limit_day
-                                                                    }
-                                                                    debt_begin={
-                                                                        e.debt_begin
-                                                                    }
-                                                                    city={
-                                                                        e.city
-                                                                    }
-                                                                    district={
-                                                                        e.district
-                                                                    }
-                                                                    ward={
-                                                                        e.ward
-                                                                    }
+                                                                    listDs={listDs}
+                                                                    dataLang={dataLang}
+                                                                    name={e.name}
+                                                                    representative={e.representative}
+                                                                    code={e.code}
+                                                                    tax_code={e.tax_code}
+                                                                    phone_number={e.phone_number}
+                                                                    address={e.address}
+                                                                    date_incorporation={e.date_incorporation}
+                                                                    note={e.note}
+                                                                    email={e.email}
+                                                                    website={e.website}
+                                                                    debt_limit={e.debt_limit}
+                                                                    debt_limit_day={e.debt_limit_day}
+                                                                    debt_begin={e.debt_begin}
+                                                                    city={e.city}
+                                                                    district={e.district}
+                                                                    ward={e.ward}
                                                                     id={e?.id}
                                                                 />
                                                                 <button
-                                                                    onClick={() =>
-                                                                        handleDelete(
-                                                                            e.id
-                                                                        )
-                                                                    }
+                                                                    onClick={() => handleDelete(e.id)}
                                                                     className="xl:text-base text-xs "
                                                                 >
                                                                     <IconDelete color="red" />
@@ -918,16 +735,12 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display}{" "}
-                                    {totalItem?.iTotalDisplayRecords}{" "}
-                                    {dataLang?.among} {totalItem?.iTotalRecords}{" "}
-                                    {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(
-                                        totalItem?.iTotalDisplayRecords
-                                    )}
+                                    totalPosts={Number(totalItem?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />

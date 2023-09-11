@@ -2,21 +2,20 @@ import React, { useEffect, useState } from "react";
 
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
-import { _ServerInstance as Axios } from '/services/axios';
+import { _ServerInstance as Axios } from "/services/axios";
 
 import PhoneInput from "react-phone-input-2";
 import Swal from "sweetalert2";
-import 'react-phone-input-2/lib/style.css'
+import "react-phone-input-2/lib/style.css";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-
 
 const Toast = Swal.mixin({
     toast: true,
-    position: 'top-end',
+    position: "top-end",
     showConfirmButton: false,
     timer: 2000,
     timerProgressBar: true,
-})
+});
 
 const PopupAddress = (props) => {
     const [namePerson, setNamePerson] = useState("");
@@ -25,82 +24,82 @@ const PopupAddress = (props) => {
     const [errNamePerson, setErrNamePerson] = useState(false);
     const [errAddress, setErrAddress] = useState(false);
     const [errPhone, setErrPhone] = useState(false);
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
 
     const handleOnChangeInput = (type, value) => {
         if (namePerson !== "" || address !== "" || phone !== "") {
-            setLoading(false)
+            setLoading(false);
         }
         if (type == "namePerson") {
-            setNamePerson(value.target?.value)
-            setErrNamePerson(false)
+            setNamePerson(value.target?.value);
+            setErrNamePerson(false);
         } else if (type == "address") {
-            setAddress(value.target?.value)
-            setErrAddress(false)
+            setAddress(value.target?.value);
+            setErrAddress(false);
         } else if (type == "phone") {
-            setPhone(value)
-            setErrPhone(false)
+            setPhone(value);
+            setErrPhone(false);
         }
-    }
-    console.log("... : ", props?.clientId);
+    };
+    // console.log("... : ", props?.clientId);
     const handleSubmitAddress = (e) => {
-        console.log('ok');
-        e.preventDefault()
-        if (namePerson === "")
-            setErrNamePerson(true)
-        if (address === "")
-            setErrAddress(true)
-        if (phone === "")
-            setErrPhone(true)
-
+        console.log("ok");
+        e.preventDefault();
+        if (namePerson === "") setErrNamePerson(true);
+        if (address === "") setErrAddress(true);
+        if (phone === "") setErrPhone(true);
 
         var data = new FormData();
-        data.append('client_id', props?.clientId !== null ? props?.clientId : null);
-        data.append('name', namePerson);
-        data.append('address', address);
-        data.append('phone', phone);
-        setLoading(true)
+        data.append("client_id", props?.clientId !== null ? props?.clientId : null);
+        data.append("name", namePerson);
+        data.append("address", address);
+        data.append("phone", phone);
+        setLoading(true);
         if (namePerson !== "" && address !== "" && phone !== "") {
-            Axios("POST", `/api_web/api_delivery/AddShippingClient?csrf_protection=true`, {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" }
-            }, (err, response) => {
-                if (!err) {
-                    var { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        Toast.fire({
-                            icon: 'success',
-                            title: `${props.dataLang[message]}`
-                        })
-                        setNamePerson("")
-                        setAddress("")
-                        setPhone("")
-                        setLoading(false)
-                        // props?.handleFetchingAddress()
-                        handleClosePopup()
-                        // props.onRefresh && props.onRefresh()
-                    } else {
-                        Toast.fire({
-                            icon: 'error',
-                            title: `${props.dataLang[message]}`
-                        })
+            Axios(
+                "POST",
+                `/api_web/api_delivery/AddShippingClient?csrf_protection=true`,
+                {
+                    data: data,
+                    headers: { "Content-Type": "multipart/form-data" },
+                },
+                (err, response) => {
+                    if (!err) {
+                        var { isSuccess, message } = response.data;
+                        if (isSuccess) {
+                            Toast.fire({
+                                icon: "success",
+                                title: `${props.dataLang[message]}`,
+                            });
+                            setNamePerson("");
+                            setAddress("");
+                            setPhone("");
+                            setLoading(false);
+                            // props?.handleFetchingAddress()
+                            handleClosePopup();
+                            // props.onRefresh && props.onRefresh()
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                title: `${props.dataLang[message]}`,
+                            });
+                        }
                     }
                 }
-            })
+            );
         }
-
-    }
+    };
 
     const handleClosePopup = () => {
-        setNamePerson("")
-        setAddress("")
-        setPhone("")
-        setErrNamePerson(false)
-        setErrAddress(false)
-        setErrPhone(false)
-        setLoading(false)
-        props?.handleClosePopupAddress()
-    }
+        setNamePerson("");
+        setAddress("");
+        setPhone("");
+        setErrNamePerson(false);
+        setErrAddress(false);
+        setErrPhone(false);
+        setLoading(false);
+        props?.handleClosePopupAddress();
+    };
 
     return (
         <PopupEdit
@@ -113,7 +112,8 @@ const PopupAddress = (props) => {
                 <form onSubmit={(e) => handleSubmitAddress(e)} className="space-y-5">
                     <div className="space-y-1">
                         <label className="text-[#344054] font-normal text-base">
-                            {props.dataLang?.delivery_receipt_name_person_address || "delivery_receipt_name_person_address"}
+                            {props.dataLang?.delivery_receipt_name_person_address ||
+                                "delivery_receipt_name_person_address"}
                             <span className="text-red-500 ml-1">*</span>
                         </label>
                         <input
@@ -121,9 +121,16 @@ const PopupAddress = (props) => {
                             onChange={(value) => handleOnChangeInput("namePerson", value)}
                             namePerson="fname"
                             type="text"
-                            className={`${errNamePerson ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
+                            className={`${
+                                errNamePerson ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                            } placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal  p-2 border outline-none`}
                         />
-                        {errNamePerson && <label className="text-sm text-red-500">{props.dataLang?.delivery_receipt_err_name_person_address || "delivery_receipt_err_name_person_address"}</label>}
+                        {errNamePerson && (
+                            <label className="text-sm text-red-500">
+                                {props.dataLang?.delivery_receipt_err_name_person_address ||
+                                    "delivery_receipt_err_name_person_address"}
+                            </label>
+                        )}
                     </div>
                     <div className="space-y-1">
                         <label className="text-[#344054] font-normal">
@@ -135,9 +142,15 @@ const PopupAddress = (props) => {
                             onChange={(value) => handleOnChangeInput("address", value)}
                             namePerson="adress"
                             type="text"
-                            className={`${errAddress ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "} placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none`}
+                            className={`${
+                                errAddress ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                            } placeholder-[color:#667085] w-full bg-[#ffffff] rounded-lg focus:border-[#92BFF7] text-[#52575E] font-normal  p-2 border border-[#d0d5dd] outline-none`}
                         />
-                        {errAddress && <label className="text-sm text-red-500">{props.dataLang?.delivery_receipt_err_address || "delivery_receipt_err_address"}</label>}
+                        {errAddress && (
+                            <label className="text-sm text-red-500">
+                                {props.dataLang?.delivery_receipt_err_address || "delivery_receipt_err_address"}
+                            </label>
+                        )}
                     </div>
                     <div className="space-y-1">
                         <label className="text-[#344054] font-normal">
@@ -161,10 +174,14 @@ const PopupAddress = (props) => {
                             }}
                             containerStyle={{
                                 border: errPhone === true ? "1.5px solid red" : "",
-                                borderRadius: '7px'
+                                borderRadius: "7px",
                             }}
                         />
-                        {errPhone && <label className="text-sm text-red-500">{props.dataLang?.delivery_receipt_err_phone || "delivery_receipt_err_phone"}</label>}
+                        {errPhone && (
+                            <label className="text-sm text-red-500">
+                                {props.dataLang?.delivery_receipt_err_phone || "delivery_receipt_err_phone"}
+                            </label>
+                        )}
                     </div>
                     <div className="mt-5 space-x-2 flex flex-row justify-end">
                         <button
@@ -177,19 +194,21 @@ const PopupAddress = (props) => {
                         <button
                             type="submit"
                             disabled={loading ? true : false}
-                            className={`${loading ? "disabled:opacity-75" : ""} button font-normal text-base py-2 px-4 rounded-lg bg-sky-400 hover:bg-sky-500 text-[#FFFFFF] transition-shadow flex justify-center items-center gap-2`}
-                        // className={`motion-reduce:hidden animate-spin button  font-normal text-base py-2 px-4 rounded-lg bg-sky-400 hover:bg-sky-500 text-[#FFFFFF] transition-shadow`}
+                            className={`${
+                                loading ? "disabled:opacity-75" : ""
+                            } button font-normal text-base py-2 px-4 rounded-lg bg-sky-400 hover:bg-sky-500 text-[#FFFFFF] transition-shadow flex justify-center items-center gap-2`}
+                            // className={`motion-reduce:hidden animate-spin button  font-normal text-base py-2 px-4 rounded-lg bg-sky-400 hover:bg-sky-500 text-[#FFFFFF] transition-shadow`}
                         >
-                            <AiOutlineLoading3Quarters className={`${loading ? "motion-reduce:hidden animate-spin visible" : "hidden"}`} />
-                            <span>
-                                {props.dataLang?.btn_save || "btn_save"}
-                            </span>
+                            <AiOutlineLoading3Quarters
+                                className={`${loading ? "motion-reduce:hidden animate-spin visible" : "hidden"}`}
+                            />
+                            <span>{props.dataLang?.btn_save || "btn_save"}</span>
                         </button>
                     </div>
                 </form>
             </div>
         </PopupEdit>
-    )
-}
+    );
+};
 
-export default PopupAddress
+export default PopupAddress;
