@@ -4,6 +4,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import moment from "moment";
 import { upperCase } from "lodash";
 import { styleMarginChild, styleMarginChildTotal, styles, uppercaseTextHeaderTabel } from "./stylePdf/style";
+import { VscFilePdf } from "react-icons/vsc";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
@@ -475,11 +476,21 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
 
     return (
         <>
-            <button
+            {/* <button
                 onClick={handlePrintPdf}
                 className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer 2xl:px-5 2xl:py-2.5 px-5 py-1.5 rounded w-full"
             >
                 {props?.dataLang?.btn_table_print || "btn_table_print"}
+            </button> */}
+            <button
+                onClick={handlePrintPdf}
+                className="transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full"
+            >
+                <VscFilePdf
+                    size={20}
+                    className="group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md "
+                />
+                <p className="group-hover:text-[#65a30d]">{props?.dataLang?.btn_table_print || "btn_table_print"}</p>
             </button>
         </>
     );

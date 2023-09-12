@@ -16,6 +16,7 @@ import { v4 as uuidv4 } from "uuid";
 import Loading from "components/UI/loading";
 import PopupAddress from "./(popupAddress)/PopupAddress";
 import { useSelector } from "react-redux";
+import ButtonSubmit from "components/UI/buttonSubmit/buttonSubmit";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -825,6 +826,8 @@ const Index = (props) => {
                 option[index].total_amount = Number(tien.toFixed(2));
             }
             setOption([...option]);
+        } else if (option[index].quantity == "") {
+            return;
         } else {
             return Toast.fire({
                 title: `${"Số lượng tối thiểu là 1 không thể giảm!"}`,
@@ -920,11 +923,11 @@ const Index = (props) => {
         }, 0);
 
         return {
-            totalPrice: totalPrice || 0,
-            totalDiscountPrice: totalDiscountPrice || 0,
-            totalDiscountAfterPrice: totalDiscountAfterPrice || 0,
-            totalTax: totalTax || 0,
-            totalAmount: totalAmount || 0,
+            totalPrice: totalPrice,
+            totalDiscountPrice: totalDiscountPrice,
+            totalDiscountAfterPrice: totalDiscountAfterPrice,
+            totalTax: totalTax,
+            totalAmount: totalAmount,
         };
     };
 
@@ -1090,43 +1093,9 @@ const Index = (props) => {
     };
 
     // codeDelivery new
-    const hiddenOptions = productOrder?.length > 3 ? productOrder?.slice(0, 3) : [];
     const allItems = [...options];
 
     const handleSelectAll = () => {
-        // const data = allItems?.map((e, index) => ({
-        //     id: uuidv4(),
-        //     item: {
-        //         e: e?.e,
-        //         label: e?.label,
-        //         value: e?.value,
-        //     },
-        //     unit: e?.e?.unit_name,
-        //     quantity: +e?.e?.quantity - (+e?.e?.quantity_delivery || 0),
-        //     sortIndex: index,
-        //     price: e?.e?.price,
-        //     discount: e?.e?.discount_percent_item,
-        //     price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent_item / 100),
-        //     tax: {
-        //         label: e?.e?.tax_name,
-        //         value: e?.e?.tax_id_item,
-        //         tax_rate: e?.e?.tax_rate_item,
-        //     },
-        //     price_after_tax:
-        //         +e?.e?.price *
-        //         e?.e?.quantity *
-        //         (1 - +e?.e?.discount_percent_item / 100) *
-        //         (1 + e?.e?.tax_rate_item / 100),
-        //     total_amount:
-        //         +e?.e?.price *
-        //         (1 - +e?.e?.discount_percent_item / 100) *
-        //         (1 + +e?.e?.tax_rate_item / 100) *
-        //         +e?.e?.quantity,
-        //     note: e?.e?.note_item,
-        // }));
-
-        // setOption(data);
-        //new
         setItemsAll(
             allItems?.map((e, index) => ({
                 id: uuidv4(),
@@ -1351,7 +1320,7 @@ const Index = (props) => {
                                 </h5>
                             </div>
 
-                            <div className="flex items-center">
+                            <div className="flex items-center gap-1">
                                 <h5 className="text-gray-400 font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
                                     {dataLang?.delivery_receipt_quantity_undelivered_order ||
                                         "delivery_receipt_quantity_undelivered_order"}
@@ -1363,7 +1332,7 @@ const Index = (props) => {
                                 </h5>
                             </div>
 
-                            <div className="flex items-center">
+                            <div className="flex items-center gap-1">
                                 <h5 className="text-gray-400 font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
                                     {dataLang?.delivery_receipt_quantity_delivered_order ||
                                         "delivery_receipt_quantity_delivered_order"}
@@ -1468,7 +1437,7 @@ const Index = (props) => {
                             <h2 className="3xl:text-[17px] 2xl:text-[16px] xl:text-[15px] text-[14px] font-normal bg-[#ECF0F4] p-1">
                                 {dataLang?.detail_general_information || "detail_general_information"}
                             </h2>
-                            <div className="grid grid-cols-12 gap-1 items-center">
+                            <div className="grid grid-cols-12 gap-2 items-center">
                                 <div className="col-span-3">
                                     <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px]">
                                         {dataLang?.delivery_receipt_code || "delivery_receipt_code"}
@@ -1698,7 +1667,7 @@ const Index = (props) => {
                                         />
                                         <AiFillPlusCircle
                                             onClick={handleOpenPopupAddress}
-                                            className="right-0 top-0 -translate-x-[300%] 3xl:translate-y-[80%] 2xl:translate-y-[70%] xl:translate-y-[70%] translate-y-[60%] 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 transition-shadow ease-in-out absolute "
+                                            className="right-0 top-0 -translate-x-[300%] 3xl:translate-y-[80%] 2xl:translate-y-[70%] xl:translate-y-[70%] translate-y-[60%] 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180  transition-all ease-in-out absolute "
                                         />
                                         <PopupAddress
                                             dataLang={dataLang}
@@ -2568,18 +2537,16 @@ const Index = (props) => {
                         </div>
                         <div className="space-x-2">
                             <button
-                                onClick={() => router.back()}
-                                className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px] button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
+                                onClick={() => router.push("/sales_export_product/deliveryReceipt?tab=all")}
+                                className="button text-[#344054] font-normal text-base hover:bg-blue-500 hover:text-white hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
                             >
                                 {dataLang?.btn_back || "btn_back"}
                             </button>
-                            <button
-                                onClick={handleSubmitValidate.bind(this)}
-                                type="submit"
-                                className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px] button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
-                            >
-                                {dataLang?.btn_save || "btn_save"}
-                            </button>
+                            <ButtonSubmit
+                                dataLang={dataLang}
+                                _HandleSubmit={handleSubmitValidate}
+                                onSending={onSending}
+                            />
                         </div>
                     </div>
                 </div>

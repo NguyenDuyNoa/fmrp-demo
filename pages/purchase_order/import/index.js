@@ -116,15 +116,10 @@ const Index = (props) => {
                     page: router.query?.page || 1,
                     "filter[status_bar]": tabPage ?? null,
                     "filter[id]": idCode != null ? idCode?.value : null,
-                    "filter[branch_id]":
-                        idBranch != null ? idBranch.value : null,
+                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
                     "filter[supplier_id]": idSupplier ? idSupplier.value : null,
-                    "filter[start_date]":
-                        valueDate?.startDate != null
-                            ? valueDate?.startDate
-                            : null,
-                    "filter[end_date]":
-                        valueDate?.endDate != null ? valueDate?.endDate : null,
+                    "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
+                    "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
                 },
             },
             (err, response) => {
@@ -149,15 +144,10 @@ const Index = (props) => {
                     limit: 0,
                     search: keySearch,
                     "filter[id]": idCode != null ? idCode?.value : null,
-                    "filter[branch_id]":
-                        idBranch != null ? idBranch.value : null,
+                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
                     "filter[supplier_id]": idSupplier ? idSupplier.value : null,
-                    "filter[start_date]":
-                        valueDate?.startDate != null
-                            ? valueDate?.startDate
-                            : null,
-                    "filter[end_date]":
-                        valueDate?.endDate != null ? valueDate?.endDate : null,
+                    "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
+                    "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
                 },
             },
             (err, response) => {
@@ -171,41 +161,24 @@ const Index = (props) => {
     };
 
     const _ServerFetching_filter = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, result } = response.data;
-                    sListBr(result);
-                }
+        Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, result } = response.data;
+                sListBr(result);
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/api_supplier/supplier/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data.rResult;
-                    sListSupplier(
-                        db?.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                }
+        });
+        Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var db = response.data.rResult;
+                sListSupplier(db?.map((e) => ({ label: e.name, value: e.id })));
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/Api_import/importCombobox/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, result } = response?.data;
-                    sListCode(result);
-                }
+        });
+        Axios("GET", "/api_web/Api_import/importCombobox/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, result } = response?.data;
+                sListCode(result);
             }
-        );
+        });
         sOnFetching_filter(false);
     };
 
@@ -232,8 +205,7 @@ const Index = (props) => {
     }, [onFetching_filter]);
 
     useEffect(() => {
-        (onFetching && _ServerFetching()) ||
-            (onFetching && _ServerFetching_group());
+        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
     }, [onFetching]);
 
     useEffect(() => {
@@ -241,9 +213,7 @@ const Index = (props) => {
             (keySearch && sOnFetching(true)) ||
             (router.query?.tab && sOnFetching_filter(true)) ||
             (idBranch != null && sOnFetching(true)) ||
-            (valueDate.startDate != null &&
-                valueDate.endDate != null &&
-                sOnFetching(true)) ||
+            (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
             (idSupplier != null && sOnFetching(true)) ||
             (idCode != null && sOnFetching(true));
     }, [
@@ -292,12 +262,8 @@ const Index = (props) => {
         });
     };
 
-    const listBr_filter = listBr
-        ? listBr?.map((e) => ({ label: e.name, value: e.id }))
-        : [];
-    const listCode_filter = lisCode
-        ? lisCode?.map((e) => ({ label: `${e.code}`, value: e.id }))
-        : [];
+    const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
+    const listCode_filter = lisCode ? lisCode?.map((e) => ({ label: `${e.code}`, value: e.id })) : [];
 
     const onchang_filter = (type, value) => {
         if (type == "branch") {
@@ -323,9 +289,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.import_day_vouchers || "import_day_vouchers"
-                    }`,
+                    title: `${dataLang?.import_day_vouchers || "import_day_vouchers"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -333,9 +297,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.import_code_vouchers || "import_code_vouchers"
-                    }`,
+                    title: `${dataLang?.import_code_vouchers || "import_code_vouchers"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -351,9 +313,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.import_the_order || "import_the_order"
-                    }`,
+                    title: `${dataLang?.import_the_order || "import_the_order"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -361,9 +321,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.import_total_amount || "import_total_amount"
-                    }`,
+                    title: `${dataLang?.import_total_amount || "import_total_amount"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -371,9 +329,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.import_tax_money || "import_tax_money"
-                    }`,
+                    title: `${dataLang?.import_tax_money || "import_tax_money"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -381,9 +337,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.import_into_money || "import_into_money"
-                    }`,
+                    title: `${dataLang?.import_into_money || "import_into_money"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -391,10 +345,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.import_payment_status ||
-                        "import_payment_status"
-                    }`,
+                    title: `${dataLang?.import_payment_status || "import_payment_status"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -402,10 +353,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.import_brow_storekeepers ||
-                        "import_brow_storekeepers"
-                    }`,
+                    title: `${dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -421,9 +369,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.import_from_note || "import_from_note"
-                    }`,
+                    title: `${dataLang?.import_from_note || "import_from_note"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -437,26 +383,16 @@ const Index = (props) => {
                 { value: `${e?.code ? e?.code : ""}` },
                 { value: `${e?.supplier_name ? e?.supplier_name : ""}` },
                 {
-                    value: `${
-                        e?.purchase_order_code ? e?.purchase_order_code : ""
-                    }`,
+                    value: `${e?.purchase_order_code ? e?.purchase_order_code : ""}`,
                 },
                 {
-                    value: `${
-                        e?.total_price ? formatNumber(e?.total_price) : ""
-                    }`,
+                    value: `${e?.total_price ? formatNumber(e?.total_price) : ""}`,
                 },
                 {
-                    value: `${
-                        e?.total_tax_price
-                            ? formatNumber(e?.total_tax_price)
-                            : ""
-                    }`,
+                    value: `${e?.total_tax_price ? formatNumber(e?.total_tax_price) : ""}`,
                 },
                 {
-                    value: `${
-                        e?.total_amount ? formatNumber(e?.total_amount) : ""
-                    }`,
+                    value: `${e?.total_amount ? formatNumber(e?.total_amount) : ""}`,
                 },
                 {
                     value: `${
@@ -470,11 +406,7 @@ const Index = (props) => {
                     }`,
                 },
                 {
-                    value: `${
-                        e?.warehouseman_id === "0"
-                            ? "Chưa duyệt kho"
-                            : "Đã duyệt kho"
-                    }`,
+                    value: `${e?.warehouseman_id === "0" ? "Chưa duyệt kho" : "Đã duyệt kho"}`,
                 },
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -494,32 +426,26 @@ const Index = (props) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 const id = event;
-                Axios(
-                    "DELETE",
-                    `/api_web/api_inventory/inventory/${id}`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var { isSuccess, message, data_export } =
-                                response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: dataLang[message],
-                                });
-                            } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: dataLang[message],
-                                });
-                                if (data_export?.length > 0) {
-                                    sData_export(data_export);
-                                }
+                Axios("DELETE", `/api_web/api_inventory/inventory/${id}`, {}, (err, response) => {
+                    if (!err) {
+                        var { isSuccess, message, data_export } = response.data;
+                        if (isSuccess) {
+                            Toast.fire({
+                                icon: "success",
+                                title: dataLang[message],
+                            });
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                title: dataLang[message],
+                            });
+                            if (data_export?.length > 0) {
+                                sData_export(data_export);
                             }
                         }
-                        _ServerFetching();
                     }
-                );
+                    _ServerFetching();
+                });
             }
         });
     };
@@ -553,10 +479,7 @@ const Index = (props) => {
     };
     const _ServerSending = () => {
         var data = new FormData();
-        data.append(
-            "warehouseman_id",
-            checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : ""
-        );
+        data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
         data.append("id", checkedWare?.id);
         Axios(
             "POST",
@@ -609,19 +532,13 @@ const Index = (props) => {
             </Head>
             <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
                 {data_export.length > 0 && (
-                    <Popup_status
-                        className="hidden"
-                        data_export={data_export}
-                        dataLang={dataLang}
-                    />
+                    <Popup_status className="hidden" data_export={data_export} dataLang={dataLang} />
                 )}
                 {trangthaiExprired ? (
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.import_title || "import_title"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.import_title || "import_title"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.import_list || "import_list"}</h6>
                     </div>
@@ -639,8 +556,7 @@ const Index = (props) => {
                                         href="/purchase_order/import/form"
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     >
-                                        {dataLang?.purchase_order_new ||
-                                            "purchase_order_new"}
+                                        {dataLang?.purchase_order_new || "purchase_order_new"}
                                     </Link>
                                 </div>
                             </div>
@@ -652,23 +568,16 @@ const Index = (props) => {
                                             <div>
                                                 <TabStatus
                                                     style={{
-                                                        backgroundColor:
-                                                            "#e2f0fe",
+                                                        backgroundColor: "#e2f0fe",
                                                     }}
                                                     dataLang={dataLang}
                                                     key={e.id}
-                                                    onClick={_HandleSelectTab.bind(
-                                                        this,
-                                                        `${e.id}`
-                                                    )}
+                                                    onClick={_HandleSelectTab.bind(this, `${e.id}`)}
                                                     total={e.count}
                                                     active={e.id}
-                                                    className={
-                                                        "text-[#0F4F9E] "
-                                                    }
+                                                    className={"text-[#0F4F9E] "}
                                                 >
-                                                    {dataLang[e?.name] ||
-                                                        e?.name}
+                                                    {dataLang[e?.name] || e?.name}
                                                 </TabStatus>
                                             </div>
                                         );
@@ -688,12 +597,8 @@ const Index = (props) => {
                                                         <input
                                                             className=" relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  py-2.5 rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
                                                             type="text"
-                                                            onChange={_HandleOnChangeKeySearch.bind(
-                                                                this
-                                                            )}
-                                                            placeholder={
-                                                                dataLang?.branch_search
-                                                            }
+                                                            onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                            placeholder={dataLang?.branch_search}
                                                         />
                                                     </form>
                                                 </div>
@@ -709,24 +614,17 @@ const Index = (props) => {
                                                             },
                                                             ...listBr_filter,
                                                         ]}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "branch"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "branch")}
                                                         value={idBranch}
                                                         placeholder={
                                                             dataLang?.purchase_order_table_branch ||
                                                             "purchase_order_table_branch"
                                                         }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
                                                         isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
+                                                        noOptionsMessage={() => "Không có dữ liệu"}
                                                         // components={{ MultiValue }}
                                                         closeMenuOnSelect={true}
                                                         style={{
@@ -738,33 +636,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -772,9 +660,7 @@ const Index = (props) => {
                                                 </div>
                                                 <div className="ml-1 col-span-1">
                                                     <Select
-                                                        onInputChange={_HandleSeachApi.bind(
-                                                            this
-                                                        )}
+                                                        onInputChange={_HandleSeachApi.bind(this)}
                                                         options={[
                                                             {
                                                                 value: "",
@@ -785,24 +671,17 @@ const Index = (props) => {
                                                             },
                                                             ...listCode_filter,
                                                         ]}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "code"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "code")}
                                                         value={idCode}
                                                         placeholder={
                                                             dataLang?.purchase_order_table_code ||
                                                             "purchase_order_table_code"
                                                         }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
                                                         isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
+                                                        noOptionsMessage={() => "Không có dữ liệu"}
                                                         // components={{ MultiValue }}
                                                         style={{
                                                             border: "none",
@@ -813,33 +692,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -858,24 +727,17 @@ const Index = (props) => {
                                                             },
                                                             ...listSupplier,
                                                         ]}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "supplier"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "supplier")}
                                                         value={idSupplier}
                                                         placeholder={
                                                             dataLang?.purchase_order_table_supplier ||
                                                             "purchase_order_table_supplier"
                                                         }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="rounded-md bg-white   2xl:text-base xl:text-xs text-[10px]  z-20"
                                                         isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
+                                                        noOptionsMessage={() => "Không có dữ liệu"}
                                                         style={{
                                                             border: "none",
                                                             boxShadow: "none",
@@ -885,33 +747,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -922,27 +774,16 @@ const Index = (props) => {
                                                         value={valueDate}
                                                         i18n={"vi"}
                                                         primaryColor={"blue"}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "date"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "date")}
                                                         showShortcuts={true}
-                                                        displayFormat={
-                                                            "DD/MM/YYYY"
-                                                        }
+                                                        displayFormat={"DD/MM/YYYY"}
                                                         configs={{
                                                             shortcuts: {
                                                                 today: "Hôm nay",
-                                                                yesterday:
-                                                                    "Hôm qua",
-                                                                past: (
-                                                                    period
-                                                                ) =>
-                                                                    `${period}  ngày qua`,
-                                                                currentMonth:
-                                                                    "Tháng này",
-                                                                pastMonth:
-                                                                    "Tháng trước",
+                                                                yesterday: "Hôm qua",
+                                                                past: (period) => `${period}  ngày qua`,
+                                                                currentMonth: "Tháng này",
+                                                                pastMonth: "Tháng trước",
                                                             },
                                                             footer: {
                                                                 cancel: "Từ bỏ",
@@ -958,9 +799,7 @@ const Index = (props) => {
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
                                                 <button
-                                                    onClick={_HandleFresh.bind(
-                                                        this
-                                                    )}
+                                                    onClick={_HandleFresh.bind(this)}
                                                     type="button"
                                                     className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none"
                                                 >
@@ -979,25 +818,15 @@ const Index = (props) => {
                                                                 <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
                                                                     <IconExcel
                                                                         className="2xl:scale-100 xl:scale-100 scale-75"
-                                                                        size={
-                                                                            18
-                                                                        }
+                                                                        size={18}
                                                                     />
-                                                                    <span>
-                                                                        {
-                                                                            dataLang?.client_list_exportexcel
-                                                                        }
-                                                                    </span>
+                                                                    <span>{dataLang?.client_list_exportexcel}</span>
                                                                 </button>
                                                             }
                                                         >
                                                             <ExcelSheet
-                                                                dataSet={
-                                                                    multiDataSet
-                                                                }
-                                                                data={
-                                                                    multiDataSet
-                                                                }
+                                                                dataSet={multiDataSet}
+                                                                data={multiDataSet}
                                                                 name="Organization"
                                                             />
                                                         </ExcelFile>
@@ -1009,20 +838,14 @@ const Index = (props) => {
                                                     </div>
                                                     <select
                                                         className="outline-none  text-[10px] xl:text-xs 2xl:text-sm"
-                                                        onChange={(e) =>
-                                                            sLimit(
-                                                                e.target.value
-                                                            )
-                                                        }
+                                                        onChange={(e) => sLimit(e.target.value)}
                                                         value={limit}
                                                     >
                                                         <option
                                                             className="text-[10px] xl:text-xs 2xl:text-sm hidden"
                                                             disabled
                                                         >
-                                                            {limit == -1
-                                                                ? "Tất cả"
-                                                                : limit}
+                                                            {limit == -1 ? "Tất cả" : limit}
                                                         </option>
                                                         <option
                                                             className="text-[10px] xl:text-xs 2xl:text-sm"
@@ -1059,55 +882,41 @@ const Index = (props) => {
                                     <div className="pr-2 w-[100%] lx:w-[120%] ">
                                         <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10 shadow divide-x">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.import_day_vouchers ||
-                                                    "import_day_vouchers"}
+                                                {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.import_code_vouchers ||
-                                                    "import_code_vouchers"}
+                                                {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.import_supplier ||
-                                                    "import_supplier"}
+                                                {dataLang?.import_supplier || "import_supplier"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.import_the_order ||
-                                                    "import_the_order"}
+                                                {dataLang?.import_the_order || "import_the_order"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.import_total_amount ||
-                                                    "import_total_amount"}
+                                                {dataLang?.import_total_amount || "import_total_amount"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.import_tax_money ||
-                                                    "import_tax_money"}
+                                                {dataLang?.import_tax_money || "import_tax_money"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.import_into_money ||
-                                                    "import_into_money"}
+                                                {dataLang?.import_into_money || "import_into_money"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                                {dataLang?.import_payment_status ||
-                                                    "import_payment_status"}
+                                                {dataLang?.import_payment_status || "import_payment_status"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.import_brow_storekeepers ||
-                                                    "import_brow_storekeepers"}
+                                                {dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.import_branch ||
-                                                    "import_branch"}
+                                                {dataLang?.import_branch || "import_branch"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.import_action ||
-                                                    "import_action"}
+                                                {dataLang?.import_action || "import_action"}
                                             </h4>
                                         </div>
                                         {onFetching ? (
-                                            <Loading
-                                                className="h-80"
-                                                color="#0f4f9e"
-                                            />
+                                            <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
@@ -1119,29 +928,19 @@ const Index = (props) => {
                                                         >
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1      font-medium  text-zinc-600  text-center">
                                                                 {e?.date != null
-                                                                    ? moment(
-                                                                          e?.date
-                                                                      ).format(
-                                                                          "DD/MM/YYYY"
-                                                                      )
+                                                                    ? moment(e?.date).format("DD/MM/YYYY")
                                                                     : ""}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2  font-medium text-center text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear cursor-pointer ">
                                                                 <Popup_chitiet
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
+                                                                    dataLang={dataLang}
                                                                     className="text-left"
-                                                                    name={
-                                                                        e?.code
-                                                                    }
+                                                                    name={e?.code}
                                                                     id={e?.id}
                                                                 />
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2      font-medium  text-zinc-600  text-left">
-                                                                {
-                                                                    e.supplier_name
-                                                                }
+                                                                {e.supplier_name}
                                                             </h6>
                                                             <h6 className="3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px]  col-span-1 flex items-center w-fit mx-auto">
                                                                 <div className="mx-auto">
@@ -1149,71 +948,44 @@ const Index = (props) => {
                                                                         // className='font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-center i h-16 w-64 bg-gradient-to-br '
                                                                         className="i py-1 px-2 bg-gradient-to-br font-normal text-lime-500 bg-lime-200 items-center rounded-full shadow-2xl cursor-pointer 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]  overflow-hidden transform hover:scale-110 transition duration-300 ease-out hover:bg-lime-500 hover:text-white"
                                                                         // className='b animate-pulse i py-1 px-2  text-lime-500 bg-lime-200 items-center rounded-2xl shadow-2xl cursor-pointer overflow-hidden xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] transform hover:scale-x-110 hover:scale-y-105 transition duration-300 ease-out'
-                                                                        name={
-                                                                            e?.purchase_order_code
-                                                                        }
-                                                                        dataLang={
-                                                                            dataLang
-                                                                        }
-                                                                        id={
-                                                                            e?.purchase_order_id
-                                                                        }
-                                                                        type={
-                                                                            "typePo"
-                                                                        }
+                                                                        name={e?.purchase_order_code}
+                                                                        dataLang={dataLang}
+                                                                        id={e?.purchase_order_id}
+                                                                        type={"typePo"}
                                                                     ></Popup_chitietThere>
                                                                     {/* <span className='flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  bg-lime-200 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-center'>{e?.purchase_order_code}</span> */}
                                                                 </div>
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2      font-medium  text-zinc-600 col-span-1 text-right">
-                                                                {formatNumber(
-                                                                    e.total_price
-                                                                )}
+                                                                {formatNumber(e.total_price)}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2      font-medium  text-zinc-600 col-span-1 text-right">
-                                                                {formatNumber(
-                                                                    e.total_tax_price
-                                                                )}
+                                                                {formatNumber(e.total_tax_price)}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2      font-medium  text-zinc-600 col-span-1 text-right">
-                                                                {formatNumber(
-                                                                    e.total_amount
-                                                                )}
+                                                                {formatNumber(e.total_amount)}
                                                             </h6>
                                                             <h6 className="3xl:items-center 3xl-text-[18px] 2xl:text-[16px]      font-medium  text-zinc-600 xl:text-xs text-[8px]  col-span-2 flex items-center  mx-auto">
                                                                 <div className="mx-auto">
-                                                                    {(e?.status_pay ===
-                                                                        "not_spent" && (
+                                                                    {(e?.status_pay === "not_spent" && (
                                                                         <span className=" font-normal text-sky-500  rounded-xl py-1 px-[19px]  bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                            {
-                                                                                "Chưa chi"
-                                                                            }
+                                                                            {"Chưa chi"}
                                                                         </span>
                                                                     )) ||
-                                                                        (e?.status_pay ===
-                                                                            "spent_part" && (
+                                                                        (e?.status_pay === "spent_part" && (
                                                                             <span className=" font-normal text-orange-500 rounded-xl py-1 px-2   bg-orange-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {
-                                                                                    "Chi 1 phần"
-                                                                                }{" "}
-                                                                                {`(${formatNumber(
-                                                                                    e?.amount_paid
-                                                                                )})`}
+                                                                                {"Chi 1 phần"}{" "}
+                                                                                {`(${formatNumber(e?.amount_paid)})`}
                                                                             </span>
                                                                         )) ||
-                                                                        (e?.status_pay ===
-                                                                            "spent" && (
+                                                                        (e?.status_pay === "spent" && (
                                                                             <span className="flex items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2   bg-lime-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]  justify-center">
                                                                                 <TickCircle
                                                                                     className="bg-lime-500 rounded-full"
                                                                                     color="white"
-                                                                                    size={
-                                                                                        15
-                                                                                    }
+                                                                                    size={15}
                                                                                 />
-                                                                                {
-                                                                                    "Đã chi đủ"
-                                                                                }
+                                                                                {"Đã chi đủ"}
                                                                             </span>
                                                                         ))}
                                                                 </div>
@@ -1221,108 +993,79 @@ const Index = (props) => {
                                                             <h6 className=" 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] col-span-1 cursor-pointer">
                                                                 <div
                                                                     className={`${
-                                                                        e?.warehouseman_id ==
-                                                                        "0"
+                                                                        e?.warehouseman_id == "0"
                                                                             ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation "
                                                                             : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "
-                                                                    } rounded-md cursor-pointer hover:scale-105 ease-in-out transition-all`}
+                                                                    } rounded-md cursor-pointer hover:scale-105 ease-in-out transition-all flex items-center`}
                                                                 >
-                                                                    <div className="flex items-center justify-center">
-                                                                        <label
-                                                                            className="relative flex cursor-pointer items-center rounded-full p-2"
-                                                                            htmlFor={
-                                                                                e.id
-                                                                            }
-                                                                            data-ripple-dark="true"
-                                                                        >
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                className={`${
-                                                                                    e?.warehouseman_id ==
-                                                                                    "0"
-                                                                                        ? "checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500"
-                                                                                        : "checked:border-lime-500 checked:bg-lime-500 border-lime-500 checked:before:bg-limborder-lime-500"
-                                                                                }before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-gray-400 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
-                                                                                id={
-                                                                                    e.id
-                                                                                }
-                                                                                value={
-                                                                                    e.warehouseman_id
-                                                                                }
-                                                                                checked={
-                                                                                    e.warehouseman_id !=
-                                                                                    "0"
-                                                                                        ? true
-                                                                                        : false
-                                                                                }
-                                                                                onChange={_HandleChangeInput.bind(
-                                                                                    this,
-                                                                                    e?.id,
-                                                                                    e?.warehouseman_id,
-                                                                                    "browser"
-                                                                                )}
-                                                                            />
-                                                                            <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                                                                <svg
-                                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                                    className="h-3.5 w-3.5"
-                                                                                    viewBox="0 0 20 20"
-                                                                                    fill="currentColor"
-                                                                                    stroke="currentColor"
-                                                                                    stroke-width="1"
-                                                                                >
-                                                                                    <path
-                                                                                        fill-rule="evenodd"
-                                                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                                        clip-rule="evenodd"
-                                                                                    ></path>
-                                                                                </svg>
-                                                                            </div>
-                                                                        </label>
-                                                                        <label
-                                                                            htmlFor={
-                                                                                e.id
-                                                                            }
+                                                                    <label
+                                                                        className="relative flex cursor-pointer items-center rounded-full p-2"
+                                                                        htmlFor={e.id}
+                                                                        data-ripple-dark="true"
+                                                                    >
+                                                                        <input
+                                                                            type="checkbox"
                                                                             className={`${
-                                                                                e?.warehouseman_id ==
-                                                                                "0"
-                                                                                    ? "text-[#6366f1]"
-                                                                                    : "text-lime-500"
-                                                                            }  3xl:text-[14px] 2xl:text-[10px] xl:text-[10px] text-[8px] font-medium cursor-pointer`}
-                                                                        >
-                                                                            {e?.warehouseman_id ==
-                                                                            "0"
-                                                                                ? "Chưa duyệt kho"
-                                                                                : "Đã duyệt kho"}
-                                                                        </label>
-                                                                    </div>
+                                                                                e?.warehouseman_id == "0"
+                                                                                    ? "checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500"
+                                                                                    : "checked:border-lime-500 checked:bg-lime-500 border-lime-500 checked:before:bg-limborder-lime-500"
+                                                                            }before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-gray-400 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
+                                                                            id={e.id}
+                                                                            value={e.warehouseman_id}
+                                                                            checked={
+                                                                                e.warehouseman_id != "0" ? true : false
+                                                                            }
+                                                                            onChange={_HandleChangeInput.bind(
+                                                                                this,
+                                                                                e?.id,
+                                                                                e?.warehouseman_id,
+                                                                                "browser"
+                                                                            )}
+                                                                        />
+                                                                        <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                            <svg
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                className="h-3.5 w-3.5"
+                                                                                viewBox="0 0 20 20"
+                                                                                fill="currentColor"
+                                                                                stroke="currentColor"
+                                                                                stroke-width="1"
+                                                                            >
+                                                                                <path
+                                                                                    fill-rule="evenodd"
+                                                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                                    clip-rule="evenodd"
+                                                                                ></path>
+                                                                            </svg>
+                                                                        </div>
+                                                                    </label>
+                                                                    <label
+                                                                        htmlFor={e.id}
+                                                                        className={`${
+                                                                            e?.warehouseman_id == "0"
+                                                                                ? "text-[#6366f1]"
+                                                                                : "text-lime-500"
+                                                                        }  3xl:text-[14px] 2xl:text-[10px] xl:text-[10px] text-[8px] font-medium cursor-pointer`}
+                                                                    >
+                                                                        {e?.warehouseman_id == "0"
+                                                                            ? "Chưa duyệt kho"
+                                                                            : "Đã duyệt kho"}
+                                                                    </label>
                                                                 </div>
                                                             </h6>
                                                             <h6 className="col-span-1 w-fit ">
                                                                 <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2">
-                                                                    {
-                                                                        e?.branch_name
-                                                                    }
+                                                                    {e?.branch_name}
                                                                 </div>
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
                                                                 <BtnTacVu
                                                                     type="import"
-                                                                    onRefresh={_ServerFetching.bind(
-                                                                        this
-                                                                    )}
-                                                                    onRefreshGroup={_ServerFetching_group.bind(
-                                                                        this
-                                                                    )}
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
-                                                                    warehouseman_id={
-                                                                        e?.warehouseman_id
-                                                                    }
-                                                                    status_pay={
-                                                                        e?.status_pay
-                                                                    }
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    onRefreshGroup={_ServerFetching_group.bind(this)}
+                                                                    dataLang={dataLang}
+                                                                    warehouseman_id={e?.warehouseman_id}
+                                                                    status_pay={e?.status_pay}
                                                                     id={e?.id}
                                                                     className="bg-slate-100  hover:scale-105 transition-all ease-linear hover:bg-gray-200 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
                                                                 />
@@ -1374,17 +1117,12 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6 className="">
-                                    {dataLang?.display}{" "}
-                                    {totalItems?.iTotalDisplayRecords}{" "}
-                                    {dataLang?.among}{" "}
-                                    {totalItems?.iTotalRecords}{" "}
-                                    {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {totalItems?.iTotalRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(
-                                        totalItems?.iTotalDisplayRecords
-                                    )}
+                                    totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />
@@ -1405,9 +1143,7 @@ const TabStatus = React.memo((props) => {
             onClick={props.onClick}
             className={`${props.className} justify-center min-w-[180px] flex gap-2 2xl:text-sm xl:text-sm text-xs items-center rounded-[5.5px] px-2 py-2 outline-none relative `}
         >
-            {router.query?.tab === `${props.active}` && (
-                <ArrowCircleDown size="20" color="#0F4F9E" />
-            )}
+            {router.query?.tab === `${props.active}` && <ArrowCircleDown size="20" color="#0F4F9E" />}
             {props.children}
             <span
                 className={`${
@@ -1439,30 +1175,25 @@ const BtnTacVu = React.memo((props) => {
             cancelButtonText: `${props.dataLang?.aler_cancel}`,
         }).then((result) => {
             if (result.isConfirmed) {
-                Axios(
-                    "DELETE",
-                    `/api_web/Api_import/import/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            console.log(response.data);
-                            var { isSuccess, message } = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: props.dataLang[message],
-                                });
-                                props.onRefresh && props.onRefresh();
-                                props.onRefreshGroup && props.onRefreshGroup();
-                            } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: props.dataLang[message],
-                                });
-                            }
+                Axios("DELETE", `/api_web/Api_import/import/${id}?csrf_protection=true`, {}, (err, response) => {
+                    if (!err) {
+                        console.log(response.data);
+                        var { isSuccess, message } = response.data;
+                        if (isSuccess) {
+                            Toast.fire({
+                                icon: "success",
+                                title: props.dataLang[message],
+                            });
+                            props.onRefresh && props.onRefresh();
+                            props.onRefreshGroup && props.onRefreshGroup();
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                title: props.dataLang[message],
+                            });
                         }
                     }
-                );
+                });
             }
         });
     };
@@ -1472,10 +1203,8 @@ const BtnTacVu = React.memo((props) => {
             Toast.fire({
                 icon: "error",
                 title: `${
-                    (props?.warehouseman_id != "0" &&
-                        props.dataLang?.warehouse_confirmed_cant_edit) ||
-                    (props?.status_pay != "not_spent" &&
-                        (props.dataLang?.paid_cant_edit || "paid_cant_edit"))
+                    (props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit) ||
+                    (props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit"))
                 }`,
             });
         } else {
@@ -1487,15 +1216,8 @@ const BtnTacVu = React.memo((props) => {
         <div>
             <Popup
                 trigger={
-                    <button
-                        className={
-                            `flex space-x-1 items-center ` + props.className
-                        }
-                    >
-                        <span>
-                            {props.dataLang?.purchase_action ||
-                                "purchase_action"}
-                        </span>
+                    <button className={`flex space-x-1 items-center ` + props.className}>
+                        <span>{props.dataLang?.purchase_action || "purchase_action"}</span>
                         <IconDown size={12} />
                     </button>
                 }
@@ -1525,8 +1247,7 @@ const BtnTacVu = React.memo((props) => {
                                 className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
                             />
                             <p className="group-hover:text-sky-500">
-                                {props.dataLang?.purchase_order_table_edit ||
-                                    "purchase_order_table_edit"}
+                                {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
                             </p>
                         </button>
                         <div className=" transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full">
@@ -1551,8 +1272,7 @@ const BtnTacVu = React.memo((props) => {
                                 className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
                             />
                             <p className="group-hover:text-[#f87171]">
-                                {props.dataLang?.purchase_order_table_delete ||
-                                    "purchase_order_table_delete"}
+                                {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
                             </p>
                         </button>
                     </div>
@@ -1579,30 +1299,20 @@ const Popup_Pdf = (props) => {
 
     const fetchDataSettingsCompany = () => {
         if (props?.id) {
-            Axios(
-                "GET",
-                `/api_web/Api_setting/CompanyInfo?csrf_protection=true`,
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var { data } = response.data;
-                        setDataCompany(data);
-                    }
+            Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+                if (!err) {
+                    var { data } = response.data;
+                    setDataCompany(data);
                 }
-            );
+            });
         }
         if (props?.id) {
-            Axios(
-                "GET",
-                `/api_web/Api_import/import/${props?.id}?csrf_protection=true`,
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var db = response.data;
-                        setData(db);
-                    }
+            Axios("GET", `/api_web/Api_import/import/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+                if (!err) {
+                    var db = response.data;
+                    setData(db);
                 }
-            );
+            });
         }
     };
     useEffect(() => {
@@ -1614,26 +1324,15 @@ const Popup_Pdf = (props) => {
     const [dataProductSerial, sDataProductSerial] = useState({});
 
     const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/api_setting/feature/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sDataMaterialExpiry(
-                        data.find((x) => x.code == "material_expiry")
-                    );
-                    sDataProductExpiry(
-                        data.find((x) => x.code == "product_expiry")
-                    );
-                    sDataProductSerial(
-                        data.find((x) => x.code == "product_serial")
-                    );
-                }
-                sOnFetching(false);
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+                sDataProductSerial(data.find((x) => x.code == "product_serial"));
             }
-        );
+            sOnFetching(false);
+        });
     };
 
     return (

@@ -1,156 +1,170 @@
 import { useRouter } from "next/dist/client/router";
 import React, { useEffect, useState } from "react";
-import Popup from 'reactjs-popup';
+import Popup from "reactjs-popup";
 import { ArrowDown2 } from "iconsax-react";
 import Swal from "sweetalert2";
-import { _ServerInstance as Axios } from '/services/axios';
+import { _ServerInstance as Axios } from "/services/axios";
 
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
 import FilePDF from "./FilePDF";
-pdfMake.vfs = pdfFonts.pdfMake.vfs
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { BiEdit } from "react-icons/bi";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const Toast = Swal.mixin({
     toast: true,
-    position: 'top-end',
+    position: "top-end",
     showConfirmButton: false,
     timer: 2000,
     timerProgressBar: true,
-})
+});
 
 const BtnAction = React.memo((props) => {
-    const router = useRouter()
+    const router = useRouter();
 
     const [openAction, setOpenAction] = useState(false);
     const [dataCompany, setDataCompany] = useState();
     const [data, setData] = useState();
     const _ToggleModal = (e) => {
-        setOpenAction(e)
-    }
+        setOpenAction(e);
+    };
     const handleDelete = (id) => {
-        if (props?.id && props?.type === 'price_quote') {
-            if (props?.status !== 'ordered') {
+        if (props?.id && props?.type === "price_quote") {
+            if (props?.status !== "ordered") {
                 Swal.fire({
                     title: `${props.dataLang?.aler_ask} `,
-                    icon: 'warning',
+                    icon: "warning",
                     showCancelButton: true,
-                    confirmButtonColor: '#296dc1',
-                    cancelButtonColor: '#d33',
+                    confirmButtonColor: "#296dc1",
+                    cancelButtonColor: "#d33",
                     confirmButtonText: `${props.dataLang?.aler_yes} `,
-                    cancelButtonText: `${props.dataLang?.aler_cancel} `
+                    cancelButtonText: `${props.dataLang?.aler_cancel} `,
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        Axios("DELETE", `/api_web/Api_quotation/quotation/${id}?csrf_protection=true`, {
-                        }, (err, response) => {
-                            if (response && response.data) {
-                                var { isSuccess, message } = response.data;
-                                if (isSuccess) {
-                                    Toast.fire({
-                                        icon: 'success',
-                                        title: props.dataLang[message]
-                                    })
-                                    props.onRefresh && props.onRefresh()
+                        Axios(
+                            "DELETE",
+                            `/api_web/Api_quotation/quotation/${id}?csrf_protection=true`,
+                            {},
+                            (err, response) => {
+                                if (response && response.data) {
+                                    var { isSuccess, message } = response.data;
+                                    if (isSuccess) {
+                                        Toast.fire({
+                                            icon: "success",
+                                            title: props.dataLang[message],
+                                        });
+                                        props.onRefresh && props.onRefresh();
+                                    } else {
+                                        Toast.fire({
+                                            icon: "error",
+                                            title: props.dataLang[message],
+                                        });
+                                    }
                                 } else {
                                     Toast.fire({
-                                        icon: 'error',
-                                        title: props.dataLang[message]
-                                    })
+                                        icon: "error",
+                                        title: `${props?.dataLang?.aler_delete_fail || "aler_delete_fail"}`,
+                                    });
                                 }
-                            } else {
-                                Toast.fire({
-                                    icon: 'error',
-                                    title: `${props?.dataLang?.aler_delete_fail || 'aler_delete_fail'}`
-                                })
                             }
-                        })
+                        );
                     }
-                })
+                });
             }
-            if (props?.status === 'ordered') {
+            if (props?.status === "ordered") {
                 Toast.fire({
-                    icon: 'error',
-                    title: `${props?.dataLang?.po_imported_cant_delete || 'po_imported_cant_delete'} `
-                })
+                    icon: "error",
+                    title: `${props?.dataLang?.po_imported_cant_delete || "po_imported_cant_delete"} `,
+                });
             }
         }
 
-        if (props?.id && props?.type === 'sales_product') {
-            if (props?.status !== 'approved') {
+        if (props?.id && props?.type === "sales_product") {
+            if (props?.status !== "approved") {
                 Swal.fire({
                     title: `${props.dataLang?.aler_ask} `,
-                    icon: 'warning',
+                    icon: "warning",
                     showCancelButton: true,
-                    confirmButtonColor: '#296dc1',
-                    cancelButtonColor: '#d33',
+                    confirmButtonColor: "#296dc1",
+                    cancelButtonColor: "#d33",
                     confirmButtonText: `${props.dataLang?.aler_yes} `,
-                    cancelButtonText: `${props.dataLang?.aler_cancel} `
+                    cancelButtonText: `${props.dataLang?.aler_cancel} `,
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        Axios("DELETE", `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`, {
-                        }, (err, response) => {
-                            if (response && response.data) {
-                                var { isSuccess, message } = response.data;
-                                if (isSuccess) {
-                                    Toast.fire({
-                                        icon: 'success',
-                                        title: props.dataLang[message]
-                                    })
-                                    props.onRefresh && props.onRefresh()
+                        Axios(
+                            "DELETE",
+                            `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`,
+                            {},
+                            (err, response) => {
+                                if (response && response.data) {
+                                    var { isSuccess, message } = response.data;
+                                    if (isSuccess) {
+                                        Toast.fire({
+                                            icon: "success",
+                                            title: props.dataLang[message],
+                                        });
+                                        props.onRefresh && props.onRefresh();
+                                    } else {
+                                        Toast.fire({
+                                            icon: "error",
+                                            title: props.dataLang[message],
+                                        });
+                                    }
                                 } else {
                                     Toast.fire({
-                                        icon: 'error',
-                                        title: props.dataLang[message]
-                                    })
+                                        icon: "error",
+                                        title: `${props?.dataLang?.aler_delete_fail || "aler_delete_fail"}`,
+                                    });
                                 }
-                            } else {
-                                Toast.fire({
-                                    icon: 'error',
-                                    title: `${props?.dataLang?.aler_delete_fail || 'aler_delete_fail'}`
-                                })
                             }
-                        })
+                        );
                     }
-                })
+                });
             }
-            if (props?.status === 'approved') {
+            if (props?.status === "approved") {
                 Toast.fire({
-                    icon: 'error',
-                    title: `${props?.dataLang?.sales_product_cant_delete || 'sales_product_cant_delete'} `
-                })
+                    icon: "error",
+                    title: `${props?.dataLang?.sales_product_cant_delete || "sales_product_cant_delete"} `,
+                });
             }
         }
-    }
+        if (props?.id && props?.type === "deliveryReceipt") {
+            alert("hí");
+        }
+    };
 
     const handleClick = () => {
-        if (props?.id && props?.type === 'price_quote') {
+        if (props?.id && props?.type === "price_quote") {
             console.log(props?.status);
             if (props?.status === "ordered") {
                 Toast.fire({
-                    icon: 'error',
-                    title: `${props?.dataLang?.po_imported_cant_edit || 'po_imported_cant_edit'} `
-                })
-            }
-            else if ( props?.status === "confirmed"){
+                    icon: "error",
+                    title: `${props?.dataLang?.po_imported_cant_edit || "po_imported_cant_edit"} `,
+                });
+            } else if (props?.status === "confirmed") {
                 Toast.fire({
-                    icon: 'error',
-                    title: `${props?.dataLang?.po_imported_cant_edit_with_confirm || 'po_imported_cant_edit_with_confirm'} `
-                })
-            }
-            else {
+                    icon: "error",
+                    title: `${
+                        props?.dataLang?.po_imported_cant_edit_with_confirm || "po_imported_cant_edit_with_confirm"
+                    } `,
+                });
+            } else {
                 router.push(`/sales_export_product/priceQuote/form?id=${props.id}`);
             }
         }
-        if (props?.id && props?.type === 'sales_product') {
+        if (props?.id && props?.type === "sales_product") {
             if (props?.status === "approved") {
                 Toast.fire({
-                    icon: 'error',
-                    title: `${props?.dataLang?.sales_product_cant_edit || 'sales_product_cant_edit'} `
-                })
-            }
-            else {
+                    icon: "error",
+                    title: `${props?.dataLang?.sales_product_cant_edit || "sales_product_cant_edit"} `,
+                });
+            } else {
                 router.push(`/sales_export_product/salesOrder/form?id=${props.id}`);
             }
-
+        }
+        if (props?.id && props?.type === "deliveryReceipt") {
+            alert("Đang !!");
         }
     };
 
@@ -159,54 +173,62 @@ const BtnAction = React.memo((props) => {
             try {
                 await Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
                     if (response && response.data) {
-                        let res = response.data.data
-                        setDataCompany(res)
+                        let res = response.data.data;
+                        setDataCompany(res);
                     }
-                })
+                });
             } catch (err) {
                 console.log(err);
             }
         }
 
-        if (props?.id && props?.type === 'price_quote') {
+        if (props?.id && props?.type === "price_quote") {
             try {
-                await Axios("GET", `/api_web/Api_quotation/quotation/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-                    if (response && response.data) {
-                        let db = response.data
-                        setData(db)
+                await Axios(
+                    "GET",
+                    `/api_web/Api_quotation/quotation/${props?.id}?csrf_protection=true`,
+                    {},
+                    (err, response) => {
+                        if (response && response.data) {
+                            let db = response.data;
+                            setData(db);
+                        }
                     }
-                })
+                );
             } catch (err) {
                 console.log(err);
             }
         }
 
-        if (props?.id && props?.type === 'sales_product') {
+        if (props?.id && props?.type === "sales_product") {
             try {
-                await Axios("GET", `/api_web/Api_sale_order/saleOrder/${props?.id}?csrf_protection=true`, {}, (err, response) => {
-                    if (response && response.data) {
-                        let db = response.data
-                        setData(db)
+                await Axios(
+                    "GET",
+                    `/api_web/Api_sale_order/saleOrder/${props?.id}?csrf_protection=true`,
+                    {},
+                    (err, response) => {
+                        if (response && response.data) {
+                            let db = response.data;
+                            setData(db);
+                        }
                     }
-                })
+                );
             } catch (err) {
                 console.log(err);
             }
         }
-    }
+    };
 
     useEffect(() => {
-        openAction && fetchDataSettingsCompany()
-    }, [openAction])
+        openAction && fetchDataSettingsCompany();
+    }, [openAction]);
 
     return (
         <div>
             <Popup
                 trigger={
-                    <button className={`flex space-x-1 items-center ` + props.className} >
-                        <span>
-                            {props.dataLang?.btn_action || "btn_action"}
-                        </span>
+                    <button className={`flex space-x-1 items-center ` + props.className}>
+                        <span>{props.dataLang?.btn_action || "btn_action"}</span>
                         <ArrowDown2 size={12} />
                     </button>
                 }
@@ -222,12 +244,25 @@ const BtnAction = React.memo((props) => {
             >
                 <div className="w-auto rounded">
                     <div className="bg-white rounded-b-xl flex flex-col overflow-hidden">
-                        <button
+                        {/* <button
                             onClick={handleClick}
                             className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer 2xl:px-5 2xl:py-2.5 px-5 py-1.5 rounded w-full"
                         >
                             {props?.dataLang?.btn_table_edit || "btn_table_edit"}
+                        </button> */}
+                        <button
+                            onClick={handleClick}
+                            className="group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                        >
+                            <BiEdit
+                                size={20}
+                                className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                            />
+                            <p className="group-hover:text-sky-500">
+                                {props.dataLang?.btn_table_edit || "btn_table_edit"}
+                            </p>
                         </button>
+
                         <FilePDF
                             props={props}
                             openAction={openAction}
@@ -235,17 +270,29 @@ const BtnAction = React.memo((props) => {
                             dataCompany={dataCompany}
                             data={data}
                         />
-                        <button
+                        {/* <button
                             onClick={() => handleDelete(props?.id)}
-                            className='2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer 2xl:px-5 2xl:py-2.5 px-5 py-1.5 rounded  w-full'
+                            className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer 2xl:px-5 2xl:py-2.5 px-5 py-1.5 rounded  w-full"
                         >
                             {props?.dataLang?.btn_table_delete || "btn_table_delete"}
+                        </button> */}
+                        <button
+                            onClick={() => handleDelete(props?.id)}
+                            className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                        >
+                            <RiDeleteBin6Line
+                                size={20}
+                                className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
+                            />
+                            <p className="group-hover:text-[#f87171]">
+                                {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
+                            </p>
                         </button>
                     </div>
                 </div>
             </Popup>
         </div>
-    )
-})
+    );
+});
 
-export default BtnAction
+export default BtnAction;
