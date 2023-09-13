@@ -252,10 +252,7 @@ const Header = () => {
                 {
                     title: "Sản xuất",
                     img: "/icon/header/kho/sx.png",
-                    items: [
-                        { name: "Lệnh sản xuất tổng" },
-                        { name: "Lệnh sản xuất chi tiết" },
-                    ],
+                    items: [{ name: "Lệnh sản xuất tổng" }, { name: "Lệnh sản xuất chi tiết" }],
                 },
                 {
                     title: "Cảnh báo tồn kho",
@@ -280,10 +277,7 @@ const Header = () => {
                 {
                     title: "Xuất gia công",
                     img: "/icon/header/khac/xgc.png",
-                    items: [
-                        { name: "Xuất gia công" },
-                        { name: "Nhập gia công" },
-                    ],
+                    items: [{ name: "Xuất gia công" }, { name: "Nhập gia công" }],
                 },
             ],
         },
@@ -325,6 +319,7 @@ const Header = () => {
                         { name: "Yêu cầu khiếu nại" },
                         { name: "Lịch" },
                         { name: "Import dữ liệu", link: "/import" },
+                        { name: "Export dữ liệu", link: "/export" },
                     ],
                 },
             ],
@@ -394,6 +389,10 @@ const Header = () => {
                         {
                             name: "Quy trình sử dụng phần mềm FMRP",
                             link: "/process",
+                        },
+                        {
+                            name: "Quy trình tổng quan các phân hệ",
+                            link: "/processOverview",
                         },
                         {
                             name: "Quy trình quản lý sản xuất",
@@ -649,12 +648,7 @@ const Header = () => {
                 {
                     title: "Công nợ bán",
                     img: "/icon/header/banxuat/cnb.png",
-                    items: [
-                        { name: "Hóa đơn bán hàng" },
-                        { name: "Phiếu thu bán hàng" },
-                        { name: "Công nợ khách hàng" },
-                        { name: "Phiếu thu khác" },
-                    ],
+                    items: [{ name: "Hóa đơn bán hàng" }, { name: "Phiếu thu" }, { name: "Công nợ khách hàng" }],
                 },
             ],
         },
@@ -759,9 +753,7 @@ const Header = () => {
             } else {
                 // Sau 3000ms, hiển thị phần tử tiếp theo
                 const timer = setTimeout(() => {
-                    setCurrentDropdownIndex(
-                        (prevIndex) => (prevIndex + 1) % dropdowns.length
-                    );
+                    setCurrentDropdownIndex((prevIndex) => (prevIndex + 1) % dropdowns.length);
                 }, 3000);
 
                 return () => {
@@ -867,10 +859,7 @@ const Header = () => {
                                         </React.Fragment>
                                     }
                                     title={dropdown.text}
-                                    open={
-                                        dataPstWH &&
-                                        index === currentDropdownIndex
-                                    }
+                                    open={dataPstWH && index === currentDropdownIndex}
                                     position="bottom"
                                     animation="perspective"
                                     size="regular"
@@ -1031,11 +1020,7 @@ const Header = () => {
                                 </div>
                             </DropdownThongBao>
                         </a>
-                        <Dropdown
-                            data={ListQuyTrinh}
-                            className="popover-quytrinh"
-                            position={"bottom right"}
-                        >
+                        <Dropdown data={ListQuyTrinh} className="popover-quytrinh" position={"bottom right"}>
                             <Image
                                 alt=""
                                 src="/icon/header/ques.png"
@@ -1069,20 +1054,15 @@ const DropdownAvatar = React.memo(() => {
     const [onSending, sOnSending] = useState(false);
 
     const _ServerSending = () => {
-        Axios(
-            "POST",
-            "/api_web/Api_Login/logout?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    dispatch({ type: "auth/update", payload: false });
-                    localStorage.removeItem("tokenFMRP");
-                    localStorage.removeItem("databaseappFMRP");
-                    router.push("/");
-                }
-                sOnSending(false);
+        Axios("POST", "/api_web/Api_Login/logout?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                dispatch({ type: "auth/update", payload: false });
+                localStorage.removeItem("tokenFMRP");
+                localStorage.removeItem("databaseappFMRP");
+                router.push("/");
             }
-        );
+            sOnSending(false);
+        });
     };
 
     useEffect(() => {
@@ -1188,12 +1168,8 @@ const DropdownAvatar = React.memo(() => {
                                 <div className="bg-green-500 w-2.5 h-2.5 rounded-full absolute bottom-0 right-1" />
                             </div>
                             <div>
-                                <h5 className="font-semibold text-sm text-[#141522]">
-                                    {auth?.user_full_name}
-                                </h5>
-                                <h6 className="text-[#9295A4] font-normal text-sm ">
-                                    {auth?.user_email}
-                                </h6>
+                                <h5 className="font-semibold text-sm text-[#141522]">{auth?.user_full_name}</h5>
+                                <h6 className="text-[#9295A4] font-normal text-sm ">{auth?.user_email}</h6>
                             </div>
                         </div>
                         <div className="">

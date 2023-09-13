@@ -270,9 +270,7 @@ const Index = (props) => {
     useEffect(() => {
         router.query.tab && tabPage != 5 && tabPage != 6 && sOnFetching(true);
         router.query.tab && sListData([]);
-        router.query.tab &&
-            (tabPage == 1 || tabPage == 2) &&
-            sListDataContat([]);
+        router.query.tab && (tabPage == 1 || tabPage == 2) && sListDataContat([]);
         router.query.tab && tabPage == 1 && sListDataDelivery([]);
         router.query.tab && sSampleImport(null);
         router.query.tab && sOnLoading(true);
@@ -347,20 +345,14 @@ const Index = (props) => {
             sOnLoadingListData(true);
             if (value) {
                 const parsedValue = JSON?.parse(value?.setup_colums);
-                const dataBackup =
-                    parsedValue?.data?.map((e) => JSON.parse(e)) || [];
+                const dataBackup = parsedValue?.data?.map((e) => JSON.parse(e)) || [];
                 if (tabPage == 1) {
-                    const dataBackupContact =
-                        parsedValue?.dataSub?.map((e) => JSON.parse(e)) || [];
-                    const dataBackupDelivery =
-                        parsedValue?.dataSubDelivery?.map((e) =>
-                            JSON.parse(e)
-                        ) || [];
+                    const dataBackupContact = parsedValue?.dataSub?.map((e) => JSON.parse(e)) || [];
+                    const dataBackupDelivery = parsedValue?.dataSubDelivery?.map((e) => JSON.parse(e)) || [];
                     sListDataContat(dataBackupContact);
                     sListDataDelivery(dataBackupDelivery);
                 } else if (tabPage == 2) {
-                    const dataBackupContact =
-                        parsedValue?.dataSub?.map((e) => JSON.parse(e)) || [];
+                    const dataBackupContact = parsedValue?.dataSub?.map((e) => JSON.parse(e)) || [];
                     sListDataContat(dataBackupContact);
                 }
                 sListData(dataBackup);
@@ -414,9 +406,7 @@ const Index = (props) => {
             const sheet = workbook.Sheets[sheetName];
 
             const startRows = parseInt(startRowIndex2) || 1; // Hàng bắt đầu, mặc định là 1
-            const endRows =
-                parseInt(endRow) ||
-                XLSX.utils.sheet_to_json(sheet, { header: 1 }).length; // Hàng kết thúc, mặc định là số hàng cuối cùng trong sheet
+            const endRows = parseInt(endRow) || XLSX.utils.sheet_to_json(sheet, { header: 1 }).length; // Hàng kết thúc, mặc định là số hàng cuối cùng trong sheet
             const jsonData = [];
 
             const sheetData = XLSX.utils.sheet_to_json(sheet, {
@@ -444,11 +434,7 @@ const Index = (props) => {
             //     jsonData.push(rowData);
             //     console.log("rowData", rowData);
             //   }
-            for (
-                let rowIndex = rowIndexStart;
-                rowIndex <= rowIndexEnd;
-                rowIndex++
-            ) {
+            for (let rowIndex = rowIndexStart; rowIndex <= rowIndexEnd; rowIndex++) {
                 const row = sheetData[rowIndex];
                 const rowData = {};
                 for (let colIndex = 0; colIndex < row.length; colIndex++) {
@@ -464,18 +450,10 @@ const Index = (props) => {
         };
     };
 
-    const checkMain = listData?.some(
-        (e) => e?.dataFields?.value == "variation"
-    );
+    const checkMain = listData?.some((e) => e?.dataFields?.value == "variation");
 
     const isDuplicateValue = (list, childId, type, value) => {
-        return (
-            value &&
-            list.some(
-                (data) =>
-                    data[type]?.value === value?.value && data.id !== childId
-            )
-        );
+        return value && list.some((data) => data[type]?.value === value?.value && data.id !== childId);
     };
 
     const showToastError = (title) => {
@@ -492,17 +470,10 @@ const Index = (props) => {
                 if (type == "data_fields") {
                     const isDuplicate =
                         value &&
-                        listData.some(
-                            (data) =>
-                                data?.dataFields?.value === value?.value &&
-                                data.id !== childId
-                        );
+                        listData.some((data) => data?.dataFields?.value === value?.value && data.id !== childId);
                     //Lỗi trùng nhau
                     if (isDuplicate && e?.dataFields?.value !== value?.value) {
-                        showToastError(
-                            dataLang?.import_ERR_selected ||
-                                "import_ERR_selected"
-                        );
+                        showToastError(dataLang?.import_ERR_selected || "import_ERR_selected");
                         return { ...e, dataFields: null };
                     } else if (
                         //Lỗi trùng nhau phải có biến thể chính mới cho chọn phụ
@@ -514,9 +485,7 @@ const Index = (props) => {
                         return e;
                     } else if ((tabPage == 3 || tabPage == 4) && checkMain2) {
                         //Khi không có biến thể chính thì trường biến thể phụ thành null
-                        const checkEx = listData?.findIndex(
-                            (e) => e?.dataFields?.value == "variation_option"
-                        );
+                        const checkEx = listData?.findIndex((e) => e?.dataFields?.value == "variation_option");
                         if (checkEx >= 0) {
                             listData[checkEx].dataFields = null;
                         }
@@ -527,18 +496,10 @@ const Index = (props) => {
                 } else if (type == "column") {
                     //Trùng cột
                     const isDuplicate =
-                        value &&
-                        listData.some(
-                            (data) =>
-                                data?.column?.value === value?.value &&
-                                data.id !== childId
-                        );
+                        value && listData.some((data) => data?.column?.value === value?.value && data.id !== childId);
 
                     if (isDuplicate && e?.column?.value !== value?.value) {
-                        showToastError(
-                            dataLang?.import_ERR_selectedColumn ||
-                                "import_ERR_selectedColumn"
-                        );
+                        showToastError(dataLang?.import_ERR_selectedColumn || "import_ERR_selectedColumn");
                         return e; // Giữ nguyên phần tử cũ nếu trùng lặp
                     } else {
                         return { ...e, column: value };
@@ -608,39 +569,17 @@ const Index = (props) => {
         const newData = listDataContact.map((e) => {
             if (e?.id === childId) {
                 if (type === "dataFieldsContact") {
-                    const isDuplicate = isDuplicateValue(
-                        listDataContact,
-                        childId,
-                        "dataFieldsContact",
-                        value
-                    );
+                    const isDuplicate = isDuplicateValue(listDataContact, childId, "dataFieldsContact", value);
                     //Kiểm tra trùng cột
-                    if (
-                        isDuplicate &&
-                        e?.dataFieldsContact?.value !== value?.value
-                    ) {
-                        showToastError(
-                            dataLang?.import_ERR_selected ||
-                                "import_ERR_selected"
-                        );
+                    if (isDuplicate && e?.dataFieldsContact?.value !== value?.value) {
+                        showToastError(dataLang?.import_ERR_selected || "import_ERR_selected");
                         return { ...e, dataFieldsContact: null };
                     }
                     return { ...e, dataFieldsContact: value };
                 } else if (type === "columnContact") {
-                    const isDuplicate = isDuplicateValue(
-                        listDataContact,
-                        childId,
-                        "columnContact",
-                        value
-                    );
-                    if (
-                        isDuplicate &&
-                        e?.columnContact?.value !== value?.value
-                    ) {
-                        showToastError(
-                            dataLang?.import_ERR_selectedColumn ||
-                                "import_ERR_selectedColumn"
-                        );
+                    const isDuplicate = isDuplicateValue(listDataContact, childId, "columnContact", value);
+                    if (isDuplicate && e?.columnContact?.value !== value?.value) {
+                        showToastError(dataLang?.import_ERR_selectedColumn || "import_ERR_selectedColumn");
                         return e;
                     } else {
                         return { ...e, columnContact: value };
@@ -656,41 +595,19 @@ const Index = (props) => {
         const newData = listDataDelivery.map((e) => {
             if (e?.id == childId) {
                 if (type == "dataFieldsDelivery") {
-                    const isDuplicate = isDuplicateValue(
-                        listDataDelivery,
-                        childId,
-                        "dataFieldsDelivery",
-                        value
-                    );
+                    const isDuplicate = isDuplicateValue(listDataDelivery, childId, "dataFieldsDelivery", value);
                     //Lỗi trùng nhau
-                    if (
-                        isDuplicate &&
-                        e?.dataFieldsDelivery?.value !== value?.value
-                    ) {
-                        showToastError(
-                            dataLang?.import_ERR_selected ||
-                                "import_ERR_selected"
-                        );
+                    if (isDuplicate && e?.dataFieldsDelivery?.value !== value?.value) {
+                        showToastError(dataLang?.import_ERR_selected || "import_ERR_selected");
                         return { ...e, dataFieldsDelivery: null };
                     }
                     return { ...e, dataFieldsDelivery: value };
                 } else if (type == "columnDelivery") {
                     //Trùng cột
-                    const isDuplicate = isDuplicateValue(
-                        listDataDelivery,
-                        childId,
-                        "columnDelivery",
-                        value
-                    );
+                    const isDuplicate = isDuplicateValue(listDataDelivery, childId, "columnDelivery", value);
 
-                    if (
-                        isDuplicate &&
-                        e?.columnDelivery?.value !== value?.value
-                    ) {
-                        showToastError(
-                            dataLang?.import_ERR_selectedColumn ||
-                                "import_ERR_selectedColumn"
-                        );
+                    if (isDuplicate && e?.columnDelivery?.value !== value?.value) {
+                        showToastError(dataLang?.import_ERR_selectedColumn || "import_ERR_selectedColumn");
                         return e;
                     } else {
                         return { ...e, columnDelivery: value };
@@ -765,11 +682,7 @@ const Index = (props) => {
         const newData = listData.filter((x) => x.id !== id); // loại bỏ phần tử cần xóa
         const newDatas = listData.filter((item) => {
             const value = item?.dataFields?.value;
-            return (
-                item.id !== id &&
-                value !== "variation" &&
-                value !== "variation_option"
-            );
+            return item.id !== id && value !== "variation" && value !== "variation_option";
         });
 
         sListData(newDatas); // cập nhật lại mảng
@@ -899,9 +812,7 @@ const Index = (props) => {
                 hasNullDataFiles && sErrFiles(true);
                 hasNullColumn && sErrColumn(true);
 
-                valueCheck == "edit" &&
-                    condition_column == null &&
-                    sErrValueCheck(true);
+                valueCheck == "edit" && condition_column == null && sErrValueCheck(true);
 
                 fileImport == null && sErrFileImport(true);
 
@@ -916,10 +827,7 @@ const Index = (props) => {
                 if (requiredColumn) {
                     Toast.fire({
                         icon: "error",
-                        title: `${
-                            dataLang?.import_ERR_add_column ||
-                            "import_ERR_add_column"
-                        }`,
+                        title: `${dataLang?.import_ERR_add_column || "import_ERR_add_column"}`,
                     });
                 }
                 //KH - bắt buộc phải có cột tên khách hàng, NCC PHẢI CÓ TÊN NCC, nvl PHẢI CÓ TÊN nvl
@@ -927,18 +835,10 @@ const Index = (props) => {
                     Toast.fire({
                         icon: "error",
                         title: `${
-                            (tabPage == 1 &&
-                                !ObError?.name &&
-                                dataLang?.import_ERR_add_nameData) ||
-                            (tabPage == 2 &&
-                                !ObError?.name &&
-                                dataLang?.import_ERR_add_nameDataSuplier) ||
-                            (tabPage == 3 &&
-                                !ObError?.name &&
-                                dataLang?.import_ERR_add_nameMterial) ||
-                            (tabPage == 4 &&
-                                !ObError?.name &&
-                                dataLang?.import_ERR_add_nameProduct)
+                            (tabPage == 1 && !ObError?.name && dataLang?.import_ERR_add_nameData) ||
+                            (tabPage == 2 && !ObError?.name && dataLang?.import_ERR_add_nameDataSuplier) ||
+                            (tabPage == 3 && !ObError?.name && dataLang?.import_ERR_add_nameMterial) ||
+                            (tabPage == 4 && !ObError?.name && dataLang?.import_ERR_add_nameProduct)
                         }`,
                     });
                 }
@@ -946,33 +846,18 @@ const Index = (props) => {
                 else if (valueCheck == "add" && !ObError?.branch_id) {
                     Toast.fire({
                         icon: "error",
-                        title: `${
-                            dataLang?.import_ERR_add_branchData ||
-                            "import_ERR_add_branchData"
-                        }`,
+                        title: `${dataLang?.import_ERR_add_branchData || "import_ERR_add_branchData"}`,
                     });
                 }
                 //nếu cập nhật thì phải có cột mã kh
-                else if (
-                    valueCheck == "edit" &&
-                    tabPage == 1 &&
-                    !ObError?.code
-                ) {
+                else if (valueCheck == "edit" && tabPage == 1 && !ObError?.code) {
                     Toast.fire({
                         icon: "error",
-                        title: `${
-                            dataLang?.import_ERR_add_CodeData ||
-                            "import_ERR_add_CodeData"
-                        }`,
+                        title: `${dataLang?.import_ERR_add_CodeData || "import_ERR_add_CodeData"}`,
                     });
                 }
                 //Hàng bắt đầu hàng kết thúc
-                else if (
-                    row_tarts == 0 ||
-                    row_tarts == null ||
-                    end_row == 0 ||
-                    end_row == null
-                ) {
+                else if (row_tarts == 0 || row_tarts == null || end_row == 0 || end_row == null) {
                     Toast.fire({
                         icon: "error",
                         title: `${"Hàng phải lớn hơn 0"}`,
@@ -980,18 +865,12 @@ const Index = (props) => {
                 } else if (errEnd) {
                     Toast.fire({
                         icon: "error",
-                        title: `${
-                            dataLang?.import_ERR_greater_end ||
-                            "import_ERR_greater_end"
-                        }`,
+                        title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"}`,
                     });
                 } else if (errStart) {
                     Toast.fire({
                         icon: "error",
-                        title: `${
-                            dataLang?.import_ERR_greater_end ||
-                            "import_ERR_greater_end"
-                        }`,
+                        title: `${dataLang?.import_ERR_greater_end || "import_ERR_greater_end"}`,
                     });
                 } else {
                     Toast.fire({
@@ -1096,8 +975,7 @@ const Index = (props) => {
         ...item,
         dataFieldsContact: listDataContact[index]?.dataFieldsContact,
         columnContact: listDataContact[index]?.columnContact,
-        dataFieldsDelivery:
-            tabPage == 1 && listDataDelivery[index]?.dataFieldsDelivery,
+        dataFieldsDelivery: tabPage == 1 && listDataDelivery[index]?.dataFieldsDelivery,
         columnDelivery: tabPage == 1 && listDataDelivery[index]?.columnDelivery,
     }));
 
@@ -1126,57 +1004,38 @@ const Index = (props) => {
                         const columnContactValue = columnContact?.value;
                         const dataFieldsContactValue = dataFieldsContact?.value;
                         const columnDeliveryValue = columnDelivery?.value;
-                        const dataFieldsDeliveryValue =
-                            dataFieldsDelivery?.value;
+                        const dataFieldsDeliveryValue = dataFieldsDelivery?.value;
 
                         if (columnValue && item[columnValue]) {
                             result[dataFieldsValue] = item[columnValue];
                         }
 
                         if (columnContactValue && item[columnContactValue]) {
-                            result[dataFieldsContactValue] =
-                                item[columnContactValue];
+                            result[dataFieldsContactValue] = item[columnContactValue];
                         }
                         if (columnDeliveryValue && item[columnDeliveryValue]) {
-                            result[dataFieldsDeliveryValue] =
-                                item[columnDeliveryValue];
+                            result[dataFieldsDeliveryValue] = item[columnDeliveryValue];
                         }
 
-                        if (
-                            dataFields?.label &&
-                            dataFieldsValue &&
-                            item[dataFields.label]
-                        ) {
+                        if (dataFields?.label && dataFieldsValue && item[dataFields.label]) {
                             const fieldKey = dataFieldsValue;
                             const fieldValue = item[dataFields.label];
                             result[fieldKey] = fieldValue;
                         }
 
-                        if (
-                            dataFieldsContact?.label &&
-                            dataFieldsContactValue &&
-                            item[dataFieldsContact.label]
-                        ) {
+                        if (dataFieldsContact?.label && dataFieldsContactValue && item[dataFieldsContact.label]) {
                             const fieldKey = dataFieldsContactValue;
                             const fieldValue = item[dataFieldsContact.label];
                             result[fieldKey] = fieldValue;
                         }
-                        if (
-                            dataFieldsDelivery?.label &&
-                            dataFieldsDeliveryValue &&
-                            item[dataFieldsDelivery.label]
-                        ) {
+                        if (dataFieldsDelivery?.label && dataFieldsDeliveryValue && item[dataFieldsDelivery.label]) {
                             const fieldKey = dataFieldsDeliveryValue;
                             const fieldValue = item[dataFieldsDelivery.label];
                             result[fieldKey] = fieldValue;
                         }
                     }
                     if (Object.keys(result).length > 0) {
-                        result["rowIndex"] = item.rowIndex
-                            ? Number(item.rowIndex) + 1
-                            : item.rowIndex == 0
-                            ? 1
-                            : null;
+                        result["rowIndex"] = item.rowIndex ? Number(item.rowIndex) + 1 : item.rowIndex == 0 ? 1 : null;
                         return result;
                     }
 
@@ -1193,12 +1052,7 @@ const Index = (props) => {
                 .map((item, index) => {
                     const result = {};
                     for (const listDataItem of mergedListData) {
-                        const {
-                            column,
-                            dataFields,
-                            columnContact,
-                            dataFieldsContact,
-                        } = listDataItem;
+                        const { column, dataFields, columnContact, dataFieldsContact } = listDataItem;
                         const columnValue = column?.value;
                         const dataFieldsValue = dataFields?.value;
                         const columnContactValue = columnContact?.value;
@@ -1209,35 +1063,22 @@ const Index = (props) => {
                         }
 
                         if (columnContactValue && item[columnContactValue]) {
-                            result[dataFieldsContactValue] =
-                                item[columnContactValue];
+                            result[dataFieldsContactValue] = item[columnContactValue];
                         }
-                        if (
-                            dataFields?.label &&
-                            dataFieldsValue &&
-                            item[dataFields.label]
-                        ) {
+                        if (dataFields?.label && dataFieldsValue && item[dataFields.label]) {
                             const fieldKey = dataFieldsValue;
                             const fieldValue = item[dataFields.label];
                             result[fieldKey] = fieldValue;
                         }
 
-                        if (
-                            dataFieldsContact?.label &&
-                            dataFieldsContactValue &&
-                            item[dataFieldsContact.label]
-                        ) {
+                        if (dataFieldsContact?.label && dataFieldsContactValue && item[dataFieldsContact.label]) {
                             const fieldKey = dataFieldsContactValue;
                             const fieldValue = item[dataFieldsContact.label];
                             result[fieldKey] = fieldValue;
                         }
                     }
                     if (Object.keys(result).length > 0) {
-                        result["rowIndex"] = item.rowIndex
-                            ? Number(item.rowIndex) + 1
-                            : item.rowIndex == 0
-                            ? 1
-                            : null;
+                        result["rowIndex"] = item.rowIndex ? Number(item.rowIndex) + 1 : item.rowIndex == 0 ? 1 : null;
                         return result;
                     }
 
@@ -1267,17 +1108,12 @@ const Index = (props) => {
                             item[listDataItem?.dataFields?.label]
                         ) {
                             const fieldKey = listDataItem?.dataFields?.value;
-                            const fieldValue =
-                                item[listDataItem?.dataFields?.label];
+                            const fieldValue = item[listDataItem?.dataFields?.label];
                             result[fieldKey] = fieldValue;
                         }
                     }
                     if (Object.keys(result).length > 0) {
-                        result["rowIndex"] = item.rowIndex
-                            ? Number(item.rowIndex) + 1
-                            : item.rowIndex == 0
-                            ? 1
-                            : null;
+                        result["rowIndex"] = item.rowIndex ? Number(item.rowIndex) + 1 : item.rowIndex == 0 ? 1 : null;
                         return result;
                     }
 
@@ -1351,16 +1187,13 @@ const Index = (props) => {
                         headers: { "Content-Type": "multipart/form-data" },
                         onUploadProgress: (progressEvent) => {
                             const { loaded, total } = progressEvent;
-                            const percentage = Math.floor(
-                                ((loaded / 1000) * 100) / (total / 1000)
-                            );
+                            const percentage = Math.floor(((loaded / 1000) * 100) / (total / 1000));
                             sMultipleProgress(percentage);
                         },
                     },
                     (err, response) => {
                         if (!err) {
-                            var { lang_message, data_fail, fail, success } =
-                                response.data;
+                            var { lang_message, data_fail, fail, success } = response.data;
 
                             sDataFail(data_fail);
                             sTotalFalse(fail);
@@ -1369,16 +1202,12 @@ const Index = (props) => {
                                 if (success == 0) {
                                     Toast.fire({
                                         icon: "success",
-                                        title: `${
-                                            dataLang[lang_message?.success]
-                                        }`,
+                                        title: `${dataLang[lang_message?.success]}`,
                                     });
                                 } else {
                                     Toast.fire({
                                         icon: "success",
-                                        title: `${
-                                            dataLang[lang_message?.success]
-                                        }`,
+                                        title: `${dataLang[lang_message?.success]}`,
                                     });
                                 }
                             }
@@ -1407,23 +1236,14 @@ const Index = (props) => {
 
         if (tabPage == 1) {
             listDataContact.forEach((e, index) => {
-                formData.append(
-                    `setup_colums[dataSub][${index}]`,
-                    JSON.stringify(e)
-                );
+                formData.append(`setup_colums[dataSub][${index}]`, JSON.stringify(e));
             });
             listDataDelivery.forEach((e, index) => {
-                formData.append(
-                    `setup_colums[dataSubDelivery][${index}]`,
-                    JSON.stringify(e)
-                );
+                formData.append(`setup_colums[dataSubDelivery][${index}]`, JSON.stringify(e));
             });
         } else if (tabPage == 2) {
             listDataContact.forEach((e, index) => {
-                formData.append(
-                    `setup_colums[dataSub][${index}]`,
-                    JSON.stringify(e)
-                );
+                formData.append(`setup_colums[dataSub][${index}]`, JSON.stringify(e));
             });
         }
         formData.append(`tab`, tabPage);
@@ -1449,11 +1269,7 @@ const Index = (props) => {
     };
 
     useEffect(() => {
-        tabPage != 5 &&
-            tabPage != 6 &&
-            onSending &&
-            save_template &&
-            _ServerSendingImporTemplate();
+        tabPage != 5 && tabPage != 6 && onSending && save_template && _ServerSendingImporTemplate();
     }, [onSending]);
 
     useEffect(() => {
@@ -1473,18 +1289,14 @@ const Index = (props) => {
             <Head>
                 <title>{dataLang?.import_data || "import_data"}</title>
             </Head>
-            <div className="px-10 xl:pt-24 pt-[88px] pb-10 ">
+            <div className="px-10 xl:pt-24 pt-[88px] pb-10">
                 {trangthaiExprired ? (
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.import_data || "import_data"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.import_data || "import_data"}</h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>
-                            {dataLang?.import_category || "import_category"}
-                        </h6>
+                        <h6>{dataLang?.import_category || "import_category"}</h6>
                     </div>
                 )}
                 {(tabPage != 5 && tabPage != 6 && (
@@ -1500,19 +1312,9 @@ const Index = (props) => {
                     />
                 )) ||
                     (tabPage == 5 && (
-                        <Popup_stages
-                            dataLang={dataLang}
-                            router={router.query?.tab}
-                            data={dataFailStages}
-                        />
+                        <Popup_stages dataLang={dataLang} router={router.query?.tab} data={dataFailStages} />
                     )) ||
-                    (tabPage == 6 && (
-                        <Popup_bom
-                            dataLang={dataLang}
-                            router={router.query?.tab}
-                            data={dataFailBom}
-                        />
-                    ))}
+                    (tabPage == 6 && <Popup_bom dataLang={dataLang} router={router.query?.tab} data={dataFailBom} />)}
                 <div className="">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-3 h-[96%] overflow-hidden">
@@ -1529,10 +1331,7 @@ const Index = (props) => {
                                                 <div>
                                                     <TabClient
                                                         key={e.id}
-                                                        onClick={_HandleSelectTab.bind(
-                                                            this,
-                                                            `${e.id}`
-                                                        )}
+                                                        onClick={_HandleSelectTab.bind(this, `${e.id}`)}
                                                         active={e.id}
                                                         className="text-[#0F4F9E] my-1 bg-[#e2f0fe] hover:bg-blue-400 hover:text-white transition-all ease-linear"
                                                     >
@@ -1545,9 +1344,7 @@ const Index = (props) => {
                                 <div className="col-span-2"></div>
                                 <div className="col-span-2"></div>
                                 <div className="col-span-8 border-b">
-                                    <h2 className="py-2">
-                                        {dataName[tabPage] || ""}
-                                    </h2>
+                                    <h2 className="py-2">{dataName[tabPage] || ""}</h2>
                                 </div>
                                 <div className="col-span-2"></div>
                                 <div className="col-span-2"></div>
@@ -1591,11 +1388,7 @@ const Index = (props) => {
                                         //     </span>
                                         //   </a>
                                         // </React.Fragment>
-                                        <ImportFileTemplate
-                                            dataLang={dataLang}
-                                            tabPage={tabPage}
-                                            ulrExel={ulrExel}
-                                        />
+                                        <ImportFileTemplate dataLang={dataLang} tabPage={tabPage} ulrExel={ulrExel} />
                                     )) ||
                                         (tabPage == 6 && (
                                             <ImportFileTemplate
@@ -1607,24 +1400,14 @@ const Index = (props) => {
                                         (tabPage != 5 && tabPage != 6 && (
                                             <React.Fragment>
                                                 <h5 className="mb-1 block text-sm font-medium text-gray-700">
-                                                    {dataLang?.import_form ||
-                                                        "import_form"}
+                                                    {dataLang?.import_form || "import_form"}
                                                 </h5>
                                                 <Select
                                                     closeMenuOnSelect={true}
-                                                    placeholder={
-                                                        dataLang?.import_form ||
-                                                        "import_form"
-                                                    }
+                                                    placeholder={dataLang?.import_form || "import_form"}
                                                     options={dataSampleImport}
-                                                    isLoading={
-                                                        sampleImport != null
-                                                            ? false
-                                                            : onLoading
-                                                    }
-                                                    formatOptionLabel={(
-                                                        option
-                                                    ) => (
+                                                    isLoading={sampleImport != null ? false : onLoading}
+                                                    formatOptionLabel={(option) => (
                                                         <div className="flex justify-start items-center gap-1 ">
                                                             <h2 className="font-medium">
                                                                 {option?.label}{" "}
@@ -1633,45 +1416,34 @@ const Index = (props) => {
                                                         </div>
                                                     )}
                                                     isSearchable={true}
-                                                    onChange={_HandleChange.bind(
-                                                        this,
-                                                        "sampleImport"
-                                                    )}
+                                                    onChange={_HandleChange.bind(this, "sampleImport")}
                                                     value={sampleImport}
                                                     LoadingIndicator
                                                     noOptionsMessage={() =>
-                                                        dataLang?.import_no_data ||
-                                                        "import_no_data"
+                                                        dataLang?.import_no_data || "import_no_data"
                                                     }
                                                     maxMenuHeight="200px"
                                                     isClearable={true}
-                                                    menuPortalTarget={
-                                                        document.body
-                                                    }
+                                                    menuPortalTarget={document.body}
                                                     onMenuOpen={handleMenuOpen}
                                                     theme={(theme) => ({
                                                         ...theme,
                                                         colors: {
                                                             ...theme.colors,
-                                                            primary25:
-                                                                "#EBF5FF",
-                                                            primary50:
-                                                                "#92BFF7",
+                                                            primary25: "#EBF5FF",
+                                                            primary50: "#92BFF7",
                                                             primary: "#0F4F9E",
                                                         },
                                                     })}
                                                     styles={{
-                                                        placeholder: (
-                                                            base
-                                                        ) => ({
+                                                        placeholder: (base) => ({
                                                             ...base,
                                                             color: "#cbd5e1",
                                                         }),
                                                         menuPortal: (base) => ({
                                                             ...base,
                                                             zIndex: 9999,
-                                                            position:
-                                                                "absolute",
+                                                            position: "absolute",
                                                         }),
                                                     }}
                                                     className="border-transparent text-sm placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border "
@@ -1690,36 +1462,24 @@ const Index = (props) => {
                                 <div className="col-span-2"></div>
                                 <div className="col-span-2"></div>
                                 <div className="col-span-4">
-                                    {tabPage != 5 &&
-                                    tabPage != 6 &&
-                                    valueCheck === "edit" ? (
+                                    {tabPage != 5 && tabPage != 6 && valueCheck === "edit" ? (
                                         <>
                                             <h5 className="mb-1 block text-sm font-medium text-gray-700">
-                                                {dataLang?.import_condition_column ||
-                                                    "import_condition_column"}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {dataLang?.import_condition_column || "import_condition_column"}
+                                                <span className="text-red-500">*</span>
                                             </h5>
                                             <Select
                                                 closeMenuOnSelect={true}
                                                 placeholder={
-                                                    dataLang?.import_condition_column ||
-                                                    "import_condition_column"
+                                                    dataLang?.import_condition_column || "import_condition_column"
                                                 }
                                                 isLoading={onLoading}
                                                 options={dataConditionColumn}
                                                 isSearchable={true}
-                                                onChange={_HandleChange.bind(
-                                                    this,
-                                                    "condition_column"
-                                                )}
+                                                onChange={_HandleChange.bind(this, "condition_column")}
                                                 value={condition_column}
                                                 LoadingIndicator
-                                                noOptionsMessage={() =>
-                                                    dataLang?.import_no_data ||
-                                                    "import_no_data"
-                                                }
+                                                noOptionsMessage={() => dataLang?.import_no_data || "import_no_data"}
                                                 maxMenuHeight="200px"
                                                 isClearable={true}
                                                 menuPortalTarget={document.body}
@@ -1745,9 +1505,7 @@ const Index = (props) => {
                                                     }),
                                                 }}
                                                 className={`${
-                                                    errValueCheck
-                                                        ? "border-red-500"
-                                                        : "border-transparent"
+                                                    errValueCheck ? "border-red-500" : "border-transparent"
                                                 } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                             />
                                             {errValueCheck && (
@@ -1766,31 +1524,19 @@ const Index = (props) => {
                                 <div className="col-span-2"></div>
                                 <div className="col-span-4 ">
                                     <div className="grid-cols-12 grid items-center gap-1">
-                                        <div
-                                            className={`${
-                                                !showDeleteButton
-                                                    ? "col-span-12"
-                                                    : "col-span-11"
-                                            }`}
-                                        >
+                                        <div className={`${!showDeleteButton ? "col-span-12" : "col-span-11"}`}>
                                             <label
                                                 for="importFile"
                                                 className="block text-sm font-medium mb-2 dark:text-white"
                                             >
-                                                {dataLang?.import_file ||
-                                                    "import_file"}{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {dataLang?.import_file || "import_file"}{" "}
+                                                <span className="text-red-500">*</span>
                                             </label>
                                             <label
                                                 for="importFile"
                                                 className={`${
-                                                    (errFileImport &&
-                                                        dataImport.length ==
-                                                            0) ||
-                                                    (errFileImport &&
-                                                        fileImport == null)
+                                                    (errFileImport && dataImport.length == 0) ||
+                                                    (errFileImport && fileImport == null)
                                                         ? "border-red-500"
                                                         : "border-gray-200"
                                                 } " border-gray-200 flex w-full cursor-pointer p-2 appearance-none hover:border-blue-400 items-center justify-center rounded-md border-2 border-dashed  transition-all`}
@@ -1798,38 +1544,27 @@ const Index = (props) => {
                                                 <input
                                                     accept=".xlsx, .xls"
                                                     id="importFile"
-                                                    onChange={_HandleChange.bind(
-                                                        this,
-                                                        "importFile"
-                                                    )}
+                                                    onChange={_HandleChange.bind(this, "importFile")}
                                                     type="file"
                                                     className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-500 file:py-0.5 file:px-5 file:text-[13px] file:font-semibold file:text-white hover:file:bg-primary-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60"
                                                 />
                                             </label>
-                                            {(errFileImport &&
-                                                dataImport.length == 0) ||
-                                                (errFileImport &&
-                                                    fileImport == null && (
-                                                        <label className="text-sm text-red-500">
-                                                            {dataLang?.import_ERR_file ||
-                                                                "import_ERR_file"}
-                                                        </label>
-                                                    ))}
+                                            {(errFileImport && dataImport.length == 0) ||
+                                                (errFileImport && fileImport == null && (
+                                                    <label className="text-sm text-red-500">
+                                                        {dataLang?.import_ERR_file || "import_ERR_file"}
+                                                    </label>
+                                                ))}
                                         </div>
 
                                         <div className="col-span-1  mx-auto">
                                             {showDeleteButton && (
                                                 <button
                                                     type="button"
-                                                    onClick={_HandleDeleteFile.bind(
-                                                        this
-                                                    )}
+                                                    onClick={_HandleDeleteFile.bind(this)}
                                                     className="mt-8 hover:bg-red-200 group animate-bounce  bg-red-100  rounded p-2 gap-1 i cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
                                                 >
-                                                    <IconDelete
-                                                        size={20}
-                                                        color="red"
-                                                    />
+                                                    <IconDelete size={20} color="red" />
                                                 </button>
                                             )}
                                         </div>
@@ -1908,9 +1643,7 @@ const Index = (props) => {
                                         // </div>
                                         <Row
                                             dataLang={dataLang}
-                                            _HandleChange={_HandleChange.bind(
-                                                this
-                                            )}
+                                            _HandleChange={_HandleChange.bind(this)}
                                             errRowStart={errRowStart}
                                             row_tarts={row_tarts}
                                             errEndRow={errEndRow}
@@ -1986,10 +1719,7 @@ const Index = (props) => {
                                             //     </div>
                                             //   </div>
                                             // </React.Fragment>
-                                            <SampleImport
-                                                dataLang={dataLang}
-                                                tabPage={tabPage}
-                                            />
+                                            <SampleImport dataLang={dataLang} tabPage={tabPage} />
                                         ))}
                                 </div>
                                 <div className="col-span-2"></div>
@@ -1998,17 +1728,10 @@ const Index = (props) => {
                                     {tabPage != 5 && tabPage != 6 && (
                                         <ParentControls
                                             listData={listData}
-                                            onLoadingListData={
-                                                onLoadingListData
-                                            }
+                                            onLoadingListData={onLoadingListData}
                                             dataLang={dataLang}
-                                            _HandleAddParent={_HandleAddParent.bind(
-                                                this
-                                            )}
-                                            _HandleDeleteParent={_HandleDeleteParent.bind(
-                                                this,
-                                                "main"
-                                            )}
+                                            _HandleAddParent={_HandleAddParent.bind(this)}
+                                            _HandleDeleteParent={_HandleDeleteParent.bind(this, "main")}
                                             color="bg-pink-600"
                                             colorIcon="red"
                                         />
@@ -2016,13 +1739,9 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-4 -mt-2 relative">
                                     {save_template && onLoadingDataBack && (
-                                        <div
-                                            className={`b  flex items-center justify-center w-full  pt-5`}
-                                        >
+                                        <div className={`b  flex items-center justify-center w-full  pt-5`}>
                                             <button
-                                                onClick={_HandleLoadDataBackup.bind(
-                                                    this
-                                                )}
+                                                onClick={_HandleLoadDataBackup.bind(this)}
                                                 className="i flex justify-center gap-2 bg-green-600 w-full text-center py-2 text-white items-center rounded cursor-pointer hover:scale-[1.02]  overflow-hidden transform  transition duration-300 ease-out"
                                             >
                                                 <RefreshCircle
@@ -2032,58 +1751,38 @@ const Index = (props) => {
                                                     className="bg-gray-50 rounded-full hi "
                                                 />
                                                 <p className="text-sm">
-                                                    {dataLang?.import_updateImport ||
-                                                        "import_updateImport"}
+                                                    {dataLang?.import_updateImport || "import_updateImport"}
                                                 </p>
                                             </button>
                                         </div>
                                     )}
-                                    {(tabPage == 3 || tabPage == 4) &&
-                                        listData.length > 0 && (
-                                            <div
-                                                className={`flex items-center justify-center  gap-2 pt-5 ${
-                                                    save_template &&
-                                                    onLoadingDataBack
-                                                        ? "absolute w-[100%] top-[66%]"
-                                                        : ""
-                                                }`}
-                                            >
-                                                <Stepper
-                                                    stepper={stepper}
-                                                    dataLang={dataLang}
-                                                    label1={
-                                                        dataLang?.import_variation ||
-                                                        "import_variation"
-                                                    }
-                                                    tabPage={tabPage}
-                                                    label2={
-                                                        dataLang?.import_subvariant ||
-                                                        "import_subvariant"
-                                                    }
-                                                />
-                                            </div>
-                                        )}
-                                    {(tabPage == 1 || tabPage == 2) && (
+                                    {(tabPage == 3 || tabPage == 4) && listData.length > 0 && (
                                         <div
                                             className={`flex items-center justify-center  gap-2 pt-5 ${
-                                                save_template &&
-                                                onLoadingDataBack
-                                                    ? "absolute w-[100%] top-[66%]"
-                                                    : ""
+                                                save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
                                             }`}
                                         >
                                             <Stepper
                                                 stepper={stepper}
                                                 dataLang={dataLang}
-                                                label1={
-                                                    dataLang?.import_contactInfo ||
-                                                    "import_contactInfo"
-                                                }
+                                                label1={dataLang?.import_variation || "import_variation"}
                                                 tabPage={tabPage}
-                                                label2={
-                                                    dataLang?.import_deliveryAdress ||
-                                                    "import_deliveryAdress"
-                                                }
+                                                label2={dataLang?.import_subvariant || "import_subvariant"}
+                                            />
+                                        </div>
+                                    )}
+                                    {(tabPage == 1 || tabPage == 2) && (
+                                        <div
+                                            className={`flex items-center justify-center  gap-2 pt-5 ${
+                                                save_template && onLoadingDataBack ? "absolute w-[100%] top-[66%]" : ""
+                                            }`}
+                                        >
+                                            <Stepper
+                                                stepper={stepper}
+                                                dataLang={dataLang}
+                                                label1={dataLang?.import_contactInfo || "import_contactInfo"}
+                                                tabPage={tabPage}
+                                                label2={dataLang?.import_deliveryAdress || "import_deliveryAdress"}
                                             />
                                         </div>
                                     )}
@@ -2091,25 +1790,15 @@ const Index = (props) => {
                                 <div className="col-span-2"></div>
                                 <div className="col-span-2"></div>
                                 <div
-                                    className={`${
-                                        listData?.length > 2 ? "mt-3" : ""
-                                    } ${
-                                        onLoadingListData
-                                            ? "col-span-8"
-                                            : "col-span-6"
+                                    className={`${listData?.length > 2 ? "mt-3" : ""} ${
+                                        onLoadingListData ? "col-span-8" : "col-span-6"
                                     }`}
                                 >
                                     {onLoadingListData ? (
-                                        <Loading
-                                            className="h-2"
-                                            color="#0f4f9e"
-                                        />
+                                        <Loading className="h-2" color="#0f4f9e" />
                                     ) : (
                                         listData?.map((e, index) => (
-                                            <div
-                                                className="grid grid-cols-6 gap-2.5 mb-2"
-                                                key={e?.id}
-                                            >
+                                            <div className="grid grid-cols-6 gap-2.5 mb-2" key={e?.id}>
                                                 <div className="col-span-4">
                                                     <div className="grid-cols-13 grid items-end justify-center gap-2.5">
                                                         <div className="col-span-6">
@@ -2117,84 +1806,52 @@ const Index = (props) => {
                                                                 <h5 className="mb-1 block text-sm font-medium text-gray-700">
                                                                     {dataLang?.import_data_fields ||
                                                                         "import_data_fields"}{" "}
-                                                                    <span className="text-red-500">
-                                                                        *
-                                                                    </span>
+                                                                    <span className="text-red-500">*</span>
                                                                 </h5>
                                                             )}
                                                             <Select
-                                                                closeMenuOnSelect={
-                                                                    true
-                                                                }
+                                                                closeMenuOnSelect={true}
                                                                 placeholder={
-                                                                    dataLang?.import_data_fields ||
-                                                                    "import_data_fields"
+                                                                    dataLang?.import_data_fields || "import_data_fields"
                                                                 }
-                                                                options={
-                                                                    dataClient
-                                                                }
-                                                                isSearchable={
-                                                                    true
-                                                                }
+                                                                options={dataClient}
+                                                                isSearchable={true}
                                                                 onChange={_HandleChangeChild.bind(
                                                                     this,
                                                                     e?.id,
                                                                     "data_fields"
                                                                 )}
-                                                                value={
-                                                                    e?.dataFields
-                                                                }
+                                                                value={e?.dataFields}
                                                                 LoadingIndicator
                                                                 noOptionsMessage={() =>
-                                                                    dataLang?.import_no_data ||
-                                                                    "import_no_data"
+                                                                    dataLang?.import_no_data || "import_no_data"
                                                                 }
                                                                 maxMenuHeight="200px"
-                                                                isClearable={
-                                                                    true
-                                                                }
-                                                                menuPortalTarget={
-                                                                    document.body
-                                                                }
-                                                                onMenuOpen={
-                                                                    handleMenuOpen
-                                                                }
-                                                                theme={(
-                                                                    theme
-                                                                ) => ({
+                                                                isClearable={true}
+                                                                menuPortalTarget={document.body}
+                                                                onMenuOpen={handleMenuOpen}
+                                                                theme={(theme) => ({
                                                                     ...theme,
                                                                     colors: {
                                                                         ...theme.colors,
-                                                                        primary25:
-                                                                            "#EBF5FF",
-                                                                        primary50:
-                                                                            "#92BFF7",
-                                                                        primary:
-                                                                            "#0F4F9E",
+                                                                        primary25: "#EBF5FF",
+                                                                        primary50: "#92BFF7",
+                                                                        primary: "#0F4F9E",
                                                                     },
                                                                 })}
                                                                 styles={{
-                                                                    placeholder:
-                                                                        (
-                                                                            base
-                                                                        ) => ({
-                                                                            ...base,
-                                                                            color: "#cbd5e1",
-                                                                        }),
-                                                                    menuPortal:
-                                                                        (
-                                                                            base
-                                                                        ) => ({
-                                                                            ...base,
-                                                                            zIndex: 9999,
-                                                                            position:
-                                                                                "absolute",
-                                                                        }),
+                                                                    placeholder: (base) => ({
+                                                                        ...base,
+                                                                        color: "#cbd5e1",
+                                                                    }),
+                                                                    menuPortal: (base) => ({
+                                                                        ...base,
+                                                                        zIndex: 9999,
+                                                                        position: "absolute",
+                                                                    }),
                                                                 }}
                                                                 className={`${
-                                                                    errFiles &&
-                                                                    e.dataFields ==
-                                                                        null
+                                                                    errFiles && e.dataFields == null
                                                                         ? "border-red-500"
                                                                         : "border-transparent"
                                                                 }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
@@ -2205,135 +1862,88 @@ const Index = (props) => {
                                                                 <h5 className="mb-1 block text-sm font-medium text-gray-700">
                                                                     {dataLang?.import_data_column ||
                                                                         "import_data_column"}
-                                                                    <span className="text-red-500">
-                                                                        *
-                                                                    </span>
+                                                                    <span className="text-red-500">*</span>
                                                                 </h5>
                                                             )}
                                                             <Select
-                                                                closeMenuOnSelect={
-                                                                    true
-                                                                }
+                                                                closeMenuOnSelect={true}
                                                                 placeholder={
-                                                                    dataLang?.import_data_column ||
-                                                                    "import_data_column"
+                                                                    dataLang?.import_data_column || "import_data_column"
                                                                 }
-                                                                options={
-                                                                    dataColumn
-                                                                }
-                                                                isSearchable={
-                                                                    true
-                                                                }
+                                                                options={dataColumn}
+                                                                isSearchable={true}
                                                                 onChange={_HandleChangeChild.bind(
                                                                     this,
                                                                     e?.id,
                                                                     "column"
                                                                 )}
-                                                                value={
-                                                                    e?.column
-                                                                }
+                                                                value={e?.column}
                                                                 LoadingIndicator
                                                                 noOptionsMessage={() =>
-                                                                    dataLang?.import_no_data ||
-                                                                    "import_no_data"
+                                                                    dataLang?.import_no_data || "import_no_data"
                                                                 }
                                                                 maxMenuHeight="200px"
-                                                                isClearable={
-                                                                    true
-                                                                }
-                                                                menuPortalTarget={
-                                                                    document.body
-                                                                }
-                                                                onMenuOpen={
-                                                                    handleMenuOpen
-                                                                }
-                                                                theme={(
-                                                                    theme
-                                                                ) => ({
+                                                                isClearable={true}
+                                                                menuPortalTarget={document.body}
+                                                                onMenuOpen={handleMenuOpen}
+                                                                theme={(theme) => ({
                                                                     ...theme,
                                                                     colors: {
                                                                         ...theme.colors,
-                                                                        primary25:
-                                                                            "#EBF5FF",
-                                                                        primary50:
-                                                                            "#92BFF7",
-                                                                        primary:
-                                                                            "#0F4F9E",
+                                                                        primary25: "#EBF5FF",
+                                                                        primary50: "#92BFF7",
+                                                                        primary: "#0F4F9E",
                                                                     },
                                                                 })}
                                                                 styles={{
-                                                                    placeholder:
-                                                                        (
-                                                                            base
-                                                                        ) => ({
-                                                                            ...base,
-                                                                            color: "#cbd5e1",
-                                                                        }),
-                                                                    menuPortal:
-                                                                        (
-                                                                            base
-                                                                        ) => ({
-                                                                            ...base,
-                                                                            zIndex: 9999,
-                                                                            position:
-                                                                                "absolute",
-                                                                        }),
+                                                                    placeholder: (base) => ({
+                                                                        ...base,
+                                                                        color: "#cbd5e1",
+                                                                    }),
+                                                                    menuPortal: (base) => ({
+                                                                        ...base,
+                                                                        zIndex: 9999,
+                                                                        position: "absolute",
+                                                                    }),
                                                                 }}
                                                                 className={`${
-                                                                    errColumn &&
-                                                                    e?.column ==
-                                                                        null
+                                                                    errColumn && e?.column == null
                                                                         ? "border-red-500"
                                                                         : "border-transparent"
                                                                 } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                                             />
                                                         </div>
                                                         <div className="col-span-1 mx-auto">
-                                                            <DeleteButton
-                                                                onClick={_HandleDelete.bind(
-                                                                    this,
-                                                                    e?.id
-                                                                )}
-                                                            />
+                                                            <DeleteButton onClick={_HandleDelete.bind(this, e?.id)} />
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div className="col-span-2 ">
                                                     {index == 0 && (
                                                         <h5 className="mb-1 block text-sm font-medium text-gray-700 opacity-0">
-                                                            {dataLang?.import_operation ||
-                                                                "import_operation"}
+                                                            {dataLang?.import_operation || "import_operation"}
                                                         </h5>
                                                     )}
-                                                    {e?.dataFields?.value ==
-                                                        "group_id" ||
-                                                    ((tabPage == 3 ||
-                                                        tabPage == 4) &&
-                                                        e?.dataFields?.value ==
-                                                            "category_id") ||
-                                                    ((tabPage == 3 ||
-                                                        tabPage == 4) &&
-                                                        e?.dataFields?.value ==
-                                                            "unit_id") ||
-                                                    ((tabPage == 3 ||
-                                                        tabPage == 4) &&
-                                                        e?.dataFields?.value ==
-                                                            "unit_convert_id") ? (
+                                                    {e?.dataFields?.value == "group_id" ||
+                                                    ((tabPage == 3 || tabPage == 4) &&
+                                                        e?.dataFields?.value == "category_id") ||
+                                                    ((tabPage == 3 || tabPage == 4) &&
+                                                        e?.dataFields?.value == "unit_id") ||
+                                                    ((tabPage == 3 || tabPage == 4) &&
+                                                        e?.dataFields?.value == "unit_convert_id") ? (
                                                         <div className="flex items-center space-x-2 rounded p-2 ">
                                                             <TiTick color="green" />
                                                             <label
                                                                 for="example11"
                                                                 className="flex w-full space-x-2 text-sm"
                                                             >
-                                                                {dataLang?.import_add ||
-                                                                    "import_add"}
+                                                                {dataLang?.import_add || "import_add"}
                                                             </label>
                                                         </div>
                                                     ) : (
                                                         ""
                                                     )}
-                                                    {e?.dataFields?.value ==
-                                                        "type_products" && (
+                                                    {e?.dataFields?.value == "type_products" && (
                                                         <div
                                                             className={` shadow-2xl rounded-xl  bg-slate-700 relative`}
                                                         >
@@ -2347,8 +1957,7 @@ const Index = (props) => {
 
                                                             <div className="grid grid-cols-2 items-center p-1 gap-2 ">
                                                                 <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white font-medium col-span-2">
-                                                                    {dataLang?.import_ERR_format ||
-                                                                        "import_ERR_format"}
+                                                                    {dataLang?.import_ERR_format || "import_ERR_format"}
                                                                 </h2>
                                                                 <div className="col-span-2">
                                                                     <div className="flex items-center gap-1">
@@ -2361,12 +1970,7 @@ const Index = (props) => {
                                                                             products:
                                                                         </p>
                                                                         <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
-                                                                            {
-                                                                                e
-                                                                                    ?.dataFields
-                                                                                    ?.note
-                                                                                    ?.products
-                                                                            }
+                                                                            {e?.dataFields?.note?.products}
                                                                         </h2>
                                                                     </div>
                                                                     <div className="flex items-center gap-1">
@@ -2379,12 +1983,7 @@ const Index = (props) => {
                                                                             semi_products:
                                                                         </p>
                                                                         <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
-                                                                            {
-                                                                                e
-                                                                                    ?.dataFields
-                                                                                    ?.note
-                                                                                    ?.semi_products
-                                                                            }
+                                                                            {e?.dataFields?.note?.semi_products}
                                                                         </h2>
                                                                     </div>
                                                                     <div className="flex items-center gap-1">
@@ -2397,12 +1996,7 @@ const Index = (props) => {
                                                                             semi_products_outside:
                                                                         </p>
                                                                         <h2 className="3xl:text-[11px] 2xl:text-[9px] xl:text-[8px] lg:text-[7.5px] text-sm text-white">
-                                                                            {
-                                                                                e
-                                                                                    ?.dataFields
-                                                                                    ?.note
-                                                                                    ?.semi_products_outside
-                                                                            }
+                                                                            {e?.dataFields?.note?.semi_products_outside}
                                                                         </h2>
                                                                     </div>
                                                                 </div>
@@ -2422,9 +2016,7 @@ const Index = (props) => {
                                             multipleProgress={multipleProgress}
                                             dataSuccess={dataSuccess}
                                             totalFalse={totalFalse}
-                                            totalSuccessStages={
-                                                totalSuccessStages
-                                            }
+                                            totalSuccessStages={totalSuccessStages}
                                             totalSuccessBom={totalSuccessBom}
                                             dataFailStages={dataFailStages}
                                             dataFailBom={dataFailBom}
@@ -2443,14 +2035,12 @@ const Index = (props) => {
                                         <div className="col-span-8 border-b flex justify-between divide-x ">
                                             {(tabPage == 1 || tabPage == 2) && (
                                                 <h2 className="py-2 w-1/2">
-                                                    {dataLang?.import_contactInfo ||
-                                                        "import_contactInfo"}
+                                                    {dataLang?.import_contactInfo || "import_contactInfo"}
                                                 </h2>
                                             )}
                                             {tabPage == 1 && (
                                                 <h2 className="py-2 w-1/2 text-right">
-                                                    {dataLang?.import_deliveryAdress ||
-                                                        "import_deliveryAdress"}
+                                                    {dataLang?.import_deliveryAdress || "import_deliveryAdress"}
                                                 </h2>
                                             )}
                                         </div>
@@ -2461,17 +2051,10 @@ const Index = (props) => {
                                             {(tabPage == 1 || tabPage == 2) && (
                                                 <ParentControls
                                                     listData={listDataContact}
-                                                    onLoadingListData={
-                                                        onLoadingListData
-                                                    }
+                                                    onLoadingListData={onLoadingListData}
                                                     dataLang={dataLang}
-                                                    _HandleAddParent={_HandleAddContact.bind(
-                                                        this
-                                                    )}
-                                                    _HandleDeleteParent={_HandleDeleteParent.bind(
-                                                        this,
-                                                        "contact"
-                                                    )}
+                                                    _HandleAddParent={_HandleAddContact.bind(this)}
+                                                    _HandleDeleteParent={_HandleDeleteParent.bind(this, "contact")}
                                                     color="bg-green-600"
                                                     colorIcon="green"
                                                 />
@@ -2481,17 +2064,10 @@ const Index = (props) => {
                                             {tabPage == 1 && (
                                                 <ParentControls
                                                     listData={listDataDelivery}
-                                                    onLoadingListData={
-                                                        onLoadingListData
-                                                    }
+                                                    onLoadingListData={onLoadingListData}
                                                     dataLang={dataLang}
-                                                    _HandleAddParent={_HandleAddDelivery.bind(
-                                                        this
-                                                    )}
-                                                    _HandleDeleteParent={_HandleDeleteParent.bind(
-                                                        this,
-                                                        "delivery"
-                                                    )}
+                                                    _HandleAddParent={_HandleAddDelivery.bind(this)}
+                                                    _HandleDeleteParent={_HandleDeleteParent.bind(this, "delivery")}
                                                     color="bg-orange-600"
                                                     colorIcon="red"
                                                 />
@@ -2502,56 +2078,30 @@ const Index = (props) => {
                                         <div className="col-span-2"></div>
                                         {tabPage == 1 && (
                                             <FormClient
-                                                onLoadingListData={
-                                                    onLoadingListData
-                                                }
+                                                onLoadingListData={onLoadingListData}
                                                 dataContact={dataContact}
                                                 dataDelivery={dataDelivery}
                                                 dataColumn={dataColumn}
-                                                listDataContact={
-                                                    listDataContact
-                                                }
-                                                listDataDelivery={
-                                                    listDataDelivery
-                                                }
+                                                listDataContact={listDataContact}
+                                                listDataDelivery={listDataDelivery}
                                                 dataLang={dataLang}
-                                                handleMenuOpen={handleMenuOpen.bind(
-                                                    this
-                                                )}
-                                                _HandleChangeChildContact={_HandleChangeChildContact.bind(
-                                                    this
-                                                )}
-                                                _HandleChangeChildDelivery={_HandleChangeChildDelivery.bind(
-                                                    this
-                                                )}
-                                                _HandleDeleteContact={_HandleDeleteContact.bind(
-                                                    this
-                                                )}
-                                                _HandleDeleteDelivery={_HandleDeleteDelivery.bind(
-                                                    this
-                                                )}
+                                                handleMenuOpen={handleMenuOpen.bind(this)}
+                                                _HandleChangeChildContact={_HandleChangeChildContact.bind(this)}
+                                                _HandleChangeChildDelivery={_HandleChangeChildDelivery.bind(this)}
+                                                _HandleDeleteContact={_HandleDeleteContact.bind(this)}
+                                                _HandleDeleteDelivery={_HandleDeleteDelivery.bind(this)}
                                             />
                                         )}
                                         {tabPage == 2 && (
                                             <FormSupplier
-                                                onLoadingListData={
-                                                    onLoadingListData
-                                                }
+                                                onLoadingListData={onLoadingListData}
                                                 dataContact={dataContact}
                                                 dataColumn={dataColumn}
-                                                listDataContact={
-                                                    listDataContact
-                                                }
+                                                listDataContact={listDataContact}
                                                 dataLang={dataLang}
-                                                handleMenuOpen={handleMenuOpen.bind(
-                                                    this
-                                                )}
-                                                _HandleChangeChildContact={_HandleChangeChildContact.bind(
-                                                    this
-                                                )}
-                                                _HandleDeleteContact={_HandleDeleteContact.bind(
-                                                    this
-                                                )}
+                                                handleMenuOpen={handleMenuOpen.bind(this)}
+                                                _HandleChangeChildContact={_HandleChangeChildContact.bind(this)}
+                                                _HandleDeleteContact={_HandleDeleteContact.bind(this)}
                                             />
                                         )}
                                         <div className="col-span-2"></div>
@@ -2563,22 +2113,15 @@ const Index = (props) => {
                                         <div className="flex items-center  space-x-2 rounded p-2 hover:bg-gray-200 bg-gray-100 cursor-pointer btn-animation hover:scale-[1.02]">
                                             <input
                                                 type="checkbox"
-                                                onChange={_HandleChange.bind(
-                                                    this,
-                                                    "save_template"
-                                                )}
+                                                onChange={_HandleChange.bind(this, "save_template")}
                                                 checked={save_template}
                                                 value={save_template}
                                                 id="example12"
                                                 name="checkGroup1"
                                                 className="h-4 w-4 rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 focus:ring-offset-0 disabled:cursor-not-allowed disabled:text-gray-400"
                                             />
-                                            <label
-                                                htmlFor="example12"
-                                                className=" space-x-2 text-sm cursor-pointer"
-                                            >
-                                                {dataLang?.import_save_template ||
-                                                    "import_save_template"}
+                                            <label htmlFor="example12" className=" space-x-2 text-sm cursor-pointer">
+                                                {dataLang?.import_save_template || "import_save_template"}
                                             </label>
                                         </div>
                                     ) : (
