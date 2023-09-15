@@ -115,7 +115,7 @@ const Index = () => {
             iconSub: (
                 <div
                     className="absolute top-[105%] 
-                3xl:-left-[33.5%] 3xl:w-[108px] 3xl:h-[147px]
+                3xl:-left-[40.5%] 3xl:w-[120px] 3xl:h-[147px]
                 xxl:-left-[76.5%]  xxl:w-[100px]
                 2xl:-left-[58.5%]  2xl:w-[100px]  2xl:h-[135px]
                 xl:-left-[45.5%]  xl:w-[60px]  xl:h-[135px]
@@ -157,7 +157,7 @@ const Index = () => {
             icon: (
                 <div
                     className="absolute top-1/2 left-[105%] 3xl:w-[248px] xxl:w-[232px] 2xl:w-[235px] 3xl:h-[301px] xxl:h-[246px] 2xl:h-[270px]
-                xl:w-[291px] xl:h-[242px] lg:w-[235px] lg:h-[190px]
+                xl:w-[291px] xl:h-[242px] lg:w-[239px] lg:h-[190px]
                 "
                 >
                     <Image
@@ -310,7 +310,7 @@ const Index = () => {
                                                 <h2 className="ml-2 text-[#6A6A6A] font-normal text-base">Phân hệ</h2>
                                                 <h1 className="ml-2 font-medium text-xl">Kế hoạch</h1>
                                             </div>
-                                            <div className="3xl:w-[255px] xxl:w-[173px] 2xl:w-[184px] xl:w-[132px] lg:w-[87px]"></div>
+                                            <div className="3xl:w-[254px] xxl:w-[173px] 2xl:w-[184px] xl:w-[132px] lg:w-[87px]"></div>
                                             <div className="flex items-center gap-1">
                                                 <div
                                                     className=" z-10 bg-orange-200 rounded-full text-black flex items-center justify-center 
@@ -324,7 +324,7 @@ const Index = () => {
                                                 </div>
                                                 <div
                                                     className="
-                                                    3xl:w-[125px] 
+                                                    3xl:w-[118px] 
                                                     xxl:w-[52px] 
                                                     2xl:w-[64px]
                                                     xl:w-[40px]
@@ -362,7 +362,7 @@ const Index = () => {
                                         </div>
                                         <div
                                             className="col-span-12 flex items-center justify-center 
-                                            3xl:ml-32  
+                                            3xl:ml-[110px]  
                                             xxl:ml-[94px] 
                                             2xl:ml-[77px]
                                             xl:ml-[45px]
@@ -542,7 +542,7 @@ const Index = () => {
                                                         xxl:left-[41%]  xxl:w-[200px]   xxl:h-[140px]
                                                         2xl:left-[75%] 2xl:w-[200px]   2xl:h-[140px]
                                                         xl:left-[43%] xl:w-[200px]   xl:h-[140px]
-                                                        lg:left-[43%] lg:w-[150px]   lg:h-[125px]
+                                                        lg:left-[47%] lg:w-[150px]   lg:h-[125px]
                                                         "
                                                     >
                                                         <Image
@@ -607,7 +607,7 @@ const Index = () => {
                             </div>
                             <div className="grid grid-cols-13 3xl:gap-14   xxl:gap-14 2xl:gap-14  xl:gap-14 lg:gap-9">
                                 <div className="bg-[#F0FFF0] w-full rounded-2xl col-span-7 h-fit">
-                                    <div className="p-6 3xl:pb-[60px] xxl:pb-[25px] 2xl:pb-[60px] xl:pb-[25px] lg:pb-[30px]">
+                                    <div className="p-6 3xl:pb-[60px] xxl:pb-[25px] 2xl:pb-[60px] xl:pb-[25px] lg:pb-[45px]">
                                         <div className="grid grid-cols-12">
                                             <div className="col-span-12 grid grid-cols-9">
                                                 <div className="border-l-[6px] border-[#0BAA2E] col-span-6 h-fit">
@@ -827,7 +827,7 @@ const Index = () => {
                                                                     xxl:w-[767px]  xxl:h-[50px]
                                                                     2xl:w-[820px] 2xl:h-[90px]
                                                                     xl:w-[710px] xl:h-[50px]
-                                                                    lg:w-[570px] lg:h-[50px]
+                                                                    lg:w-[576px] lg:h-[50px]
 
                                                                     "
                                                                     >
@@ -954,7 +954,7 @@ const Index = () => {
                                                     xxl:w-[110px] xxl:h-[45px] 
                                                     2xl:w-[110px] 2xl:h-[60px]
                                                     xl:w-[100px] xl:h-[50px]
-                                                    lg:w-[90px] lg:h-[40px]
+                                                    lg:w-[75px] lg:h-[40px]
                                                     "
                                                 >
                                                     <div
@@ -974,25 +974,26 @@ const Index = () => {
                                                         xxl:left-[40%] xxl:w-[50px] xxl:h-[45px]
                                                         2xl:left-[40%] 2xl:w-[70px] 2xl:h-[35px]
                                                         xl:left-[40%] xl:w-[45px] xl:h-[35px]
-                                                        lg:left-[40%] lg:w-[40px] lg:h-[25px]
+                                                        lg:left-[20%] lg:w-[23px] lg:h-[37px]
                                                         "
                                                     >
                                                         <Image
                                                             src={"/procesOvevew/manufacture/Connectorline3.png"}
                                                             width={1920}
                                                             height={1280}
-                                                            className="w-full h-full object-contain"
+                                                            className="w-full h-full 3xl:object-contain xxl:object-contain 2xl:object-contain xl:object-contain "
                                                         />
                                                     </div>
                                                 </div>
                                                 <div
                                                     className="
-                                                    3xl:ml-[150px] 
+                                                    3xl:ml-[150px]
                                                     xxl:ml-[100px] 
                                                     2xl:ml-[130px] 
                                                     xl:ml-[90px] 
-                                                    lg:ml-[80px] 
-                                                    flex items-center gap-1 3xl:mt-0 xxl:mt-2 2xl:mt-0"
+                                                    lg:ml-[40px] 
+                                                
+                                                    flex items-center gap-1 3xl:mt-0 xxl:mt-2 2xl:mt-0 xl:mt-1 lg:mt-3"
                                                 >
                                                     <div
                                                         className=" bg-white relative  rounded-lg border border-[#8590A2] inline-block 
@@ -1009,7 +1010,7 @@ const Index = () => {
                                                             xxl:text-[12px] 
                                                             2xl:text-[13px] 
                                                             xl:text-[11px] 
-                                                            lg:text-[10px]
+                                                            lg:text-[9.5px]
                                                             text-center w-full h-full flex items-center justify-center px-2.5"
                                                         >
                                                             {"Theo dõi tiến độ sản xuất"}
@@ -1069,7 +1070,9 @@ const Index = () => {
                                 3xl:pb-[50px] 
                                 xxl:pb-[25px]
                                 2xl:pb-[50px]
-                                xl:pb-[30px]"
+                                xl:pb-[30px]
+                                lg:pb-[35px]
+                                "
                             >
                                 <div className="border-l-[6px] border-[#EE1EC0]">
                                     <h2 className="ml-2 text-[#6A6A6A] font-normal text-base">Phân hệ</h2>
@@ -1178,7 +1181,7 @@ const Index = () => {
                                             xxl:top-[42%] xxl:translate-x-[25%] xxl:w-[66px] xxl:h-[69px]
                                             2xl:top-[42%] 2xl:translate-x-[35%] 2xl:w-[76px] 2xl:h-[89px]
                                             xl:top-[42%] xl:translate-x-[35%] xl:w-[76px] xl:h-[70px]
-                                            lg:top-[42%] lg:translate-x-[12%] lg:w-[55px] lg:h-[70px]
+                                            lg:top-[42%] lg:translate-x-[26%] lg:w-[55px] lg:h-[70px]
                                         "
                                         >
                                             <Image
@@ -1230,8 +1233,8 @@ const Index = () => {
                                             3xl:-translate-x-[28%] 3xl:translate-y-[10%] 3xl:w-[290px] 3xl:h-[49px]
                                             xxl:-translate-x-[0%] xxl:translate-y-[5%] xxl:w-[200px] xxl:h-[39px]
                                             2xl:-translate-x-[5%] 2xl:translate-y-[5%] 2xl:w-[200px] 2xl:h-[40px]
-                                            xl:-translate-x-[-2%] xl:translate-y-[5%] xl:w-[180px] xl:h-[45px]
-                                            lg:-translate-x-[10%] lg:translate-y-[4%] lg:w-[150px] lg:h-[30px]
+                                            xl:-translate-x-[-2%] xl:translate-y-[5%] xl:w-[180px] xl:h-[50px]
+                                            lg:-translate-x-[10%] lg:translate-y-[4%] lg:w-[150px] lg:h-[37px]
                                             "
                                         >
                                             <Image
@@ -1242,7 +1245,16 @@ const Index = () => {
                                             />
                                         </div>
                                     </div>
-                                    <div className="absolute left-full translate-x-[40%] top-1/4">
+                                    <div
+                                        className="absolute left-full 
+                                        3xl:translate-x-[40%] 3xl:top-1/4
+                                        xxl:translate-x-[40%] xxl:top-1/4
+                                        2xl:translate-x-[40%] 2xl:top-1/4
+                                        xl:translate-x-[40%] xl:top-1/4
+                                        lg:translate-x-[50%] lg:top-[20%]
+
+                                        "
+                                    >
                                         <div className="relative">
                                             <div
                                                 className="text-white bg-blue-500 rounded-lg border border-blude-600 inline-block 
