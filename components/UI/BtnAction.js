@@ -10,6 +10,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import FilePDF from "./FilePDF";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { BiEdit } from "react-icons/bi";
+import ToatstNotifi from "./alerNotification/alerNotification";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const Toast = Swal.mixin({
@@ -130,7 +131,35 @@ const BtnAction = React.memo((props) => {
             }
         }
         if (props?.id && props?.type === "deliveryReceipt") {
-            alert("hí");
+            Swal.fire({
+                title: `${props.dataLang?.aler_ask}`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#296dc1",
+                cancelButtonColor: "#d33",
+                confirmButtonText: `${props.dataLang?.aler_yes}`,
+                cancelButtonText: `${props.dataLang?.aler_cancel}`,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Axios(
+                        "DELETE",
+                        `/api_web/api_delivery/delete/${props?.id}?csrf_protection=true`,
+                        {},
+                        (err, response) => {
+                            if (!err) {
+                                var { isSuccess, message } = response.data;
+                                if (isSuccess) {
+                                    ToatstNotifi("success", props.dataLang[message] || message);
+                                    props.onRefresh && props.onRefresh();
+                                    props.onRefreshGroup && props.onRefreshGroup();
+                                } else {
+                                    ToatstNotifi("error", props.dataLang[message] || message);
+                                }
+                            }
+                        }
+                    );
+                }
+            });
         }
     };
 

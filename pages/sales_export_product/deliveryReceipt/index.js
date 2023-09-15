@@ -1,4 +1,3 @@
-import vi from "date-fns/locale/vi";
 import React, { useState } from "react";
 import Select from "react-select";
 import BtnAction from "../../../components/UI/BtnAction";
@@ -8,12 +7,10 @@ import Loading from "components/UI/loading";
 import Swal from "sweetalert2";
 import ReactExport from "react-data-export";
 import Head from "next/head";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import moment from "moment/moment";
 import Datepicker from "react-tailwindcss-datepicker";
 import { useRouter } from "next/router";
-import { registerLocale } from "react-datepicker";
 import { _ServerInstance as Axios } from "/services/axios";
 import { useEffect } from "react";
 import { debounce } from "lodash";
@@ -26,24 +23,13 @@ import ImageErrors from "components/UI/imageErrors";
 import PopupDetail from "./(popupDetail)/PopupDetail";
 import ToatstNotifi from "components/UI/alerNotification/alerNotification";
 import PopupDetailProduct from "../salesOrder/(PopupDetail)/PopupDetailProduct";
-import { name } from "dayjs/locale/vi";
-registerLocale("vi", vi);
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
-
 const Index = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const [dataExcel, sDataExcel] = useState([]);
     const [onFetching, sOnFetching] = useState(false);
@@ -80,7 +66,6 @@ const Index = (props) => {
 
     const _ServerFetching = () => {
         const tabPage = router.query?.tab;
-        setLoading(true);
         Axios(
             "GET",
             `/api_web/api_delivery/getDeliveries?csrf_protection=true`,
@@ -100,7 +85,6 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     var { rResult, output, rTotal } = response.data.data;
-                    setLoading(false);
                     setData(rResult);
                     sTotalItems(output);
                     sDataExcel(rResult);
@@ -193,12 +177,31 @@ const Index = (props) => {
     };
 
     useEffect(() => {
+        onFetching_filter && _ServerFetching_filter();
+    }, [onFetching_filter]);
+
+    useEffect(() => {
         (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
     }, [onFetching]);
 
-    useEffect(() => {
-        onFetching_filter && _ServerFetching_filter();
-    }, [onFetching_filter]);
+    // useEffect(() => {
+    //     (router.query.tab && sOnFetching(true)) ||
+    //         (keySearch && sOnFetching(true)) ||
+    //         (router.query?.tab && sOnFetching_filter(true)) ||
+    //         (idBranch != null && sOnFetching(true)) ||
+    //         (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
+    //         (idCustomer != null && sOnFetching(true)) ||
+    //         (idDelivery != null && sOnFetching(true));
+    // }, [
+    //     limit,
+    //     router.query?.page,
+    //     router.query?.tab,
+    //     idBranch,
+    //     valueDate.endDate,
+    //     valueDate.startDate,
+    //     idCustomer,
+    //     idDelivery,
+    // ]);
 
     useEffect(() => {
         (router.query.tab && sOnFetching(true)) || (router.query?.tab && sOnFetching_filter(true));
@@ -447,6 +450,19 @@ const Index = (props) => {
             }
         );
     };
+    const useTest = (url) => {
+        const [data, sData] = useState([]);
+        useEffect(() => {
+            Axios("GET", `${url}`, {}, (err, response) => {
+                if (!err) {
+                    sData(response.data);
+                }
+            });
+        }, [url]);
+        return data;
+    };
+    const { rResult } = useTest(`/api_web/Api_Branch/branch/?csrf_protection=true`);
+    console.log("rResult", rResult);
 
     useEffect(() => {
         onSending && _ServerSending();
@@ -829,7 +845,7 @@ const Index = (props) => {
                                                 {dataLang?.price_quote_operations || "price_quote_operations"}
                                             </h4>
                                         </div>
-                                        {loading ? (
+                                        {onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <>
@@ -967,7 +983,7 @@ const Index = (props) => {
                                                                             e?.warehouseman_id == "0"
                                                                                 ? "text-[#6366f1]"
                                                                                 : "text-lime-500"
-                                                                        }  3xl:text-[14px] 2xl:text-[10px] xl:text-[10px] text-[8px] font-medium cursor-pointer`}
+                                                                        }  3xl:text-[12px] 2xl:text-[10px] xl:text-[10px] text-[8px] font-medium cursor-pointer`}
                                                                     >
                                                                         {e?.warehouseman_id == "0"
                                                                             ? "Chưa duyệt kho"
@@ -989,6 +1005,7 @@ const Index = (props) => {
                                                             <div className="col-span-1 flex justify-center">
                                                                 <BtnAction
                                                                     onRefresh={_ServerFetching.bind(this)}
+                                                                    onRefreshGroup={_ServerFetching_group.bind(this)}
                                                                     dataLang={dataLang}
                                                                     status={e?.status}
                                                                     id={e?.id}
@@ -1026,7 +1043,7 @@ const Index = (props) => {
                             </div>
                             <div className="col-span-2 text-right justify-end pr-4 flex gap-2 flex-wrap ">
                                 <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-1">
-                                    {formatNumber(total?.total_amount)}
+                                    {formatNumber(total?.grand_total)}
                                 </h3>
                             </div>
                             <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">

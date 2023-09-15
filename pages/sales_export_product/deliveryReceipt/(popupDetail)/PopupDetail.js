@@ -25,7 +25,6 @@ const PopupDetail = (props) => {
     const _ToggleModal = (e) => sOpen(e);
     const [data, setData] = useState();
     const [onFetching, sOnFetching] = useState(false);
-    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         props?.id && sOnFetching(true);
@@ -37,26 +36,20 @@ const PopupDetail = (props) => {
         return parseFloat(roundedNum).toLocaleString("en");
     };
 
-    const handleFetchingDetailQuote = async () => {
-        setLoading(true);
-        await Axios(
-            "GET",
-            `/api_web/Api_sale_order/saleOrder/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (response && response?.data) {
-                    var db = response?.data;
+    const handleFetchingDetail = async () => {
+        await Axios("GET", `/api_web/Api_delivery/get/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+            if (response && response?.data) {
+                var db = response?.data;
 
-                    setData(db);
-                    sOnFetching(false);
-                    setLoading(false);
-                }
+                setData(db);
+                sOnFetching(false);
+                setLoading(false);
             }
-        );
+        });
     };
 
     useEffect(() => {
-        onFetching && handleFetchingDetailQuote();
+        onFetching && handleFetchingDetail();
     }, [open]);
 
     const scrollableDiv = document.querySelector(".customsroll");
@@ -106,7 +99,7 @@ const PopupDetail = (props) => {
                                         {"Số giao hàng"}:
                                     </h3>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]  font-medium col-span-2 ml-3 text-[#0F4F9E]">
-                                        {data?.code}
+                                        {data?.reference_no}
                                     </h3>
                                 </div>
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
@@ -114,7 +107,7 @@ const PopupDetail = (props) => {
                                         {"Địa chỉ giao"}:
                                     </h3>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-medium col-span-4 ml-3">
-                                        {"Hà nội"}
+                                        {data?.address_delivery}
                                     </h3>
                                 </div>
                             </div>
@@ -124,7 +117,7 @@ const PopupDetail = (props) => {
                                         {"Số đơn hàng"}:
                                     </h3>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-medium col-span-4 text-[#0BAA2E]">
-                                        {data?.quote_code}
+                                        {data?.reference_order?.reference_order}
                                     </h3>
                                 </div>
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
@@ -132,7 +125,7 @@ const PopupDetail = (props) => {
                                         {props.dataLang?.price_quote_customer || "price_quote_customer"}:
                                     </h3>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-medium col-span-4">
-                                        {data?.client_name}
+                                        {data?.customer_name}
                                     </h3>
                                 </div>
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
@@ -155,7 +148,7 @@ const PopupDetail = (props) => {
                                 </div>
 
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
-                                    <h3 className=" text-[13px] col-span-2">
+                                    <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
                                         {props.dataLang?.import_from_browse || "import_from_browse"}:
                                     </h3>
                                     <div className="flex flex-wrap gap-2 items-center">
@@ -216,7 +209,7 @@ const PopupDetail = (props) => {
                                     {props.dataLang?.price_quote_note_item || "price_quote_note_item"}
                                 </h4>
                             </div>
-                            {loading ? (
+                            {onFetching ? (
                                 <Loading className="max-h-40" color="#0f4f9e" />
                             ) : data?.items?.length > 0 ? (
                                 <>
@@ -252,7 +245,7 @@ const PopupDetail = (props) => {
                                                                 )}
                                                             </div>
                                                             <div className="flex flex-col">
-                                                                <h2 className="text-sm">{e?.item?.name}</h2>
+                                                                <h2 className="text-sm">{e?.item_name}</h2>
                                                                 <h3 className="italic text-xs">
                                                                     {e?.item?.product_variation}
                                                                 </h3>
