@@ -607,7 +607,7 @@ const Index = () => {
                             </div>
                             <div className="grid grid-cols-13 3xl:gap-14   xxl:gap-14 2xl:gap-14  xl:gap-14 lg:gap-9">
                                 <div className="bg-[#F0FFF0] w-full rounded-2xl col-span-7 h-fit">
-                                    <div className="p-6 3xl:pb-[60px] xxl:pb-[25px] 2xl:pb-[60px] xl:pb-[25px] lg:pb-[45px]">
+                                    <div className="p-6 3xl:pb-[60px] xxl:pb-[25px] 2xl:pb-[70px] xl:pb-[25px] lg:pb-[45px]">
                                         <div className="grid grid-cols-12">
                                             <div className="col-span-12 grid grid-cols-9">
                                                 <div className="border-l-[6px] border-[#0BAA2E] col-span-6 h-fit">
@@ -850,7 +850,7 @@ const Index = () => {
                                     </div>
                                 </div>
                                 <div className="bg-[#FFF5F5] w-full rounded-2xl col-span-6 h-fit">
-                                    <div className="p-6 3xl:pb-[50px] xxl:pb-[35px] 2xl:pb-[50px] xl:pb-[30px] lg:pb-[40px]">
+                                    <div className="p-6 3xl:pb-[50px] xxl:pb-[35px] 2xl:pb-[60px] xl:pb-[30px] lg:pb-[40px]">
                                         <div className="grid grid-cols-12 w-full items-center gap-2">
                                             <div className="col-span-12">
                                                 <div className="border-l-[6px] border-[#EE1E1E]">
