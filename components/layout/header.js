@@ -116,16 +116,12 @@ const Header = () => {
                             name: "Đơn hàng bán",
                             link: "/sales_export_product/salesOrder",
                         },
-                        {
-                            name: "Trả lại hàng bán",
-                            link: "/sales_export_product/returnSales",
-                        },
                     ],
                 },
             ],
         },
         {
-            title: "Giao hàng",
+            title: "Giao hàng & Trả hàng",
             sub: [
                 {
                     // title: "Phiếu giao hàng",
@@ -134,6 +130,10 @@ const Header = () => {
                         {
                             name: "Phiếu giao hàng",
                             link: "/sales_export_product/deliveryReceipt",
+                        },
+                        {
+                            name: "Trả lại hàng bán",
+                            link: "/sales_export_product/returnSales",
                         },
                     ],
                 },

@@ -44,21 +44,14 @@ const Index = () => {
 
                             <div className="flex items-center -space-x-5">
                                 <div className="h-0.5 bg-[#3276FA] 2xl:w-20 xl:w-12 lg:w-10" />
-                                <IconRight
-                                    size="32"
-                                    className="text-[#3276FA]"
-                                />
+                                <IconRight size="32" className="text-[#3276FA]" />
                             </div>
 
                             {/* <div className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px]  xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] flex space-x-3 border-none bg-[#E2F0FE] rounded-md  items-center justify-center relative"> */}
                             <div className="flex space-x-3 border-none  items-center justify-center relative">
                                 <button
                                     type="button"
-                                    onClick={() =>
-                                        router.push(
-                                            "/purchase_order/purchases?tab="
-                                        )
-                                    }
+                                    onClick={() => router.push("/purchase_order/purchases?tab=")}
                                     className="3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-6 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
                                 >
                                     Yêu cầu mua hàng{" "}
@@ -78,11 +71,11 @@ const Index = () => {
                                 </div>
 
                                 {/* <div className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[175%] 2xl:top-[165%] 2xl:left-[-7%] xl:top-[175%] xl:-left-[9%] lg:top-[160%] lg:-left-[11%] flex border rounded-md items-center justify-center absolute"> */}
-                                <div className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[175%] 2xl:top-[165%] 2xl:left-[-7%] xl:top-[175%] xl:-left-[9%] lg:top-[160%] lg:-left-[11%] flex border rounded-md items-center justify-center absolute">
+                                <div className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[175%] 2xl:top-[165%] 2xl:left-[-7%] xl:top-[175%] xl:-left-[9%] lg:top-[160%] lg:-left-[11%] flex  rounded-md items-center justify-center absolute">
                                     <button
                                         type="button"
                                         onClick={() => router.push("")}
-                                        className="3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-6 rounded py-9  hover:scale-[1.03] transition-all ease-in-out"
+                                        className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] text-sm   p-1 text-center px-6 rounded py-9  hover:scale-[1.03] transition-all ease-in-out border"
                                     >
                                         Sản xuất
                                     </button>
@@ -91,22 +84,14 @@ const Index = () => {
 
                             <div className="flex items-center -space-x-5">
                                 <div className="h-0.5 bg-[#3276FA] 3xl:w-20 2xl:w-20 xl:w-12 lg:w-10" />
-                                <IconRight
-                                    size="32"
-                                    color="#3276FA"
-                                    variant="Outline"
-                                />
+                                <IconRight size="32" color="#3276FA" variant="Outline" />
                             </div>
 
                             {/* <div className="flex space-x-3 border-none bg-[#E2F0FE] rounded-md 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[150px] lg:h-[70px] lg:w-[130px] items-center justify-center relative"> */}
                             <div className="flex space-x-3items-center justify-center relative">
                                 <button
                                     type="button"
-                                    onClick={() =>
-                                        router.push(
-                                            "/purchase_order/order?tab=all"
-                                        )
-                                    }
+                                    onClick={() => router.push("/purchase_order/order?tab=all")}
                                     // className=" font-medium 2xl:max-w-[180px] xl:max-w-[140px] lg:max-w-[130px] p-1 text-center"
                                     className="3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-3 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
                                 >
@@ -139,9 +124,7 @@ const Index = () => {
                                         blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                     />
                                     <span className="transform 3xl:translate-x-[-60%] 3xl:translate-y-[-60%] 2xl:translate-x-[-65%] xl:translate-x-[-65%] lg:translate-x-[-65%] lg:translate-y-[-60%] absolute select-none pointer-events-none font-bold 2xl:top-[30%] xl:top-[32%] lg:top-[30%] left-[52%] 3xl:text-[10px] 2xl:text-[9px] xl:text-[8px] lg:text-[7px] 3xl:p-4 2xl:p-3 xl:p-2 lg:p-1">
-                                        <span className="uppercase">
-                                            Đơn đặt hàng
-                                        </span>
+                                        <span className="uppercase">Đơn đặt hàng</span>
                                         <Image
                                             alt=""
                                             src="/process_products/Frame.png"
@@ -159,21 +142,13 @@ const Index = () => {
 
                             <div className="flex items-center -space-x-5">
                                 <div className="h-0.5 bg-[#3276FA] 2xl:w-20 xl:w-12 lg:w-10" />
-                                <IconRight
-                                    size="32"
-                                    color="#3276FA"
-                                    variant="Outline"
-                                />
+                                <IconRight size="32" color="#3276FA" variant="Outline" />
                             </div>
 
                             {/* <div className="flex space-x-3 border-none bg-[#E2F0FE] rounded-md 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[130px] items-center justify-center relative"> */}
                             <div className="flex space-x-3items-center justify-center relative">
                                 <button
-                                    onClick={() =>
-                                        router.push(
-                                            "/purchase_order/import?tab=all"
-                                        )
-                                    }
+                                    onClick={() => router.push("/purchase_order/import?tab=all")}
                                     className=" 3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-14 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
                                 >
                                     Nhập kho
@@ -203,13 +178,11 @@ const Index = () => {
                                 </div>
 
                                 {/* <div className="3xl:h-[96px] group 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[160%] 3xl:left-[75%] 2xl:top-[120%] 2xl:left-[78%] xl:top-[140%] xl:left-[70%] lg:top-[160%] lg:left-[70%] flex border rounded-md items-center justify-center absolute"> */}
-                                <div className="3xl:h-[96px] group 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[160%] 3xl:left-[75%] 2xl:top-[120%] 2xl:left-[78%] xl:top-[140%] xl:left-[70%] lg:top-[160%] lg:left-[70%] flex border rounded-md items-center justify-center absolute">
+                                <div className="3xl:h-[96px] group 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[160%] 3xl:left-[75%] 2xl:top-[120%] 2xl:left-[78%] xl:top-[140%] xl:left-[70%] lg:top-[160%] lg:left-[70%] flex  rounded-md items-center justify-center absolute">
                                     <button
                                         type="button"
-                                        onClick={() =>
-                                            router.push("/warehouses/warehouse")
-                                        }
-                                        className=" 3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-14 rounded py-9  hover:scale-[1.03] transition-all ease-in-out"
+                                        onClick={() => router.push("/warehouses/warehouse")}
+                                        className=" 3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-14 rounded py-9 border  hover:scale-[1.03] transition-all ease-in-out"
                                     >
                                         Kho hàng
                                     </button>
@@ -218,17 +191,19 @@ const Index = () => {
 
                             <div className="flex items-center -space-x-5 ">
                                 <div className="h-0.5 bg-[#3276FA] 2xl:w-20 xl:w-12 lg:w-10" />
-                                <IconRight
-                                    size="32"
-                                    color="#3276FA"
-                                    variant="Outline"
-                                />
+                                <IconRight size="32" color="#3276FA" variant="Outline" />
                             </div>
-
-                            <div className="flex space-x-3 border-none bg-[#E2F0FE] rounded-md 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[130px]  items-center justify-center relative">
-                                <h5 className="2xl:max-w-[180px] xl:max-w-[130px] lg:max-w-[130px] p-1 text-center">
+                            <div className="flex space-x-3 items-center justify-center relative">
+                                {/* <div className="flex space-x-3 border-none bg-[#E2F0FE] rounded-md 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[70px] xl:w-[140px] lg:h-[70px] lg:w-[130px]  items-center justify-center relative"> */}
+                                {/* <h5 className="2xl:max-w-[180px] xl:max-w-[130px] lg:max-w-[130px] p-1 text-center">
                                     Công nợ
-                                </h5>
+                                </h5> */}
+                                <button
+                                    onClick={() => router.push("/accountant/debt_suppliers?tab=all")}
+                                    className=" 3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-14 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
+                                >
+                                    Công nợ
+                                </button>
                                 <h5 className="xl:h-4 xl:w-4 lg:h-3 lg:w-3 xl:text-sm lg:text-[10px] xl:top-[8%] lg:top-[6%] 2xl:-left-[2%] xl:-left-[6%] lg:-left-[6%] rounded-full flex flex-col justify-center items-center bg-[#3276FA] absolute text-white ">
                                     4
                                 </h5>
@@ -246,11 +221,7 @@ const Index = () => {
                                 {/* <div className="flex border rounded-md 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[72px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[320%] 3xl:-left-[85%] 2xl:top-[280%] 2xl:-left-[90%] xl:top-[310%] xl:-left-[84%] lg:top-[330%] lg:-left-[83%]  items-center justify-center absolute  bg-[#FDE7AE]"> */}
                                 <div className="flex  3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[72px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[320%] 3xl:-left-[85%] 2xl:top-[280%] 2xl:-left-[90%] xl:top-[310%] xl:-left-[84%] lg:top-[330%] lg:-left-[83%]  items-center justify-center absolute  ">
                                     <button
-                                        onClick={() =>
-                                            router.push(
-                                                "/purchase_order/returns"
-                                            )
-                                        }
+                                        onClick={() => router.push("/purchase_order/returns")}
                                         className="3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-11 rounded py-9  hover:scale-[1.03] transition-all ease-in-out bg-[#FDE7AE]"
                                     >
                                         Trả lại hàng
@@ -271,11 +242,7 @@ const Index = () => {
                             </div>
                             <div className="flex items-center -space-x-5">
                                 <div className="h-0.5 bg-[#3276FA] 2xl:w-20 xl:w-12 lg:w-10" />
-                                <IconRight
-                                    size="32"
-                                    color="#3276FA"
-                                    variant="Outline"
-                                />
+                                <IconRight size="32" color="#3276FA" variant="Outline" />
                             </div>
 
                             <div className="3xl:h-24 3xl:w-24 2xl:h-20 2xl:w-20 xl:h-20 xl:w-20 lg:h-16 lg:w-16 rounded-full flex flex-col justify-center items-center bg-[#3276FA] text-white">
