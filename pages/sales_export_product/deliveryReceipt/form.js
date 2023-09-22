@@ -133,18 +133,6 @@ const Index = (props) => {
     };
 
     useEffect(() => {
-        // router.query && sErrDate(false);
-        // router.query && sErrClient(false);
-        // router.query && sErrAddress(false);
-        // router.query && sErrProductOrder(false);
-        // router.query && sErrSurvive(false);
-        // router.query && sErrSurvivePrice(false);
-        // router.query && sErrPrice(false);
-        // router.query && sErrStaff(false);
-        // router.query && sErrQuantity(false);
-        // router.query && sErrBranch(false);
-        // router.query && sStartDate(new Date());
-        // router.query && sNote("");
         router.query && resetAllStates();
     }, [router.query]);
 
@@ -766,9 +754,24 @@ const Index = (props) => {
                                 `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(quantityAmount)} số lượng chưa giao`,
                                 3000
                             );
+                        } else if (+ce.quantity > +ce?.warehouse?.qty) {
+                            ToatstNotifi(
+                                "error",
+                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                    +ce?.warehouse?.qty
+                                )} số lượng tồn kho`,
+                                3000
+                            );
+                        } else if (+ce.quantity > quantityAmount) {
+                            ToatstNotifi(
+                                "error",
+                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(quantityAmount)} số lượng chưa giao`,
+                                3000
+                            );
                         } else {
                             ce.quantity = Number(ce?.quantity) + 1;
                         }
+                        FunCheckQuantity(parentId, childId);
                         break;
 
                     case "decrease":
