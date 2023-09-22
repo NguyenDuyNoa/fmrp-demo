@@ -472,6 +472,9 @@ const Index = (props) => {
                 checkListData(value, sDataItems, sListData, sIdClient, idClient, sIdProductOrder);
             } else {
                 sIdClient(value);
+                sIdProductOrder(null);
+                sIdContactPerson(null);
+                sDataContactPerson([]);
                 if (value == null) {
                     sDataProductOrder([]);
                 }
@@ -506,6 +509,10 @@ const Index = (props) => {
                 checkListData(value, sDataItems, sListData, sIdBranch, idBranch);
             } else {
                 sIdBranch(value);
+                sIdClient(null);
+                sIdProductOrder(null);
+                sIdContactPerson(null);
+                sIdStaff(null);
                 if (value == null) {
                     sDataClient([]);
                 }
