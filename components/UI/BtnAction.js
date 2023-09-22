@@ -193,7 +193,14 @@ const BtnAction = React.memo((props) => {
             }
         }
         if (props?.id && props?.type === "deliveryReceipt") {
-            alert("Đang !!");
+            if (props?.warehouseman_id != "0") {
+                Toast.fire({
+                    icon: "error",
+                    title: `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`,
+                });
+            } else {
+                router.push(`/sales_export_product/deliveryReceipt/form?id=${props.id}`);
+            }
         }
     };
 
@@ -234,6 +241,23 @@ const BtnAction = React.memo((props) => {
                 await Axios(
                     "GET",
                     `/api_web/Api_sale_order/saleOrder/${props?.id}?csrf_protection=true`,
+                    {},
+                    (err, response) => {
+                        if (response && response.data) {
+                            let db = response.data;
+                            setData(db);
+                        }
+                    }
+                );
+            } catch (err) {
+                console.log(err);
+            }
+        }
+        if (props?.id && props?.type === "deliveryReceipt") {
+            try {
+                await Axios(
+                    "GET",
+                    `/api_web/Api_delivery/get/${props?.id}?csrf_protection=true`,
                     {},
                     (err, response) => {
                         if (response && response.data) {

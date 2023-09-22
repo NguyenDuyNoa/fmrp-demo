@@ -14,11 +14,7 @@ import "../styles/globals.scss";
 
 import Swal from "sweetalert2";
 import Popup from "reactjs-popup";
-import {
-    More as IconMore,
-    Eye as IconEye,
-    EyeSlash as IconEyeSlash,
-} from "iconsax-react";
+import { More as IconMore, Eye as IconEye, EyeSlash as IconEyeSlash } from "iconsax-react";
 import { Lexend_Deca } from "@next/font/google";
 import { useRouter } from "next/router";
 import PopupModelTime from "../components/UI/modelTime";
@@ -65,17 +61,12 @@ function MainPage({ Component, pageProps }) {
     }, []);
 
     const _ServerLang = async () => {
-        await Axios(
-            "GET",
-            `/api_web/Api_Lang/language/${langDefault}`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    sData(response.data);
-                    sChangeLang(false);
-                }
+        await Axios("GET", `/api_web/Api_Lang/language/${langDefault}`, {}, (err, response) => {
+            if (!err) {
+                sData(response.data);
+                sChangeLang(false);
             }
-        );
+        });
     };
 
     useEffect(() => {
@@ -92,24 +83,19 @@ function MainPage({ Component, pageProps }) {
     const [onChecking, sOnChecking] = useState(false);
 
     const ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_Authentication/authentication?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (err) {
-                    dispatch({ type: "auth/update", payload: false });
+        Axios("GET", "/api_web/Api_Authentication/authentication?csrf_protection=true", {}, (err, response) => {
+            if (err) {
+                dispatch({ type: "auth/update", payload: false });
+            } else {
+                var { isSuccess, info } = response.data;
+                if (isSuccess) {
+                    dispatch({ type: "auth/update", payload: info });
                 } else {
-                    var { isSuccess, info } = response.data;
-                    if (isSuccess) {
-                        dispatch({ type: "auth/update", payload: info });
-                    } else {
-                        dispatch({ type: "auth/update", payload: false });
-                    }
+                    dispatch({ type: "auth/update", payload: false });
                 }
-                sOnChecking(false);
             }
-        );
+            sOnChecking(false);
+        });
     };
 
     useEffect(() => {
@@ -159,22 +145,12 @@ const LoginPage = React.memo((props) => {
     const _TogglePassword = () => sTypePassword(!typePassword);
 
     const [rememberMe, sRememberMe] = useState(
-        localStorage?.getItem("remembermeFMRP")
-            ? localStorage?.getItem("remembermeFMRP")
-            : false
+        localStorage?.getItem("remembermeFMRP") ? localStorage?.getItem("remembermeFMRP") : false
     );
     const _ToggleRememberMe = () => sRememberMe(!rememberMe);
 
-    const [code, sCode] = useState(
-        localStorage?.getItem("usercodeFMRP")
-            ? localStorage?.getItem("usercodeFMRP")
-            : ""
-    );
-    const [name, sName] = useState(
-        localStorage?.getItem("usernameFMRP")
-            ? localStorage?.getItem("usernameFMRP")
-            : ""
-    );
+    const [code, sCode] = useState(localStorage?.getItem("usercodeFMRP") ? localStorage?.getItem("usercodeFMRP") : "");
+    const [name, sName] = useState(localStorage?.getItem("usernameFMRP") ? localStorage?.getItem("usernameFMRP") : "");
     const [password, sPassword] = useState("");
     const [onSending, sOnSending] = useState(false);
 
@@ -207,8 +183,7 @@ const LoginPage = React.memo((props) => {
             },
             (err, response) => {
                 if (response !== null) {
-                    var { isSuccess, message, token, database_app } =
-                        response.data;
+                    var { isSuccess, message, token, database_app } = response.data;
                     if (isSuccess) {
                         dispatch({
                             type: "auth/update",
@@ -268,18 +243,13 @@ const LoginPage = React.memo((props) => {
     };
 
     const _ServerFetching_Majior = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_Login/get_list_data?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var result = response.data;
-                    sListMajor(result?.career);
-                    sListPosition(result?.role_user);
-                }
+        Axios("GET", "/api_web/Api_Login/get_list_data?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var result = response.data;
+                sListMajor(result?.career);
+                sListPosition(result?.role_user);
             }
-        );
+        });
         sOnFechingRegister(false);
     };
     useEffect(() => {
@@ -379,37 +349,28 @@ const LoginPage = React.memo((props) => {
                                     <div className="bg-white px-16 pt-20 pb-12 xxl:pb-10 xxl:pt-4 2xl:pb-15 2xl:pt-10 xl:pb-8 lg:pt-2 xl:pt-4 rounded-lg space-y-10 w-[600px]">
                                         <div className="space-y-3">
                                             <h1 className="text-[#11315B] font-medium text-3xl text-center">
-                                                {dataLang?.auth_login ||
-                                                    "auth_login"}
+                                                {dataLang?.auth_login || "auth_login"}
                                             </h1>
                                             <div className="flex space-x-5 w-full">
                                                 <button
-                                                    onClick={_HandleSelectTab.bind(
-                                                        this,
-                                                        0
-                                                    )}
+                                                    onClick={_HandleSelectTab.bind(this, 0)}
                                                     className={`${
                                                         tab === 0
                                                             ? "bg-[#E2F0FE] border-transparent text-[#11315B]"
                                                             : "bg-white border-[#cccccc]"
                                                     } px-5 py-3 rounded-md transition hover:scale-105 border w-full`}
                                                 >
-                                                    {dataLang?.auth_version_official ||
-                                                        "auth_version_official"}
+                                                    {dataLang?.auth_version_official || "auth_version_official"}
                                                 </button>
                                                 <button
-                                                    onClick={_HandleSelectTab.bind(
-                                                        this,
-                                                        1
-                                                    )}
+                                                    onClick={_HandleSelectTab.bind(this, 1)}
                                                     className={`${
                                                         tab === 1
                                                             ? "bg-[#E2F0FE] border-transparent text-[#11315B]"
                                                             : "bg-white border-[#cccccc]"
                                                     } px-5 py-3 rounded-md transition hover:scale-105 border w-full`}
                                                 >
-                                                    {dataLang?.auth_version_test ||
-                                                        "auth_version_test"}
+                                                    {dataLang?.auth_version_test || "auth_version_test"}
                                                 </button>
                                             </div>
                                         </div>
@@ -418,56 +379,31 @@ const LoginPage = React.memo((props) => {
                                                 type="text"
                                                 placeholder="Mã công ty"
                                                 value={code}
-                                                onChange={_HandleInputChange.bind(
-                                                    this,
-                                                    "code"
-                                                )}
+                                                onChange={_HandleInputChange.bind(this, "code")}
                                                 className="border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full"
                                             />
                                             <input
                                                 type="text"
-                                                placeholder={
-                                                    dataLang?.auth_user_name ||
-                                                    "auth_user_name"
-                                                }
+                                                placeholder={dataLang?.auth_user_name || "auth_user_name"}
                                                 value={name}
                                                 id="username"
-                                                onChange={_HandleInputChange.bind(
-                                                    this,
-                                                    "name"
-                                                )}
+                                                onChange={_HandleInputChange.bind(this, "name")}
                                                 className="border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 px-5 py-3 rounded-md w-full"
                                             />
                                             <div className="relative flex flex-col justify-center">
                                                 <input
-                                                    type={
-                                                        typePassword
-                                                            ? "text"
-                                                            : "password"
-                                                    }
-                                                    placeholder={
-                                                        dataLang?.auth_password ||
-                                                        "auth_password"
-                                                    }
+                                                    type={typePassword ? "text" : "password"}
+                                                    placeholder={dataLang?.auth_password || "auth_password"}
                                                     value={password}
                                                     id="userpwd"
-                                                    onChange={_HandleInputChange.bind(
-                                                        this,
-                                                        "password"
-                                                    )}
+                                                    onChange={_HandleInputChange.bind(this, "password")}
                                                     className="border outline-none border-[#cccccc] focus:border-[#0F4F9E] hover:border-[#0F4F9E]/60 py-3 pl-5 pr-12 rounded-md w-full"
                                                 />
                                                 <button
-                                                    onClick={_TogglePassword.bind(
-                                                        this
-                                                    )}
+                                                    onClick={_TogglePassword.bind(this)}
                                                     className="absolute right-3"
                                                 >
-                                                    {typePassword ? (
-                                                        <IconEyeSlash />
-                                                    ) : (
-                                                        <IconEye />
-                                                    )}
+                                                    {typePassword ? <IconEyeSlash /> : <IconEye />}
                                                 </button>
                                             </div>
                                             <div className="flex w-full justify-between">
@@ -476,23 +412,15 @@ const LoginPage = React.memo((props) => {
                                                         type="checkbox"
                                                         id="rememberMe"
                                                         value={rememberMe}
-                                                        checked={
-                                                            rememberMe
-                                                                ? true
-                                                                : false
-                                                        }
-                                                        onChange={_ToggleRememberMe.bind(
-                                                            this
-                                                        )}
+                                                        checked={rememberMe ? true : false}
+                                                        onChange={_ToggleRememberMe.bind(this)}
                                                     />
                                                     <label htmlFor="rememberMe">
-                                                        {dataLang?.auth_remember_login ||
-                                                            "auth_remember_login"}
+                                                        {dataLang?.auth_remember_login || "auth_remember_login"}
                                                     </label>
                                                 </div>
                                                 <button className="text-[#3276FA] text-sm">
-                                                    {dataLang?.auth_forgot_password ||
-                                                        "auth_forgot_password"}
+                                                    {dataLang?.auth_forgot_password || "auth_forgot_password"}
                                                 </button>
                                             </div>
                                         </div>
@@ -500,18 +428,12 @@ const LoginPage = React.memo((props) => {
                                             onClick={_HandleSubmit.bind(this)}
                                             className="text-[#FFFFFF] font-normal text-lg py-3 w-full rounded-md bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] btn-animation hover:scale-105"
                                         >
-                                            {dataLang?.auth_login ||
-                                                "auth_login"}
+                                            {dataLang?.auth_login || "auth_login"}
                                         </button>
                                         <div className="flex justify-center space-x-2">
-                                            <span className="font-[300] ">
-                                                Bạn chưa có tài khoản?
-                                            </span>
+                                            <span className="font-[300] ">Bạn chưa có tài khoản?</span>
                                             <button
-                                                onClick={_HandleIsLogin.bind(
-                                                    this,
-                                                    false
-                                                )}
+                                                onClick={_HandleIsLogin.bind(this, false)}
                                                 className="text-[#5599EC]"
                                             >
                                                 Đăng ký ngay
@@ -522,22 +444,13 @@ const LoginPage = React.memo((props) => {
                                         </h4>
                                     </div>
                                     <div className="flex items-center space-x-6 justify-center">
-                                        <a
-                                            href="#"
-                                            className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm"
-                                        >
+                                        <a href="#" className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm">
                                             Cổng dịch vụ khách hàng
                                         </a>
-                                        <a
-                                            href="#"
-                                            className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm"
-                                        >
+                                        <a href="#" className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm">
                                             User Pay
                                         </a>
-                                        <a
-                                            href="#"
-                                            className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm"
-                                        >
+                                        <a href="#" className="text-[#344054] hover:text-[#0F4F9E] font-light text-sm">
                                             FMRP Website
                                         </a>
                                         <Popup
@@ -555,12 +468,10 @@ const LoginPage = React.memo((props) => {
                                             <div className="w-auto">
                                                 <div className="bg-white p-0.5 rounded-t w-60">
                                                     <button className="text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5">
-                                                        Tạo phím tắt trên màn
-                                                        hình
+                                                        Tạo phím tắt trên màn hình
                                                     </button>
                                                     <button className="text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5">
-                                                        Yêu cầu Tư vấn qua điện
-                                                        thoại
+                                                        Yêu cầu Tư vấn qua điện thoại
                                                     </button>
                                                     <button className="text-sm text-[#667085] hover:text-black font-semibold hover:bg-slate-100 text-left w-full px-5 rounded py-2.5">
                                                         Tối ưu hóa trình duyệt
@@ -598,27 +509,19 @@ const LoginPage = React.memo((props) => {
                                         />
                                     </div>
                                     <div className="space-y-6">
-                                        <h1 className="text-[#344054] font-medium text-xl">
-                                            Trợ lý sản xuất
-                                        </h1>
+                                        <h1 className="text-[#344054] font-medium text-xl">Trợ lý sản xuất</h1>
                                         <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
                                             <p className="text-[#667085] font-light text-[16px]">
-                                                Giải pháp phần mềm cho doanh
-                                                nghiệp
+                                                Giải pháp phần mềm cho doanh nghiệp
                                             </p>
                                             <p className="text-[#667085] font-light text-[16px]">
                                                 Hotline:
-                                                <span className="text-[#0F4F9E] font-normal ml-1">
-                                                    0901.13.6968
-                                                </span>
+                                                <span className="text-[#0F4F9E] font-normal ml-1">0901.13.6968</span>
                                             </p>
                                             <p className="text-[#667085] font-light text-[16px]">
                                                 Tổng đài:
-                                                <span className="text-[#0F4F9E] font-normal mx-1">
-                                                    028.7776.8880
-                                                </span>
-                                                (Phím 1 - BP. Tư Vấn - Phím 2 -
-                                                BP. Kỹ Thuật)
+                                                <span className="text-[#0F4F9E] font-normal mx-1">028.7776.8880</span>
+                                                (Phím 1 - BP. Tư Vấn - Phím 2 - BP. Kỹ Thuật)
                                             </p>
                                         </div>
                                     </div>
@@ -687,12 +590,8 @@ const LoginPage = React.memo((props) => {
                                     placeholder="blur"
                                     blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                 />
-                                <h2 className="text-white text-2xl font-[600] mt-8">
-                                    Đăng ký tài khoản FMRP
-                                </h2>
-                                <h6 className="text-white mt-3">
-                                    Hỗ trợ đăng ký: 01821 92 2312
-                                </h6>
+                                <h2 className="text-white text-2xl font-[600] mt-8">Đăng ký tài khoản FMRP</h2>
+                                <h6 className="text-white mt-3">Hỗ trợ đăng ký: 01821 92 2312</h6>
                             </div>
                         </div>
                         <div className="col-span-3 bg-white h-full flex flex-col items-center xxl:mt-0 2xl:mt-1 mt-1 3xl:p-0 2xl:p-0 p-0">
@@ -710,9 +609,7 @@ const LoginPage = React.memo((props) => {
                                     <div className="w-full h-1.5 rounded-full bg-[#F3F4F6] relative overflow-hidden">
                                         <div
                                             className={`${
-                                                stepRegister == 0
-                                                    ? "w-0"
-                                                    : "w-full"
+                                                stepRegister == 0 ? "w-0" : "w-full"
                                             } duration-300 bg-[#3276FA] transition-[width] h-full absolute`}
                                         />
                                     </div>
@@ -739,9 +636,7 @@ const LoginPage = React.memo((props) => {
                                                         // })}
                                                         {...register(`major`)}
                                                         onChange={(e) => {
-                                                            sCheckMajior(
-                                                                e.target.checked
-                                                            );
+                                                            sCheckMajior(e.target.checked);
                                                         }}
                                                         value={e?.id}
                                                         // name="major register"
@@ -768,9 +663,7 @@ const LoginPage = React.memo((props) => {
                                         <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
                                             <label className="2xl:text-base text-sm">
                                                 Họ và tên của bạn
-                                                <span className="text-red-500 p-1">
-                                                    *
-                                                </span>
+                                                <span className="text-red-500 p-1">*</span>
                                             </label>
                                             <input
                                                 type="text"
@@ -794,9 +687,7 @@ const LoginPage = React.memo((props) => {
                                         <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
                                             <label className="2xl:text-base text-sm">
                                                 Tên công ty
-                                                <span className="text-red-500 p-1">
-                                                    *
-                                                </span>
+                                                <span className="text-red-500 p-1">*</span>
                                             </label>
                                             <input
                                                 type="text"
@@ -821,9 +712,7 @@ const LoginPage = React.memo((props) => {
                                             <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
                                                 <label className="2xl:text-base text-sm">
                                                     Email của bạn
-                                                    <span className="text-red-500 p-1">
-                                                        *
-                                                    </span>
+                                                    <span className="text-red-500 p-1">*</span>
                                                 </label>
                                                 <input
                                                     type="email"
@@ -832,8 +721,7 @@ const LoginPage = React.memo((props) => {
                                                         required: true,
                                                         pattern: {
                                                             value: /\S+@\S+\.\S+/,
-                                                            message:
-                                                                "Nhập đúng định dạng email",
+                                                            message: "Nhập đúng định dạng email",
                                                         },
                                                     })}
                                                     placeholder="Nhập Email của bạn"
@@ -844,21 +732,15 @@ const LoginPage = React.memo((props) => {
                                                     } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
                                                 {errors.email && (
-                                                    <span
-                                                        className="text-red-500 text-[13px]"
-                                                        role="alert"
-                                                    >
-                                                        {errors.email.message ||
-                                                            "Vui lòng nhập email"}
+                                                    <span className="text-red-500 text-[13px]" role="alert">
+                                                        {errors.email.message || "Vui lòng nhập email"}
                                                     </span>
                                                 )}
                                             </div>
                                             <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
                                                 <label className="2xl:text-base text-sm">
                                                     Số điện thoại
-                                                    <span className="text-red-500 p-1">
-                                                        *
-                                                    </span>
+                                                    <span className="text-red-500 p-1">*</span>
                                                 </label>
                                                 <input
                                                     type="text"
@@ -875,33 +757,20 @@ const LoginPage = React.memo((props) => {
                                                             : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
                                                     } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
-                                                {errors.phone &&
-                                                    errors.phone.type ===
-                                                        "required" && (
-                                                        <span className="text-red-500 text-[13px]">
-                                                            Vui lòng nhập số
-                                                            điện thoại
-                                                        </span>
-                                                    )}
-                                                {errors.phone &&
-                                                    errors.phone.type ===
-                                                        "maxLength" && (
-                                                        <span className="text-red-500 text-[13px]">
-                                                            Tối đa 16 số
-                                                        </span>
-                                                    )}
-                                                {errors.phone &&
-                                                    errors.phone.type ===
-                                                        "minLength" && (
-                                                        <span className="text-red-500 text-[13px]">
-                                                            Tối thiểu 10 số
-                                                        </span>
-                                                    )}
+                                                {errors.phone && errors.phone.type === "required" && (
+                                                    <span className="text-red-500 text-[13px]">
+                                                        Vui lòng nhập số điện thoại
+                                                    </span>
+                                                )}
+                                                {errors.phone && errors.phone.type === "maxLength" && (
+                                                    <span className="text-red-500 text-[13px]">Tối đa 16 số</span>
+                                                )}
+                                                {errors.phone && errors.phone.type === "minLength" && (
+                                                    <span className="text-red-500 text-[13px]">Tối thiểu 10 số</span>
+                                                )}
                                             </div>
                                             <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
-                                                <label className="2xl:text-base text-sm">
-                                                    Tỉnh / Thành phố
-                                                </label>
+                                                <label className="2xl:text-base text-sm">Tỉnh / Thành phố</label>
                                                 <input
                                                     type="text"
                                                     name="city"
@@ -913,9 +782,7 @@ const LoginPage = React.memo((props) => {
                                             <div className="3xl:space-y-1 xxl:space-y-1 2xl:space-y-0 space-y-1">
                                                 <label className="2xl:text-base text-sm placeholder:text-[13px]">
                                                     Mật khẩu
-                                                    <span className="text-red-500 p-1">
-                                                        *
-                                                    </span>
+                                                    <span className="text-red-500 p-1">*</span>
                                                 </label>
                                                 <input
                                                     type="password"
@@ -931,29 +798,20 @@ const LoginPage = React.memo((props) => {
                                                             : "border-[#D0D5DD] border focus:border-[#3276FA] placeholder:text-[13px]"
                                                     } w-full   3xl:p-3 xxl:p-1.5 2xl:p-2 xl:p-2 lg:p-1 p-3 outline-none  rounded`}
                                                 />
-                                                {errors.password &&
-                                                    errors.password.type ===
-                                                        "required" && (
-                                                        <span className="text-red-500 text-[13px]">
-                                                            Vui lòng nhập mật
-                                                            khẩu
-                                                        </span>
-                                                    )}
-                                                {errors.password &&
-                                                    errors.password.type ===
-                                                        "minLength" && (
-                                                        <span className="text-red-500 text-[13px]">
-                                                            Tối thiểu 10 ký tự
-                                                        </span>
-                                                    )}
+                                                {errors.password && errors.password.type === "required" && (
+                                                    <span className="text-red-500 text-[13px]">
+                                                        Vui lòng nhập mật khẩu
+                                                    </span>
+                                                )}
+                                                {errors.password && errors.password.type === "minLength" && (
+                                                    <span className="text-red-500 text-[13px]">Tối thiểu 10 ký tự</span>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="space-y-1.5">
                                             <label className="2xl:text-base text-sm">
                                                 Vị trí công việc
-                                                <span className="text-red-500 p-1">
-                                                    *
-                                                </span>
+                                                <span className="text-red-500 p-1">*</span>
                                             </label>
                                             <div className="flex flex-wrap">
                                                 {listPosition.map((e) => (
@@ -964,12 +822,9 @@ const LoginPage = React.memo((props) => {
                                                         <input
                                                             id={`posiiton ${e?.id}`}
                                                             type="radio"
-                                                            {...register(
-                                                                "location",
-                                                                {
-                                                                    required: true,
-                                                                }
-                                                            )}
+                                                            {...register("location", {
+                                                                required: true,
+                                                            })}
                                                             value={e?.id}
                                                             name="location"
                                                             className="accent-[#1847ED] 2xl:scale-110"
@@ -977,9 +832,7 @@ const LoginPage = React.memo((props) => {
                                                         <label
                                                             htmlFor={`posiiton ${e?.id}`}
                                                             className={`${
-                                                                errors.location
-                                                                    ? "text-[#52575E]"
-                                                                    : "text-[#52575E]"
+                                                                errors.location ? "text-[#52575E]" : "text-[#52575E]"
                                                             }  2xl:text-base text-sm cursor-pointer`}
                                                         >
                                                             {e?.title}
@@ -988,8 +841,7 @@ const LoginPage = React.memo((props) => {
                                                 ))}
                                                 {errors.location && (
                                                     <span className="text-red-500 text-[13px]">
-                                                        Vui lòng chọn vị trí
-                                                        công việc
+                                                        Vui lòng chọn vị trí công việc
                                                     </span>
                                                 )}
                                             </div>
@@ -1009,23 +861,15 @@ const LoginPage = React.memo((props) => {
                                 {stepRegister == 0 ? (
                                     <>
                                         <button
-                                            onClick={_HandleSelectStep.bind(
-                                                this,
-                                                1
-                                            )}
+                                            onClick={_HandleSelectStep.bind(this, 1)}
                                             className="hover:bg-blue-600 transition-all duration-200 ease-linear w-full py-4 text-center rounded bg bg-[#0F4F9E] text-white 3xl:mt-5 xl:mt-2 2xl:mt-2 mt-5"
                                         >
                                             Tiếp theo
                                         </button>
                                         <div className="flex justify-center space-x-2 3xl:mt-5 xxl:mt-1 mt-1 2xl:mt-5">
-                                            <span className="font-[300] ">
-                                                Bạn đã có tài khoản?
-                                            </span>
+                                            <span className="font-[300] ">Bạn đã có tài khoản?</span>
                                             <button
-                                                onClick={_HandleIsLogin.bind(
-                                                    this,
-                                                    true
-                                                )}
+                                                onClick={_HandleIsLogin.bind(this, true)}
                                                 className="text-[#5599EC]"
                                             >
                                                 Đăng nhập ngay
@@ -1039,9 +883,7 @@ const LoginPage = React.memo((props) => {
                                             onClick={handleSubmit(onSubmit)}
                                             disabled={loadingRegester}
                                             className={`${
-                                                loadingRegester
-                                                    ? "relative"
-                                                    : ""
+                                                loadingRegester ? "relative" : ""
                                             } w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded hover:bg-blue-600 transition-all duration-200 ease-linear bg bg-[#0F4F9E] text-white 3xl:mt-5 xxl:mt-1  2xl:mt-2 mt-1`}
                                         >
                                             {loadingRegester ? (
@@ -1063,10 +905,7 @@ const LoginPage = React.memo((props) => {
                                                                 fill="currentFill"
                                                             />
                                                         </svg>
-                                                        <h2>
-                                                            Đang khởi tạo dữ
-                                                            liệu ...
-                                                        </h2>
+                                                        <h2>Đang khởi tạo dữ liệu ...</h2>
                                                     </div>
                                                 </div>
                                             ) : (
@@ -1074,10 +913,7 @@ const LoginPage = React.memo((props) => {
                                             )}
                                         </button>
                                         <button
-                                            onClick={_HandleSelectStep.bind(
-                                                this,
-                                                0
-                                            )}
+                                            onClick={_HandleSelectStep.bind(this, 0)}
                                             className="w-full 3xl:py-4 xxl:p-2 2xl:py-2 xl:p-2 lg:p-1 py-3 text-center rounded bg bg-white text-[#667085] mt-3 border border-[#D0D5DD]"
                                         >
                                             Quay lại

@@ -15,11 +15,6 @@ import FormClientEndSuplier from "./(client)/client";
 import ClientEndSuplier from "./(client)/client";
 import ClientSuplier from "./(client)/client";
 import Client from "./(client)/client";
-import TitleHeader from "./(children)/titleHeader/titleHeader";
-import ToatstNotifi from "components/UI/alerNotification/alerNotification";
-import Supplier from "./(supplier)/supplier";
-import Materials from "./(materials)/materials";
-import Products from "./(products)/products";
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -43,16 +38,11 @@ const Index = (props) => {
 
     const [dataColumn, sDataColumn] = useState([]);
 
-    const [arrEmty, sArrEmty] = useState({
+    const [clientAffter, sClientAffter] = useState({
         clients: [],
         contacts: [],
         address: [],
-        suppliers: [],
-        materials: [],
-        products: [],
     });
-
-    const [dataColumnNew, sDataColumnNew] = useState([]);
 
     const [dataConditionColumn, sDataConditionColumn] = useState([
         { label: "hi1", value: 1 },
@@ -107,10 +97,6 @@ const Index = (props) => {
         });
     }, []);
 
-    useEffect(() => {
-        sDataColumnNew(dataColumn);
-    }, [dataColumn]);
-
     const _FetchDataColumn = () => {
         const apiDataComlumn = {
             1: "/api_web/Api_import_data/get_field_client?csrf_protection=true",
@@ -123,8 +109,11 @@ const Index = (props) => {
         Axios("GET", `${apiUrlComLumn}`, {}, (err, response) => {
             if (!err) {
                 var db = response.data;
-
-                sDataColumn((tabPage == 3 && { materials: db }) || (tabPage == 4 && { products: db }) || db);
+                // const dataConcat = (arrays) => {
+                //     return arrays.flat();
+                // };
+                // const resultArray = dataConcat([db.clients, db.address, db.contacts]);
+                sDataColumn(db);
             }
         });
         sOnFetching(false);
@@ -148,65 +137,6 @@ const Index = (props) => {
             sSampleImport(value);
         }
     };
-
-    const HandlePushItem = (value, type, dataEmty, sDataEmty) => {
-        const obDataAffter = dataEmty[type].find((item) => item.value === value);
-
-        if (!obDataAffter) {
-            const newData = dataColumnNew[type].filter((e) => value === e.value);
-            sDataEmty((preve) => ({ ...preve, [type]: [...dataEmty[type], ...newData] }));
-            sDataColumnNew((preve) => ({
-                ...preve,
-                [type]: preve[type].filter((e) => value !== e.value),
-            }));
-        } else {
-            const updatedDataAffter = dataEmty[type].filter((item) => item.value !== value);
-            sDataEmty((preve) => ({ ...preve, [type]: updatedDataAffter }));
-            // add dataColumnNew
-            sDataColumnNew((preve) => ({ ...preve, [type]: [...preve[type], obDataAffter] }));
-        }
-    };
-
-    const HandleCheckAll = (type, parent, dataEmty, sDataEmty) => {
-        if (type === "addAll") {
-            sDataEmty((preve) => ({
-                ...preve,
-                [parent]: [...dataEmty[parent], ...dataColumnNew[parent]],
-            }));
-            sDataColumnNew((dataColumn) => ({ ...dataColumn, [parent]: [] }));
-        } else if (type === "deleteAll") {
-            sDataEmty((preve) => ({ ...preve, [parent]: [] }));
-            sDataColumnNew((preve) => ({ ...preve, [parent]: dataColumn[parent] }));
-        }
-    };
-
-    const [percentage, setPercentage] = useState(0);
-
-    const testProgress = () => {
-        const interval = setInterval(() => {
-            setPercentage((prevPercentage) => {
-                if (prevPercentage < 100) {
-                    return prevPercentage + 1; // Tăng giá trị phần trăm lên
-                } else {
-                    ToatstNotifi("success", "Xuất file thành công");
-                    clearInterval(interval); // Dừng lại khi đạt 100%
-                    setTimeout(() => {
-                        setPercentage(0);
-                    }, 500);
-                    return prevPercentage;
-                }
-            });
-        }, 300);
-        return () => clearInterval(interval);
-    };
-
-    const _HandleSubmit = (e) => {
-        e.preventDefault();
-        testProgress();
-    };
-
-    console.log("dataColumnNew", dataColumnNew);
-    console.log("arrEmty", arrEmty);
 
     return (
         <div>
@@ -244,72 +174,31 @@ const Index = (props) => {
                             })}
                     </div>
                     <div className="">
-                        <TitleHeader dataLang={dataLang} tabPage={tabPage} />
                         {onFetchTemple ? (
                             <Loading />
                         ) : (
-                            (tabPage == 1 && (
+                            tabPage == 1 && (
                                 <Client
+                                    dataColumn={dataColumn}
+                                    sDataColumn={sDataColumn}
                                     dataLang={dataLang}
-                                    dataColumnNew={dataColumnNew}
-                                    sDataEmty={sArrEmty}
-                                    HandleCheckAll={HandleCheckAll}
-                                    tabPage={tabPage}
-                                    HandlePushItem={HandlePushItem}
-                                    dataEmty={arrEmty}
+                                    sClientAffter={sClientAffter}
+                                    clientAffter={clientAffter}
                                 />
-                            )) ||
-                            (tabPage == 2 && (
-                                <Supplier
-                                    dataLang={dataLang}
-                                    dataColumnNew={dataColumnNew}
-                                    sDataEmty={sArrEmty}
-                                    HandleCheckAll={HandleCheckAll}
-                                    tabPage={tabPage}
-                                    HandlePushItem={HandlePushItem}
-                                    dataEmty={arrEmty}
-                                />
-                            )) ||
-                            (tabPage == 3 && (
-                                <Materials
-                                    dataLang={dataLang}
-                                    dataColumnNew={dataColumnNew}
-                                    sDataEmty={sArrEmty}
-                                    HandleCheckAll={HandleCheckAll}
-                                    tabPage={tabPage}
-                                    HandlePushItem={HandlePushItem}
-                                    dataEmty={arrEmty}
-                                />
-                            )) ||
-                            (tabPage == 4 && (
-                                <Products
-                                    dataLang={dataLang}
-                                    dataColumnNew={dataColumnNew}
-                                    sDataEmty={sArrEmty}
-                                    HandleCheckAll={HandleCheckAll}
-                                    tabPage={tabPage}
-                                    HandlePushItem={HandlePushItem}
-                                    dataEmty={arrEmty}
-                                />
-                            ))
+                            )
                         )}
                     </div>
                     {/* <div className="bg-gray-300 p-1.5 rounded-md relative">
-                        <div
-                            style={{
-                                width: percentage + "%",
-                            }}
-                            className="absolute transition-all duration-1000 ease-linear bg-sky-600 top-0 left-0 h-full rounded-md"
-                        ></div>
+                        <div className="absolute bg-sky-600 top-0 left-0 w-1/3 h-full rounded-md"></div>
                     </div> */}
                     <div className="w-full bg-gray-200 rounded-lg dark:bg-gray-700">
                         <div
-                            className="bg-sky-600 transition-all duration-1000 ease-linear text-[11px] font-medium text-sky-100 text-center leading-none rounded-lg"
+                            className="bg-sky-600 text-xs font-medium text-sky-100 text-center leading-none rounded-lg"
                             style={{
-                                width: percentage + "%",
+                                width: "20%",
                             }}
                         >
-                            {percentage + "%"}
+                            20%
                         </div>
                     </div>
                     <div className="col-span-12 mt-2 grid-cols-12 grid gap-2.5 justify-center">
@@ -370,7 +259,7 @@ const Index = (props) => {
                             <div></div>
                         )}
                         <button
-                            onClick={(e) => _HandleSubmit(e)}
+                            // onClick={_HandleSubmit.bind(this)}
                             type="button"
                             className="col-span-4 xl:text-sm text-xs p-2.5  bg-gradient-to-l hover:bg-blue-300 from-blue-500 via-blue-500  to-blue-500 text-white rounded btn-animation hover:scale-[1.02] flex items-center gap-1 justify-center z-0"
                         >

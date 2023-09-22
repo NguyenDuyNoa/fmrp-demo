@@ -15,14 +15,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 });
 import Select, { components, MenuListProps } from "react-select";
 
-import {
-    Add,
-    Trash as IconDelete,
-    Image as IconImage,
-    MaximizeCircle,
-    Minus,
-    TableDocument,
-} from "iconsax-react";
+import { Add, Trash as IconDelete, Image as IconImage, MaximizeCircle, Minus, TableDocument } from "iconsax-react";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
 import { NumericFormat } from "react-number-format";
@@ -116,55 +109,38 @@ const Index = (props) => {
 
     const _ServerFetching = () => {
         sOnLoading(true);
-        Axios(
-            "GET",
-            "/api_web/Api_Branch/branchCombobox/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, result } = response.data;
-                    sDataBranch(
-                        result?.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                    sOnLoading(false);
-                }
+        Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, result } = response.data;
+                sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
+                sOnLoading(false);
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/Api_tax/tax?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataTasxes(
-                        rResult?.map((e) => ({
-                            label: e.name,
-                            value: e.id,
-                            tax_rate: e.tax_rate,
-                        }))
-                    );
-                    sOnLoading(false);
-                }
+        });
+        Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sDataTasxes(
+                    rResult?.map((e) => ({
+                        label: e.name,
+                        value: e.id,
+                        tax_rate: e.tax_rate,
+                    }))
+                );
+                sOnLoading(false);
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/Api_return_supplier/treatment_methods/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sData_Treatmentr(
-                        data?.map((e) => ({
-                            label: dataLang[e?.name],
-                            value: e?.id,
-                        }))
-                    );
-                    sOnLoading(false);
-                }
+        });
+        Axios("GET", "/api_web/Api_return_supplier/treatment_methods/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sData_Treatmentr(
+                    data?.map((e) => ({
+                        label: dataLang[e?.name],
+                        value: e?.id,
+                    }))
+                );
+                sOnLoading(false);
             }
-        );
+        });
 
         sOnFetching(false);
     };
@@ -174,26 +150,15 @@ const Index = (props) => {
     }, [onFetching]);
 
     const _ServerFetchingCondition = () => {
-        Axios(
-            "GET",
-            "/api_web/api_setting/feature/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sDataMaterialExpiry(
-                        data.find((x) => x.code == "material_expiry")
-                    );
-                    sDataProductExpiry(
-                        data.find((x) => x.code == "product_expiry")
-                    );
-                    sDataProductSerial(
-                        data.find((x) => x.code == "product_serial")
-                    );
-                }
-                sOnFetchingCondition(false);
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+                sDataProductSerial(data.find((x) => x.code == "product_serial"));
             }
-        );
+            sOnFetchingCondition(false);
+        });
     };
 
     useEffect(() => {
@@ -227,100 +192,79 @@ const Index = (props) => {
         e,
     }));
     const _ServerFetchingDetailPage = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_return_supplier/getDetail/${id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var rResult = response.data;
-                    sListData(
-                        rResult?.items.map((e) => ({
-                            id: e?.item?.id,
-                            matHang: {
-                                e: e?.item,
-                                label: `${
-                                    e.item?.name
-                                } <span style={{display: none}}>${
-                                    e.item?.code +
-                                    e.item?.product_variation +
-                                    e.item?.text_type +
-                                    e.item?.unit_name
-                                }</span>`,
-                                value: e.item?.id,
+        Axios("GET", `/api_web/Api_return_supplier/getDetail/${id}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var rResult = response.data;
+                sListData(
+                    rResult?.items.map((e) => ({
+                        id: e?.item?.id,
+                        matHang: {
+                            e: e?.item,
+                            label: `${e.item?.name} <span style={{display: none}}>${
+                                e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                            }</span>`,
+                            value: e.item?.id,
+                        },
+                        child: e?.child.map((ce) => ({
+                            id: Number(ce?.id),
+                            disabledDate:
+                                (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
+                                (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
+                                (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
+                                (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
+                            kho: {
+                                label: ce?.location_name,
+                                value: ce?.location_warehouses_id,
+                                warehouse_name: ce?.warehouse_name,
+                                qty: ce?.quantity_warehouse,
                             },
-                            child: e?.child.map((ce) => ({
-                                id: Number(ce?.id),
-                                disabledDate:
-                                    (e.item?.text_type == "material" &&
-                                        dataMaterialExpiry?.is_enable == "1" &&
-                                        false) ||
-                                    (e.item?.text_type == "material" &&
-                                        dataMaterialExpiry?.is_enable == "0" &&
-                                        true) ||
-                                    (e.item?.text_type == "products" &&
-                                        dataProductExpiry?.is_enable == "1" &&
-                                        false) ||
-                                    (e.item?.text_type == "products" &&
-                                        dataProductExpiry?.is_enable == "0" &&
-                                        true),
-                                kho: {
-                                    label: ce?.location_name,
-                                    value: ce?.location_warehouses_id,
-                                    warehouse_name: ce?.warehouse_name,
-                                    qty: ce?.quantity_warehouse,
-                                },
-                                serial: ce?.serial == null ? "" : ce?.serial,
-                                soluongcl: Number(e?.item?.quantity_left),
-                                soluongdt: Number(e?.item?.quantity_returned),
-                                soluongdn: Number(e?.item?.quantity_create),
-                                lot: ce?.lot == null ? "" : ce?.lot,
-                                date:
-                                    ce?.expiration_date != null
-                                        ? moment(ce?.expiration_date).toDate()
-                                        : null,
-                                donViTinh: e?.item?.unit_name,
-                                amount: Number(ce?.quantity),
-                                price: Number(ce?.price),
-                                chietKhau: Number(ce?.discount_percent),
-                                tax: {
-                                    tax_rate: ce?.tax_rate,
-                                    value: ce?.tax_id,
-                                    label: ce?.tax_name,
-                                },
-                                note: ce?.note,
-                            })),
-                        }))
-                    );
+                            serial: ce?.serial == null ? "" : ce?.serial,
+                            soluongcl: Number(e?.item?.quantity_left),
+                            soluongdt: Number(e?.item?.quantity_returned),
+                            soluongdn: Number(e?.item?.quantity_create),
+                            lot: ce?.lot == null ? "" : ce?.lot,
+                            date: ce?.expiration_date != null ? moment(ce?.expiration_date).toDate() : null,
+                            donViTinh: e?.item?.unit_name,
+                            amount: Number(ce?.quantity),
+                            price: Number(ce?.price),
+                            chietKhau: Number(ce?.discount_percent),
+                            tax: {
+                                tax_rate: ce?.tax_rate,
+                                value: ce?.tax_id,
+                                label: ce?.tax_name,
+                            },
+                            note: ce?.note,
+                        })),
+                    }))
+                );
 
-                    const checkQty = rResult?.items
-                        ?.map((e) => e?.item)
-                        .reduce((obj, e) => {
-                            obj.id = e?.id;
-                            obj.qty = Number(e?.quantity_left);
-                            return obj;
-                        }, {});
-                    sIdParent(checkQty?.id);
-                    sQtyHouse(checkQty?.qty);
-                    sCode(rResult?.code);
-                    sIdBranch({
-                        label: rResult?.branch_name,
-                        value: rResult?.branch_id,
-                    });
-                    sIdSupplier({
-                        label: rResult?.supplier_name,
-                        value: rResult?.supplier_id,
-                    });
-                    sIdTreatment({
-                        label: dataLang[rResult?.treatment_methods_name],
-                        value: rResult?.treatment_methods,
-                    });
-                    sStartDate(moment(rResult?.date).toDate());
-                    sNote(rResult?.note);
-                }
-                sOnFetchingDetail(false);
+                const checkQty = rResult?.items
+                    ?.map((e) => e?.item)
+                    .reduce((obj, e) => {
+                        obj.id = e?.id;
+                        obj.qty = Number(e?.quantity_left);
+                        return obj;
+                    }, {});
+                sIdParent(checkQty?.id);
+                sQtyHouse(checkQty?.qty);
+                sCode(rResult?.code);
+                sIdBranch({
+                    label: rResult?.branch_name,
+                    value: rResult?.branch_id,
+                });
+                sIdSupplier({
+                    label: rResult?.supplier_name,
+                    value: rResult?.supplier_id,
+                });
+                sIdTreatment({
+                    label: dataLang[rResult?.treatment_methods_name],
+                    value: rResult?.treatment_methods,
+                });
+                sStartDate(moment(rResult?.date).toDate());
+                sNote(rResult?.note);
             }
-        );
+            sOnFetchingDetail(false);
+        });
     };
 
     useEffect(() => {
@@ -346,9 +290,7 @@ const Index = (props) => {
             "/api_web/Api_return_supplier/getImportItems/?csrf_protection=true",
             {
                 params: {
-                    "filter[supplier_id]": idSupplier
-                        ? idSupplier?.value
-                        : null,
+                    "filter[supplier_id]": idSupplier ? idSupplier?.value : null,
                     "filter[branch_id]": idBranch ? idBranch?.value : null,
                 },
             },
@@ -369,16 +311,13 @@ const Index = (props) => {
             "/api_web/api_supplier/supplier/?csrf_protection=true",
             {
                 params: {
-                    "filter[branch_id]":
-                        idBranch != null ? idBranch.value : null,
+                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
                 },
             },
             (err, response) => {
                 if (!err) {
                     var { rResult } = response.data;
-                    sDataSupplier(
-                        rResult?.map((e) => ({ label: e.name, value: e.id }))
-                    );
+                    sDataSupplier(rResult?.map((e) => ({ label: e.name, value: e.id })));
                     sOnLoading(false);
                 }
             }
@@ -399,10 +338,7 @@ const Index = (props) => {
             if (listData?.length > 0) {
                 if (type === "supplier" && idSupplier != value) {
                     Swal.fire({
-                        title: `${
-                            dataLang?.returns_err_DeleteItem ||
-                            "returns_err_DeleteItem"
-                        }`,
+                        title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
                         icon: "warning",
                         showCancelButton: true,
                         confirmButtonColor: "#296dc1",
@@ -435,10 +371,7 @@ const Index = (props) => {
             if (listData?.length > 0) {
                 if (type === "branch" && idBranch != value) {
                     Swal.fire({
-                        title: `${
-                            dataLang?.returns_err_DeleteItem ||
-                            "returns_err_DeleteItem"
-                        }`,
+                        title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
                         icon: "warning",
                         showCancelButton: true,
                         confirmButtonColor: "#296dc1",
@@ -507,17 +440,12 @@ const Index = (props) => {
             item.child?.some(
                 (childItem) =>
                     childItem.kho === null ||
-                    (id &&
-                        (childItem.kho?.label === null ||
-                            childItem.kho?.warehouse_name === null))
+                    (id && (childItem.kho?.label === null || childItem.kho?.warehouse_name === null))
             )
         );
         const hasNullAmount = listData.some((item) =>
             item.child?.some(
-                (childItem) =>
-                    childItem.amount === null ||
-                    childItem.amount === "" ||
-                    childItem.amount == 0
+                (childItem) => childItem.amount === null || childItem.amount === "" || childItem.amount == 0
             )
         );
         const isTotalExceeded = listData?.some(
@@ -554,10 +482,7 @@ const Index = (props) => {
                 sErrSurvive(true);
                 Toast.fire({
                     icon: "error",
-                    title: `${
-                        dataLang?.returns_err_QtyNotQexceed ||
-                        "returns_err_QtyNotQexceed"
-                    }`,
+                    title: `${dataLang?.returns_err_QtyNotQexceed || "returns_err_QtyNotQexceed"}`,
                 });
             } else {
                 Toast.fire({
@@ -644,10 +569,7 @@ const Index = (props) => {
         idSupplier != null && sOnFetchingItemsAll(true);
     }, [idSupplier]);
 
-    const taxOptions = [
-        { label: "Miễn thuế", value: "0", tax_rate: "0" },
-        ...dataTasxes,
-    ];
+    const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes];
 
     const formatNumber = (number) => {
         const integerPart = Math.floor(number);
@@ -656,71 +578,49 @@ const Index = (props) => {
 
     const tinhTongTien = (option) => {
         const tongTien = option?.reduce((accumulator, item) => {
-            const childTotal = item.child?.reduce(
-                (childAccumulator, childItem) => {
-                    const product =
-                        Number(childItem?.price) * Number(childItem?.amount);
-                    return childAccumulator + product;
-                },
-                0
-            );
+            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                const product = Number(childItem?.price) * Number(childItem?.amount);
+                return childAccumulator + product;
+            }, 0);
             return accumulator + childTotal;
         }, 0);
 
         const tienChietKhau = option?.reduce((accumulator, item) => {
-            const childTotal = item.child?.reduce(
-                (childAccumulator, childItem) => {
-                    const product =
-                        Number(childItem?.price) *
-                        (Number(childItem?.chietKhau) / 100) *
-                        Number(childItem?.amount);
-                    return childAccumulator + product;
-                },
-                0
-            );
+            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                const product =
+                    Number(childItem?.price) * (Number(childItem?.chietKhau) / 100) * Number(childItem?.amount);
+                return childAccumulator + product;
+            }, 0);
             return accumulator + childTotal;
         }, 0);
 
         const tongTienSauCK = option?.reduce((accumulator, item) => {
-            const childTotal = item.child?.reduce(
-                (childAccumulator, childItem) => {
-                    const product =
-                        Number(childItem?.priceAfter) *
-                        Number(childItem?.amount);
-                    return childAccumulator + product;
-                },
-                0
-            );
+            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                const product = Number(childItem?.priceAfter) * Number(childItem?.amount);
+                return childAccumulator + product;
+            }, 0);
             return accumulator + childTotal;
         }, 0);
 
         const tienThue = option?.reduce((accumulator, item) => {
-            const childTotal = item.child?.reduce(
-                (childAccumulator, childItem) => {
-                    const product =
-                        Number(childItem?.priceAfter) *
-                        (isNaN(childItem?.tax?.tax_rate)
-                            ? 0
-                            : Number(childItem?.tax?.tax_rate) / 100) *
-                        Number(childItem?.amount);
-                    return childAccumulator + product;
-                },
-                0
-            );
+            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                const product =
+                    Number(childItem?.priceAfter) *
+                    (isNaN(childItem?.tax?.tax_rate) ? 0 : Number(childItem?.tax?.tax_rate) / 100) *
+                    Number(childItem?.amount);
+                return childAccumulator + product;
+            }, 0);
             return accumulator + childTotal;
         }, 0);
 
         const tongThanhTien = option?.reduce((accumulator, item) => {
-            const childTotal = item.child?.reduce(
-                (childAccumulator, childItem) => {
-                    const product =
-                        Number(childItem?.priceAfter) *
-                        (1 + Number(childItem?.tax?.tax_rate) / 100) *
-                        Number(childItem?.amount);
-                    return childAccumulator + product;
-                },
-                0
-            );
+            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                const product =
+                    Number(childItem?.priceAfter) *
+                    (1 + Number(childItem?.tax?.tax_rate) / 100) *
+                    Number(childItem?.amount);
+                return childAccumulator + product;
+            }, 0);
             return accumulator + childTotal;
         }, 0);
 
@@ -749,10 +649,7 @@ const Index = (props) => {
     const _ServerSending = () => {
         var formData = new FormData();
         formData.append("code", code);
-        formData.append(
-            "date",
-            moment(startDate).format("YYYY-MM-DD HH:mm:ss")
-        );
+        formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
         formData.append("branch_id", idBranch?.value);
         formData.append("supplier_id", idSupplier?.value);
         formData.append("treatment_methods", idTreatment?.value);
@@ -762,10 +659,7 @@ const Index = (props) => {
             formData.append(`items[${index}][item]`, item?.matHang?.value);
             // formData.append(`items[${index}][purchase_order_item_id]`, item?.matHang?.e?.purchase_order_item_id);
             item?.child?.forEach((childItem, childIndex) => {
-                formData.append(
-                    `items[${index}][child][${childIndex}][id]`,
-                    childItem?.id
-                );
+                formData.append(`items[${index}][child][${childIndex}][id]`, childItem?.id);
                 {
                     id &&
                         formData.append(
@@ -773,37 +667,16 @@ const Index = (props) => {
                             typeof childItem?.id == "number" ? childItem?.id : 0
                         );
                 }
-                formData.append(
-                    `items[${index}][child][${childIndex}][quantity]`,
-                    childItem?.amount
-                );
+                formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.amount);
                 // formData.append(`items[${index}][child][${childIndex}][serial]`, childItem?.serial === null ? "" : childItem?.serial);
                 // formData.append(`items[${index}][child][${childIndex}][lot]`, childItem?.lot === null ? "" : childItem?.lot);
                 // formData.append(`items[${index}][child][${childIndex}][expiration_date]`, childItem?.date === null ? "" : moment(childItem?.date).format("YYYY-MM-DD HH:mm:ss"));
-                formData.append(
-                    `items[${index}][child][${childIndex}][unit_name]`,
-                    childItem?.donViTinh
-                );
-                formData.append(
-                    `items[${index}][child][${childIndex}][note]`,
-                    childItem?.note
-                );
-                formData.append(
-                    `items[${index}][child][${childIndex}][tax_id]`,
-                    childItem?.tax?.value
-                );
-                formData.append(
-                    `items[${index}][child][${childIndex}][price]`,
-                    childItem?.price
-                );
-                formData.append(
-                    `items[${index}][child][${childIndex}][location_warehouses_id]`,
-                    childItem?.kho?.value
-                );
-                formData.append(
-                    `items[${index}][child][${childIndex}][discount_percent]`,
-                    childItem?.chietKhau
-                );
+                formData.append(`items[${index}][child][${childIndex}][unit_name]`, childItem?.donViTinh);
+                formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note);
+                formData.append(`items[${index}][child][${childIndex}][tax_id]`, childItem?.tax?.value);
+                formData.append(`items[${index}][child][${childIndex}][price]`, childItem?.price);
+                formData.append(`items[${index}][child][${childIndex}][location_warehouses_id]`, childItem?.kho?.value);
+                formData.append(`items[${index}][child][${childIndex}][discount_percent]`, childItem?.chietKhau);
             });
         });
         Axios(
@@ -868,18 +741,10 @@ const Index = (props) => {
                 const newChild = {
                     id: uuidv4(),
                     disabledDate:
-                        (value?.e?.text_type === "material" &&
-                            dataMaterialExpiry?.is_enable === "1" &&
-                            false) ||
-                        (value?.e?.text_type === "material" &&
-                            dataMaterialExpiry?.is_enable === "0" &&
-                            true) ||
-                        (value?.e?.text_type === "products" &&
-                            dataProductExpiry?.is_enable === "1" &&
-                            false) ||
-                        (value?.e?.text_type === "products" &&
-                            dataProductExpiry?.is_enable === "0" &&
-                            true),
+                        (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
+                        (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
+                        (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
+                        (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
                     soluongcl: Number(value?.e?.quantity_left),
                     soluongdt: Number(value?.e?.quantity_returned),
                     soluongdn: Number(value?.e?.quantity_create),
@@ -888,17 +753,12 @@ const Index = (props) => {
                     price: Number(value?.e?.price),
                     // amount: Number(value?.e?.quantity_create) || 1,
                     amount: null,
-                    chietKhau: chietkhautong
-                        ? chietkhautong
-                        : Number(value?.e?.discount_percent),
+                    chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent),
                     priceAfter: Number(value?.e?.price_after_discount),
                     tax: thuetong
                         ? thuetong
                         : {
-                              label:
-                                  value?.e?.tax_name == null
-                                      ? "Miễn thuế"
-                                      : value?.e?.tax_name,
+                              label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
                               value: value?.e?.tax_id,
                               tax_rate: value?.e?.tax_rate,
                           },
@@ -914,9 +774,7 @@ const Index = (props) => {
         sListData(newData);
     };
     const _HandleAddParent = (value) => {
-        const checkData = listData?.some(
-            (e) => e?.matHang?.value === value?.value
-        );
+        const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
         if (!checkData) {
             sIdParent(value?.value);
             sQtyHouse(value?.e?.quantity_left);
@@ -927,18 +785,10 @@ const Index = (props) => {
                     {
                         id: uuidv4(),
                         disabledDate:
-                            (value?.e?.text_type === "material" &&
-                                dataMaterialExpiry?.is_enable === "1" &&
-                                false) ||
-                            (value?.e?.text_type === "material" &&
-                                dataMaterialExpiry?.is_enable === "0" &&
-                                true) ||
-                            (value?.e?.text_type === "products" &&
-                                dataProductExpiry?.is_enable === "1" &&
-                                false) ||
-                            (value?.e?.text_type === "products" &&
-                                dataProductExpiry?.is_enable === "0" &&
-                                true),
+                            (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
+                            (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
+                            (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
+                            (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
                         kho: null,
                         donViTinh: value?.e?.unit_name,
                         soluongcl: Number(value?.e?.quantity_left),
@@ -946,17 +796,12 @@ const Index = (props) => {
                         soluongdn: Number(value?.e?.quantity_create),
                         price: Number(value?.e?.price),
                         amount: Number(value?.e?.quantity_left),
-                        chietKhau: chietkhautong
-                            ? chietkhautong
-                            : Number(value?.e?.discount_percent),
+                        chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent),
                         priceAfter: Number(value?.e?.price_after_discount),
                         tax: thuetong
                             ? thuetong
                             : {
-                                  label:
-                                      value?.e?.tax_name == null
-                                          ? "Miễn thuế"
-                                          : value?.e?.tax_name,
+                                  label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
                                   value: value?.e?.tax_id,
                                   tax_rate: value?.e?.tax_rate,
                               },
@@ -968,9 +813,7 @@ const Index = (props) => {
             sListData([newData, ...listData]);
         } else {
             Toast.fire({
-                title: `${
-                    dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
-                }`,
+                title: `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`,
                 icon: "error",
             });
         }
@@ -980,9 +823,7 @@ const Index = (props) => {
         const newData = listData
             .map((e) => {
                 if (e.id === parentId) {
-                    const newChild = e.child?.filter(
-                        (ce) => ce?.id !== childId
-                    );
+                    const newChild = e.child?.filter((ce) => ce?.id !== childId);
                     return { ...e, child: newChild };
                 }
                 return e;
@@ -1013,11 +854,7 @@ const Index = (props) => {
                         if (type === "amount") {
                             sErrSurvive(false);
                             ce.amount = Number(value?.value);
-                            const totalSoLuong = e.child.reduce(
-                                (sum, opt) =>
-                                    sum + parseFloat(opt?.amount || 0),
-                                0
-                            );
+                            const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
                             if (totalSoLuong > qtyHouse) {
                                 e.child.forEach((opt, optIndex) => {
                                     const currentValue = ce.amount; // Lưu giá trị hiện tại
@@ -1051,16 +888,9 @@ const Index = (props) => {
                         } else if (type === "increase") {
                             sErrSurvive(false);
 
-                            const totalSoLuong = e.child.reduce(
-                                (sum, opt) =>
-                                    sum + parseFloat(opt?.amount || 0),
-                                0
-                            );
+                            const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
 
-                            if (
-                                ce?.id === childId &&
-                                totalSoLuong == qtyHouse
-                            ) {
+                            if (ce?.id === childId && totalSoLuong == qtyHouse) {
                                 Toast.fire({
                                     title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
                                         qtyHouse
@@ -1072,10 +902,7 @@ const Index = (props) => {
                                     timer: 3000,
                                 });
                                 return { ...ce };
-                            } else if (
-                                ce?.id === childId &&
-                                totalSoLuong == Number(ce?.kho?.qty)
-                            ) {
+                            } else if (ce?.id === childId && totalSoLuong == Number(ce?.kho?.qty)) {
                                 Toast.fire({
                                     title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
                                         Number(ce?.kho?.qty)
@@ -1087,10 +914,7 @@ const Index = (props) => {
                                     timer: 3000,
                                 });
                                 return { ...ce };
-                            } else if (
-                                ce?.id === childId &&
-                                totalSoLuong > Number(ce?.kho?.qty)
-                            ) {
+                            } else if (ce?.id === childId && totalSoLuong > Number(ce?.kho?.qty)) {
                                 Toast.fire({
                                     title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
                                         Number(ce?.kho?.qty)
@@ -1102,10 +926,7 @@ const Index = (props) => {
                                     timer: 3000,
                                 });
                                 return { ...ce };
-                            } else if (
-                                ce?.id === childId &&
-                                totalSoLuong > qtyHouse
-                            ) {
+                            } else if (ce?.id === childId && totalSoLuong > qtyHouse) {
                                 Toast.fire({
                                     title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
                                         qtyHouse
@@ -1143,10 +964,7 @@ const Index = (props) => {
                             sErrSurvive(false);
                             if (checkKho) {
                                 Toast.fire({
-                                    title: `${
-                                        dataLang?.returns_err_Warehouse ||
-                                        "returns_err_Warehouse"
-                                    }`,
+                                    title: `${dataLang?.returns_err_Warehouse || "returns_err_Warehouse"}`,
                                     icon: "error",
                                 });
                                 return { ...ce };
@@ -1169,9 +987,7 @@ const Index = (props) => {
     };
 
     const _HandleChangeValue = (parentId, value) => {
-        const checkData = listData?.some(
-            (e) => e?.matHang?.value === value?.value
-        );
+        const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
         if (!checkData) {
             sIdParent(value?.value);
             const newData = listData?.map((e) => {
@@ -1202,19 +1018,12 @@ const Index = (props) => {
                                 soluongcl: Number(value?.e?.quantity_left),
                                 soluongdt: Number(value?.e?.quantity_returned),
                                 soluongdn: Number(value?.e?.quantity_create),
-                                chietKhau: chietkhautong
-                                    ? chietkhautong
-                                    : Number(value?.e?.discount_percent),
-                                priceAfter: Number(
-                                    value?.e?.price_after_discount
-                                ),
+                                chietKhau: chietkhautong ? chietkhautong : Number(value?.e?.discount_percent),
+                                priceAfter: Number(value?.e?.price_after_discount),
                                 tax: thuetong
                                     ? thuetong
                                     : {
-                                          label:
-                                              value?.e?.tax_name == null
-                                                  ? "Miễn thuế"
-                                                  : value?.e?.tax_name,
+                                          label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
                                           value: value?.e?.tax_id,
                                           tax_rate: value?.e?.tax_rate,
                                       },
@@ -1230,9 +1039,7 @@ const Index = (props) => {
             sListData([...newData]);
         } else {
             Toast.fire({
-                title: `${
-                    dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"
-                }`,
+                title: `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`,
                 icon: "error",
             });
         }
@@ -1244,8 +1051,7 @@ const Index = (props) => {
                 <title>
                     {id
                         ? dataLang?.returns_title_edit || "returns_title_edit"
-                        : dataLang?.returns_title_child ||
-                          "returns_title_child"}
+                        : dataLang?.returns_title_child || "returns_title_child"}
                 </title>
             </Head>
             <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
@@ -1254,28 +1060,20 @@ const Index = (props) => {
                         <div className="p-2"></div>
                     ) : (
                         <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">
-                                {dataLang?.returns_title || "returns_title"}
-                            </h6>
+                            <h6 className="text-[#141522]/40">{dataLang?.returns_title || "returns_title"}</h6>
                             <span className="text-[#141522]/40">/</span>
                             <h6>
                                 {id
-                                    ? dataLang?.returns_title_edit ||
-                                      "returns_title_edit"
-                                    : dataLang?.returns_title_child ||
-                                      "returns_title_child"}
+                                    ? dataLang?.returns_title_edit || "returns_title_edit"
+                                    : dataLang?.returns_title_child || "returns_title_child"}
                             </h6>
                         </div>
                     )}
                     <div className="flex justify-between items-center">
-                        <h2 className="xl:text-2xl text-xl ">
-                            {dataLang?.returns_title || "returns_title"}
-                        </h2>
+                        <h2 className="xl:text-2xl text-xl ">{dataLang?.returns_title || "returns_title"}</h2>
                         <div className="flex justify-end items-center">
                             <button
-                                onClick={() =>
-                                    router.push("/purchase_order/returns")
-                                }
+                                onClick={() => router.push("/purchase_order/returns")}
                                 className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.import_comeback || "import_comeback"}
@@ -1292,28 +1090,22 @@ const Index = (props) => {
                             <div className="grid grid-cols-10  gap-3 items-center mt-2">
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.import_code_vouchers ||
-                                            "import_code_vouchers"}{" "}
+                                        {dataLang?.import_code_vouchers || "import_code_vouchers"}{" "}
                                     </label>
                                     <input
                                         value={code}
-                                        onChange={_HandleChangeInput.bind(
-                                            this,
-                                            "code"
-                                        )}
+                                        onChange={_HandleChangeInput.bind(this, "code")}
                                         name="fname"
                                         type="text"
                                         placeholder={
-                                            dataLang?.purchase_order_system_default ||
-                                            "purchase_order_system_default"
+                                            dataLang?.purchase_order_system_default || "purchase_order_system_default"
                                         }
                                         className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                 </div>
                                 <div className="col-span-2 relative">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.import_day_vouchers ||
-                                            "import_day_vouchers"}
+                                        {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                     </label>
                                     <div className="custom-date-picker flex flex-row">
                                         <DatePicker
@@ -1321,34 +1113,23 @@ const Index = (props) => {
                                             fixedHeight
                                             showTimeSelect
                                             selected={startDate}
-                                            onSelect={(date) =>
-                                                sStartDate(date)
-                                            }
-                                            onChange={(e) =>
-                                                handleTimeChange(e)
-                                            }
+                                            onSelect={(date) => sStartDate(date)}
+                                            onChange={(e) => handleTimeChange(e)}
                                             placeholderText="DD/MM/YYYY HH:mm:ss"
                                             dateFormat="dd/MM/yyyy h:mm:ss aa"
                                             timeInputLabel={"Time: "}
                                             placeholder={
-                                                dataLang?.price_quote_system_default ||
-                                                "price_quote_system_default"
+                                                dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
                                             className={`border ${
-                                                errDate
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                             } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
                                                 <MdClear
                                                     className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
-                                                    onClick={() =>
-                                                        handleClearDate(
-                                                            "startDate"
-                                                        )
-                                                    }
+                                                    onClick={() => handleClearDate("startDate")}
                                                 />
                                             </>
                                         )}
@@ -1357,31 +1138,20 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.import_branch ||
-                                            "import_branch"}{" "}
+                                        {dataLang?.import_branch || "import_branch"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <Select
                                         options={dataBranch}
-                                        onChange={_HandleChangeInput.bind(
-                                            this,
-                                            "branch"
-                                        )}
+                                        onChange={_HandleChangeInput.bind(this, "branch")}
                                         value={idBranch}
-                                        isLoading={
-                                            idBranch != null ? false : onLoading
-                                        }
+                                        isLoading={idBranch != null ? false : onLoading}
                                         isClearable={true}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={
-                                            dataLang?.import_branch ||
-                                            "import_branch"
-                                        }
+                                        placeholder={dataLang?.import_branch || "import_branch"}
                                         className={`${
-                                            errBranch
-                                                ? "border-red-500"
-                                                : "border-transparent"
+                                            errBranch ? "border-red-500" : "border-transparent"
                                         } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
@@ -1419,41 +1189,28 @@ const Index = (props) => {
                                     />
                                     {errBranch && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.purchase_order_errBranch ||
-                                                "purchase_order_errBranch"}
+                                            {dataLang?.purchase_order_errBranch || "purchase_order_errBranch"}
                                         </label>
                                     )}
                                 </div>
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.import_supplier ||
-                                            "import_supplier"}{" "}
+                                        {dataLang?.import_supplier || "import_supplier"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <Select
                                         options={dataSupplier}
-                                        onChange={_HandleChangeInput.bind(
-                                            this,
-                                            "supplier"
-                                        )}
+                                        onChange={_HandleChangeInput.bind(this, "supplier")}
                                         value={idSupplier}
                                         isLoading={onLoading}
-                                        placeholder={
-                                            dataLang?.import_supplier ||
-                                            "import_supplier"
-                                        }
+                                        placeholder={dataLang?.import_supplier || "import_supplier"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
                                         className={`${
-                                            errSupplier
-                                                ? "border-red-500"
-                                                : "border-transparent"
+                                            errSupplier ? "border-red-500" : "border-transparent"
                                         } placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
-                                        noOptionsMessage={() =>
-                                            dataLang?.returns_nodata ||
-                                            "returns_nodata"
-                                        }
+                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         menuPortalTarget={document.body}
                                         closeMenuOnSelect={true}
                                         style={{
@@ -1491,44 +1248,27 @@ const Index = (props) => {
                                     />
                                     {errSupplier && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.purchase_order_errSupplier ||
-                                                "purchase_order_errSupplier"}
+                                            {dataLang?.purchase_order_errSupplier || "purchase_order_errSupplier"}
                                         </label>
                                     )}
                                 </div>
                                 <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.returns_treatment_methods ||
-                                            "returns_treatment_methods"}{" "}
+                                        {dataLang?.returns_treatment_methods || "returns_treatment_methods"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <Select
                                         options={data_Treatmentr}
-                                        onChange={_HandleChangeInput.bind(
-                                            this,
-                                            "treatment"
-                                        )}
-                                        isLoading={
-                                            idBranch || idSupplier != null
-                                                ? false
-                                                : onLoading
-                                        }
+                                        onChange={_HandleChangeInput.bind(this, "treatment")}
+                                        isLoading={idBranch || idSupplier != null ? false : onLoading}
                                         value={idTreatment}
                                         isClearable={true}
-                                        noOptionsMessage={() =>
-                                            dataLang?.returns_nodata ||
-                                            "returns_nodata"
-                                        }
+                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={
-                                            dataLang?.returns_treatment_methods ||
-                                            "returns_treatment_methods"
-                                        }
+                                        placeholder={dataLang?.returns_treatment_methods || "returns_treatment_methods"}
                                         className={`${
-                                            errTreatment
-                                                ? "border-red-500"
-                                                : "border-transparent"
+                                            errTreatment ? "border-red-500" : "border-transparent"
                                         } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
@@ -1566,8 +1306,7 @@ const Index = (props) => {
                                     />
                                     {errTreatment && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.returns_treatment_methods_err ||
-                                                "returns_treatment_methods_err"}
+                                            {dataLang?.returns_treatment_methods_err || "returns_treatment_methods_err"}
                                         </label>
                                     )}
                                 </div>
@@ -1576,8 +1315,7 @@ const Index = (props) => {
                     </div>
                     <div className=" bg-[#ECF0F4] p-2 grid  grid-cols-12">
                         <div className="font-normal col-span-12">
-                            {dataLang?.import_item_information ||
-                                "import_item_information"}
+                            {dataLang?.import_item_information || "import_item_information"}
                         </div>
                     </div>
                     <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10">
@@ -1593,35 +1331,28 @@ const Index = (props) => {
                                     {"ĐVT"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.import_from_quantity ||
-                                        "import_from_quantity"}
+                                    {dataLang?.import_from_quantity || "import_from_quantity"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.import_from_unit_price ||
-                                        "import_from_unit_price"}
+                                    {dataLang?.import_from_unit_price || "import_from_unit_price"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.import_from_discount ||
-                                        "import_from_discount"}
+                                    {dataLang?.import_from_discount || "import_from_discount"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
                                     {dataLang?.returns_sck || "returns_sck"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {dataLang?.import_from_tax ||
-                                        "import_from_tax"}
+                                    {dataLang?.import_from_tax || "import_from_tax"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
-                                    {dataLang?.import_into_money ||
-                                        "import_into_money"}
+                                    {dataLang?.import_into_money || "import_into_money"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
-                                    {dataLang?.import_from_note ||
-                                        "import_from_note"}
+                                    {dataLang?.import_from_note || "import_from_note"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
-                                    {dataLang?.import_from_operation ||
-                                        "import_from_operation"}
+                                    {dataLang?.import_from_operation || "import_from_operation"}
                                 </h4>
                             </div>
                         </div>
@@ -1633,12 +1364,8 @@ const Index = (props) => {
                                 value={null}
                                 onChange={_HandleAddParent.bind(this)}
                                 className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
-                                placeholder={
-                                    dataLang?.returns_items || "returns_items"
-                                }
-                                noOptionsMessage={() =>
-                                    dataLang?.returns_nodata || "returns_nodata"
-                                }
+                                placeholder={dataLang?.returns_items || "returns_items"}
+                                noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                 menuPortalTarget={document.body}
                                 formatOptionLabel={(option) => (
                                     <div className="py-2">
@@ -1669,63 +1396,37 @@ const Index = (props) => {
                                                         {option.e?.code}
                                                     </h5>
                                                     <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                        {
-                                                            option.e
-                                                                ?.product_variation
-                                                        }
+                                                        {option.e?.product_variation}
                                                     </h5>
                                                 </div>
                                                 <div className="flex items-center gap-1">
                                                     <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                        {option.e?.import_code}{" "}
-                                                        -{" "}
+                                                        {option.e?.import_code} -{" "}
                                                     </h5>
                                                     <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">{`(ĐGSCK: ${formatNumber(
-                                                        option.e
-                                                            ?.price_after_discount
+                                                        option.e?.price_after_discount
                                                     )}) -`}</h5>
                                                     <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                        {
-                                                            dataLang[
-                                                                option.e
-                                                                    ?.text_type
-                                                            ]
-                                                        }
+                                                        {dataLang[option.e?.text_type]}
                                                     </h5>
                                                 </div>
 
                                                 <div className="flex items-center gap-2 italic">
-                                                    {dataProductSerial.is_enable ===
-                                                        "1" && (
+                                                    {dataProductSerial.is_enable === "1" && (
                                                         <div className="text-[11px] text-[#667085] font-[500]">
-                                                            Serial:{" "}
-                                                            {option.e?.serial
-                                                                ? option.e
-                                                                      ?.serial
-                                                                : "-"}
+                                                            Serial: {option.e?.serial ? option.e?.serial : "-"}
                                                         </div>
                                                     )}
-                                                    {dataMaterialExpiry.is_enable ===
-                                                        "1" ||
-                                                    dataProductExpiry.is_enable ===
-                                                        "1" ? (
+                                                    {dataMaterialExpiry.is_enable === "1" ||
+                                                    dataProductExpiry.is_enable === "1" ? (
                                                         <>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
-                                                                Lot:{" "}
-                                                                {option.e?.lot
-                                                                    ? option.e
-                                                                          ?.lot
-                                                                    : "-"}
+                                                                Lot: {option.e?.lot ? option.e?.lot : "-"}
                                                             </div>
                                                             <div className="text-[11px] text-[#667085] font-[500]">
                                                                 Date:{" "}
-                                                                {option.e
-                                                                    ?.expiration_date
-                                                                    ? moment(
-                                                                          option
-                                                                              .e
-                                                                              ?.expiration_date
-                                                                      ).format(
+                                                                {option.e?.expiration_date
+                                                                    ? moment(option.e?.expiration_date).format(
                                                                           "DD/MM/YYYY"
                                                                       )
                                                                     : "-"}
@@ -1782,10 +1483,7 @@ const Index = (props) => {
                                     {" "}
                                     <Select
                                         classNamePrefix="customDropdowDefault"
-                                        placeholder={
-                                            dataLang?.returns_point ||
-                                            "returns_point"
-                                        }
+                                        placeholder={dataLang?.returns_point || "returns_point"}
                                         className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
                                     />
@@ -1793,19 +1491,13 @@ const Index = (props) => {
                                 <div className="col-span-1"></div>
                                 <div className="col-span-1 flex  justify-center items-center">
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Minus
-                                            className="2xl:scale-100 xl:scale-100 scale-50"
-                                            size="16"
-                                        />
+                                        <Minus className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
                                     </button>
                                     <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b border-gray-200">
                                         1
                                     </div>
                                     <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
-                                        <Add
-                                            className="2xl:scale-100 xl:scale-100 scale-50"
-                                            size="16"
-                                        />
+                                        <Add className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
                                     </button>
                                 </div>
                                 <div className="col-span-1 justify-center flex items-center">
@@ -1824,10 +1516,7 @@ const Index = (props) => {
                                 <div className="col-span-1 flex items-center w-full">
                                     <Select
                                         classNamePrefix="customDropdowDefault"
-                                        placeholder={
-                                            dataLang?.returns_tax ||
-                                            "returns_tax"
-                                        }
+                                        placeholder={dataLang?.returns_tax || "returns_tax"}
                                         className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full"
                                         isDisabled={true}
                                     />
@@ -1836,17 +1525,12 @@ const Index = (props) => {
                                     1.00
                                 </div>
                                 <input
-                                    placeholder={
-                                        dataLang?.returns_note || "returns_note"
-                                    }
+                                    placeholder={dataLang?.returns_note || "returns_note"}
                                     disabled
                                     className=" disabled:bg-gray-50 col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 "
                                 />
                                 <button
-                                    title={
-                                        dataLang?.returns_delete ||
-                                        "returns_delete"
-                                    }
+                                    title={dataLang?.returns_delete || "returns_delete"}
                                     disabled
                                     className="col-span-1 disabled:opacity-50 transition w-full h-full bg-slate-100  rounded-[5.5px] text-red-500 flex flex-col justify-center items-center"
                                 >
@@ -1858,10 +1542,7 @@ const Index = (props) => {
                     <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                         <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
                             {onFetchingDetail ? (
-                                <Loading
-                                    className="h-10 w-full"
-                                    color="#0f4f9e"
-                                />
+                                <Loading className="h-10 w-full" color="#0f4f9e" />
                             ) : (
                                 <>
                                     {listData?.map((e) => (
@@ -1875,29 +1556,15 @@ const Index = (props) => {
                                                         options={options}
                                                         value={e?.matHang}
                                                         className=""
-                                                        onChange={_HandleChangeValue.bind(
-                                                            this,
-                                                            e?.id
-                                                        )}
-                                                        menuPortalTarget={
-                                                            document.body
-                                                        }
-                                                        formatOptionLabel={(
-                                                            option
-                                                        ) => (
+                                                        onChange={_HandleChangeValue.bind(this, e?.id)}
+                                                        menuPortalTarget={document.body}
+                                                        formatOptionLabel={(option) => (
                                                             <div className="py-2">
                                                                 <div className="flex items-center ">
                                                                     <div className="w-[40px] h-[50px]">
-                                                                        {option
-                                                                            .e
-                                                                            ?.images !=
-                                                                        null ? (
+                                                                        {option.e?.images != null ? (
                                                                             <img
-                                                                                src={
-                                                                                    option
-                                                                                        .e
-                                                                                        ?.images
-                                                                                }
+                                                                                src={option.e?.images}
                                                                                 alt="Product Image"
                                                                                 className="max-w-[40px] h-[50px] text-[8px] object-cover rounded"
                                                                             />
@@ -1913,94 +1580,53 @@ const Index = (props) => {
                                                                     </div>
                                                                     <div>
                                                                         <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                            {
-                                                                                option
-                                                                                    .e
-                                                                                    ?.name
-                                                                            }
+                                                                            {option.e?.name}
                                                                         </h3>
                                                                         <div className="flex gap-2">
                                                                             <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                                {
-                                                                                    option
-                                                                                        .e
-                                                                                        ?.code
-                                                                                }
+                                                                                {option.e?.code}
                                                                             </h5>
                                                                             <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                                {
-                                                                                    option
-                                                                                        .e
-                                                                                        ?.product_variation
-                                                                                }
+                                                                                {option.e?.product_variation}
                                                                             </h5>
                                                                         </div>
                                                                         <div className="flex items-center gap-1">
                                                                             <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                                {
-                                                                                    option
-                                                                                        .e
-                                                                                        ?.import_code
-                                                                                }{" "}
-                                                                                -{" "}
+                                                                                {option.e?.import_code} -{" "}
                                                                             </h5>
                                                                             <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">{`(ĐGSCK: ${formatNumber(
-                                                                                option
-                                                                                    .e
-                                                                                    ?.price_after_discount
+                                                                                option.e?.price_after_discount
                                                                             )}) -`}</h5>
                                                                             <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                                {
-                                                                                    dataLang[
-                                                                                        option
-                                                                                            .e
-                                                                                            ?.text_type
-                                                                                    ]
-                                                                                }
+                                                                                {dataLang[option.e?.text_type]}
                                                                             </h5>
                                                                         </div>
 
                                                                         <div className="flex items-center gap-2 italic">
-                                                                            {dataProductSerial.is_enable ===
-                                                                                "1" && (
+                                                                            {dataProductSerial.is_enable === "1" && (
                                                                                 <div className="text-[11px] text-[#667085] font-[500]">
                                                                                     Serial:{" "}
-                                                                                    {option
-                                                                                        .e
-                                                                                        ?.serial
-                                                                                        ? option
-                                                                                              .e
-                                                                                              ?.serial
+                                                                                    {option.e?.serial
+                                                                                        ? option.e?.serial
                                                                                         : "-"}
                                                                                 </div>
                                                                             )}
-                                                                            {dataMaterialExpiry.is_enable ===
-                                                                                "1" ||
-                                                                            dataProductExpiry.is_enable ===
-                                                                                "1" ? (
+                                                                            {dataMaterialExpiry.is_enable === "1" ||
+                                                                            dataProductExpiry.is_enable === "1" ? (
                                                                                 <>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Lot:{" "}
-                                                                                        {option
-                                                                                            .e
-                                                                                            ?.lot
-                                                                                            ? option
-                                                                                                  .e
-                                                                                                  ?.lot
+                                                                                        {option.e?.lot
+                                                                                            ? option.e?.lot
                                                                                             : "-"}
                                                                                     </div>
                                                                                     <div className="text-[11px] text-[#667085] font-[500]">
                                                                                         Date:{" "}
-                                                                                        {option
-                                                                                            .e
-                                                                                            ?.expiration_date
+                                                                                        {option.e?.expiration_date
                                                                                             ? moment(
-                                                                                                  option
-                                                                                                      .e
+                                                                                                  option.e
                                                                                                       ?.expiration_date
-                                                                                              ).format(
-                                                                                                  "DD/MM/YYYY"
-                                                                                              )
+                                                                                              ).format("DD/MM/YYYY")
                                                                                             : "-"}
                                                                                     </div>
                                                                                 </>
@@ -2022,80 +1648,49 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            menuPortal: (
-                                                                base
-                                                            ) => ({
+                                                            menuPortal: (base) => ({
                                                                 ...base,
                                                                 // zIndex: 9999,
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 ...(state.isFocused && {
                                                                     border: "0 0 0 1px #92BFF7",
-                                                                    boxShadow:
-                                                                        "none",
+                                                                    boxShadow: "none",
                                                                 }),
                                                             }),
-                                                            menu: (
-                                                                provided,
-                                                                state
-                                                            ) => ({
+                                                            menu: (provided, state) => ({
                                                                 ...provided,
                                                                 width: "150%",
                                                             }),
                                                         }}
                                                     />
                                                     <button
-                                                        onClick={_HandleAddChild.bind(
-                                                            this,
-                                                            e?.id,
-                                                            e?.matHang
-                                                        )}
+                                                        onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)}
                                                         className="w-8 h-8 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-4 right-5 hover:rotate-45 hover:bg-slate-200 transition hover:scale-105 hover:text-red-500 ease-in-out"
                                                     >
                                                         <Add className="" />
                                                     </button>
                                                 </div>
-                                                {e?.child?.filter(
-                                                    (e) => e?.kho == null
-                                                ).length >= 2 && (
+                                                {e?.child?.filter((e) => e?.kho == null).length >= 2 && (
                                                     <button
-                                                        onClick={_HandleDeleteAllChild.bind(
-                                                            this,
-                                                            e?.id,
-                                                            e?.matHang
-                                                        )}
+                                                        onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)}
                                                         className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
                                                     >
                                                         <span className="absolute right-0 w-full h-full -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
                                                         <span className="relative text-xs">
-                                                            Xóa{" "}
-                                                            {
-                                                                e?.child?.filter(
-                                                                    (e) =>
-                                                                        e?.kho ==
-                                                                        null
-                                                                ).length
-                                                            }{" "}
-                                                            hàng chưa chọn kho
+                                                            Xóa {e?.child?.filter((e) => e?.kho == null).length} hàng
+                                                            chưa chọn kho
                                                         </span>
                                                     </button>
                                                 )}
@@ -2103,28 +1698,16 @@ const Index = (props) => {
                                             <div className="col-span-10  items-center">
                                                 <div className="grid grid-cols-11  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
                                                     {load ? (
-                                                        <Loading
-                                                            className="h-2 col-span-11"
-                                                            color="#0f4f9e"
-                                                        />
+                                                        <Loading className="h-2 col-span-11" color="#0f4f9e" />
                                                     ) : (
                                                         e?.child?.map((ce) => (
-                                                            <React.Fragment
-                                                                key={ce?.id?.toString()}
-                                                            >
+                                                            <React.Fragment key={ce?.id?.toString()}>
                                                                 <div className="p-1 border-t border-l  flex flex-col col-span-2 justify-center h-full">
                                                                     <Select
-                                                                        options={
-                                                                            warehouse
-                                                                        }
-                                                                        value={
-                                                                            ce?.kho
-                                                                        }
+                                                                        options={warehouse}
+                                                                        value={ce?.kho}
                                                                         isLoading={
-                                                                            ce?.kho ==
-                                                                            null
-                                                                                ? onLoadingChild
-                                                                                : false
+                                                                            ce?.kho == null ? onLoadingChild : false
                                                                         }
                                                                         onChange={_HandleChangeChild.bind(
                                                                             this,
@@ -2133,18 +1716,10 @@ const Index = (props) => {
                                                                             "kho"
                                                                         )}
                                                                         className={`${
+                                                                            (errWarehouse && ce?.kho == null) ||
                                                                             (errWarehouse &&
-                                                                                ce?.kho ==
-                                                                                    null) ||
-                                                                            (errWarehouse &&
-                                                                                (ce
-                                                                                    ?.kho
-                                                                                    ?.label ==
-                                                                                    null ||
-                                                                                    ce
-                                                                                        ?.kho
-                                                                                        ?.warehouse_name ==
-                                                                                        null))
+                                                                                (ce?.kho?.label == null ||
+                                                                                    ce?.kho?.warehouse_name == null))
                                                                                 ? "border-red-500 border"
                                                                                 : ""
                                                                         }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
@@ -2154,12 +1729,8 @@ const Index = (props) => {
                                                                                 : dataLang?.returns_point ||
                                                                                   "returns_point"
                                                                         }
-                                                                        menuPortalTarget={
-                                                                            document.body
-                                                                        }
-                                                                        formatOptionLabel={(
-                                                                            option
-                                                                        ) => {
+                                                                        menuPortalTarget={document.body}
+                                                                        formatOptionLabel={(option) => {
                                                                             return (
                                                                                 (option?.warehouse_name ||
                                                                                     option?.label ||
@@ -2169,33 +1740,26 @@ const Index = (props) => {
                                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
                                                                                                 {dataLang?.returns_wareshoue ||
                                                                                                     "returns_wareshoue"}
-
                                                                                                 :
                                                                                             </h2>
                                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
-                                                                                                {
-                                                                                                    option?.warehouse_name
-                                                                                                }
+                                                                                                {option?.warehouse_name}
                                                                                             </h2>
                                                                                         </div>
                                                                                         <div className="flex gap-1">
                                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
                                                                                                 {dataLang?.returns_wareshouePosition ||
                                                                                                     "returns_wareshouePosition"}
-
                                                                                                 :
                                                                                             </h2>
                                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
-                                                                                                {
-                                                                                                    option?.label
-                                                                                                }
+                                                                                                {option?.label}
                                                                                             </h2>
                                                                                         </div>
                                                                                         <div className="flex gap-1">
                                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
                                                                                                 {dataLang?.returns_survive ||
                                                                                                     "returns_survive"}
-
                                                                                                 :
                                                                                             </h2>
                                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
@@ -2210,23 +1774,16 @@ const Index = (props) => {
                                                                         }}
                                                                         style={{
                                                                             border: "none",
-                                                                            boxShadow:
-                                                                                "none",
-                                                                            outline:
-                                                                                "none",
+                                                                            boxShadow: "none",
+                                                                            outline: "none",
                                                                         }}
-                                                                        theme={(
-                                                                            theme
-                                                                        ) => ({
+                                                                        theme={(theme) => ({
                                                                             ...theme,
                                                                             colors: {
                                                                                 ...theme.colors,
-                                                                                primary25:
-                                                                                    "#EBF5FF",
-                                                                                primary50:
-                                                                                    "#92BFF7",
-                                                                                primary:
-                                                                                    "#0F4F9E",
+                                                                                primary25: "#EBF5FF",
+                                                                                primary50: "#92BFF7",
+                                                                                primary: "#0F4F9E",
                                                                             },
                                                                         })}
                                                                         // styles={{
@@ -2239,22 +1796,16 @@ const Index = (props) => {
                                                                     />
                                                                 </div>
                                                                 <div className="text-center  p-0.5 pr-2.5 h-full flex flex-col justify-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                    {
-                                                                        ce?.donViTinh
-                                                                    }
+                                                                    {ce?.donViTinh}
                                                                 </div>
                                                                 <div className="relative">
                                                                     <div className="flex items-center justify-center h-full p-0.5">
                                                                         <button
                                                                             disabled={
-                                                                                ce?.amount ===
-                                                                                    1 ||
-                                                                                ce?.amount ===
-                                                                                    "" ||
-                                                                                ce?.amount ===
-                                                                                    null ||
-                                                                                ce?.amount ===
-                                                                                    0
+                                                                                ce?.amount === 1 ||
+                                                                                ce?.amount === "" ||
+                                                                                ce?.amount === null ||
+                                                                                ce?.amount === 0
                                                                             }
                                                                             className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
                                                                             onClick={_HandleChangeChild.bind(
@@ -2276,72 +1827,44 @@ const Index = (props) => {
                                                                                 ce?.id,
                                                                                 "amount"
                                                                             )}
-                                                                            value={
-                                                                                ce?.amount ||
-                                                                                null
-                                                                            }
+                                                                            value={ce?.amount || null}
                                                                             className={`${
                                                                                 errAmount &&
-                                                                                (ce?.amount ==
-                                                                                    null ||
-                                                                                    ce?.amount ==
-                                                                                        "" ||
-                                                                                    ce?.amount ==
-                                                                                        0)
+                                                                                (ce?.amount == null ||
+                                                                                    ce?.amount == "" ||
+                                                                                    ce?.amount == 0)
                                                                                     ? "border-b border-red-500"
                                                                                     : errSurvive
                                                                                     ? "border-b border-red-500"
                                                                                     : "border-b border-gray-200"
                                                                             } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
-                                                                            allowNegative={
-                                                                                false
-                                                                            }
-                                                                            decimalScale={
-                                                                                0
-                                                                            }
-                                                                            isNumericString={
-                                                                                true
-                                                                            }
+                                                                            allowNegative={false}
+                                                                            decimalScale={0}
+                                                                            isNumericString={true}
                                                                             thousandSeparator=","
                                                                             // isAllowed={(values) => {
                                                                             //    const {floatValue} = values;
                                                                             //    return floatValue > 0
                                                                             //   }}
-                                                                            isAllowed={(
-                                                                                values
-                                                                            ) => {
+                                                                            isAllowed={(values) => {
+                                                                                if (!values.value) return true;
+                                                                                const { floatValue } = values;
                                                                                 if (
-                                                                                    !values.value
-                                                                                )
-                                                                                    return true;
-                                                                                const {
-                                                                                    floatValue,
-                                                                                } =
-                                                                                    values;
-                                                                                if (
-                                                                                    floatValue >
-                                                                                        ce?.soluongcl ||
-                                                                                    floatValue >
-                                                                                        qtyHouse
+                                                                                    floatValue > ce?.soluongcl ||
+                                                                                    floatValue > qtyHouse
                                                                                 ) {
-                                                                                    Toast.fire(
-                                                                                        {
-                                                                                            icon: "error",
-                                                                                            title: `${
-                                                                                                props
-                                                                                                    .dataLang
-                                                                                                    ?.returns_err_Qty ||
-                                                                                                "returns_err_Qty"
-                                                                                            } ${ce?.soluongcl?.toLocaleString(
-                                                                                                "en"
-                                                                                            )}`,
-                                                                                        }
-                                                                                    );
+                                                                                    Toast.fire({
+                                                                                        icon: "error",
+                                                                                        title: `${
+                                                                                            props.dataLang
+                                                                                                ?.returns_err_Qty ||
+                                                                                            "returns_err_Qty"
+                                                                                        } ${ce?.soluongcl?.toLocaleString(
+                                                                                            "en"
+                                                                                        )}`,
+                                                                                    });
                                                                                 }
-                                                                                return (
-                                                                                    floatValue <=
-                                                                                    ce?.soluongcl
-                                                                                );
+                                                                                return floatValue <= ce?.soluongcl;
                                                                             }}
                                                                         />
                                                                         <button
@@ -2377,38 +1900,23 @@ const Index = (props) => {
                                                                                 </div>
                                                                             }
                                                                             position="left center"
-                                                                            on={[
-                                                                                "hover",
-                                                                                "focus",
-                                                                            ]}
+                                                                            on={["hover", "focus"]}
                                                                         >
                                                                             <div className="flex flex-col bg-gray-300 px-2.5 py-0.5 rounded-sm">
                                                                                 <span className="font-medium text-xs">
                                                                                     {dataLang?.returns_sldn ||
                                                                                         "returns_sldn"}
-
-                                                                                    :{" "}
-                                                                                    {formatNumber(
-                                                                                        ce?.soluongdn
-                                                                                    )}{" "}
+                                                                                    : {formatNumber(ce?.soluongdn)}{" "}
                                                                                 </span>
                                                                                 <span className="font-medium text-xs">
                                                                                     {dataLang?.returns_sldt ||
                                                                                         "returns_sldt"}
-
-                                                                                    :{" "}
-                                                                                    {formatNumber(
-                                                                                        ce?.soluongdt
-                                                                                    )}
+                                                                                    : {formatNumber(ce?.soluongdt)}
                                                                                 </span>
                                                                                 <span className="font-medium text-xs">
                                                                                     {dataLang?.returns_slcl ||
                                                                                         "returns_slcl"}
-
-                                                                                    :{" "}
-                                                                                    {formatNumber(
-                                                                                        ce?.soluongcl
-                                                                                    )}
+                                                                                    : {formatNumber(ce?.soluongcl)}
                                                                                 </span>
                                                                             </div>
                                                                         </Popup>
@@ -2423,30 +1931,14 @@ const Index = (props) => {
                                                                             ce?.id,
                                                                             "price"
                                                                         )}
-                                                                        value={
-                                                                            ce?.price
-                                                                        }
-                                                                        allowNegative={
-                                                                            false
-                                                                        }
-                                                                        decimalScale={
-                                                                            0
-                                                                        }
-                                                                        isNumericString={
-                                                                            true
-                                                                        }
+                                                                        value={ce?.price}
+                                                                        allowNegative={false}
+                                                                        decimalScale={0}
+                                                                        isNumericString={true}
                                                                         thousandSeparator=","
-                                                                        isAllowed={(
-                                                                            values
-                                                                        ) => {
-                                                                            const {
-                                                                                floatValue,
-                                                                            } =
-                                                                                values;
-                                                                            return (
-                                                                                floatValue >
-                                                                                0
-                                                                            );
+                                                                        isAllowed={(values) => {
+                                                                            const { floatValue } = values;
+                                                                            return floatValue > 0;
                                                                         }}
                                                                     />
                                                                 </div>
@@ -2459,30 +1951,14 @@ const Index = (props) => {
                                                                             ce?.id,
                                                                             "chietKhau"
                                                                         )}
-                                                                        value={
-                                                                            ce?.chietKhau
-                                                                        }
-                                                                        allowNegative={
-                                                                            false
-                                                                        }
-                                                                        decimalScale={
-                                                                            0
-                                                                        }
-                                                                        isNumericString={
-                                                                            true
-                                                                        }
+                                                                        value={ce?.chietKhau}
+                                                                        allowNegative={false}
+                                                                        decimalScale={0}
+                                                                        isNumericString={true}
                                                                         thousandSeparator=","
-                                                                        isAllowed={(
-                                                                            values
-                                                                        ) => {
-                                                                            const {
-                                                                                floatValue,
-                                                                            } =
-                                                                                values;
-                                                                            return (
-                                                                                floatValue >=
-                                                                                0
-                                                                            );
+                                                                        isAllowed={(values) => {
+                                                                            const { floatValue } = values;
+                                                                            return floatValue >= 0;
                                                                         }}
                                                                     />
                                                                 </div>
@@ -2490,25 +1966,15 @@ const Index = (props) => {
                                                                 <div className="col-span-1 text-right flex items-center justify-end  h-full p-0.5">
                                                                     <h3 className="px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                         {formatNumber(
-                                                                            Number(
-                                                                                ce?.price
-                                                                            ) *
-                                                                                (1 -
-                                                                                    Number(
-                                                                                        ce?.chietKhau
-                                                                                    ) /
-                                                                                        100)
+                                                                            Number(ce?.price) *
+                                                                                (1 - Number(ce?.chietKhau) / 100)
                                                                         )}
                                                                     </h3>
                                                                 </div>
                                                                 <div className=" flex flex-col items-center p-1 h-full justify-center">
                                                                     <Select
-                                                                        options={
-                                                                            taxOptions
-                                                                        }
-                                                                        value={
-                                                                            ce?.tax
-                                                                        }
+                                                                        options={taxOptions}
+                                                                        value={ce?.tax}
                                                                         onChange={_HandleChangeChild.bind(
                                                                             this,
                                                                             e?.id,
@@ -2520,40 +1986,27 @@ const Index = (props) => {
                                                                             "import_from_tax"
                                                                         }
                                                                         className={`  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                                                                        menuPortalTarget={
-                                                                            document.body
-                                                                        }
+                                                                        menuPortalTarget={document.body}
                                                                         style={{
                                                                             border: "none",
-                                                                            boxShadow:
-                                                                                "none",
-                                                                            outline:
-                                                                                "none",
+                                                                            boxShadow: "none",
+                                                                            outline: "none",
                                                                         }}
-                                                                        formatOptionLabel={(
-                                                                            option
-                                                                        ) => (
+                                                                        formatOptionLabel={(option) => (
                                                                             <div className="flex justify-start items-center gap-1 ">
                                                                                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                                    {
-                                                                                        option?.label
-                                                                                    }
+                                                                                    {option?.label}
                                                                                 </h2>
                                                                                 <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">{`(${option?.tax_rate})`}</h2>
                                                                             </div>
                                                                         )}
-                                                                        theme={(
-                                                                            theme
-                                                                        ) => ({
+                                                                        theme={(theme) => ({
                                                                             ...theme,
                                                                             colors: {
                                                                                 ...theme.colors,
-                                                                                primary25:
-                                                                                    "#EBF5FF",
-                                                                                primary50:
-                                                                                    "#92BFF7",
-                                                                                primary:
-                                                                                    "#0F4F9E",
+                                                                                primary25: "#EBF5FF",
+                                                                                primary50: "#92BFF7",
+                                                                                primary: "#0F4F9E",
                                                                             },
                                                                         })}
                                                                         classNamePrefix="customDropdowTax"
@@ -2563,29 +2016,15 @@ const Index = (props) => {
                                                                 <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                     {formatNumber(
                                                                         ce?.price *
-                                                                            (1 -
-                                                                                Number(
-                                                                                    ce?.chietKhau
-                                                                                ) /
-                                                                                    100) *
-                                                                            (1 +
-                                                                                Number(
-                                                                                    ce
-                                                                                        ?.tax
-                                                                                        ?.tax_rate
-                                                                                ) /
-                                                                                    100) *
-                                                                            Number(
-                                                                                ce?.amount
-                                                                            )
+                                                                            (1 - Number(ce?.chietKhau) / 100) *
+                                                                            (1 + Number(ce?.tax?.tax_rate) / 100) *
+                                                                            Number(ce?.amount)
                                                                     )}
                                                                 </div>
                                                                 {/* <div>{ce?.note}</div> */}
                                                                 <div className="col-span-1 flex items-center justify-center  h-full p-0.5">
                                                                     <input
-                                                                        value={
-                                                                            ce?.note
-                                                                        }
+                                                                        value={ce?.note}
                                                                         onChange={_HandleChangeChild.bind(
                                                                             this,
                                                                             e?.id,
@@ -2623,17 +2062,11 @@ const Index = (props) => {
                     </div>
                     <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
                         <div className="col-span-2  flex items-center gap-2">
-                            <h2>
-                                {dataLang?.purchase_order_detail_discount ||
-                                    "purchase_order_detail_discount"}
-                            </h2>
+                            <h2>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h2>
                             <div className="col-span-1 text-center flex items-center justify-center">
                                 <NumericFormat
                                     value={chietkhautong}
-                                    onValueChange={_HandleChangeInput.bind(
-                                        this,
-                                        "chietkhautong"
-                                    )}
+                                    onValueChange={_HandleChangeInput.bind(this, "chietkhautong")}
                                     className=" text-center py-1 px-2 bg-transparent font-medium w-20 focus:outline-none border-b-2 border-gray-300"
                                     thousandSeparator=","
                                     allowNegative={false}
@@ -2643,16 +2076,10 @@ const Index = (props) => {
                             </div>
                         </div>
                         <div className="col-span-2 flex items-center gap-2 ">
-                            <h2>
-                                {dataLang?.purchase_order_detail_tax ||
-                                    "purchase_order_detail_tax"}
-                            </h2>
+                            <h2>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h2>
                             <Select
                                 options={taxOptions}
-                                onChange={_HandleChangeInput.bind(
-                                    this,
-                                    "thuetong"
-                                )}
+                                onChange={_HandleChangeInput.bind(this, "thuetong")}
                                 value={thuetong}
                                 formatOptionLabel={(option) => (
                                     <div className="flex justify-start items-center gap-1 ">
@@ -2660,16 +2087,11 @@ const Index = (props) => {
                                         <h2>{`(${option?.tax_rate})`}</h2>
                                     </div>
                                 )}
-                                placeholder={
-                                    dataLang?.purchase_order_detail_tax ||
-                                    "purchase_order_detail_tax"
-                                }
+                                placeholder={dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}
                                 hideSelectedOptions={false}
                                 className={` "border-transparent placeholder:text-slate-300 w-[70%] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
                                 isSearchable={true}
-                                noOptionsMessage={() =>
-                                    dataLang?.returns_nodata || "returns_nodata"
-                                }
+                                noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                 //  dangerouslySetInnerHTML={{__html: option.label}}
                                 menuPortalTarget={document.body}
                                 closeMenuOnSelect={true}
@@ -2709,8 +2131,7 @@ const Index = (props) => {
                         </div>
                     </div>
                     <h2 className="font-normal bg-[white]  p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]">
-                        {dataLang?.purchase_order_table_total_outside ||
-                            "purchase_order_table_total_outside"}{" "}
+                        {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}{" "}
                     </h2>
                 </div>
                 <div className="grid grid-cols-12">
@@ -2720,9 +2141,7 @@ const Index = (props) => {
                         </div>
                         <textarea
                             value={note}
-                            placeholder={
-                                dataLang?.returns_reason || "returns_reason"
-                            }
+                            placeholder={dataLang?.returns_reason || "returns_reason"}
                             onChange={_HandleChangeInput.bind(this, "note")}
                             name="fname"
                             type="text"
@@ -2733,41 +2152,19 @@ const Index = (props) => {
                         <div className="flex justify-between "></div>
                         <div className="flex justify-between ">
                             <div className="font-normal ">
-                                <h3>
-                                    {dataLang?.purchase_order_table_total ||
-                                        "purchase_order_table_total"}
-                                </h3>
+                                <h3>{dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tongTien)} */}
                                     {formatNumber(
-                                        listData?.reduce(
-                                            (accumulator, item) => {
-                                                const childTotal =
-                                                    item.child?.reduce(
-                                                        (
-                                                            childAccumulator,
-                                                            childItem
-                                                        ) => {
-                                                            const product =
-                                                                Number(
-                                                                    childItem?.price
-                                                                ) *
-                                                                Number(
-                                                                    childItem?.amount
-                                                                );
-                                                            return (
-                                                                childAccumulator +
-                                                                product
-                                                            );
-                                                        },
-                                                        0
-                                                    );
-                                                return accumulator + childTotal;
-                                            },
-                                            0
-                                        )
+                                        listData?.reduce((accumulator, item) => {
+                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                                                const product = Number(childItem?.price) * Number(childItem?.amount);
+                                                return childAccumulator + product;
+                                            }, 0);
+                                            return accumulator + childTotal;
+                                        }, 0)
                                     )}
                                 </h3>
                             </div>
@@ -2775,44 +2172,23 @@ const Index = (props) => {
                         <div className="flex justify-between ">
                             <div className="font-normal">
                                 <h3>
-                                    {dataLang?.purchase_order_detail_discounty ||
-                                        "purchase_order_detail_discounty"}
+                                    {dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}
                                 </h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tienChietKhau)} */}
                                     {formatNumber(
-                                        listData?.reduce(
-                                            (accumulator, item) => {
-                                                const childTotal =
-                                                    item.child?.reduce(
-                                                        (
-                                                            childAccumulator,
-                                                            childItem
-                                                        ) => {
-                                                            const product =
-                                                                Number(
-                                                                    childItem?.price
-                                                                ) *
-                                                                (Number(
-                                                                    childItem?.chietKhau
-                                                                ) /
-                                                                    100) *
-                                                                Number(
-                                                                    childItem?.amount
-                                                                );
-                                                            return (
-                                                                childAccumulator +
-                                                                product
-                                                            );
-                                                        },
-                                                        0
-                                                    );
-                                                return accumulator + childTotal;
-                                            },
-                                            0
-                                        )
+                                        listData?.reduce((accumulator, item) => {
+                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                                                const product =
+                                                    Number(childItem?.price) *
+                                                    (Number(childItem?.chietKhau) / 100) *
+                                                    Number(childItem?.amount);
+                                                return childAccumulator + product;
+                                            }, 0);
+                                            return accumulator + childTotal;
+                                        }, 0)
                                     )}
                                 </h3>
                             </div>
@@ -2828,35 +2204,15 @@ const Index = (props) => {
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tongTienSauCK)} */}
                                     {formatNumber(
-                                        listData?.reduce(
-                                            (accumulator, item) => {
-                                                const childTotal =
-                                                    item.child?.reduce(
-                                                        (
-                                                            childAccumulator,
-                                                            childItem
-                                                        ) => {
-                                                            const product =
-                                                                Number(
-                                                                    childItem?.price *
-                                                                        (1 -
-                                                                            childItem?.chietKhau /
-                                                                                100)
-                                                                ) *
-                                                                Number(
-                                                                    childItem?.amount
-                                                                );
-                                                            return (
-                                                                childAccumulator +
-                                                                product
-                                                            );
-                                                        },
-                                                        0
-                                                    );
-                                                return accumulator + childTotal;
-                                            },
-                                            0
-                                        )
+                                        listData?.reduce((accumulator, item) => {
+                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                                                const product =
+                                                    Number(childItem?.price * (1 - childItem?.chietKhau / 100)) *
+                                                    Number(childItem?.amount);
+                                                return childAccumulator + product;
+                                            }, 0);
+                                            return accumulator + childTotal;
+                                        }, 0)
                                     )}
                                 </h3>
                             </div>
@@ -2864,54 +2220,25 @@ const Index = (props) => {
                         <div className="flex justify-between ">
                             <div className="font-normal">
                                 <h3>
-                                    {dataLang?.purchase_order_detail_tax_money ||
-                                        "purchase_order_detail_tax_money"}
+                                    {dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}
                                 </h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tienThue)} */}
                                     {formatNumber(
-                                        listData?.reduce(
-                                            (accumulator, item) => {
-                                                const childTotal =
-                                                    item.child?.reduce(
-                                                        (
-                                                            childAccumulator,
-                                                            childItem
-                                                        ) => {
-                                                            const product =
-                                                                Number(
-                                                                    childItem?.price *
-                                                                        (1 -
-                                                                            childItem?.chietKhau /
-                                                                                100)
-                                                                ) *
-                                                                (isNaN(
-                                                                    childItem
-                                                                        ?.tax
-                                                                        ?.tax_rate
-                                                                )
-                                                                    ? 0
-                                                                    : Number(
-                                                                          childItem
-                                                                              ?.tax
-                                                                              ?.tax_rate
-                                                                      ) / 100) *
-                                                                Number(
-                                                                    childItem?.amount
-                                                                );
-                                                            return (
-                                                                childAccumulator +
-                                                                product
-                                                            );
-                                                        },
-                                                        0
-                                                    );
-                                                return accumulator + childTotal;
-                                            },
-                                            0
-                                        )
+                                        listData?.reduce((accumulator, item) => {
+                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                                                const product =
+                                                    Number(childItem?.price * (1 - childItem?.chietKhau / 100)) *
+                                                    (isNaN(childItem?.tax?.tax_rate)
+                                                        ? 0
+                                                        : Number(childItem?.tax?.tax_rate) / 100) *
+                                                    Number(childItem?.amount);
+                                                return childAccumulator + product;
+                                            }, 0);
+                                            return accumulator + childTotal;
+                                        }, 0)
                                     )}
                                 </h3>
                             </div>
@@ -2919,71 +2246,40 @@ const Index = (props) => {
                         <div className="flex justify-between ">
                             <div className="font-normal">
                                 <h3>
-                                    {dataLang?.purchase_order_detail_into_money ||
-                                        "purchase_order_detail_into_money"}
+                                    {dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}
                                 </h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
                                     {/* {formatNumber(tongTienState.tongThanhTien)} */}
                                     {formatNumber(
-                                        listData?.reduce(
-                                            (accumulator, item) => {
-                                                const childTotal =
-                                                    item.child?.reduce(
-                                                        (
-                                                            childAccumulator,
-                                                            childItem
-                                                        ) => {
-                                                            const product =
-                                                                Number(
-                                                                    childItem?.price *
-                                                                        (1 -
-                                                                            childItem?.chietKhau /
-                                                                                100)
-                                                                ) *
-                                                                (1 +
-                                                                    Number(
-                                                                        childItem
-                                                                            ?.tax
-                                                                            ?.tax_rate
-                                                                    ) /
-                                                                        100) *
-                                                                Number(
-                                                                    childItem?.amount
-                                                                );
-                                                            return (
-                                                                childAccumulator +
-                                                                product
-                                                            );
-                                                        },
-                                                        0
-                                                    );
-                                                return accumulator + childTotal;
-                                            },
-                                            0
-                                        )
+                                        listData?.reduce((accumulator, item) => {
+                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                                                const product =
+                                                    Number(childItem?.price * (1 - childItem?.chietKhau / 100)) *
+                                                    (1 + Number(childItem?.tax?.tax_rate) / 100) *
+                                                    Number(childItem?.amount);
+                                                return childAccumulator + product;
+                                            }, 0);
+                                            return accumulator + childTotal;
+                                        }, 0)
                                     )}
                                 </h3>
                             </div>
                         </div>
                         <div className="space-x-2">
                             <button
-                                onClick={() =>
-                                    router.push("/purchase_order/returns")
-                                }
+                                onClick={() => router.push("/purchase_order/returns")}
                                 className="button text-[#344054] font-normal text-base hover:bg-blue-500 hover:text-white hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
                             >
-                                {dataLang?.purchase_order_purchase_back ||
-                                    "purchase_order_purchase_back"}
+                                {dataLang?.purchase_order_purchase_back || "purchase_order_purchase_back"}
                             </button>
                             <button
                                 onClick={_HandleSubmit.bind(this)}
                                 type="submit"
                                 className="button text-[#FFFFFF] hover:bg-blue-500 font-normal text-base hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
                             >
-                                {dataLang?.purchase_order_purchase_save ||
-                                    "purchase_order_purchase_save"}
+                                {dataLang?.purchase_order_purchase_save || "purchase_order_purchase_save"}
                             </button>
                         </div>
                     </div>

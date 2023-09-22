@@ -3,7 +3,13 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import moment from "moment";
 import { upperCase } from "lodash";
-import { styleMarginChild, styleMarginChildTotal, styles, uppercaseTextHeaderTabel } from "./stylePdf/style";
+import {
+    bottomForm,
+    styleMarginChild,
+    styleMarginChildTotal,
+    styles,
+    uppercaseTextHeaderTabel,
+} from "./stylePdf/style";
 import { VscFilePdf } from "react-icons/vsc";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -39,7 +45,8 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
         info: {
             title: `${
                 (props?.type === "price_quote" && `Báo Giá - ${data?.reference_no}`) ||
-                (props?.type === "sales_product" && `Đơn Hàng Bán - ${data?.code}`)
+                (props?.type === "sales_product" && `Đơn Hàng Bán - ${data?.code}`) ||
+                (props?.type === "deliveryReceipt" && `Phiếu Giao Hàng - ${data?.reference_no}`)
             }`,
             author: "Foso",
             subject: "Quotation",
@@ -107,7 +114,8 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
                     {
                         text:
                             (props?.type === "price_quote" && uppercaseText("bảng báo giá", "contentTitle")) ||
-                            (props?.type === "sales_product" && uppercaseText("đơn hàng bán", "contentTitle")),
+                            (props?.type === "sales_product" && uppercaseText("đơn hàng bán", "contentTitle")) ||
+                            (props?.type === "deliveryReceipt" && uppercaseText("Phiếu giao hàng", "contentTitle")),
                     },
                     // {
                     //     text:
@@ -142,7 +150,8 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
                                     {
                                         text: `${
                                             (props?.type === "price_quote" && `${data?.reference_no}`) ||
-                                            (props?.type === "sales_product" && `${data?.code}`)
+                                            (props?.type === "sales_product" && `${data?.code}`) ||
+                                            (props?.type === "deliveryReceipt" && `${data?.reference_no}`)
                                         }`,
                                         bold: true,
                                         fontSize: 8,
@@ -168,6 +177,8 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
                                             (props?.type === "price_quote" &&
                                                 `${moment(data?.date).format("DD/MM/YYYY")}`) ||
                                             (props?.type === "sales_product" &&
+                                                `${moment(data?.date).format("DD/MM/YYYY")}`) ||
+                                            (props?.type === "deliveryReceipt" &&
                                                 `${moment(data?.date).format("DD/MM/YYYY")}`),
                                         bold: true,
                                         fontSize: 8,
@@ -204,17 +215,23 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
             {
                 text: [
                     { text: "Khách hàng: ", inline: true, fontSize: 10 },
-                    { text: `${data?.client_name}`, bold: true, fontSize: 10 },
+                    {
+                        text: (props?.type == "deliveryReceipt" && `${data?.customer_name}`) || `${data?.client_name}`,
+                        bold: true,
+                        fontSize: 10,
+                    },
                 ],
                 margin: [0, 2, 0, 2],
             },
-            {
-                text: [
-                    { text: "Địa chỉ giao hàng: ", inline: true, fontSize: 10 },
-                    { text: "", bold: true, fontSize: 10 },
-                ],
-                margin: [0, 2, 0, 2],
-            },
+            props?.type == "deliveryReceipt"
+                ? {
+                      text: [
+                          { text: "Địa chỉ giao hàng: ", inline: true, fontSize: 10 },
+                          { text: `${data?.name_address_delivery}`, bold: true, fontSize: 10 },
+                      ],
+                      margin: [0, 2, 0, 2],
+                  }
+                : null,
             {
                 text: [
                     { text: "Ghi chú: ", inline: true, fontSize: 10 },
@@ -276,7 +293,10 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
                                           margin: styleMarginChild,
                                       },
                                       {
-                                          text: item?.discount_percent ? `${item?.discount_percent}` : "",
+                                          text:
+                                              (props?.type == "deliveryReceipt" && `${item?.discount_percent_item}%`) ||
+                                              (item?.discount_percent ? `${item?.discount_percent}%` : ""),
+
                                           alignment: "center",
                                           fontSize: 10,
                                           margin: styleMarginChild,
@@ -298,7 +318,10 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
                                           margin: styleMarginChild,
                                       },
                                       {
-                                          text: item?.note ? `${item?.note}` : "",
+                                          // note_item
+                                          text:
+                                              (props?.type == "deliveryReceipt" && `${item?.note_item}`) ||
+                                              (item?.note ? `${item?.note}` : ""),
                                           fontSize: 10,
                                           margin: styleMarginChild,
                                       },
@@ -369,38 +392,42 @@ const FilePDF = ({ props, dataCompany, data, setOpenAction }) => {
                 ],
                 margin: [0, 5, 0, 0],
             },
-            {
-                columns: [
-                    {
-                        text: "",
-                        width: "50%",
-                    },
-                    {
-                        width: "50%",
-                        stack: [
-                            {
-                                text: currentDate,
-                                style: "dateText",
-                                alignment: "center",
-                                fontSize: 10,
-                            },
-                            {
-                                text: "Người Lập Phiếu",
-                                style: "signatureText",
-                                alignment: "center",
-                                fontSize: 10,
-                            },
-                            {
-                                text: "(Ký, ghi rõ họ tên)",
-                                style: "signatureText",
-                                alignment: "center",
-                                fontSize: 10,
-                            },
-                        ],
-                    },
-                ],
-                columnGap: 2,
-            },
+            props?.type == "deliveryReceipt" ? bottomForm(props, currentDate).date : null,
+            props?.type == "deliveryReceipt" ? bottomForm(props, currentDate).column : null,
+            props?.type != "deliveryReceipt"
+                ? {
+                      columns: [
+                          {
+                              text: "",
+                              width: "50%",
+                          },
+                          {
+                              width: "50%",
+                              stack: [
+                                  {
+                                      text: currentDate,
+                                      style: "dateText",
+                                      alignment: "center",
+                                      fontSize: 10,
+                                  },
+                                  {
+                                      text: "Người Lập Phiếu",
+                                      style: "signatureText",
+                                      alignment: "center",
+                                      fontSize: 10,
+                                  },
+                                  {
+                                      text: "(Ký, ghi rõ họ tên)",
+                                      style: "signatureText",
+                                      alignment: "center",
+                                      fontSize: 10,
+                                  },
+                              ],
+                          },
+                      ],
+                      columnGap: 2,
+                  }
+                : null,
         ],
         // styles: {
         //     headerInfoTextWithMargin: {

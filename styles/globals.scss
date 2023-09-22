@@ -32,8 +32,7 @@ body::-webkit-scrollbar-thumb:hover {
         width: inherit;
         padding: inherit;
         border-radius: 8px;
-        -webkit-animation: anvil 0.1s cubic-bezier(0.38, 0.1, 0.36, 0.9)
-            forwards;
+        -webkit-animation: anvil 0.1s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
         top: -120px;
     }
 }
@@ -297,8 +296,7 @@ body::-webkit-scrollbar-thumb:hover {
 .CircularProgressbar .CircularProgressbar-background {
     fill: #d6d6d6;
 }
-.CircularProgressbar.CircularProgressbar-inverted
-    .CircularProgressbar-background {
+.CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-background {
     fill: #3e98c7;
 }
 .CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-text {

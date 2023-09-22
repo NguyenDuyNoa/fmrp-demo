@@ -74,3 +74,86 @@ export const styles = {
         margin: [0, 2, 0, 2],
     },
 };
+
+export const bottomForm = (props, currentDate) => {
+    return {
+        date: { style: "dateTexts", text: `${currentDate}`, alignment: "right" },
+        column: {
+            columns: [
+                {
+                    width: "33%",
+                    stack: [
+                        {
+                            text: "",
+                            style: "dateText",
+                            alignment: "center",
+                            fontSize: 10,
+                        },
+                        {
+                            text: `${"Người giao"}`,
+                            style: "signatureText",
+                            alignment: "center",
+                            fontSize: 10,
+                            bold: true,
+                        },
+                        {
+                            text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                            style: "signatureText",
+                            alignment: "center",
+                            fontSize: 10,
+                        },
+                    ],
+                },
+                {
+                    width: "33%",
+                    stack: [
+                        {
+                            text: "",
+                            style: "dateText",
+                            alignment: "center",
+                            fontSize: 10,
+                        },
+                        {
+                            text: `${"Người nhận"}`,
+                            style: "signatureText",
+                            alignment: "center",
+                            fontSize: 10,
+                            bold: true,
+                        },
+                        {
+                            text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                            style: "signatureText",
+                            alignment: "center",
+                            fontSize: 10,
+                        },
+                    ],
+                },
+                {
+                    width: "33%",
+                    stack: [
+                        {
+                            text: "",
+                            style: "dateText",
+                            alignment: "center",
+                            fontSize: 10,
+                        },
+                        {
+                            text: `${"Thủ kho"}`,
+                            style: "signatureText",
+                            alignment: "center",
+                            fontSize: 10,
+                            bold: true,
+                        },
+                        {
+                            text: `(${props.dataLang?.PDF_sign || "PDF_sign"})`,
+                            style: "signatureText",
+                            alignment: "center",
+                            fontSize: 10,
+                        },
+                    ],
+                },
+            ],
+            columnGap: 2,
+        },
+    };
+};
