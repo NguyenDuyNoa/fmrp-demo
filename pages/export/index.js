@@ -135,6 +135,15 @@ const Index = (props) => {
     }, [onFetching]);
     useEffect(() => {
         router.query.tab && sOnFetching(true);
+        router.query.tab &&
+            sArrEmty({
+                clients: [],
+                contacts: [],
+                address: [],
+                suppliers: [],
+                materials: [],
+                products: [],
+            });
     }, [router.query?.page, router.query?.tab]);
 
     const _HandleChange = (value, type) => {

@@ -1,22 +1,31 @@
-import Head from "next/head";
-import Swal from "sweetalert2";
-import moment from "moment";
-import DatePicker from "react-datepicker";
-import React, { useState, useEffect } from "react";
-import Select, { components } from "react-select";
+import React, { useRef, useState } from "react";
 import { useRouter } from "next/router";
-import { MdClear } from "react-icons/md";
-import { BsThreeDots } from "react-icons/bs";
-import { AiFillPlusCircle } from "react-icons/ai";
-import { BsCalendarEvent } from "react-icons/bs";
-import { Trash as IconDelete, Add, Minus } from "iconsax-react";
+import Head from "next/head";
 import { _ServerInstance as Axios } from "/services/axios";
-import { NumericFormat } from "react-number-format";
 import { v4 as uuidv4 } from "uuid";
+import dynamic from "next/dynamic";
 import Loading from "components/UI/loading";
-import PopupAddress from "./(popupAddress)/PopupAddress";
+
+import { MdClear } from "react-icons/md";
+import { BsCalendarEvent } from "react-icons/bs";
+import DatePicker from "react-datepicker";
+
+const ScrollArea = dynamic(() => import("react-scrollbar"), {
+    ssr: false,
+});
+import Select, { components, MenuListProps } from "react-select";
+
+import { Add, Trash as IconDelete, Image as IconImage, MaximizeCircle, Minus, TableDocument } from "iconsax-react";
+import Swal from "sweetalert2";
+import { useEffect } from "react";
+import { NumericFormat } from "react-number-format";
+import Link from "next/link";
+import moment from "moment/moment";
+import Popup from "reactjs-popup";
 import { useSelector } from "react-redux";
-import ButtonSubmit from "components/UI/buttonSubmit/buttonSubmit";
+import PopupAddress from "./(popupAddress)/PopupAddress";
+import { AiFillPlusCircle } from "react-icons/ai";
+import ToatstNotifi from "components/UI/alerNotification/alerNotification";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -25,228 +34,392 @@ const Toast = Swal.mixin({
     timer: 2000,
     timerProgressBar: true,
 });
+
 const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id;
+
     const dataLang = props?.dataLang;
-    const [onFetching, setOnFetching] = useState(false);
-    const [onFetchingItemsAll, setOnFetchingItemsAll] = useState(false);
-    const [onFetchingItem, setOnFetchingItem] = useState(false);
-    const [onFetchingDetail, setOnFetchingDetail] = useState(false);
-    const [onFetchingCustomer, setOnFetchingCustomer] = useState(false);
-    const [onFetchingStaff, setOnFetchingStaff] = useState(false);
-    const [onFetchingAddress, setOnFetchingAddress] = useState(false);
-    const [onFetchingQuote, setOnFetchingQuote] = useState(false);
-    const [onFetchingContactPerson, setOnFetchingContactPerson] = useState(false);
-    const [onSending, setOnSending] = useState(false);
-    const [option, setOption] = useState([]);
-
-    const [dataCustomer, setDataCustomer] = useState([]);
-    const [dataPersonContact, setDataContactPerson] = useState([]);
-    const [dataAddress, setDataAddress] = useState([]);
-    const [dataStaffs, setDataStaffs] = useState([]);
-    const [dataProductOrder, setDataProductOrder] = useState([]);
-    const [dataItems, setDataItems] = useState([]);
-    const [dataTasxes, setDataTasxes] = useState([]);
-    const [dataBranch, setDataBranch] = useState([]);
-
-    const [note, setNote] = useState("");
-    const [codeDelivery, setCodeProduct] = useState("");
-    const [totalTax, setTotalTax] = useState();
-    const [totalDiscount, setTotalDiscount] = useState(0);
-
-    const [startDate, setStartDate] = useState(new Date());
-    const [deliveryDate, setDeliveryDate] = useState(null);
-
-    const [customer, setCustomer] = useState(null);
-    const [contactPerson, setContactPerson] = useState(null);
-    const [address, setAddress] = useState(null);
-    const [staff, setStaff] = useState(null);
-    const [productOrder, setProductOrder] = useState(null);
-    const [branch, setBranch] = useState(null);
-
-    const [errDate, setErrDate] = useState(false);
-    const [errCustomer, sErrCustomer] = useState(false);
-    const [errStaff, setErrStaff] = useState(false);
-    const [errProductOrder, setErrProductOrder] = useState(false);
-    const [errAddress, setErrAddress] = useState(false);
-    const [errBranch, setErrBranch] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [errQty, setErrQty] = useState(false);
-
-    const [openPopupAddress, setOpenPopupAddress] = useState(false);
-
-    const [itemsAll, setItemsAll] = useState([]);
-
-    const [tongTienState, setTongTienState] = useState({
-        totalPrice: 0,
-        totalDiscountPrice: 0,
-        totalDiscountAfterPrice: 0,
-        totalTax: 0,
-        totalAmount: 0,
-    });
+    const scrollAreaRef = useRef(null);
+    const handleMenuOpen = () => {
+        const menuPortalTarget = scrollAreaRef.current;
+        return { menuPortalTarget };
+    };
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
 
-    useEffect(() => {
-        router.query && setErrDate(false);
-        router.query && sErrCustomer(false);
-        router.query && setErrStaff(false);
-        router.query && setErrBranch(false);
-        router.query && setErrQty(false);
-        router.query && setErrAddress(false);
-        router.query && setStartDate(new Date());
-        router.query && setDeliveryDate(null);
-        router.query && setNote("");
-        router.query && setOnFetching(true);
-        router.query && setOnFetchingItemsAll(true);
-    }, [id, router.query]);
+    const [onFetching, sOnFetching] = useState(false);
+    const [onFetchingDetail, sOnFetchingDetail] = useState(false);
+    const [onFetchingCondition, sOnFetchingCondition] = useState(false);
+    const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
+    const [onFetchingClient, sOnFetchingClient] = useState(false);
+    const [onFetchingContactPerson, sOnFetchingContactPerson] = useState(false);
+    const [onFetchingStaff, sOnFetchingStaff] = useState(false);
+    const [onFetchingProductOrder, sOnFetchingProductOrder] = useState(false);
+    const [onFetchingAddress, sOnFetchingAddress] = useState(false);
+    const [openPopupAddress, sOpenPopupAddress] = useState(false);
+    const [onLoading, sOnLoading] = useState(false);
+    const [onLoadingChild, sOnLoadingChild] = useState(false);
 
-    // Fetch edit
-    const _ServerFetchingDetail = () => {
-        Axios("GET", `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var rResult = response.data;
+    const [onSending, sOnSending] = useState(false);
+    const [generalTax, sThuetong] = useState();
+    const [generalDiscount, sChietkhautong] = useState(0);
+    const [code, sCode] = useState("");
+    const [startDate, sStartDate] = useState(new Date());
+    const [effectiveDate, sEffectiveDate] = useState(null);
 
-                const items = rResult?.items?.map((e) => ({
-                    price_quote_order_item_id: e?.id,
-                    id: e.id,
-                    item: {
-                        e: e?.item,
-                        label: `${e.item?.item_name} <span style={{display: none}}>${
-                            e.item?.codeDelivery + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                        }</span>`,
-                        value: e.item?.id,
-                    },
-                    quantity: +e?.quantity,
-                    price: +e?.price,
-                    discount: +e?.discount_percent,
-                    tax: { tax_rate: e?.tax_rate, value: e?.tax_id },
-                    unit: e.item?.unit_name,
-                    price_after_discount: +e?.price_after_discount,
-                    note: e?.note,
-                    total_amount: +e?.price_after_discount * (1 + +e?.tax_rate / 100) * +e?.quantity,
-                    delivery_date: moment(e?.delivery_date).toDate(),
-                }));
+    const [note, sNote] = useState("");
+    const [date, sDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
+    const [dataClient, sDataClient] = useState([]);
+    const [dataContactPerson, sDataContactPerson] = useState([]);
+    const [dataStaff, sDataStaff] = useState([]);
+    const [dataBranch, sDataBranch] = useState([]);
+    const [dataProductOrder, sDataProductOrder] = useState([]);
+    const [dataAddress, sDataAddress] = useState([]);
+    const [dataItems, sDataItems] = useState([]);
+    const [dataTasxes, sDataTasxes] = useState([]);
 
-                setOption(items);
-                setCodeProduct(rResult?.code);
-                setContactPerson(
-                    rResult?.contact_name !== null && rResult?.contact_name !== "0"
-                        ? {
-                              label: rResult?.contact_name,
-                              value: rResult?.contact_id,
-                          }
-                        : null
-                );
-                setBranch({
-                    label: rResult?.branch_name,
-                    value: rResult?.branch_id,
-                });
-                setStaff({
-                    label: rResult?.staff_name,
-                    value: rResult?.staff_id,
-                });
-                setCustomer({
-                    label: rResult?.client_name,
-                    value: rResult?.client_id,
-                });
-                setStartDate(moment(rResult?.date).toDate());
-                // setDeliveryDate(moment(rResult?.validity).toDate())
-                setNote(rResult?.note);
-                if (rResult?.quote_id !== "0" && rResult?.quote_code !== null) {
-                    // setTypeOrder("1")
-                    setProductOrder({
-                        label: rResult?.quote_code,
-                        value: rResult?.quote_id,
-                    });
-                }
-            }
-            setOnFetchingDetail(false);
-        });
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+    const [dataProductExpiry, sDataProductExpiry] = useState({});
+    const [dataProductSerial, sDataProductSerial] = useState({});
+
+    const [listData, sListData] = useState([]);
+
+    const [idBranch, sIdBranch] = useState(null);
+    const [idClient, sIdClient] = useState(null);
+    const [idContactPerson, sIdContactPerson] = useState(null);
+    const [idStaff, sIdStaff] = useState(null);
+    const [idProductOrder, sIdProductOrder] = useState(null);
+    const [idAddress, sIdAddress] = useState(null);
+    const [itemAll, sItemAll] = useState([]);
+
+    const [load, sLoad] = useState(false);
+
+    const [errClient, sErrClient] = useState(false);
+    const [errStaff, sErrStaff] = useState(false);
+    const [errProductOrder, sErrProductOrder] = useState(false);
+    const [errDate, sErrDate] = useState(false);
+    const [errAddress, sErrAddress] = useState(false);
+    const [errBranch, sErrBranch] = useState(false);
+    const [errWarehouse, sErrWarehouse] = useState(false);
+    const [errQuantity, sErrQuantity] = useState(false);
+    const [errSurvive, sErrSurvive] = useState(false);
+    const [errPrice, sErrPrice] = useState(false);
+    const [errSurvivePrice, sErrSurvivePrice] = useState(false);
+
+    const _HandleClosePopupAddress = (e) => {
+        sOpenPopupAddress(e);
+        !e && _ServerFetching_Address();
     };
 
-    // fetch chi nhanh
-    const handleFetchingBranch = () => {
-        setLoading(true);
-        Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
+    const resetAllStates = () => {
+        sCode("");
+        sStartDate(new Date());
+        sIdBranch(null);
+        sIdClient(null);
+        sIdContactPerson(null);
+        sIdProductOrder(null);
+        sIdStaff(null);
+        sIdAddress(null);
+        sNote("");
+        sErrBranch(false);
+        sErrDate(false);
+        sErrClient(false);
+        sErrProductOrder(false);
+        sErrQuantity(false);
+        sErrStaff(false);
+        sErrSurvive(false);
+        sErrSurvivePrice(false);
+        sErrWarehouse(false);
+    };
+
+    useEffect(() => {
+        // router.query && sErrDate(false);
+        // router.query && sErrClient(false);
+        // router.query && sErrAddress(false);
+        // router.query && sErrProductOrder(false);
+        // router.query && sErrSurvive(false);
+        // router.query && sErrSurvivePrice(false);
+        // router.query && sErrPrice(false);
+        // router.query && sErrStaff(false);
+        // router.query && sErrQuantity(false);
+        // router.query && sErrBranch(false);
+        // router.query && sStartDate(new Date());
+        // router.query && sNote("");
+        router.query && resetAllStates();
+    }, [router.query]);
+
+    const _ServerFetching = () => {
+        sOnLoading(true);
+        Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
-                setDataBranch(rResult?.map((e) => ({ label: e.name, value: e.id })));
-                setLoading(false);
+                var { result } = response.data;
+                sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
+                sOnLoading(false);
             }
         });
-
         Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 var { rResult } = response.data;
-                setDataTasxes(
+                sDataTasxes(
                     rResult?.map((e) => ({
                         label: e.name,
                         value: e.id,
                         tax_rate: e.tax_rate,
                     }))
                 );
-                setLoading(false);
+                sOnLoading(false);
             }
         });
 
-        setOnFetching(false);
+        sOnFetching(false);
     };
 
-    // fetch Customer
-    const handleFetchingCustomer = () => {
-        setLoading(true);
+    useEffect(() => {
+        onFetching && _ServerFetching();
+    }, [onFetching]);
+
+    const _ServerFetchingCondition = () => {
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+                sDataProductSerial(data.find((x) => x.code == "product_serial"));
+            }
+            sOnFetchingCondition(false);
+        });
+    };
+
+    useEffect(() => {
+        onFetchingCondition && _ServerFetchingCondition();
+    }, [onFetchingCondition]);
+
+    useEffect(() => {
+        id && sOnFetchingCondition(true);
+    }, []);
+
+    useEffect(() => {
+        JSON.stringify(dataMaterialExpiry) === "{}" &&
+            JSON.stringify(dataProductExpiry) === "{}" &&
+            JSON.stringify(dataProductSerial) === "{}" &&
+            sOnFetchingCondition(true);
+    }, [
+        JSON.stringify(dataMaterialExpiry) === "{}",
+        JSON.stringify(dataProductExpiry) === "{}",
+        JSON.stringify(dataProductSerial) === "{}",
+    ]);
+
+    const options = dataItems?.map((e) => ({
+        label: `${e.name}
+            <span style={{display: none}}>${e.code}</span>
+            <span style={{display: none}}>${e.product_variation} </span>
+            <span style={{display: none}}>${e.serial} </span>
+            <span style={{display: none}}>${e.lot} </span>
+            <span style={{display: none}}>${e.expiration_date} </span>
+            <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+        value: e.id,
+        e,
+    }));
+
+    const _ServerFetchingDetailPage = () => {
+        Axios("GET", `/api_web/Api_delivery/getDeliveryDetail/${id}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var rResult = response.data;
+                console.log("rResult", rResult);
+                sListData(
+                    rResult?.items.map((e) => ({
+                        id: e?.item?.id,
+                        idParenBackend: e?.item?.id,
+                        matHang: {
+                            e: e?.item,
+                            label: `${e.item?.name} <span style={{display: none}}>${
+                                e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                            }</span>`,
+                            value: e.item?.id,
+                        },
+                        child: e?.child.map((ce) => ({
+                            id: Number(ce?.id),
+                            idChildBackEnd: Number(ce?.id),
+                            disabledDate:
+                                (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
+                                (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
+                                (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
+                                (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
+                            warehouse: {
+                                label: e?.item?.warehouse_location?.location_name,
+                                value: e?.item?.warehouse_location?.id,
+                                warehouse_name: e?.item?.warehouse_location?.warehouse_name,
+                                qty: e?.item?.warehouse_location?.quantity,
+                            },
+                            dataWarehouse: e?.item?.warehouseList?.map((ce) => ({
+                                label: ce?.location_name,
+                                value: ce?.id,
+                                warehouse_name: ce?.warehouse_name,
+                                qty: ce?.quantity,
+                                lot: ce?.lot,
+                                date: ce?.expiration_date,
+                                serial: ce?.serial,
+                            })),
+                            quantityStock: e?.item?.quantity,
+                            quantityDelive: e?.item?.quantity_delivery,
+                            unit: e?.item?.unit_name,
+                            quantity: Number(ce?.quantity),
+                            price: Number(ce?.price),
+                            discount: Number(ce?.discount_percent_item),
+                            tax: {
+                                tax_rate: ce?.tax_rate_item,
+                                value: ce?.tax_id_item,
+                                label: ce?.tax_name_item || "Miễn thuế",
+                            },
+                            note: ce?.note_item,
+                        })),
+                    }))
+                );
+                sCode(rResult?.reference_no);
+                sIdBranch({
+                    label: rResult?.branch_name,
+                    value: rResult?.branch_id,
+                });
+                sStartDate(moment(rResult?.date).toDate());
+                sNote(rResult?.note);
+                sIdAddress({ label: rResult?.name_address_delivery, value: rResult?.address_delivery_id });
+                sIdClient({ label: rResult?.customer_name, value: rResult?.customer_id });
+                sIdStaff({ label: rResult?.staff_full_name, value: rResult?.staff_id });
+                sIdProductOrder({ label: rResult?.order_code, value: rResult?.order_id });
+                sIdContactPerson(
+                    rResult?.person_contact_id != 0 && {
+                        label: rResult?.person_contact_name,
+                        value: rResult?.person_contact_id,
+                    }
+                );
+            }
+            sOnFetchingDetail(false);
+        });
+    };
+    console.log("hihih", listData);
+
+    useEffect(() => {
+        onFetchingDetail && _ServerFetchingDetailPage();
+    }, [onFetchingDetail]);
+
+    useEffect(() => {
+        id &&
+            JSON.stringify(dataMaterialExpiry) !== "{}" &&
+            JSON.stringify(dataProductExpiry) !== "{}" &&
+            JSON.stringify(dataProductSerial) !== "{}" &&
+            sOnFetchingDetail(true);
+    }, [
+        JSON.stringify(dataMaterialExpiry) !== "{}" &&
+            JSON.stringify(dataProductExpiry) !== "{}" &&
+            JSON.stringify(dataProductSerial) !== "{}",
+    ]);
+
+    const _ServerFetching_ItemsAll = () => {
         Axios(
-            "GET",
-            `/api_web/api_client/client_option/?csrf_protection=true`,
+            "POST",
+            "/api_web/api_delivery/searchItemsVariant/?csrf_protection=true",
             {
                 params: {
-                    "filter[branch_id]": branch !== null ? branch?.value : null,
+                    "filter[order_id]": idProductOrder !== null ? +idProductOrder.value : null,
+                    "filter[delivery_id]": id ? id : "",
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var db = response.data.rResult;
-                    setDataCustomer(db?.map((e) => ({ label: e.name, value: e.id })));
-                    setLoading(false);
+                    var { result } = response.data.data;
+                    sDataItems(result);
                 }
             }
         );
-        setOnFetchingCustomer(false);
+        sOnFetchingItemsAll(false);
     };
-    // Contact person
-    const handleFetchingContactPerson = () => {
-        setLoading(true);
+
+    const _ServerFetching_Client = () => {
+        sOnLoading(true);
         Axios(
             "GET",
-            `/api_web/api_client/contactCombobox/?csrf_protection=true`,
+            "/api_web/api_client/client_option/?csrf_protection=true",
             {
                 params: {
-                    "filter[client_id]": customer != null ? customer.value : null,
+                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
                 },
             },
             (err, response) => {
                 if (!err) {
                     var { rResult } = response.data;
-                    setDataContactPerson(
-                        rResult?.map((e) => ({
-                            label: e.full_name,
-                            value: e.id,
-                        }))
-                    );
-                    setLoading(false);
+                    sDataClient(rResult?.map((e) => ({ label: e.name, value: e.id })));
+                    sOnLoading(false);
                 }
             }
         );
-        setOnFetchingContactPerson(false);
+        sOnFetchingClient(false);
+    };
+    const _ServerFetching_ContactPerson = () => {
+        sOnLoading(true);
+        Axios(
+            "GET",
+            "/api_web/api_client/contactCombobox/?csrf_protection=true",
+            {
+                params: {
+                    "filter[client_id]": idClient != null ? idClient.value : null,
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    var { rResult } = response.data;
+                    sDataContactPerson(rResult?.map((e) => ({ label: e.full_name, value: e.id })));
+                    sOnLoading(false);
+                }
+            }
+        );
+        sOnFetchingContactPerson(false);
+    };
+    const _ServerFetching_Staff = () => {
+        sOnLoading(true);
+        Axios(
+            "GET",
+            "/api_web/Api_staff/staffOption?csrf_protection=true",
+            {
+                params: {
+                    "filter[branch_id]": idBranch !== null ? +idBranch?.value : null,
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    var { rResult } = response.data;
+                    sDataStaff(rResult?.map((e) => ({ label: e.name, value: e.staffid })));
+                    sOnLoading(false);
+                }
+            }
+        );
+        sOnFetchingStaff(false);
     };
 
-    // Address
-    const handleFetchingAddress = () => {
-        setLoading(true);
+    const _ServerFetching_ProductOrder = () => {
         var data = new FormData();
-        data.append("client_id", customer !== null ? +customer.value : null);
+        data.append("branch_id", idBranch !== null ? +idBranch.value : null);
+        data.append("client_id", idClient !== null ? +idClient.value : null);
+        id && data.append("filter[delivery_id]", id ? id : "");
+        Axios(
+            "POST",
+            `/api_web/api_delivery/searchOrdersToCustomer?csrf_protection=true`,
+            {
+                data: data,
+                headers: { "Content-Type": "multipart/form-data" },
+            },
+            (err, response) => {
+                if (!err) {
+                    var { results } = response?.data;
+                    sDataProductOrder(results?.map((e) => ({ label: e.text, value: e.id })));
+                }
+            }
+        );
+        sOnFetchingProductOrder(false);
+    };
 
+    const _ServerFetching_Address = () => {
+        var data = new FormData();
+        data.append("client_id", idClient !== null ? +idClient.value : null);
         Axios(
             "POST",
             `/api_web/api_delivery/GetShippingClient?csrf_protection=true`,
@@ -257,930 +430,468 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     var rResult = response?.data;
-                    setDataAddress(rResult?.map((e) => ({ label: e.name, value: e.id })));
-                    setLoading(false);
+                    sDataAddress(rResult?.map((e) => ({ label: e.name, value: e.id })));
                 }
             }
         );
-        setOnFetchingAddress(false);
-    };
-    // Staff
-    const handleFetchingStaff = () => {
-        setLoading(true);
-        Axios(
-            "GET",
-            `/api_web/Api_staff/staffOption?csrf_protection=true`,
-            {
-                params: {
-                    "filter[branch_id]": branch !== null ? +branch?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response?.data;
-                    setDataStaffs(
-                        rResult?.map((e) => ({
-                            label: e.name,
-                            value: e.staffid,
-                        }))
-                    );
-                    setLoading(false);
-                }
-            }
-        );
-        setOnFetchingStaff(false);
-    };
-
-    // Đơn hàng bán
-    const handleFetchingProductOrder = () => {
-        setLoading(true);
-        var data = new FormData();
-        data.append("branch_id", branch !== null ? +branch.value : null);
-        data.append("client_id", customer !== null ? +customer.value : null);
-
-        Axios(
-            "POST",
-            `/api_web/api_delivery/searchOrdersToCustomer?csrf_protection=true`,
-            {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var rResult = response?.data.results;
-                    setDataProductOrder(rResult?.map((e) => ({ label: e.text, value: e.id })));
-                    setLoading(false);
-                }
-            }
-        );
-        setOnFetchingQuote(false);
-    };
-
-    // fetch items
-    // const handleFetchingItemsAll = () => {
-
-    //   Axios("POST", "/api_web/Api_product/searchItemsVariant/?csrf_protection=true", {}, (err, response) => {
-    //     if (!err) {
-    //       var { result } = response.data.data
-    //       setDataItems(result)
-    //     }
-    //   })
-    //   setOnFetchingItemsAll(false)
-
-    // }
-
-    const handleFetchingItem = () => {
-        Axios(
-            "POST",
-            "/api_web/api_delivery/searchItemsVariant/?csrf_protection=true",
-            {
-                params: {
-                    "filter[order_id]": productOrder !== null ? +productOrder.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { result } = response.data.data;
-                    setDataItems(result);
-                }
-            }
-        );
-        setOnFetchingItem(false);
+        sOnFetchingAddress(false);
     };
 
     useEffect(() => {
-        (branch === null && setDataCustomer([])) ||
-            setCustomer(null) ||
-            setDataContactPerson([]) ||
-            setContactPerson(null) ||
-            setDataStaffs([]) ||
-            setStaff(null);
+        idBranch === null && sDataClient([]);
     }, []);
 
-    useEffect(() => {
-        onFetchingCustomer && handleFetchingCustomer();
-    }, [onFetchingCustomer]);
+    const checkListData = (value, sDataItems, sListData, sId, id, idEmty) => {
+        return Swal.fire({
+            title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#296dc1",
+            cancelButtonColor: "#d33",
+            confirmButtonText: `${dataLang?.aler_yes}`,
+            cancelButtonText: `${dataLang?.aler_cancel}`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                sDataItems([]);
+                sListData([]);
+                sId(value);
+                idEmty && idEmty(null);
+            } else {
+                sId({ ...id });
+            }
+        });
+    };
+
+    const _HandleChangeInput = (type, value) => {
+        if (type == "code") {
+            sCode(value.target.value);
+        } else if (type === "date") {
+            sDate(moment(value.target.value).format("YYYY-MM-DD HH:mm:ss"));
+        } else if (type === "idClient" && idClient != value) {
+            if (listData?.length > 0) {
+                checkListData(value, sDataItems, sListData, sIdClient, idClient, sIdProductOrder);
+            } else {
+                sIdClient(value);
+                if (value == null) {
+                    sDataProductOrder([]);
+                }
+            }
+        } else if (type === "idContactPerson") {
+            sIdContactPerson(value);
+        } else if (type === "idStaff" && idStaff != value) {
+            sIdStaff(value);
+        } else if (type === "idProductOrder" && idProductOrder != value) {
+            if (listData?.length > 0) {
+                checkListData(value, sDataItems, sListData, sIdProductOrder, idProductOrder);
+            } else {
+                sIdProductOrder(value);
+            }
+        } else if (type === "idAddress") {
+            sIdAddress(value);
+        } else if (type === "itemAll" && itemAll != value) {
+            sItemAll(value);
+            if (value?.length === 0) {
+                sListData([]);
+            } else if (value?.length > 0) {
+                const newData = value?.map((e, index) => {
+                    const parent = _DataValueItem(e).parent;
+                    return parent;
+                });
+                sListData([...newData]);
+            }
+        } else if (type === "note") {
+            sNote(value.target.value);
+        } else if (type == "branch" && idBranch != value) {
+            if (listData?.length > 0) {
+                checkListData(value, sDataItems, sListData, sIdBranch, idBranch);
+            } else {
+                sIdBranch(value);
+                if (value == null) {
+                    sDataClient([]);
+                }
+            }
+        } else if (type == "generalTax") {
+            sThuetong(value);
+            if (listData?.length > 0) {
+                const newData = listData.map((e) => {
+                    const newChild = e?.child.map((ce) => {
+                        return { ...ce, tax: value };
+                    });
+                    return { ...e, child: newChild };
+                });
+                sListData(newData);
+            }
+        } else if (type == "generalDiscount") {
+            sChietkhautong(value?.value);
+            if (listData?.length > 0) {
+                const newData = listData.map((e) => {
+                    const newChild = e?.child.map((ce) => {
+                        return { ...ce, discount: value?.value };
+                    });
+                    return { ...e, child: newChild };
+                });
+                sListData(newData);
+            }
+        }
+    };
+
+    const handleClearDate = (type) => {
+        if (type === "effectiveDate") {
+            sEffectiveDate(null);
+        }
+        if (type === "startDate") {
+            sStartDate(new Date());
+        }
+    };
+    const handleTimeChange = (date) => {
+        sStartDate(date);
+    };
 
     useEffect(() => {
-        onFetchingStaff && handleFetchingStaff();
+        sErrDate(false);
+    }, [date != null]);
+
+    useEffect(() => {
+        sErrClient(false);
+    }, [idClient != null]);
+
+    useEffect(() => {
+        sErrStaff(false);
+    }, [idStaff != null]);
+
+    useEffect(() => {
+        sErrBranch(false);
+    }, [idBranch != null]);
+
+    useEffect(() => {
+        sErrProductOrder(false);
+    }, [idProductOrder != null]);
+
+    useEffect(() => {
+        sErrAddress(false);
+    }, [idAddress != null]);
+
+    useEffect(() => {
+        router.query && sOnFetching(true);
+    }, [router.query]);
+
+    useEffect(() => {
+        onFetchingClient && _ServerFetching_Client();
+    }, [onFetchingClient]);
+    useEffect(() => {
+        onFetchingStaff && _ServerFetching_Staff();
     }, [onFetchingStaff]);
 
     useEffect(() => {
-        onFetchingAddress && handleFetchingAddress();
-    }, [onFetchingAddress]);
-
-    useEffect(() => {
-        onFetchingQuote && handleFetchingProductOrder();
-    }, [onFetchingQuote]);
-
-    useEffect(() => {
-        onFetchingContactPerson && handleFetchingContactPerson();
-    }, [onFetchingContactPerson]);
-
-    useEffect(() => {
-        branch !== null && (setOnFetchingCustomer(true) || setOnFetchingStaff(true));
-    }, [branch]);
-
-    useEffect(() => {
-        customer !== null &&
-            (setOnFetchingContactPerson(true) || setOnFetchingQuote(true) || setOnFetchingAddress(true));
-    }, [customer]);
-    useEffect(() => {
-        productOrder !== null && setOnFetchingItem(true);
-    }, [productOrder]);
-
-    // useEffect(() => {
-    //   onFetchingItemsAll && handleFetchingItemsAll()
-    // }, [onFetchingItemsAll])
-
-    useEffect(() => {
-        onFetchingItem && handleFetchingItem();
-    }, [onFetchingItem]);
-
-    useEffect(() => {
-        onFetching && handleFetchingBranch();
-    }, [onFetching]);
-
-    const options = dataItems?.map((e) => {
-        return {
-            label: `${e.name} <span style={{display: none}}>${e.codeDelivery}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
-            value: e.id,
-            e,
-        };
-    });
-
-    useEffect(() => {
-        onFetchingDetail && _ServerFetchingDetail();
-    }, [onFetchingDetail]);
-
-    useEffect(() => {
-        id && setOnFetchingDetail(true);
-    }, []);
-
-    // tổng thay đổi
-    useEffect(() => {
-        if (totalTax == null) return;
-        setOption((prevOption) => {
-            const newOption = [...prevOption];
-            const thueValue = totalTax?.tax_rate || 0;
-            const chietKhauValue = totalDiscount || 0;
-            newOption.forEach((item, index) => {
-                const dongiasauchietkhau = item?.price * (1 - chietKhauValue / 100);
-                const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.quantity;
-                item.tax = totalTax;
-                item.total_amount = isNaN(thanhTien) ? 0 : thanhTien;
-            });
-            return newOption;
-        });
-    }, [totalTax]);
-
-    useEffect(() => {
-        if (deliveryDate == null) return;
-        setOption((prevOption) => {
-            const newOption = [...prevOption];
-
-            newOption.forEach((item, index) => {
-                item.delivery_date = deliveryDate || null;
-            });
-            return newOption;
-        });
-    }, [deliveryDate]);
-
-    useEffect(() => {
-        if (totalDiscount == null) return;
-        setOption((prevOption) => {
-            const newOption = [...prevOption];
-            const thueValue = totalTax?.tax_rate != undefined ? totalTax?.tax_rate : 0;
-            const chietKhauValue = totalDiscount ? totalDiscount : 0;
-
-            newOption.forEach((item, index) => {
-                const dongiasauchietkhau = item?.price * (1 - chietKhauValue / 100);
-                const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.quantity;
-                item.tax = totalTax;
-                item.discount = Number(totalDiscount);
-                item.price_after_discount = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau;
-                item.total_amount = isNaN(thanhTien) ? 0 : thanhTien;
-            });
-            return newOption;
-        });
-    }, [totalDiscount]);
-    // Hàm kiểm tra và  error
-    const setErrorState = (variable, setErrorFunction) => {
-        if (variable != null) {
-            setErrorFunction(false);
+        if (idBranch == null) {
+            sIdClient(null);
+            sIdProductOrder(null);
+            sDataProductOrder([]);
+            sIdStaff(null);
+            sDataStaff([]);
+        } else {
+            sOnFetchingClient(true);
+            sOnFetchingStaff(true);
         }
-    };
-    useEffect(() => {
-        setErrorState(startDate, setErrDate);
-        setErrorState(customer, sErrCustomer);
-        setErrorState(address, setErrAddress);
-        setErrorState(branch, setErrBranch);
-        setErrorState(staff, setErrStaff);
-    }, [startDate, customer, address, branch, staff]);
+    }, [idBranch]);
 
-    // format number
+    useEffect(() => {
+        idBranch != null && idClient != null && sOnFetchingProductOrder(true);
+    }, [idBranch, idClient]);
+
+    useEffect(() => {
+        idProductOrder != null && sOnFetchingItemsAll(true);
+    }, [idProductOrder]);
+
+    useEffect(() => {
+        if (idClient == null) {
+            sIdProductOrder(null);
+            sDataProductOrder([]);
+        } else {
+            _ServerFetching_ContactPerson(true);
+            sOnFetchingAddress(true);
+        }
+    }, [idClient]);
+
+    const useFetchingEffect = (condition, serverFetchFunction) => {
+        useEffect(() => {
+            if (condition) {
+                serverFetchFunction();
+            }
+        }, [condition, serverFetchFunction]);
+    };
+
+    useFetchingEffect(onFetchingContactPerson, _ServerFetching_Client);
+    useFetchingEffect(onFetchingProductOrder, _ServerFetching_ProductOrder);
+    useFetchingEffect(onFetchingAddress, _ServerFetching_Address);
+    useFetchingEffect(onFetchingItemsAll, _ServerFetching_ItemsAll);
+
+    const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes];
+
     const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
         const integerPart = Math.floor(number);
         return integerPart.toLocaleString("en");
     };
 
-    // onChange
-    const handleOnChangeInput = (type, value) => {
-        if (type === "codeDelivery") {
-            setCodeProduct(value.target.value);
-        } else if (type === "customer") {
-            if (option?.length >= 1) {
-                Swal.fire({
-                    title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó, bạn có muốn tiếp tục ?"}`,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#296dc1",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: `${dataLang?.aler_yes}`,
-                    cancelButtonText: `${dataLang?.aler_cancel}`,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        setCustomer(value);
-                        setDataContactPerson([]);
-                        setDataAddress([]);
-                        setAddress(null);
-                        setContactPerson(null);
-                        setDataProductOrder([]);
-                        setProductOrder(null);
-                        setOption([]);
-                        setErrProductOrder(false);
-
-                        // setOnFetchingItem(true);
-                    }
-                });
-            } else {
-                setCustomer(value);
-                setDataContactPerson([]);
-                setDataAddress([]);
-                setAddress(null);
-                setContactPerson(null);
-                setDataProductOrder([]);
-                setProductOrder(null);
-                setErrProductOrder(false);
-
-                // setOnFetchingItem(true);
-            }
-        } else if (type === "branch") {
-            if (option?.length >= 1) {
-                Swal.fire({
-                    title: `${"Mặt hàng đã chọn sẽ bị xóa, bạn có muốn tiếp tục?"}`,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#296dc1",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: `${dataLang?.aler_yes}`,
-                    cancelButtonText: `${dataLang?.aler_cancel}`,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        setBranch(value);
-                        setOption([]);
-                        setCustomer(null);
-                        setDataCustomer([]);
-                        setDataContactPerson([]);
-                        setDataAddress([]);
-                        setContactPerson(null);
-                        setDataStaffs([]);
-                        setStaff(null);
-                        setDataProductOrder([]);
-                        setProductOrder(null);
-                    }
-                });
-            } else if (value !== branch) {
-                setBranch(value);
-                setCustomer(null);
-                setDataCustomer([]);
-                setDataContactPerson([]);
-                setDataAddress([]);
-                setContactPerson(null);
-                setDataStaffs([]);
-                setStaff(null);
-                setDataProductOrder([]);
-                setProductOrder(null);
-                setOption([]);
-            }
-        } else if (type === "contactPerson") {
-            setContactPerson(value);
-        } else if (type === "address") {
-            setAddress(value);
-        } else if (type === "staff") {
-            setStaff(value);
-        } else if (type === "productOrder") {
-            if (option?.length >= 1) {
-                Swal.fire({
-                    title: `${"Thay đổi sẽ xóa lựa chọn mặt hàng trước đó, bạn có muốn tiếp tục ?"}`,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#296dc1",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: `${dataLang?.aler_yes}`,
-                    cancelButtonText: `${dataLang?.aler_cancel}`,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        setProductOrder(value);
-                        setOption([]);
-
-                        setOnFetchingItemsAll(true);
-                        setOnFetchingItem(true);
-                    }
-                });
-            } else {
-                setProductOrder(value);
-                setOnFetchingItem(true);
-            }
-        } else if (type === "note") {
-            setNote(value.target.value);
-        } else if (type === "total_tax") {
-            setTotalTax(value);
-        } else if (type === "total_delivery_date") {
-            setDeliveryDate(value);
-        } else if (type === "totaldiscount") {
-            setTotalDiscount(value?.value);
-        } else if (type == "itemAll") {
-            setItemsAll(value);
-            if (value?.length === 0) {
-                // setOption([{id: Date.now(), item: null}])
-                //new
-                setOption([]);
-            } else if (value?.length > 0) {
-                const newData = value
-                    ?.map((e, index) => {
-                        return {
-                            id: uuidv4(),
-                            item: {
-                                e: e?.e,
-                                label: e?.label,
-                                value: e?.value,
-                            },
-                            unit: e?.e?.unit_name,
-                            quantity: +e?.e?.quantity - (+e?.e?.quantity_delivery || 0),
-                            sortIndex: index,
-                            price: e?.e?.price,
-                            discount: e?.e?.discount_percent_item,
-                            price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent_item / 100),
-                            tax: {
-                                label: e?.e?.tax_name,
-                                value: e?.e?.tax_id_item,
-                                tax_rate: e?.e?.tax_rate_item,
-                            },
-                            price_after_tax:
-                                +e?.e?.price *
-                                e?.e?.quantity *
-                                (1 - +e?.e?.discount_percent_item / 100) *
-                                (1 + e?.e?.tax_rate_item / 100),
-                            total_amount:
-                                +e?.e?.price *
-                                (1 - +e?.e?.discount_percent_item / 100) *
-                                (1 + +e?.e?.tax_rate_item / 100) *
-                                +e?.e?.quantity,
-                            note: e?.e?.note_item,
-                        };
-                    })
-                    .sort((a, b) => b.sortIndex - a.sortIndex);
-                setOption([...newData]);
-            }
-        }
-    };
-
-    const handleAddParent = (value) => {
-        const checkData = option?.some((e) => e?.item?.value === value?.value);
-        if (!checkData) {
-            const newData = {
+    const _DataValueItem = (value) => {
+        const newChild = {
+            id: uuidv4(),
+            idChildBackEnd: null,
+            disabledDate:
+                (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
+                (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
+                (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
+                (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
+            quantityStock: value?.e?.quantity,
+            quantityDelive: value?.e?.quantity_delivery,
+            warehouse: null,
+            dataWarehouse: value?.e?.warehouseList?.map((e) => ({
+                label: e?.location_name,
+                value: e?.id,
+                warehouse_name: e?.warehouse_name,
+                qty: e?.quantity,
+                lot: e?.lot,
+                date: e?.expiration_date,
+                serial: e?.serial,
+            })),
+            unit: value?.e?.unit_name,
+            price: Number(value?.e?.price),
+            quantity: value?.e?.quantity,
+            discount: generalDiscount ? generalDiscount : Number(value?.e?.discount_percent_item),
+            tax: generalTax
+                ? generalTax
+                : {
+                      label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
+                      value: value?.e?.tax_id_item,
+                      tax_rate: value?.e?.tax_rate_item,
+                  },
+            note: value?.e?.note_item,
+        };
+        return {
+            newChild: newChild,
+            parent: {
                 id: uuidv4(),
-                item: {
-                    e: value?.e,
-                    label: value?.label,
-                    value: value?.value,
-                },
-                unit: value?.e?.unit_name,
-                quantity: +value?.e?.quantity - (+value?.e?.quantity_delivery || 0),
-                price: value?.e?.price,
-                discount: value?.e?.discount_percent_item,
-                price_after_discount: +value?.e?.price * (1 - +value?.e?.discount_percent_item / 100),
-                tax: {
-                    label: value?.e?.tax_name,
-                    value: value?.e?.tax_id_item,
-                    tax_rate: value?.e?.tax_rate_item,
-                },
-                price_after_tax:
-                    +value?.e?.price *
-                    value?.e?.quantity *
-                    (1 - +value?.e?.discount_percent_item / 100) *
-                    (1 + value?.e?.tax_rate_item / 100),
-                total_amount:
-                    +value?.e?.price *
-                    (1 - +value?.e?.discount_percent_item / 100) *
-                    (1 + +value?.e?.tax_rate_item / 100) *
-                    +value?.e?.quantity,
-                note: value?.e?.note_item,
-            };
-            setOption([newData, ...option]);
+                matHang: value,
+                idParenBackend: null,
+                child: [newChild],
+            },
+        };
+    };
+
+    const _HandleAddChild = (parentId, value) => {
+        const newData = listData?.map((e) => {
+            if (e?.id === parentId) {
+                const newChild = _DataValueItem(value).newChild;
+                return { ...e, child: [...e.child, newChild] };
+            } else {
+                return e;
+            }
+        });
+        sListData(newData);
+    };
+
+    const _HandleAddParent = (value) => {
+        const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
+        if (!checkData) {
+            const newData = _DataValueItem(value).parent;
+            sListData([newData, ...listData]);
         } else {
-            Toast.fire({
-                title: `${"Mặt hàng đã được chọn"}`,
-                icon: "error",
-            });
+            ToatstNotifi("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
         }
     };
 
-    // change items
-    const handleOnChangeInputOption = (id, type, value) => {
-        var index = option.findIndex((x) => x.id === id);
-
-        if (type == "unit") {
-            option[index].unit = value.target?.value;
-        } else if (type === "quantity") {
-            if (value?.floatValue > 0 && option[index].quantity > 0) {
-                option[index].quantity = Number(value?.value);
-                if (option[index].tax?.tax_rate == undefined) {
-                    const tien =
-                        Number(option[index].price_after_discount) *
-                        (1 + Number(0) / 100) *
-                        Number(option[index].quantity);
-                    option[index].total_amount = Number(tien.toFixed(2));
-                } else {
-                    const tien =
-                        Number(option[index].price_after_discount) *
-                        (1 + Number(option[index].tax?.tax_rate) / 100) *
-                        Number(option[index].quantity);
-                    option[index].total_amount = Number(tien.toFixed(2));
+    const _HandleDeleteChild = (parentId, childId) => {
+        const newData = listData
+            .map((e) => {
+                if (e.id === parentId) {
+                    const newChild = e.child?.filter((ce) => ce?.id !== childId);
+                    return { ...e, child: newChild };
                 }
-                setOption([...option]);
-            } else {
-                option[index].quantity = value?.value;
-            }
-            // bug so luong neu so luong la 1
-            // if (value?.floatValue === 0 || value?.floatValue === 1 || option[index].quantity === 1) {
-            //     option[index].quantity = 1;
-            // }
-        } else if (type == "price") {
-            option[index].price = Number(value.value);
-            option[index].price_after_discount = +option[index].price * (1 - option[index].discount / 100);
-            option[index].price_after_discount = +(Math.round(option[index].price_after_discount + "e+2") + "e-2");
-            if (option[index].tax?.tax_rate == undefined) {
-                const tien =
-                    Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
-                option[index].total_amount = Number(tien.toFixed(2));
-            } else {
-                const tien =
-                    Number(option[index].price_after_discount) *
-                    (1 + Number(option[index].tax?.tax_rate) / 100) *
-                    Number(option[index].quantity);
-                option[index].total_amount = Number(tien.toFixed(2));
-            }
-        } else if (type == "discount") {
-            option[index].discount = Number(value.value);
-            option[index].price_after_discount = +option[index].price * (1 - option[index].discount / 100);
-            option[index].price_after_discount = +(Math.round(option[index].price_after_discount + "e+2") + "e-2");
-            if (option[index].tax?.tax_rate == undefined) {
-                const tien =
-                    Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
-                option[index].total_amount = Number(tien.toFixed(2));
-            } else {
-                const tien =
-                    Number(option[index].price_after_discount) *
-                    (1 + Number(option[index].tax?.tax_rate) / 100) *
-                    Number(option[index].quantity);
-                option[index].total_amount = Number(tien.toFixed(2));
-            }
-        } else if (type == "tax") {
-            option[index].tax = value;
-            if (option[index].tax?.tax_rate == undefined) {
-                const tien =
-                    Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
-                option[index].total_amount = Number(tien.toFixed(2));
-            } else {
-                const tien =
-                    Number(option[index].price_after_discount) *
-                    (1 + Number(option[index].tax?.tax_rate) / 100) *
-                    Number(option[index].quantity);
-                option[index].total_amount = Number(tien.toFixed(2));
-            }
-        } else if (type == "note") {
-            option[index].note = value?.target?.value;
-        } else if (type == "delivery_date") {
-            option[index].delivery_date = value;
-        } else if (type == "clear_delivery_date") {
-            option[index].delivery_date = null;
-            setDeliveryDate(null);
-        } else if (type == "clearDeliveryDate") {
-            setDeliveryDate(null);
-            // option[index].delivery_date = null
-        }
-
-        setOption([...option]);
+                return e;
+            })
+            .filter((e) => e.child?.length > 0);
+        sItemAll([...newData]);
+        sListData([...newData]);
     };
 
-    const handleIncrease = (id) => {
-        const index = option.findIndex((x) => x.id === id);
-        const newQuantity = +option[index].quantity + 1;
-        if (newQuantity <= +option[index].item.e.quantity - +option[index].item.e.quantity_delivery) {
-            option[index].quantity = newQuantity;
-            if (option[index].tax?.tax_rate == undefined) {
-                const tien =
-                    Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
-                option[index].total_amount = Number(tien.toFixed(2));
-            } else {
-                const tien =
-                    Number(option[index].price_after_discount) *
-                    (1 + Number(option[index].tax?.tax_rate) / 100) *
-                    Number(option[index].quantity);
-                option[index].total_amount = Number(tien.toFixed(2));
-            }
-            setOption([...option]);
-        }
-        if (newQuantity > +option[index].item.e.quantity) {
-            Toast.fire({
-                title: `${"Vượt quá số lượng tồn"}`,
-                icon: "error",
+    const _HandleDeleteAllChild = (parentId) => {
+        const newData = listData
+            .map((e) => {
+                if (e.id === parentId) {
+                    const newChild = e.child?.filter((ce) => ce?.warehouse !== null);
+                    return { ...e, child: newChild };
+                }
+                return e;
+            })
+            .filter((e) => e.child?.length > 0);
+        sListData([...newData]);
+    };
+
+    const _HandleChangeChild = (parentId, childId, type, value) => {
+        const newData = listData.map((e) => {
+            if (e?.id !== parentId) return e;
+
+            const newChild = e.child?.map((ce) => {
+                if (ce?.id !== childId) return ce;
+                const quantityAmount = +ce?.quantityStock - +ce?.quantityDelive;
+                const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.quantity || 0), 0);
+                const checkWarehouse = e?.child?.some((i) => i?.warehouse?.value === value?.value);
+                switch (type) {
+                    case "quantity":
+                        sErrSurvive(false);
+                        ce.quantity = Number(value?.value);
+                        FunCheckQuantity(parentId, childId);
+                        break;
+
+                    case "increase":
+                        sErrSurvive(false);
+                        if (+ce.quantity === +ce?.warehouse?.qty) {
+                            ToatstNotifi(
+                                "error",
+                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                    +ce?.warehouse?.qty
+                                )} số lượng tồn kho`,
+                                3000
+                            );
+                        } else if (+ce.quantity === quantityAmount) {
+                            ToatstNotifi(
+                                "error",
+                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(quantityAmount)} số lượng chưa giao`,
+                                3000
+                            );
+                        } else {
+                            ce.quantity = Number(ce?.quantity) + 1;
+                        }
+                        break;
+
+                    case "decrease":
+                        sErrSurvive(false);
+                        ce.quantity = Number(ce?.quantity) - 1;
+                        break;
+
+                    case "price":
+                        sErrSurvivePrice(false);
+                        ce.price = Number(value?.value);
+                        break;
+
+                    case "discount":
+                        ce.discount = Number(value?.value);
+                        break;
+
+                    case "note":
+                        ce.note = value?.target.value;
+                        break;
+
+                    case "warehouse":
+                        if (!checkWarehouse && +ce?.quantity > +value?.qty) {
+                            ToatstNotifi(
+                                "error",
+                                `Số lượng chưa giao vượt quá ${formatNumber(+value?.qty)} số lượng tồn kho`
+                            );
+                            ce.warehouse = value;
+                            ce.quantity = value?.qty;
+                        } else if (!checkWarehouse && totalSoLuong > quantityAmount) {
+                            ToatstNotifi(
+                                "error",
+                                `Tổng số lượng vượt quá ${formatNumber(quantityAmount)} số lượng chưa giao`
+                            );
+                            HandTimeout();
+                            ce.warehouse = value;
+                            ce.quantity = "";
+                        } else if (checkWarehouse) {
+                            ToatstNotifi("error", `Kho - vị trí kho đã được chọn`);
+                        } else {
+                            ce.warehouse = value;
+                        }
+                        break;
+
+                    case "tax":
+                        ce.tax = value;
+                        break;
+
+                    default:
+                }
+
+                return { ...ce };
             });
-        }
-        if (newQuantity > +option[index].item.e.quantity - +option[index].item.e.quantity_delivery) {
-            Toast.fire({
-                title: `${"Vượt quá số lượng còn lại"}`,
-                icon: "error",
-            });
+
+            return { ...e, child: newChild };
+        });
+
+        sListData([...newData]);
+    };
+
+    const FunCheckQuantity = (parentId, childId) => {
+        const e = listData.find((item) => item?.id == parentId);
+        if (!e) return;
+
+        const ce = e.child.find((child) => child?.id == childId);
+        if (!ce) return;
+
+        const checkChild = e.child.reduce((sum, opt) => sum + parseFloat(opt?.quantity || 0), 0);
+        const quantityAmount = +ce?.quantityStock - +ce?.quantityDelive;
+
+        if (checkChild > quantityAmount) {
+            ToatstNotifi("error", `Tổng số lượng vượt quá ${formatNumber(quantityAmount)} số lượng chưa giao`);
+            ce.quantity = "";
+            HandTimeout();
         }
     };
 
-    const handleDecrease = (id) => {
-        const index = option.findIndex((x) => x.id === id);
-        const newQuantity = Number(option[index].quantity) - 1;
-        // chỉ giảm số lượng khi nó lớn hơn hoặc bằng 1
-        if (newQuantity >= 1) {
-            option[index].quantity = Number(newQuantity);
-            if (option[index].tax?.tax_rate == undefined) {
-                const tien =
-                    Number(option[index].price_after_discount) * (1 + Number(0) / 100) * Number(option[index].quantity);
-                option[index].total_amount = Number(tien.toFixed(2));
-            } else {
-                const tien =
-                    Number(option[index].price_after_discount) *
-                    (1 + Number(option[index].tax?.tax_rate) / 100) *
-                    Number(option[index].quantity);
-                option[index].total_amount = Number(tien.toFixed(2));
-            }
-            setOption([...option]);
-        } else if (option[index].quantity == "") {
-            return;
-        } else {
-            return Toast.fire({
-                title: `${"Số lượng tối thiểu là 1 không thể giảm!"}`,
-                icon: "error",
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${dataLang?.aler_yes}`,
-            });
-        }
-    };
-    const _HandleDelete = (id, type) => {
-        if (type === "default") {
-            return Toast.fire({
-                title: `${"Mặc định của hệ thống, không thể xóa!"}`,
-                icon: "error",
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${dataLang?.aler_yes}`,
-            });
-        }
-        const newOption = option.filter((x) => x.id !== id);
-        setOption(newOption); // cập nhật lại mảng
+    const HandTimeout = () => {
+        setTimeout(() => {
+            sLoad(true);
+        }, 500);
+        setTimeout(() => {
+            sLoad(false);
+        }, 1000);
     };
 
     const _HandleChangeValue = (parentId, value) => {
-        const checkData = option?.some((e) => e?.item?.value === value?.value);
-
+        const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
         if (!checkData) {
-            const newData = option?.map((e, index) => {
+            const newData = listData?.map((e) => {
                 if (e?.id === parentId) {
-                    return {
-                        ...e,
-                        id: uuidv4(),
-                        item: {
-                            e: value?.e,
-                            label: value?.label,
-                            value: value?.value,
-                        },
-                        unit: value.unit_name,
-                        quantity: +value?.e?.quantity - (+value?.e?.quantity_delivery || 0),
-                        sortIndex: index,
-                        price: 1,
-                        discount: 0,
-                        price_after_discount: 1,
-                        tax: 0,
-                        price_after_tax: 1,
-                        total_amount: 1,
-                        note: "",
-                        delivery_date: null,
-                    };
+                    const newParentChild = _DataValueItem(value).parent;
+                    return newParentChild;
                 } else {
                     return e;
                 }
             });
-            setOption([...newData]);
+            sListData([...newData]);
         } else {
-            Toast.fire({
-                title: `${"Mặt hàng đã được chọn"}`,
-                icon: "error",
-            });
+            ToatstNotifi("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
         }
     };
 
-    const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes];
-
-    const tinhTongTien = (option) => {
-        const totalPrice = option.reduce((acc, item) => {
-            const totalPrice = item?.price * item?.quantity;
-            return acc + totalPrice;
-        }, 0);
-
-        const totalDiscountPrice = option.reduce((acc, item) => {
-            const totalDiscountPrice = item?.price * (item?.discount / 100) * item?.quantity;
-            return acc + totalDiscountPrice;
-        }, 0);
-
-        const totalDiscountAfterPrice = option.reduce((acc, item) => {
-            const tienSauCK = item?.quantity * item?.price_after_discount;
-            return acc + tienSauCK;
-        }, 0);
-
-        const totalTax = option.reduce((acc, item) => {
-            const totalTaxIem =
-                item?.price_after_discount *
-                (isNaN(item?.tax?.tax_rate) ? 0 : item?.tax?.tax_rate / 100) *
-                item?.quantity;
-            return acc + totalTaxIem;
-        }, 0);
-
-        const totalAmount = option.reduce((acc, item) => {
-            const totalAmount = item?.total_amount;
-            return acc + totalAmount;
-        }, 0);
-
-        return {
-            totalPrice: totalPrice,
-            totalDiscountPrice: totalDiscountPrice,
-            totalDiscountAfterPrice: totalDiscountAfterPrice,
-            totalTax: totalTax,
-            totalAmount: totalAmount,
-        };
-    };
-
-    useEffect(() => {
-        const totalPrice = tinhTongTien(option);
-        setTongTienState(totalPrice);
-    }, [option]);
-
-    const dataOption = option?.map((e) => {
-        return {
-            item: e?.item?.value,
-            quantity: Number(e?.quantity),
-            price: e?.price,
-            discount_percent: e?.discount,
-            tax_id: e?.tax?.value,
-            price_quote_item_id: e?.item?.e?.price_quote_item_id,
-            note: e?.note,
-            id: e?.id,
-            delivery_date: e?.delivery_date,
-            price_quote_order_item_id: e?.price_quote_order_item_id,
-        };
-    });
-
-    let newDataOption = dataOption?.filter((e) => e?.item !== undefined);
-
-    // validate submit
-    const handleSubmitValidate = (e) => {
-        e.preventDefault();
-        const checkQty = newDataOption?.some((e) => e.quantity == "");
-        if (
-            startDate == null ||
-            customer == null ||
-            branch == null ||
-            staff == null ||
-            productOrder == null ||
-            address == null ||
-            checkQty
-        ) {
-            startDate == null && setErrDate(true);
-            customer?.value == null && sErrCustomer(true);
-            branch?.value == null && setErrBranch(true);
-            address?.value == null && setErrAddress(true);
-            staff?.value == null && setErrStaff(true);
-            productOrder?.value == null && setErrProductOrder(true);
-            checkQty && setErrQty(true);
-            Toast.fire({
-                icon: "error",
-                title: `${dataLang?.required_field_null}`,
+    const handleSelectAll = (type) => {
+        if (type == "addAll") {
+            const newData = [...dataItems]?.map((e) => {
+                const parent = _DataValueItem({ e: e }).parent;
+                return parent;
             });
+            sListData([...newData]);
+            return;
         } else {
-            setErrQty(false);
-            setOnSending(true);
+            sListData([]);
+            return;
         }
     };
 
-    // handle submit
-    const handleSubmit = async () => {
-        var formData = new FormData();
-        formData.append("code", codeDelivery ? codeDelivery : "");
-        formData.append(
-            "date",
-            moment(startDate).format("YYYY-MM-DD HH:mm:ss") ? moment(startDate).format("YYYY-MM-DD HH:mm:ss") : ""
-        );
-        formData.append("branch_id", branch?.value ? branch?.value : "");
-        formData.append("client_id", customer?.value ? customer?.value : "");
-        formData.append("person_contact_id", contactPerson?.value ? contactPerson?.value : "");
-        formData.append("address_id", address?.value ? address?.value : "");
-        formData.append("staff_id", staff?.value ? staff?.value : "");
-        formData.append("product_order_id", productOrder?.value ? productOrder?.value : "");
-        formData.append("note", note ? note : "");
-
-        newDataOption.forEach((item, index) => {
-            formData.append(`items[${index}][item]`, item?.item != undefined ? item?.item : "");
-            formData.append(`items[${index}][quantity]`, item?.quantity.toString() ? item?.quantity.toString() : "");
-            formData.append(`items[${index}][price]`, item?.price ? item?.price : "");
-            formData.append(`items[${index}][discount_percent]`, item?.discount_percent ? item?.discount_percent : "");
-            formData.append(`items[${index}][tax_id]`, item?.tax_id != undefined ? item?.tax_id : "");
-            formData.append(`items[${index}][note]`, item?.note != undefined ? item?.note : "");
-        });
-
-        if (
-            tongTienState?.totalPrice > 0 &&
-            tongTienState?.totalDiscountPrice >= 0 &&
-            tongTienState?.totalDiscountAfterPrice > 0 &&
-            tongTienState?.totalTax >= 0 &&
-            tongTienState?.totalAmount > 0
-        ) {
-            await Axios(
-                "POST",
-                `${
-                    id
-                        ? `/api_web/api_delivery/AddDelivery/${id}?csrf_protection=true`
-                        : "/api_web/api_delivery/AddDelivery/?csrf_protection=true"
-                }`,
-                {
-                    data: formData,
-                    headers: { "Content-Type": "multipart/form-data" },
-                },
-                (err, response) => {
-                    const { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        // if (response && response.data && response?.data?.isSuccess === true && router.isReady) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${message}`,
-                        });
-                        setCodeProduct("");
-                        setStartDate(new Date());
-                        setDeliveryDate(new Date());
-                        setContactPerson(null);
-                        setStaff(null);
-                        setCustomer(null);
-                        setBranch(null);
-                        setProductOrder(null);
-                        setNote("");
-                        setErrBranch(false);
-                        setErrAddress(false);
-                        setErrDate(false);
-                        sErrCustomer(false);
-                        setErrQty(false);
-                        setErrStaff(false);
-                        setErrProductOrder(false);
-                        setOption([]);
-                        router.push("/sales_export_product/deliveryReceipt?tab=all");
-                    } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${message}`,
-                        });
-                    }
-                    // if (response && response.data && response?.data?.isSuccess === false) {
-                    //     Toast.fire({
-                    //         icon: "error",
-                    //         title: `${dataLang[response?.data?.message]}`,
-                    //     });
-                    // }
-                    setOnSending(false);
-                }
-            );
-        } else {
-            Toast.fire({
-                icon: "error",
-                title:
-                    newDataOption?.length === 0
-                        ? `Chưa chọn thông tin mặt hàng!`
-                        : "Tiền không được âm, vui lòng kiểm tra lại thông tin mặt hàng!",
-            });
-            setOnSending(false);
-        }
-    };
-
-    useEffect(() => {
-        onSending && handleSubmit();
-    }, [onSending]);
-
-    const handleClearDate = (type, id) => {
-        if (type === "deliveryDate") {
-            setDeliveryDate(null);
-        }
-        if (type === "startDate") {
-            setStartDate(new Date());
-        }
-    };
-
-    // codeDelivery new
-    const allItems = [...options];
-
-    const handleSelectAll = () => {
-        setItemsAll(
-            allItems?.map((e, index) => ({
-                id: uuidv4(),
-                item: {
-                    e: e?.e,
-                    label: e?.label,
-                    value: e?.value,
-                },
-                unit: e?.e?.unit_name,
-                quantity: +e?.e?.quantity - (+e?.e?.quantity_delivery || 0),
-                sortIndex: index,
-                price: e?.e?.price,
-                discount: e?.e?.discount_percent_item,
-                price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent_item / 100),
-                tax: {
-                    label: e?.e?.tax_name,
-                    value: e?.e?.tax_id_item,
-                    tax_rate: e?.e?.tax_rate_item,
-                },
-                price_after_tax:
-                    +e?.e?.price *
-                    e?.e?.quantity *
-                    (1 - +e?.e?.discount_percent_item / 100) *
-                    (1 + e?.e?.tax_rate_item / 100),
-                total_amount:
-                    +e?.e?.price *
-                    (1 - +e?.e?.discount_percent_item / 100) *
-                    (1 + +e?.e?.tax_rate_item / 100) *
-                    +e?.e?.quantity,
-                note: e?.e?.note_item,
-            }))
-        );
-        setOption(
-            allItems?.map((e, index) => ({
-                id: uuidv4(),
-                item: {
-                    e: e?.e,
-                    label: e?.label,
-                    value: e?.value,
-                },
-                unit: e?.e?.unit_name,
-                quantity: +e?.e?.quantity - (+e?.e?.quantity_delivery || 0),
-                sortIndex: index,
-                price: e?.e?.price,
-                discount: e?.e?.discount_percent_item,
-                price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent_item / 100),
-                tax: {
-                    label: e?.e?.tax_name,
-                    value: e?.e?.tax_id_item,
-                    tax_rate: e?.e?.tax_rate_item,
-                },
-                price_after_tax:
-                    +e?.e?.price *
-                    e?.e?.quantity *
-                    (1 - +e?.e?.discount_percent_item / 100) *
-                    (1 + e?.e?.tax_rate_item / 100),
-                total_amount:
-                    +e?.e?.price *
-                    (1 - +e?.e?.discount_percent_item / 100) *
-                    (1 + +e?.e?.tax_rate_item / 100) *
-                    +e?.e?.quantity,
-                note: e?.e?.note_item,
-            }))
-        );
-    };
-
-    const handleDeleteAll = () => {
-        setItemsAll([]);
-        setOption([]);
-        //new
-    };
     const MenuList = (props) => {
         return (
             <components.MenuList {...props}>
-                {allItems?.length > 0 && (
+                {dataItems?.length > 0 && (
                     <div className="grid grid-cols-2 items-center  cursor-pointer">
                         <div
                             className="hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px] "
-                            onClick={handleSelectAll.bind(this)}
+                            onClick={() => handleSelectAll("addAll")}
                         >
                             Chọn tất cả
                         </div>
                         <div
                             className="hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px]"
-                            onClick={handleDeleteAll.bind(this)}
+                            onClick={() => handleSelectAll("deleteAll")}
                         >
                             Bỏ chọn tất cả
                         </div>
@@ -1191,83 +902,8 @@ const Index = (props) => {
         );
     };
 
-    // label của chọn nhanh
-    const quickSelectItemsLabel = (option) => {
-        if (option.value === "0") {
-            return <div className="text-gray-400 font-medium">{option.label}</div>;
-        } else if (option.value === null) {
-            return <div className="text-gray-400 font-medium">{option.label}</div>;
-        } else {
-            return (
-                <>
-                    {dataItems == [] ? (
-                        <Loading className="h-80" color="#0f4f9e" />
-                    ) : (
-                        <div className="flex items-center justify-between py-2">
-                            <div className="flex items-center gap-2">
-                                <div>
-                                    {option.e?.images != null ? (
-                                        <img
-                                            src={option.e?.images}
-                                            alt="Product Image"
-                                            style={{
-                                                width: "40px",
-                                                height: "50px",
-                                            }}
-                                            className="object-cover rounded"
-                                        />
-                                    ) : (
-                                        <div className="w-[50px] h-[60px] object-cover flex items-center justify-center rounded">
-                                            <img
-                                                src="/no_img.png"
-                                                alt="Product Image"
-                                                style={{
-                                                    width: "40px",
-                                                    height: "40px",
-                                                }}
-                                                className="object-cover rounded"
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                                <div>
-                                    <h3 className="font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                        {option.e?.name}
-                                    </h3>
-                                    <div className="flex">
-                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                            {option.e?.codeDelivery}
-                                        </h5>
-                                        <h5 className="font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                            {option.e?.product_variation}
-                                        </h5>
-                                    </div>
-                                    <h5 className="text-gray-400 font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                        {dataLang[option.e?.text_type]}
-                                    </h5>
-                                </div>
-                            </div>
-
-                            <div className="text-right opacity-0">{"0"}</div>
-                            <div className="flex gap-2">
-                                <div className="flex items-center gap-2">
-                                    <h5 className="text-gray-400 font-normal">
-                                        {dataLang?.purchase_survive || "purchase_survive"}:
-                                    </h5>
-                                    <h5 className="text-[#0F4F9E] font-medium">{option.e?.qty_warehouse || 0}</h5>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </>
-            );
-        }
-    };
-
-    // label của chọn mặt hàng đơn lẻ
     const selectItemsLabel = (option) => {
         let quantityUndelived = +option?.e?.quantity - +option?.e?.quantity_delivery;
-
         return (
             <div className="flex items-center justify-between">
                 <div className="flex items-center ">
@@ -1276,39 +912,37 @@ const Index = (props) => {
                             <img
                                 src={option.e?.images}
                                 alt="Product Image"
-                                className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] text-[8px] object-cover rounded mr-1"
+                                className="3xl:max-w-[40px] 3xl:h-[40px] 2xl:max-w-[40px] 2xl:h-[40px] xl:max-w-[40px] xl:h-[40px] max-w-[40px] h-[40px] text-[8px] object-cover rounded mr-1"
                             />
                         ) : (
-                            <div className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] object-cover flex items-center justify-center rounded xl:mr-1 mx-0.5">
+                            <div className="3xl:max-w-[40px] 3xl:h-[40px] 2xl:max-w-[40px] 2xl:h-[40px] xl:max-w-[40px] xl:h-[40px] max-w-[40px] h-[40px] object-cover flex items-center justify-center rounded xl:mr-1 mx-0.5">
                                 <img
                                     src="/no_img.png"
                                     alt="Product Image"
-                                    className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] object-cover rounded mr-1"
+                                    className="3xl:max-w-[40px] 3xl:h-[40px] 2xl:max-w-[40px] 2xl:h-[40px] xl:max-w-[40px] xl:h-[40px] max-w-[40px] h-[40px] object-cover rounded mr-1"
                                 />
                             </div>
                         )}
                     </div>
 
                     <div>
-                        <h3 className="font-bold 3xl:text-[14px] 2xl:text-[11px] xl:text-[10px] text-[10px] whitespace-pre-wrap">
+                        <h3 className="font-medium 3xl:text-[14px] 2xl:text-[11px] xl:text-[10px] text-[10px] whitespace-pre-wrap">
                             {option.e?.name}
                         </h3>
 
                         <div className="flex 3xl:gap-2 2xl:gap-1 xl:gap-1 gap-1">
                             <h5 className="text-gray-400  3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
-                                {option.e?.codeDelivery} :
+                                {option.e?.code} :
                             </h5>
                             <h5 className="3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
                                 {option.e?.product_variation}
                             </h5>
                         </div>
-
-                        <div className="flex flex-row 3xl:gap-3 2xl:gap-3 xl:gap-3 gap-1">
-                            <h5 className="text-gray-400 3xl:w-[90px] 2xl:min-w-[85px] xl:min-w-[55px] min-w-[45px] 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                {dataLang[option.e?.text_type]}
-                            </h5>
-
+                        <div className="flex 3xl:gap-3 2xl:gap-3 xl:gap-3 gap-1">
                             <div className="flex items-center gap-1">
+                                <h5 className="min-w-1/3 text-gray-400 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
+                                    {dataLang[option.e?.text_type]}
+                                </h5>
                                 <h5 className="text-gray-400 font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
                                     {dataLang?.delivery_receipt_quantity_stock_order ||
                                         "delivery_receipt_quantity_stock_order"}
@@ -1350,62 +984,152 @@ const Index = (props) => {
         );
     };
 
-    // render option formatGroupLabel tax
-    const taxRateLabel = (option) => {
-        return (
-            <div className="flex justify-start items-center">
-                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[8px] ">{option?.label}</h2>
-                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[8px] ">{`(${option?.tax_rate})`}</h2>
-            </div>
+    const _HandleSubmit = (e) => {
+        e.preventDefault();
+
+        const hasNullWarehouse = listData.some((item) =>
+            item.child?.some(
+                (childItem) =>
+                    childItem.warehouse === null ||
+                    (id && (childItem.warehouse?.label === null || childItem.warehouse?.warehouse_name === null))
+            )
+        );
+
+        const hasNullQuantity = listData.some((item) =>
+            item.child?.some(
+                (childItem) => childItem.quantity === null || childItem.quantity === "" || childItem.quantity == 0
+            )
+        );
+        const hasNullPrice = listData.some((item) =>
+            item.child?.some((childItem) => childItem.price === null || childItem.price === "" || childItem.price == 0)
+        );
+
+        const isTotalExceeded = listData?.some(
+            (e) =>
+                !hasNullWarehouse &&
+                e.child?.some((opt) => {
+                    const quantity = parseFloat(opt?.quantity) || 0;
+                    const qty = parseFloat(opt?.warehouse?.qty) || 0;
+                    return quantity > qty;
+                })
+        );
+
+        const isEmpty = listData?.length === 0 ? true : false;
+        if (
+            idClient == null ||
+            idStaff == null ||
+            idBranch == null ||
+            idProductOrder == null ||
+            idAddress == null ||
+            hasNullWarehouse ||
+            hasNullQuantity ||
+            hasNullPrice ||
+            isTotalExceeded ||
+            isEmpty
+        ) {
+            idClient == null && sErrClient(true);
+            idAddress == null && sErrAddress(true);
+            idStaff == null && sErrStaff(true);
+            idBranch == null && sErrBranch(true);
+            idProductOrder == null && sErrProductOrder(true);
+            hasNullWarehouse && sErrWarehouse(true);
+            hasNullQuantity && sErrQuantity(true);
+            hasNullPrice && sErrPrice(true);
+            if (isEmpty) {
+                ToatstNotifi("error", `Chưa nhập thông tin mặt hàng`);
+            } else if (isTotalExceeded) {
+                sErrSurvive(true);
+                ToatstNotifi("error", `${dataLang?.returns_err_QtyNotQexceed || "returns_err_QtyNotQexceed"}`);
+            } else if (hasNullPrice) {
+                sErrSurvivePrice(true);
+                ToatstNotifi("error", `${"Vui lòng nhập đơn giá"}`);
+            } else {
+                ToatstNotifi("error", `${dataLang?.required_field_null}`);
+            }
+        } else {
+            sOnSending(true);
+        }
+    };
+
+    const _ServerSending = () => {
+        let formData = new FormData();
+        formData.append("code", code ? code : "");
+        formData.append(
+            "date",
+            moment(startDate).format("YYYY-MM-DD HH:mm:ss") ? moment(startDate).format("YYYY-MM-DD HH:mm:ss") : ""
+        );
+        formData.append("branch_id", idBranch?.value ? idBranch?.value : "");
+        formData.append("client_id", idClient?.value ? idClient?.value : "");
+        formData.append("person_contact_id", idContactPerson?.value ? idContactPerson?.value : "");
+        formData.append("address_id", idAddress?.value ? idAddress?.value : "");
+        formData.append("staff_id", idStaff?.value ? idStaff?.value : "");
+        formData.append("product_order_id", idProductOrder?.value ? idProductOrder?.value : "");
+        formData.append("note", note ? note : "");
+        listData.forEach((item, index) => {
+            formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
+            formData.append(`items[${index}][item]`, item?.matHang?.value);
+            item?.child?.forEach((childItem, childIndex) => {
+                formData.append(`items[${index}][child][${childIndex}][row_id]`, id ? childItem?.idChildBackEnd : "");
+                formData.append(
+                    `items[${index}][child][${childIndex}][warehouse_id]`,
+                    childItem?.warehouse?.value || 0
+                );
+                formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.quantity);
+                formData.append(`items[${index}][child][${childIndex}][price]`, childItem?.price);
+                formData.append(`items[${index}][child][${childIndex}][discount]`, childItem?.discount);
+                formData.append(`items[${index}][child][${childIndex}][tax]`, childItem?.tax?.value);
+                formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
+            });
+        });
+        Axios(
+            "POST",
+            `${
+                id
+                    ? `/api_web/Api_delivery/getDeliveryDetail/${id}?csrf_protection=true`
+                    : "/api_web/Api_delivery/AddDelivery/?csrf_protection=true"
+            }`,
+            {
+                data: formData,
+                headers: { "Content-Type": "multipart/form-data" },
+            },
+            (err, response) => {
+                if (!err) {
+                    var { isSuccess, message } = response.data;
+                    if (isSuccess) {
+                        ToatstNotifi("success", `${dataLang[message] || message}`);
+                        resetAllStates();
+                        sListData([]);
+                        router.push("/sales_export_product/deliveryReceipt?tab=all");
+                    } else {
+                        ToatstNotifi("error", `${dataLang[message] || message}`);
+                    }
+                }
+                sOnSending(false);
+            }
         );
     };
 
-    const sortedArr = id ? option.sort((a, b) => a.id - b.id) : option.sort((a, b) => b.id - a.id);
-
-    const handleOpenPopupAddress = () => {
-        setOpenPopupAddress(true);
-    };
-    const handleClosePopupAddress = () => {
-        handleFetchingAddress();
-        setOpenPopupAddress(false);
-    };
-
-    const ClearIndicator = (props) => (
-        <components.ClearIndicator {...props}>
-            <MdClear
-                className="absolute top-0 left-0 3xl:translate-x-[2650%] 3xl:-translate-y-[2%] 2xl:translate-x-[2000%] 2xl:-translate-y-[5%] xl:translate-x-[1630%] xl:-translate-y-[4%] translate-x-[1250%] -translate-y-[6%] h-10 text-[#CCCCCC] hover:text-[#999999] 3xl:scale-125 2xl:scale-110 xl:scale-100 scale-90 cursor-pointer"
-                onClick={() => setAddress(null)}
-            />
-        </components.ClearIndicator>
-    );
-    const LoadingIndicator = (props) => (
-        <components.LoadingMessage {...props}>
-            <BsThreeDots className="animate-pulse absolute top-0 left-0 3xl:translate-x-[2650%] 3xl:-translate-y-[2%] 2xl:translate-x-[2000%] 2xl:-translate-y-[5%] xl:translate-x-[1630%] xl:-translate-y-[4%] translate-x-[1250%] -translate-y-[6%] h-10 text-[#CCCCCC] hover:text-[#999999] 3xl:scale-150 2xl:scale-110 xl:scale-100 scale-90" />
-        </components.LoadingMessage>
-    );
-    const SelectIndicator = (props) => (
-        <components.ValueContainer {...props}>
-            <BsThreeDots className="animate-pulse absolute top-0 left-0 3xl:translate-x-[2650%] 3xl:-translate-y-[2%] 2xl:translate-x-[2000%] 2xl:-translate-y-[5%] xl:translate-x-[1630%] xl:-translate-y-[4%] translate-x-[1250%] -translate-y-[6%] h-10 text-[#CCCCCC] hover:text-[#999999] 3xl:scale-150 2xl:scale-110 xl:scale-100 scale-90" />
-        </components.ValueContainer>
-    );
+    useEffect(() => {
+        onSending && _ServerSending();
+    }, [onSending]);
 
     return (
-        <>
+        <React.Fragment>
             <Head>
                 <title>
                     {id
-                        ? dataLang?.sales_product_edit_order || "sales_product_edit_order"
+                        ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit"
                         : dataLang?.delivery_receipt_add || "delivery_receipt_add"}
                 </title>
             </Head>
-            <div className="3xl:px-5 px-4 3xl:pt-[76px] 2xl:pt-[72px] xl:pt-16 pt-14 pb-3 3xl:space-y-1.5 space-y-1 flex flex-col justify-between">
-                <div className="h-[97%] 3xl:space-y-1 2xl:space-y-2 space-y-2 overflow-hidden">
+            <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
+                <div className="h-[97%] space-y-3 overflow-hidden">
                     {trangthaiExprired ? (
-                        <div className="p-5"></div>
+                        <div className="p-2"></div>
                     ) : (
-                        <div className="flex space-x-1 3xl:text-[13px] 2xl:text-[12px] xl:text-[14.5px] text-[12px]">
+                        <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
                             <h6 className="text-[#141522]/40">
-                                {dataLang?.delivery_receipt_list || "delivery_receipt_list"}
+                                {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
                             </h6>
                             <span className="text-[#141522]/40">/</span>
                             <h6>
@@ -1416,60 +1140,92 @@ const Index = (props) => {
                         </div>
                     )}
                     <div className="flex justify-between items-center">
-                        <h2 className="3xl:text-[24px] 2xl:text-2xl xl:text-xl text-xl">
-                            {id
-                                ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit"
-                                : dataLang?.delivery_receipt_add || "delivery_receipt_add"}
+                        <h2 className="xl:text-2xl text-xl ">
+                            {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
                         </h2>
                         <div className="flex justify-end items-center">
                             <button
-                                onClick={() => router.push("/sales_export_product/deliveryReceipt?tab=all")}
-                                className=" xl:text-sm text-xs xl:px-5 px-3 3xl:py-1.5 2xl:py-2.5 xl:py-1.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
+                                onClick={() => router.push("/purchase_order/returns")}
+                                className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
-                                {dataLang?.btn_back || "btn_back"}
+                                {dataLang?.import_comeback || "import_comeback"}
                             </button>
                         </div>
                     </div>
 
-                    {/* Thông tin chung */}
                     <div className=" w-full rounded">
-                        <div>
-                            <h2 className="3xl:text-[17px] 2xl:text-[16px] xl:text-[15px] text-[14px] font-normal bg-[#ECF0F4] p-1">
-                                {dataLang?.detail_general_information || "detail_general_information"}
+                        <div className="">
+                            <h2 className="font-normal bg-[#ECF0F4] p-2">
+                                {dataLang?.purchase_order_detail_general_informatione ||
+                                    "purchase_order_detail_general_informatione"}
                             </h2>
-                            <div className="grid grid-cols-12 gap-2 items-center">
+                            <div className="grid grid-cols-12  gap-3 items-center mt-2">
                                 <div className="col-span-3">
-                                    <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px]">
-                                        {dataLang?.delivery_receipt_code || "delivery_receipt_code"}
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {dataLang?.import_code_vouchers || "import_code_vouchers"}{" "}
                                     </label>
                                     <input
-                                        value={codeDelivery}
-                                        onChange={(value) => handleOnChangeInput("codeDelivery", value)}
+                                        value={code}
+                                        onChange={_HandleChangeInput.bind(this, "code")}
                                         name="fname"
                                         type="text"
-                                        placeholder={dataLang?.system_default || "system_default"}
-                                        className={`3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] focus:border-[#0F4F9E] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal 2xl:p-2 p-[9px] border outline-none`}
+                                        placeholder={
+                                            dataLang?.purchase_order_system_default || "purchase_order_system_default"
+                                        }
+                                        className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                 </div>
-
+                                <div className="col-span-3 relative">
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {dataLang?.import_day_vouchers || "import_day_vouchers"}
+                                    </label>
+                                    <div className="custom-date-picker flex flex-row">
+                                        <DatePicker
+                                            blur
+                                            fixedHeight
+                                            showTimeSelect
+                                            selected={startDate}
+                                            onSelect={(date) => sStartDate(date)}
+                                            onChange={(e) => handleTimeChange(e)}
+                                            placeholderText="DD/MM/YYYY HH:mm:ss"
+                                            dateFormat="dd/MM/yyyy h:mm:ss aa"
+                                            timeInputLabel={"Time: "}
+                                            placeholder={
+                                                dataLang?.price_quote_system_default || "price_quote_system_default"
+                                            }
+                                            className={`border ${
+                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                        />
+                                        {startDate && (
+                                            <>
+                                                <MdClear
+                                                    className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
+                                                    onClick={() => handleClearDate("startDate")}
+                                                />
+                                            </>
+                                        )}
+                                        <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                                    </div>
+                                </div>
                                 <div className="col-span-3">
-                                    <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
-                                        {dataLang?.branch || "branch"} <span className="text-red-500">*</span>
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {dataLang?.import_branch || "import_branch"}{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <Select
                                         options={dataBranch}
-                                        onChange={(value) => handleOnChangeInput("branch", value)}
-                                        isLoading={loading}
-                                        value={branch}
+                                        onChange={_HandleChangeInput.bind(this, "branch")}
+                                        value={idBranch}
+                                        isLoading={idBranch != null ? false : onLoading}
                                         isClearable={true}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={dataLang?.select_branch || "select_branch"}
+                                        placeholder={dataLang?.import_branch || "import_branch"}
                                         className={`${
-                                            errBranch ? "border border-red-500 rounded-md" : ""
-                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
+                                            errBranch ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
-                                        components={{ MultiValue }}
                                         style={{
                                             border: "none",
                                             boxShadow: "none",
@@ -1489,38 +1245,43 @@ const Index = (props) => {
                                                 ...base,
                                                 color: "#cbd5e1",
                                             }),
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                // zIndex: 9999, // Giá trị z-index tùy chỉnh
+                                            }),
                                             control: (base, state) => ({
                                                 ...base,
                                                 boxShadow: "none",
-                                                padding: "0.7px",
+                                                padding: "2.7px",
+                                                ...(state.isFocused && {
+                                                    border: "0 0 0 1px #92BFF7",
+                                                }),
                                             }),
                                         }}
                                     />
                                     {errBranch && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.delivery_receipt_err_select_branch ||
-                                                "delivery_receipt_err_select_branch"}
+                                            {dataLang?.purchase_order_errBranch || "purchase_order_errBranch"}
                                         </label>
                                     )}
                                 </div>
-
                                 <div className="col-span-3">
-                                    <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
-                                        {dataLang?.customer || "customer"} <span className="text-red-500">*</span>
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {"Khách hàng"} <span className="text-red-500">*</span>
                                     </label>
                                     <Select
-                                        options={dataCustomer}
-                                        onChange={(value) => handleOnChangeInput("customer", value)}
-                                        isLoading={loading}
-                                        value={customer}
-                                        placeholder={dataLang?.select_customer || "select_customer"}
+                                        options={dataClient}
+                                        onChange={_HandleChangeInput.bind(this, "idClient")}
+                                        value={idClient}
+                                        isLoading={onLoading}
+                                        placeholder={"Khách hàng"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
                                         className={`${
-                                            errCustomer ? "border border-red-500 rounded-md" : ""
-                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                            errClient ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-[30]  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
-                                        noOptionsMessage={() => "Không có dữ liệu"}
+                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         menuPortalTarget={document.body}
                                         closeMenuOnSelect={true}
                                         style={{
@@ -1544,40 +1305,38 @@ const Index = (props) => {
                                             }),
                                             menuPortal: (base) => ({
                                                 ...base,
-                                                zIndex: 20,
+                                                zIndex: 9999,
                                             }),
                                             control: (base, state) => ({
                                                 ...base,
                                                 boxShadow: "none",
-                                                padding: "0.7px",
+                                                padding: "2.7px",
+                                                ...(state.isFocused && {
+                                                    border: "0 0 0 1px #92BFF7",
+                                                }),
                                             }),
                                         }}
                                     />
-                                    {errCustomer && (
-                                        <label className="text-sm text-red-500">
-                                            {dataLang?.delivery_receipt_err_select_customer ||
-                                                "delivery_receipt_err_select_customer"}
-                                        </label>
+                                    {errClient && (
+                                        <label className="text-sm text-red-500">{"Vui lòng chọn khách hàng"}</label>
                                     )}
                                 </div>
-
                                 <div className="col-span-3">
-                                    <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
-                                        {dataLang?.contact_person || "contact_person"}
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {"Người liên lạc"}
                                     </label>
                                     <Select
-                                        options={dataPersonContact}
-                                        onChange={(value) => handleOnChangeInput("contactPerson", value)}
-                                        isLoading={loading}
-                                        value={contactPerson}
-                                        placeholder={dataLang?.select_contact_person || "select_contact_person"}
-                                        hideSelectedOptions={false}
+                                        options={dataContactPerson}
+                                        onChange={_HandleChangeInput.bind(this, "idContactPerson")}
+                                        isLoading={idBranch || idClient != null ? false : onLoading}
+                                        value={idContactPerson}
                                         isClearable={true}
-                                        className={` rounded-md 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
-                                        isSearchable={true}
-                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                        menuPortalTarget={document.body}
+                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         closeMenuOnSelect={true}
+                                        hideSelectedOptions={false}
+                                        placeholder={"Người liên lạc"}
+                                        className={`placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        isSearchable={true}
                                         style={{
                                             border: "none",
                                             boxShadow: "none",
@@ -1597,14 +1356,17 @@ const Index = (props) => {
                                                 ...base,
                                                 color: "#cbd5e1",
                                             }),
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 20,
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                // zIndex: 9999, // Giá trị z-index tùy chỉnh
                                             }),
                                             control: (base, state) => ({
                                                 ...base,
                                                 boxShadow: "none",
-                                                padding: "0.7px",
+                                                padding: "2.7px",
+                                                ...(state.isFocused && {
+                                                    border: "0 0 0 1px #92BFF7",
+                                                }),
                                             }),
                                         }}
                                     />
@@ -1617,9 +1379,9 @@ const Index = (props) => {
                                     <div className="relative">
                                         <Select
                                             options={dataAddress}
-                                            onChange={(value) => handleOnChangeInput("address", value)}
-                                            value={address}
-                                            isLoading={loading}
+                                            onChange={_HandleChangeInput.bind(this, "idAddress")}
+                                            value={idAddress}
+                                            // isLoading={loading}
                                             placeholder={dataLang?.select_address || "select_address"}
                                             hideSelectedOptions={false}
                                             isClearable={true}
@@ -1627,11 +1389,11 @@ const Index = (props) => {
                                                 errAddress ? "border border-red-500 rounded-md" : ""
                                             } rounded-md 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
                                             isSearchable={true}
-                                            components={{
-                                                ClearIndicator,
-                                                LoadingIndicator,
-                                                SelectIndicator,
-                                            }}
+                                            // components={{
+                                            //     ClearIndicator,
+                                            //     LoadingIndicator,
+                                            //     SelectIndicator,
+                                            // }}
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             menuPortalTarget={document.body}
                                             closeMenuOnSelect={true}
@@ -1666,82 +1428,44 @@ const Index = (props) => {
                                             }}
                                         />
                                         <AiFillPlusCircle
-                                            onClick={handleOpenPopupAddress}
-                                            className="right-0 top-0 -translate-x-[300%] 3xl:translate-y-[80%] 2xl:translate-y-[70%] xl:translate-y-[70%] translate-y-[60%] 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180  transition-all ease-in-out absolute "
+                                            onClick={() => _HandleClosePopupAddress(true)}
+                                            className="right-0 top-0 -translate-x-[450%] 3xl:translate-y-[80%] 2xl:translate-y-[70%] xl:translate-y-[70%] translate-y-[60%] 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180  transition-all ease-in-out absolute "
                                         />
                                         <PopupAddress
                                             dataLang={dataLang}
-                                            clientId={customer?.value}
-                                            handleFetchingAddress={handleFetchingAddress}
+                                            clientId={idClient?.value}
+                                            handleFetchingAddress={_ServerFetching_Address}
                                             openPopupAddress={openPopupAddress}
-                                            handleClosePopupAddress={handleClosePopupAddress}
+                                            handleClosePopupAddress={() => _HandleClosePopupAddress(false)}
                                             className="hidden"
                                         />
                                         {errAddress && (
                                             <label className="text-sm text-red-500">
-                                                {dataLang?.delivery_receipt_err_select_address ||
-                                                    "delivery_receipt_err_select_address"}
+                                                {"Vui lòng chọn địa chỉ giao hàng"}
                                             </label>
                                         )}
                                     </div>
                                 </div>
-
                                 <div className="col-span-3">
-                                    <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] mb-1 ">
-                                        {dataLang?.delivery_receipt_date || "delivery_receipt_date"}{" "}
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {"Người dùng"}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="custom-date-picker flex flex-row relative">
-                                        <DatePicker
-                                            blur
-                                            fixedHeight
-                                            showTimeSelect
-                                            selected={startDate}
-                                            onSelect={(date) => setStartDate(date)}
-                                            onChange={(e) => setStartDate(e)}
-                                            placeholderText="DD/MM/YYYY HH:mm:ss"
-                                            dateFormat="dd/MM/yyyy h:mm:ss aa"
-                                            timeInputLabel={"Time: "}
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal 2xl:p-2 p-[9px] outline-none cursor-pointer `}
-                                        />
-                                        {startDate && (
-                                            <>
-                                                <MdClear
-                                                    className="absolute 3xl:translate-x-[2600%] 3xl:-translate-y-[2%] 2xl:translate-x-[2000%] 2xl:-translate-y-[5%] xl:translate-x-[1630%] xl:-translate-y-[4%] translate-x-[1250%] -translate-y-[6%] h-10 text-[#CCCCCC] hover:text-[#999999] 2xl:scale-110 xl:scale-100 scale-90 cursor-pointer"
-                                                    onClick={() => handleClearDate("startDate")}
-                                                />
-                                            </>
-                                        )}
-                                        <BsCalendarEvent className="absolute left-0 3xl:translate-x-[2750%] 3xl:translate-y-[70%] 2xl:translate-x-[2180%] 2xl:translate-y-[60%] xl:translate-x-[1800%] xl:translate-y-[60%] translate-x-[1400%] translate-y-[60%] text-[#CCCCCC] 2xl:scale-110 xl:scale-100 scale-90 cursor-pointer" />
-                                    </div>
-                                    {errDate && (
-                                        <label className="text-sm text-red-500">
-                                            {dataLang?.price_quote_errDate || "price_quote_errDate"}
-                                        </label>
-                                    )}
-                                </div>
-
-                                <div className="col-span-3">
-                                    <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] mb-1 ">
-                                        {dataLang?.staff || "staff"} <span className="text-red-500">*</span>
-                                    </label>
                                     <Select
-                                        options={dataStaffs}
-                                        onChange={(value) => handleOnChangeInput("staff", value)}
-                                        value={staff}
-                                        isLoading={loading}
-                                        placeholder={dataLang?.select_staff || "select_staff"}
-                                        hideSelectedOptions={false}
+                                        options={dataStaff}
+                                        onChange={_HandleChangeInput.bind(this, "idStaff")}
+                                        isLoading={idBranch != null ? false : onLoading}
+                                        value={idStaff}
                                         isClearable={true}
-                                        className={`${
-                                            errStaff ? "border border-red-500 rounded-md" : ""
-                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
-                                        isSearchable={true}
-                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                        menuPortalTarget={document.body}
+                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         closeMenuOnSelect={true}
+                                        hideSelectedOptions={false}
+                                        placeholder={"Người dùng"}
+                                        className={`${
+                                            errStaff ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        // className={`placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                        isSearchable={true}
                                         style={{
                                             border: "none",
                                             boxShadow: "none",
@@ -1761,50 +1485,42 @@ const Index = (props) => {
                                                 ...base,
                                                 color: "#cbd5e1",
                                             }),
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 20,
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                // zIndex: 9999, // Giá trị z-index tùy chỉnh
                                             }),
                                             control: (base, state) => ({
                                                 ...base,
                                                 boxShadow: "none",
-                                                padding: "0.7px",
+                                                padding: "2.7px",
+                                                ...(state.isFocused && {
+                                                    border: "0 0 0 1px #92BFF7",
+                                                }),
                                             }),
                                         }}
                                     />
                                     {errStaff && (
-                                        <label className="text-sm text-red-500">
-                                            {dataLang?.sales_product_err_staff_in_charge ||
-                                                "sales_product_err_staff_in_charge"}
-                                        </label>
+                                        <label className="text-sm text-red-500">{"Vui lòng chọn người dùng"}</label>
                                     )}
                                 </div>
-
                                 <div className="col-span-3">
-                                    <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] mb-1 ">
-                                        {dataLang?.delivery_receipt_product_order || "delivery_receipt_product_order"}{" "}
-                                        <span className="text-red-500">*</span>
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {"Đơn hàng bán"} <span className="text-red-500">*</span>
                                     </label>
                                     <Select
-                                        // options={fakeDataQuotes}
                                         options={dataProductOrder}
-                                        onChange={(value) => handleOnChangeInput("productOrder", value)}
-                                        value={productOrder}
-                                        isLoading={loading}
-                                        placeholder={
-                                            dataLang?.delivery_receipt_select_product_order ||
-                                            "delivery_receipt_select_product_order"
-                                        }
-                                        hideSelectedOptions={false}
+                                        onChange={_HandleChangeInput.bind(this, "idProductOrder")}
+                                        isLoading={idBranch || idClient != null ? false : onLoading}
+                                        value={idProductOrder}
                                         isClearable={true}
+                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
+                                        closeMenuOnSelect={true}
+                                        hideSelectedOptions={false}
+                                        placeholder={"Đơn hàng bán"}
                                         className={`${
-                                            errProductOrder && productOrder === null
-                                                ? "border border-red-500 rounded-md"
-                                                : ""
-                                        } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px]`}
+                                            errProductOrder ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
-                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                        menuPortalTarget={document.body}
                                         style={{
                                             border: "none",
                                             boxShadow: "none",
@@ -1824,33 +1540,32 @@ const Index = (props) => {
                                                 ...base,
                                                 color: "#cbd5e1",
                                             }),
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 20,
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                // zIndex: 9999, // Giá trị z-index tùy chỉnh
                                             }),
                                             control: (base, state) => ({
                                                 ...base,
                                                 boxShadow: "none",
-                                                padding: "0.7px",
+                                                padding: "2.7px",
+                                                ...(state.isFocused && {
+                                                    border: "0 0 0 1px #92BFF7",
+                                                }),
                                             }),
                                         }}
                                     />
-                                    {errProductOrder && productOrder === null && (
-                                        <label className="text-sm text-red-500">
-                                            {dataLang?.sales_product_err_quote || "sales_product_err_quote"}
-                                        </label>
+                                    {errProductOrder && (
+                                        <label className="text-sm text-red-500">{"Vui lòng chọn đơn hàng bán"}</label>
                                     )}
                                 </div>
                             </div>
                         </div>
                     </div>
-                    {/* fix */}
-                    {/* Thông tin mặt hàng */}
-                    <h2 className="3xl:text-[17px] 2xl:text-[16px] xl:text-[15px] text-[14px] font-normal bg-[#ECF0F4] p-1">
-                        {dataLang?.item_information || "item_information"}
-                    </h2>
-
-                    {/* Chọn nhanh  */}
+                    <div className=" bg-[#ECF0F4] p-2 grid  grid-cols-12">
+                        <div className="font-normal col-span-12">
+                            {dataLang?.import_item_information || "import_item_information"}
+                        </div>
+                    </div>
                     <div className="grid grid-cols-12">
                         <div div className="col-span-3">
                             <label className="text-[#344054] font-normal 2xl:text-base text-[14px]">
@@ -1858,14 +1573,14 @@ const Index = (props) => {
                             </label>
                             <Select
                                 // onInputChange={(value) => handleSearchApi(value)}
-                                options={productOrder ? allItems : []}
+                                options={idProductOrder ? options : []}
                                 closeMenuOnSelect={false}
-                                onChange={(value) => handleOnChangeInput("itemAll", value)}
-                                value={itemsAll?.value ? itemsAll?.value : option?.map((e) => e?.item)}
+                                onChange={_HandleChangeInput.bind(this, "itemAll")}
+                                value={itemAll ? itemAll : listData?.map((e) => e)}
                                 isMulti
                                 components={{ MenuList, MultiValue }}
-                                formatOptionLabel={(option) => quickSelectItemsLabel(option)}
-                                placeholder={dataLang?.purchase_items || "purchase_items"}
+                                formatOptionLabel={(option) => selectItemsLabel(option)}
+                                placeholder={"Chọn nhanh mặt hàng"}
                                 hideSelectedOptions={false}
                                 className="rounded-md bg-white 3xl:text-[16px] 2xl:text-[10px] xl:text-[13px] text-[12.5px] "
                                 isSearchable={true}
@@ -1903,536 +1618,686 @@ const Index = (props) => {
                             />
                         </div>
                     </div>
-
-                    {/* Thông tin mặt hàng Header */}
-                    <div className="pr-2">
-                        <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 ">
-                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-3 text-left truncate font-[400]">
-                                {dataLang?.sales_product_item || "sales_product_item"}
-                            </h4>
-                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                                {dataLang?.sales_product_from_unit || "sales_product_from_unit"}
-                            </h4>
-                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                                {dataLang?.sales_product_quantity || "sales_product_quantity"}
-                            </h4>
-                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                                {dataLang?.sales_product_unit_price || "sales_product_unit_price"}
-                            </h4>
-                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                                {`${dataLang?.sales_product_rate_discount}` || "sales_product_rate_discount"}
-                            </h4>
-                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center    font-[400] whitespace-nowrap">
-                                {dataLang?.sales_product_after_discount || "sales_product_after_discount"}
-                            </h4>
-                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                                {dataLang?.sales_product_tax || "sales_product_tax"}
-                            </h4>
-                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center    truncate font-[400]">
-                                {dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}
-                            </h4>
-                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center    truncate font-[400]">
-                                {dataLang?.sales_product_note || "sales_product_note"}
-                            </h4>
-                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                                {dataLang?.sales_product_operations || "sales_product_operations"}
-                            </h4>
-                        </div>
-                    </div>
-                    {/* Thông tin mặt hàng Mặt hàng */}
-                    <div className="3xl:h-[330px] h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                        <div className="pr-2">
-                            <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                {/* phân chia */}
-                                <div className="grid grid-cols-12">
-                                    <div className="col-span-3 ">
-                                        <Select
-                                            // onInputChange={handleSearchApi.bind(this)}
-                                            dangerouslySetInnerHTML={{
-                                                __html: option.label,
-                                            }}
-                                            options={productOrder ? options : []}
-                                            onChange={(value) => handleAddParent(value)}
-                                            value={null}
-                                            formatOptionLabel={selectItemsLabel}
-                                            placeholder={
-                                                dataLang?.sales_product_select_item || "sales_product_select_item"
-                                            }
-                                            hideSelectedOptions={false}
-                                            className={`cursor-pointer rounded-md bg-white  3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]`}
-                                            isSearchable={true}
-                                            noOptionsMessage={() => "Không có dữ liệu"}
-                                            menuPortalTarget={document.body}
-                                            style={{
-                                                border: "none",
-                                                boxShadow: "none",
-                                                outline: "none",
-                                            }}
-                                            theme={(theme) => ({
-                                                ...theme,
-                                                colors: {
-                                                    ...theme.colors,
-                                                    primary25: "#EBF5FF",
-                                                    primary50: "#92BFF7",
-                                                    primary: "#0F4F9E",
-                                                },
-                                            })}
-                                            styles={{
-                                                placeholder: (base) => ({
-                                                    ...base,
-                                                    color: "#cbd5e1",
-                                                }),
-                                                menuPortal: (base) => ({
-                                                    ...base,
-                                                    zIndex: 9999,
-                                                }),
-                                                control: (base, state) => ({
-                                                    ...base,
-                                                    ...(state.isFocused && {
-                                                        border: "0 0 0 1px #92BFF7",
-                                                        boxShadow: "none",
-                                                    }),
-                                                }),
-                                            }}
-                                        />
-                                    </div>
-
-                                    <div className="grid col-span-9 grid-cols-9 gap-1  items-center mb-1">
-                                        <div className="col-span-1 text-center flex items-center justify-center">
-                                            <h3
-                                                className={`cursor-default 3xl:text-[16px] 2xl:text-[14px] xl:text-[13px] text-[12px]`}
-                                            />
-                                        </div>
-                                        <div className="col-span-1 flex items-center justify-center">
-                                            <button
-                                                disabled={true}
-                                                className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                                            >
-                                                <Minus size="16" className="2xl:scale-100 xl:scale-90 scale-75 " />
-                                            </button>
-                                            <NumericFormat
-                                                className={`cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                                                value={1}
-                                                thousandSeparator=","
-                                                allowNegative={false}
-                                                readOnly={true}
-                                                decimalScale={0}
-                                                isNumericString={true}
-                                                isAllowed={(values) => {
-                                                    const { floatValue } = values;
-                                                    return floatValue > 0;
-                                                }}
-                                            />
-                                            <button
-                                                disabled={true}
-                                                className=" 2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                                            >
-                                                <Add size="16" className="2xl:scale-100 xl:scale-90 scale-75" />
-                                            </button>
-                                        </div>
-                                        <div className="col-span-1 text-center flex items-center justify-center">
-                                            <NumericFormat
-                                                value={1}
-                                                allowNegative={false}
-                                                readOnly={true}
-                                                decimalScale={0}
-                                                isNumericString={true}
-                                                className={`cursor-default appearance-none 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
-                                                thousandSeparator=","
-                                            />
-                                        </div>
-                                        <div className="col-span-1 text-center flex items-center justify-center">
-                                            <NumericFormat
-                                                value={0}
-                                                className={`cursor-default appearance-none text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
-                                                thousandSeparator=","
-                                                allowNegative={false}
-                                                readOnly={true}
-                                                isNumericString={true}
-                                            />
-                                        </div>
-                                        <div className="col-span-1 text-right flex items-center justify-end">
-                                            <h3
-                                                className={`cursor-default px-2 py-2.5 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
-                                            >
-                                                1
-                                            </h3>
-                                        </div>
-                                        <div className="col-span-1 flex justify-center items-center">
-                                            <Select
-                                                options={taxOptions}
-                                                value={null}
-                                                placeholder={"% Thuế"}
-                                                isDisabled={true}
-                                                hideSelectedOptions={false}
-                                                formatOptionLabel={taxRateLabel}
-                                                className={`border-transparent placeholder:text-slate-300 3xl:mb-4 2xl:mb-3 mb-3.5 3x:h-4 h-6 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                                                isSearchable={true}
-                                                noOptionsMessage={() => "Không có dữ liệu"}
-                                                menuPortalTarget={document.body}
-                                                closeMenuOnSelect={true}
-                                                style={{
-                                                    border: "none",
-                                                    boxShadow: "none",
-                                                    outline: "none",
-                                                }}
-                                                theme={(theme) => ({
-                                                    ...theme,
-                                                    colors: {
-                                                        ...theme.colors,
-                                                        primary25: "#EBF5FF",
-                                                        primary50: "#92BFF7",
-                                                        primary: "#0F4F9E",
-                                                    },
-                                                })}
-                                                styles={{
-                                                    placeholder: (base) => ({
-                                                        ...base,
-                                                        color: "#cbd5e1",
-                                                    }),
-                                                    menuPortal: (base) => ({
-                                                        ...base,
-                                                        zIndex: 20,
-                                                    }),
-                                                    control: (base, state) => ({
-                                                        ...base,
-                                                        boxShadow: "none",
-                                                        padding: "0.7px",
-                                                    }),
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="col-span-1 text-right flex items-center justify-end">
-                                            <h3
-                                                className={`cursor-default px-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
-                                            >
-                                                1
-                                            </h3>
-                                        </div>
-                                        <div className="col-span-1 flex items-center justify-center">
-                                            <input
-                                                value={null}
-                                                name="optionEmail"
-                                                placeholder="Ghi chú"
-                                                disabled={true}
-                                                type="text"
-                                                className="focus:border-[#92BFF7] border-[#d0d5dd] h-10 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[10px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none"
-                                            />
-                                        </div>
-                                        <div className="col-span-1 flex items-center justify-center">
-                                            <button
-                                                onClick={() => _HandleDelete("default", "default")}
-                                                type="button"
-                                                title="Xóa"
-                                                className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
-                                            >
-                                                <IconDelete />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* phân chia  */}
-                                {sortedArr.map((e, index) => (
-                                    <div className="grid grid-cols-12 gap-1 py-1 items-center" key={e?.id}>
-                                        <div className="col-span-3 ">
-                                            <Select
-                                                // onInputChange={handleSearchApi.bind(this)}
-                                                dangerouslySetInnerHTML={{
-                                                    __html: option.label,
-                                                }}
-                                                options={productOrder ? options : []}
-                                                onChange={(value) => _HandleChangeValue(e?.id, value)}
-                                                value={e?.item}
-                                                // components={{ MenuList, MultiValue }}
-                                                formatOptionLabel={selectItemsLabel}
-                                                placeholder={
-                                                    dataLang?.sales_product_select_item || "sales_product_select_item"
-                                                }
-                                                hideSelectedOptions={false}
-                                                className={`cursor-pointer rounded-md bg-white 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
-                                                isSearchable={true}
-                                                noOptionsMessage={() => "Không có dữ liệu"}
-                                                menuPortalTarget={document.body}
-                                                style={{
-                                                    border: "none",
-                                                    boxShadow: "none",
-                                                    outline: "none",
-                                                }}
-                                                theme={(theme) => ({
-                                                    ...theme,
-                                                    colors: {
-                                                        ...theme.colors,
-                                                        primary25: "#EBF5FF",
-                                                        primary50: "#92BFF7",
-                                                        primary: "#0F4F9E",
-                                                    },
-                                                })}
-                                                styles={{
-                                                    placeholder: (base) => ({
-                                                        ...base,
-                                                        color: "#cbd5e1",
-                                                    }),
-                                                    menuPortal: (base) => ({
-                                                        ...base,
-                                                        zIndex: 9999,
-                                                    }),
-                                                    control: (base, state) => ({
-                                                        ...base,
-                                                        ...(state.isFocused && {
-                                                            boxShadow: "none",
-                                                            padding: "0",
-                                                        }),
-                                                    }),
-                                                }}
-                                            />
-                                        </div>
-
-                                        <div className="col-span-1 text-center flex items-center justify-center">
-                                            <h3
-                                                className={`'cursor-text 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
-                                            >
-                                                {e?.unit}
-                                            </h3>
-                                        </div>
-                                        <div className="col-span-1 flex items-center justify-center">
-                                            <div className="flex items-center justify-center">
-                                                <button
-                                                    onClick={() => handleDecrease(e?.id)}
-                                                    className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                                                >
-                                                    <Minus size="16" className="2xl:scale-100 xl:scale-90 scale-75" />
-                                                </button>
-                                                <NumericFormat
-                                                    className={`${
-                                                        errQty && e?.quantity == ""
-                                                            ? "border-red-400"
-                                                            : "border-gray-200"
-                                                    } cursor-text appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 `}
-                                                    onValueChange={(value) =>
-                                                        handleOnChangeInputOption(e?.id, "quantity", value)
-                                                    }
-                                                    value={e?.quantity}
-                                                    thousandSeparator=","
-                                                    allowNegative={false}
-                                                    decimalScale={0}
-                                                    isNumericString={true}
-                                                    isAllowed={(values) => {
-                                                        if (!values.value) return true;
-                                                        let { floatValue } = values;
-                                                        let count =
-                                                            +e?.item?.e?.quantity - +e?.item?.e?.quantity_delivery;
-                                                        if (floatValue > +e?.item?.e?.quantity) {
-                                                            Toast.fire({
-                                                                icon: "error",
-                                                                title: `Vui nhập số lượng nhỏ hơn hoặc bằng ${+e?.item
-                                                                    ?.e?.quantity}`,
-                                                            });
-                                                        }
-                                                        if (floatValue > count) {
-                                                            Toast.fire({
-                                                                icon: "error",
-                                                                title: `Vui nhập số lượng nhỏ hơn hoặc bằng ${count}`,
-                                                            });
-                                                        } else if (floatValue === 0) {
-                                                            Toast.fire({
-                                                                icon: "error",
-                                                                title: `Vui nhập số lượng lớn hơn 0!`,
-                                                            });
-                                                        }
-                                                        return floatValue <= count;
-                                                    }}
-                                                />
-                                                <button
-                                                    onClick={() => handleIncrease(e.id)}
-                                                    className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                                                >
-                                                    <Add size="16" className="2xl:scale-100 xl:scale-90 scale-75" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div className="col-span-1 text-center flex items-center justify-center">
-                                            <NumericFormat
-                                                value={e?.price}
-                                                onValueChange={(value) =>
-                                                    handleOnChangeInputOption(e?.id, "price", value)
-                                                }
-                                                allowNegative={false}
-                                                decimalScale={0}
-                                                isNumericString={true}
-                                                className={`cursor-text appearance-none 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
-                                                thousandSeparator=","
-                                            />
-                                        </div>
-                                        <div className="col-span-1 text-center flex items-center justify-center">
-                                            <NumericFormat
-                                                value={e?.discount}
-                                                onValueChange={(value) =>
-                                                    handleOnChangeInputOption(e?.id, "discount", value)
-                                                }
-                                                className={`cursor-text appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
-                                                thousandSeparator=","
-                                                allowNegative={false}
-                                                isAllowed={(values) => {
-                                                    if (!values.value) return true;
-                                                    const { floatValue } = values;
-                                                    if (floatValue > 101) {
-                                                        Toast.fire({
-                                                            icon: "error",
-                                                            title: `Vui lòng nhập số % chiết khấu nhỏ hơn 101`,
-                                                        });
-                                                    }
-                                                    return floatValue < 101;
-                                                }}
-                                                // decimalScale={0}
-                                                isNumericString={true}
-                                            />
-                                        </div>
-                                        <div className="col-span-1 text-right flex items-center justify-end">
-                                            <h3
-                                                className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
-                                            >
-                                                {formatNumber(e?.price_after_discount)}
-                                            </h3>
-                                        </div>
-                                        <div className="col-span-1 flex justify-center items-center p-0">
-                                            <Select
-                                                options={taxOptions}
-                                                onChange={(value) => handleOnChangeInputOption(e?.id, "tax", value)}
-                                                value={
-                                                    e?.tax
-                                                        ? {
-                                                              label: taxOptions.find(
-                                                                  (item) => item.value === e?.tax?.value
-                                                              )?.label,
-                                                              value: e?.tax?.value,
-                                                              tax_rate: e?.tax?.tax_rate,
-                                                          }
-                                                        : null
-                                                }
-                                                placeholder={"% Thuế"}
-                                                hideSelectedOptions={false}
-                                                formatOptionLabel={taxRateLabel}
-                                                className={` border-transparent placeholder:text-slate-300 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                                                isSearchable={true}
-                                                noOptionsMessage={() => "Không có dữ liệu"}
-                                                menuPortalTarget={document.body}
-                                                closeMenuOnSelect={true}
-                                                style={{
-                                                    border: "none",
-                                                    boxShadow: "none",
-                                                    outline: "none",
-                                                }}
-                                                theme={(theme) => ({
-                                                    ...theme,
-                                                    colors: {
-                                                        ...theme.colors,
-                                                        primary25: "#EBF5FF",
-                                                        primary50: "#92BFF7",
-                                                        primary: "#0F4F9E",
-                                                    },
-                                                })}
-                                                styles={{
-                                                    placeholder: (base) => ({
-                                                        ...base,
-                                                        color: "#cbd5e1",
-                                                    }),
-                                                    menuPortal: (base) => ({
-                                                        ...base,
-                                                        zIndex: 20,
-                                                    }),
-                                                    control: (base, state) => ({
-                                                        ...base,
-                                                        boxShadow: "none",
-                                                        padding: "0px",
-                                                        margin: "0px",
-                                                    }),
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="col-span-1 text-right flex items-center justify-end">
-                                            <h3
-                                                className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[13px] xl:text-[12px] text-[11px]`}
-                                            >
-                                                {formatNumber(e?.total_amount)}
-                                            </h3>
-                                        </div>
-                                        <div className="col-span-1 flex items-center justify-center">
-                                            <input
-                                                value={e?.note}
-                                                onChange={(value) => handleOnChangeInputOption(e?.id, "note", value)}
-                                                name="optionEmail"
-                                                placeholder="Ghi chú"
-                                                type="text"
-                                                className="focus:border-[#92BFF7] border-[#d0d5dd] h-10 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[10px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none"
-                                            />
-                                        </div>
-                                        <div className="col-span-1 flex items-center justify-center">
-                                            <button
-                                                onClick={_HandleDelete.bind(this, e?.id)}
-                                                type="button"
-                                                title="Xóa"
-                                                className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
-                                            >
-                                                <IconDelete />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
+                    <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10">
+                        <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2 text-center truncate font-[400]">
+                            {dataLang?.import_from_items || "import_from_items"}
+                        </h4>
+                        <div className="col-span-10">
+                            <div className="grid grid-cols-11">
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-2   text-center  truncate font-[400]">
+                                    {dataLang?.PDF_house || "PDF_house"}
+                                </h4>
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                                    {"ĐVT"}
+                                </h4>
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                                    {dataLang?.import_from_quantity || "import_from_quantity"}
+                                </h4>
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                                    {dataLang?.import_from_unit_price || "import_from_unit_price"}
+                                </h4>
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                                    {dataLang?.import_from_discount || "import_from_discount"}
+                                </h4>
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                                    {dataLang?.returns_sck || "returns_sck"}
+                                </h4>
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                                    {dataLang?.import_from_tax || "import_from_tax"}
+                                </h4>
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
+                                    {dataLang?.import_into_money || "import_into_money"}
+                                </h4>
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
+                                    {dataLang?.import_from_note || "import_from_note"}
+                                </h4>
+                                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
+                                    {dataLang?.import_from_operation || "import_from_operation"}
+                                </h4>
                             </div>
                         </div>
                     </div>
+                    <div className="grid grid-cols-12 items-center gap-1 py-2">
+                        <div className="col-span-2">
+                            <Select
+                                options={options}
+                                value={null}
+                                onChange={_HandleAddParent.bind(this)}
+                                className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
+                                placeholder={dataLang?.returns_items || "returns_items"}
+                                noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
+                                menuPortalTarget={document.body}
+                                formatOptionLabel={selectItemsLabel}
+                                style={{
+                                    border: "none",
+                                    boxShadow: "none",
+                                    outline: "none",
+                                }}
+                                theme={(theme) => ({
+                                    ...theme,
+                                    colors: {
+                                        ...theme.colors,
+                                        primary25: "#EBF5FF",
+                                        primary50: "#92BFF7",
+                                        primary: "#0F4F9E",
+                                    },
+                                })}
+                                styles={{
+                                    placeholder: (base) => ({
+                                        ...base,
+                                        color: "#cbd5e1",
+                                    }),
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        // zIndex: 9999,
+                                    }),
+                                    control: (base, state) => ({
+                                        ...base,
+                                        ...(state.isFocused && {
+                                            border: "0 0 0 1px #92BFF7",
+                                            boxShadow: "none",
+                                        }),
+                                    }),
+                                    menu: (provided, state) => ({
+                                        ...provided,
+                                        width: "150%",
+                                    }),
+                                }}
+                            />
+                        </div>
+                        <div className="col-span-10">
+                            <div className="grid grid-cols-11  divide-x border-t border-b border-r border-l">
+                                <div className="col-span-2">
+                                    {" "}
+                                    <Select
+                                        classNamePrefix="customDropdowDefault"
+                                        placeholder={"Kho - Vị trí kho"}
+                                        className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
+                                        isDisabled={true}
+                                    />
+                                </div>
+                                <div className="col-span-1"></div>
+                                <div className="col-span-1 flex  justify-center items-center">
+                                    <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
+                                        <Minus className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
+                                    </button>
+                                    <div className=" text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none border-b border-gray-200">
+                                        1
+                                    </div>
+                                    <button className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full">
+                                        <Add className="2xl:scale-100 xl:scale-100 scale-50" size="16" />
+                                    </button>
+                                </div>
+                                <div className="col-span-1 justify-center flex items-center">
+                                    <div className=" 3xl:text-[12px] w-full 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50 text-black">
+                                        1
+                                    </div>
+                                </div>
+                                <div className="col-span-1 justify-center flex items-center">
+                                    <div className=" w-full 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] text-center py-1 px-2 font-medium bg-slate-50">
+                                        0
+                                    </div>
+                                </div>
+                                <div className="col-span-1 text-right 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black flex items-center justify-end">
+                                    0
+                                </div>
+                                <div className="col-span-1 flex items-center w-full">
+                                    <Select
+                                        classNamePrefix="customDropdowDefault"
+                                        placeholder={dataLang?.returns_tax || "returns_tax"}
+                                        className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] w-full"
+                                        isDisabled={true}
+                                    />
+                                </div>
+                                <div className="col-span-1 text-right 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black  flex items-center justify-end">
+                                    1.00
+                                </div>
+                                <input
+                                    placeholder={dataLang?.returns_note || "returns_note"}
+                                    disabled
+                                    className=" disabled:bg-gray-50 col-span-1 placeholder:text-slate-300 w-full bg-[#ffffff] 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  p-1.5 "
+                                />
+                                <button
+                                    title={dataLang?.returns_delete || "returns_delete"}
+                                    disabled
+                                    className="col-span-1 disabled:opacity-50 transition w-full h-full bg-slate-100  rounded-[5.5px] text-red-500 flex flex-col justify-center items-center"
+                                >
+                                    <IconDelete />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                        <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
+                            {onFetchingDetail ? (
+                                <Loading className="h-10 w-full" color="#0f4f9e" />
+                            ) : (
+                                <>
+                                    {listData?.map((e) => (
+                                        <div
+                                            key={e?.id?.toString()}
+                                            className="grid grid-cols-12 gap-2 my-1 items-start"
+                                        >
+                                            <div className="col-span-2 border border-r p-2 pb-1 h-full">
+                                                <div className="relative mt-5">
+                                                    <Select
+                                                        options={options}
+                                                        value={e?.matHang}
+                                                        className=""
+                                                        onChange={_HandleChangeValue.bind(this, e?.id)}
+                                                        menuPortalTarget={document.body}
+                                                        formatOptionLabel={selectItemsLabel}
+                                                        classNamePrefix="customDropdow"
+                                                        style={{
+                                                            border: "none",
+                                                            boxShadow: "none",
+                                                            outline: "none",
+                                                        }}
+                                                        theme={(theme) => ({
+                                                            ...theme,
+                                                            colors: {
+                                                                ...theme.colors,
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
+                                                            },
+                                                        })}
+                                                        styles={{
+                                                            placeholder: (base) => ({
+                                                                ...base,
+                                                                color: "#cbd5e1",
+                                                            }),
+                                                            menuPortal: (base) => ({
+                                                                ...base,
+                                                                // zIndex: 9999,
+                                                            }),
+                                                            control: (base, state) => ({
+                                                                ...base,
+                                                                ...(state.isFocused && {
+                                                                    border: "0 0 0 1px #92BFF7",
+                                                                    boxShadow: "none",
+                                                                }),
+                                                            }),
+                                                            menu: (provided, state) => ({
+                                                                ...provided,
+                                                                width: "150%",
+                                                            }),
+                                                        }}
+                                                    />
+                                                    <button
+                                                        onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)}
+                                                        className="w-8 h-8 rounded bg-slate-100 flex flex-col justify-center items-center absolute -top-4 right-5 hover:rotate-45 hover:bg-slate-200 transition hover:scale-105 hover:text-red-500 ease-in-out"
+                                                    >
+                                                        <Add className="" />
+                                                    </button>
+                                                </div>
+                                                {e?.child?.filter((e) => e?.warehouse == null).length >= 2 && (
+                                                    <button
+                                                        onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)}
+                                                        className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
+                                                    >
+                                                        <span className="absolute right-0 w-full h-full -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
+                                                        <span className="relative text-xs">
+                                                            Xóa {e?.child?.filter((e) => e?.warehouse == null).length}{" "}
+                                                            hàng chưa chọn kho
+                                                        </span>
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <div className="col-span-10  items-center">
+                                                <div className="grid grid-cols-11  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
+                                                    {load ? (
+                                                        <Loading className="h-2 col-span-11" color="#0f4f9e" />
+                                                    ) : (
+                                                        e?.child?.map((ce) => (
+                                                            <React.Fragment key={ce?.id?.toString()}>
+                                                                <div className="p-1 border-t border-l  flex flex-col col-span-2 justify-center h-full">
+                                                                    <Select
+                                                                        options={ce?.dataWarehouse}
+                                                                        value={ce?.warehouse}
+                                                                        isLoading={
+                                                                            ce?.warehouse == null
+                                                                                ? onLoadingChild
+                                                                                : false
+                                                                        }
+                                                                        onChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "warehouse"
+                                                                        )}
+                                                                        className={`${
+                                                                            (errWarehouse && ce?.warehouse == null) ||
+                                                                            (errWarehouse &&
+                                                                                (ce?.warehouse?.label == null ||
+                                                                                    ce?.warehouse?.warehouse_name ==
+                                                                                        null))
+                                                                                ? "border-red-500 border"
+                                                                                : ""
+                                                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
+                                                                        placeholder={
+                                                                            onLoadingChild
+                                                                                ? ""
+                                                                                : dataLang?.PDF_house || "PDF_house"
+                                                                        }
+                                                                        menuPortalTarget={document.body}
+                                                                        formatOptionLabel={(option) => {
+                                                                            return (
+                                                                                (option?.warehouse_name ||
+                                                                                    option?.label ||
+                                                                                    option?.qty) && (
+                                                                                    <div className="">
+                                                                                        <div className="flex gap-1">
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                                                {"Kho"}:
+                                                                                            </h2>
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
+                                                                                                {option?.warehouse_name}
+                                                                                            </h2>
+                                                                                        </div>
+                                                                                        <div className="flex gap-1">
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                                                {"Vị trí kho"}:
+                                                                                            </h2>
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
+                                                                                                {option?.label}
+                                                                                            </h2>
+                                                                                        </div>
+                                                                                        <div className="flex gap-1">
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
+                                                                                                {dataLang?.returns_survive ||
+                                                                                                    "returns_survive"}
+                                                                                                :
+                                                                                            </h2>
+                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
+                                                                                                {formatNumber(
+                                                                                                    option?.qty
+                                                                                                )}
+                                                                                            </h2>
+                                                                                        </div>
+                                                                                        <div className="flex items-center gap-2 italic">
+                                                                                            {dataProductSerial.is_enable ===
+                                                                                                "1" && (
+                                                                                                <div className="text-[11px] text-[#667085] font-[500]">
+                                                                                                    Serial:{" "}
+                                                                                                    {option?.serial
+                                                                                                        ? option?.serial
+                                                                                                        : "-"}
+                                                                                                </div>
+                                                                                            )}
+                                                                                            {dataMaterialExpiry.is_enable ===
+                                                                                                "1" ||
+                                                                                            dataProductExpiry.is_enable ===
+                                                                                                "1" ? (
+                                                                                                <>
+                                                                                                    <div className="text-[11px] text-[#667085] font-[500]">
+                                                                                                        Lot:{" "}
+                                                                                                        {option?.lot
+                                                                                                            ? option?.lot
+                                                                                                            : "-"}
+                                                                                                    </div>
+                                                                                                    <div className="text-[11px] text-[#667085] font-[500]">
+                                                                                                        Date:{" "}
+                                                                                                        {option?.date
+                                                                                                            ? moment(
+                                                                                                                  option?.date
+                                                                                                              ).format(
+                                                                                                                  "DD/MM/YYYY"
+                                                                                                              )
+                                                                                                            : "-"}
+                                                                                                    </div>
+                                                                                                </>
+                                                                                            ) : (
+                                                                                                ""
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                )
+                                                                            );
+                                                                        }}
+                                                                        style={{
+                                                                            border: "none",
+                                                                            boxShadow: "none",
+                                                                            outline: "none",
+                                                                        }}
+                                                                        theme={(theme) => ({
+                                                                            ...theme,
+                                                                            colors: {
+                                                                                ...theme.colors,
+                                                                                primary25: "#EBF5FF",
+                                                                                primary50: "#92BFF7",
+                                                                                primary: "#0F4F9E",
+                                                                            },
+                                                                        })}
+                                                                        // styles={{
+                                                                        //   menu: (provided, state) => ({
+                                                                        //     ...provided,
+                                                                        //     width: "200%",
+                                                                        //   }),
+                                                                        // }}
+                                                                        classNamePrefix="customDropdow"
+                                                                    />
+                                                                </div>
+                                                                <div className="text-center  p-0.5 pr-2.5 h-full flex flex-col justify-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                    {ce?.unit}
+                                                                </div>
+                                                                <div className="relative">
+                                                                    <div className="flex items-center justify-center h-full p-0.5">
+                                                                        <button
+                                                                            disabled={
+                                                                                ce?.quantity === 1 ||
+                                                                                ce?.quantity === "" ||
+                                                                                ce?.quantity === null ||
+                                                                                ce?.quantity === 0
+                                                                            }
+                                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
+                                                                            onClick={_HandleChangeChild.bind(
+                                                                                this,
+                                                                                e?.id,
+                                                                                ce?.id,
+                                                                                "decrease"
+                                                                            )}
+                                                                        >
+                                                                            <Minus
+                                                                                className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                                size="16"
+                                                                            />
+                                                                        </button>
+                                                                        <NumericFormat
+                                                                            onValueChange={_HandleChangeChild.bind(
+                                                                                this,
+                                                                                e?.id,
+                                                                                ce?.id,
+                                                                                "quantity"
+                                                                            )}
+                                                                            value={ce?.quantity || null}
+                                                                            className={`${
+                                                                                errQuantity &&
+                                                                                (ce?.quantity == null ||
+                                                                                    ce?.quantity == "" ||
+                                                                                    ce?.quantity == 0)
+                                                                                    ? "border-b border-red-500"
+                                                                                    : errSurvive
+                                                                                    ? "border-b border-red-500"
+                                                                                    : "border-b border-gray-200"
+                                                                            } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
+                                                                            allowNegative={false}
+                                                                            decimalScale={0}
+                                                                            isNumericString={true}
+                                                                            thousandSeparator=","
+                                                                            isAllowed={(values) => {
+                                                                                const { value } = values;
+                                                                                const newValue = +value;
+                                                                                const quantityAmount =
+                                                                                    +ce?.quantityStock -
+                                                                                    +ce?.quantityDelive;
 
+                                                                                if (newValue > +ce?.warehouse?.qty) {
+                                                                                    ToatstNotifi(
+                                                                                        "error",
+                                                                                        `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                                                                            +ce?.warehouse?.qty
+                                                                                        )} số lượng tồn kho`
+                                                                                    );
+                                                                                } else if (newValue > quantityAmount) {
+                                                                                    ToatstNotifi(
+                                                                                        "error",
+                                                                                        `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                                                                            quantityAmount
+                                                                                        )} số lượng chưa giao`
+                                                                                    );
+                                                                                }
+                                                                                return (
+                                                                                    newValue <= +ce?.warehouse?.qty ||
+                                                                                    newValue <= quantityAmount
+                                                                                );
+                                                                            }}
+                                                                        />
+                                                                        <button
+                                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
+                                                                            onClick={_HandleChangeChild.bind(
+                                                                                this,
+                                                                                e?.id,
+                                                                                ce?.id,
+                                                                                "increase"
+                                                                            )}
+                                                                        >
+                                                                            <Add
+                                                                                className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                                size="16"
+                                                                            />
+                                                                        </button>
+                                                                    </div>
+                                                                    <div className="absolute top-0 right-0 p-1 cursor-pointer ">
+                                                                        <Popup
+                                                                            className=""
+                                                                            trigger={
+                                                                                <div className="relative ">
+                                                                                    <TableDocument
+                                                                                        size="18"
+                                                                                        color="#4f46e5"
+                                                                                        className="font-medium"
+                                                                                    />
+                                                                                    <span className="h-2 w-2  absolute top-0 left-1/2  translate-x-[50%] -translate-y-[50%]">
+                                                                                        <span className="inline-flex relative rounded-full h-2 w-2 bg-indigo-500">
+                                                                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75 absolute"></span>
+                                                                                        </span>
+                                                                                    </span>
+                                                                                </div>
+                                                                            }
+                                                                            position="left center"
+                                                                            on={["hover", "focus"]}
+                                                                        >
+                                                                            <div className="flex flex-col bg-gray-300 px-2.5 py-0.5 rounded-sm">
+                                                                                <span className="font-medium text-xs">
+                                                                                    Sl tồn:{" "}
+                                                                                    {ce?.warehouse == null
+                                                                                        ? 0
+                                                                                        : formatNumber(
+                                                                                              +ce?.warehouse?.qty
+                                                                                          )}
+                                                                                </span>
+
+                                                                                <span className="font-medium text-xs">
+                                                                                    Sl đã giao:{" "}
+                                                                                    {formatNumber(ce?.quantityDelive)}
+                                                                                </span>
+                                                                                <span className="font-medium text-xs">
+                                                                                    Sl chưa giao:{" "}
+                                                                                    {formatNumber(
+                                                                                        ce?.quantityStock -
+                                                                                            ce?.quantityDelive
+                                                                                    )}
+                                                                                </span>
+                                                                            </div>
+                                                                        </Popup>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex justify-center  h-full p-0.5 flex-col items-center">
+                                                                    <NumericFormat
+                                                                        className={`${
+                                                                            errPrice &&
+                                                                            (ce?.price == null ||
+                                                                                ce?.price == "" ||
+                                                                                ce?.price == 0)
+                                                                                ? "border-b border-red-500"
+                                                                                : errSurvivePrice &&
+                                                                                  (ce?.price == null ||
+                                                                                      ce?.price == "" ||
+                                                                                      ce?.price == 0)
+                                                                                ? "border-b border-red-500"
+                                                                                : "border-b border-gray-200"
+                                                                        } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
+                                                                        onValueChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "price"
+                                                                        )}
+                                                                        value={ce?.price}
+                                                                        allowNegative={false}
+                                                                        decimalScale={0}
+                                                                        isNumericString={true}
+                                                                        thousandSeparator=","
+                                                                    />
+                                                                </div>
+                                                                <div className="flex justify-center  h-full p-0.5 flex-col items-center">
+                                                                    <NumericFormat
+                                                                        className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b border-gray-200"
+                                                                        onValueChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "discount"
+                                                                        )}
+                                                                        value={ce?.discount}
+                                                                        allowNegative={false}
+                                                                        decimalScale={0}
+                                                                        isNumericString={true}
+                                                                        thousandSeparator=","
+                                                                        isAllowed={(values) => {
+                                                                            const { value } = values;
+                                                                            if (+value > 100) {
+                                                                                ToatstNotifi(
+                                                                                    "error",
+                                                                                    " % Chiết khấu chỉ được bé hơn hoặc bằng 100%"
+                                                                                );
+                                                                            }
+                                                                            return value < 101;
+                                                                        }}
+                                                                    />
+                                                                </div>
+
+                                                                <div className="col-span-1 text-right flex items-center justify-end  h-full p-0.5">
+                                                                    <h3 className="px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                        {formatNumber(
+                                                                            Number(ce?.price) *
+                                                                                (1 - Number(ce?.discount) / 100)
+                                                                        )}
+                                                                    </h3>
+                                                                </div>
+                                                                <div className=" flex flex-col items-center p-1 h-full justify-center">
+                                                                    <Select
+                                                                        options={taxOptions}
+                                                                        value={ce?.tax}
+                                                                        onChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "tax"
+                                                                        )}
+                                                                        placeholder={
+                                                                            dataLang?.import_from_tax ||
+                                                                            "import_from_tax"
+                                                                        }
+                                                                        className={`  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                                                                        menuPortalTarget={document.body}
+                                                                        style={{
+                                                                            border: "none",
+                                                                            boxShadow: "none",
+                                                                            outline: "none",
+                                                                        }}
+                                                                        formatOptionLabel={(option) => (
+                                                                            <div className="flex justify-start items-center gap-1 ">
+                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                                    {option?.label}
+                                                                                </h2>
+                                                                                <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">{`(${option?.tax_rate})`}</h2>
+                                                                            </div>
+                                                                        )}
+                                                                        theme={(theme) => ({
+                                                                            ...theme,
+                                                                            colors: {
+                                                                                ...theme.colors,
+                                                                                primary25: "#EBF5FF",
+                                                                                primary50: "#92BFF7",
+                                                                                primary: "#0F4F9E",
+                                                                            },
+                                                                        })}
+                                                                        classNamePrefix="customDropdowTax"
+                                                                    />
+                                                                </div>
+                                                                {/* <div>{ce?.thanhTien}</div> */}
+                                                                <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                                                    {formatNumber(
+                                                                        ce?.price *
+                                                                            (1 - Number(ce?.discount) / 100) *
+                                                                            (1 + Number(ce?.tax?.tax_rate) / 100) *
+                                                                            Number(ce?.quantity)
+                                                                    )}
+                                                                </div>
+                                                                {/* <div>{ce?.note}</div> */}
+                                                                <div className="col-span-1 flex items-center justify-center  h-full p-0.5">
+                                                                    <input
+                                                                        value={ce?.note}
+                                                                        onChange={_HandleChangeChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id,
+                                                                            "note"
+                                                                        )}
+                                                                        placeholder="Ghi chú"
+                                                                        type="text"
+                                                                        className="  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
+                                                                    />
+                                                                </div>
+                                                                <div className=" h-full p-0.5 flex flex-col items-center justify-center">
+                                                                    <button
+                                                                        title="Xóa"
+                                                                        onClick={_HandleDeleteChild.bind(
+                                                                            this,
+                                                                            e?.id,
+                                                                            ce?.id
+                                                                        )}
+                                                                        className=" text-red-500 flex flex-col justify-center items-center hover:scale-110 bg-red-50 p-2 rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
+                                                                    >
+                                                                        <IconDelete />
+                                                                    </button>
+                                                                </div>
+                                                            </React.Fragment>
+                                                        ))
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </div>
+                    </div>
                     <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
                         <div className="col-span-2  flex items-center gap-2">
-                            <h2 className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px]">
-                                {dataLang?.sales_product_discount || "sales_product_discount"}
-                            </h2>
+                            <h2>{dataLang?.purchase_order_detail_discount || "purchase_order_detail_discount"}</h2>
                             <div className="col-span-1 text-center flex items-center justify-center">
                                 <NumericFormat
-                                    value={totalDiscount}
-                                    onValueChange={handleOnChangeInput.bind(this, "totaldiscount")}
-                                    className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] text-center py-1 px-2 bg-transparent font-normal xl:w-20 w-24 focus:outline-none border-b-2 border-gray-300"
+                                    value={generalDiscount}
+                                    onValueChange={_HandleChangeInput.bind(this, "generalDiscount")}
+                                    className=" text-center py-1 px-2 bg-transparent font-medium w-20 focus:outline-none border-b-2 border-gray-300"
                                     thousandSeparator=","
-                                    isAllowed={(values) => {
-                                        if (!values.value) return true;
-                                        const { floatValue } = values;
-                                        if (floatValue > 101) {
-                                            Toast.fire({
-                                                icon: "error",
-                                                title: `Vui lòng nhập số % chiết khấu nhỏ hơn 101`,
-                                            });
-                                        }
-                                        return floatValue < 101;
-                                    }}
                                     allowNegative={false}
                                     decimalScale={0}
                                     isNumericString={true}
                                 />
                             </div>
                         </div>
-                        <div className="col-span-2 flex items-center gap-2">
-                            <h2 className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px]">
-                                {dataLang?.sales_product_tax || "sales_product_tax"}
-                            </h2>
+                        <div className="col-span-2 flex items-center gap-2 ">
+                            <h2>{dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}</h2>
                             <Select
                                 options={taxOptions}
-                                onChange={(value) => handleOnChangeInput("total_tax", value)}
-                                value={totalTax ? "" : ""}
+                                onChange={_HandleChangeInput.bind(this, "generalTax")}
+                                value={generalTax}
                                 formatOptionLabel={(option) => (
                                     <div className="flex justify-start items-center gap-1 ">
                                         <h2>{option?.label}</h2>
                                         <h2>{`(${option?.tax_rate})`}</h2>
                                     </div>
                                 )}
-                                placeholder={dataLang?.sales_product_tax || "sales_product_tax"}
+                                placeholder={dataLang?.purchase_order_detail_tax || "purchase_order_detail_tax"}
                                 hideSelectedOptions={false}
-                                className={` 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] border-transparent placeholder:text-slate-300 xl:w-[70%] w-[60%] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                                className={` "border-transparent placeholder:text-slate-300 w-[70%] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
                                 isSearchable={true}
-                                noOptionsMessage={() => "Không có dữ liệu"}
-                                dangerouslySetInnerHTML={{
-                                    __html: option.label,
-                                }}
+                                noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
+                                //  dangerouslySetInnerHTML={{__html: option.label}}
                                 menuPortalTarget={document.body}
                                 closeMenuOnSelect={true}
                                 style={{
@@ -2470,91 +2335,164 @@ const Index = (props) => {
                             />
                         </div>
                     </div>
-
                     <h2 className="font-normal bg-[white]  p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]">
-                        {dataLang?.price_quote_total_outside || "price_quote_total_outside"}{" "}
+                        {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}{" "}
                     </h2>
                 </div>
-
                 <div className="grid grid-cols-12">
                     <div className="col-span-9">
-                        <div className="text-[#344054] font-normal 3xl:text-[16px] text-sm mb-1 ">
-                            {dataLang?.sales_product_note || "sales_product_note"}
+                        <div className="text-[#344054] font-normal text-sm mb-1 ">
+                            {dataLang?.returns_reason || "returns_reason"}
                         </div>
                         <textarea
                             value={note}
-                            placeholder={dataLang?.sales_product_note || "sales_product_note"}
-                            onChange={handleOnChangeInput.bind(this, "note")}
+                            placeholder={dataLang?.returns_reason || "returns_reason"}
+                            onChange={_HandleChangeInput.bind(this, "note")}
                             name="fname"
                             type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-[40%] h-[150px] max-h-[150px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
+                            className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-[40%] min-h-[220px] max-h-[220px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2 border outline-none "
                         />
                     </div>
-                    <div className="text-right xl:space-y-1 space-y-1.5 col-span-3 flex-col justify-between ">
+                    <div className="text-right mt-5 space-y-4 col-span-3 flex-col justify-between ">
                         <div className="flex justify-between "></div>
                         <div className="flex justify-between ">
-                            <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3>{dataLang?.price_quote_total || "price_quote_total"}</h3>
+                            <div className="font-normal ">
+                                <h3>{dataLang?.purchase_order_table_total || "purchase_order_table_total"}</h3>
                             </div>
-                            <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalPrice)}</h3>
-                            </div>
-                        </div>
-                        <div className="flex justify-between ">
-                            <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3>{dataLang?.sales_product_discount || "sales_product_discount"}</h3>
-                            </div>
-                            <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalDiscountPrice)}</h3>
-                            </div>
-                        </div>
-                        <div className="flex justify-between ">
-                            <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3>
-                                    {dataLang?.sales_product_total_money_after_discount ||
-                                        "sales_product_total_money_after_discount"}
+                            <div className="font-normal">
+                                <h3 className="text-blue-600">
+                                    {/* {formatNumber(tongTienState.tongTien)} */}
+                                    {formatNumber(
+                                        listData?.reduce((accumulator, item) => {
+                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                                                const product = Number(childItem?.price) * Number(childItem?.quantity);
+                                                return childAccumulator + product;
+                                            }, 0);
+                                            return accumulator + childTotal;
+                                        }, 0)
+                                    )}
                                 </h3>
                             </div>
-                            <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalDiscountAfterPrice)}</h3>
+                        </div>
+                        <div className="flex justify-between ">
+                            <div className="font-normal">
+                                <h3>
+                                    {dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"}
+                                </h3>
+                            </div>
+                            <div className="font-normal">
+                                <h3 className="text-blue-600">
+                                    {/* {formatNumber(tongTienState.tienChietKhau)} */}
+                                    {formatNumber(
+                                        listData?.reduce((accumulator, item) => {
+                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                                                const product =
+                                                    Number(childItem?.price) *
+                                                    (Number(childItem?.discount) / 100) *
+                                                    Number(childItem?.quantity);
+                                                return childAccumulator + product;
+                                            }, 0);
+                                            return accumulator + childTotal;
+                                        }, 0)
+                                    )}
+                                </h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
-                            <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3>{dataLang?.sales_product_total_tax || "sales_product_total_tax"}</h3>
+                            <div className="font-normal">
+                                <h3>
+                                    {dataLang?.purchase_order_detail_money_after_discount ||
+                                        "purchase_order_detail_money_after_discount"}
+                                </h3>
                             </div>
-                            <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalTax)}</h3>
+                            <div className="font-normal">
+                                <h3 className="text-blue-600">
+                                    {/* {formatNumber(tongTienState.tongTienSauCK)} */}
+                                    {formatNumber(
+                                        listData?.reduce((accumulator, item) => {
+                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                                                const product =
+                                                    Number(childItem?.price * (1 - childItem?.discount / 100)) *
+                                                    Number(childItem?.quantity);
+                                                return childAccumulator + product;
+                                            }, 0);
+                                            return accumulator + childTotal;
+                                        }, 0)
+                                    )}
+                                </h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
-                            <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3>{dataLang?.sales_product_total_into_money || "sales_product_total_into_money"}</h3>
+                            <div className="font-normal">
+                                <h3>
+                                    {dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"}
+                                </h3>
                             </div>
-                            <div className="font-normal 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[13px]">
-                                <h3 className="text-blue-600">{formatNumber(tongTienState.totalAmount)}</h3>
+                            <div className="font-normal">
+                                <h3 className="text-blue-600">
+                                    {/* {formatNumber(tongTienState.tienThue)} */}
+                                    {formatNumber(
+                                        listData?.reduce((accumulator, item) => {
+                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                                                const product =
+                                                    Number(childItem?.price * (1 - childItem?.discount / 100)) *
+                                                    (isNaN(childItem?.tax?.tax_rate)
+                                                        ? 0
+                                                        : Number(childItem?.tax?.tax_rate) / 100) *
+                                                    Number(childItem?.quantity);
+                                                return childAccumulator + product;
+                                            }, 0);
+                                            return accumulator + childTotal;
+                                        }, 0)
+                                    )}
+                                </h3>
+                            </div>
+                        </div>
+                        <div className="flex justify-between ">
+                            <div className="font-normal">
+                                <h3>
+                                    {dataLang?.purchase_order_detail_into_money || "purchase_order_detail_into_money"}
+                                </h3>
+                            </div>
+                            <div className="font-normal">
+                                <h3 className="text-blue-600">
+                                    {/* {formatNumber(tongTienState.tongThanhTien)} */}
+                                    {formatNumber(
+                                        listData?.reduce((accumulator, item) => {
+                                            const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+                                                const product =
+                                                    Number(childItem?.price * (1 - childItem?.discount / 100)) *
+                                                    (1 + Number(childItem?.tax?.tax_rate) / 100) *
+                                                    Number(childItem?.quantity);
+                                                return childAccumulator + product;
+                                            }, 0);
+                                            return accumulator + childTotal;
+                                        }, 0)
+                                    )}
+                                </h3>
                             </div>
                         </div>
                         <div className="space-x-2">
                             <button
-                                onClick={() => router.push("/sales_export_product/deliveryReceipt?tab=all")}
+                                onClick={() => router.push("/purchase_order/returns")}
                                 className="button text-[#344054] font-normal text-base hover:bg-blue-500 hover:text-white hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
                             >
-                                {dataLang?.btn_back || "btn_back"}
+                                {dataLang?.purchase_order_purchase_back || "purchase_order_purchase_back"}
                             </button>
-                            <ButtonSubmit
-                                dataLang={dataLang}
-                                _HandleSubmit={handleSubmitValidate}
-                                onSending={onSending}
-                            />
+                            <button
+                                onClick={_HandleSubmit.bind(this)}
+                                type="submit"
+                                className="button text-[#FFFFFF] hover:bg-blue-500 font-normal text-base hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] bg-[#0F4F9E]"
+                            >
+                                {dataLang?.purchase_order_purchase_save || "purchase_order_purchase_save"}
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </>
+        </React.Fragment>
     );
 };
-
 const MoreSelectedBadge = ({ items }) => {
     const style = {
         marginLeft: "auto",
@@ -2568,18 +2506,13 @@ const MoreSelectedBadge = ({ items }) => {
     const title = items.join(", ");
     const length = items.length;
     const label = `+ ${length}`;
+    // const label = ``;
 
-    return (
-        // <div style={style} title={title}>{label}</div>
-        <div style={style} title={title}>
-            + {length}
-        </div>
-    );
+    return <div title={title}>{label}</div>;
 };
 
 const MultiValue = ({ index, getValue, ...props }) => {
     const maxToShow = 0;
-
     const overflow = getValue()
         .slice(maxToShow)
         .map((x) => x.label);

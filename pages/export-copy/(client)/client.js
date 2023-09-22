@@ -123,7 +123,7 @@ const Client = (props) => {
                                 HandleCheckAll={HandleCheckAll}
                                 parent="contacts"
                             />
-                            <div className="scrollbar-thin  scrollbar-thumb-slate-300 scrollbar-track-slate-100 overflow-auto h-[50vh]">
+                            <div className="scrollbar-thin  scrollbar-thumb-slate-300 scrollbar-track-slate-100 overflow-auto 3xl:h-[50vh] xxl:h-[26vh] 2xl:h-[40vh] xl:h-[26vh] lg:h-[28vh]">
                                 <ListItem
                                     dataLang={dataLang}
                                     type={"contacts"}

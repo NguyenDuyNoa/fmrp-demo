@@ -7,7 +7,7 @@ const Materials = ({ dataColumnNew, HandleCheckAll, dataLang, HandlePushItem, da
     return (
         <div>
             <div className="grid grid-cols-12 gap-2">
-                <div className="col-span-4 bg-zinc-50 border-2 rounded my-2">
+                <div className="col-span-4 bg-zinc-50 border-2 rounded my-2 3xl:h-auto xxl:h-[270px]  2xl:h-[375px] xl:h-[265px] lg:h-[270px] h-auto">
                     <div className="grid grid-cols-2  divide-x-2">
                         <div className="">
                             <TitleForm title={"Trường dữ liệu"} />

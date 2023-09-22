@@ -98,8 +98,7 @@ const Index = (props) => {
     const _ServerFetching_group = async () => {
         await Axios(
             "GET",
-            `/api_web/api_delivery/statusDelivery?csrf_protection=true
-            `,
+            `/api_web/api_delivery/statusDelivery?csrf_protection=true`,
             {
                 params: {
                     limit: 0,
@@ -287,7 +286,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${"Ngày giao hàng"}`,
+                    title: `${dataLang?.delivery_receipt_date || "delivery_receipt_date"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -295,7 +294,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${"Số giao hàng"}`,
+                    title: `${dataLang?.delivery_receipt_code || "delivery_receipt_code"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -311,7 +310,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${"Địa chỉ giao"}`,
+                    title: `${dataLang?.delivery_receipt_address1 || "delivery_receipt_address1"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -319,7 +318,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${"Số đơn hàng"}`,
+                    title: `${dataLang?.delivery_receipt_OrderNumber || "delivery_receipt_OrderNumber"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -327,7 +326,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${"Thành tiền"}`,
+                    title: `${dataLang?.delivery_receipt_intoMoney || "delivery_receipt_intoMoney"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -335,7 +334,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${"Người tạo"}`,
+                    title: `${dataLang?.delivery_receipt_Creator || "delivery_receipt_Creator"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -343,7 +342,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${"Duyệt thủ kho"}`,
+                    title: `${dataLang?.delivery_receipt_BrowseStorekeepers || "delivery_receipt_BrowseStorekeepers"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -415,7 +414,7 @@ const Index = (props) => {
                     };
                     sCheckedWare(dataChecked);
                 }
-                sData([...data]);
+                setData([...data]);
             });
         }
     };
@@ -426,7 +425,7 @@ const Index = (props) => {
         data.append("id", checkedWare?.id);
         Axios(
             "POST",
-            `/api_web/Api_transfer/confirmWarehouse?csrf_protection=true`,
+            `/api_web/Api_delivery/confirmWarehouse?csrf_protection=true`,
             {
                 data: data,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -450,19 +449,6 @@ const Index = (props) => {
             }
         );
     };
-    const useTest = (url) => {
-        const [data, sData] = useState([]);
-        useEffect(() => {
-            Axios("GET", `${url}`, {}, (err, response) => {
-                if (!err) {
-                    sData(response.data);
-                }
-            });
-        }, [url]);
-        return data;
-    };
-    const { rResult } = useTest(`/api_web/Api_Branch/branch/?csrf_protection=true`);
-    console.log("rResult", rResult);
 
     useEffect(() => {
         onSending && _ServerSending();
@@ -610,7 +596,9 @@ const Index = (props) => {
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label: "Số giao hàng",
+                                                                label:
+                                                                    dataLang?.delivery_receipt_code ||
+                                                                    "delivery_receipt_code",
                                                                 isDisabled: true,
                                                             },
                                                             ...listDelivery,
@@ -618,7 +606,9 @@ const Index = (props) => {
                                                         onInputChange={_HandleSeachApi.bind(this)}
                                                         onChange={onChangeFilter.bind(this, "code")}
                                                         value={idDelivery}
-                                                        placeholder={"Số giao hàng"}
+                                                        placeholder={
+                                                            dataLang?.delivery_receipt_code || "delivery_receipt_code"
+                                                        }
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
@@ -743,7 +733,10 @@ const Index = (props) => {
                                                 <div>
                                                     {dataExcel?.length > 0 && (
                                                         <ExcelFile
-                                                            filename="Danh sách Phiếu Giao Hàng"
+                                                            filename={
+                                                                dataLang?.delivery_receipt_list ||
+                                                                "delivery_receipt_list"
+                                                            }
                                                             title="DSPGH"
                                                             element={
                                                                 <button className="3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-2 xl:py-2 lg:py-2.5 3xl:text-[15px] 2xl:text-[13px] xl:text-[12px] lg:text-[8px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
@@ -812,28 +805,30 @@ const Index = (props) => {
                                     <div className="pr-2 w-[100%] lg:w-[100%] ">
                                         <div className="grid grid-cols-12 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {"Ngày giao hàng"}
+                                                {dataLang?.delivery_receipt_date || "delivery_receipt_date"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {"Số giao hàng"}
+                                                {dataLang?.delivery_receipt_code || "delivery_receipt_code"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
                                                 {dataLang?.price_quote_customer || "price_quote_table_customer"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {"Địa chỉ giao"}
+                                                {dataLang?.delivery_receipt_address1 || "delivery_receipt_address1"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {"Số đơn hàng"}
+                                                {dataLang?.delivery_receipt_OrderNumber ||
+                                                    "delivery_receipt_OrderNumber"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
                                                 {dataLang?.price_quote_into_money || "price_quote_into_money"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {"Người tạo"}
+                                                {dataLang?.delivery_receipt_Creator || "delivery_receipt_Creator"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {"Duyệt thủ kho"}
+                                                {dataLang?.delivery_receipt_BrowseStorekeepers ||
+                                                    "delivery_receipt_BrowseStorekeepers"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
                                                 {dataLang?.price_quote_note || "price_quote_note"}
@@ -1007,7 +1002,7 @@ const Index = (props) => {
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     onRefreshGroup={_ServerFetching_group.bind(this)}
                                                                     dataLang={dataLang}
-                                                                    status={e?.status}
+                                                                    warehouseman_id={e?.warehouseman_id}
                                                                     id={e?.id}
                                                                     type="deliveryReceipt"
                                                                     className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
@@ -1053,8 +1048,8 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
                                 <h6>
-                                    {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} phiếu giao
-                                    hàng
+                                    {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords}{" "}
+                                    {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}

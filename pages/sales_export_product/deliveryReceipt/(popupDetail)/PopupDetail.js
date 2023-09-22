@@ -43,13 +43,28 @@ const PopupDetail = (props) => {
 
                 setData(db);
                 sOnFetching(false);
-                setLoading(false);
             }
+        });
+    };
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+    const [dataProductExpiry, sDataProductExpiry] = useState({});
+    const [dataProductSerial, sDataProductSerial] = useState({});
+
+    const _ServerFetching = () => {
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+                sDataProductSerial(data.find((x) => x.code == "product_serial"));
+            }
+            sOnFetching(false);
         });
     };
 
     useEffect(() => {
         onFetching && handleFetchingDetail();
+        onFetching && _ServerFetching();
     }, [open]);
 
     const scrollableDiv = document.querySelector(".customsroll");
@@ -69,7 +84,7 @@ const PopupDetail = (props) => {
     return (
         <>
             <PopupEdit
-                title={"Chi tiết phiếu giao hàng"}
+                title={props.dataLang?.delivery_receipt_detail || "delivery_receipt_detail"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
@@ -88,7 +103,7 @@ const PopupDetail = (props) => {
                             <div className="col-span-4">
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6 ">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2 whitespace-nowrap">
-                                        {"Ngày giao hàng"}:
+                                        {props.dataLang?.delivery_receipt_date || "delivery_receipt_date"}:
                                     </h3>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-medium items-start col-span-4 ml-3">
                                         {data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}
@@ -96,7 +111,7 @@ const PopupDetail = (props) => {
                                 </div>
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
-                                        {"Số giao hàng"}:
+                                        {props.dataLang?.delivery_receipt_code || "delivery_receipt_code"}:
                                     </h3>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]  font-medium col-span-2 ml-3 text-[#0F4F9E]">
                                         {data?.reference_no}
@@ -104,20 +119,21 @@ const PopupDetail = (props) => {
                                 </div>
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2 ">
-                                        {"Địa chỉ giao"}:
+                                        {props.dataLang?.delivery_receipt_address1 || "delivery_receipt_address1"}:
                                     </h3>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-medium col-span-4 ml-3">
-                                        {data?.address_delivery}
+                                        {data?.name_address_delivery}
                                     </h3>
                                 </div>
                             </div>
                             <div className="col-span-4 ">
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
-                                        {"Số đơn hàng"}:
+                                        {props.dataLang?.delivery_receipt_OrderNumber || "delivery_receipt_OrderNumber"}
+                                        :
                                     </h3>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-medium col-span-4 text-[#0BAA2E]">
-                                        {data?.reference_order?.reference_order}
+                                        {data?.order_code}
                                     </h3>
                                 </div>
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
@@ -133,17 +149,17 @@ const PopupDetail = (props) => {
                                         {props.dataLang?.price_quote_contact_person || "price_quote_contact_person"}:
                                     </h3>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-medium col-span-4 ">
-                                        {data?.contact_name && data?.contact_id !== "0" ? data?.contact_name : ""}
+                                        {data?.person_contact_name}
                                     </h3>
                                 </div>
                             </div>
                             <div className="col-span-4 ">
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
-                                        {"Người dùng"}:
+                                        {props.dataLang?.delivery_receipt_edit_User || "delivery_receipt_edit_User"}:
                                     </h3>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] font-medium col-span-2">
-                                        {data?.staff_name}
+                                        {data?.staff_full_name}
                                     </h3>
                                 </div>
 
@@ -185,6 +201,9 @@ const PopupDetail = (props) => {
                                     {props.dataLang?.price_quote_item || "price_quote_item"}
                                 </h4>
                                 <h4 className="text-[13px] px-1 py-1 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                                    {"Kho - Vtk"}
+                                </h4>
+                                <h4 className="text-[13px] px-1 py-1 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                                     {props.dataLang?.price_quote_from_unit || "price_quote_from_unit"}
                                 </h4>
                                 <h4 className="text-[13px] px-1 py-1 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
@@ -205,7 +224,7 @@ const PopupDetail = (props) => {
                                 <h4 className="text-[13px] px-1 py-1 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                                     {props.dataLang?.price_quote_into_money || "price_quote_into_money"}
                                 </h4>
-                                <h4 className="text-[13px] px-1 py-1 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-normal">
+                                <h4 className="text-[13px] px-1 py-1 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-normal">
                                     {props.dataLang?.price_quote_note_item || "price_quote_note_item"}
                                 </h4>
                             </div>
@@ -232,25 +251,59 @@ const PopupDetail = (props) => {
                                                                         small={e?.item?.images}
                                                                         large={e?.item?.images}
                                                                         alt="Product Image"
-                                                                        className="custom-modal-image object-cover rounded w-[50px] h-[60px]"
+                                                                        className="custom-modal-image object-cover rounded w-[50px] h-[60px] mx-auto"
                                                                     />
                                                                 ) : (
-                                                                    <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
+                                                                    <div className="w-[50px] h-[60px] object-cover  mx-auto">
                                                                         <ModalImage
                                                                             small="/no_img.png"
                                                                             large="/no_img.png"
                                                                             className="w-full h-full rounded object-contain p-1"
-                                                                        />
+                                                                        >
+                                                                            {" "}
+                                                                        </ModalImage>
                                                                     </div>
                                                                 )}
                                                             </div>
-                                                            <div className="flex flex-col">
-                                                                <h2 className="text-sm">{e?.item_name}</h2>
-                                                                <h3 className="italic text-xs">
+                                                            <div>
+                                                                <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                    {e?.item?.name}
+                                                                </h6>
+                                                                <h6 className="text-[13px] text-left font-medium capitalize">
                                                                     {e?.item?.product_variation}
-                                                                </h3>
+                                                                </h6>
+                                                                <div className="flex items-center font-oblique flex-wrap">
+                                                                    {dataMaterialExpiry.is_enable === "1" ? (
+                                                                        <>
+                                                                            <div className="flex gap-0.5">
+                                                                                <h6 className="text-[12px]">Lot:</h6>{" "}
+                                                                                <h6 className="text-[12px]  px-2   w-[full] text-left ">
+                                                                                    {e?.lot == null || e?.lot == ""
+                                                                                        ? "-"
+                                                                                        : e?.lot}
+                                                                                </h6>
+                                                                            </div>
+                                                                            <div className="flex gap-0.5">
+                                                                                <h6 className="text-[12px]">Date:</h6>{" "}
+                                                                                <h6 className="text-[12px]  px-2   w-[full] text-center ">
+                                                                                    {e?.expiration_date
+                                                                                        ? moment(
+                                                                                              e?.expiration_date
+                                                                                          ).format("DD/MM/YYYY")
+                                                                                        : "-"}
+                                                                                </h6>
+                                                                            </div>
+                                                                        </>
+                                                                    ) : (
+                                                                        ""
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
+                                                    </h6>
+                                                    <h6 className="text-[12px] font-medium py-1 col-span-1 text-left flex-col flex">
+                                                        <span>{e?.item?.warehouse_location?.warehouse_name}</span>
+                                                        <span>{e?.item?.warehouse_location?.location_name}</span>
                                                     </h6>
                                                     <h6 className="text-[13px] font-medium py-1 col-span-1 text-center">
                                                         {e?.item?.unit_name}
@@ -262,20 +315,20 @@ const PopupDetail = (props) => {
                                                         {formatNumber(e?.price)}
                                                     </h6>
                                                     <h6 className="text-[13px] font-medium py-1 col-span-1 text-center">
-                                                        {e?.discount_percent + "%"}
+                                                        {e?.discount_percent_item + "%"}
                                                     </h6>
                                                     <h6 className="text-[13px] font-medium py-1 col-span-1 text-right">
                                                         {formatNumber(e?.price_after_discount)}
                                                     </h6>
                                                     <h6 className="text-[13px] font-medium py-1 col-span-1 text-center">
-                                                        {formatNumber(e?.tax_rate) + "%"}
+                                                        {formatNumber(e?.tax_rate_item) + "%"}
                                                     </h6>
                                                     <h6 className="text-[13px] font-medium py-1 col-span-1 pr-2 text-right">
-                                                        {formatNumber(e?.amount)}
+                                                        {formatNumber(e?.total_amount)}
                                                     </h6>
-                                                    <h6 className="text-[13px] font-medium py-1 col-span-2 text-left">
-                                                        {e?.note != undefined ? (
-                                                            <ExpandableContent content={e?.note} />
+                                                    <h6 className="text-[13px] font-medium py-1 col-span-1 text-left">
+                                                        {e?.note_item != undefined ? (
+                                                            <ExpandableContent content={e?.note_item} />
                                                         ) : (
                                                             ""
                                                         )}

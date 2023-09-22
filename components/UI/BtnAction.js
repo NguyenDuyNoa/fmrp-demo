@@ -1,5 +1,5 @@
 import { useRouter } from "next/dist/client/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Popup from "reactjs-popup";
 import { ArrowDown2 } from "iconsax-react";
 import Swal from "sweetalert2";
@@ -11,6 +11,9 @@ import FilePDF from "./FilePDF";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { BiEdit } from "react-icons/bi";
 import ToatstNotifi from "./alerNotification/alerNotification";
+import PopupEdit from "/components/UI/popup";
+import { VscFilePdf } from "react-icons/vsc";
+
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const Toast = Swal.mixin({
@@ -315,14 +318,25 @@ const BtnAction = React.memo((props) => {
                                 {props.dataLang?.btn_table_edit || "btn_table_edit"}
                             </p>
                         </button>
+                        {props?.type == "deliveryReceipt" ? (
+                            <Popup_Pdf
+                                dataLang={props.dataLang}
+                                props={props}
+                                openAction={openAction}
+                                setOpenAction={setOpenAction}
+                                dataCompany={dataCompany}
+                                data={data}
+                            />
+                        ) : (
+                            <FilePDF
+                                props={props}
+                                openAction={openAction}
+                                setOpenAction={setOpenAction}
+                                dataCompany={dataCompany}
+                                data={data}
+                            />
+                        )}
 
-                        <FilePDF
-                            props={props}
-                            openAction={openAction}
-                            setOpenAction={setOpenAction}
-                            dataCompany={dataCompany}
-                            data={data}
-                        />
                         {/* <button
                             onClick={() => handleDelete(props?.id)}
                             className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer 2xl:px-5 2xl:py-2.5 px-5 py-1.5 rounded  w-full"
@@ -347,5 +361,53 @@ const BtnAction = React.memo((props) => {
         </div>
     );
 });
+
+const Popup_Pdf = (props) => {
+    const [open, sOpen] = useState(false);
+    const _ToggleModal = (e) => sOpen(e);
+
+    return (
+        <>
+            <PopupEdit
+                title={props.dataLang?.option_prin || "option_prin"}
+                button={
+                    <div>
+                        <div>
+                            <button className="transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full">
+                                <VscFilePdf
+                                    size={20}
+                                    className="group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md "
+                                />
+                                <p className="group-hover:text-[#65a30d]">
+                                    {props?.dataLang?.btn_table_print || "btn_table_print"}
+                                </p>
+                            </button>
+                        </div>
+                    </div>
+                }
+                onClickOpen={_ToggleModal.bind(this, true)}
+                open={open}
+                onClose={_ToggleModal.bind(this, false)}
+                classNameBtn={props?.className}
+            >
+                <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
+                <div className="space-x-5 w-[400px] h-auto">
+                    <div>
+                        <div className="w-[400px]">
+                            <FilePDF
+                                props={props.props}
+                                openAction={props.openAction}
+                                setOpenAction={props.setOpenAction}
+                                dataCompany={props.dataCompany}
+                                data={props.data}
+                                dataLang={props.dataLang}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </PopupEdit>
+        </>
+    );
+};
 
 export default BtnAction;
