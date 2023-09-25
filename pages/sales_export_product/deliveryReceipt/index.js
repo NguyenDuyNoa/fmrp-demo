@@ -23,6 +23,7 @@ import ImageErrors from "components/UI/imageErrors";
 import PopupDetail from "./(popupDetail)/PopupDetail";
 import ToatstNotifi from "components/UI/alerNotification/alerNotification";
 import PopupDetailProduct from "../salesOrder/(PopupDetail)/PopupDetailProduct";
+import { routerDeliveryReceipt } from "components/UI/router/sellingGoods";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -489,7 +490,7 @@ const Index = (props) => {
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Link
-                                        href="/sales_export_product/deliveryReceipt/form"
+                                        href={routerDeliveryReceipt.form}
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E]  via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.btn_new || "btn_new"}

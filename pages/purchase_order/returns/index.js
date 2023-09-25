@@ -48,6 +48,7 @@ import FilePDF from "../FilePDF";
 import ExpandableContent from "components/UI/more";
 import Popup_chitiet from "./(popup)/pupup";
 import { useSelector } from "react-redux";
+import { routerReturns } from "components/UI/router/buyImportGoods";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -506,7 +507,7 @@ const Index = (props) => {
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Link
-                                        href="/purchase_order/returns/form"
+                                        href={routerReturns.form}
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     >
                                         {dataLang?.purchase_order_new || "purchase_order_new"}
@@ -1174,7 +1175,8 @@ const BtnTacVu = React.memo((props) => {
                 title: `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`,
             });
         } else {
-            router.push(`/purchase_order/returns/form?id=${props.id}`);
+            // router.push(`/purchase_order/returns/form?id=${props.id}`);
+            router.push(`${routerReturns.form}?id=${props.id}`);
         }
     };
 

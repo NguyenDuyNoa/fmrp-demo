@@ -13,6 +13,7 @@ import { BiEdit } from "react-icons/bi";
 import ToatstNotifi from "./alerNotification/alerNotification";
 import PopupEdit from "/components/UI/popup";
 import { VscFilePdf } from "react-icons/vsc";
+import { routerDeliveryReceipt } from "./router/sellingGoods";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -202,7 +203,7 @@ const BtnAction = React.memo((props) => {
                     title: `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`,
                 });
             } else {
-                router.push(`/sales_export_product/deliveryReceipt/form?id=${props.id}`);
+                router.push(`${routerDeliveryReceipt.form}?id=${props.id}`);
             }
         }
     };

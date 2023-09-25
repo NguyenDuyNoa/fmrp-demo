@@ -24,6 +24,7 @@ import Loading from "components/UI/loading";
 import Swal from "sweetalert2";
 
 import { useEffect } from "react";
+import { routerOrder } from "components/UI/router/buyImportGoods";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -42,35 +43,27 @@ const Popup_TableValidateEdit = (props) => {
     // }, [props.isOpen]);
     // console.log(props);
     const handleClick = () => {
-        if (
-            props?.status_pay != "not_spent" ||
-            props?.status != "not_stocked"
-        ) {
+        if (props?.status_pay != "not_spent" || props?.status != "not_stocked") {
             Toast.fire({
                 icon: "error",
                 title: `${
-                    (props?.status_pay != "not_spent" &&
-                        (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
-                    (props?.status != "not_stocked" &&
-                        "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")
+                    (props?.status_pay != "not_spent" && (props.dataLang?.paid_cant_edit || "paid_cant_edit")) ||
+                    (props?.status != "not_stocked" && "Đơn đặt hàng đã có phiếu Nhập. Không thể sửa")
                 }`,
             });
         } else {
-            router.push(`/purchase_order/order/form?id=${props.id}`);
+            // router.push(`/purchase_order/order/form?id=${props.id}`);
+            router.push(`${routerOrder.form}?id=${props.id}`);
         }
     };
 
     return (
         <>
             <PopupEdit
-                title={
-                    props.dataLang?.purchase_order_title ||
-                    "purchase_order_title"
-                }
+                title={props.dataLang?.purchase_order_title || "purchase_order_title"}
                 button={
                     <button onClick={handleClick.bind(this)} type="button">
-                        {props.dataLang?.purchase_order_table_edit ||
-                            "purchase_order_table_edit"}
+                        {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
                     </button>
                 }
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -84,8 +77,7 @@ const Popup_TableValidateEdit = (props) => {
                         <div className="w-[400px]">
                             <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 <h2 className="font-normal bg-[#ECF0F4] p-2 text-[13px]">
-                                    {props?.dataLang
-                                        ?.purchase_order_detail_general_informatione ||
+                                    {props?.dataLang?.purchase_order_detail_general_informatione ||
                                         "purchase_order_detail_general_informatione"}
                                 </h2>
                                 <div className="w-[100%] lx:w-[110%] ">
@@ -98,10 +90,7 @@ const Popup_TableValidateEdit = (props) => {
                                         </h4>
                                     </div>
                                     {onFetching ? (
-                                        <Loading
-                                            className="max-h-28"
-                                            color="#0f4f9e"
-                                        />
+                                        <Loading className="max-h-28" color="#0f4f9e" />
                                     ) : props.data?.payment_code?.length > 0 ? (
                                         <>
                                             <ScrollArea
@@ -110,21 +99,19 @@ const Popup_TableValidateEdit = (props) => {
                                                 smoothScrolling={true}
                                             >
                                                 <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
-                                                    {props.data?.payment_code?.map(
-                                                        (e, index) => (
-                                                            <div
-                                                                className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 "
-                                                                key={e.id?.toString()}
-                                                            >
-                                                                <h6 className="text-[13px] px-2  py-0.5 col-span-2  rounded-md text-center ">
-                                                                    {index + 1}
-                                                                </h6>
-                                                                <h6 className="text-[13px]   py-0.5 col-span-10 rounded-md text-center ">
-                                                                    {e}
-                                                                </h6>
-                                                            </div>
-                                                        )
-                                                    )}
+                                                    {props.data?.payment_code?.map((e, index) => (
+                                                        <div
+                                                            className="grid items-center grid-cols-12 py-1.5 px-2 hover:bg-slate-100/40 "
+                                                            key={e.id?.toString()}
+                                                        >
+                                                            <h6 className="text-[13px] px-2  py-0.5 col-span-2  rounded-md text-center ">
+                                                                {index + 1}
+                                                            </h6>
+                                                            <h6 className="text-[13px]   py-0.5 col-span-10 rounded-md text-center ">
+                                                                {e}
+                                                            </h6>
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             </ScrollArea>
                                         </>
@@ -135,8 +122,7 @@ const Popup_TableValidateEdit = (props) => {
                                                     <IconSearch />
                                                 </div>
                                                 <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                    {props.dataLang
-                                                        ?.purchase_order_table_item_not_found ||
+                                                    {props.dataLang?.purchase_order_table_item_not_found ||
                                                         "purchase_order_table_item_not_found"}
                                                 </h1>
                                                 <div className="flex items-center justify-around mt-6 ">

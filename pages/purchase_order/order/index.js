@@ -51,6 +51,7 @@ import Popup_chitiet from "./(popup)/popup";
 import Popup_TableValidateEdit from "./(popup)/validateEdit";
 import Popup_TableValidateDelete from "./(popup)/validateDelete";
 import { useSelector } from "react-redux";
+import { routerOrder } from "components/UI/router/buyImportGoods";
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -118,22 +119,15 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[branch_id]":
-                        idBranch != null ? idBranch.value : null,
+                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
                     "filter[id]": idCode != null ? idCode?.value : null,
                     "filter[status_bar]": tabPage ?? null,
                     "filter[supplier_id]": idSupplier ? idSupplier.value : null,
-                    "filter[order_type]": idOrderType
-                        ? idOrderType.value
-                        : null,
+                    "filter[order_type]": idOrderType ? idOrderType.value : null,
                     // "filter[start_date]":  formattedDateRange[0] == "undefined-NaN-undefined" ? null : formattedDateRange[0],
                     // "filter[end_date]":  formattedDateRange[1] == "undefined-NaN-undefined" ? null : formattedDateRange[1],
-                    "filter[start_date]":
-                        valueDate?.startDate != null
-                            ? valueDate?.startDate
-                            : null,
-                    "filter[end_date]":
-                        valueDate?.endDate != null ? valueDate?.endDate : null,
+                    "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
+                    "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
                 },
             },
             (err, response) => {
@@ -156,19 +150,12 @@ const Index = (props) => {
                 params: {
                     limit: 0,
                     search: keySearch,
-                    "filter[branch_id]":
-                        idBranch != null ? idBranch.value : null,
+                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
                     "filter[id]": idCode != null ? idCode?.value : null,
                     "filter[supplier_id]": idSupplier ? idSupplier.value : null,
-                    "filter[order_type]": idOrderType
-                        ? idOrderType.value
-                        : null,
-                    "filter[start_date]":
-                        valueDate?.startDate != null
-                            ? valueDate?.startDate
-                            : null,
-                    "filter[end_date]":
-                        valueDate?.endDate != null ? valueDate?.endDate : null,
+                    "filter[order_type]": idOrderType ? idOrderType.value : null,
+                    "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
+                    "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
                 },
             },
             (err, response) => {
@@ -182,63 +169,40 @@ const Index = (props) => {
     };
 
     const _ServerFetching_filter = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch/?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sListBr(rResult);
-                }
+        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sListBr(rResult);
             }
-        );
-        Axios(
-            "GET",
-            `/api_web/Api_purchase_order/purchase_order/?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sListCode(rResult);
-                }
+        });
+        Axios("GET", `/api_web/Api_purchase_order/purchase_order/?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sListCode(rResult);
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/api_supplier/supplier/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data.rResult;
-                    sListSupplier(
-                        db?.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                }
+        });
+        Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var db = response.data.rResult;
+                sListSupplier(db?.map((e) => ({ label: e.name, value: e.id })));
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/Api_purchase_order/order_type_option/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sListOrderType(
-                        data?.map((e) => ({
-                            label: dataLang[e?.name],
-                            value: e.id,
-                        }))
-                    );
-                }
+        });
+        Axios("GET", "/api_web/Api_purchase_order/order_type_option/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sListOrderType(
+                    data?.map((e) => ({
+                        label: dataLang[e?.name],
+                        value: e.id,
+                    }))
+                );
             }
-        );
+        });
         sOnFetching_filter(false);
     };
 
     useEffect(() => {
-        (onFetching && _ServerFetching()) ||
-            (onFetching && _ServerFetching_group());
+        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
     }, [onFetching]);
     useEffect(() => {
         onFetching_filter && _ServerFetching_filter();
@@ -251,9 +215,7 @@ const Index = (props) => {
             (idCode != null && sOnFetching(true)) ||
             (idSupplier != null && sOnFetching(true)) ||
             (idOrderType != null && sOnFetching(true)) ||
-            (valueDate.startDate != null &&
-                valueDate.endDate != null &&
-                sOnFetching(true));
+            (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true));
     }, [
         limit,
         router.query?.page,
@@ -266,12 +228,8 @@ const Index = (props) => {
         valueDate.startDate,
     ]);
 
-    const listBr_filter = listBr
-        ? listBr?.map((e) => ({ label: e.name, value: e.id }))
-        : [];
-    const listCode_filter = lisCode
-        ? lisCode?.map((e) => ({ label: e.code, value: e.id }))
-        : [];
+    const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
+    const listCode_filter = lisCode ? lisCode?.map((e) => ({ label: e.code, value: e.id })) : [];
     const onchang_filter = (type, value) => {
         if (type == "branch") {
             sIdBranch(value);
@@ -344,10 +302,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.purchase_order_table_dayvoucers ||
-                        "purchase_order_table_dayvoucers"
-                    }`,
+                    title: `${dataLang?.purchase_order_table_dayvoucers || "purchase_order_table_dayvoucers"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -355,10 +310,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.purchase_order_table_code ||
-                        "purchase_order_table_code"
-                    }`,
+                    title: `${dataLang?.purchase_order_table_code || "purchase_order_table_code"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -366,10 +318,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.purchase_order_table_supplier ||
-                        "purchase_order_table_supplier"
-                    }`,
+                    title: `${dataLang?.purchase_order_table_supplier || "purchase_order_table_supplier"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -377,10 +326,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.purchase_order_table_ordertype ||
-                        "purchase_order_table_ordertype"
-                    }`,
+                    title: `${dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -388,10 +334,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.purchase_order_table_number ||
-                        "purchase_order_table_number"
-                    }`,
+                    title: `${dataLang?.purchase_order_table_number || "purchase_order_table_number"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -399,10 +342,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.purchase_order_table_total ||
-                        "purchase_order_table_total"
-                    }`,
+                    title: `${dataLang?.purchase_order_table_total || "purchase_order_table_total"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -410,10 +350,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.purchase_order_table_totalTax ||
-                        "purchase_order_table_totalTax"
-                    }`,
+                    title: `${dataLang?.purchase_order_table_totalTax || "purchase_order_table_totalTax"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -421,10 +358,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.purchase_order_table_intoMoney ||
-                        "purchase_order_table_intoMoney"
-                    }`,
+                    title: `${dataLang?.purchase_order_table_intoMoney || "purchase_order_table_intoMoney"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -433,10 +367,7 @@ const Index = (props) => {
                 },
                 // {title: `${dataLang?.purchase_order_table_statusOfSpending || "purchase_order_table_statusOfSpending"}`, width: {wch: 40}, style: {fill: {fgColor: {rgb: "C7DFFB"}}, font: {bold: true}}},
                 {
-                    title: `${
-                        dataLang?.purchase_order_table_importStatus ||
-                        "purchase_order_table_importStatus"
-                    }`,
+                    title: `${dataLang?.purchase_order_table_importStatus || "purchase_order_table_importStatus"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -444,10 +375,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.purchase_order_table_branch ||
-                        "purchase_order_table_branch"
-                    }`,
+                    title: `${dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -455,9 +383,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.purchase_order_note || "purchase_order_note"
-                    }`,
+                    title: `${dataLang?.purchase_order_note || "purchase_order_note"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -471,13 +397,7 @@ const Index = (props) => {
                 { value: `${e?.code ? e?.code : ""}` },
                 { value: `${e?.supplier_name ? e?.supplier_name : ""}` },
                 {
-                    value: `${
-                        e?.order_type
-                            ? e?.order_type == "0"
-                                ? "Tạo mới"
-                                : "Theo YCHM"
-                            : ""
-                    }`,
+                    value: `${e?.order_type ? (e?.order_type == "0" ? "Tạo mới" : "Theo YCHM") : ""}`,
                 },
                 {
                     value: `${
@@ -489,21 +409,13 @@ const Index = (props) => {
                     }`,
                 },
                 {
-                    value: `${
-                        e?.total_price ? formatNumber(e?.total_price) : ""
-                    }`,
+                    value: `${e?.total_price ? formatNumber(e?.total_price) : ""}`,
                 },
                 {
-                    value: `${
-                        e?.total_tax_price
-                            ? formatNumber(e?.total_tax_price)
-                            : ""
-                    }`,
+                    value: `${e?.total_tax_price ? formatNumber(e?.total_tax_price) : ""}`,
                 },
                 {
-                    value: `${
-                        e?.total_amount ? formatNumber(e?.total_amount) : ""
-                    }`,
+                    value: `${e?.total_amount ? formatNumber(e?.total_amount) : ""}`,
                 },
                 // {value: `${e?.import_status ? e?.import_status === "0" && "Chưa chi" || e?.import_status === "1" && "Chi 1 phần" ||  e?.import_status === "2"  &&"Đã chi đủ" : ""}`},
                 {
@@ -533,13 +445,9 @@ const Index = (props) => {
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-xs text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.purchase_order || "purchase_order"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.purchase_order || "purchase_order"}</h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>
-                            {dataLang?.purchase_order_list || "purchase_order"}
-                        </h6>
+                        <h6>{dataLang?.purchase_order_list || "purchase_order"}</h6>
                     </div>
                 )}
                 <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
@@ -547,16 +455,14 @@ const Index = (props) => {
                         <div className="space-y-3 h-[96%] overflow-hidden">
                             <div className="flex justify-between">
                                 <h2 className="text-2xl text-[#52575E] capitalize">
-                                    {dataLang?.purchase_order ||
-                                        "purchase_order"}
+                                    {dataLang?.purchase_order || "purchase_order"}
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Link
-                                        href="/purchase_order/order/form"
+                                        href={routerOrder.form}
                                         className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     >
-                                        {dataLang?.purchase_order_new ||
-                                            "purchase_order_new"}
+                                        {dataLang?.purchase_order_new || "purchase_order_new"}
                                     </Link>
                                     {/* <Popup_dsncc  listBr={listBr}  listSelectCt={listSelectCt}  onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" /> */}
                                 </div>
@@ -569,21 +475,16 @@ const Index = (props) => {
                                             <div>
                                                 <TabClient
                                                     style={{
-                                                        backgroundColor:
-                                                            "#e2f0fe",
+                                                        backgroundColor: "#e2f0fe",
                                                     }}
                                                     dataLang={dataLang}
                                                     key={e.id}
-                                                    onClick={_HandleSelectTab.bind(
-                                                        this,
-                                                        `${e.id}`
-                                                    )}
+                                                    onClick={_HandleSelectTab.bind(this, `${e.id}`)}
                                                     total={e.count}
                                                     active={e.id}
                                                     className={"text-[#0F4F9E]"}
                                                 >
-                                                    {dataLang[e?.name] ||
-                                                        e?.name}
+                                                    {dataLang[e?.name] || e?.name}
                                                 </TabClient>
                                             </div>
                                         );
@@ -603,12 +504,8 @@ const Index = (props) => {
                                                         <input
                                                             className=" relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  py-2.5 rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
                                                             type="text"
-                                                            onChange={_HandleOnChangeKeySearch.bind(
-                                                                this
-                                                            )}
-                                                            placeholder={
-                                                                dataLang?.branch_search
-                                                            }
+                                                            onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                            placeholder={dataLang?.branch_search}
                                                         />
                                                     </form>
                                                 </div>
@@ -624,24 +521,17 @@ const Index = (props) => {
                                                             },
                                                             ...listBr_filter,
                                                         ]}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "branch"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "branch")}
                                                         value={idBranch}
                                                         placeholder={
                                                             dataLang?.purchase_order_table_branch ||
                                                             "purchase_order_table_branch"
                                                         }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px] z-20"
                                                         isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
+                                                        noOptionsMessage={() => "Không có dữ liệu"}
                                                         // components={{ MultiValue }}
                                                         closeMenuOnSelect={true}
                                                         style={{
@@ -653,33 +543,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -697,24 +577,17 @@ const Index = (props) => {
                                                             },
                                                             ...listCode_filter,
                                                         ]}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "code"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "code")}
                                                         value={idCode}
                                                         placeholder={
                                                             dataLang?.purchase_order_table_code ||
                                                             "purchase_order_table_code"
                                                         }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px] z-20"
                                                         isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
+                                                        noOptionsMessage={() => "Không có dữ liệu"}
                                                         // components={{ MultiValue }}
                                                         style={{
                                                             border: "none",
@@ -725,33 +598,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -770,24 +633,17 @@ const Index = (props) => {
                                                             },
                                                             ...listSupplier,
                                                         ]}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "supplier"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "supplier")}
                                                         value={idSupplier}
                                                         placeholder={
                                                             dataLang?.purchase_order_table_supplier ||
                                                             "purchase_order_table_supplier"
                                                         }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px] z-20"
                                                         isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
+                                                        noOptionsMessage={() => "Không có dữ liệu"}
                                                         style={{
                                                             border: "none",
                                                             boxShadow: "none",
@@ -797,33 +653,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -840,23 +686,14 @@ const Index = (props) => {
                                                             },
                                                             ...listOrderType,
                                                         ]}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "OrderType"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "OrderType")}
                                                         value={idOrderType}
-                                                        placeholder={
-                                                            "Loại đặt hàng"
-                                                        }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        placeholder={"Loại đặt hàng"}
+                                                        hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
                                                         isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
+                                                        noOptionsMessage={() => "Không có dữ liệu"}
                                                         // components={{ MultiValue }}
                                                         style={{
                                                             border: "none",
@@ -867,33 +704,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -904,27 +731,16 @@ const Index = (props) => {
                                                         value={valueDate}
                                                         i18n={"vi"}
                                                         primaryColor={"blue"}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "date"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "date")}
                                                         showShortcuts={true}
-                                                        displayFormat={
-                                                            "DD/MM/YYYY"
-                                                        }
+                                                        displayFormat={"DD/MM/YYYY"}
                                                         configs={{
                                                             shortcuts: {
                                                                 today: "Hôm nay",
-                                                                yesterday:
-                                                                    "Hôm qua",
-                                                                past: (
-                                                                    period
-                                                                ) =>
-                                                                    `${period}  ngày qua`,
-                                                                currentMonth:
-                                                                    "Tháng này",
-                                                                pastMonth:
-                                                                    "Tháng trước",
+                                                                yesterday: "Hôm qua",
+                                                                past: (period) => `${period}  ngày qua`,
+                                                                currentMonth: "Tháng này",
+                                                                pastMonth: "Tháng trước",
                                                             },
                                                             footer: {
                                                                 cancel: "Từ bỏ",
@@ -954,9 +770,7 @@ const Index = (props) => {
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
                                                 <button
-                                                    onClick={_HandleFresh.bind(
-                                                        this
-                                                    )}
+                                                    onClick={_HandleFresh.bind(this)}
                                                     type="button"
                                                     className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none"
                                                 >
@@ -975,25 +789,15 @@ const Index = (props) => {
                                                                 <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
                                                                     <IconExcel
                                                                         className="2xl:scale-100 xl:scale-100 scale-75"
-                                                                        size={
-                                                                            18
-                                                                        }
+                                                                        size={18}
                                                                     />
-                                                                    <span>
-                                                                        {
-                                                                            dataLang?.client_list_exportexcel
-                                                                        }
-                                                                    </span>
+                                                                    <span>{dataLang?.client_list_exportexcel}</span>
                                                                 </button>
                                                             }
                                                         >
                                                             <ExcelSheet
-                                                                dataSet={
-                                                                    multiDataSet
-                                                                }
-                                                                data={
-                                                                    multiDataSet
-                                                                }
+                                                                dataSet={multiDataSet}
+                                                                data={multiDataSet}
                                                                 name="Organization"
                                                             />
                                                         </ExcelFile>
@@ -1005,20 +809,14 @@ const Index = (props) => {
                                                     </div>
                                                     <select
                                                         className="outline-none  text-[10px] xl:text-xs 2xl:text-sm"
-                                                        onChange={(e) =>
-                                                            sLimit(
-                                                                e.target.value
-                                                            )
-                                                        }
+                                                        onChange={(e) => sLimit(e.target.value)}
                                                         value={limit}
                                                     >
                                                         <option
                                                             className="text-[10px] xl:text-xs 2xl:text-sm hidden"
                                                             disabled
                                                         >
-                                                            {limit == -1
-                                                                ? "Tất cả"
-                                                                : limit}
+                                                            {limit == -1 ? "Tất cả" : limit}
                                                         </option>
                                                         <option
                                                             className="text-[10px] xl:text-xs 2xl:text-sm"
@@ -1059,8 +857,7 @@ const Index = (props) => {
                                                     "purchase_order_table_dayvoucers"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {dataLang?.purchase_order_table_code ||
-                                                    "purchase_order_table_code"}
+                                                {dataLang?.purchase_order_table_code || "purchase_order_table_code"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
                                                 {dataLang?.purchase_order_table_supplier ||
@@ -1071,12 +868,10 @@ const Index = (props) => {
                                                     "purchase_order_table_ordertype"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {dataLang?.purchase_order_table_number ||
-                                                    "purchase_order_table_number"}
+                                                {dataLang?.purchase_order_table_number || "purchase_order_table_number"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {dataLang?.purchase_order_table_total ||
-                                                    "purchase_order_table_total"}
+                                                {dataLang?.purchase_order_table_total || "purchase_order_table_total"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
                                                 {dataLang?.purchase_order_table_totalTax ||
@@ -1092,12 +887,10 @@ const Index = (props) => {
                                                     "purchase_order_table_importStatus"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {dataLang?.purchase_order_note ||
-                                                    "purchase_order_note"}
+                                                {dataLang?.purchase_order_note || "purchase_order_note"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1">
-                                                {dataLang?.purchase_order_table_branch ||
-                                                    "purchase_order_table_branch"}
+                                                {dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
                                                 {dataLang?.purchase_order_table_operations ||
@@ -1105,10 +898,7 @@ const Index = (props) => {
                                             </h4>
                                         </div>
                                         {onFetching ? (
-                                            <Loading
-                                                className="h-80"
-                                                color="#0f4f9e"
-                                            />
+                                            <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
@@ -1119,33 +909,22 @@ const Index = (props) => {
                                                         >
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
                                                                 {e?.date != null
-                                                                    ? moment(
-                                                                          e?.date
-                                                                      ).format(
-                                                                          "DD/MM/YYYY"
-                                                                      )
+                                                                    ? moment(e?.date).format("DD/MM/YYYY")
                                                                     : ""}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] hover:text-blue-600 transition-all ease-in-out xl:text-[11px] font-medium text-[9px]  px-2 col-span-1 text-center text-[#0F4F9E]  cursor-pointer">
                                                                 <Popup_chitiet
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
+                                                                    dataLang={dataLang}
                                                                     className="text-left"
-                                                                    name={
-                                                                        e?.code
-                                                                    }
+                                                                    name={e?.code}
                                                                     id={e?.id}
                                                                 />
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left">
-                                                                {
-                                                                    e.supplier_name
-                                                                }
+                                                                {e.supplier_name}
                                                             </h6>
                                                             <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-1 flex items-center justify-center text-center">
-                                                                {e?.order_type ==
-                                                                "0" ? (
+                                                                {e?.order_type == "0" ? (
                                                                     <span className="font-normal text-red-500  rounded-xl py-1 px-3  bg-red-200 2xl:text-xs xl:text-xs text-[8px] min-w-[80px]">
                                                                         Tạo mới
                                                                     </span>
@@ -1157,52 +936,27 @@ const Index = (props) => {
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-left flex flex-wrap text-[#0F4F9E] hover:text-blue-600 transition-all ease-in-out">
                                                                 {/* {e?.purchases?.reduce((acc, cur) => acc + (acc ? ', ' : '') + cur.code, '').split('').join('').replace(/^,/, '')} */}
-                                                                {e?.purchases?.map(
-                                                                    (
-                                                                        purchase,
-                                                                        index
-                                                                    ) => (
-                                                                        <React.Fragment
-                                                                            key={
-                                                                                purchase.id
-                                                                            }
-                                                                        >
-                                                                            {index !==
-                                                                                0 &&
-                                                                                ","}
-                                                                            <Popup_chitietThere
-                                                                                dataLang={
-                                                                                    dataLang
-                                                                                }
-                                                                                className="text-left"
-                                                                                type={
-                                                                                    e?.order_type
-                                                                                }
-                                                                                id={
-                                                                                    purchase.id
-                                                                                }
-                                                                                name={
-                                                                                    purchase.code
-                                                                                }
-                                                                            />
-                                                                        </React.Fragment>
-                                                                    )
-                                                                )}
+                                                                {e?.purchases?.map((purchase, index) => (
+                                                                    <React.Fragment key={purchase.id}>
+                                                                        {index !== 0 && ","}
+                                                                        <Popup_chitietThere
+                                                                            dataLang={dataLang}
+                                                                            className="text-left"
+                                                                            type={e?.order_type}
+                                                                            id={purchase.id}
+                                                                            name={purchase.code}
+                                                                        />
+                                                                    </React.Fragment>
+                                                                ))}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(
-                                                                    e.total_price
-                                                                )}
+                                                                {formatNumber(e.total_price)}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(
-                                                                    e.total_tax_price
-                                                                )}
+                                                                {formatNumber(e.total_tax_price)}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(
-                                                                    e.total_amount
-                                                                )}
+                                                                {formatNumber(e.total_amount)}
                                                             </h6>
                                                             {/* <h6 className='px-2 py-2.5 xl:text-[14px] text-xs col-span-1 flex items-center justify-center text-center '>
                                     {e?.status_pay === "0" && <span className=' font-normal text-sky-500  rounded-xl py-1 px-2  bg-sky-200'>{dataLang?.purchase_order_table_havent_spent_yet || "purchase_order_table_havent_spent_yet"}</span>||
@@ -1211,40 +965,25 @@ const Index = (props) => {
                                     }
                                 </h6> */}
                                                             <h6 className="px-2 py-2.5  col-span-1 flex items-center justify-center text-center ">
-                                                                {(e?.import_status ===
-                                                                    "not_stocked" && (
+                                                                {(e?.import_status === "not_stocked" && (
                                                                     <span className=" font-normal 2xl:text-xs xl:text-xs text-[8px] text-sky-500  rounded-xl py-1 px-2  min-w-[100px] bg-sky-200">
-                                                                        {dataLang[
-                                                                            e
-                                                                                ?.import_status
-                                                                        ] ||
-                                                                            e?.import_status}{" "}
+                                                                        {dataLang[e?.import_status] || e?.import_status}{" "}
                                                                     </span>
                                                                 )) ||
-                                                                    (e?.import_status ===
-                                                                        "stocked_part" && (
+                                                                    (e?.import_status === "stocked_part" && (
                                                                         <span className=" font-normal 2xl:text-xs xl:text-xs text-[8px] text-orange-500 rounded-xl py-1 px-2  min-w-[100px] bg-orange-200">
-                                                                            {dataLang[
-                                                                                e
-                                                                                    ?.import_status
-                                                                            ] ||
+                                                                            {dataLang[e?.import_status] ||
                                                                                 e?.import_status}
                                                                         </span>
                                                                     )) ||
-                                                                    (e?.import_status ===
-                                                                        "stocked" && (
+                                                                    (e?.import_status === "stocked" && (
                                                                         <span className="flex 2xl:text-xs xl:text-xs text-[8px] items-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2  min-w-[100px] bg-lime-200">
                                                                             <TickCircle
                                                                                 className="bg-lime-500 rounded-full "
                                                                                 color="white"
-                                                                                size={
-                                                                                    15
-                                                                                }
+                                                                                size={15}
                                                                             />
-                                                                            {dataLang[
-                                                                                e
-                                                                                    ?.import_status
-                                                                            ] ||
+                                                                            {dataLang[e?.import_status] ||
                                                                                 e?.import_status}
                                                                         </span>
                                                                     ))}
@@ -1254,26 +993,16 @@ const Index = (props) => {
                                                             </h6>
                                                             <h6 className="col-span-1 w-fit ">
                                                                 <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
-                                                                    {
-                                                                        e?.branch_name
-                                                                    }
+                                                                    {e?.branch_name}
                                                                 </div>
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
                                                                 <BtnTacVu
                                                                     type="order"
-                                                                    onRefresh={_ServerFetching.bind(
-                                                                        this
-                                                                    )}
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
-                                                                    status={
-                                                                        e?.import_status
-                                                                    }
-                                                                    status_pay={
-                                                                        e?.status_pay
-                                                                    }
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    dataLang={dataLang}
+                                                                    status={e?.import_status}
+                                                                    status_pay={e?.status_pay}
                                                                     data={e}
                                                                     id={e?.id}
                                                                     className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
@@ -1330,17 +1059,12 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display}{" "}
-                                    {totalItems?.iTotalDisplayRecords}{" "}
-                                    {dataLang?.among}{" "}
-                                    {totalItems?.iTotalRecords}{" "}
-                                    {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {totalItems?.iTotalRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(
-                                        totalItems?.iTotalDisplayRecords
-                                    )}
+                                    totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />
@@ -1360,9 +1084,7 @@ const TabClient = React.memo((props) => {
             onClick={props.onClick}
             className={`${props.className} justify-center min-w-[180px] flex gap-2 2xl:text-sm xl:text-sm text-xs items-center rounded-[5.5px] px-2 py-2 outline-none relative `}
         >
-            {router.query?.tab === `${props.active}` && (
-                <ArrowCircleDown size="20" color="#0F4F9E" />
-            )}
+            {router.query?.tab === `${props.active}` && <ArrowCircleDown size="20" color="#0F4F9E" />}
             {props.children}
             <span
                 className={`${
@@ -1390,17 +1112,12 @@ const BtnTacVu = React.memo((props) => {
 
     const fetchDataSettingsCompany = () => {
         if (props?.id) {
-            Axios(
-                "GET",
-                `/api_web/Api_setting/CompanyInfo?csrf_protection=true`,
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var { data } = response.data;
-                        setDataCompany(data);
-                    }
+            Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+                if (!err) {
+                    var { data } = response.data;
+                    setDataCompany(data);
                 }
-            );
+            });
         }
         if (props?.id) {
             Axios(
@@ -1518,15 +1235,8 @@ const BtnTacVu = React.memo((props) => {
         <div>
             <Popup
                 trigger={
-                    <button
-                        className={
-                            `flex space-x-1 items-center ` + props.className
-                        }
-                    >
-                        <span>
-                            {props.dataLang?.purchase_action ||
-                                "purchase_action"}
-                        </span>
+                    <button className={`flex space-x-1 items-center ` + props.className}>
+                        <span>{props.dataLang?.purchase_action || "purchase_action"}</span>
                         <IconDown size={12} />
                     </button>
                 }

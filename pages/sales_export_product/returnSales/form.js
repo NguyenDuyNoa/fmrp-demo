@@ -23,11 +23,8 @@ import Link from "next/link";
 import moment from "moment/moment";
 import Popup from "reactjs-popup";
 import { useSelector } from "react-redux";
-import PopupAddress from "./(popupAddress)/PopupAddress";
-import { AiFillPlusCircle } from "react-icons/ai";
 import ToatstNotifi from "components/UI/alerNotification/alerNotification";
-import { routerDeliveryReceipt } from "components/UI/router/sellingGoods";
-
+import { routerReturnSales } from "components/UI/router/sellingGoods";
 const Toast = Swal.mixin({
     toast: true,
     position: "top-end",
@@ -53,17 +50,12 @@ const Index = (props) => {
     const [onFetchingCondition, sOnFetchingCondition] = useState(false);
     const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
     const [onFetchingClient, sOnFetchingClient] = useState(false);
-    const [onFetchingContactPerson, sOnFetchingContactPerson] = useState(false);
-    const [onFetchingStaff, sOnFetchingStaff] = useState(false);
-    const [onFetchingProductOrder, sOnFetchingProductOrder] = useState(false);
-    const [onFetchingAddress, sOnFetchingAddress] = useState(false);
-    const [openPopupAddress, sOpenPopupAddress] = useState(false);
     const [onLoading, sOnLoading] = useState(false);
     const [onLoadingChild, sOnLoadingChild] = useState(false);
 
     const [onSending, sOnSending] = useState(false);
     const [generalTax, sThuetong] = useState();
-    const [generalDiscount, sChietkhautong] = useState(0);
+    const [generalDiscount, sGeneralD] = useState(0);
     const [code, sCode] = useState("");
     const [startDate, sStartDate] = useState(new Date());
     const [effectiveDate, sEffectiveDate] = useState(null);
@@ -71,11 +63,9 @@ const Index = (props) => {
     const [note, sNote] = useState("");
     const [date, sDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
     const [dataClient, sDataClient] = useState([]);
-    const [dataContactPerson, sDataContactPerson] = useState([]);
-    const [dataStaff, sDataStaff] = useState([]);
+    const [dataTreatmentr, sDataTreatmentr] = useState([]);
+
     const [dataBranch, sDataBranch] = useState([]);
-    const [dataProductOrder, sDataProductOrder] = useState([]);
-    const [dataAddress, sDataAddress] = useState([]);
     const [dataItems, sDataItems] = useState([]);
     const [dataTasxes, sDataTasxes] = useState([]);
 
@@ -87,19 +77,13 @@ const Index = (props) => {
 
     const [idBranch, sIdBranch] = useState(null);
     const [idClient, sIdClient] = useState(null);
-    const [idContactPerson, sIdContactPerson] = useState(null);
-    const [idStaff, sIdStaff] = useState(null);
-    const [idProductOrder, sIdProductOrder] = useState(null);
-    const [idAddress, sIdAddress] = useState(null);
-    const [itemAll, sItemAll] = useState([]);
+    const [idTreatment, sIdTreatment] = useState(null);
 
     const [load, sLoad] = useState(false);
 
     const [errClient, sErrClient] = useState(false);
-    const [errStaff, sErrStaff] = useState(false);
-    const [errProductOrder, sErrProductOrder] = useState(false);
+    const [errTreatment, sErrTreatment] = useState(false);
     const [errDate, sErrDate] = useState(false);
-    const [errAddress, sErrAddress] = useState(false);
     const [errBranch, sErrBranch] = useState(false);
     const [errWarehouse, sErrWarehouse] = useState(false);
     const [errQuantity, sErrQuantity] = useState(false);
@@ -107,30 +91,20 @@ const Index = (props) => {
     const [errPrice, sErrPrice] = useState(false);
     const [errSurvivePrice, sErrSurvivePrice] = useState(false);
 
-    const _HandleClosePopupAddress = (e) => {
-        sOpenPopupAddress(e);
-        !e && _ServerFetching_Address();
-    };
-
     const resetAllStates = () => {
         sCode("");
         sStartDate(new Date());
         sIdBranch(null);
         sIdClient(null);
-        sIdContactPerson(null);
-        sIdProductOrder(null);
-        sIdStaff(null);
-        sIdAddress(null);
         sNote("");
         sErrBranch(false);
         sErrDate(false);
         sErrClient(false);
-        sErrProductOrder(false);
         sErrQuantity(false);
-        sErrStaff(false);
         sErrSurvive(false);
         sErrSurvivePrice(false);
         sErrWarehouse(false);
+        sErrTreatment(false);
     };
 
     useEffect(() => {
@@ -154,6 +128,18 @@ const Index = (props) => {
                         label: e.name,
                         value: e.id,
                         tax_rate: e.tax_rate,
+                    }))
+                );
+                sOnLoading(false);
+            }
+        });
+        Axios("GET", "/api_web/Api_return_supplier/treatment_methods/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sDataTreatmentr(
+                    data?.map((e) => ({
+                        label: dataLang[e?.name],
+                        value: e?.id,
                     }))
                 );
                 sOnLoading(false);
@@ -344,94 +330,8 @@ const Index = (props) => {
         );
         sOnFetchingClient(false);
     };
-    const _ServerFetching_ContactPerson = () => {
-        sOnLoading(true);
-        Axios(
-            "GET",
-            "/api_web/api_client/contactCombobox/?csrf_protection=true",
-            {
-                params: {
-                    "filter[client_id]": idClient != null ? idClient.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataContactPerson(rResult?.map((e) => ({ label: e.full_name, value: e.id })));
-                    sOnLoading(false);
-                }
-            }
-        );
-        sOnFetchingContactPerson(false);
-    };
-    const _ServerFetching_Staff = () => {
-        sOnLoading(true);
-        Axios(
-            "GET",
-            "/api_web/Api_staff/staffOption?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": idBranch !== null ? +idBranch?.value : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataStaff(rResult?.map((e) => ({ label: e.name, value: e.staffid })));
-                    sOnLoading(false);
-                }
-            }
-        );
-        sOnFetchingStaff(false);
-    };
 
-    const _ServerFetching_ProductOrder = () => {
-        var data = new FormData();
-        data.append("branch_id", idBranch !== null ? +idBranch.value : null);
-        data.append("client_id", idClient !== null ? +idClient.value : null);
-        id && data.append("filter[delivery_id]", id ? id : "");
-        Axios(
-            "POST",
-            `/api_web/api_delivery/searchOrdersToCustomer?csrf_protection=true`,
-            {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { results } = response?.data;
-                    sDataProductOrder(results?.map((e) => ({ label: e.text, value: e.id })));
-                }
-            }
-        );
-        sOnFetchingProductOrder(false);
-    };
-
-    const _ServerFetching_Address = () => {
-        var data = new FormData();
-        data.append("client_id", idClient !== null ? +idClient.value : null);
-        Axios(
-            "POST",
-            `/api_web/api_delivery/GetShippingClient?csrf_protection=true`,
-            {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var rResult = response?.data;
-                    sDataAddress(rResult?.map((e) => ({ label: e.name, value: e.id })));
-                }
-            }
-        );
-        sOnFetchingAddress(false);
-    };
-
-    useEffect(() => {
-        idBranch === null && sDataClient([]);
-    }, []);
-
-    const checkListData = (value, sDataItems, sListData, sId, id, idEmty, sIdStaff) => {
+    const checkListData = (value, sDataItems, sListData, sId, id, idEmty) => {
         return Swal.fire({
             title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
             icon: "warning",
@@ -445,7 +345,6 @@ const Index = (props) => {
                 sDataItems([]);
                 sListData([]);
                 sId(value);
-                sIdStaff && sIdStaff(null);
                 idEmty && idEmty(null);
             } else {
                 sId({ ...id });
@@ -454,83 +353,56 @@ const Index = (props) => {
     };
 
     const _HandleChangeInput = (type, value) => {
-        if (type == "code") {
-            sCode(value.target.value);
-        } else if (type === "date") {
-            sDate(moment(value.target.value).format("YYYY-MM-DD HH:mm:ss"));
-        } else if (type === "idClient" && idClient != value) {
-            if (listData?.length > 0) {
-                checkListData(value, sDataItems, sListData, sIdClient, idClient, sIdProductOrder);
-            } else {
-                sIdClient(value);
-                sIdProductOrder(null);
-                sIdContactPerson(null);
-                sDataContactPerson([]);
-                if (value == null) {
-                    sDataProductOrder([]);
+        const onChange = {
+            code: () => sCode(value.target.value),
+            date: () => sDate(moment(value.target.value).format("YYYY-MM-DD HH:mm:ss")),
+            idClient: () => {
+                if (listData?.length > 0) {
+                    checkListData(value, sDataItems, sListData, sIdClient, idClient);
+                } else {
+                    sIdClient(value);
+                    if (value == null) {
+                        alert("rỗng thì mặt hàng rỗng nhe");
+                    }
                 }
-            }
-        } else if (type === "idContactPerson") {
-            sIdContactPerson(value);
-        } else if (type === "idStaff" && idStaff != value) {
-            sIdStaff(value);
-        } else if (type === "idProductOrder" && idProductOrder != value) {
-            if (listData?.length > 0) {
-                checkListData(value, sDataItems, sListData, sIdProductOrder, idProductOrder);
-            } else {
-                sIdProductOrder(value);
-            }
-        } else if (type === "idAddress") {
-            sIdAddress(value);
-        } else if (type === "itemAll" && itemAll != value) {
-            sItemAll(value);
-            if (value?.length === 0) {
-                sListData([]);
-            } else if (value?.length > 0) {
-                const newData = value?.map((e, index) => {
-                    const parent = _DataValueItem(e).parent;
-                    return parent;
-                });
-                sListData([...newData]);
-            }
-        } else if (type === "note") {
-            sNote(value.target.value);
-        } else if (type == "branch" && idBranch != value) {
-            if (listData?.length > 0) {
-                checkListData(value, sDataItems, sListData, sIdBranch, idBranch, sIdClient, sIdStaff);
-            } else {
-                sIdBranch(value);
-                sIdClient(null);
-                sIdProductOrder(null);
-                sIdContactPerson(null);
-                sIdStaff(null);
-                if (value == null) {
-                    sDataClient([]);
+            },
+            treatment: () => sIdTreatment(value),
+            note: () => sNote(value.target.value),
+            branch: () => {
+                if (listData?.length > 0) {
+                    checkListData(value, sDataItems, sListData, sIdBranch, idBranch, sIdClient);
+                } else {
+                    sIdBranch(value);
+                    sIdClient(null);
+                    sOnFetchingClient(true);
+                    if (value == null) {
+                        sDataClient([]);
+                        sIdClient(null);
+                    }
                 }
-            }
-        } else if (type == "generalTax") {
-            sThuetong(value);
-            if (listData?.length > 0) {
-                const newData = listData.map((e) => {
-                    const newChild = e?.child.map((ce) => {
-                        return { ...ce, tax: value };
+            },
+            generalTax: () => {
+                sThuetong(value);
+                if (listData?.length > 0) {
+                    const newData = listData.map((e) => {
+                        const newChild = e?.child.map((ce) => ({ ...ce, tax: value }));
+                        return { ...e, child: newChild };
                     });
-                    return { ...e, child: newChild };
-                });
-                sListData(newData);
-            }
-        } else if (type == "generalDiscount") {
-            sChietkhautong(value?.value);
-            if (listData?.length > 0) {
-                const newData = listData.map((e) => {
-                    const newChild = e?.child.map((ce) => {
-                        return { ...ce, discount: value?.value };
+                    sListData(newData);
+                }
+            },
+            generalDiscount: () => {
+                sGeneralD(value?.value);
+                if (listData?.length > 0) {
+                    const newData = listData.map((e) => {
+                        const newChild = e?.child.map((ce) => ({ ...ce, discount: value?.value }));
+                        return { ...e, child: newChild };
                     });
-                    return { ...e, child: newChild };
-                });
-                sListData(newData);
-            }
-        }
+                    sListData(newData);
+                }
+            },
+        };
+        onChange[type] && onChange[type]();
     };
 
     const handleClearDate = (type) => {
@@ -546,83 +418,23 @@ const Index = (props) => {
     };
 
     useEffect(() => {
-        sErrDate(false);
-    }, [date != null]);
-
-    useEffect(() => {
-        sErrClient(false);
-    }, [idClient != null]);
-
-    useEffect(() => {
-        sErrStaff(false);
-    }, [idStaff != null]);
-
-    useEffect(() => {
-        sErrBranch(false);
-    }, [idBranch != null]);
-
-    useEffect(() => {
-        sErrProductOrder(false);
-    }, [idProductOrder != null]);
-
-    useEffect(() => {
-        sErrAddress(false);
-    }, [idAddress != null]);
-
-    useEffect(() => {
         router.query && sOnFetching(true);
     }, [router.query]);
+
+    const useClearError = (condition, sState) => {
+        useEffect(() => {
+            sState(false);
+        }, [condition]);
+    };
+
+    useClearError(date != null, sErrDate);
+    useClearError(idClient != null, sErrClient);
+    useClearError(idBranch != null, sErrBranch);
+    useClearError(idTreatment != null, sErrTreatment);
 
     useEffect(() => {
         onFetchingClient && _ServerFetching_Client();
     }, [onFetchingClient]);
-    useEffect(() => {
-        onFetchingStaff && _ServerFetching_Staff();
-    }, [onFetchingStaff]);
-
-    useEffect(() => {
-        if (idBranch == null) {
-            sIdClient(null);
-            sIdProductOrder(null);
-            sDataProductOrder([]);
-            sIdStaff(null);
-            sDataStaff([]);
-        } else {
-            sOnFetchingClient(true);
-            sOnFetchingStaff(true);
-        }
-    }, [idBranch]);
-
-    useEffect(() => {
-        idBranch != null && idClient != null && sOnFetchingProductOrder(true);
-    }, [idBranch, idClient]);
-
-    useEffect(() => {
-        idProductOrder != null && sOnFetchingItemsAll(true);
-    }, [idProductOrder]);
-
-    useEffect(() => {
-        if (idClient == null) {
-            sIdProductOrder(null);
-            sDataProductOrder([]);
-        } else {
-            _ServerFetching_ContactPerson(true);
-            sOnFetchingAddress(true);
-        }
-    }, [idClient]);
-
-    const useFetchingEffect = (condition, serverFetchFunction) => {
-        useEffect(() => {
-            if (condition) {
-                serverFetchFunction();
-            }
-        }, [condition, serverFetchFunction]);
-    };
-
-    useFetchingEffect(onFetchingContactPerson, _ServerFetching_Client);
-    useFetchingEffect(onFetchingProductOrder, _ServerFetching_ProductOrder);
-    useFetchingEffect(onFetchingAddress, _ServerFetching_Address);
-    useFetchingEffect(onFetchingItemsAll, _ServerFetching_ItemsAll);
 
     const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes];
 
@@ -679,7 +491,6 @@ const Index = (props) => {
     const _HandleAddChild = (parentId, value) => {
         const newData = listData?.map((e) => {
             if (e?.id === parentId) {
-                // const newChild = _DataValueItem(value).newChild;
                 const { newChild } = _DataValueItem(value);
                 return { ...e, child: [...e.child, newChild] };
             } else {
@@ -692,7 +503,6 @@ const Index = (props) => {
     const _HandleAddParent = (value) => {
         const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
         if (!checkData) {
-            // const newData = _DataValueItem(value).parent;
             const { parent } = _DataValueItem(value);
             sListData([parent, ...listData]);
         } else {
@@ -710,7 +520,6 @@ const Index = (props) => {
                 return e;
             })
             .filter((e) => e.child?.length > 0);
-        sItemAll([...newData]);
         sListData([...newData]);
     };
 
@@ -727,6 +536,11 @@ const Index = (props) => {
         sListData([...newData]);
     };
 
+    const [test, sTest] = useState({
+        name: [],
+        age: [],
+    });
+
     const _HandleChangeChild = (parentId, childId, type, value) => {
         const newData = listData.map((e) => {
             if (e?.id !== parentId) return e;
@@ -740,7 +554,7 @@ const Index = (props) => {
                     case "quantity":
                         sErrSurvive(false);
                         ce.quantity = Number(value?.value);
-                        FunCheckQuantity(parentId, childId);
+                        funtionsCheckQuantity(parentId, childId);
                         break;
 
                     case "increase":
@@ -776,7 +590,7 @@ const Index = (props) => {
                         } else {
                             ce.quantity = Number(ce?.quantity) + 1;
                         }
-                        FunCheckQuantity(parentId, childId);
+                        funtionsCheckQuantity(parentId, childId);
                         break;
 
                     case "decrease":
@@ -805,9 +619,9 @@ const Index = (props) => {
                             );
                             ce.warehouse = value;
                             ce.quantity = value?.qty;
-                            FunCheckQuantity(parentId, childId);
+                            funtionsCheckQuantity(parentId, childId);
                         } else if (!checkWarehouse && totalSoLuong > quantityAmount) {
-                            FunCheckQuantity(parentId, childId);
+                            funtionsCheckQuantity(parentId, childId);
                             ce.warehouse = value;
                         } else if (checkWarehouse) {
                             ToatstNotifi("error", `Kho - vị trí kho đã được chọn`);
@@ -832,7 +646,7 @@ const Index = (props) => {
         sListData([...newData]);
     };
 
-    const FunCheckQuantity = (parentId, childId) => {
+    const funtionsCheckQuantity = (parentId, childId) => {
         const e = listData.find((item) => item?.id == parentId);
         if (!e) return;
 
@@ -880,44 +694,6 @@ const Index = (props) => {
         } else {
             ToatstNotifi("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
         }
-    };
-
-    const handleSelectAll = (type) => {
-        if (type == "addAll") {
-            const newData = [...dataItems]?.map((e) => {
-                const { parent } = _DataValueItem({ e: e });
-                return parent;
-            });
-            sListData([...newData]);
-            return;
-        } else {
-            sListData([]);
-            return;
-        }
-    };
-
-    const MenuList = (props) => {
-        return (
-            <components.MenuList {...props}>
-                {dataItems?.length > 0 && (
-                    <div className="grid grid-cols-2 items-center  cursor-pointer">
-                        <div
-                            className="hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px] "
-                            onClick={() => handleSelectAll("addAll")}
-                        >
-                            Chọn tất cả
-                        </div>
-                        <div
-                            className="hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px]"
-                            onClick={() => handleSelectAll("deleteAll")}
-                        >
-                            Bỏ chọn tất cả
-                        </div>
-                    </div>
-                )}
-                {props.children}
-            </components.MenuList>
-        );
     };
 
     const selectItemsLabel = (option) => {
@@ -1003,22 +779,29 @@ const Index = (props) => {
     const _HandleSubmit = (e) => {
         e.preventDefault();
 
-        const hasNullWarehouse = listData.some((item) =>
-            item.child?.some(
-                (childItem) =>
-                    childItem.warehouse === null ||
-                    (id && (childItem.warehouse?.label === null || childItem.warehouse?.warehouse_name === null))
-            )
-        );
+        const checkChildItem = (childItem, property) => {
+            switch (property) {
+                case "warehouse":
+                    return (
+                        childItem.warehouse === null ||
+                        (id && (!childItem.warehouse?.label || !childItem.warehouse?.warehouse_name))
+                    );
+                case "quantity":
+                    return childItem.quantity === null || childItem.quantity === "" || childItem.quantity == 0;
+                case "price":
+                    return childItem.price === null || childItem.price === "" || childItem.price == 0;
+                default:
+                    return false;
+            }
+        };
 
-        const hasNullQuantity = listData.some((item) =>
-            item.child?.some(
-                (childItem) => childItem.quantity === null || childItem.quantity === "" || childItem.quantity == 0
-            )
-        );
-        const hasNullPrice = listData.some((item) =>
-            item.child?.some((childItem) => childItem.price === null || childItem.price === "" || childItem.price == 0)
-        );
+        const checkPropertyRecursive = (list, property) => {
+            return list.some((item) => item.child?.some((childItem) => checkChildItem(childItem, property)));
+        };
+
+        const hasNullWarehouse = checkPropertyRecursive(listData, "warehouse");
+        const hasNullQuantity = checkPropertyRecursive(listData, "quantity");
+        const hasNullPrice = checkPropertyRecursive(listData, "price");
 
         const isTotalExceeded = listData?.some(
             (e) =>
@@ -1033,10 +816,8 @@ const Index = (props) => {
         const isEmpty = listData?.length === 0 ? true : false;
         if (
             idClient == null ||
-            idStaff == null ||
             idBranch == null ||
-            idProductOrder == null ||
-            idAddress == null ||
+            idTreatment == null ||
             hasNullWarehouse ||
             hasNullQuantity ||
             hasNullPrice ||
@@ -1044,10 +825,8 @@ const Index = (props) => {
             isEmpty
         ) {
             idClient == null && sErrClient(true);
-            idAddress == null && sErrAddress(true);
-            idStaff == null && sErrStaff(true);
+            idTreatment == null && sErrTreatment(true);
             idBranch == null && sErrBranch(true);
-            idProductOrder == null && sErrProductOrder(true);
             hasNullWarehouse && sErrWarehouse(true);
             hasNullQuantity && sErrQuantity(true);
             hasNullPrice && sErrPrice(true);
@@ -1115,7 +894,7 @@ const Index = (props) => {
                         ToatstNotifi("success", `${dataLang[message] || message}`);
                         resetAllStates();
                         sListData([]);
-                        router.push(routerDeliveryReceipt.home);
+                        router.push(routerReturnSales.home);
                     } else {
                         ToatstNotifi("error", `${dataLang[message] || message}`);
                     }
@@ -1132,11 +911,7 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>
-                    {id
-                        ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit"
-                        : dataLang?.delivery_receipt_add || "delivery_receipt_add"}
-                </title>
+                <title>{id ? "Sửa trả lại hàng bán" : "Thêm trả lại hàng bán"}</title>
             </Head>
             <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
                 <div className="h-[97%] space-y-3 overflow-hidden">
@@ -1148,20 +923,14 @@ const Index = (props) => {
                                 {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
                             </h6>
                             <span className="text-[#141522]/40">/</span>
-                            <h6>
-                                {id
-                                    ? dataLang?.delivery_receipt_edit || "delivery_receipt_edit"
-                                    : dataLang?.delivery_receipt_add || "delivery_receipt_add"}
-                            </h6>
+                            <h6>{id ? "Sửa trả lại hàng bán" : "Thêm trả lại hàng bán"}</h6>
                         </div>
                     )}
                     <div className="flex justify-between items-center">
-                        <h2 className="xl:text-2xl text-xl ">
-                            {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
-                        </h2>
+                        <h2 className="xl:text-2xl text-xl ">{"Trả lại hàng bán"}</h2>
                         <div className="flex justify-end items-center">
                             <button
-                                onClick={() => router.push(routerDeliveryReceipt.home)}
+                                onClick={() => router.push(routerReturnSales.home)}
                                 className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.import_comeback || "import_comeback"}
@@ -1175,8 +944,8 @@ const Index = (props) => {
                                 {dataLang?.purchase_order_detail_general_informatione ||
                                     "purchase_order_detail_general_informatione"}
                             </h2>
-                            <div className="grid grid-cols-12  gap-3 items-center mt-2">
-                                <div className="col-span-3">
+                            <div className="grid grid-cols-10 gap-3 items-center mt-2">
+                                <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_code_vouchers || "import_code_vouchers"}{" "}
                                     </label>
@@ -1191,7 +960,7 @@ const Index = (props) => {
                                         className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                 </div>
-                                <div className="col-span-3 relative">
+                                <div className="col-span-2 relative">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                     </label>
@@ -1224,7 +993,7 @@ const Index = (props) => {
                                         <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
                                     </div>
                                 </div>
-                                <div className="col-span-3">
+                                <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.import_branch || "import_branch"}{" "}
                                         <span className="text-red-500">*</span>
@@ -1281,7 +1050,7 @@ const Index = (props) => {
                                         </label>
                                     )}
                                 </div>
-                                <div className="col-span-3">
+                                <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {"Khách hàng"} <span className="text-red-500">*</span>
                                     </label>
@@ -1337,214 +1106,24 @@ const Index = (props) => {
                                         <label className="text-sm text-red-500">{"Vui lòng chọn khách hàng"}</label>
                                     )}
                                 </div>
-                                <div className="col-span-3">
+                                <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {"Người liên lạc"}
-                                    </label>
-                                    <Select
-                                        options={dataContactPerson}
-                                        onChange={_HandleChangeInput.bind(this, "idContactPerson")}
-                                        isLoading={idBranch || idClient != null ? false : onLoading}
-                                        value={idContactPerson}
-                                        isClearable={true}
-                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
-                                        closeMenuOnSelect={true}
-                                        hideSelectedOptions={false}
-                                        placeholder={"Người liên lạc"}
-                                        className={`placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                                        isSearchable={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            menu: (provided) => ({
-                                                ...provided,
-                                                // zIndex: 9999, // Giá trị z-index tùy chỉnh
-                                            }),
-                                            control: (base, state) => ({
-                                                ...base,
-                                                boxShadow: "none",
-                                                padding: "2.7px",
-                                                ...(state.isFocused && {
-                                                    border: "0 0 0 1px #92BFF7",
-                                                }),
-                                            }),
-                                        }}
-                                    />
-                                </div>
-
-                                <div className="col-span-3">
-                                    <label className="text-[#344054] font-normal 3xl:text-sm 2xl:text-[13px] text-[13px] ">
-                                        {dataLang?.address || "address"} <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="relative">
-                                        <Select
-                                            options={dataAddress}
-                                            onChange={_HandleChangeInput.bind(this, "idAddress")}
-                                            value={idAddress}
-                                            // isLoading={loading}
-                                            placeholder={dataLang?.select_address || "select_address"}
-                                            hideSelectedOptions={false}
-                                            isClearable={true}
-                                            className={`${
-                                                errAddress ? "border border-red-500 rounded-md" : ""
-                                            } rounded-md 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] `}
-                                            isSearchable={true}
-                                            // components={{
-                                            //     ClearIndicator,
-                                            //     LoadingIndicator,
-                                            //     SelectIndicator,
-                                            // }}
-                                            noOptionsMessage={() => "Không có dữ liệu"}
-                                            menuPortalTarget={document.body}
-                                            closeMenuOnSelect={true}
-                                            style={{
-                                                border: "none",
-                                                boxShadow: "none",
-                                                outline: "none",
-                                            }}
-                                            theme={(theme) => ({
-                                                ...theme,
-                                                colors: {
-                                                    ...theme.colors,
-                                                    primary25: "#EBF5FF",
-                                                    primary50: "#92BFF7",
-                                                    primary: "#0F4F9E",
-                                                },
-                                            })}
-                                            styles={{
-                                                placeholder: (base) => ({
-                                                    ...base,
-                                                    color: "#cbd5e1",
-                                                }),
-                                                menuPortal: (base) => ({
-                                                    ...base,
-                                                    zIndex: 20,
-                                                }),
-                                                control: (base, state) => ({
-                                                    ...base,
-                                                    boxShadow: "none",
-                                                    padding: "0.7px",
-                                                }),
-                                            }}
-                                        />
-                                        <AiFillPlusCircle
-                                            onClick={() => _HandleClosePopupAddress(true)}
-                                            className="right-0 top-0 -translate-x-[450%] 3xl:translate-y-[80%] 2xl:translate-y-[70%] xl:translate-y-[70%] translate-y-[60%] 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180  transition-all ease-in-out absolute "
-                                        />
-                                        <PopupAddress
-                                            dataLang={dataLang}
-                                            clientId={idClient?.value}
-                                            handleFetchingAddress={_ServerFetching_Address}
-                                            openPopupAddress={openPopupAddress}
-                                            handleClosePopupAddress={() => _HandleClosePopupAddress(false)}
-                                            className="hidden"
-                                        />
-                                        {errAddress && (
-                                            <label className="text-sm text-red-500">
-                                                {dataLang?.delivery_receipt_err_select_address ||
-                                                    "delivery_receipt_err_select_address"}
-                                            </label>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="col-span-3">
-                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.delivery_receipt_edit_User || "delivery_receipt_edit_User"}
+                                        {dataLang?.returns_treatment_methods || "returns_treatment_methods"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <Select
-                                        options={dataStaff}
-                                        onChange={_HandleChangeInput.bind(this, "idStaff")}
-                                        isLoading={idBranch != null ? false : onLoading}
-                                        value={idStaff}
-                                        isClearable={true}
-                                        noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
-                                        closeMenuOnSelect={true}
-                                        hideSelectedOptions={false}
-                                        placeholder={
-                                            dataLang?.delivery_receipt_edit_User || "delivery_receipt_edit_User"
-                                        }
-                                        className={`${
-                                            errStaff ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                                        // className={`placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                                        isSearchable={true}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            menu: (provided) => ({
-                                                ...provided,
-                                                // zIndex: 9999, // Giá trị z-index tùy chỉnh
-                                            }),
-                                            control: (base, state) => ({
-                                                ...base,
-                                                boxShadow: "none",
-                                                padding: "2.7px",
-                                                ...(state.isFocused && {
-                                                    border: "0 0 0 1px #92BFF7",
-                                                }),
-                                            }),
-                                        }}
-                                    />
-                                    {errStaff && (
-                                        <label className="text-sm text-red-500">
-                                            {dataLang?.delivery_receipt_err_userStaff ||
-                                                "delivery_receipt_err_userStaff"}
-                                        </label>
-                                    )}
-                                </div>
-                                <div className="col-span-3">
-                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.delivery_receipt_product_order || "delivery_receipt_product_order"}{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <Select
-                                        options={dataProductOrder}
-                                        onChange={_HandleChangeInput.bind(this, "idProductOrder")}
+                                        options={dataTreatmentr}
+                                        onChange={_HandleChangeInput.bind(this, "treatment")}
                                         isLoading={idBranch || idClient != null ? false : onLoading}
-                                        value={idProductOrder}
+                                        value={idTreatment}
                                         isClearable={true}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={
-                                            dataLang?.delivery_receipt_product_order || "delivery_receipt_product_order"
-                                        }
+                                        placeholder={dataLang?.returns_treatment_methods || "returns_treatment_methods"}
                                         className={`${
-                                            errProductOrder ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                                            errTreatment ? "border-red-500" : "border-transparent"
+                                        } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
                                             border: "none",
@@ -1579,10 +1158,9 @@ const Index = (props) => {
                                             }),
                                         }}
                                     />
-                                    {errProductOrder && (
+                                    {errTreatment && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.delivery_receipt_err_select_product_order ||
-                                                "delivery_receipt_err_select_product_order"}
+                                            {dataLang?.returns_treatment_methods_err || "returns_treatment_methods_err"}
                                         </label>
                                     )}
                                 </div>
@@ -1592,57 +1170,6 @@ const Index = (props) => {
                     <div className=" bg-[#ECF0F4] p-2 grid  grid-cols-12">
                         <div className="font-normal col-span-12">
                             {dataLang?.import_item_information || "import_item_information"}
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-12">
-                        <div div className="col-span-3">
-                            <label className="text-[#344054] font-normal 2xl:text-base text-[14px]">
-                                {dataLang?.import_click_items || "import_click_items"}
-                            </label>
-                            <Select
-                                options={idProductOrder ? options : []}
-                                closeMenuOnSelect={false}
-                                onChange={_HandleChangeInput.bind(this, "itemAll")}
-                                value={itemAll?.value ? itemAll?.value : listData?.map((e) => e?.matHang)}
-                                isMulti
-                                components={{ MenuList, MultiValue }}
-                                formatOptionLabel={(option) => selectItemsLabel(option)}
-                                placeholder={"Chọn nhanh mặt hàng"}
-                                hideSelectedOptions={false}
-                                className="rounded-md bg-white 3xl:text-[16px] 2xl:text-[10px] xl:text-[13px] text-[12.5px] "
-                                isSearchable={true}
-                                noOptionsMessage={() => "Không có dữ liệu"}
-                                menuPortalTarget={document.body}
-                                style={{
-                                    border: "none",
-                                    boxShadow: "none",
-                                    outline: "none",
-                                }}
-                                theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                        ...theme.colors,
-                                        primary25: "#EBF5FF",
-                                        primary50: "#92BFF7",
-                                        primary: "#0F4F9E",
-                                    },
-                                })}
-                                styles={{
-                                    placeholder: (base) => ({
-                                        ...base,
-                                        color: "#cbd5e1",
-                                    }),
-                                    menuPortal: (base) => ({
-                                        ...base,
-                                        zIndex: 100,
-                                    }),
-                                    control: (base, state) => ({
-                                        ...base,
-                                        boxShadow: "none",
-                                        padding: "0.7px",
-                                    }),
-                                }}
-                            />
                         </div>
                     </div>
                     <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10">
@@ -1779,7 +1306,7 @@ const Index = (props) => {
                                     />
                                 </div>
                                 <div className="col-span-1 text-right 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium pr-3 text-black  flex items-center justify-end">
-                                    1.00
+                                    1
                                 </div>
                                 <input
                                     placeholder={dataLang?.returns_note || "returns_note"}
@@ -2505,7 +2032,7 @@ const Index = (props) => {
                         </div>
                         <div className="space-x-2">
                             <button
-                                onClick={() => router.push(routerDeliveryReceipt.home)}
+                                onClick={() => router.push(routerReturnSales.home)}
                                 className="button text-[#344054] font-normal text-base hover:bg-blue-500 hover:text-white hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
                             >
                                 {dataLang?.purchase_order_purchase_back || "purchase_order_purchase_back"}
@@ -2525,15 +2052,6 @@ const Index = (props) => {
     );
 };
 const MoreSelectedBadge = ({ items }) => {
-    // const style = {
-    //     marginLeft: "auto",
-    //     background: "#d4eefa",
-    //     borderRadius: "4px",
-    //     fontSize: "13px",
-    //     padding: "2px 4px",
-    //     order: 99,
-    // };
-
     const title = items.join(", ");
     const length = items.length;
     const label = `+ ${length}`;

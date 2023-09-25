@@ -31,6 +31,7 @@ import { MdClear } from "react-icons/md";
 import { BsCalendarEvent } from "react-icons/bs";
 import DatePicker from "react-datepicker";
 import { useSelector } from "react-redux";
+import { routerPurchases } from "components/UI/router/buyImportGoods";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -58,9 +59,7 @@ const Index = (props) => {
     const [listBr, sListBr] = useState();
     const [idBranch, sIdBranch] = useState(null);
     const [code, sCode] = useState("");
-    const [selectedDate, setSelectedDate] = useState(
-        moment().format("YYYY-MM-DD HH:mm:ss")
-    );
+    const [selectedDate, setSelectedDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
     const [namePromis, sNamePromis] = useState("Yêu cầu mua hàng (PR)");
     const [note, sNote] = useState();
 
@@ -101,24 +100,19 @@ const Index = (props) => {
     sortedArr.unshift(option[0]);
 
     const _ServerFetching = () => {
-        Axios(
-            "GET",
-            "/api_web/api_product/searchItemsVariant?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { result } = response.data.data;
-                    sData(
-                        result?.map((e) => ({
-                            label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
-                            value: e.id,
-                            e,
-                        }))
-                    );
-                    // const options = data?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e}))
-                }
+        Axios("GET", "/api_web/api_product/searchItemsVariant?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { result } = response.data.data;
+                sData(
+                    result?.map((e) => ({
+                        label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+                        value: e.id,
+                        e,
+                    }))
+                );
+                // const options = data?.map(e => ({label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,value:e.id,e}))
             }
-        );
+        });
         Axios(
             "GET",
             `/api_web/Api_Branch/branch/?csrf_protection=true`,
@@ -137,49 +131,44 @@ const Index = (props) => {
         sOnFetching(false);
     };
     const _ServerFetchingDetail = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var rResult = response.data;
-                    sCode(rResult?.code);
-                    sNamePromis(rResult?.name);
-                    // setSelectedDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
-                    sStartDate(moment(rResult?.date).toDate());
-                    sNote(rResult?.note);
-                    sIdBranch({
-                        label: rResult?.branch_name,
-                        value: rResult?.branch_id,
-                    });
-                    const itemlast = [{ mathang: null }];
-                    const item = itemlast?.concat(
-                        rResult?.items?.map((e) => ({
-                            id: e.item.id,
-                            data: e.item.id,
-                            ghichu: e.note,
-                            donvitinh: e.item.unit_name,
-                            soluong: Number(e.quantity),
-                            mathang: {
-                                e: e.item,
-                                label: `${e.item.name} <span style={{display: none}}>${e.item.code}</span><span style={{display: none}}>${e.item.product_variation} </span><span style={{display: none}}>${e.item.text_type} ${e.item.unit_name} </span>`,
-                                value: e.item.id,
-                            },
-                        }))
-                    );
-                    sOption(item);
-                    let listQty = rResult?.items;
-                    let totalQuantity = 0;
-                    for (let i = 0; i < listQty.length; i++) {
-                        totalQuantity += parseInt(listQty[i].quantity);
-                    }
-                    setTotalSoluong(totalQuantity);
-                    setTotalQty(rResult?.items?.length);
+        Axios("GET", `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var rResult = response.data;
+                sCode(rResult?.code);
+                sNamePromis(rResult?.name);
+                // setSelectedDate(moment(rResult?.date).format('YYYY-MM-DD HH:mm:ss'))
+                sStartDate(moment(rResult?.date).toDate());
+                sNote(rResult?.note);
+                sIdBranch({
+                    label: rResult?.branch_name,
+                    value: rResult?.branch_id,
+                });
+                const itemlast = [{ mathang: null }];
+                const item = itemlast?.concat(
+                    rResult?.items?.map((e) => ({
+                        id: e.item.id,
+                        data: e.item.id,
+                        ghichu: e.note,
+                        donvitinh: e.item.unit_name,
+                        soluong: Number(e.quantity),
+                        mathang: {
+                            e: e.item,
+                            label: `${e.item.name} <span style={{display: none}}>${e.item.code}</span><span style={{display: none}}>${e.item.product_variation} </span><span style={{display: none}}>${e.item.text_type} ${e.item.unit_name} </span>`,
+                            value: e.item.id,
+                        },
+                    }))
+                );
+                sOption(item);
+                let listQty = rResult?.items;
+                let totalQuantity = 0;
+                for (let i = 0; i < listQty.length; i++) {
+                    totalQuantity += parseInt(listQty[i].quantity);
                 }
-                sOnFetchingDetail(false);
+                setTotalSoluong(totalQuantity);
+                setTotalQty(rResult?.items?.length);
             }
-        );
+            sOnFetchingDetail(false);
+        });
     };
 
     const listBr_filter = listBr?.map((e) => ({ label: e.name, value: e.id }));
@@ -195,9 +184,7 @@ const Index = (props) => {
             });
         }
         const newOption = option.filter((x) => x.id !== id); // loại bỏ phần tử cần xóa
-        const newTotal = newOption
-            .slice(1)
-            .reduce((total, item) => total + item.soluong, 0); // tính toán lại tổng số lượng bắt đầu từ phần tử thứ 2
+        const newTotal = newOption.slice(1).reduce((total, item) => total + item.soluong, 0); // tính toán lại tổng số lượng bắt đầu từ phần tử thứ 2
         sOption(newOption); // cập nhật lại mảng
         setTotalSoluong(newTotal); // cập nhật lại tổng số lượng
         setTotalQty(newOption.slice(1).length); // cập nhật lại độ dài của mảng từ phần tử thứ 2 trở đi
@@ -206,9 +193,7 @@ const Index = (props) => {
         if (type == "branch") {
             sIdBranch(value);
         } else if (type == "date") {
-            setSelectedDate(
-                moment(value.target.value).format("YYYY-MM-DD HH:mm:ss")
-            );
+            setSelectedDate(moment(value.target.value).format("YYYY-MM-DD HH:mm:ss"));
         } else if (type == "code") {
             sCode(value.target.value);
         } else if (type == "namePromis") {
@@ -234,9 +219,7 @@ const Index = (props) => {
     const _HandleChangeInputOption = (id, type, index3, value) => {
         var index = option.findIndex((x) => x.id === id);
         if (type == "mathang") {
-            const hasSelectedOption = option.some(
-                (o) => o.mathang?.value === value.value
-            );
+            const hasSelectedOption = option.some((o) => o.mathang?.value === value.value);
             if (hasSelectedOption) {
                 return Toast.fire({
                     title: `${"Mặt hàng này đã được chọn "}`,
@@ -262,10 +245,7 @@ const Index = (props) => {
                     option.push(newData);
                     const newOption = option.slice(1); // Tạo một mảng mới bắt đầu từ phần tử thứ hai của option
                     setTotalQty(newOption.length);
-                    const newTotal = newOption.reduce(
-                        (total, item) => total + item.soluong,
-                        0
-                    ); // Tính tổng số lượng trong mảng mới
+                    const newTotal = newOption.reduce((total, item) => total + item.soluong, 0); // Tính tổng số lượng trong mảng mới
                     setTotalSoluong(newTotal);
                 }
             }
@@ -315,11 +295,7 @@ const Index = (props) => {
     };
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        if (
-            namePromis?.length == 0 ||
-            selectedDate?.length == 0 ||
-            branch_id == null
-        ) {
+        if (namePromis?.length == 0 || selectedDate?.length == 0 || branch_id == null) {
             namePromis?.length == 0 && sErrName(true);
             selectedDate?.length == 0 && sErrDate(true);
             branch_id == null && sErrBranch(true);
@@ -345,18 +321,12 @@ const Index = (props) => {
         var formData = new FormData();
         formData.append("code", code);
         formData.append("name", namePromis);
-        formData.append(
-            "date",
-            moment(startDate).format("YYYY-MM-DD HH:mm:ss")
-        );
+        formData.append("date", moment(startDate).format("YYYY-MM-DD HH:mm:ss"));
         formData.append("branch_id", branch_id);
         formData.append("note", note);
         newDataOption.forEach((item, index) => {
             formData.append(`items[${index}][item]`, item?.data);
-            formData.append(
-                `items[${index}][quantity]`,
-                item?.soluong.toString()
-            );
+            formData.append(`items[${index}][quantity]`, item?.soluong.toString());
             formData.append(`items[${index}][note]`, item?.ghichu);
         });
         Axios(
@@ -400,7 +370,7 @@ const Index = (props) => {
                         ]);
                         setTotalSoluong(0); // cập nhật lại tổng số lượng
                         setTotalQty(0);
-                        router.back();
+                        router.push(routerPurchases.home);
                     } else {
                         if (totalQty == 0) {
                             Toast.fire({
@@ -502,9 +472,7 @@ const Index = (props) => {
         <React.Fragment>
             <Head>
                 <title>
-                    {id
-                        ? dataLang?.purchase_edit || "purchase_edit"
-                        : dataLang?.purchase_add || "purchase_add"}
+                    {id ? dataLang?.purchase_edit || "purchase_edit" : dataLang?.purchase_add || "purchase_add"}
                 </title>
             </Head>
             {/* <div className='xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 h-screen overflow-hidden flex flex-col justify-between'> */}
@@ -514,10 +482,7 @@ const Index = (props) => {
                         <div className="p-2"></div>
                     ) : (
                         <div className="flex space-x-3 ">
-                            <h6 className="text-[#141522]/40 ">
-                                {dataLang?.purchase_purchase ||
-                                    "purchase_purchase"}
-                            </h6>
+                            <h6 className="text-[#141522]/40 ">{dataLang?.purchase_purchase || "purchase_purchase"}</h6>
                             <span className="text-[#141522]/40 ">/</span>
                             <h6 className="">
                                 {id
@@ -528,13 +493,11 @@ const Index = (props) => {
                     )}
                     <div className="flex justify-between items-center">
                         <h2 className=" ">
-                            {id
-                                ? dataLang?.purchase_edit || "purchase_edit"
-                                : dataLang?.purchase_add || "purchase_add"}
+                            {id ? dataLang?.purchase_edit || "purchase_edit" : dataLang?.purchase_add || "purchase_add"}
                         </h2>
                         <div className="flex justify-end items-center">
                             <button
-                                onClick={() => router.back()}
+                                onClick={() => router.push(routerPurchases.home)}
                                 className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.warehouses_detail_back}
@@ -544,35 +507,26 @@ const Index = (props) => {
                     <div className=" w-full rounded">
                         <div className="">
                             <h2 className="font-normal bg-[#ECF0F4] p-2 ">
-                                {dataLang?.purchase_general ||
-                                    "purchase_general"}
+                                {dataLang?.purchase_general || "purchase_general"}
                             </h2>
 
                             <div className="flex flex-wrap justify-between items-center mt-2">
                                 <div className="w-[24.5%]">
                                     <label className="text-[#344054] font-normal text-sm mb-1  2xl:text-[12px] xl:text-[13px] text-[13px]">
-                                        {dataLang?.purchase_code ||
-                                            "purchase_code"}{" "}
+                                        {dataLang?.purchase_code || "purchase_code"}{" "}
                                     </label>
                                     <input
                                         value={code}
-                                        onChange={_HandleChangeInput.bind(
-                                            this,
-                                            "code"
-                                        )}
+                                        onChange={_HandleChangeInput.bind(this, "code")}
                                         name="fname"
                                         type="text"
-                                        placeholder={
-                                            dataLang?.purchase_err_Name_sytem ||
-                                            "purchase_err_Name_sytem"
-                                        }
+                                        placeholder={dataLang?.purchase_err_Name_sytem || "purchase_err_Name_sytem"}
                                         className={`focus:border-[#92BFF7] border-[#d0d5dd]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                     />
                                 </div>
                                 <div className="w-[24.5%] relative">
                                     <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">
-                                        {dataLang?.purchase_day ||
-                                            "purchase_day"}{" "}
+                                        {dataLang?.purchase_day || "purchase_day"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     {/* <input
@@ -589,34 +543,23 @@ const Index = (props) => {
                                             fixedHeight
                                             showTimeSelect
                                             selected={startDate}
-                                            onSelect={(date) =>
-                                                sStartDate(date)
-                                            }
-                                            onChange={(e) =>
-                                                handleTimeChange(e)
-                                            }
+                                            onSelect={(date) => sStartDate(date)}
+                                            onChange={(e) => handleTimeChange(e)}
                                             placeholderText="DD/MM/YYYY HH:mm:ss"
                                             dateFormat="dd/MM/yyyy h:mm:ss aa"
                                             timeInputLabel={"Time: "}
                                             placeholder={
-                                                dataLang?.price_quote_system_default ||
-                                                "price_quote_system_default"
+                                                dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
                                             className={`border ${
-                                                errDate
-                                                    ? "border-red-500"
-                                                    : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                             } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
                                         {startDate && (
                                             <>
                                                 <MdClear
                                                     className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
-                                                    onClick={() =>
-                                                        handleClearDate(
-                                                            "startDate"
-                                                        )
-                                                    }
+                                                    onClick={() => handleClearDate("startDate")}
                                                 />
                                             </>
                                         )}
@@ -625,31 +568,21 @@ const Index = (props) => {
                                 </div>
                                 <div className="w-[24.5%]">
                                     <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">
-                                        {dataLang?.purchase_name ||
-                                            "purchase_name"}
+                                        {dataLang?.purchase_name || "purchase_name"}
                                     </label>
                                     <input
                                         value={namePromis}
-                                        onChange={_HandleChangeInput.bind(
-                                            this,
-                                            "namePromis"
-                                        )}
+                                        onChange={_HandleChangeInput.bind(this, "namePromis")}
                                         name="fname"
                                         type="text"
-                                        placeholder={
-                                            dataLang?.purchase_name ||
-                                            "purchase_name"
-                                        }
+                                        placeholder={dataLang?.purchase_name || "purchase_name"}
                                         className={`${
-                                            errName
-                                                ? "border-red-500"
-                                                : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                                            errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
                                         } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                                     />
                                     {errName && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.purchase_err_Name ||
-                                                "purchase_err_Name"}
+                                            {dataLang?.purchase_err_Name || "purchase_err_Name"}
                                         </label>
                                     )}
 
@@ -657,31 +590,21 @@ const Index = (props) => {
                                 </div>
                                 <div className="w-[24.5%]">
                                     <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[13px] mb-1 ">
-                                        {dataLang?.purchase_branch ||
-                                            "purchase_branch"}{" "}
+                                        {dataLang?.purchase_branch || "purchase_branch"}{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <Select
                                         options={listBr_filter}
-                                        onChange={_HandleChangeInput.bind(
-                                            this,
-                                            "branch"
-                                        )}
+                                        onChange={_HandleChangeInput.bind(this, "branch")}
                                         value={idBranch}
-                                        placeholder={
-                                            dataLang?.client_list_filterbrand
-                                        }
+                                        placeholder={dataLang?.client_list_filterbrand}
                                         hideSelectedOptions={false}
                                         isClearable={true}
                                         className={`${
-                                            errBranch
-                                                ? "border-red-500"
-                                                : "border-transparent"
+                                            errBranch ? "border-red-500" : "border-transparent"
                                         } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
-                                        noOptionsMessage={() =>
-                                            "Không có dữ liệu"
-                                        }
+                                        noOptionsMessage={() => "Không có dữ liệu"}
                                         // components={{ MultiValue }}
                                         menuPortalTarget={document.body}
                                         closeMenuOnSelect={true}
@@ -723,8 +646,7 @@ const Index = (props) => {
 
                                     {errBranch && (
                                         <label className="text-sm text-red-500">
-                                            {dataLang?.purchase_err_branch ||
-                                                "purchase_err_branch"}
+                                            {dataLang?.purchase_err_branch || "purchase_err_branch"}
                                         </label>
                                     )}
                                 </div>
@@ -746,15 +668,13 @@ const Index = (props) => {
                                 {dataLang?.purchase_unit || "purchase_unit"}
                             </h4>
                             <h4 className="2xl:text-[12px] xl:text-[13px] text-[13px] px-2  text-[#667085] uppercase  col-span-2    text-center   truncate font-[400]">
-                                {dataLang?.purchase_quantity ||
-                                    "purchase_quantity"}
+                                {dataLang?.purchase_quantity || "purchase_quantity"}
                             </h4>
                             <h4 className="2xl:text-[12px] xl:text-[13px] text-[13px] px-2  text-[#667085] uppercase  col-span-3     truncate font-[400]">
                                 {dataLang?.purchase_note || "purchase_note"}
                             </h4>
                             <h4 className="2xl:text-[12px] xl:text-[13px] text-[13px] px-2  text-[#667085] uppercase  col-span-1 text-center     truncate font-[400]">
-                                {dataLang?.purchase_operation ||
-                                    "purchase_operation"}
+                                {dataLang?.purchase_operation || "purchase_operation"}
                             </h4>
                         </div>
                     </div>
@@ -766,10 +686,7 @@ const Index = (props) => {
                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                     {/* <ScrollArea className=" h-[400px] overflow-hidden" speed={1}  smoothScrolling={true}> */}
                                     {sortedArr.map((e, index) => (
-                                        <div
-                                            className="grid grid-cols-12 gap-1 py-1 "
-                                            key={e.id}
-                                        >
+                                        <div className="grid grid-cols-12 gap-1 py-1 " key={e.id}>
                                             <div className="col-span-1 flex items-center justify-center">
                                                 <h3 className="text-[#344054] font-normal text-center text-sm mb-1 ml-2 ">
                                                     {index + 1}
@@ -777,9 +694,7 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-4  z-[100] my-auto">
                                                 <Select
-                                                    onInputChange={_HandleSeachApi.bind(
-                                                        this
-                                                    )}
+                                                    onInputChange={_HandleSeachApi.bind(this)}
                                                     dangerouslySetInnerHTML={{
                                                         __html: option.label,
                                                     }}
@@ -791,21 +706,13 @@ const Index = (props) => {
                                                         index
                                                     )}
                                                     value={e?.mathang}
-                                                    formatOptionLabel={(
-                                                        option
-                                                    ) => (
+                                                    formatOptionLabel={(option) => (
                                                         <div className="flex items-center  justify-between py-2">
                                                             <div className="flex items-center gap-2">
                                                                 <div>
-                                                                    {option.e
-                                                                        ?.images !=
-                                                                    null ? (
+                                                                    {option.e?.images != null ? (
                                                                         <img
-                                                                            src={
-                                                                                option
-                                                                                    .e
-                                                                                    ?.images
-                                                                            }
+                                                                            src={option.e?.images}
                                                                             alt="Product Image"
                                                                             style={{
                                                                                 width: "40px",
@@ -828,44 +735,22 @@ const Index = (props) => {
                                                                     )}
                                                                 </div>
                                                                 <div>
-                                                                    <h3 className="font-normal">
-                                                                        {
-                                                                            option
-                                                                                .e
-                                                                                ?.name
-                                                                        }
-                                                                    </h3>
+                                                                    <h3 className="font-normal">{option.e?.name}</h3>
                                                                     <div className="flex gap-2">
                                                                         <h5 className="text-gray-400 font-normal">
-                                                                            {
-                                                                                option
-                                                                                    .e
-                                                                                    ?.code
-                                                                            }
+                                                                            {option.e?.code}
                                                                         </h5>
                                                                         <h5 className="font-normal">
-                                                                            {
-                                                                                option
-                                                                                    ?.e
-                                                                                    ?.product_variation
-                                                                            }
+                                                                            {option?.e?.product_variation}
                                                                         </h5>
                                                                     </div>
                                                                     <h5 className="text-gray-400 font-normal text-xs">
-                                                                        {
-                                                                            dataLang[
-                                                                                option
-                                                                                    .e
-                                                                                    ?.text_type
-                                                                            ]
-                                                                        }
+                                                                        {dataLang[option.e?.text_type]}
                                                                     </h5>
                                                                 </div>
                                                             </div>
                                                             <div className="">
-                                                                <div className="text-right opacity-0">
-                                                                    {"0"}
-                                                                </div>
+                                                                <div className="text-right opacity-0">{"0"}</div>
                                                                 <div className="flex gap-2">
                                                                     <div className="flex items-center gap-2">
                                                                         <h5 className="text-gray-400 font-normal">
@@ -874,29 +759,19 @@ const Index = (props) => {
                                                                             :
                                                                         </h5>
                                                                         <h5 className="text-[#0F4F9E] font-normal">
-                                                                            {option
-                                                                                .e
-                                                                                ?.qty_warehouse ??
-                                                                                0}
+                                                                            {option.e?.qty_warehouse ?? 0}
                                                                         </h5>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     )}
-                                                    placeholder={
-                                                        dataLang?.purchase_items ||
-                                                        "purchase_items"
-                                                    }
+                                                    placeholder={dataLang?.purchase_items || "purchase_items"}
                                                     hideSelectedOptions={false}
                                                     className="rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2"
                                                     isSearchable={true}
-                                                    noOptionsMessage={() =>
-                                                        "Không có dữ liệu"
-                                                    }
-                                                    menuPortalTarget={
-                                                        document.body
-                                                    }
+                                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                                    menuPortalTarget={document.body}
                                                     style={{
                                                         border: "none",
                                                         boxShadow: "none",
@@ -906,17 +781,13 @@ const Index = (props) => {
                                                         ...theme,
                                                         colors: {
                                                             ...theme.colors,
-                                                            primary25:
-                                                                "#EBF5FF",
-                                                            primary50:
-                                                                "#92BFF7",
+                                                            primary25: "#EBF5FF",
+                                                            primary50: "#92BFF7",
                                                             primary: "#0F4F9E",
                                                         },
                                                     })}
                                                     styles={{
-                                                        placeholder: (
-                                                            base
-                                                        ) => ({
+                                                        placeholder: (base) => ({
                                                             ...base,
                                                             color: "#cbd5e1",
                                                         }),
@@ -924,15 +795,11 @@ const Index = (props) => {
                                                             ...base,
                                                             zIndex: 9999,
                                                         }),
-                                                        control: (
-                                                            base,
-                                                            state
-                                                        ) => ({
+                                                        control: (base, state) => ({
                                                             ...base,
                                                             ...(state.isFocused && {
                                                                 border: "0 0 0 1px #92BFF7",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                             }),
                                                         }),
                                                     }}
@@ -947,9 +814,7 @@ const Index = (props) => {
                                                 <div className="flex items-center justify-center">
                                                     <button
                                                         className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                                                        onClick={() =>
-                                                            handleDecrease(e.id)
-                                                        }
+                                                        onClick={() => handleDecrease(e.id)}
                                                         disabled={index === 0}
                                                     >
                                                         <Minus size="14" />
@@ -969,19 +834,13 @@ const Index = (props) => {
                                                         isNumericString={true}
                                                         thousandSeparator=","
                                                         isAllowed={(values) => {
-                                                            const {
-                                                                floatValue,
-                                                            } = values;
-                                                            return (
-                                                                floatValue > 0
-                                                            );
+                                                            const { floatValue } = values;
+                                                            return floatValue > 0;
                                                         }}
                                                     />
                                                     <button
                                                         className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                                                        onClick={() =>
-                                                            handleIncrease(e.id)
-                                                        }
+                                                        onClick={() => handleIncrease(e.id)}
                                                         disabled={index === 0}
                                                     >
                                                         <Add size="14" />
@@ -1005,10 +864,7 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-1 flex items-center justify-center">
                                                 <button
-                                                    onClick={_HandleDelete.bind(
-                                                        this,
-                                                        e.id
-                                                    )}
+                                                    onClick={_HandleDelete.bind(this, e.id)}
                                                     type="button"
                                                     title="Xóa"
                                                     className="transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2"
@@ -1044,33 +900,23 @@ const Index = (props) => {
                     <div className="text-right mt-5 space-y-4 col-span-3 flex-col justify-between ">
                         <div className="flex justify-between ">
                             <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[13px]">
-                                <h3>
-                                    {dataLang?.purchase_totalCount ||
-                                        "purchase_totalCount"}
-                                </h3>
+                                <h3>{dataLang?.purchase_totalCount || "purchase_totalCount"}</h3>
                             </div>
                             <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[13px]">
-                                <h3 className="text-blue-600">
-                                    {formatNumber(totalSoluong)}
-                                </h3>
+                                <h3 className="text-blue-600">{formatNumber(totalSoluong)}</h3>
                             </div>
                         </div>
                         <div className="flex justify-between ">
                             <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[13px]">
-                                <h3>
-                                    {dataLang?.purchase_totalItem ||
-                                        "purchase_totalItem"}
-                                </h3>
+                                <h3>{dataLang?.purchase_totalItem || "purchase_totalItem"}</h3>
                             </div>
                             <div className="font-normal 2xl:text-[14px] xl:text-[13px] text-[13px]">
-                                <h3 className="text-blue-600">
-                                    {formatNumber(totalQty)}
-                                </h3>
+                                <h3 className="text-blue-600">{formatNumber(totalQty)}</h3>
                             </div>
                         </div>
                         <div className="space-x-2">
                             <button
-                                onClick={() => router.back()}
+                                onClick={() => router.push(routerPurchases.home)}
                                 className="button text-[#344054] font-normal 2xl:text-[14px] xl:text-[13px] text-[13px] py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
                             >
                                 {dataLang?.purchase_back || "purchase_back"}

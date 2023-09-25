@@ -59,6 +59,7 @@ import FilePDF from "../FilePDF";
 import ExpandableContent from "components/UI/more";
 import Popup_chitiet from "./(popup)/popup";
 import { useSelector } from "react-redux";
+import { routerPurchases } from "components/UI/router/buyImportGoods";
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
@@ -120,8 +121,7 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[branch_id]":
-                        idBranch != null ? idBranch.value : null,
+                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
                     // "filter[status]": tabPage !== "" ? (tabPage !== "1" ? id : 1) : null ,
                     "filter[status]": tabPage,
                     "filter[id]": idCode?.value,
@@ -145,51 +145,30 @@ const Index = (props) => {
     };
 
     const _ServerFetching_filter = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch/?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sListBr(rResult);
-                }
+        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sListBr(rResult);
             }
-        );
-        Axios(
-            "GET",
-            `/api_web/Api_purchases/purchases/?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sListCode(rResult);
-                }
+        });
+        Axios("GET", `/api_web/Api_purchases/purchases/?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sListCode(rResult);
             }
-        );
-        Axios(
-            "GET",
-            `/api_web/Api_staff/staffOption?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sListUser(rResult);
-                }
+        });
+        Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sListUser(rResult);
             }
-        );
+        });
         sOnFetching_filter(false);
     };
 
-    const listBr_filter = listBr
-        ? listBr?.map((e) => ({ label: e.name, value: e.id }))
-        : [];
-    const listCode_filter = listCode
-        ? listCode?.map((e) => ({ label: e.code, value: e.id }))
-        : [];
-    const listUser_filter = listUser
-        ? listUser?.map((e) => ({ label: e.name, value: e.staffid }))
-        : [];
+    const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
+    const listCode_filter = listCode ? listCode?.map((e) => ({ label: e.code, value: e.id })) : [];
+    const listUser_filter = listUser ? listUser?.map((e) => ({ label: e.name, value: e.staffid })) : [];
 
     const onchang_filter = (type, value) => {
         if (type == "branch") {
@@ -212,8 +191,7 @@ const Index = (props) => {
                 params: {
                     limit: 0,
                     search: keySearch,
-                    "filter[branch_id]":
-                        idBranch != null ? idBranch.value : null,
+                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
                     "filter[id]": idCode?.value,
                     "filter[staff_id]": idUser?.value,
                     "filter[start_date]": valueDate?.startDate,
@@ -256,8 +234,7 @@ const Index = (props) => {
         }, 500);
     };
     useEffect(() => {
-        (onFetching && _ServerFetching()) ||
-            (onFetching && _ServerFetching_group());
+        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
     }, [onFetching]);
     useEffect(() => {
         onnFetching_filter && _ServerFetching_filter();
@@ -270,9 +247,7 @@ const Index = (props) => {
             (idBranch != null && sOnFetching(true)) ||
             (idCode != null && sOnFetching(true)) ||
             (idUser != null && sOnFetching(true)) ||
-            (valueDate.startDate != null &&
-                valueDate.endDate != null &&
-                sOnFetching(true));
+            (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true));
     }, [
         limit,
         router.query?.page,
@@ -398,9 +373,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.purchase_planNumber || "purchase_planNumber"
-                    }`,
+                    title: `${dataLang?.purchase_planNumber || "purchase_planNumber"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -408,9 +381,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.purchase_propnent || "purchase_propnent"
-                    }`,
+                    title: `${dataLang?.purchase_propnent || "purchase_propnent"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -426,9 +397,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.purchase_totalitem || "purchase_totalitem"
-                    }`,
+                    title: `${dataLang?.purchase_totalitem || "purchase_totalitem"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -436,9 +405,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.purchase_orderStatus || "purchase_orderStatus"
-                    }`,
+                    title: `${dataLang?.purchase_orderStatus || "purchase_orderStatus"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -468,18 +435,10 @@ const Index = (props) => {
                 { value: `${e?.code ? e?.code : ""}` },
                 { value: `${e?.reference_no ? e?.reference_no : ""}` },
                 {
-                    value: `${
-                        e?.staff_create_name ? e?.staff_create_name : ""
-                    }`,
+                    value: `${e?.staff_create_name ? e?.staff_create_name : ""}`,
                 },
                 {
-                    value: `${
-                        e?.status
-                            ? e?.status === "1"
-                                ? "Đã duyệt"
-                                : "Chưa duyệt"
-                            : ""
-                    }`,
+                    value: `${e?.status ? (e?.status === "1" ? "Đã duyệt" : "Chưa duyệt") : ""}`,
                 },
                 { value: `${e?.total_item ? e?.total_item : ""}` },
                 {
@@ -489,16 +448,12 @@ const Index = (props) => {
                             : "" ||
                               `${
                                   e?.order_status.status === "purchase_portion"
-                                      ? dataLang[e?.order_status?.status] +
-                                        " " +
-                                        `(${e?.order_status?.count})`
+                                      ? dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})`
                                       : ""
                               }` ||
                               `${
                                   e?.order_status.status === "purchase_enough"
-                                      ? dataLang[e?.order_status?.status] +
-                                        " " +
-                                        `(${e?.order_status?.count})`
+                                      ? dataLang[e?.order_status?.status] + " " + `(${e?.order_status?.count})`
                                       : ""
                               }`,
                 },
@@ -526,20 +481,16 @@ const Index = (props) => {
                         <div className="p-2"></div>
                     ) : (
                         <div className="flex space-x-3 text-[12px]">
-                            <h6 className="text-[#141522]/40">
-                                {dataLang?.purchase_title}
-                            </h6>
+                            <h6 className="text-[#141522]/40">{dataLang?.purchase_title}</h6>
                             <span className="text-[#141522]/40">/</span>
                             <h6 className="">{dataLang?.purchase_title}</h6>
                         </div>
                     )}
                     <div className="flex justify-between items-center">
-                        <h2 className="text-2xl text-[#52575E] capitalize ">
-                            {dataLang?.purchase_title}
-                        </h2>
+                        <h2 className="text-2xl text-[#52575E] capitalize ">{dataLang?.purchase_title}</h2>
                         <div className="flex space-x-3 items-center">
                             <Link
-                                href="/purchase_order/purchases/form"
+                                href={routerPurchases.form}
                                 className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                             >
                                 Tạo mới
@@ -553,17 +504,10 @@ const Index = (props) => {
                                     <div>
                                         <TabStatus
                                             key={e.id}
-                                            onClick={_HandleSelectTab.bind(
-                                                this,
-                                                `${e.id}`
-                                            )}
+                                            onClick={_HandleSelectTab.bind(this, `${e.id}`)}
                                             total={e.count}
                                             active={e.id}
-                                            className={`${
-                                                e.color
-                                                    ? "text-white"
-                                                    : "text-[#0F4F9E] bg-[#e2f0fe] "
-                                            }`}
+                                            className={`${e.color ? "text-white" : "text-[#0F4F9E] bg-[#e2f0fe] "}`}
                                         >
                                             {dataLang[e?.name] || e?.name}
                                         </TabStatus>
@@ -584,12 +528,8 @@ const Index = (props) => {
                                         <input
                                             className=" relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-2    xl:py-3 py-3 rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
                                             type="text"
-                                            onChange={_HandleOnChangeKeySearch.bind(
-                                                this
-                                            )}
-                                            placeholder={
-                                                dataLang?.branch_search
-                                            }
+                                            onChange={_HandleOnChangeKeySearch.bind(this)}
+                                            placeholder={dataLang?.branch_search}
                                         />
                                     </form>
                                 </div>
@@ -603,19 +543,13 @@ const Index = (props) => {
                                             },
                                             ...listBr_filter,
                                         ]}
-                                        onChange={onchang_filter.bind(
-                                            this,
-                                            "branch"
-                                        )}
+                                        onChange={onchang_filter.bind(this, "branch")}
                                         value={idBranch}
                                         isClearable={true}
                                         // isMulti
                                         closeMenuOnSelect={false}
                                         hideSelectedOptions={false}
-                                        placeholder={
-                                            dataLang?.client_list_brand ||
-                                            "client_list_brand"
-                                        }
+                                        placeholder={dataLang?.client_list_brand || "client_list_brand"}
                                         className="rounded-md py-0.5 bg-white border-none 2xl:text-base xl:text-xs text-[10px] z-20"
                                         isSearchable={true}
                                         // components={{ MultiValue }}
@@ -644,8 +578,7 @@ const Index = (props) => {
                                                 outline: "none",
                                                 boxShadow: "none",
                                                 ...(state.isFocused && {
-                                                    boxShadow:
-                                                        "0 0 0 1.5px #0F4F9E",
+                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                 }),
                                             }),
                                         }}
@@ -661,19 +594,11 @@ const Index = (props) => {
                                             },
                                             ...listCode_filter,
                                         ]}
-                                        onChange={onchang_filter.bind(
-                                            this,
-                                            "code"
-                                        )}
+                                        onChange={onchang_filter.bind(this, "code")}
                                         value={idCode}
-                                        noOptionsMessage={() =>
-                                            `${dataLang?.no_data_found}`
-                                        }
+                                        noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                         isClearable={true}
-                                        placeholder={
-                                            dataLang?.purchase_code ||
-                                            "purchase_code"
-                                        }
+                                        placeholder={dataLang?.purchase_code || "purchase_code"}
                                         className="rounded-md py-0.5 bg-white border-none 2xl:text-base xl:text-xs text-[10px] z-20"
                                         isSearchable={true}
                                         style={{
@@ -701,8 +626,7 @@ const Index = (props) => {
                                                 outline: "none",
                                                 boxShadow: "none",
                                                 ...(state.isFocused && {
-                                                    boxShadow:
-                                                        "0 0 0 1.5px #0F4F9E",
+                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                 }),
                                             }),
                                         }}
@@ -719,19 +643,11 @@ const Index = (props) => {
                                             ...listUser_filter,
                                         ]}
                                         // formatOptionLabel={CustomSelectOption}
-                                        onChange={onchang_filter.bind(
-                                            this,
-                                            "user"
-                                        )}
+                                        onChange={onchang_filter.bind(this, "user")}
                                         value={idUser}
-                                        noOptionsMessage={() =>
-                                            `${dataLang?.no_data_found}`
-                                        }
+                                        noOptionsMessage={() => `${dataLang?.no_data_found}`}
                                         isClearable={true}
-                                        placeholder={
-                                            dataLang?.purchase_propnent ||
-                                            "purchase_propnent"
-                                        }
+                                        placeholder={dataLang?.purchase_propnent || "purchase_propnent"}
                                         className="rounded-md py-0.5 bg-white border-none 2xl:text-base xl:text-xs text-[10px] z-20"
                                         isSearchable={true}
                                         style={{
@@ -759,8 +675,7 @@ const Index = (props) => {
                                                 outline: "none",
                                                 boxShadow: "none",
                                                 ...(state.isFocused && {
-                                                    boxShadow:
-                                                        "0 0 0 1.5px #0F4F9E",
+                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                 }),
                                             }),
                                         }}
@@ -771,18 +686,14 @@ const Index = (props) => {
                                         value={valueDate}
                                         i18n={"vi"}
                                         primaryColor={"blue"}
-                                        onChange={onchang_filter.bind(
-                                            this,
-                                            "date"
-                                        )}
+                                        onChange={onchang_filter.bind(this, "date")}
                                         showShortcuts={true}
                                         displayFormat={"DD/MM/YYYY"}
                                         configs={{
                                             shortcuts: {
                                                 today: "Hôm nay",
                                                 yesterday: "Hôm qua",
-                                                past: (period) =>
-                                                    `${period}  ngày qua`,
+                                                past: (period) => `${period}  ngày qua`,
                                                 currentMonth: "Tháng này",
                                                 pastMonth: "Tháng trước",
                                             },
@@ -835,11 +746,7 @@ const Index = (props) => {
                                                         className="2xl:scale-100 xl:scale-100 scale-75"
                                                         size={18}
                                                     />
-                                                    <span>
-                                                        {
-                                                            dataLang?.client_list_exportexcel
-                                                        }
-                                                    </span>
+                                                    <span>{dataLang?.client_list_exportexcel}</span>
                                                 </button>
                                             }
                                         >
@@ -860,34 +767,19 @@ const Index = (props) => {
                                         onChange={(e) => sLimit(e.target.value)}
                                         value={limit}
                                     >
-                                        <option
-                                            className="text-[10px] xl:text-xs 2xl:text-sm hidden"
-                                            disabled
-                                        >
+                                        <option className="text-[10px] xl:text-xs 2xl:text-sm hidden" disabled>
                                             {limit == -1 ? "Tất cả" : limit}
                                         </option>
-                                        <option
-                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                            value={15}
-                                        >
+                                        <option className="text-[10px] xl:text-xs 2xl:text-sm" value={15}>
                                             15
                                         </option>
-                                        <option
-                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                            value={20}
-                                        >
+                                        <option className="text-[10px] xl:text-xs 2xl:text-sm" value={20}>
                                             20
                                         </option>
-                                        <option
-                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                            value={40}
-                                        >
+                                        <option className="text-[10px] xl:text-xs 2xl:text-sm" value={40}>
                                             40
                                         </option>
-                                        <option
-                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                            value={60}
-                                        >
+                                        <option className="text-[10px] xl:text-xs 2xl:text-sm" value={60}>
                                             60
                                         </option>
                                         {/* <option value={-1}>Tất cả</option> */}
@@ -906,35 +798,28 @@ const Index = (props) => {
                                     {dataLang?.purchase_code || "purchase_code"}
                                 </h4>
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                    {dataLang?.purchase_planNumber ||
-                                        "purchase_planNumber"}
+                                    {dataLang?.purchase_planNumber || "purchase_planNumber"}
                                 </h4>
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                    {dataLang?.purchase_propnent ||
-                                        "purchase_propnent"}
+                                    {dataLang?.purchase_propnent || "purchase_propnent"}
                                 </h4>
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1  text-center">
-                                    {dataLang?.purchase_status ||
-                                        "purchase_status"}
+                                    {dataLang?.purchase_status || "purchase_status"}
                                 </h4>
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                    {dataLang?.purchase_totalitem ||
-                                        "purchase_totalitem"}
+                                    {dataLang?.purchase_totalitem || "purchase_totalitem"}
                                 </h4>
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center col-span-2 ">
-                                    {dataLang?.purchase_orderStatus ||
-                                        "purchase_orderStatus"}
+                                    {dataLang?.purchase_orderStatus || "purchase_orderStatus"}
                                 </h4>
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center col-span-2 ">
                                     {dataLang?.purchase_note || "purchase_note"}
                                 </h4>
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                    {dataLang?.purchase_branch ||
-                                        "purchase_branch"}
+                                    {dataLang?.purchase_branch || "purchase_branch"}
                                 </h4>
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] text-center  col-span-1 ">
-                                    {dataLang?.purchase_action ||
-                                        "purchase_action"}
+                                    {dataLang?.purchase_action || "purchase_action"}
                                 </h4>
                             </div>
                             {onFetching ? (
@@ -947,11 +832,7 @@ const Index = (props) => {
                                             className="grid grid-cols-12 items-center hover:bg-slate-50 relative"
                                         >
                                             <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-1 flex items-center justify-center">
-                                                {e?.date != null
-                                                    ? moment(e?.date).format(
-                                                          "DD/MM/YYYY"
-                                                      )
-                                                    : ""}
+                                                {e?.date != null ? moment(e?.date).format("DD/MM/YYYY") : ""}
                                             </h6>
                                             <h6 className="px-2 py-2.5 3xl:text-base text-center justify-center 2xl:text-[12.5px] xl:text-[11px] font-semibold text-[9px]  col-span-1 flex items-center  text-[#0F4F9e] hover:text-[#5599EC] transition-all ease-linear  cursor-pointer">
                                                 <Popup_chitiet
@@ -971,9 +852,7 @@ const Index = (props) => {
                                                 {e?.status == "1" ? (
                                                     <div
                                                         className="border border-lime-500 px-2 py-1 rounded text-lime-500 font-normal flex justify-center  items-center gap-1 3xl:text-[16px] 2xl:text-[14px] xl:text-[10px] text-[8px] bg-gradient-to-l from-[#ecfccb]  via-transparent to-transparent btn-animation"
-                                                        onClick={() =>
-                                                            _ToggleStatus(e?.id)
-                                                        }
+                                                        onClick={() => _ToggleStatus(e?.id)}
                                                     >
                                                         Đã duyệt{" "}
                                                         <TickCircle
@@ -985,12 +864,9 @@ const Index = (props) => {
                                                 ) : (
                                                     <div
                                                         className="border border-red-500 3xl:px-2 px-0 py-1 rounded text-red-500  font-normal flex justify-center items-center gap-1 3xl:text-[16px] 2xl:text-[13px] xl:text-[10px] text-[8px]  bg-gradient-to-l from-[#fee2e2]  via-transparent to-transparent btn-animation "
-                                                        onClick={() =>
-                                                            _ToggleStatus(e?.id)
-                                                        }
+                                                        onClick={() => _ToggleStatus(e?.id)}
                                                     >
-                                                        Chưa duyệt{" "}
-                                                        <TickCircle size={22} />
+                                                        Chưa duyệt <TickCircle size={22} />
                                                     </div>
                                                 )}
                                             </h6>
@@ -999,49 +875,25 @@ const Index = (props) => {
                                             </h6>
                                             <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-2 flex items-center ">
                                                 <div className="mx-auto">
-                                                    {(e?.order_status
-                                                        ?.status ===
-                                                        "purchase_ordered" && (
+                                                    {(e?.order_status?.status === "purchase_ordered" && (
                                                         <span className="flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center 2xl:text-sm xl:text-xs text-[8px]">
-                                                            {
-                                                                dataLang[
-                                                                    e
-                                                                        ?.order_status
-                                                                        ?.status
-                                                                ]
-                                                            }
+                                                            {dataLang[e?.order_status?.status]}
                                                         </span>
                                                     )) ||
-                                                        (e?.order_status
-                                                            ?.status ===
-                                                            "purchase_portion" && (
+                                                        (e?.order_status?.status === "purchase_portion" && (
                                                             <span className=" flex items-center justify-center font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center 2xl:text-sm xl:text-xs text-[8px]">
-                                                                {
-                                                                    dataLang[
-                                                                        e
-                                                                            ?.order_status
-                                                                            ?.status
-                                                                    ]
-                                                                }{" "}
+                                                                {dataLang[e?.order_status?.status]}{" "}
                                                                 {`(${e?.order_status?.count})`}
                                                             </span>
                                                         )) ||
-                                                        (e?.order_status
-                                                            ?.status ===
-                                                            "purchase_enough" && (
+                                                        (e?.order_status?.status === "purchase_enough" && (
                                                             <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 2xl:text-sm xl:text-xs text-[8px]">
                                                                 <TickCircle
                                                                     className="bg-lime-500 rounded-full"
                                                                     color="white"
                                                                     size={15}
                                                                 />
-                                                                {
-                                                                    dataLang[
-                                                                        e
-                                                                            ?.order_status
-                                                                            ?.status
-                                                                    ]
-                                                                }{" "}
+                                                                {dataLang[e?.order_status?.status]}{" "}
                                                                 {`(${e?.order_status?.count})`}
                                                             </span>
                                                         ))}
@@ -1059,16 +911,12 @@ const Index = (props) => {
                                                 <BtnTacVu
                                                     type="purchases"
                                                     order={e?.order_status}
-                                                    onRefreshGroup={_ServerFetching_group.bind(
-                                                        this
-                                                    )}
+                                                    onRefreshGroup={_ServerFetching_group.bind(this)}
                                                     dataLang={dataLang}
                                                     id={e.id}
                                                     name={e.name}
                                                     code={e.code}
-                                                    onRefresh={_ServerFetching.bind(
-                                                        this
-                                                    )}
+                                                    onRefresh={_ServerFetching.bind(this)}
                                                     status={e?.status}
                                                     keepTooltipInside=".tooltipBoundary"
                                                     className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] 2xl:text-base xl:text-xs text-[8px] hover:scale-x-105 hover:bg-slate-200 transition-all ease-in-out"
@@ -1084,8 +932,7 @@ const Index = (props) => {
                                             <IconSearch />
                                         </div>
                                         <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                            {dataLang?.no_data_found ||
-                                                "no_data_found"}
+                                            {dataLang?.no_data_found || "no_data_found"}
                                         </h1>
                                     </div>
                                 </div>
@@ -1096,14 +943,11 @@ const Index = (props) => {
                 {data?.length != 0 && (
                     <div className="flex space-x-5 items-center">
                         <h6>
-                            Hiển thị {totalItems?.iTotalDisplayRecords} trong số{" "}
-                            {totalItems?.iTotalRecords} thành phần
+                            Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords} thành phần
                         </h6>
                         <Pagination
                             postsPerPage={limit}
-                            totalPosts={Number(
-                                totalItems?.iTotalDisplayRecords
-                            )}
+                            totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                             paginate={paginate}
                             currentPage={router.query?.page || 1}
                         />
@@ -1121,9 +965,7 @@ const TabStatus = React.memo((props) => {
             onClick={props.onClick}
             className={`${props.className} justify-center min-w-[180px] flex gap-2 2xl:text-sm xl:text-sm text-xs items-center rounded-[5.5px] px-2 py-2 outline-none relative `}
         >
-            {router.query?.tab === `${props.active}` && (
-                <ArrowCircleDown size="20" color="#0F4F9E" />
-            )}
+            {router.query?.tab === `${props.active}` && <ArrowCircleDown size="20" color="#0F4F9E" />}
             {props.children}
             <span
                 className={`${
@@ -1158,29 +1000,24 @@ const BtnTacVu = React.memo((props) => {
             cancelButtonText: `${props.dataLang?.aler_cancel}`,
         }).then((result) => {
             if (result.isConfirmed) {
-                Axios(
-                    "DELETE",
-                    `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var { isSuccess, message } = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: props.dataLang[message],
-                                });
-                                props.onRefresh && props.onRefresh();
-                                props.onRefreshGroup && props.onRefreshGroup();
-                            } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: props.dataLang[message],
-                                });
-                            }
+                Axios("DELETE", `/api_web/Api_purchases/purchases/${id}?csrf_protection=true`, {}, (err, response) => {
+                    if (!err) {
+                        var { isSuccess, message } = response.data;
+                        if (isSuccess) {
+                            Toast.fire({
+                                icon: "success",
+                                title: props.dataLang[message],
+                            });
+                            props.onRefresh && props.onRefresh();
+                            props.onRefreshGroup && props.onRefreshGroup();
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                title: props.dataLang[message],
+                            });
                         }
                     }
-                );
+                });
             }
         });
     };
@@ -1196,36 +1033,27 @@ const BtnTacVu = React.memo((props) => {
                 title: `${props.dataLang?.confirmed_cant_edit}`,
             });
         } else {
-            router.push(`/purchase_order/purchases/form?id=${props.id}`);
+            // router.push(`/purchase_order/purchases/form?id=${props.id}`);
+            router.push(`${routerPurchases.form}?id=${props.id}`);
         }
     };
 
     const fetchDataSettingsCompany = () => {
         if (props?.id) {
-            Axios(
-                "GET",
-                `/api_web/Api_setting/CompanyInfo?csrf_protection=true`,
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var { data } = response.data;
-                        setDataCompany(data);
-                    }
+            Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+                if (!err) {
+                    var { data } = response.data;
+                    setDataCompany(data);
                 }
-            );
+            });
         }
         if (props?.id) {
-            Axios(
-                "GET",
-                `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`,
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var db = response.data;
-                        setData(db);
-                    }
+            Axios("GET", `/api_web/Api_purchases/purchases/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+                if (!err) {
+                    var db = response.data;
+                    setData(db);
                 }
-            );
+            });
         }
     };
     useEffect(() => {
@@ -1236,15 +1064,8 @@ const BtnTacVu = React.memo((props) => {
         <div>
             <Popup
                 trigger={
-                    <button
-                        className={
-                            `flex space-x-1 items-center ` + props.className
-                        }
-                    >
-                        <span>
-                            {props.dataLang?.purchase_action ||
-                                "purchase_action"}
-                        </span>
+                    <button className={`flex space-x-1 items-center ` + props.className}>
+                        <span>{props.dataLang?.purchase_action || "purchase_action"}</span>
                         <IconDown size={12} />
                     </button>
                 }
@@ -1272,8 +1093,7 @@ const BtnTacVu = React.memo((props) => {
                                 className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
                             />
                             <p className="group-hover:text-sky-500">
-                                {props.dataLang?.purchase_editVoites ||
-                                    "purchase_editVoites"}
+                                {props.dataLang?.purchase_editVoites || "purchase_editVoites"}
                             </p>
                         </button>
                         <FilePDF
@@ -1294,8 +1114,7 @@ const BtnTacVu = React.memo((props) => {
                                 className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
                             />
                             <p className="group-hover:text-[#f87171]">
-                                {props.dataLang?.purchase_deleteVoites ||
-                                    "purchase_deleteVoites"}
+                                {props.dataLang?.purchase_deleteVoites || "purchase_deleteVoites"}
                             </p>
                         </button>
                     </div>
