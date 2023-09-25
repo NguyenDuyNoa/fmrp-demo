@@ -536,11 +536,6 @@ const Index = (props) => {
         sListData([...newData]);
     };
 
-    const [test, sTest] = useState({
-        name: [],
-        age: [],
-    });
-
     const _HandleChangeChild = (parentId, childId, type, value) => {
         const newData = listData.map((e) => {
             if (e?.id !== parentId) return e;
