@@ -273,6 +273,18 @@ const PopupDetail = (props) => {
                                                                     {e?.item?.product_variation}
                                                                 </h6>
                                                                 <div className="flex items-center font-oblique flex-wrap">
+                                                                    {dataProductSerial.is_enable === "1" ? (
+                                                                        <div className="flex gap-0.5">
+                                                                            <h6 className="text-[12px]">Serial:</h6>
+                                                                            <h6 className="text-[12px]  px-2   w-[full] text-left ">
+                                                                                {e.serial == null || e.serial == ""
+                                                                                    ? "-"
+                                                                                    : e.serial}
+                                                                            </h6>
+                                                                        </div>
+                                                                    ) : (
+                                                                        ""
+                                                                    )}
                                                                     {dataMaterialExpiry.is_enable === "1" ? (
                                                                         <>
                                                                             <div className="flex gap-0.5">

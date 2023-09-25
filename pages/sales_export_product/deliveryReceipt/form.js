@@ -213,19 +213,9 @@ const Index = (props) => {
         Axios("GET", `/api_web/Api_delivery/getDeliveryDetail/${id}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 var rResult = response.data;
-                console.log("rResult", rResult);
                 sListData(
-                    rResult?.items.map((e) => ({
-                        id: e?.item?.id,
-                        idParenBackend: e?.item?.id,
-                        matHang: {
-                            e: e?.item,
-                            label: `${e.item?.name} <span style={{display: none}}>${
-                                e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
-                            }</span>`,
-                            value: e.item?.id,
-                        },
-                        child: e?.child.map((ce) => ({
+                    rResult?.items.map((e) => {
+                        const child = e?.child.map((ce) => ({
                             id: Number(ce?.id),
                             idChildBackEnd: Number(ce?.id),
                             disabledDate:
@@ -260,8 +250,20 @@ const Index = (props) => {
                                 label: ce?.tax_name_item || "Miễn thuế",
                             },
                             note: ce?.note_item,
-                        })),
-                    }))
+                        }));
+                        return {
+                            id: e?.item?.id,
+                            idParenBackend: e?.item?.id,
+                            matHang: {
+                                e: e?.item,
+                                label: `${e.item?.name} <span style={{display: none}}>${
+                                    e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
+                                }</span>`,
+                                value: e.item?.id,
+                            },
+                            child: child,
+                        };
+                    })
                 );
                 sCode(rResult?.reference_no);
                 sIdBranch({
@@ -284,7 +286,6 @@ const Index = (props) => {
             sOnFetchingDetail(false);
         });
     };
-    console.log("hihih", listData);
 
     useEffect(() => {
         onFetchingDetail && _ServerFetchingDetailPage();
@@ -429,7 +430,7 @@ const Index = (props) => {
         idBranch === null && sDataClient([]);
     }, []);
 
-    const checkListData = (value, sDataItems, sListData, sId, id, idEmty) => {
+    const checkListData = (value, sDataItems, sListData, sId, id, idEmty, sIdStaff) => {
         return Swal.fire({
             title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
             icon: "warning",
@@ -443,6 +444,7 @@ const Index = (props) => {
                 sDataItems([]);
                 sListData([]);
                 sId(value);
+                sIdStaff && sIdStaff(null);
                 idEmty && idEmty(null);
             } else {
                 sId({ ...id });
@@ -494,7 +496,7 @@ const Index = (props) => {
             sNote(value.target.value);
         } else if (type == "branch" && idBranch != value) {
             if (listData?.length > 0) {
-                checkListData(value, sDataItems, sListData, sIdBranch, idBranch);
+                checkListData(value, sDataItems, sListData, sIdBranch, idBranch, sIdClient, sIdStaff);
             } else {
                 sIdBranch(value);
                 sIdClient(null);
@@ -631,7 +633,7 @@ const Index = (props) => {
     const _DataValueItem = (value) => {
         const newChild = {
             id: uuidv4(),
-            idChildBackEnd: null,
+            idChildBackEnd: "",
             disabledDate:
                 (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
                 (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
@@ -667,7 +669,7 @@ const Index = (props) => {
             parent: {
                 id: uuidv4(),
                 matHang: value,
-                idParenBackend: null,
+                idParenBackend: "",
                 child: [newChild],
             },
         };
@@ -676,7 +678,8 @@ const Index = (props) => {
     const _HandleAddChild = (parentId, value) => {
         const newData = listData?.map((e) => {
             if (e?.id === parentId) {
-                const newChild = _DataValueItem(value).newChild;
+                // const newChild = _DataValueItem(value).newChild;
+                const { newChild } = _DataValueItem(value);
                 return { ...e, child: [...e.child, newChild] };
             } else {
                 return e;
@@ -688,8 +691,9 @@ const Index = (props) => {
     const _HandleAddParent = (value) => {
         const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
         if (!checkData) {
-            const newData = _DataValueItem(value).parent;
-            sListData([newData, ...listData]);
+            // const newData = _DataValueItem(value).parent;
+            const { parent } = _DataValueItem(value);
+            sListData([parent, ...listData]);
         } else {
             ToatstNotifi("error", `${dataLang?.returns_err_ItemSelect || "returns_err_ItemSelect"}`);
         }
@@ -800,14 +804,10 @@ const Index = (props) => {
                             );
                             ce.warehouse = value;
                             ce.quantity = value?.qty;
+                            FunCheckQuantity(parentId, childId);
                         } else if (!checkWarehouse && totalSoLuong > quantityAmount) {
-                            ToatstNotifi(
-                                "error",
-                                `Tổng số lượng vượt quá ${formatNumber(quantityAmount)} số lượng chưa giao`
-                            );
-                            HandTimeout();
+                            FunCheckQuantity(parentId, childId);
                             ce.warehouse = value;
-                            ce.quantity = "";
                         } else if (checkWarehouse) {
                             ToatstNotifi("error", `Kho - vị trí kho đã được chọn`);
                         } else {
@@ -845,6 +845,13 @@ const Index = (props) => {
             ToatstNotifi("error", `Tổng số lượng vượt quá ${formatNumber(quantityAmount)} số lượng chưa giao`);
             ce.quantity = "";
             HandTimeout();
+            sErrQuantity(true);
+        }
+        if (checkChild > +ce?.warehouse?.qty) {
+            ToatstNotifi("error", `Tổng số lượng vượt quá ${formatNumber(+ce?.warehouse?.qty)} số lượng tồn`);
+            ce.quantity = "";
+            sErrQuantity(true);
+            HandTimeout();
         }
     };
 
@@ -862,8 +869,8 @@ const Index = (props) => {
         if (!checkData) {
             const newData = listData?.map((e) => {
                 if (e?.id === parentId) {
-                    const newParentChild = _DataValueItem(value).parent;
-                    return newParentChild;
+                    const { parent } = _DataValueItem(value);
+                    return parent;
                 } else {
                     return e;
                 }
@@ -877,7 +884,7 @@ const Index = (props) => {
     const handleSelectAll = (type) => {
         if (type == "addAll") {
             const newData = [...dataItems]?.map((e) => {
-                const parent = _DataValueItem({ e: e }).parent;
+                const { parent } = _DataValueItem({ e: e });
                 return parent;
             });
             sListData([...newData]);
@@ -954,13 +961,11 @@ const Index = (props) => {
                                     {dataLang[option.e?.text_type]}
                                 </h5>
                                 <h5 className="text-gray-400 font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                    {dataLang?.delivery_receipt_quantity_stock_order ||
-                                        "delivery_receipt_quantity_stock_order"}
-                                    :
+                                    {dataLang?.delivery_receipt_quantity || "delivery_receipt_quantity"}:
                                 </h5>
 
                                 <h5 className=" font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                    {option.e?.quantity ? option.e?.quantity : "0"}
+                                    {option.e?.quantity ? formatNumber(+option.e?.quantity) : "0"}
                                 </h5>
                             </div>
 
@@ -972,7 +977,7 @@ const Index = (props) => {
                                 </h5>
 
                                 <h5 className=" font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                    {quantityUndelived ? quantityUndelived : "0"}
+                                    {quantityUndelived ? formatNumber(+quantityUndelived) : "0"}
                                 </h5>
                             </div>
 
@@ -984,7 +989,7 @@ const Index = (props) => {
                                 </h5>
 
                                 <h5 className=" font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                    {option.e?.quantity_delivery ? option.e?.quantity_delivery : "0"}
+                                    {option.e?.quantity_delivery ? formatNumber(+option.e?.quantity_delivery) : "0"}
                                 </h5>
                             </div>
                         </div>
@@ -1061,7 +1066,7 @@ const Index = (props) => {
         }
     };
 
-    const _ServerSending = () => {
+    const _ServerSending = async () => {
         let formData = new FormData();
         formData.append("code", code ? code : "");
         formData.append(
@@ -1091,11 +1096,11 @@ const Index = (props) => {
                 formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
             });
         });
-        Axios(
+        await Axios(
             "POST",
             `${
                 id
-                    ? `/api_web/Api_delivery/getDeliveryDetail/${id}?csrf_protection=true`
+                    ? `/api_web/Api_delivery/updateDelivery/${id}?csrf_protection=true`
                     : "/api_web/Api_delivery/AddDelivery/?csrf_protection=true"
             }`,
             {
@@ -1109,7 +1114,7 @@ const Index = (props) => {
                         ToatstNotifi("success", `${dataLang[message] || message}`);
                         resetAllStates();
                         sListData([]);
-                        router.push("/sales_export_product/deliveryReceipt?tab=all");
+                        router.push("/sales_export_product/deliveryReceipt?tab=-1");
                     } else {
                         ToatstNotifi("error", `${dataLang[message] || message}`);
                     }
@@ -1155,7 +1160,7 @@ const Index = (props) => {
                         </h2>
                         <div className="flex justify-end items-center">
                             <button
-                                onClick={() => router.push("/purchase_order/returns")}
+                                onClick={() => router.push("/sales_export_product/deliveryReceipt?tab=-1")}
                                 className="xl:text-sm text-xs xl:px-5 px-3 hover:bg-blue-500 hover:text-white transition-all ease-in-out xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
                             >
                                 {dataLang?.import_comeback || "import_comeback"}
@@ -1451,14 +1456,15 @@ const Index = (props) => {
                                         />
                                         {errAddress && (
                                             <label className="text-sm text-red-500">
-                                                {"Vui lòng chọn địa chỉ giao hàng"}
+                                                {dataLang?.delivery_receipt_err_select_address ||
+                                                    "delivery_receipt_err_select_address"}
                                             </label>
                                         )}
                                     </div>
                                 </div>
                                 <div className="col-span-3">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {"Người dùng"}
+                                        {dataLang?.delivery_receipt_edit_User || "delivery_receipt_edit_User"}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <Select
@@ -1470,7 +1476,9 @@ const Index = (props) => {
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={"Người dùng"}
+                                        placeholder={
+                                            dataLang?.delivery_receipt_edit_User || "delivery_receipt_edit_User"
+                                        }
                                         className={`${
                                             errStaff ? "border-red-500" : "border-transparent"
                                         } placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
@@ -1510,12 +1518,16 @@ const Index = (props) => {
                                         }}
                                     />
                                     {errStaff && (
-                                        <label className="text-sm text-red-500">{"Vui lòng chọn người dùng"}</label>
+                                        <label className="text-sm text-red-500">
+                                            {dataLang?.delivery_receipt_err_userStaff ||
+                                                "delivery_receipt_err_userStaff"}
+                                        </label>
                                     )}
                                 </div>
                                 <div className="col-span-3">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {"Đơn hàng bán"} <span className="text-red-500">*</span>
+                                        {dataLang?.delivery_receipt_product_order || "delivery_receipt_product_order"}{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <Select
                                         options={dataProductOrder}
@@ -1526,7 +1538,9 @@ const Index = (props) => {
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
-                                        placeholder={"Đơn hàng bán"}
+                                        placeholder={
+                                            dataLang?.delivery_receipt_product_order || "delivery_receipt_product_order"
+                                        }
                                         className={`${
                                             errProductOrder ? "border-red-500" : "border-transparent"
                                         } placeholder:text-slate-300 w-full z-20  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
@@ -1565,7 +1579,10 @@ const Index = (props) => {
                                         }}
                                     />
                                     {errProductOrder && (
-                                        <label className="text-sm text-red-500">{"Vui lòng chọn đơn hàng bán"}</label>
+                                        <label className="text-sm text-red-500">
+                                            {dataLang?.delivery_receipt_err_select_product_order ||
+                                                "delivery_receipt_err_select_product_order"}
+                                        </label>
                                     )}
                                 </div>
                             </div>
@@ -1582,11 +1599,10 @@ const Index = (props) => {
                                 {dataLang?.import_click_items || "import_click_items"}
                             </label>
                             <Select
-                                // onInputChange={(value) => handleSearchApi(value)}
                                 options={idProductOrder ? options : []}
                                 closeMenuOnSelect={false}
                                 onChange={_HandleChangeInput.bind(this, "itemAll")}
-                                value={itemAll ? itemAll : listData?.map((e) => e)}
+                                value={itemAll?.value ? itemAll?.value : listData?.map((e) => e?.matHang)}
                                 isMulti
                                 components={{ MenuList, MultiValue }}
                                 formatOptionLabel={(option) => selectItemsLabel(option)}
@@ -1721,7 +1737,9 @@ const Index = (props) => {
                                     {" "}
                                     <Select
                                         classNamePrefix="customDropdowDefault"
-                                        placeholder={"Kho - Vị trí kho"}
+                                        placeholder={
+                                            dataLang?.delivery_receipt_warehouse || "delivery_receipt_warehouse"
+                                        }
                                         className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
                                         isDisabled={true}
                                     />
@@ -2049,6 +2067,7 @@ const Index = (props) => {
                                                                                             +ce?.warehouse?.qty
                                                                                         )} số lượng tồn kho`
                                                                                     );
+                                                                                    return;
                                                                                 } else if (newValue > quantityAmount) {
                                                                                     ToatstNotifi(
                                                                                         "error",
@@ -2056,11 +2075,9 @@ const Index = (props) => {
                                                                                             quantityAmount
                                                                                         )} số lượng chưa giao`
                                                                                     );
+                                                                                    return;
                                                                                 }
-                                                                                return (
-                                                                                    newValue <= +ce?.warehouse?.qty ||
-                                                                                    newValue <= quantityAmount
-                                                                                );
+                                                                                return true;
                                                                             }}
                                                                         />
                                                                         <button
@@ -2246,7 +2263,10 @@ const Index = (props) => {
                                                                             ce?.id,
                                                                             "note"
                                                                         )}
-                                                                        placeholder="Ghi chú"
+                                                                        placeholder={
+                                                                            dataLang?.delivery_receipt_note ||
+                                                                            "delivery_receipt_note"
+                                                                        }
                                                                         type="text"
                                                                         className="  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 outline-none mb-2"
                                                                     />
@@ -2484,7 +2504,7 @@ const Index = (props) => {
                         </div>
                         <div className="space-x-2">
                             <button
-                                onClick={() => router.push("/purchase_order/returns")}
+                                onClick={() => router.push("/sales_export_product/deliveryReceipt?tab=-1")}
                                 className="button text-[#344054] font-normal text-base hover:bg-blue-500 hover:text-white hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD]"
                             >
                                 {dataLang?.purchase_order_purchase_back || "purchase_order_purchase_back"}
@@ -2504,21 +2524,25 @@ const Index = (props) => {
     );
 };
 const MoreSelectedBadge = ({ items }) => {
-    const style = {
-        marginLeft: "auto",
-        background: "#d4eefa",
-        borderRadius: "4px",
-        fontSize: "14px",
-        padding: "1px 3px",
-        order: 99,
-    };
+    // const style = {
+    //     marginLeft: "auto",
+    //     background: "#d4eefa",
+    //     borderRadius: "4px",
+    //     fontSize: "13px",
+    //     padding: "2px 4px",
+    //     order: 99,
+    // };
 
     const title = items.join(", ");
     const length = items.length;
     const label = `+ ${length}`;
     // const label = ``;
 
-    return <div title={title}>{label}</div>;
+    return (
+        <div className="ml-auto bg-sky-500 rounded-md text-xs px-1 py-1 order-[99] text-white" title={title}>
+            {label}
+        </div>
+    );
 };
 
 const MultiValue = ({ index, getValue, ...props }) => {

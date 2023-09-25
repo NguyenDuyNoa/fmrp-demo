@@ -60,7 +60,7 @@ const Index = (props) => {
     useEffect(() => {
         router.push({
             pathname: router.route,
-            query: { tab: router.query?.tab ? router.query?.tab : "all" },
+            query: { tab: router.query?.tab ? router.query?.tab : "-1" },
         });
     }, []);
 
