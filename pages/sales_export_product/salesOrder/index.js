@@ -418,12 +418,17 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess } = response.data;
+                    var { isSuccess, message } = response.data;
 
                     if (isSuccess !== false) {
                         Toast.fire({
                             icon: "success",
                             title: `${dataLang?.change_status_when_order || "change_status_when_order"}`,
+                        });
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: `${dataLang[message] || message}`,
                         });
                     }
                     _ServerFetching();
