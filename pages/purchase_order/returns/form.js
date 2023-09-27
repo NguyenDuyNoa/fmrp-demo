@@ -24,6 +24,7 @@ import moment from "moment/moment";
 import Popup from "reactjs-popup";
 import { useSelector } from "react-redux";
 import { routerReturns } from "components/UI/router/buyImportGoods";
+import ToatstNotifi from "components/UI/alerNotification/alerNotification";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -527,7 +528,6 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     var result = response.data;
-                    console.log("result", result);
                     sDataWarehouse(
                         result?.map((e) => ({
                             label: e?.name,
@@ -847,6 +847,29 @@ const Index = (props) => {
         sListData([...newData]);
     };
 
+    console.log(listData);
+
+    const FunCheckQuantity = (parentId, childId) => {
+        const e = listData.find((item) => item?.id == parentId);
+        if (!e) return;
+        const ce = e.child.find((child) => child?.id == childId);
+        if (!ce) return;
+        const checkChild = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
+        console.log("checkChild", checkChild);
+        console.log("ce.amount", ce.amount);
+        console.log("qtyHouse", qtyHouse);
+        if (checkChild > qtyHouse) {
+            ToatstNotifi("error", `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(qtyHouse)} số lượng còn lại`);
+            ce.amount = "";
+            setTimeout(() => {
+                sLoad(true);
+            }, 500);
+            setTimeout(() => {
+                sLoad(false);
+            }, 1000);
+        }
+    };
+
     const _HandleChangeChild = (parentId, childId, type, value) => {
         const newData = listData.map((e) => {
             if (e?.id === parentId) {
@@ -856,37 +879,40 @@ const Index = (props) => {
                         if (type === "amount") {
                             sErrSurvive(false);
                             ce.amount = Number(value?.value);
-                            const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
-                            if (totalSoLuong > qtyHouse) {
-                                e.child.forEach((opt, optIndex) => {
-                                    const currentValue = ce.amount; // Lưu giá trị hiện tại
-                                    ce.amount = "";
-                                    if (optIndex === index) {
-                                        ce.amount = currentValue; // Gán lại giá trị hiện tại
-                                    }
-                                });
-                                Toast.fire({
-                                    title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                        qtyHouse
-                                    )} số lượng còn lại`,
-                                    icon: "error",
-                                    confirmButtonColor: "#296dc1",
-                                    cancelButtonColor: "#d33",
-                                    confirmButtonText: dataLang?.aler_yes,
-                                    timer: 3000,
-                                });
-                                ce.amount = "" || null;
-                                setTimeout(() => {
-                                    sLoad(true);
-                                }, 500);
-                                setTimeout(() => {
-                                    sLoad(false);
-                                }, 1000);
-                                return { ...ce };
-                            } else {
-                                sLoad(false);
-                                return { ...ce };
-                            }
+                            FunCheckQuantity(parentId, childId);
+                            // const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
+                            // if (totalSoLuong > qtyHouse) {
+                            //     e.child.forEach((opt, optIndex) => {
+                            //         const currentValue = ce.amount; // Lưu giá trị hiện tại
+                            //         ce.amount = "";
+                            //         if (optIndex === index) {
+                            //             ce.amount = currentValue; // Gán lại giá trị hiện tại
+                            //         }
+                            //     });
+                            //     Toast.fire({
+                            //         title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                            //             qtyHouse
+                            //         )} số lượng còn lại`,
+                            //         icon: "error",
+                            //         confirmButtonColor: "#296dc1",
+                            //         cancelButtonColor: "#d33",
+                            //         confirmButtonText: dataLang?.aler_yes,
+                            //         timer: 3000,
+                            //     });
+                            //     ce.amount = "" || null;
+                            //     setTimeout(() => {
+                            //         sLoad(true);
+                            //     }, 500);
+                            //     setTimeout(() => {
+                            //         sLoad(false);
+                            //     }, 1000);
+                            //     return { ...ce };
+                            // } else {
+                            //     sLoad(false);
+                            //     console.log(" ce.amount", ce.amount);
+                            //     return { ...ce };
+                            // }
+                            return { ...ce };
                         } else if (type === "increase") {
                             sErrSurvive(false);
 
@@ -992,6 +1018,7 @@ const Index = (props) => {
         const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
         if (!checkData) {
             sIdParent(value?.value);
+            sQtyHouse(value?.e?.quantity_left);
             const newData = listData?.map((e) => {
                 if (e?.id === parentId) {
                     return {
