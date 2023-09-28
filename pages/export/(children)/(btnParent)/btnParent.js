@@ -98,7 +98,7 @@ const BtnParent = ({
                 ws["!cols"] = ws["!cols"] || [];
                 ws["!cols"][colIndex] = { wch: width };
             });
-            ws["!outline"] = null;
+            // ws["!outline"] = null;
             ws["!merges"] = [
                 { s: { r: 0, c: 0 }, e: { r: 2, c: dataSet.columns.length - 1 } }, // Gộp từ hàng 0 đến hàng 1, từ cột 2 đến cột cuối cùng
             ];
