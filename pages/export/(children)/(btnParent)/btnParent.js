@@ -123,7 +123,7 @@ const BtnParent = ({
         );
     };
 
-    console.log("multiDataSet", multiDataSet);
+    console.log("pageLimit.limit", pageLimit.limit);
     return (
         <div className="col-span-12 mt-2 grid-cols-10 grid gap-2.5 justify-center">
             <div className="col-span-2">

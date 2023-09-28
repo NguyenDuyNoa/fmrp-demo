@@ -34,6 +34,10 @@ const Index = (props) => {
         materials: [],
         products: [],
     };
+    const initsPageLimit = {
+        page: 1,
+        limit: 100,
+    };
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
 
     const scrollAreaRef = useRef(null);
@@ -59,10 +63,7 @@ const Index = (props) => {
 
     const [dataTemplate, sDataTemplate] = useState([]);
 
-    const [pageLimit, sPageLimit] = useState({
-        page: 1,
-        limit: 100,
-    });
+    const [pageLimit, sPageLimit] = useState(initsPageLimit);
 
     const [templateValue, sTemplateValue] = useState(null);
 
@@ -177,11 +178,7 @@ const Index = (props) => {
     useEffect(() => {
         router.query.tab && sOnFetching(true);
         router.query.tab && sArrEmty(initsArr);
-        router.query.tab &&
-            sPageLimit({
-                page: 1,
-                limit: 1,
-            });
+        router.query.tab && sPageLimit(initsPageLimit);
     }, [router.query?.page, router.query?.tab]);
 
     useEffect(() => {
@@ -206,6 +203,7 @@ const Index = (props) => {
             sSampleImport(value);
         }
     };
+    console.log(pageLimit);
 
     const parseAndSetData = (value, arrEmtyLength) => {
         const parsedValue = JSON?.parse(value?.setup_colums);
@@ -491,9 +489,11 @@ const Index = (props) => {
             }
         );
     };
+
     useEffect(() => {
         onSending && sampleImport && _ServerSendingTemplate();
     }, [onSending]);
+
     const objectProps = {
         dataLang,
         dataColumnNew,
