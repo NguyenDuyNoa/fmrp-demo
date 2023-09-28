@@ -58,7 +58,7 @@ const BtnParent = ({
             const wsData = dataSet.data.map((row) =>
                 row.map((cell) => {
                     return {
-                        v: cel || "",
+                        v: cell || "",
                         s: {
                             font: { sz: 11 },
                             border: border.borders,
