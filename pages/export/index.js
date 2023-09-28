@@ -439,7 +439,7 @@ const Index = (props) => {
             })
             .flat();
         const values = dataCustom.flatMap((item) => {
-            const baseRow = allFields.map((field) => item[field.value]);
+            const baseRow = allFields.map((field) => item[field.value] || "");
             return [baseRow];
         });
 
