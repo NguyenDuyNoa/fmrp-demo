@@ -61,7 +61,7 @@ const Index = (props) => {
 
     const [pageLimit, sPageLimit] = useState({
         page: 1,
-        limit: 1,
+        limit: 100,
     });
 
     const [templateValue, sTemplateValue] = useState(null);
