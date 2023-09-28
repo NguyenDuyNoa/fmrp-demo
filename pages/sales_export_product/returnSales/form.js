@@ -91,6 +91,9 @@ const Index = (props) => {
     const [errPrice, sErrPrice] = useState(false);
     const [errSurvivePrice, sErrSurvivePrice] = useState(false);
 
+    const [warehouse, sDataWarehouse] = useState([]);
+    const [onFetchingWarehouser, sOnFetchingWarehouse] = useState(false);
+
     const resetAllStates = () => {
         sCode("");
         sStartDate(new Date());
@@ -293,11 +296,11 @@ const Index = (props) => {
     const _ServerFetching_ItemsAll = () => {
         Axios(
             "POST",
-            "/api_web/api_delivery/searchItemsVariant/?csrf_protection=true",
+            "/api_web/Api_return_order/getDeliveriItems?csrf_protection=true",
             {
                 params: {
-                    "filter[order_id]": idProductOrder !== null ? +idProductOrder.value : null,
-                    "filter[delivery_id]": id ? id : "",
+                    "filter[client_id]": idClient !== null ? +idClient.value : null,
+                    "filter[branch_id]": idBranch !== null ? +idBranch.value : null,
                 },
             },
             (err, response) => {
@@ -331,6 +334,31 @@ const Index = (props) => {
         sOnFetchingClient(false);
     };
 
+    const _ServerFetching_Warehouse = () => {
+        Axios(
+            "GET",
+            "/api_web/api_warehouse/Getcomboboxlocation/?csrf_protection=true",
+            {
+                params: {
+                    "filter[branch_id]": idBranch.value,
+                },
+            },
+            (err, response) => {
+                if (!err) {
+                    var result = response.data.rResult;
+                    sDataWarehouse(
+                        result?.map((e) => ({
+                            label: e?.name,
+                            value: e?.id,
+                            warehouse_name: e?.warehouse_name,
+                        }))
+                    );
+                }
+            }
+        );
+        sOnFetchingWarehouse(false);
+    };
+
     const checkListData = (value, sDataItems, sListData, sId, id, idEmty) => {
         return Swal.fire({
             title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
@@ -361,8 +389,10 @@ const Index = (props) => {
                     checkListData(value, sDataItems, sListData, sIdClient, idClient);
                 } else {
                     sIdClient(value);
+                    sOnFetchingItemsAll(true);
                     if (value == null) {
-                        alert("rỗng thì mặt hàng rỗng nhe");
+                        sOnFetchingItemsAll(false);
+                        sDataItems([]);
                     }
                 }
             },
@@ -378,6 +408,7 @@ const Index = (props) => {
                     if (value == null) {
                         sDataClient([]);
                         sIdClient(null);
+                        sOnFetchingClient(false);
                     }
                 }
             },
@@ -433,8 +464,20 @@ const Index = (props) => {
     useClearError(idTreatment != null, sErrTreatment);
 
     useEffect(() => {
+        idBranch != null && sOnFetchingWarehouse(true);
+    }, [idBranch]);
+
+    useEffect(() => {
         onFetchingClient && _ServerFetching_Client();
     }, [onFetchingClient]);
+
+    useEffect(() => {
+        onFetchingItemsAll && _ServerFetching_ItemsAll();
+    }, [onFetchingItemsAll]);
+
+    useEffect(() => {
+        onFetchingWarehouser && _ServerFetching_Warehouse();
+    }, [onFetchingWarehouser]);
 
     const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes];
 
@@ -452,21 +495,13 @@ const Index = (props) => {
                 (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
                 (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
                 (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
-            quantityStock: value?.e?.quantity,
-            quantityDelive: value?.e?.quantity_delivery,
+            quantityDelivered: value?.e?.quantity_create,
+            quantityPay: value?.e?.quantity_returned,
+            quantityLeft: value?.e?.quantity_left,
             warehouse: null,
-            dataWarehouse: value?.e?.warehouseList?.map((e) => ({
-                label: e?.location_name,
-                value: e?.id,
-                warehouse_name: e?.warehouse_name,
-                qty: e?.quantity,
-                lot: e?.lot,
-                date: e?.expiration_date,
-                serial: e?.serial,
-            })),
             unit: value?.e?.unit_name,
             price: Number(value?.e?.price),
-            quantity: value?.e?.quantity,
+            quantity: null,
             discount: generalDiscount ? generalDiscount : Number(value?.e?.discount_percent_item),
             tax: generalTax
                 ? generalTax
@@ -607,22 +642,7 @@ const Index = (props) => {
                         break;
 
                     case "warehouse":
-                        if (!checkWarehouse && +ce?.quantity > +value?.qty) {
-                            ToatstNotifi(
-                                "error",
-                                `Số lượng chưa giao vượt quá ${formatNumber(+value?.qty)} số lượng tồn kho`
-                            );
-                            ce.warehouse = value;
-                            ce.quantity = value?.qty;
-                            funtionsCheckQuantity(parentId, childId);
-                        } else if (!checkWarehouse && totalSoLuong > quantityAmount) {
-                            funtionsCheckQuantity(parentId, childId);
-                            ce.warehouse = value;
-                        } else if (checkWarehouse) {
-                            ToatstNotifi("error", `Kho - vị trí kho đã được chọn`);
-                        } else {
-                            ce.warehouse = value;
-                        }
+                        ce.warehouse = value;
                         break;
 
                     case "tax":
@@ -649,19 +669,11 @@ const Index = (props) => {
         if (!ce) return;
 
         const checkChild = e.child.reduce((sum, opt) => sum + parseFloat(opt?.quantity || 0), 0);
-        const quantityAmount = +ce?.quantityStock - +ce?.quantityDelive;
-
-        if (checkChild > quantityAmount) {
-            ToatstNotifi("error", `Tổng số lượng vượt quá ${formatNumber(quantityAmount)} số lượng chưa giao`);
+        if (checkChild > +ce?.quantityLeft) {
+            ToatstNotifi("error", `Tổng số lượng vượt quá ${formatNumber(+ce?.quantityLeft)} số lượng còn lại`);
             ce.quantity = "";
             HandTimeout();
             sErrQuantity(true);
-        }
-        if (checkChild > +ce?.warehouse?.qty) {
-            ToatstNotifi("error", `Tổng số lượng vượt quá ${formatNumber(+ce?.warehouse?.qty)} số lượng tồn`);
-            ce.quantity = "";
-            sErrQuantity(true);
-            HandTimeout();
         }
     };
 
@@ -692,78 +704,68 @@ const Index = (props) => {
     };
 
     const selectItemsLabel = (option) => {
-        let quantityUndelived = +option?.e?.quantity - +option?.e?.quantity_delivery;
         return (
-            <div className="flex items-center justify-between">
-                <div className="flex items-center ">
-                    <div>
-                        {option.e?.images !== null ? (
+            <div className="py-2">
+                <div className="flex items-center gap-1">
+                    <div className="w-[40px] h-[50px]">
+                        {option.e?.images != null ? (
                             <img
                                 src={option.e?.images}
                                 alt="Product Image"
-                                className="3xl:max-w-[40px] 3xl:h-[40px] 2xl:max-w-[40px] 2xl:h-[40px] xl:max-w-[40px] xl:h-[40px] max-w-[40px] h-[40px] text-[8px] object-cover rounded mr-1"
+                                className="max-w-[40px] h-[50px] text-[8px] object-cover rounded"
                             />
                         ) : (
-                            <div className="3xl:max-w-[40px] 3xl:h-[40px] 2xl:max-w-[40px] 2xl:h-[40px] xl:max-w-[40px] xl:h-[40px] max-w-[40px] h-[40px] object-cover flex items-center justify-center rounded xl:mr-1 mx-0.5">
+                            <div className=" w-[40px] h-[50px] object-cover  flex items-center justify-center rounded">
                                 <img
                                     src="/no_img.png"
                                     alt="Product Image"
-                                    className="3xl:max-w-[40px] 3xl:h-[40px] 2xl:max-w-[40px] 2xl:h-[40px] xl:max-w-[40px] xl:h-[40px] max-w-[40px] h-[40px] object-cover rounded mr-1"
+                                    className="w-[30px] h-[30px] object-cover rounded"
                                 />
                             </div>
                         )}
                     </div>
-
                     <div>
-                        <h3 className="font-medium 3xl:text-[14px] 2xl:text-[11px] xl:text-[10px] text-[10px] whitespace-pre-wrap">
+                        <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                             {option.e?.name}
                         </h3>
-
-                        <div className="flex 3xl:gap-2 2xl:gap-1 xl:gap-1 gap-1">
-                            <h5 className="text-gray-400  3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
-                                {option.e?.code} :
+                        <div className="flex gap-2">
+                            <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                {option.e?.code}
                             </h5>
-                            <h5 className="3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
+                            <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                 {option.e?.product_variation}
                             </h5>
                         </div>
-                        <div className="flex 3xl:gap-3 2xl:gap-3 xl:gap-3 gap-1">
-                            <div className="flex items-center gap-1">
-                                <h5 className="min-w-1/3 text-gray-400 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                    {dataLang[option.e?.text_type]}
-                                </h5>
-                                <h5 className="text-gray-400 font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                    {dataLang?.delivery_receipt_quantity || "delivery_receipt_quantity"}:
-                                </h5>
+                        <div className="flex items-center gap-1">
+                            <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                {option.e?.import_code} -{" "}
+                            </h5>
+                            <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                                {dataLang[option.e?.text_type]}
+                            </h5>
+                        </div>
 
-                                <h5 className=" font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                    {option.e?.quantity ? formatNumber(+option.e?.quantity) : "0"}
-                                </h5>
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                                <h5 className="text-gray-400 font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                    {dataLang?.delivery_receipt_quantity_undelivered_order ||
-                                        "delivery_receipt_quantity_undelivered_order"}
-                                    :
-                                </h5>
-
-                                <h5 className=" font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                    {quantityUndelived ? formatNumber(+quantityUndelived) : "0"}
-                                </h5>
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                                <h5 className="text-gray-400 font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                    {dataLang?.delivery_receipt_quantity_delivered_order ||
-                                        "delivery_receipt_quantity_delivered_order"}
-                                    :
-                                </h5>
-
-                                <h5 className=" font-normal 3xl:text-[13.5px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                                    {option.e?.quantity_delivery ? formatNumber(+option.e?.quantity_delivery) : "0"}
-                                </h5>
-                            </div>
+                        <div className="flex items-center gap-2 italic">
+                            {dataProductSerial.is_enable === "1" && (
+                                <div className="text-[11px] text-[#667085] font-[500]">
+                                    Serial: {option.e?.serial ? option.e?.serial : "-"}
+                                </div>
+                            )}
+                            {dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1" ? (
+                                <>
+                                    <div className="text-[11px] text-[#667085] font-[500]">
+                                        Lot: {option.e?.lot ? option.e?.lot : "-"}
+                                    </div>
+                                    <div className="text-[11px] text-[#667085] font-[500]">
+                                        Date:{" "}
+                                        {option.e?.expiration_date
+                                            ? moment(option.e?.expiration_date).format("DD/MM/YYYY")
+                                            : "-"}
+                                    </div>
+                                </>
+                            ) : (
+                                ""
+                            )}
                         </div>
                     </div>
                 </div>
@@ -1404,7 +1406,7 @@ const Index = (props) => {
                                                             <React.Fragment key={ce?.id?.toString()}>
                                                                 <div className="p-1 border-t border-l  flex flex-col col-span-2 justify-center h-full">
                                                                     <Select
-                                                                        options={ce?.dataWarehouse}
+                                                                        options={warehouse}
                                                                         value={ce?.warehouse}
                                                                         isLoading={
                                                                             ce?.warehouse == null
@@ -1453,54 +1455,6 @@ const Index = (props) => {
                                                                                             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
                                                                                                 {option?.label}
                                                                                             </h2>
-                                                                                        </div>
-                                                                                        <div className="flex gap-1">
-                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                                                                {dataLang?.returns_survive ||
-                                                                                                    "returns_survive"}
-                                                                                                :
-                                                                                            </h2>
-                                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
-                                                                                                {formatNumber(
-                                                                                                    option?.qty
-                                                                                                )}
-                                                                                            </h2>
-                                                                                        </div>
-                                                                                        <div className="flex items-center gap-2 italic">
-                                                                                            {dataProductSerial.is_enable ===
-                                                                                                "1" && (
-                                                                                                <div className="text-[11px] text-[#667085] font-[500]">
-                                                                                                    Serial:{" "}
-                                                                                                    {option?.serial
-                                                                                                        ? option?.serial
-                                                                                                        : "-"}
-                                                                                                </div>
-                                                                                            )}
-                                                                                            {dataMaterialExpiry.is_enable ===
-                                                                                                "1" ||
-                                                                                            dataProductExpiry.is_enable ===
-                                                                                                "1" ? (
-                                                                                                <>
-                                                                                                    <div className="text-[11px] text-[#667085] font-[500]">
-                                                                                                        Lot:{" "}
-                                                                                                        {option?.lot
-                                                                                                            ? option?.lot
-                                                                                                            : "-"}
-                                                                                                    </div>
-                                                                                                    <div className="text-[11px] text-[#667085] font-[500]">
-                                                                                                        Date:{" "}
-                                                                                                        {option?.date
-                                                                                                            ? moment(
-                                                                                                                  option?.date
-                                                                                                              ).format(
-                                                                                                                  "DD/MM/YYYY"
-                                                                                                              )
-                                                                                                            : "-"}
-                                                                                                    </div>
-                                                                                                </>
-                                                                                            ) : (
-                                                                                                ""
-                                                                                            )}
                                                                                         </div>
                                                                                     </div>
                                                                                 )
@@ -1579,24 +1533,13 @@ const Index = (props) => {
                                                                             isAllowed={(values) => {
                                                                                 const { value } = values;
                                                                                 const newValue = +value;
-                                                                                const quantityAmount =
-                                                                                    +ce?.quantityStock -
-                                                                                    +ce?.quantityDelive;
 
-                                                                                if (newValue > +ce?.warehouse?.qty) {
+                                                                                if (newValue > +ce?.quantityLeft) {
                                                                                     ToatstNotifi(
                                                                                         "error",
                                                                                         `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                                                                            +ce?.warehouse?.qty
-                                                                                        )} số lượng tồn kho`
-                                                                                    );
-                                                                                    return;
-                                                                                } else if (newValue > quantityAmount) {
-                                                                                    ToatstNotifi(
-                                                                                        "error",
-                                                                                        `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                                                                            quantityAmount
-                                                                                        )} số lượng chưa giao`
+                                                                                            +ce?.quantityLeft
+                                                                                        )} số lượng còn lại`
                                                                                     );
                                                                                     return;
                                                                                 }
@@ -1640,24 +1583,18 @@ const Index = (props) => {
                                                                         >
                                                                             <div className="flex flex-col bg-gray-300 px-2.5 py-0.5 rounded-sm">
                                                                                 <span className="font-medium text-xs">
-                                                                                    Sl tồn:{" "}
-                                                                                    {ce?.warehouse == null
-                                                                                        ? 0
-                                                                                        : formatNumber(
-                                                                                              +ce?.warehouse?.qty
-                                                                                          )}
-                                                                                </span>
-
-                                                                                <span className="font-medium text-xs">
                                                                                     Sl đã giao:{" "}
-                                                                                    {formatNumber(ce?.quantityDelive)}
+                                                                                    {formatNumber(
+                                                                                        +ce?.quantityDelivered
+                                                                                    )}
                                                                                 </span>
                                                                                 <span className="font-medium text-xs">
-                                                                                    Sl chưa giao:{" "}
-                                                                                    {formatNumber(
-                                                                                        ce?.quantityStock -
-                                                                                            ce?.quantityDelive
-                                                                                    )}
+                                                                                    Sl đã trả:{" "}
+                                                                                    {formatNumber(ce?.quantityPay)}
+                                                                                </span>
+                                                                                <span className="font-medium text-xs">
+                                                                                    Sl còn lại:{" "}
+                                                                                    {formatNumber(ce?.quantityLeft)}
                                                                                 </span>
                                                                             </div>
                                                                         </Popup>
