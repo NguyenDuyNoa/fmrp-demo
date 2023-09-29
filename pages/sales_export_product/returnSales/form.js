@@ -25,89 +25,68 @@ import Popup from "reactjs-popup";
 import { useSelector } from "react-redux";
 import ToatstNotifi from "components/UI/alerNotification/alerNotification";
 import { routerReturnSales } from "components/UI/router/sellingGoods";
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 
 const Index = (props) => {
     const router = useRouter();
     const id = router.query?.id;
 
-    const dataLang = props?.dataLang;
-    const scrollAreaRef = useRef(null);
-    const handleMenuOpen = () => {
-        const menuPortalTarget = scrollAreaRef.current;
-        return { menuPortalTarget };
+    const initsFetching = {
+        onFetching: false,
+        onFetchingDetail: false,
+        onFetchingCondition: false,
+        onFetchingItemsAll: false,
+        onFetchingClient: false,
+        onLoading: false,
+        onLoadingChild: false,
+        onFetchingWarehouser: false,
+        onSending: false,
+        load: false,
     };
+    const initsErors = {
+        errClient: false,
+        errTreatment: false,
+        errBranch: false,
+        errWarehouse: false,
+        errQuantity: false,
+        errSurvive: false,
+        errPrice: false,
+        errSurvivePrice: false,
+    };
+    const initsArr = {
+        dataBranch: [],
+        dataItems: [],
+        dataClient: [],
+        dataTasxes: [],
+        dataTreatmentr: [],
+        dataWarehouse: [],
+    };
+    const initsValue = {
+        code: "",
+        note: "",
+        idBranch: null,
+        idClient: null,
+        idTreatment: null,
+        date: new Date(),
+    };
+    const dataLang = props?.dataLang;
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
-
-    const [onFetching, sOnFetching] = useState(false);
-    const [onFetchingDetail, sOnFetchingDetail] = useState(false);
-    const [onFetchingCondition, sOnFetchingCondition] = useState(false);
-    const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false);
-    const [onFetchingClient, sOnFetchingClient] = useState(false);
-    const [onLoading, sOnLoading] = useState(false);
-    const [onLoadingChild, sOnLoadingChild] = useState(false);
-
-    const [onSending, sOnSending] = useState(false);
-    const [generalTax, sThuetong] = useState();
-    const [generalDiscount, sGeneralD] = useState(0);
-    const [code, sCode] = useState("");
-    const [startDate, sStartDate] = useState(new Date());
-    const [effectiveDate, sEffectiveDate] = useState(null);
-
-    const [note, sNote] = useState("");
-    const [date, sDate] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
-    const [dataClient, sDataClient] = useState([]);
-    const [dataTreatmentr, sDataTreatmentr] = useState([]);
-
-    const [dataBranch, sDataBranch] = useState([]);
-    const [dataItems, sDataItems] = useState([]);
-    const [dataTasxes, sDataTasxes] = useState([]);
-
+    const [fetChingData, sFetchingData] = useState(initsFetching);
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
     const [dataProductExpiry, sDataProductExpiry] = useState({});
     const [dataProductSerial, sDataProductSerial] = useState({});
-
+    const [generalTax, sGeneralTax] = useState();
+    const [generalDiscount, sGeneralD] = useState(0);
+    const [dataSelect, sDataSelect] = useState(initsArr);
+    const [idChange, sIdChange] = useState(initsValue);
+    const [errors, sErrors] = useState(initsErors);
     const [listData, sListData] = useState([]);
-
-    const [idBranch, sIdBranch] = useState(null);
-    const [idClient, sIdClient] = useState(null);
-    const [idTreatment, sIdTreatment] = useState(null);
-
-    const [load, sLoad] = useState(false);
-
-    const [errClient, sErrClient] = useState(false);
-    const [errTreatment, sErrTreatment] = useState(false);
-    const [errDate, sErrDate] = useState(false);
-    const [errBranch, sErrBranch] = useState(false);
-    const [errWarehouse, sErrWarehouse] = useState(false);
-    const [errQuantity, sErrQuantity] = useState(false);
-    const [errSurvive, sErrSurvive] = useState(false);
-    const [errPrice, sErrPrice] = useState(false);
-    const [errSurvivePrice, sErrSurvivePrice] = useState(false);
-
-    const [warehouse, sDataWarehouse] = useState([]);
-    const [onFetchingWarehouser, sOnFetchingWarehouse] = useState(false);
-
+    const [initsId, sInitsId] = useState({
+        idParentAdd: null,
+        idChildAdd: null,
+    });
     const resetAllStates = () => {
-        sCode("");
-        sStartDate(new Date());
-        sIdBranch(null);
-        sIdClient(null);
-        sNote("");
-        sErrBranch(false);
-        sErrDate(false);
-        sErrClient(false);
-        sErrQuantity(false);
-        sErrSurvive(false);
-        sErrSurvivePrice(false);
-        sErrWarehouse(false);
-        sErrTreatment(false);
+        sIdChange(initsValue);
+        sErrors(initsErors);
     };
 
     useEffect(() => {
@@ -115,46 +94,50 @@ const Index = (props) => {
     }, [router.query]);
 
     const _ServerFetching = () => {
-        sOnLoading(true);
+        sFetchingData((e) => ({ ...e, onLoading: true }));
         Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 var { result } = response.data;
-                sDataBranch(result?.map((e) => ({ label: e.name, value: e.id })));
-                sOnLoading(false);
+                sDataSelect((e) => ({
+                    ...e,
+                    dataBranch: result?.map((e) => ({ label: e.name, value: e.id })),
+                }));
+                sFetchingData((e) => ({ ...e, onLoading: false }));
             }
         });
         Axios("GET", "/api_web/Api_tax/tax?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 var { rResult } = response.data;
-                sDataTasxes(
-                    rResult?.map((e) => ({
+                sDataSelect((e) => ({
+                    ...e,
+                    dataTasxes: rResult?.map((e) => ({
                         label: e.name,
                         value: e.id,
                         tax_rate: e.tax_rate,
-                    }))
-                );
-                sOnLoading(false);
+                    })),
+                }));
+                sFetchingData((e) => ({ ...e, onLoading: false }));
             }
         });
         Axios("GET", "/api_web/Api_return_supplier/treatment_methods/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 var data = response.data;
-                sDataTreatmentr(
-                    data?.map((e) => ({
-                        label: dataLang[e?.name],
+                sDataSelect((e) => ({
+                    ...e,
+                    dataTreatmentr: data?.map((e) => ({
+                        label: dataLang[e?.name] || e?.name,
                         value: e?.id,
-                    }))
-                );
-                sOnLoading(false);
+                    })),
+                }));
+                sFetchingData((e) => ({ ...e, onLoading: false }));
             }
         });
-
-        sOnFetching(false);
+        sFetchingData((e) => ({ ...e, onFetching: false }));
     };
 
     useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
+        fetChingData.onFetching && _ServerFetching();
+    }, [fetChingData.onFetching]);
 
     const _ServerFetchingCondition = () => {
         Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
@@ -164,30 +147,40 @@ const Index = (props) => {
                 sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
                 sDataProductSerial(data.find((x) => x.code == "product_serial"));
             }
-            sOnFetchingCondition(false);
+            sFetchingData((e) => ({
+                ...e,
+                onFetchingCondition: true,
+            }));
         });
     };
 
     useEffect(() => {
-        onFetchingCondition && _ServerFetchingCondition();
-    }, [onFetchingCondition]);
+        fetChingData.onFetchingCondition && _ServerFetchingCondition();
+    }, [fetChingData.onFetchingCondition]);
 
     useEffect(() => {
-        id && sOnFetchingCondition(true);
+        id &&
+            sFetchingData((e) => ({
+                ...e,
+                onFetchingCondition: true,
+            }));
     }, []);
 
     useEffect(() => {
         JSON.stringify(dataMaterialExpiry) === "{}" &&
             JSON.stringify(dataProductExpiry) === "{}" &&
             JSON.stringify(dataProductSerial) === "{}" &&
-            sOnFetchingCondition(true);
+            sFetchingData((e) => ({
+                ...e,
+                onFetchingCondition: true,
+            }));
     }, [
         JSON.stringify(dataMaterialExpiry) === "{}",
         JSON.stringify(dataProductExpiry) === "{}",
         JSON.stringify(dataProductSerial) === "{}",
     ]);
 
-    const options = dataItems?.map((e) => ({
+    const options = dataSelect.dataItems?.map((e) => ({
         label: `${e.name}
             <span style={{display: none}}>${e.code}</span>
             <span style={{display: none}}>${e.product_variation} </span>
@@ -273,20 +266,20 @@ const Index = (props) => {
                     }
                 );
             }
-            sOnFetchingDetail(false);
+            sFetchingData((e) => ({ ...e, onFetchingDetail: false }));
         });
     };
 
     useEffect(() => {
-        onFetchingDetail && _ServerFetchingDetailPage();
-    }, [onFetchingDetail]);
+        fetChingData.onFetchingDetail && _ServerFetchingDetailPage();
+    }, [fetChingData.onFetchingDetail]);
 
     useEffect(() => {
         id &&
             JSON.stringify(dataMaterialExpiry) !== "{}" &&
             JSON.stringify(dataProductExpiry) !== "{}" &&
             JSON.stringify(dataProductSerial) !== "{}" &&
-            sOnFetchingDetail(true);
+            sFetchingData((e) => ({ ...e, onFetchingDetail: true }));
     }, [
         JSON.stringify(dataMaterialExpiry) !== "{}" &&
             JSON.stringify(dataProductExpiry) !== "{}" &&
@@ -299,39 +292,45 @@ const Index = (props) => {
             "/api_web/Api_return_order/getDeliveriItems?csrf_protection=true",
             {
                 params: {
-                    "filter[client_id]": idClient !== null ? +idClient.value : null,
-                    "filter[branch_id]": idBranch !== null ? +idBranch.value : null,
+                    "filter[client_id]": idChange.idClient !== null ? +idChange.idClient.value : null,
+                    "filter[branch_id]": idChange.idBranch !== null ? +idChange.idBranch.value : null,
                 },
             },
             (err, response) => {
                 if (!err) {
                     var { result } = response.data.data;
-                    sDataItems(result);
+                    sDataSelect((e) => ({
+                        ...e,
+                        dataItems: result,
+                    }));
                 }
             }
         );
-        sOnFetchingItemsAll(false);
+        sFetchingData((e) => ({ ...e, onFetchingItemsAll: false }));
     };
 
     const _ServerFetching_Client = () => {
-        sOnLoading(true);
+        sFetchingData((e) => ({ ...e, onLoading: true }));
         Axios(
             "GET",
             "/api_web/api_client/client_option/?csrf_protection=true",
             {
                 params: {
-                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
+                    "filter[branch_id]": idChange.idBranch != null ? idChange.idBranch.value : null,
                 },
             },
             (err, response) => {
                 if (!err) {
                     var { rResult } = response.data;
-                    sDataClient(rResult?.map((e) => ({ label: e.name, value: e.id })));
-                    sOnLoading(false);
+                    sDataSelect((e) => ({
+                        ...e,
+                        dataClient: rResult?.map((e) => ({ label: e.name, value: e.id })),
+                    }));
+                    sFetchingData((e) => ({ ...e, onLoading: false }));
                 }
             }
         );
-        sOnFetchingClient(false);
+        sFetchingData((e) => ({ ...e, onFetchingClient: false }));
     };
 
     const _ServerFetching_Warehouse = () => {
@@ -340,26 +339,27 @@ const Index = (props) => {
             "/api_web/api_warehouse/Getcomboboxlocation/?csrf_protection=true",
             {
                 params: {
-                    "filter[branch_id]": idBranch.value,
+                    "filter[branch_id]": idChange.idBranch ? idChange.idBranch?.value : null,
                 },
             },
             (err, response) => {
                 if (!err) {
                     var result = response.data.rResult;
-                    sDataWarehouse(
-                        result?.map((e) => ({
+                    sDataSelect((e) => ({
+                        ...e,
+                        dataWarehouse: result?.map((e) => ({
                             label: e?.name,
                             value: e?.id,
                             warehouse_name: e?.warehouse_name,
-                        }))
-                    );
+                        })),
+                    }));
                 }
             }
         );
-        sOnFetchingWarehouse(false);
+        sFetchingData((e) => ({ ...e, onFetchingWarehouser: false }));
     };
 
-    const checkListData = (value, sDataItems, sListData, sId, id, idEmty) => {
+    const checkListData = (value, sDataSelect, sListData, sId, id, idEmty) => {
         return Swal.fire({
             title: `${dataLang?.returns_err_DeleteItem || "returns_err_DeleteItem"}`,
             icon: "warning",
@@ -370,7 +370,7 @@ const Index = (props) => {
             cancelButtonText: `${dataLang?.aler_cancel}`,
         }).then((result) => {
             if (result.isConfirmed) {
-                sDataItems([]);
+                sDataSelect((e) => ({ ...e, dataItems: [] }));
                 sListData([]);
                 sId(value);
                 idEmty && idEmty(null);
@@ -381,39 +381,47 @@ const Index = (props) => {
     };
 
     const _HandleChangeInput = (type, value) => {
+        const sIdClient = (e) => {
+            sIdChange((list) => ({ ...list, idClient: e }));
+        };
+        const sIdBranch = (e) => {
+            sIdChange((list) => ({ ...list, idBranch: e }));
+        };
         const onChange = {
-            code: () => sCode(value.target.value),
-            date: () => sDate(moment(value.target.value).format("YYYY-MM-DD HH:mm:ss")),
+            code: () => sIdChange((e) => ({ ...e, code: value.target.value })),
+            date: () => sIdChange((e) => ({ ...e, date: moment(value).format("YYYY-MM-DD HH:mm:ss") })),
+            startDate: () => {
+                sIdChange((e) => ({ ...e, date: new Date() }));
+            },
             idClient: () => {
                 if (listData?.length > 0) {
-                    checkListData(value, sDataItems, sListData, sIdClient, idClient);
+                    checkListData(value, sDataSelect, sListData, sIdClient);
                 } else {
-                    sIdClient(value);
-                    sOnFetchingItemsAll(true);
+                    sIdChange((e) => ({ ...e, idClient: value }));
+                    sFetchingData((e) => ({ ...e, onFetchingItemsAll: true }));
                     if (value == null) {
-                        sOnFetchingItemsAll(false);
-                        sDataItems([]);
+                        sFetchingData((e) => ({ ...e, onFetchingItemsAll: false }));
+                        sDataSelect((e) => ({ ...e, dataItems: [] }));
                     }
                 }
             },
-            treatment: () => sIdTreatment(value),
-            note: () => sNote(value.target.value),
+            treatment: () => sIdChange((e) => ({ ...e, idTreatment: value })),
+            note: () => sIdChange((e) => ({ ...e, note: value.target.value })),
             branch: () => {
                 if (listData?.length > 0) {
-                    checkListData(value, sDataItems, sListData, sIdBranch, idBranch, sIdClient);
+                    checkListData(value, sDataSelect, sListData, sIdBranch, idChange.idBranch, sIdClient);
                 } else {
-                    sIdBranch(value);
-                    sIdClient(null);
-                    sOnFetchingClient(true);
+                    sIdChange((e) => ({ ...e, idClient: null, idBranch: value }));
+                    sFetchingData((e) => ({ ...e, onFetchingClient: true }));
                     if (value == null) {
-                        sDataClient([]);
-                        sIdClient(null);
-                        sOnFetchingClient(false);
+                        sDataSelect((e) => ({ ...e, dataClient: [] }));
+                        sIdChange((e) => ({ ...e, idClient: null }));
+                        sFetchingData((e) => ({ ...e, onFetchingClient: false }));
                     }
                 }
             },
             generalTax: () => {
-                sThuetong(value);
+                sGeneralTax(value);
                 if (listData?.length > 0) {
                     const newData = listData.map((e) => {
                         const newChild = e?.child.map((ce) => ({ ...ce, tax: value }));
@@ -436,50 +444,39 @@ const Index = (props) => {
         onChange[type] && onChange[type]();
     };
 
-    const handleClearDate = (type) => {
-        if (type === "effectiveDate") {
-            sEffectiveDate(null);
-        }
-        if (type === "startDate") {
-            sStartDate(new Date());
-        }
-    };
-    const handleTimeChange = (date) => {
-        sStartDate(date);
-    };
-
     useEffect(() => {
-        router.query && sOnFetching(true);
+        router.query && sFetchingData((e) => ({ ...e, onFetching: true }));
     }, [router.query]);
 
-    const useClearError = (condition, sState) => {
-        useEffect(() => {
-            sState(false);
-        }, [condition]);
-    };
-
-    useClearError(date != null, sErrDate);
-    useClearError(idClient != null, sErrClient);
-    useClearError(idBranch != null, sErrBranch);
-    useClearError(idTreatment != null, sErrTreatment);
+    useEffect(() => {
+        if (idChange.idClient !== null) {
+            sErrors((prevErrors) => ({ ...prevErrors, errClient: false }));
+        }
+        if (idChange.idBranch !== null) {
+            sErrors((prevErrors) => ({ ...prevErrors, errBranch: false }));
+        }
+        if (idChange.idBranch !== null) {
+            sErrors((prevErrors) => ({ ...prevErrors, errTreatment: false }));
+        }
+    }, [idChange.idClient, idChange.idBranch, idChange.idTreatment]);
 
     useEffect(() => {
-        idBranch != null && sOnFetchingWarehouse(true);
-    }, [idBranch]);
+        idChange.idBranch != null && sFetchingData((e) => ({ ...e, onFetchingWarehouser: true }));
+    }, [idChange.idBranch]);
 
     useEffect(() => {
-        onFetchingClient && _ServerFetching_Client();
-    }, [onFetchingClient]);
+        fetChingData.onFetchingClient && _ServerFetching_Client();
+    }, [fetChingData.onFetchingClient]);
 
     useEffect(() => {
-        onFetchingItemsAll && _ServerFetching_ItemsAll();
-    }, [onFetchingItemsAll]);
+        fetChingData.onFetchingItemsAll && _ServerFetching_ItemsAll();
+    }, [fetChingData.onFetchingItemsAll]);
 
     useEffect(() => {
-        onFetchingWarehouser && _ServerFetching_Warehouse();
-    }, [onFetchingWarehouser]);
+        fetChingData.onFetchingWarehouser && _ServerFetching_Warehouse();
+    }, [fetChingData.onFetchingWarehouser]);
 
-    const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataTasxes];
+    const taxOptions = [{ label: "Miễn thuế", value: "0", tax_rate: "0" }, ...dataSelect.dataTasxes];
 
     const formatNumber = (number) => {
         const integerPart = Math.floor(number);
@@ -501,14 +498,14 @@ const Index = (props) => {
             warehouse: null,
             unit: value?.e?.unit_name,
             price: Number(value?.e?.price),
-            quantity: null,
+            quantity: value?.e?.quantity_left,
             discount: generalDiscount ? generalDiscount : Number(value?.e?.discount_percent_item),
             tax: generalTax
                 ? generalTax
                 : {
                       label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
                       value: value?.e?.tax_id_item,
-                      tax_rate: value?.e?.tax_rate_item,
+                      tax_rate: value?.e?.tax_name_item,
                   },
             note: value?.e?.note_item,
         };
@@ -524,16 +521,28 @@ const Index = (props) => {
     };
 
     const _HandleAddChild = (parentId, value) => {
+        const { newChild } = _DataValueItem(value);
+
         const newData = listData?.map((e) => {
             if (e?.id === parentId) {
-                const { newChild } = _DataValueItem(value);
                 return { ...e, child: [...e.child, newChild] };
             } else {
                 return e;
             }
         });
+
         sListData(newData);
+        // Lấy id của newChild
+        const newChildId = newChild.id;
+        sInitsId({
+            idParentAdd: parentId,
+            idChildAdd: newChildId,
+        });
     };
+
+    useEffect(() => {
+        validateQuantity(initsId.idParentAdd, initsId.idChildAdd);
+    }, [initsId]);
 
     const _HandleAddParent = (value) => {
         const checkData = listData?.some((e) => e?.matHang?.value === value?.value);
@@ -574,62 +583,27 @@ const Index = (props) => {
     const _HandleChangeChild = (parentId, childId, type, value) => {
         const newData = listData.map((e) => {
             if (e?.id !== parentId) return e;
-
             const newChild = e.child?.map((ce) => {
                 if (ce?.id !== childId) return ce;
-                const quantityAmount = +ce?.quantityStock - +ce?.quantityDelive;
-                const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.quantity || 0), 0);
-                const checkWarehouse = e?.child?.some((i) => i?.warehouse?.value === value?.value);
                 switch (type) {
                     case "quantity":
-                        sErrSurvive(false);
+                        sErrors((e) => ({ ...e, errSurvive: false }));
                         ce.quantity = Number(value?.value);
-                        funtionsCheckQuantity(parentId, childId);
+                        validateQuantity(parentId, childId, type);
                         break;
-
                     case "increase":
-                        sErrSurvive(false);
-                        if (+ce.quantity === +ce?.warehouse?.qty) {
-                            ToatstNotifi(
-                                "error",
-                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                    +ce?.warehouse?.qty
-                                )} số lượng tồn kho`,
-                                3000
-                            );
-                        } else if (+ce.quantity === quantityAmount) {
-                            ToatstNotifi(
-                                "error",
-                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(quantityAmount)} số lượng chưa giao`,
-                                3000
-                            );
-                        } else if (+ce.quantity > +ce?.warehouse?.qty) {
-                            ToatstNotifi(
-                                "error",
-                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                    +ce?.warehouse?.qty
-                                )} số lượng tồn kho`,
-                                3000
-                            );
-                        } else if (+ce.quantity > quantityAmount) {
-                            ToatstNotifi(
-                                "error",
-                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(quantityAmount)} số lượng chưa giao`,
-                                3000
-                            );
-                        } else {
-                            ce.quantity = Number(ce?.quantity) + 1;
-                        }
-                        funtionsCheckQuantity(parentId, childId);
+                        sErrors((e) => ({ ...e, errSurvive: false }));
+                        ce.quantity = Number(ce?.quantity) + 1;
+                        validateQuantity(parentId, childId, type);
                         break;
 
                     case "decrease":
-                        sErrSurvive(false);
+                        sErrors((e) => ({ ...e, errSurvive: false }));
                         ce.quantity = Number(ce?.quantity) - 1;
                         break;
 
                     case "price":
-                        sErrSurvivePrice(false);
+                        sErrors((e) => ({ ...e, errSurvivePrice: false }));
                         ce.price = Number(value?.value);
                         break;
 
@@ -660,29 +634,33 @@ const Index = (props) => {
 
         sListData([...newData]);
     };
-
-    const funtionsCheckQuantity = (parentId, childId) => {
+    /// Hàm kiểm tra số lượng
+    const validateQuantity = (parentId, childId, type) => {
         const e = listData.find((item) => item?.id == parentId);
         if (!e) return;
-
         const ce = e.child.find((child) => child?.id == childId);
         if (!ce) return;
 
-        const checkChild = e.child.reduce((sum, opt) => sum + parseFloat(opt?.quantity || 0), 0);
-        if (checkChild > +ce?.quantityLeft) {
-            ToatstNotifi("error", `Tổng số lượng vượt quá ${formatNumber(+ce?.quantityLeft)} số lượng còn lại`);
+        const checkMsg = (mssg) => {
+            ToatstNotifi("error", `${mssg}`);
             ce.quantity = "";
             HandTimeout();
-            sErrQuantity(true);
+        };
+        const checkChild = e.child.reduce((sum, opt) => sum + parseFloat(opt?.quantity || 0), 0);
+        if (type == "increase" && ce?.quantity > +ce?.quantityLeft) {
+            checkMsg(`Số lượng vượt quá ${formatNumber(+ce?.quantityLeft)} số lượng còn lại`);
+        } else if (checkChild > +ce?.quantityLeft) {
+            checkMsg(`Tổng số lượng vượt quá ${formatNumber(+ce?.quantityLeft)} số lượng còn lại`);
         }
     };
 
     const HandTimeout = () => {
         setTimeout(() => {
-            sLoad(true);
+            sErrors((e) => ({ ...e, errQuantity: true }));
+            sFetchingData((e) => ({ ...e, load: true }));
         }, 500);
         setTimeout(() => {
-            sLoad(false);
+            sFetchingData((e) => ({ ...e, load: false }));
         }, 1000);
     };
 
@@ -800,38 +778,28 @@ const Index = (props) => {
         const hasNullQuantity = checkPropertyRecursive(listData, "quantity");
         const hasNullPrice = checkPropertyRecursive(listData, "price");
 
-        const isTotalExceeded = listData?.some(
-            (e) =>
-                !hasNullWarehouse &&
-                e.child?.some((opt) => {
-                    const quantity = parseFloat(opt?.quantity) || 0;
-                    const qty = parseFloat(opt?.warehouse?.qty) || 0;
-                    return quantity > qty;
-                })
-        );
+        const isEmpty = listData?.length == 0;
 
-        const isEmpty = listData?.length === 0 ? true : false;
         if (
             idClient == null ||
-            idBranch == null ||
             idTreatment == null ||
+            idBranch == null ||
             hasNullWarehouse ||
             hasNullQuantity ||
             hasNullPrice ||
-            isTotalExceeded ||
             isEmpty
         ) {
-            idClient == null && sErrClient(true);
-            idTreatment == null && sErrTreatment(true);
-            idBranch == null && sErrBranch(true);
-            hasNullWarehouse && sErrWarehouse(true);
-            hasNullQuantity && sErrQuantity(true);
-            hasNullPrice && sErrPrice(true);
+            sErrors((e) => ({
+                ...e,
+                errClient: idClient == null,
+                errTreatment: idTreatment == null,
+                errBranch: idBranch == null,
+                errWarehouse: hasNullWarehouse,
+                errQuantity: hasNullQuantity,
+                errPrice: hasNullPrice,
+            }));
             if (isEmpty) {
                 ToatstNotifi("error", `Chưa nhập thông tin mặt hàng`);
-            } else if (isTotalExceeded) {
-                sErrSurvive(true);
-                ToatstNotifi("error", `${dataLang?.returns_err_QtyNotQexceed || "returns_err_QtyNotQexceed"}`);
             } else if (hasNullPrice) {
                 sErrSurvivePrice(true);
                 ToatstNotifi("error", `${"Vui lòng nhập đơn giá"}`);
@@ -839,10 +807,9 @@ const Index = (props) => {
                 ToatstNotifi("error", `${dataLang?.required_field_null}`);
             }
         } else {
-            sOnSending(true);
+            sFetchingData((e) => ({ ...e, onSending: true }));
         }
     };
-
     const _ServerSending = async () => {
         let formData = new FormData();
         formData.append("code", code ? code : "");
@@ -896,14 +863,14 @@ const Index = (props) => {
                         ToatstNotifi("error", `${dataLang[message] || message}`);
                     }
                 }
-                sOnSending(false);
+                sFetchingData((e) => ({ ...e, onSending: false }));
             }
         );
     };
 
     useEffect(() => {
-        onSending && _ServerSending();
-    }, [onSending]);
+        fetChingData.onSending && _ServerSending();
+    }, [fetChingData.onSending]);
 
     return (
         <React.Fragment>
@@ -947,7 +914,7 @@ const Index = (props) => {
                                         {dataLang?.import_code_vouchers || "import_code_vouchers"}{" "}
                                     </label>
                                     <input
-                                        value={code}
+                                        value={idChange.code}
                                         onChange={_HandleChangeInput.bind(this, "code")}
                                         name="fname"
                                         type="text"
@@ -966,24 +933,22 @@ const Index = (props) => {
                                             blur
                                             fixedHeight
                                             showTimeSelect
-                                            selected={startDate}
-                                            onSelect={(date) => sStartDate(date)}
-                                            onChange={(e) => handleTimeChange(e)}
+                                            selected={idChange.date}
+                                            onSelect={(date) => sIdChange((e) => ({ ...e, date: date }))}
+                                            onChange={(e) => _HandleChangeInput(e, "date")}
                                             placeholderText="DD/MM/YYYY HH:mm:ss"
                                             dateFormat="dd/MM/yyyy h:mm:ss aa"
                                             timeInputLabel={"Time: "}
                                             placeholder={
                                                 dataLang?.price_quote_system_default || "price_quote_system_default"
                                             }
-                                            className={`border ${
-                                                errDate ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
-                                            } placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            className={`border ${"focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
                                         />
-                                        {startDate && (
+                                        {idChange.date && (
                                             <>
                                                 <MdClear
                                                     className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
-                                                    onClick={() => handleClearDate("startDate")}
+                                                    onClick={() => _HandleChangeInput("startDate")}
                                                 />
                                             </>
                                         )}
@@ -996,16 +961,16 @@ const Index = (props) => {
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <Select
-                                        options={dataBranch}
+                                        options={dataSelect.dataBranch}
                                         onChange={_HandleChangeInput.bind(this, "branch")}
-                                        value={idBranch}
-                                        isLoading={idBranch != null ? false : onLoading}
+                                        value={idChange.idBranch}
+                                        isLoading={idChange.idBranch != null ? false : fetChingData.onLoading}
                                         isClearable={true}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.import_branch || "import_branch"}
                                         className={`${
-                                            errBranch ? "border-red-500" : "border-transparent"
+                                            errors.errBranch ? "border-red-500" : "border-transparent"
                                         } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
@@ -1041,7 +1006,7 @@ const Index = (props) => {
                                             }),
                                         }}
                                     />
-                                    {errBranch && (
+                                    {errors.errBranch && (
                                         <label className="text-sm text-red-500">
                                             {dataLang?.purchase_order_errBranch || "purchase_order_errBranch"}
                                         </label>
@@ -1052,15 +1017,15 @@ const Index = (props) => {
                                         {"Khách hàng"} <span className="text-red-500">*</span>
                                     </label>
                                     <Select
-                                        options={dataClient}
+                                        options={dataSelect.dataClient}
                                         onChange={_HandleChangeInput.bind(this, "idClient")}
-                                        value={idClient}
-                                        isLoading={onLoading}
+                                        value={idChange.idClient}
+                                        isLoading={fetChingData.onLoading}
                                         placeholder={"Khách hàng"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
                                         className={`${
-                                            errClient ? "border-red-500" : "border-transparent"
+                                            errors.errClient ? "border-red-500" : "border-transparent"
                                         } placeholder:text-slate-300 w-full z-[30]  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
@@ -1099,7 +1064,7 @@ const Index = (props) => {
                                             }),
                                         }}
                                     />
-                                    {errClient && (
+                                    {errors.errClient && (
                                         <label className="text-sm text-red-500">{"Vui lòng chọn khách hàng"}</label>
                                     )}
                                 </div>
@@ -1109,17 +1074,21 @@ const Index = (props) => {
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <Select
-                                        options={dataTreatmentr}
+                                        options={dataSelect.dataTreatmentr}
                                         onChange={_HandleChangeInput.bind(this, "treatment")}
-                                        isLoading={idBranch || idClient != null ? false : onLoading}
-                                        value={idTreatment}
+                                        isLoading={
+                                            idChange.idBranch || idChange.idClient != null
+                                                ? false
+                                                : fetChingData.onLoading
+                                        }
+                                        value={idChange.idTreatment}
                                         isClearable={true}
                                         noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
                                         closeMenuOnSelect={true}
                                         hideSelectedOptions={false}
                                         placeholder={dataLang?.returns_treatment_methods || "returns_treatment_methods"}
                                         className={`${
-                                            errTreatment ? "border-red-500" : "border-transparent"
+                                            errors.errTreatment ? "border-red-500" : "border-transparent"
                                         } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                         isSearchable={true}
                                         style={{
@@ -1155,7 +1124,7 @@ const Index = (props) => {
                                             }),
                                         }}
                                     />
-                                    {errTreatment && (
+                                    {errors.errTreatment && (
                                         <label className="text-sm text-red-500">
                                             {dataLang?.returns_treatment_methods_err || "returns_treatment_methods_err"}
                                         </label>
@@ -1322,7 +1291,7 @@ const Index = (props) => {
                     </div>
                     <div className="h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                         <div className="min:h-[400px] h-[100%] max:h-[800px] w-full">
-                            {onFetchingDetail ? (
+                            {fetChingData.onFetchingDetail ? (
                                 <Loading className="h-10 w-full" color="#0f4f9e" />
                             ) : (
                                 <>
@@ -1399,18 +1368,18 @@ const Index = (props) => {
                                             </div>
                                             <div className="col-span-10  items-center">
                                                 <div className="grid grid-cols-11  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-b divide-x divide-y border-r">
-                                                    {load ? (
+                                                    {fetChingData.load ? (
                                                         <Loading className="h-2 col-span-11" color="#0f4f9e" />
                                                     ) : (
                                                         e?.child?.map((ce) => (
                                                             <React.Fragment key={ce?.id?.toString()}>
                                                                 <div className="p-1 border-t border-l  flex flex-col col-span-2 justify-center h-full">
                                                                     <Select
-                                                                        options={warehouse}
+                                                                        options={dataSelect.dataWarehouse}
                                                                         value={ce?.warehouse}
                                                                         isLoading={
                                                                             ce?.warehouse == null
-                                                                                ? onLoadingChild
+                                                                                ? fetChingData.onLoadingChild
                                                                                 : false
                                                                         }
                                                                         onChange={_HandleChangeChild.bind(
@@ -1420,8 +1389,9 @@ const Index = (props) => {
                                                                             "warehouse"
                                                                         )}
                                                                         className={`${
-                                                                            (errWarehouse && ce?.warehouse == null) ||
-                                                                            (errWarehouse &&
+                                                                            (errors.errWarehouse &&
+                                                                                ce?.warehouse == null) ||
+                                                                            (errors.errWarehouse &&
                                                                                 (ce?.warehouse?.label == null ||
                                                                                     ce?.warehouse?.warehouse_name ==
                                                                                         null))
@@ -1429,7 +1399,7 @@ const Index = (props) => {
                                                                                 : ""
                                                                         }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
                                                                         placeholder={
-                                                                            onLoadingChild
+                                                                            fetChingData.onLoadingChild
                                                                                 ? ""
                                                                                 : dataLang?.PDF_house || "PDF_house"
                                                                         }
@@ -1517,12 +1487,12 @@ const Index = (props) => {
                                                                             )}
                                                                             value={ce?.quantity || null}
                                                                             className={`${
-                                                                                errQuantity &&
+                                                                                errors.errQuantity &&
                                                                                 (ce?.quantity == null ||
                                                                                     ce?.quantity == "" ||
                                                                                     ce?.quantity == 0)
                                                                                     ? "border-b border-red-500"
-                                                                                    : errSurvive
+                                                                                    : errors.errSurvive
                                                                                     ? "border-b border-red-500"
                                                                                     : "border-b border-gray-200"
                                                                             } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
@@ -1533,7 +1503,6 @@ const Index = (props) => {
                                                                             isAllowed={(values) => {
                                                                                 const { value } = values;
                                                                                 const newValue = +value;
-
                                                                                 if (newValue > +ce?.quantityLeft) {
                                                                                     ToatstNotifi(
                                                                                         "error",
@@ -1603,12 +1572,12 @@ const Index = (props) => {
                                                                 <div className="flex justify-center  h-full p-0.5 flex-col items-center">
                                                                     <NumericFormat
                                                                         className={`${
-                                                                            errPrice &&
+                                                                            errors.errPrice &&
                                                                             (ce?.price == null ||
                                                                                 ce?.price == "" ||
                                                                                 ce?.price == 0)
                                                                                 ? "border-b border-red-500"
-                                                                                : errSurvivePrice &&
+                                                                                : errors.errSurvivePrice &&
                                                                                   (ce?.price == null ||
                                                                                       ce?.price == "" ||
                                                                                       ce?.price == 0)
@@ -1704,7 +1673,6 @@ const Index = (props) => {
                                                                         classNamePrefix="customDropdowTax"
                                                                     />
                                                                 </div>
-                                                                {/* <div>{ce?.thanhTien}</div> */}
                                                                 <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
                                                                     {formatNumber(
                                                                         ce?.price *
@@ -1713,7 +1681,6 @@ const Index = (props) => {
                                                                             Number(ce?.quantity)
                                                                     )}
                                                                 </div>
-                                                                {/* <div>{ce?.note}</div> */}
                                                                 <div className="col-span-1 flex items-center justify-center  h-full p-0.5">
                                                                     <input
                                                                         value={ce?.note}
@@ -1835,7 +1802,7 @@ const Index = (props) => {
                             {dataLang?.returns_reason || "returns_reason"}
                         </div>
                         <textarea
-                            value={note}
+                            value={idChange.note}
                             placeholder={dataLang?.returns_reason || "returns_reason"}
                             onChange={_HandleChangeInput.bind(this, "note")}
                             name="fname"
@@ -1851,7 +1818,6 @@ const Index = (props) => {
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
-                                    {/* {formatNumber(tongTienState.tongTien)} */}
                                     {formatNumber(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
@@ -1872,7 +1838,6 @@ const Index = (props) => {
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
-                                    {/* {formatNumber(tongTienState.tienChietKhau)} */}
                                     {formatNumber(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
@@ -1897,7 +1862,6 @@ const Index = (props) => {
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
-                                    {/* {formatNumber(tongTienState.tongTienSauCK)} */}
                                     {formatNumber(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
@@ -1920,7 +1884,6 @@ const Index = (props) => {
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
-                                    {/* {formatNumber(tongTienState.tienThue)} */}
                                     {formatNumber(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
@@ -1946,7 +1909,6 @@ const Index = (props) => {
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">
-                                    {/* {formatNumber(tongTienState.tongThanhTien)} */}
                                     {formatNumber(
                                         listData?.reduce((accumulator, item) => {
                                             const childTotal = item.child?.reduce((childAccumulator, childItem) => {
