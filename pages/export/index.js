@@ -200,10 +200,9 @@ const Index = (props) => {
             }
             checkLoadingTemplate();
         } else if (type == "sampleImport") {
-            sSampleImport(value);
+            sSampleImport(value?.target.checked);
         }
     };
-    console.log(pageLimit);
 
     const parseAndSetData = (value, arrEmtyLength) => {
         const parsedValue = JSON?.parse(value?.setup_colums);
