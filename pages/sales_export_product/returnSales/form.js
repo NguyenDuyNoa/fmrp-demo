@@ -390,35 +390,35 @@ const Index = (props) => {
         const onChange = {
             code: () => sIdChange((e) => ({ ...e, code: value.target.value })),
             date: () => sIdChange((e) => ({ ...e, date: moment(value).format("YYYY-MM-DD HH:mm:ss") })),
-            startDate: () => {
-                sIdChange((e) => ({ ...e, date: new Date() }));
-            },
+            startDate: () => sIdChange((e) => ({ ...e, date: new Date() })),
             idClient: () => {
-                if (listData?.length > 0) {
-                    checkListData(value, sDataSelect, sListData, sIdClient);
-                } else {
-                    sIdChange((e) => ({ ...e, idClient: value }));
-                    sFetchingData((e) => ({ ...e, onFetchingItemsAll: true }));
-                    if (value == null) {
-                        sFetchingData((e) => ({ ...e, onFetchingItemsAll: false }));
-                        sDataSelect((e) => ({ ...e, dataItems: [] }));
+                if (idChange.idClient != value)
+                    if (listData?.length > 0) {
+                        checkListData(value, sDataSelect, sListData, sIdClient, idChange.idClient);
+                    } else {
+                        sIdChange((e) => ({ ...e, idClient: value }));
+                        sFetchingData((e) => ({ ...e, onFetchingItemsAll: true }));
+                        if (value == null) {
+                            sFetchingData((e) => ({ ...e, onFetchingItemsAll: false }));
+                            sDataSelect((e) => ({ ...e, dataItems: [] }));
+                        }
                     }
-                }
             },
             treatment: () => sIdChange((e) => ({ ...e, idTreatment: value })),
             note: () => sIdChange((e) => ({ ...e, note: value.target.value })),
             branch: () => {
-                if (listData?.length > 0) {
-                    checkListData(value, sDataSelect, sListData, sIdBranch, idChange.idBranch, sIdClient);
-                } else {
-                    sIdChange((e) => ({ ...e, idClient: null, idBranch: value }));
-                    sFetchingData((e) => ({ ...e, onFetchingClient: true }));
-                    if (value == null) {
-                        sDataSelect((e) => ({ ...e, dataClient: [] }));
-                        sIdChange((e) => ({ ...e, idClient: null }));
-                        sFetchingData((e) => ({ ...e, onFetchingClient: false }));
+                if (idChange.idBranch != value)
+                    if (listData?.length > 0) {
+                        checkListData(value, sDataSelect, sListData, sIdBranch, idChange.idBranch, sIdClient);
+                    } else {
+                        sIdChange((e) => ({ ...e, idClient: null, idBranch: value }));
+                        sFetchingData((e) => ({ ...e, onFetchingClient: true }));
+                        if (value == null) {
+                            sDataSelect((e) => ({ ...e, dataClient: [] }));
+                            sIdChange((e) => ({ ...e, idClient: null }));
+                            sFetchingData((e) => ({ ...e, onFetchingClient: false }));
+                        }
                     }
-                }
             },
             generalTax: () => {
                 sGeneralTax(value);
@@ -449,20 +449,16 @@ const Index = (props) => {
     }, [router.query]);
 
     useEffect(() => {
-        if (idChange.idClient !== null) {
-            sErrors((prevErrors) => ({ ...prevErrors, errClient: false }));
-        }
-        if (idChange.idBranch !== null) {
-            sErrors((prevErrors) => ({ ...prevErrors, errBranch: false }));
-        }
-        if (idChange.idBranch !== null) {
-            sErrors((prevErrors) => ({ ...prevErrors, errTreatment: false }));
-        }
-    }, [idChange.idClient, idChange.idBranch, idChange.idTreatment]);
+        if (idChange.idBranch !== null) sErrors((prevErrors) => ({ ...prevErrors, errBranch: false }));
+        if (idChange.idClient !== null) sErrors((prevErrors) => ({ ...prevErrors, errClient: false }));
+        if (idChange.idTreatment !== null) sErrors((prevErrors) => ({ ...prevErrors, errTreatment: false }));
+    }, [idChange.idBranch, idChange.idClient, idChange.idTreatment]);
 
     useEffect(() => {
         idChange.idBranch != null && sFetchingData((e) => ({ ...e, onFetchingWarehouser: true }));
     }, [idChange.idBranch]);
+    console.log("id", idChange);
+    console.log("eror", errors);
 
     useEffect(() => {
         fetChingData.onFetchingClient && _ServerFetching_Client();
@@ -522,7 +518,6 @@ const Index = (props) => {
 
     const _HandleAddChild = (parentId, value) => {
         const { newChild } = _DataValueItem(value);
-
         const newData = listData?.map((e) => {
             if (e?.id === parentId) {
                 return { ...e, child: [...e.child, newChild] };
@@ -530,9 +525,7 @@ const Index = (props) => {
                 return e;
             }
         });
-
         sListData(newData);
-        // Lấy id của newChild
         const newChildId = newChild.id;
         sInitsId({
             idParentAdd: parentId,
@@ -781,9 +774,9 @@ const Index = (props) => {
         const isEmpty = listData?.length == 0;
 
         if (
-            idClient == null ||
-            idTreatment == null ||
-            idBranch == null ||
+            !idChange.idClient ||
+            !idChange.idTreatment ||
+            !idChange.idBranch ||
             hasNullWarehouse ||
             hasNullQuantity ||
             hasNullPrice ||
@@ -791,14 +784,16 @@ const Index = (props) => {
         ) {
             sErrors((e) => ({
                 ...e,
-                errClient: idClient == null,
-                errTreatment: idTreatment == null,
-                errBranch: idBranch == null,
+                errClient: !idChange.idClient,
+                errTreatment: !idChange.idTreatment,
+                errBranch: !idChange.idBranch,
                 errWarehouse: hasNullWarehouse,
                 errQuantity: hasNullQuantity,
                 errPrice: hasNullPrice,
             }));
-            if (isEmpty) {
+            if (!idChange.idClient || !idChange.idTreatment || !idChange.idBranch) {
+                ToatstNotifi("error", `${dataLang?.required_field_null}`);
+            } else if (isEmpty) {
                 ToatstNotifi("error", `Chưa nhập thông tin mặt hàng`);
             } else if (hasNullPrice) {
                 sErrSurvivePrice(true);
@@ -812,18 +807,17 @@ const Index = (props) => {
     };
     const _ServerSending = async () => {
         let formData = new FormData();
-        formData.append("code", code ? code : "");
+        formData.append("code", idChange.code ? idChange.code : "");
         formData.append(
             "date",
-            moment(startDate).format("YYYY-MM-DD HH:mm:ss") ? moment(startDate).format("YYYY-MM-DD HH:mm:ss") : ""
+            moment(idChange.date).format("YYYY-MM-DD HH:mm:ss")
+                ? moment(idChange.date).format("YYYY-MM-DD HH:mm:ss")
+                : ""
         );
-        formData.append("branch_id", idBranch?.value ? idBranch?.value : "");
-        formData.append("client_id", idClient?.value ? idClient?.value : "");
-        formData.append("person_contact_id", idContactPerson?.value ? idContactPerson?.value : "");
-        formData.append("address_id", idAddress?.value ? idAddress?.value : "");
-        formData.append("staff_id", idStaff?.value ? idStaff?.value : "");
-        formData.append("product_order_id", idProductOrder?.value ? idProductOrder?.value : "");
-        formData.append("note", note ? note : "");
+        formData.append("branch_id", idChange.idBranch?.value ? idChange.idBranch?.value : "");
+        formData.append("client_id", idChange.idClient?.value ? idChange.idClient?.value : "");
+        formData.append("handling_solution", idChange.idTreatment?.value ? idChange.idTreatment?.value : "");
+        formData.append("note", idChange.note ? idChange.note : "");
         listData.forEach((item, index) => {
             formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
             formData.append(`items[${index}][item]`, item?.matHang?.value);
@@ -845,7 +839,7 @@ const Index = (props) => {
             `${
                 id
                     ? `/api_web/Api_delivery/updateDelivery/${id}?csrf_protection=true`
-                    : "/api_web/Api_delivery/AddDelivery/?csrf_protection=true"
+                    : "/api_web/Api_return_order/return_order/?csrf_protection=true"
             }`,
             {
                 data: formData,

@@ -31,26 +31,32 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 const Index = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
-    const [data, setData] = useState([]);
-    const [dataExcel, sDataExcel] = useState([]);
+    const initsArr = {
+        data: [],
+        dataExcel: [],
+        listBr: [],
+        listCode: [],
+        listCustomer: [],
+        listStatus: [],
+    };
+    const initsId = {
+        idBranch: null,
+        idCode: null,
+        idCustomer: null,
+        valueDate: {
+            startDate: null,
+            endDate: null,
+        },
+    };
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const [idFillter, sIdFillter] = useState(initsId);
+    const [listData, sListData] = useState(initsArr);
     const [onFetching, sOnFetching] = useState(false);
     const [onFetching_filter, sOnFetching_filter] = useState(false);
     const [totalItems, sTotalItems] = useState([]);
     const [keySearch, sKeySearch] = useState("");
     const [limit, sLimit] = useState(15);
-    const [total, setTotal] = useState({});
-    const [listBr, sListBr] = useState([]);
-    const [listDelivery, sListDelivery] = useState([]);
-    const [listCustomer, sListCustomer] = useState([]);
-    const [idBranch, sIdBranch] = useState(null);
-    const [idDelivery, sIdDelivery] = useState(null);
-    const [idCustomer, sIdCustomer] = useState(null);
-    const [listTabStatus, sListTabStatus] = useState();
-    const [valueDate, sValueDate] = useState({
-        startDate: null,
-        endDate: null,
-    });
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const [total, sTotal] = useState({});
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -75,21 +81,20 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    branch_id: idBranch != null ? idBranch.value : null,
-                    delivery_id: idDelivery != null ? idDelivery?.value : null,
-                    status: tabPage ?? null,
-                    customer_id: idCustomer != null ? idCustomer.value : null,
-                    start_date: valueDate?.startDate != null ? valueDate?.startDate : null,
-                    end_date: valueDate?.endDate != null ? valueDate?.endDate : null,
+                    start_date: idFillter.valueDate?.startDate != null ? idFillter.valueDate?.startDate : null,
+                    end_date: idFillter.valueDate?.endDate != null ? idFillter.valueDate?.endDate : null,
                 },
             },
             (err, response) => {
                 if (!err) {
                     var { rResult, output, rTotal } = response.data.data;
-                    setData(rResult);
+                    sListData((e) => ({
+                        ...e,
+                        data: rResult,
+                        dataExcel: rResult,
+                    }));
                     sTotalItems(output);
-                    sDataExcel(rResult);
-                    setTotal(rTotal);
+                    sTotal(rTotal);
                     sOnFetching(false);
                 }
             }
@@ -104,17 +109,14 @@ const Index = (props) => {
                 params: {
                     limit: 0,
                     search: keySearch,
-                    branch_id: idBranch != null ? idBranch.value : null,
-                    delivery_id: idDelivery != null ? idDelivery?.value : null,
-                    start_date: valueDate?.startDate != null ? valueDate?.startDate : null,
-                    end_date: valueDate?.endDate != null ? valueDate?.endDate : null,
-                    customer_id: idCustomer != null ? idCustomer.value : null,
+                    start_date: idFillter.valueDate?.startDate != null ? idFillter.valueDate?.startDate : null,
+                    end_date: idFillter.valueDate?.endDate != null ? idFillter.valueDate?.endDate : null,
                 },
             },
             (err, response) => {
                 if (!err) {
                     var { data } = response.data;
-                    sListTabStatus(data?.status);
+                    sListData((e) => ({ ...e, listStatus: data?.status }));
                 }
                 sOnFetching(false);
             }
@@ -126,21 +128,10 @@ const Index = (props) => {
         await Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 var { rResult } = response.data;
-                sListBr(rResult);
+                sListData((e) => ({ ...e, listBr: rResult.map((e) => ({ label: e.name, value: e.id })) }));
             }
         });
-        await Axios("GET", `/api_web/api_delivery/searchDelivery?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                var rResult = response.data.data;
-                sListDelivery(rResult?.map((e) => ({ label: e?.reference_no, value: e?.id })));
-            }
-        });
-        await Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var db = response.data.rResult;
-                sListCustomer(db?.map((e) => ({ label: e.name, value: e.id })));
-            }
-        });
+
         sOnFetching_filter(false);
     };
 
@@ -184,35 +175,14 @@ const Index = (props) => {
         (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
     }, [onFetching]);
 
-    // useEffect(() => {
-    //     (router.query.tab && sOnFetching(true)) ||
-    //         (keySearch && sOnFetching(true)) ||
-    //         (router.query?.tab && sOnFetching_filter(true)) ||
-    //         (idBranch != null && sOnFetching(true)) ||
-    //         (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
-    //         (idCustomer != null && sOnFetching(true)) ||
-    //         (idDelivery != null && sOnFetching(true));
-    // }, [
-    //     limit,
-    //     router.query?.page,
-    //     router.query?.tab,
-    //     idBranch,
-    //     valueDate.endDate,
-    //     valueDate.startDate,
-    //     idCustomer,
-    //     idDelivery,
-    // ]);
-
     useEffect(() => {
         (router.query.tab && sOnFetching(true)) || (router.query?.tab && sOnFetching_filter(true));
     }, [limit, router.query?.page, router.query?.tab]);
 
     useEffect(() => {
         if (
-            idBranch != null ||
-            (valueDate.startDate != null && valueDate.endDate != null) ||
-            idCustomer != null ||
-            idDelivery != null
+            idFillter.idBranch != null ||
+            (idFillter.valueDate.startDate != null && idFillter.valueDate.endDate != null)
         ) {
             router.push({
                 pathname: router.route,
@@ -221,31 +191,26 @@ const Index = (props) => {
                 },
             });
             setTimeout(() => {
-                (idBranch != null && sOnFetching(true)) ||
-                    (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
-                    (idCustomer != null && sOnFetching(true)) ||
-                    (idDelivery != null && sOnFetching(true)) ||
+                (idFillter.idBranch != null && sOnFetching(true)) ||
+                    (idFillter.valueDate.startDate != null &&
+                        idFillter.valueDate.endDate != null &&
+                        sOnFetching(true)) ||
                     (keySearch && sOnFetching(true));
             }, 300);
         } else {
             sOnFetching(true);
         }
-    }, [limit, idBranch, idDelivery, idCustomer, valueDate.endDate, valueDate.startDate]);
+    }, [
+        limit,
+        idFillter.idBranch,
+        idFillter.idDelivery,
+        idFillter.idCustomer,
+        idFillter.valueDate.endDate,
+        idFillter.valueDate.startDate,
+    ]);
 
-    const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
-
-    const typeChange = {
-        branch: sIdBranch,
-        code: sIdDelivery,
-        customer: sIdCustomer,
-        date: sValueDate,
-    };
-
-    const onChangeFilter = async (type, value) => {
-        const updateFunction = await typeChange[type];
-        if (updateFunction) {
-            updateFunction(value);
-        }
+    const onChangeFilter = (type, value) => {
+        sIdFillter((e) => ({ ...e, [type]: value }));
     };
 
     const paginate = (pageNumber) => {
@@ -367,7 +332,7 @@ const Index = (props) => {
                     },
                 },
             ],
-            data: dataExcel?.map((e) => [
+            data: listData.dataExcel?.map((e) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.date ? e?.date : ""}` },
                 { value: `${e?.reference_no ? e?.reference_no : ""}` },
@@ -466,7 +431,7 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{"Trả lại hàng mua"} </title>
+                <title>{"Trả lại hàng bán"} </title>
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 {trangthaiExprired ? (
@@ -475,7 +440,7 @@ const Index = (props) => {
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
                         <h6 className="text-[#141522]/40">{"Bán & Xuất hàng"}</h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{"Trả lại hàng mua"}</h6>
+                        <h6>{"Trả lại hàng bán"}</h6>
                     </div>
                 )}
 
@@ -484,7 +449,7 @@ const Index = (props) => {
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className="flex justify-between  mt-1 mr-2">
                                 <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                    {"Trả lại hàng mua"}
+                                    {"Trả lại hàng bán"}
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Link
@@ -495,9 +460,9 @@ const Index = (props) => {
                                     </Link>
                                 </div>
                             </div>
-                            {/* <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                {listTabStatus &&
-                                    listTabStatus.map((e) => {
+                            <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                {listData.listStatus &&
+                                    listData.listStatus.map((e) => {
                                         return (
                                             <div>
                                                 <TabFilter
@@ -516,9 +481,9 @@ const Index = (props) => {
                                             </div>
                                         );
                                     })}
-                            </div> */}
+                            </div>
                             {/* table */}
-                            {/* <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
+                            <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded-lg grid grid-cols-7 justify-between xl:p-3 p-2">
                                         <div className="col-span-6">
@@ -544,10 +509,10 @@ const Index = (props) => {
                                                                     "price_quote_branch",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listBr_filter,
+                                                            ...listData.listBr,
                                                         ]}
-                                                        onChange={onChangeFilter.bind(this, "branch")}
-                                                        value={idBranch}
+                                                        onChange={onChangeFilter.bind(this, "idBranch")}
+                                                        value={idFillter.idBranch}
                                                         placeholder={
                                                             dataLang?.price_quote_select_branch ||
                                                             "price_quote_select_branch"
@@ -599,11 +564,11 @@ const Index = (props) => {
                                                                     "delivery_receipt_code",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listDelivery,
+                                                            ...listData.listCode,
                                                         ]}
                                                         onInputChange={_HandleSeachApi.bind(this)}
-                                                        onChange={onChangeFilter.bind(this, "code")}
-                                                        value={idDelivery}
+                                                        onChange={onChangeFilter.bind(this, "idCode")}
+                                                        value={idFillter.idCode}
                                                         placeholder={
                                                             dataLang?.delivery_receipt_code || "delivery_receipt_code"
                                                         }
@@ -653,10 +618,10 @@ const Index = (props) => {
                                                                     "price_quote_select_customer",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listCustomer,
+                                                            ...listData.listCustomer,
                                                         ]}
-                                                        onChange={onChangeFilter.bind(this, "customer")}
-                                                        value={idCustomer}
+                                                        onChange={onChangeFilter.bind(this, "idCustomer")}
+                                                        value={idFillter.idCustomer}
                                                         placeholder={
                                                             dataLang?.price_quote_customer || "price_quote_customer"
                                                         }
@@ -698,10 +663,10 @@ const Index = (props) => {
                                                 </div>
                                                 <div className="z-20 col-span-1">
                                                     <Datepicker
-                                                        value={valueDate}
+                                                        value={idFillter.valueDate}
                                                         i18n={"vi"}
                                                         primaryColor={"blue"}
-                                                        onChange={onChangeFilter.bind(this, "date")}
+                                                        onChange={onChangeFilter.bind(this, "valueDate")}
                                                         showShortcuts={true}
                                                         displayFormat={"DD/MM/YYYY"}
                                                         configs={{
@@ -727,7 +692,7 @@ const Index = (props) => {
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={sOnFetching} />
                                                 <div>
-                                                    {dataExcel?.length > 0 && (
+                                                    {listData.dataExcel?.length > 0 && (
                                                         <ExcelFile
                                                             filename={
                                                                 dataLang?.delivery_receipt_list ||
@@ -799,49 +764,44 @@ const Index = (props) => {
                                 </div>
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lg:w-[100%] ">
-                                        <div className="grid grid-cols-12 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {dataLang?.delivery_receipt_date || "delivery_receipt_date"}
+                                        <div className="grid grid-cols-10 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {dataLang?.delivery_receipt_code || "delivery_receipt_code"}
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center">
-                                                {dataLang?.price_quote_customer || "price_quote_table_customer"}
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.import_supplier || "import_supplier"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {dataLang?.delivery_receipt_address1 || "delivery_receipt_address1"}
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.import_total_amount || "import_total_amount"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {dataLang?.delivery_receipt_OrderNumber ||
-                                                    "delivery_receipt_OrderNumber"}
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.import_tax_money || "import_tax_money"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {dataLang?.price_quote_into_money || "price_quote_into_money"}
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.import_into_money || "import_into_money"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {dataLang?.delivery_receipt_Creator || "delivery_receipt_Creator"}
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.returns_form || "returns_form"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {dataLang?.delivery_receipt_BrowseStorekeepers ||
-                                                    "delivery_receipt_BrowseStorekeepers"}
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {dataLang?.price_quote_note || "price_quote_note"}
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.import_branch || "import_branch"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {dataLang?.price_quote_branch || "price_quote_branch"}
-                                            </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center">
-                                                {dataLang?.price_quote_operations || "price_quote_operations"}
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.import_action || "import_action"}
                                             </h4>
                                         </div>
                                         {onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
-                                        ) : data?.length > 0 ? (
+                                        ) : listData.data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                                                    {data?.map((e) => (
+                                                    {listData.data?.map((e) => (
                                                         <div
                                                             className="relative grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40"
                                                             key={e.id.toString()}
@@ -1024,9 +984,9 @@ const Index = (props) => {
                                         )}
                                     </div>
                                 </div>
-                            </div> */}
+                            </div>
                         </div>
-                        {/* <div className="grid grid-cols-12 bg-gray-100 items-center">
+                        <div className="grid grid-cols-12 bg-gray-100 items-center">
                             <div className="col-span-5 p-2 text-center">
                                 <h3 className="uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
                                     {dataLang?.total_outside || "total_outside"}
@@ -1041,7 +1001,7 @@ const Index = (props) => {
                                 <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]"></h3>
                             </div>
                         </div>
-                        {data?.length != 0 && (
+                        {listData.data?.length != 0 && (
                             <div className="flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
                                 <h6>
                                     {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords}{" "}
@@ -1054,7 +1014,7 @@ const Index = (props) => {
                                     currentPage={router.query?.page ? router.query?.page : 1}
                                 />
                             </div>
-                        )} */}
+                        )}
                     </div>
                 </div>
             </div>
