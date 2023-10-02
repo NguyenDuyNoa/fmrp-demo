@@ -154,12 +154,13 @@ const Index = (props) => {
                     (err, response) => {
                         if (!err) {
                             var result = response?.data;
-                            sListCode(
-                                result?.map((e) => ({
+                            sListData((pver) => ({
+                                ...pver,
+                                listCode: result?.map((e) => ({
                                     label: `${e.reference_no}`,
                                     value: e.id,
-                                }))
-                            );
+                                })),
+                            }));
                         }
                     }
                 );
@@ -200,14 +201,7 @@ const Index = (props) => {
         } else {
             sOnFetching(true);
         }
-    }, [
-        limit,
-        idFillter.idBranch,
-        idFillter.idDelivery,
-        idFillter.idCustomer,
-        idFillter.valueDate.endDate,
-        idFillter.valueDate.startDate,
-    ]);
+    }, [limit, idFillter.idBranch, idFillter.valueDate.endDate, idFillter.valueDate.startDate]);
 
     const onChangeFilter = (type, value) => {
         sIdFillter((e) => ({ ...e, [type]: value }));
@@ -772,7 +766,7 @@ const Index = (props) => {
                                                 {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.import_supplier || "import_supplier"}
+                                                {"Khách hàng"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.import_total_amount || "import_total_amount"}
@@ -986,32 +980,39 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="grid grid-cols-12 bg-gray-100 items-center">
-                            <div className="col-span-5 p-2 text-center">
-                                <h3 className="uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
-                                    {dataLang?.total_outside || "total_outside"}
+                        <div className="grid grid-cols-10 bg-gray-100 items-center rounded-md">
+                            <div className="col-span-3 p-2 text-center">
+                                <h3 className="uppercase text-gray-600 font-medium 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
+                                    {dataLang?.import_total || "import_total"}
                                 </h3>
                             </div>
-                            <div className="col-span-2 text-right justify-end pr-4 flex gap-2 flex-wrap ">
-                                <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-1">
-                                    {formatNumber(total?.grand_total)}
+                            <div className="col-span-1 text-right">
+                                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
+                                    {formatNumber(total?.total_price)}
                                 </h3>
                             </div>
-                            <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
-                                <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]"></h3>
+                            <div className="col-span-1 text-right ">
+                                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
+                                    {formatNumber(total?.total_tax_price)}
+                                </h3>
+                            </div>
+                            <div className="col-span-1 text-right">
+                                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
+                                    {formatNumber(total?.total_amount)}
+                                </h3>
                             </div>
                         </div>
                         {listData.data?.length != 0 && (
-                            <div className="flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
-                                <h6>
-                                    {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords}{" "}
-                                    {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
+                            <div className="flex space-x-5 items-center">
+                                <h6 className="">
+                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {totalItems?.iTotalRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
                                     totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                     paginate={paginate}
-                                    currentPage={router.query?.page ? router.query?.page : 1}
+                                    currentPage={router.query?.page || 1}
                                 />
                             </div>
                         )}

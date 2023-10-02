@@ -654,7 +654,7 @@ const Index = (props) => {
         }, 500);
         setTimeout(() => {
             sFetchingData((e) => ({ ...e, load: false }));
-        }, 1000);
+        }, 1300);
     };
 
     const _HandleChangeValue = (parentId, value) => {
@@ -746,7 +746,6 @@ const Index = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-
         const checkChildItem = (childItem, property) => {
             switch (property) {
                 case "warehouse":
@@ -823,15 +822,15 @@ const Index = (props) => {
             formData.append(`items[${index}][item]`, item?.matHang?.value);
             item?.child?.forEach((childItem, childIndex) => {
                 formData.append(`items[${index}][child][${childIndex}][row_id]`, id ? childItem?.idChildBackEnd : "");
-                formData.append(
-                    `items[${index}][child][${childIndex}][warehouse_id]`,
-                    childItem?.warehouse?.value || 0
-                );
                 formData.append(`items[${index}][child][${childIndex}][quantity]`, childItem?.quantity);
+                formData.append(`items[${index}][child][${childIndex}][tax_id]`, childItem?.tax?.value);
                 formData.append(`items[${index}][child][${childIndex}][price]`, childItem?.price);
-                formData.append(`items[${index}][child][${childIndex}][discount]`, childItem?.discount);
-                formData.append(`items[${index}][child][${childIndex}][tax]`, childItem?.tax?.value);
-                formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : "");
+                formData.append(
+                    `items[${index}][child][${childIndex}][location_warehouses_id]`,
+                    childItem?.warehouse?.value
+                );
+                formData.append(`items[${index}][child][${childIndex}][discount_percent]`, childItem?.discount);
+                formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note);
             });
         });
         await Axios(
