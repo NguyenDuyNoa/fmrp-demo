@@ -553,7 +553,7 @@ const FilePDF = ({
             {
                 stack: [
                     {
-                        text: uppercaseText(`Phiếu giao hàng`, "contentTitle"),
+                        text: uppercaseText(`Trả lại hàng mua`, "contentTitle"),
                     },
                 ],
                 margin: [0, 8, 0, 0],
@@ -1072,7 +1072,7 @@ const FilePDF = ({
             {
                 stack: [
                     {
-                        text: uppercaseText(`Phiếu giao hàng`, "contentTitle"),
+                        text: uppercaseText(`Trả lại hàng mua`, "contentTitle"),
                     },
                 ],
                 margin: [0, 8, 0, 0],
@@ -1390,6 +1390,916 @@ const FilePDF = ({
         },
     };
 
+    //Trả lại hàng not full
+    const docDefinitionReturnSalesFull = {
+        info: {
+            title: `${props?.type === "returnSales" && `Trả lại hàng bán - ${data?.code}`}`,
+            author: "Foso",
+            subject: "Quotation",
+            keywords: "PDF",
+        },
+        pageOrientation: "portrait",
+        content: [
+            {
+                columns: [
+                    {
+                        width: "30%",
+                        stack: [
+                            {
+                                image: "logo",
+                                width: 100,
+                                height: 100,
+                                alignment: "left",
+                                margin: [0, -15, 0, 5],
+                                fit: [100, 100],
+                            },
+                        ],
+                    },
+                    {
+                        width: "70%",
+                        stack: [
+                            {
+                                text: `${dataCompany?.company_name}`,
+                                style: "headerInfo",
+                            },
+                            {
+                                text: dataCompany?.company_address
+                                    ? `${props.dataLang?.PDF_adress || "PDF_adress"} : ${dataCompany?.company_address}`
+                                    : "",
+                                style: "headerInfoText",
+                            },
+                            {
+                                text: dataCompany?.company_phone_number
+                                    ? `${props.dataLang?.PDF_tel || "PDF_tel"}: ${dataCompany?.company_phone_number}`
+                                    : "",
+                                style: "headerInfoText",
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: dataCompany?.company_email ? `Email: ${dataCompany?.company_email}` : "",
+                                        style: "headerInfoText",
+                                    },
+                                    "    ",
+                                    {
+                                        text: dataCompany?.company_website
+                                            ? `Website: ${dataCompany?.company_website}`
+                                            : "",
+                                        style: "headerInfoText",
+                                    },
+                                ],
+                                margin: [0, -4, 0, 0],
+                            },
+                        ],
+                        margin: [0, -20, 0, 5],
+                    },
+                ],
+                columnGap: 10,
+            },
+            {
+                canvas: [
+                    {
+                        type: "line",
+                        x1: 0,
+                        y1: 0,
+                        x2: 520,
+                        y2: 0,
+                        lineWidth: 1,
+                        color: "#e2e8f0",
+                    },
+                ],
+            },
+            {
+                stack: [
+                    {
+                        text: uppercaseText(`Trả lại hàng bán`, "contentTitle"),
+                    },
+                ],
+                margin: [0, 8, 0, 0],
+            },
+            {
+                columns: [
+                    {
+                        text: "",
+                        width: "80%",
+                    },
+                    {
+                        width: "20%",
+                        stack: [
+                            {
+                                text: [
+                                    {
+                                        text: `${
+                                            props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
+                                        }`,
+                                        inline: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                    {
+                                        text: `${data?.reference_no}`,
+                                        bold: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                ],
+                                italic: true,
+                                margin: [0, 10, 0, 2],
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"}`,
+                                        inline: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                    {
+                                        text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                        bold: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                ],
+                                italic: true,
+                                margin: [0, 2, 0, 2],
+                            },
+                        ],
+                    },
+                ],
+                columnGap: 2,
+            },
+
+            {
+                text: [
+                    {
+                        text: `${props?.dataLang?.returnSales_client || "returnSales_client"}: `,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text: `${data?.client_name}`,
+                        bold: true,
+                        fontSize: 10,
+                    },
+                ],
+                margin: [0, 2, 0, 2],
+            },
+            {
+                text: [
+                    {
+                        text: `${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}: `,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    { text: `${data?.note}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 10],
+            },
+            {
+                table: {
+                    widths: "100%",
+                    headerRows: 0,
+                    widths: props?.type == "returnSales" && [
+                        "auto",
+                        "auto",
+                        "auto",
+                        // "auto",
+                        "auto",
+                        "auto",
+                        "auto",
+                        "auto",
+                        "auto",
+                        "*",
+                    ],
+                    body: [
+                        // Header row
+                        [
+                            uppercaseTextHeaderTabel("STT", "headerTable", "center"),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.purchase_items || "purchase_items"}`,
+                                "headerTables",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.PDF_infoItem || "PDF_infoItem"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(`${"ĐVT"}`, "headerTable", "center"),
+                            uppercaseTextHeaderTabel(`${"SL"}`, "headerTable", "center"),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.inventory_unit_price || "inventory_unit_price"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.serviceVoucher_tax || "serviceVoucher_tax"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                        ],
+
+                        // Data rows
+                        ...(data && props?.type == "returnSales" && data?.items.length > 0
+                            ? data?.items.map((item, index) => {
+                                  const stack = [];
+                                  const stackBt = [];
+                                  stack.push({
+                                      text: item?.item?.name ? item?.item?.name : "",
+                                      fontSize: 10,
+                                      margin: styleMarginChild,
+                                  });
+                                  stackBt.push({
+                                      text: `Biến thể: ${item?.item?.product_variation}`,
+                                      fontSize: 9,
+                                      italics: true,
+                                      margin: styleMarginChild,
+                                  });
+
+                                  if (dataProductSerial?.is_enable === "1") {
+                                      const serialStack = [
+                                          {
+                                              text: [
+                                                  {
+                                                      text: "Serial: ",
+                                                      fontSize: 9,
+                                                      italics: true,
+                                                  },
+                                                  {
+                                                      text:
+                                                          item.serial == null || item.serial == "" ? "-" : item.serial,
+                                                      fontSize: 9,
+                                                      italics: true,
+                                                      margin: [0, 5, 0, 0],
+                                                  },
+                                              ],
+                                          },
+                                      ];
+                                      stackBt.push(serialStack);
+                                  }
+
+                                  if (dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1") {
+                                      const subStack = [
+                                          {
+                                              text: [
+                                                  {
+                                                      text: "Lot: ",
+                                                      fontSize: 9,
+                                                      italics: true,
+                                                  },
+                                                  {
+                                                      text: item.lot == null || item.lot == "" ? "-" : item.lot,
+                                                      fontSize: 9,
+                                                      italics: true,
+                                                      margin: [0, 5, 0, 0],
+                                                  },
+                                              ],
+                                              fontSize: 9,
+                                              margin: [0, 5, 0, 0],
+                                          },
+                                          {
+                                              text: [
+                                                  {
+                                                      text: "Date: ",
+                                                      fontSize: 9,
+                                                      italics: true,
+                                                  },
+                                                  {
+                                                      text: item.expiration_date
+                                                          ? moment(item.expiration_date).format("DD/MM/YYYY")
+                                                          : "-",
+                                                      fontSize: 8.5,
+                                                      italics: true,
+                                                      margin: [0, 5, 0, 0],
+                                                  },
+                                              ],
+                                              fontSize: 9,
+                                              margin: [0, 5, 0, 0],
+                                          },
+                                      ];
+                                      stackBt.push(subStack);
+                                  }
+                                  return [
+                                      {
+                                          text: `${index + 1}`,
+                                          alignment: "center",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          stack: stack,
+                                      },
+                                      { stack: stackBt },
+                                      {
+                                          text: item?.item?.unit_name ? item?.item?.unit_name : "",
+                                          fontSize: 10,
+                                          alignment: "center",
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.quantity ? formatNumber(item?.quantity) : "",
+                                          fontSize: 10,
+                                          alignment: "center",
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.price_after_discount
+                                              ? formatNumber(item?.price_after_discount)
+                                              : "",
+                                          fontSize: 10,
+                                          alignment: "center",
+                                          margin: styleMarginChild,
+                                      },
+
+                                      {
+                                          text: item?.tax_rate_item ? `${item?.tax_rate_item + "%"}` : "",
+                                          alignment: "center",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.amount ? `${formatNumber(item?.amount)}` : "",
+                                          alignment: "right",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.note ? item?.note : "",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                  ];
+                              })
+                            : ""),
+                        [
+                            {
+                                text: `${props.dataLang?.purchase_order_table_total || "purchase_order_table_total"}`,
+                                bold: true,
+                                colSpan: 2,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                            "",
+                            {
+                                text: `${formatNumber(data?.total_price)}`,
+                                bold: true,
+                                alignment: "right",
+                                colSpan: 7,
+                                margin: styleMarginChildTotal,
+                                fontSize: 10,
+                            },
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                        ],
+                        [
+                            {
+                                text: `${
+                                    props.dataLang?.purchase_order_detail_discounty || "purchase_order_detail_discounty"
+                                }`,
+                                bold: true,
+                                colSpan: 2,
+                                margin: styleMarginChildTotal,
+                                fontSize: 10,
+                            },
+                            "",
+                            {
+                                text: `${formatNumber(data?.total_discount)}`,
+                                bold: true,
+                                alignment: "right",
+                                colSpan: 7,
+                                margin: styleMarginChildTotal,
+                                fontSize: 10,
+                            },
+                            "",
+
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                        ],
+                        [
+                            {
+                                text: `${
+                                    props.dataLang?.purchase_order_detail_money_after_discount ||
+                                    "purchase_order_detail_money_after_discount"
+                                }`,
+                                margin: styleMarginChildTotal,
+                                bold: true,
+                                colSpan: 2,
+                                fontSize: 10,
+                            },
+                            "",
+                            {
+                                text: `${formatNumber(data?.total_price_after_discount)}`,
+                                bold: true,
+                                alignment: "right",
+                                margin: styleMarginChildTotal,
+                                colSpan: 7,
+                                fontSize: 10,
+                            },
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                        ],
+                        [
+                            {
+                                text: `${
+                                    props.dataLang?.purchase_order_detail_tax_money || "purchase_order_detail_tax_money"
+                                }`,
+                                margin: styleMarginChildTotal,
+                                bold: true,
+                                colSpan: 2,
+                                fontSize: 10,
+                            },
+                            "",
+                            {
+                                text: `${formatNumber(data?.total_tax_price)}`,
+                                bold: true,
+                                alignment: "right",
+                                margin: styleMarginChildTotal,
+                                colSpan: 7,
+                                fontSize: 10,
+                            },
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                        ],
+                        [
+                            {
+                                text: `${
+                                    props.dataLang?.purchase_order_detail_into_money ||
+                                    "purchase_order_detail_into_money"
+                                }`,
+                                bold: true,
+                                margin: styleMarginChildTotal,
+                                colSpan: 2,
+                                fontSize: 10,
+                            },
+                            "",
+                            {
+                                text: `${formatNumber(data?.total_amount)}`,
+                                bold: true,
+                                alignment: "right",
+                                colSpan: 7,
+                                margin: styleMarginChildTotal,
+                                fontSize: 10,
+                            },
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                        ],
+                    ],
+                },
+            },
+            {
+                text: [
+                    {
+                        text: `${props.dataLang?.PDF_price || "PDF_price"} : `,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text: capitalizedTotalAmountWord,
+                        fontSize: 10,
+                        bold: true,
+                    },
+                ],
+                margin: [0, 5, 0, 0],
+            },
+            bottomForm(props, currentDate).date,
+            bottomForm(props, currentDate).column,
+        ],
+        styles: styles,
+        dontBreakRows: true,
+        images: {
+            logo: {
+                url: `${dataCompany?.company_logo}`,
+            },
+        },
+    };
+
+    //Trả lại hàng not price
+
+    const docDefinitionReturnSalesNoPrice = {
+        info: {
+            title: `${props?.type === "returnSales" && `Trả lại hàng bán - ${data?.code}`}`,
+            author: "Foso",
+            subject: "Quotation",
+            keywords: "PDF",
+        },
+        pageOrientation: "portrait",
+        content: [
+            {
+                columns: [
+                    {
+                        width: "30%",
+                        stack: [
+                            {
+                                image: "logo",
+                                width: 100,
+                                height: 100,
+                                alignment: "left",
+                                margin: [0, -15, 0, 5],
+                                fit: [100, 100],
+                            },
+                        ],
+                    },
+                    {
+                        width: "70%",
+                        stack: [
+                            {
+                                text: `${dataCompany?.company_name}`,
+                                style: "headerInfo",
+                            },
+                            {
+                                text: dataCompany?.company_address
+                                    ? `${props.dataLang?.PDF_adress || "PDF_adress"} : ${dataCompany?.company_address}`
+                                    : "",
+                                style: "headerInfoText",
+                            },
+                            {
+                                text: dataCompany?.company_phone_number
+                                    ? `${props.dataLang?.PDF_tel || "PDF_tel"}: ${dataCompany?.company_phone_number}`
+                                    : "",
+                                style: "headerInfoText",
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: dataCompany?.company_email ? `Email: ${dataCompany?.company_email}` : "",
+                                        style: "headerInfoText",
+                                    },
+                                    "    ",
+                                    {
+                                        text: dataCompany?.company_website
+                                            ? `Website: ${dataCompany?.company_website}`
+                                            : "",
+                                        style: "headerInfoText",
+                                    },
+                                ],
+                                margin: [0, -4, 0, 0],
+                            },
+                        ],
+                        margin: [0, -20, 0, 5],
+                    },
+                ],
+                columnGap: 10,
+            },
+            {
+                canvas: [
+                    {
+                        type: "line",
+                        x1: 0,
+                        y1: 0,
+                        x2: 520,
+                        y2: 0,
+                        lineWidth: 1,
+                        color: "#e2e8f0",
+                    },
+                ],
+            },
+            {
+                stack: [
+                    {
+                        text: uppercaseText(`Trả lại hàng bán`, "contentTitle"),
+                    },
+                ],
+                margin: [0, 8, 0, 0],
+            },
+
+            {
+                columns: [
+                    {
+                        text: "",
+                        width: "80%",
+                    },
+                    {
+                        width: "20%",
+                        stack: [
+                            {
+                                text: [
+                                    {
+                                        text: `${
+                                            props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
+                                        }`,
+                                        inline: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                    {
+                                        text: `${data?.reference_no}`,
+                                        bold: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                ],
+                                italic: true,
+                                margin: [0, 10, 0, 2],
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"}`,
+                                        inline: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                    {
+                                        text: `${moment(data?.date).format("DD/MM/YYYY")}`,
+                                        bold: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                ],
+                                italic: true,
+                                margin: [0, 2, 0, 2],
+                            },
+                        ],
+                    },
+                ],
+                columnGap: 2,
+            },
+
+            {
+                text: [
+                    {
+                        text: `${props?.dataLang?.returnSales_client || "returnSales_client"}: `,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text: `${data?.client_name}`,
+                        bold: true,
+                        fontSize: 10,
+                    },
+                ],
+                margin: [0, 2, 0, 2],
+            },
+
+            {
+                text: [
+                    {
+                        text: `${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}: `,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    { text: `${data?.note}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 10],
+            },
+            {
+                table: {
+                    widths: "100%",
+                    headerRows: 0,
+                    widths: props?.type == "returnSales" && ["auto", "auto", "auto", "auto", "auto", "auto", "*"],
+                    body: [
+                        // Header row
+                        [
+                            uppercaseTextHeaderTabel("STT", "headerTable", "center"),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.inventory_items || "inventory_items"}`,
+                                "headerTables",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.PDF_infoItem || "PDF_infoItem"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.PDF_house || "PDF_house"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(`${"ĐVT"}`, "headerTable", "center"),
+                            uppercaseTextHeaderTabel(`${"SL"}`, "headerTable", "center"),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                        ],
+
+                        // Data rows
+                        ...(data && props?.type == "returnSales" && data?.items.length > 0
+                            ? data?.items.map((item, index) => {
+                                  const stack = [];
+                                  const stackBt = [];
+                                  stack.push({
+                                      text: item?.item?.name ? item?.item?.name : "",
+                                      fontSize: 10,
+                                      margin: styleMarginChild,
+                                  });
+                                  stackBt.push({
+                                      text: `Biến thể: ${item?.item?.product_variation}`,
+                                      fontSize: 9,
+                                      italics: true,
+                                      margin: styleMarginChild,
+                                  });
+
+                                  if (dataProductSerial?.is_enable === "1") {
+                                      const serialStack = [
+                                          {
+                                              text: [
+                                                  {
+                                                      text: "Serial: ",
+                                                      fontSize: 9,
+                                                      italics: true,
+                                                  },
+                                                  {
+                                                      text:
+                                                          item.serial == null || item.serial == "" ? "-" : item.serial,
+                                                      fontSize: 9,
+                                                      italics: true,
+                                                      margin: [0, 5, 0, 0],
+                                                  },
+                                              ],
+                                          },
+                                      ];
+                                      stackBt.push(serialStack);
+                                  }
+
+                                  if (dataMaterialExpiry?.is_enable === "1" || dataProductExpiry?.is_enable === "1") {
+                                      const subStack = [
+                                          {
+                                              text: [
+                                                  {
+                                                      text: "Lot: ",
+                                                      fontSize: 9,
+                                                      italics: true,
+                                                  },
+                                                  {
+                                                      text: item.lot == null || item.lot == "" ? "-" : item.lot,
+                                                      fontSize: 9,
+                                                      italics: true,
+                                                      margin: [0, 5, 0, 0],
+                                                  },
+                                              ],
+                                              fontSize: 9,
+                                              margin: [0, 5, 0, 0],
+                                          },
+                                          {
+                                              text: [
+                                                  {
+                                                      text: "Date: ",
+                                                      fontSize: 9,
+                                                      italics: true,
+                                                  },
+                                                  {
+                                                      text: item.expiration_date
+                                                          ? moment(item.expiration_date).format("DD/MM/YYYY")
+                                                          : "-",
+                                                      fontSize: 8.5,
+                                                      italics: true,
+                                                      margin: [0, 5, 0, 0],
+                                                  },
+                                              ],
+                                              fontSize: 9,
+                                              margin: [0, 5, 0, 0],
+                                          },
+                                      ];
+                                      stackBt.push(subStack);
+                                  }
+                                  return [
+                                      {
+                                          text: `${index + 1}`,
+                                          alignment: "center",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          stack: stack,
+                                      },
+                                      //   location_name
+                                      {
+                                          stack: stackBt,
+                                      },
+                                      {
+                                          stack: [
+                                              {
+                                                  text: item?.item?.warehouse_location?.warehouse_name
+                                                      ? item?.item?.warehouse_location?.warehouse_name
+                                                      : "",
+                                                  fontSize: 10,
+                                                  margin: styleMarginChild,
+                                              },
+                                              {
+                                                  text: item?.item?.warehouse_location?.location_name
+                                                      ? `(${item?.item?.warehouse_location?.location_name})`
+                                                      : "",
+                                                  fontSize: 9,
+                                                  italics: true,
+                                                  margin: styleMarginChild,
+                                              },
+                                          ],
+                                      },
+                                      {
+                                          text: item?.item?.unit_name ? item?.item?.unit_name : "",
+                                          alignment: "center",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.quantity ? formatNumber(item?.quantity) : "",
+                                          fontSize: 10,
+                                          alignment: "center",
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.note ? item?.note : "",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                  ];
+                              })
+                            : ""),
+                        [
+                            {
+                                text: `${props.dataLang?.inventory_total_item || "inventory_total_item"}`,
+                                bold: true,
+                                colSpan: 2,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                            "",
+                            {
+                                text: `${formatNumber(data?.items?.length)}`,
+                                bold: true,
+                                alignment: "right",
+                                colSpan: 5,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                            "",
+                            "",
+                            "",
+                            "",
+                        ],
+                        [
+                            {
+                                text: `${props.dataLang?.purchase_totalCount || "purchase_totalCount"}`,
+                                bold: true,
+                                colSpan: 2,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                            "",
+                            {
+                                text: `${formatNumber(
+                                    data?.items?.reduce((accumulator, item) => accumulator + parseInt(item.quantity), 0)
+                                )}`,
+                                bold: true,
+                                alignment: "right",
+                                colSpan: 5,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                            "",
+                            "",
+                            "",
+                            "",
+                        ],
+                        //   [{ text: `${"Tổng số lượng"}`, bold: true, colSpan: 5, fontSize: 10 },'', '','','',{ text: `${formatNumber(data?.total_price)}`, bold: true, alignment: 'right', colSpan: 5, fontSize: 10 },'','','',''],
+                    ],
+                },
+            },
+            bottomForm(props, currentDate).date,
+            bottomForm(props, currentDate).column,
+        ],
+        styles: styles,
+        dontBreakRows: true,
+        images: {
+            logo: {
+                url: `${dataCompany?.company_logo}`,
+            },
+        },
+    };
+
     const handlePrintPdf = (type) => {
         if (
             (props?.type == "sales_product" || props?.type == "price_quote") &&
@@ -1418,6 +2328,25 @@ const FilePDF = ({
         }
         if (type == "noprice" && data !== undefined && dataCompany !== undefined && props?.type == "deliveryReceipt") {
             const pdfGenerator = pdfMake.createPdf(docDefinitionDeliveryNoPrice);
+            console.log(data);
+            pdfGenerator.open((blob) => {
+                const url = URL.createObjectURL(blob);
+                setUrl(url);
+            });
+            setOpenAction(false);
+        }
+
+        ///Trả lại hàng bán
+        if (type == "fullStyle" && data !== undefined && dataCompany !== undefined && props?.type == "returnSales") {
+            const pdfGenerator = pdfMake.createPdf(docDefinitionReturnSalesFull);
+            pdfGenerator.open((blob) => {
+                const url = URL.createObjectURL(blob);
+                setUrl(url);
+            });
+            setOpenAction(false);
+        }
+        if (type == "noprice" && data !== undefined && dataCompany !== undefined && props?.type == "returnSales") {
+            const pdfGenerator = pdfMake.createPdf(docDefinitionReturnSalesNoPrice);
             console.log(data);
             pdfGenerator.open((blob) => {
                 const url = URL.createObjectURL(blob);

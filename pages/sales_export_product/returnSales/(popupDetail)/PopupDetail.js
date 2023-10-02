@@ -111,7 +111,7 @@ const PopupDetail = (props) => {
     return (
         <>
             <PopupEdit
-                title={props.dataLang?.returns_payment_detail || "returns_payment_detail"}
+                title={props.dataLang?.returnSales_detail || "returnSales_detail"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
@@ -137,14 +137,6 @@ const PopupDetail = (props) => {
                                             </h3>
                                         </div>
                                         <div className="grid grid-cols-2 col-span-2 items-center">
-                                            {/* <h3 className="col-span-1 text-[13px] font-medium">
-                                                {props.dataLang
-                                                    ?.production_warehouse_creator ||
-                                                    "production_warehouse_creator"}
-                                            </h3> */}
-                                            {/* <h3 className="col-span-1 text-[13px] font-normal">
-                                                {data?.user_create_name}
-                                            </h3> */}
                                             <h3 className=" text-[13px] font-medium">
                                                 {props?.dataLang?.production_warehouse_creator ||
                                                     "production_warehouse_creator"}
