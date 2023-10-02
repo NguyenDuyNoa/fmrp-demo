@@ -224,9 +224,9 @@ const Index = (props) => {
                             price: Number(ce?.price),
                             discount: Number(ce?.discount_percent),
                             tax: {
-                                tax_rate: ce?.tax_rate,
-                                value: ce?.tax_id_item,
-                                label: ce?.tax_name_item || "Miễn thuế",
+                                tax_rate: ce?.tax_rate || "0",
+                                value: ce?.tax_id || "0",
+                                label: ce?.tax_name || "Miễn thuế",
                             },
                             note: ce?.note,
                         }));
