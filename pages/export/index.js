@@ -268,7 +268,7 @@ const Index = (props) => {
             // Thêm dữ liệu vào trường dữ liệu xuất
             const updatedDataAffter = dataEmty[type].filter((item) => item.value !== value);
             sDataEmty((prev) => ({ ...prev, [type]: updatedDataAffter }));
-            sDataColumnNew((prev) => ({ ...prev, [type]: [...prev[type], obDataAffter] }));
+            sDataColumnNew((prev) => ({ ...prev, [type]: [obDataAffter, ...prev[type]] }));
         }
     };
 
@@ -406,43 +406,82 @@ const Index = (props) => {
     //     return { values, columns };
     // }, [dataServer, arrEmty.clients, arrEmty.contacts, arrEmty.address]);
     const { values, columns } = useMemo(() => {
-        const allFields = [...arrEmty.clients, ...arrEmty.contacts, ...arrEmty.address];
+        const examp = {
+            1: [...arrEmty.clients, ...arrEmty.contacts, ...arrEmty.address],
+            2: [...arrEmty.clients, ...arrEmty.contacts],
+        };
+        // const allFields = [...arrEmty.clients, ...arrEmty.contacts, ...arrEmty.address];
+        const allFields = examp[tabPage];
+
+        const checkValue = (e, contacts, arrAddress, temp) => {
+            if (contacts && (contacts?.length > arrAddress?.length || contacts?.length == arrAddress?.length)) {
+                temp = contacts?.map((contact, index) => {
+                    const address = arrAddress ? arrAddress[index] : null;
+                    return {
+                        ...e,
+                        ...contact,
+                        ...address,
+                    };
+                });
+            } else if (arrAddress) {
+                temp = arrAddress?.map((address, index) => {
+                    const contact = contacts ? contacts[index] : null;
+                    return {
+                        ...e,
+                        ...address,
+                        ...contact,
+                    };
+                });
+            } else {
+                temp = [e];
+            }
+            return temp;
+        };
+
         const dataCustom = dataServer
             .map((e, index) => {
-                const { arrAddress, contacts, ...obBefore } = e;
                 let temp = [];
+                // const { arrAddress, contacts, ...obBefore } = e;
                 const contactsLength = e?.contacts?.length;
                 const arrAddressLength = e?.arrAddress?.length;
-                if (e?.contacts && (contactsLength > arrAddressLength || contactsLength == arrAddressLength)) {
-                    temp = e.contacts?.map((contact, index) => {
-                        const address = e.arrAddress ? e.arrAddress[index] : null;
-                        return {
-                            ...obBefore,
-                            ...contact,
-                            ...address,
-                        };
-                    });
-                } else if (e.arrAddress) {
-                    temp = e.arrAddress?.map((address, index) => {
-                        const contact = e.contacts ? e.contacts[index] : null;
-                        return {
-                            ...obBefore,
-                            ...address,
-                            ...contact,
-                        };
-                    });
-                } else {
-                    temp = [obBefore];
+                if (tabPage == 1) {
+                    // if (e?.contacts && (contactsLength > arrAddressLength || contactsLength == arrAddressLength)) {
+                    //     temp = e.contacts?.map((contact, index) => {
+                    //         const address = e.arrAddress ? e.arrAddress[index] : null;
+                    //         return {
+                    //             ...e,
+                    //             ...contact,
+                    //             ...address,
+                    //         };
+                    //     });
+                    // } else if (e.arrAddress) {
+                    //     temp = e.arrAddress?.map((address, index) => {
+                    //         const contact = e.contacts ? e.contacts[index] : null;
+                    //         return {
+                    //             ...e,
+                    //             ...address,
+                    //             ...contact,
+                    //         };
+                    //     });
+                    // } else {
+                    //     temp = [e];
+                    // }
+                    //  const { arrAddress, contacts, ...obBefore } = e;
+                    temp = checkValue(e, e.contacts, e.arrAddress, temp);
                 }
+                // if (tabPage == 2) {
+                //     checkValue(e, [], [], temp);
+                // }
                 return temp;
             })
             .flat();
+
         const values = dataCustom.flatMap((item) => {
-            const baseRow = allFields.map((field) => item[field.value] || "");
+            const baseRow = allFields?.map((field) => item[field?.value] || "");
             return [baseRow];
         });
 
-        const columns = allFields.map((header) => ({
+        const columns = allFields?.map((header) => ({
             title: `${dataLang[header.label] || header.label}`,
         }));
         return { values, columns };
