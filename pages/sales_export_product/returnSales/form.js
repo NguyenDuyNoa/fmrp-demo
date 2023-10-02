@@ -119,19 +119,24 @@ const Index = (props) => {
                 sFetchingData((e) => ({ ...e, onLoading: false }));
             }
         });
-        Axios("GET", "/api_web/Api_return_supplier/treatment_methods/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sDataSelect((e) => ({
-                    ...e,
-                    dataTreatmentr: data?.map((e) => ({
-                        label: dataLang[e?.name] || e?.name,
-                        value: e?.id,
-                    })),
-                }));
-                sFetchingData((e) => ({ ...e, onLoading: false }));
+        Axios(
+            "GET",
+            "/api_web/Api_return_order/comboboxHandlingSolution/?csrf_protection=true",
+            {},
+            (err, response) => {
+                if (!err) {
+                    var data = response.data;
+                    sDataSelect((e) => ({
+                        ...e,
+                        dataTreatmentr: data?.map((e) => ({
+                            label: dataLang[e?.name] || e?.name,
+                            value: e?.id,
+                        })),
+                    }));
+                    sFetchingData((e) => ({ ...e, onLoading: false }));
+                }
             }
-        });
+        );
         sFetchingData((e) => ({ ...e, onFetching: false }));
     };
 
@@ -517,23 +522,26 @@ const Index = (props) => {
     const _HandleAddChild = (parentId, value) => {
         const { newChild } = _DataValueItem(value);
         const newData = listData?.map((e) => {
-            if (e?.id === parentId) {
-                return { ...e, child: [...e.child, newChild] };
+            if (e?.id == parentId) {
+                return {
+                    ...e,
+                    child: [...e.child, { ...newChild, quantity: 0 }],
+                };
             } else {
                 return e;
             }
         });
         sListData(newData);
-        const newChildId = newChild.id;
-        sInitsId({
-            idParentAdd: parentId,
-            idChildAdd: newChildId,
-        });
+        // const newChildId = newChild.id;
+        // sInitsId({
+        //     idParentAdd: parentId,
+        //     idChildAdd: newChildId,
+        // });
     };
 
-    useEffect(() => {
-        validateQuantity(initsId.idParentAdd, initsId.idChildAdd);
-    }, [initsId]);
+    // useEffect(() => {
+    //     validateQuantity(initsId.idParentAdd, initsId.idChildAdd);
+    // }, [initsId]);
 
     const _HandleAddParent = (value) => {
         const checkData = listData?.some((e) => e?.matHang?.value === value?.value);

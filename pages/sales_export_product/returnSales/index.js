@@ -22,7 +22,6 @@ import ModalImage from "react-modal-image";
 import ImageErrors from "components/UI/imageErrors";
 import PopupDetail from "./(popupDetail)/PopupDetail";
 import ToatstNotifi from "components/UI/alerNotification/alerNotification";
-import PopupDetailProduct from "../salesOrder/(PopupDetail)/PopupDetailProduct";
 import { routerReturnSales } from "components/UI/router/sellingGoods";
 
 const ExcelFile = ReactExport.ExcelFile;
@@ -31,18 +30,19 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 const Index = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
+    const tabPage = router.query?.tab;
     const initsArr = {
         data: [],
         dataExcel: [],
         listBr: [],
         listCode: [],
-        listCustomer: [],
+        listClient: [],
         listStatus: [],
     };
     const initsId = {
         idBranch: null,
         idCode: null,
-        idCustomer: null,
+        idClient: null,
         valueDate: {
             startDate: null,
             endDate: null,
@@ -67,27 +67,31 @@ const Index = (props) => {
     useEffect(() => {
         router.push({
             pathname: router.route,
-            query: { tab: router.query?.tab ? router.query?.tab : "-1" },
+            query: { tab: router.query?.tab ? router.query?.tab : "all" },
         });
     }, []);
 
     const _ServerFetching = () => {
-        const tabPage = router.query?.tab;
         Axios(
             "GET",
-            `/api_web/api_delivery/getDeliveries?csrf_protection=true`,
+            `/api_web/Api_return_order/return_order/?csrf_protection=true`,
             {
                 params: {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    start_date: idFillter.valueDate?.startDate != null ? idFillter.valueDate?.startDate : null,
-                    end_date: idFillter.valueDate?.endDate != null ? idFillter.valueDate?.endDate : null,
+                    "filter[status_bar]": tabPage ?? null,
+                    "filter[id]": idFillter.idCode != null ? idFillter.idCode?.value : null,
+                    "filter[branch_id]": idFillter.idBranch != null ? idFillter.idBranch.value : null,
+                    "filter[client_id]": idFillter?.idClient ? idFillter?.idClient.value : null,
+                    "filter[start_date]":
+                        idFillter?.valueDate?.startDate != null ? idFillter?.valueDate?.startDate : null,
+                    "filter[end_date]": idFillter?.valueDate?.endDate != null ? idFillter?.valueDate?.endDate : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output, rTotal } = response.data.data;
+                    var { rResult, output, rTotal } = response.data;
                     sListData((e) => ({
                         ...e,
                         data: rResult,
@@ -104,19 +108,25 @@ const Index = (props) => {
     const _ServerFetching_group = async () => {
         await Axios(
             "GET",
-            `/api_web/api_delivery/statusDelivery?csrf_protection=true`,
+            `/api_web/Api_return_order/filterBar/?csrf_protection=true`,
             {
                 params: {
-                    limit: 0,
                     search: keySearch,
-                    start_date: idFillter.valueDate?.startDate != null ? idFillter.valueDate?.startDate : null,
-                    end_date: idFillter.valueDate?.endDate != null ? idFillter.valueDate?.endDate : null,
+                    limit: limit,
+                    page: router.query?.page || 1,
+                    "filter[status_bar]": tabPage ?? null,
+                    "filter[id]": idFillter.idCode != null ? idFillter.idCode?.value : null,
+                    "filter[branch_id]": idFillter.idBranch != null ? idFillter.idBranch.value : null,
+                    "filter[client_id]": idFillter?.idClient ? idFillter?.idClient.value : null,
+                    "filter[start_date]":
+                        idFillter?.valueDate?.startDate != null ? idFillter?.valueDate?.startDate : null,
+                    "filter[end_date]": idFillter?.valueDate?.endDate != null ? idFillter?.valueDate?.endDate : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { data } = response.data;
-                    sListData((e) => ({ ...e, listStatus: data?.status }));
+                    let data = response.data;
+                    sListData((e) => ({ ...e, listStatus: data }));
                 }
                 sOnFetching(false);
             }
@@ -127,10 +137,27 @@ const Index = (props) => {
     const _ServerFetching_filter = async () => {
         await Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
+                let { rResult } = response.data;
                 sListData((e) => ({ ...e, listBr: rResult.map((e) => ({ label: e.name, value: e.id })) }));
             }
         });
+        await Axios("GET", `/api_web/api_client/client_option/?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                let { rResult } = response.data;
+                sListData((e) => ({ ...e, listClient: rResult.map((e) => ({ label: e.name, value: e.id })) }));
+            }
+        });
+        await Axios(
+            "GET",
+            `/api_web/Api_return_order/returnOrderCombobox/?csrf_protection=true`,
+            {},
+            (err, response) => {
+                if (!err) {
+                    let { result } = response.data;
+                    sListData((e) => ({ ...e, listCode: result.map((e) => ({ label: e.code, value: e.id })) }));
+                }
+            }
+        );
 
         sOnFetching_filter(false);
     };
@@ -138,14 +165,13 @@ const Index = (props) => {
     let searchTimeout;
 
     const _HandleSeachApi = (inputValue) => {
-        if (inputValue == "") {
-            return;
-        } else {
+        if (inputValue == "") return;
+        else {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 Axios(
                     "POST",
-                    `/api_web/api_delivery/searchDelivery?csrf_protection=true`,
+                    `/api_web/Api_return_order/returnOrderCombobox/?csrf_protection=true`,
                     {
                         data: {
                             term: inputValue,
@@ -153,14 +179,8 @@ const Index = (props) => {
                     },
                     (err, response) => {
                         if (!err) {
-                            var result = response?.data;
-                            sListData((pver) => ({
-                                ...pver,
-                                listCode: result?.map((e) => ({
-                                    label: `${e.reference_no}`,
-                                    value: e.id,
-                                })),
-                            }));
+                            let { result } = response.data;
+                            sListData((e) => ({ ...e, listCode: result.map((e) => ({ label: e.code, value: e.id })) }));
                         }
                     }
                 );
@@ -183,7 +203,9 @@ const Index = (props) => {
     useEffect(() => {
         if (
             idFillter.idBranch != null ||
-            (idFillter.valueDate.startDate != null && idFillter.valueDate.endDate != null)
+            (idFillter.valueDate.startDate != null && idFillter.valueDate.endDate != null) ||
+            idFillter.idClient != null ||
+            idFillter.idCode != null
         ) {
             router.push({
                 pathname: router.route,
@@ -193,6 +215,8 @@ const Index = (props) => {
             });
             setTimeout(() => {
                 (idFillter.idBranch != null && sOnFetching(true)) ||
+                    (idFillter.idClient != null && sOnFetching(true)) ||
+                    (idFillter.idCode != null && sOnFetching(true)) ||
                     (idFillter.valueDate.startDate != null &&
                         idFillter.valueDate.endDate != null &&
                         sOnFetching(true)) ||
@@ -201,7 +225,14 @@ const Index = (props) => {
         } else {
             sOnFetching(true);
         }
-    }, [limit, idFillter.idBranch, idFillter.valueDate.endDate, idFillter.valueDate.startDate]);
+    }, [
+        limit,
+        idFillter.idBranch,
+        idFillter.idClient,
+        idFillter.idCode,
+        idFillter.valueDate.endDate,
+        idFillter.valueDate.startDate,
+    ]);
 
     const onChangeFilter = (type, value) => {
         sIdFillter((e) => ({ ...e, [type]: value }));
@@ -246,7 +277,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.delivery_receipt_date || "delivery_receipt_date"}`,
+                    title: `${dataLang?.import_day_vouchers || "import_day_vouchers"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -254,7 +285,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.delivery_receipt_code || "delivery_receipt_code"}`,
+                    title: `${dataLang?.import_code_vouchers || "import_code_vouchers"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -262,7 +293,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.customer || "customer"}`,
+                    title: `${dataLang?.import_supplier || "import_supplier"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -270,7 +301,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.delivery_receipt_address1 || "delivery_receipt_address1"}`,
+                    title: `${dataLang?.import_total_amount || "import_total_amount"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -278,7 +309,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.delivery_receipt_OrderNumber || "delivery_receipt_OrderNumber"}`,
+                    title: `${dataLang?.import_tax_money || "import_tax_money"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -286,7 +317,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.delivery_receipt_intoMoney || "delivery_receipt_intoMoney"}`,
+                    title: `${dataLang?.import_into_money || "import_into_money"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -294,7 +325,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.delivery_receipt_Creator || "delivery_receipt_Creator"}`,
+                    title: `${"Hình thức"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -302,7 +333,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.delivery_receipt_BrowseStorekeepers || "delivery_receipt_BrowseStorekeepers"}`,
+                    title: `${dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -310,7 +341,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.note || "note"}`,
+                    title: `${dataLang?.import_branch || "import_branch"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -318,7 +349,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.branch || "branch"}`,
+                    title: `${dataLang?.import_from_note || "import_from_note"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -326,24 +357,28 @@ const Index = (props) => {
                     },
                 },
             ],
-            data: listData.dataExcel?.map((e) => [
+            data: listData?.dataExcel?.map((e) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.date ? e?.date : ""}` },
-                { value: `${e?.reference_no ? e?.reference_no : ""}` },
-                { value: `${e?.name_client ? e?.name_client : ""}` },
+                { value: `${e?.code ? e?.code : ""}` },
+                { value: `${e?.client_name ? e?.client_name : ""}` },
                 {
-                    value: `${e?.name_address_delivery ? e?.name_address_delivery : ""}`,
+                    value: `${e?.total_price ? formatNumber(e?.total_price) : ""}`,
                 },
-                { value: `${e?.reference_no_order ? e?.reference_no_order : ""}` },
                 {
-                    value: `${e?.grand_total ? formatNumber(e?.grand_total) : 0}`,
+                    value: `${e?.total_tax_price ? formatNumber(e?.total_tax_price) : ""}`,
                 },
-                { value: `${e?.created_by_full_name ? e?.created_by_full_name : ""}` },
+                {
+                    value: `${e?.total_amount ? formatNumber(e?.total_amount) : ""}`,
+                },
+                {
+                    value: `${e?.handling_solution ? dataLang[e?.handling_solution] || e?.handling_solution : ""}`,
+                },
                 {
                     value: `${e?.warehouseman_id === "0" ? "Chưa duyệt kho" : "Đã duyệt kho"}`,
                 },
+                { value: `${e?.branch_name ? e?.branch_name : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
-                { value: `${e?.name_branch ? e?.name_branch : ""}` },
             ]),
         },
     ];
@@ -470,7 +505,7 @@ const Index = (props) => {
                                                     active={e?.id}
                                                     className={"text-[#0F4F9E]"}
                                                 >
-                                                    {e?.name}
+                                                    {dataLang[e?.name] || e?.name}
                                                 </TabFilter>
                                             </div>
                                         );
@@ -553,9 +588,7 @@ const Index = (props) => {
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label:
-                                                                    dataLang?.delivery_receipt_code ||
-                                                                    "delivery_receipt_code",
+                                                                label: "Mã chứng từ",
                                                                 isDisabled: true,
                                                             },
                                                             ...listData.listCode,
@@ -563,9 +596,7 @@ const Index = (props) => {
                                                         onInputChange={_HandleSeachApi.bind(this)}
                                                         onChange={onChangeFilter.bind(this, "idCode")}
                                                         value={idFillter.idCode}
-                                                        placeholder={
-                                                            dataLang?.delivery_receipt_code || "delivery_receipt_code"
-                                                        }
+                                                        placeholder={"Mã chứng từ"}
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
@@ -612,10 +643,10 @@ const Index = (props) => {
                                                                     "price_quote_select_customer",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listData.listCustomer,
+                                                            ...listData.listClient,
                                                         ]}
-                                                        onChange={onChangeFilter.bind(this, "idCustomer")}
-                                                        value={idFillter.idCustomer}
+                                                        onChange={onChangeFilter.bind(this, "idClient")}
+                                                        value={idFillter.idClient}
                                                         placeholder={
                                                             dataLang?.price_quote_customer || "price_quote_customer"
                                                         }
@@ -794,10 +825,10 @@ const Index = (props) => {
                                             <Loading className="h-80" color="#0f4f9e" />
                                         ) : listData.data?.length > 0 ? (
                                             <>
-                                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                                                    {listData.data?.map((e) => (
+                                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                                                    {listData?.data?.map((e) => (
                                                         <div
-                                                            className="relative grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40"
+                                                            className="relative  grid grid-cols-10 items-center py-1.5  hover:bg-slate-100/40 group"
                                                             key={e.id.toString()}
                                                         >
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
@@ -805,148 +836,118 @@ const Index = (props) => {
                                                                     ? moment(e?.date).format("DD/MM/YYYY")
                                                                     : ""}
                                                             </h6>
-
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all ease-linear  cursor-pointer">
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer ">
                                                                 <PopupDetail
                                                                     dataLang={dataLang}
                                                                     className="text-left"
-                                                                    name={e?.reference_no}
+                                                                    name={e?.code}
                                                                     id={e?.id}
                                                                 />
                                                             </h6>
-
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-left ">
-                                                                {e.name_client}
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
+                                                                {e.client_name}
                                                             </h6>
-
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left">
-                                                                {e.name_address_delivery}
-                                                            </h6>
-                                                            <PopupDetailProduct
-                                                                dataLang={dataLang}
-                                                                className="text-left"
-                                                                name={
-                                                                    <h1 className="col-span-1 3xl:text-[14px] 2xl:text-[12.5px] xl:text-[11px] font-normal text-[9px] text-[#0BAA2E] bg-[#EBFEF2] hover:bg-[#0BAA2E]/90 hover:text-[#EBFEF2] py-0.5 rounded-2xl border-[#0BAA2E]/5 border  cursor-pointer transition-all ease-in-out duration-200 text-center ">
-                                                                        {e?.reference_no_order}
-                                                                    </h1>
-                                                                }
-                                                                id={e?.order_id}
-                                                            />
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(e.grand_total)}
+                                                                {formatNumber(e.total_price)}
                                                             </h6>
-
-                                                            <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
-                                                                <div className="relative">
-                                                                    <ModalImage
-                                                                        small={
-                                                                            e?.created_by_profile_image
-                                                                                ? e?.created_by_profile_image
-                                                                                : "/user-placeholder.jpg"
-                                                                        }
-                                                                        large={
-                                                                            e?.created_by_profile_image
-                                                                                ? e?.created_by_profile_image
-                                                                                : "/user-placeholder.jpg"
-                                                                        }
-                                                                        className="h-6 w-6 rounded-full object-cover "
-                                                                    >
-                                                                        <div className="">
-                                                                            <ImageErrors
-                                                                                src={e?.created_by_profile_image}
-                                                                                width={25}
-                                                                                height={25}
-                                                                                defaultSrc="/user-placeholder.jpg"
-                                                                                alt="Image"
-                                                                                className="object-cover  rounded-[100%] text-left cursor-pointer"
-                                                                            />
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
+                                                                {formatNumber(e.total_tax_price)}
+                                                            </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
+                                                                {formatNumber(e.total_amount)}
+                                                            </h6>
+                                                            <h6 className="col-span-1 mx-auto">
+                                                                {(e?.handling_solution === "pay_down" && (
+                                                                    <div className="cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full min-w-auto text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-lime-500 bg-lime-200  border-lime-200  px-2 py-0.5 border  rounded-2xl ml-2">
+                                                                        {dataLang[e?.handling_solution] ||
+                                                                            e?.handling_solution}
+                                                                    </div>
+                                                                )) ||
+                                                                    (e?.handling_solution === "debt_reduction" && (
+                                                                        <div className="cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-orange-500 bg-orange-200  border-orange-200 px-2 py-0.5 border   rounded-2xl ml-2">
+                                                                            {dataLang[e?.handling_solution] ||
+                                                                                e?.handling_solution}
                                                                         </div>
-                                                                    </ModalImage>
-                                                                    <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                                        <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
-                                                                        </span>
-                                                                    </span>
-                                                                </div>
-                                                                <h6 className="capitalize">
-                                                                    {e?.created_by_full_name}
-                                                                </h6>
+                                                                    ))}
                                                             </h6>
-
                                                             <h6 className=" 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1">
                                                                 <div
                                                                     className={`${
                                                                         e?.warehouseman_id == "0"
                                                                             ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation "
                                                                             : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "
-                                                                    } rounded-md cursor-pointer hover:scale-105 ease-in-out transition-all flex items-center`}
+                                                                    } rounded-lg cursor-pointer hover:font-semibold `}
                                                                 >
-                                                                    <label
-                                                                        className="relative flex cursor-pointer items-center rounded-full p-2"
-                                                                        htmlFor={e.id}
-                                                                        data-ripple-dark="true"
-                                                                    >
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            className={`${
-                                                                                e?.warehouseman_id == "0"
-                                                                                    ? "checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500"
-                                                                                    : "checked:border-lime-500 checked:bg-lime-500 border-lime-500 checked:before:bg-limborder-lime-500"
-                                                                            }before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-gray-400 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
-                                                                            id={e.id}
-                                                                            value={e.warehouseman_id}
-                                                                            checked={
-                                                                                e.warehouseman_id != "0" ? true : false
-                                                                            }
-                                                                            onChange={_HandleChangeInput.bind(
-                                                                                this,
-                                                                                e?.id,
-                                                                                e?.warehouseman_id,
-                                                                                "browser"
-                                                                            )}
-                                                                        />
-                                                                        <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                                                            <svg
-                                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                                className="h-3.5 w-3.5"
-                                                                                viewBox="0 0 20 20"
-                                                                                fill="currentColor"
-                                                                                stroke="currentColor"
-                                                                                stroke-width="1"
-                                                                            >
-                                                                                <path
-                                                                                    fill-rule="evenodd"
-                                                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                                    clip-rule="evenodd"
-                                                                                ></path>
-                                                                            </svg>
-                                                                        </div>
-                                                                    </label>
-                                                                    <label
-                                                                        htmlFor={e.id}
+                                                                    <div
                                                                         className={`${
                                                                             e?.warehouseman_id == "0"
-                                                                                ? "text-[#6366f1]"
-                                                                                : "text-lime-500"
-                                                                        }  3xl:text-[12px] 2xl:text-[10px] xl:text-[10px] text-[8px] font-medium cursor-pointer`}
+                                                                                ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation "
+                                                                                : "bg-lime-100  transition-all bg-gradient-to-l from-lime-100  via-[#f7fee7] to-[#d9f99d] btn-animation "
+                                                                        } rounded-md cursor-pointer hover:scale-105 ease-in-out transition-all flex items-center`}
                                                                     >
-                                                                        {e?.warehouseman_id == "0"
-                                                                            ? "Chưa duyệt kho"
-                                                                            : "Đã duyệt kho"}
-                                                                    </label>
+                                                                        <label
+                                                                            className="relative flex cursor-pointer items-center rounded-full p-2"
+                                                                            htmlFor={e.id}
+                                                                            data-ripple-dark="true"
+                                                                        >
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                className={`${
+                                                                                    e?.warehouseman_id == "0"
+                                                                                        ? "checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500"
+                                                                                        : "checked:border-lime-500 checked:bg-lime-500 border-lime-500 checked:before:bg-limborder-lime-500"
+                                                                                }before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-gray-400 border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
+                                                                                id={e.id}
+                                                                                value={e.warehouseman_id}
+                                                                                checked={
+                                                                                    e.warehouseman_id != "0"
+                                                                                        ? true
+                                                                                        : false
+                                                                                }
+                                                                                onChange={_HandleChangeInput.bind(
+                                                                                    this,
+                                                                                    e?.id,
+                                                                                    e?.warehouseman_id,
+                                                                                    "browser"
+                                                                                )}
+                                                                            />
+                                                                            <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                                <svg
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    className="h-3.5 w-3.5"
+                                                                                    viewBox="0 0 20 20"
+                                                                                    fill="currentColor"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="1"
+                                                                                >
+                                                                                    <path
+                                                                                        fill-rule="evenodd"
+                                                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                                        clip-rule="evenodd"
+                                                                                    ></path>
+                                                                                </svg>
+                                                                            </div>
+                                                                        </label>
+                                                                        <label
+                                                                            htmlFor={e.id}
+                                                                            className={`${
+                                                                                e?.warehouseman_id == "0"
+                                                                                    ? "text-[#6366f1]"
+                                                                                    : "text-lime-500"
+                                                                            }  3xl:text-[14px] 2xl:text-[10px] xl:text-[10px] text-[8px] font-medium cursor-pointer`}
+                                                                        >
+                                                                            {e?.warehouseman_id == "0"
+                                                                                ? "Chưa duyệt kho"
+                                                                                : "Đã duyệt kho"}
+                                                                        </label>
+                                                                    </div>
                                                                 </div>
                                                             </h6>
-
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right truncate">
-                                                                {e?.note}
-                                                            </h6>
-
                                                             <h6 className="col-span-1 w-fit ">
-                                                                <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#086FFC] font-[300] px-1.5 py-0.5 border border-[#086FFC] bg-white rounded-[5.5px] uppercase">
-                                                                    {e?.name_branch}
+                                                                <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2">
+                                                                    {e?.branch_name}
                                                                 </div>
                                                             </h6>
-
                                                             <div className="col-span-1 flex justify-center">
                                                                 <BtnAction
                                                                     onRefresh={_ServerFetching.bind(this)}
@@ -954,7 +955,7 @@ const Index = (props) => {
                                                                     dataLang={dataLang}
                                                                     warehouseman_id={e?.warehouseman_id}
                                                                     id={e?.id}
-                                                                    type="deliveryReceipt"
+                                                                    type="returnSales"
                                                                     className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                                 />
                                                             </div>

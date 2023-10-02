@@ -13,7 +13,7 @@ import { BiEdit } from "react-icons/bi";
 import ToatstNotifi from "./alerNotification/alerNotification";
 import PopupEdit from "/components/UI/popup";
 import { VscFilePdf } from "react-icons/vsc";
-import { routerDeliveryReceipt } from "./router/sellingGoods";
+import { routerDeliveryReceipt, routerReturnSales } from "./router/sellingGoods";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -165,6 +165,37 @@ const BtnAction = React.memo((props) => {
                 }
             });
         }
+        if (props?.id && props?.type === "returnSales") {
+            Swal.fire({
+                title: `${props.dataLang?.aler_ask}`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#296dc1",
+                cancelButtonColor: "#d33",
+                confirmButtonText: `${props.dataLang?.aler_yes}`,
+                cancelButtonText: `${props.dataLang?.aler_cancel}`,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Axios(
+                        "DELETE",
+                        `/api_web/Api_return_order/return_order/${props?.id}?csrf_protection=true`,
+                        {},
+                        (err, response) => {
+                            if (!err) {
+                                var { isSuccess, message } = response.data;
+                                if (isSuccess) {
+                                    ToatstNotifi("success", props.dataLang[message] || message);
+                                    props.onRefresh && props.onRefresh();
+                                    props.onRefreshGroup && props.onRefreshGroup();
+                                } else {
+                                    ToatstNotifi("error", props.dataLang[message] || message);
+                                }
+                            }
+                        }
+                    );
+                }
+            });
+        }
     };
 
     const handleClick = () => {
@@ -204,6 +235,16 @@ const BtnAction = React.memo((props) => {
                 });
             } else {
                 router.push(`${routerDeliveryReceipt.form}?id=${props.id}`);
+            }
+        }
+        if (props?.id && props?.type === "returnSales") {
+            if (props?.warehouseman_id != "0") {
+                Toast.fire({
+                    icon: "error",
+                    title: `${props?.warehouseman_id != "0" && props.dataLang?.warehouse_confirmed_cant_edit}`,
+                });
+            } else {
+                router.push(`${routerReturnSales.form}?id=${props.id}`);
             }
         }
     };
