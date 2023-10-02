@@ -76,12 +76,11 @@ const PopupDetail = (props) => {
     const _ServerFetching_detailOrder = () => {
         Axios(
             "GET",
-            `/api_web/Api_return_supplier/returnSupplier/${props?.id}?csrf_protection=true`,
+            `/api_web/Api_return_order/return_order/${props?.id}?csrf_protection=true`,
             {},
             (err, response) => {
                 if (!err) {
                     var db = response.data;
-
                     sData(db);
                 }
                 sOnFetching(false);
@@ -92,20 +91,6 @@ const PopupDetail = (props) => {
     useEffect(() => {
         (onFetching && _ServerFetching_detailOrder()) || (onFetching && _ServerFetching());
     }, [open]);
-
-    // const scrollableDiv = document.querySelector('.customsroll');
-    // scrollableDiv?.addEventListener('wheel', (event) => {
-    //   const deltaY = event.deltaY;
-    //   const top = scrollableDiv.scrollTop;
-    //   const height = scrollableDiv.scrollHeight;
-    //   const offset = scrollableDiv.offsetHeight;
-    //   const isScrolledToTop = top === 0;
-    //   const isScrolledToBottom = top === height - offset;
-
-    //   if ((deltaY < 0 && isScrolledToTop) || (deltaY > 0 && isScrolledToBottom)) {
-    //     event.preventDefault();
-    //   }
-    // });
 
     const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
     const [dataProductExpiry, sDataProductExpiry] = useState({});
@@ -134,9 +119,6 @@ const PopupDetail = (props) => {
                 classNameBtn={props?.className}
             >
                 <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
-                {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[550px] xl:h-[750px] h-[700px] customsroll overflow-hidden  3xl:h-auto 2xl:scrollbar-thin 2xl:scrollbar-thumb-slate-300 2xl:scrollbar-track-slate-100">         */}
-                {/* <div className="mt-4 space-x-5 w-[999px]">         */}
-                {/* <div className="mt-4 space-x-5 w-[999px] 2xl:h-[750px] xl:h-[750px] h-[700px] 2xl:max-h-[750px] max-h-[600px] 2xl:overflow-visible xl:overflow-y-auto overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">         */}
                 <div className=" space-x-5 3xl:w-[1200px] 2xl:w-[1150px] w-[1100px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">
                     <div>
                         <div className="3xl:w-[1200px] 2xl:w-[1150px] w-[1100px]">
@@ -203,14 +185,16 @@ const PopupDetail = (props) => {
                                                 {props.dataLang?.returns_form || "returns_form"}
                                             </h3>
                                             <div className="flex flex-wrap  gap-2 items-center">
-                                                {(data?.treatment_methods === "1" && (
+                                                {(data?.handling_solution === "pay_down" && (
                                                     <div className="cursor-default min-w-[135px] min-w-auto text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-lime-500 bg-lime-200  border-lime-200  px-2 py-1 border  rounded-2xl">
-                                                        {props.dataLang?.pay_down || "pay_down"}
+                                                        {props.dataLang[data?.handling_solution] ||
+                                                            data?.handling_solution}
                                                     </div>
                                                 )) ||
-                                                    (data?.treatment_methods === "2" && (
+                                                    (data?.handling_solution === "debt_reduction" && (
                                                         <div className="cursor-default min-w-[135px] text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-orange-500 bg-orange-200  border-orange-200 px-2 py-1 border   rounded-2xl">
-                                                            {props.dataLang?.debt_reduction || "debt_reduction"}
+                                                            {props.dataLang[data?.handling_solution] ||
+                                                                data?.handling_solution}
                                                         </div>
                                                     ))}
                                             </div>
@@ -241,11 +225,9 @@ const PopupDetail = (props) => {
                                     <div className="col-span-3 ">
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props.dataLang?.import_supplier || "import_supplier"}
+                                                {props.dataLang?.returnSales_client || "returnSales_client"}
                                             </h3>
-                                            <h3 className="text-[13px] font-medium capitalize">
-                                                {data?.supplier_name}
-                                            </h3>
+                                            <h3 className="text-[13px] font-medium capitalize">{data?.client_name}</h3>
                                         </div>
 
                                         <div className="my-2 font-medium grid grid-cols-2">

@@ -874,7 +874,11 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{id ? "Sửa trả lại hàng bán" : "Thêm trả lại hàng bán"}</title>
+                <title>
+                    {id
+                        ? dataLang?.returnSales_edit || "returnSales_edit"
+                        : dataLang?.returnSales_add || "returnSales_add"}
+                </title>
             </Head>
             <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
                 <div className="h-[97%] space-y-3 overflow-hidden">
@@ -886,11 +890,17 @@ const Index = (props) => {
                                 {dataLang?.delivery_receipt_edit_notes || "delivery_receipt_edit_notes"}
                             </h6>
                             <span className="text-[#141522]/40">/</span>
-                            <h6>{id ? "Sửa trả lại hàng bán" : "Thêm trả lại hàng bán"}</h6>
+                            <h6>
+                                {id
+                                    ? dataLang?.returnSales_edit || "returnSales_edit"
+                                    : dataLang?.returnSales_add || "returnSales_add"}
+                            </h6>
                         </div>
                     )}
                     <div className="flex justify-between items-center">
-                        <h2 className="xl:text-2xl text-xl ">{"Trả lại hàng bán"}</h2>
+                        <h2 className="xl:text-2xl text-xl ">
+                            {dataLang?.returnSales_titleLits || "returnSales_titleLits"}
+                        </h2>
                         <div className="flex justify-end items-center">
                             <button
                                 onClick={() => router.push(routerReturnSales.home)}
@@ -1013,14 +1023,15 @@ const Index = (props) => {
                                 </div>
                                 <div className="col-span-2">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {"Khách hàng"} <span className="text-red-500">*</span>
+                                        {dataLang?.returnSales_client || "returnSales_client"}{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <Select
                                         options={dataSelect.dataClient}
                                         onChange={_HandleChangeInput.bind(this, "idClient")}
                                         value={idChange.idClient}
                                         isLoading={fetChingData.onLoading}
-                                        placeholder={"Khách hàng"}
+                                        placeholder={dataLang?.returnSales_client || "returnSales_client"}
                                         hideSelectedOptions={false}
                                         isClearable={true}
                                         className={`${
@@ -1064,7 +1075,9 @@ const Index = (props) => {
                                         }}
                                     />
                                     {errors.errClient && (
-                                        <label className="text-sm text-red-500">{"Vui lòng chọn khách hàng"}</label>
+                                        <label className="text-sm text-red-500">
+                                            {dataLang?.returnSales_errClient || "returnSales_errClient"}
+                                        </label>
                                     )}
                                 </div>
                                 <div className="col-span-2 ">

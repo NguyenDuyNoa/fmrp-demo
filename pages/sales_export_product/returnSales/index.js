@@ -460,16 +460,16 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{"Trả lại hàng bán"} </title>
+                <title>{dataLang?.returnSales_titleLits || "returnSales_titleLits"} </title>
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 {trangthaiExprired ? (
                     <div className="p-4"></div>
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{"Bán & Xuất hàng"}</h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.returnSales_title || "returnSales_title"}</h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{"Trả lại hàng bán"}</h6>
+                        <h6>{dataLang?.returnSales_titleLits || "returnSales_titleLits"}</h6>
                     </div>
                 )}
 
@@ -478,7 +478,7 @@ const Index = (props) => {
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className="flex justify-between  mt-1 mr-2">
                                 <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                    {"Trả lại hàng bán"}
+                                    {dataLang?.returnSales_titleLits || "returnSales_titleLits"}
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Link
@@ -588,7 +588,9 @@ const Index = (props) => {
                                                         options={[
                                                             {
                                                                 value: "",
-                                                                label: "Mã chứng từ",
+                                                                label:
+                                                                    dataLang?.purchase_order_table_code ||
+                                                                    "purchase_order_table_code",
                                                                 isDisabled: true,
                                                             },
                                                             ...listData.listCode,
@@ -596,7 +598,10 @@ const Index = (props) => {
                                                         onInputChange={_HandleSeachApi.bind(this)}
                                                         onChange={onChangeFilter.bind(this, "idCode")}
                                                         value={idFillter.idCode}
-                                                        placeholder={"Mã chứng từ"}
+                                                        placeholder={
+                                                            dataLang?.purchase_order_table_code ||
+                                                            "purchase_order_table_code"
+                                                        }
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
@@ -719,7 +724,9 @@ const Index = (props) => {
                                                 <div>
                                                     {listData.dataExcel?.length > 0 && (
                                                         <ExcelFile
-                                                            filename={"Danh sách trả lại hàng bán"}
+                                                            filename={
+                                                                dataLang?.returnSales_titleEx || "returnSales_titleEx"
+                                                            }
                                                             title="DSTLHB"
                                                             element={
                                                                 <button className="3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-2 xl:py-2 lg:py-2.5 3xl:text-[15px] 2xl:text-[13px] xl:text-[12px] lg:text-[8px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
@@ -794,7 +801,7 @@ const Index = (props) => {
                                                 {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {"Khách hàng"}
+                                                {dataLang?.returnSales_client || "returnSales_client"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.import_total_amount || "import_total_amount"}
