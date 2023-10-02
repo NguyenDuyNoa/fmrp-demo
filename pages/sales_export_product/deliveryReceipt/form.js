@@ -1066,7 +1066,7 @@ const Index = (props) => {
             sOnSending(true);
         }
     };
-
+    console.log("listData", listData);
     const _ServerSending = async () => {
         let formData = new FormData();
         formData.append("code", code ? code : "");

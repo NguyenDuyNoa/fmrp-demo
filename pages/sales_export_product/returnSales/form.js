@@ -457,8 +457,6 @@ const Index = (props) => {
     useEffect(() => {
         idChange.idBranch != null && sFetchingData((e) => ({ ...e, onFetchingWarehouser: true }));
     }, [idChange.idBranch]);
-    console.log("id", idChange);
-    console.log("eror", errors);
 
     useEffect(() => {
         fetChingData.onFetchingClient && _ServerFetching_Client();
@@ -501,7 +499,7 @@ const Index = (props) => {
                 : {
                       label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
                       value: value?.e?.tax_id_item,
-                      tax_rate: value?.e?.tax_name_item,
+                      tax_rate: value?.e?.tax_rate,
                   },
             note: value?.e?.note_item,
         };
