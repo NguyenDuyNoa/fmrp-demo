@@ -62,11 +62,11 @@ const Index = (props) => {
     };
     const initsValue = {
         code: "",
-        note: "",
+        date: new Date(),
         idBranch: null,
         idClient: null,
         idTreatment: null,
-        date: new Date(),
+        note: "",
     };
     const dataLang = props?.dataLang;
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
@@ -198,9 +198,9 @@ const Index = (props) => {
     }));
 
     const _ServerFetchingDetailPage = () => {
-        Axios("GET", `/api_web/Api_delivery/getDeliveryDetail/${id}?csrf_protection=true`, {}, (err, response) => {
+        Axios("GET", `/api_web/Api_return_order/getDetail/${id}?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var rResult = response.data;
+                let rResult = response.data;
                 sListData(
                     rResult?.items.map((e) => {
                         const child = e?.child.map((ce) => ({
@@ -212,32 +212,23 @@ const Index = (props) => {
                                 (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
                                 (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
                             warehouse: {
-                                label: e?.item?.warehouse_location?.location_name,
-                                value: e?.item?.warehouse_location?.id,
-                                warehouse_name: e?.item?.warehouse_location?.warehouse_name,
-                                qty: e?.item?.warehouse_location?.quantity,
-                            },
-                            dataWarehouse: e?.item?.warehouseList?.map((ce) => ({
                                 label: ce?.location_name,
-                                value: ce?.id,
+                                value: ce?.location_warehouses_id,
                                 warehouse_name: ce?.warehouse_name,
-                                qty: ce?.quantity,
-                                lot: ce?.lot,
-                                date: ce?.expiration_date,
-                                serial: ce?.serial,
-                            })),
-                            quantityStock: e?.item?.quantity,
-                            quantityDelive: e?.item?.quantity_delivery,
+                            },
+                            quantityDelivered: e?.item?.quantity_create,
+                            quantityPay: e?.item?.quantity_returned,
+                            quantityLeft: e?.item?.quantity_left,
                             unit: e?.item?.unit_name,
                             quantity: Number(ce?.quantity),
                             price: Number(ce?.price),
-                            discount: Number(ce?.discount_percent_item),
+                            discount: Number(ce?.discount_percent),
                             tax: {
-                                tax_rate: ce?.tax_rate_item,
+                                tax_rate: ce?.tax_rate,
                                 value: ce?.tax_id_item,
                                 label: ce?.tax_name_item || "Miễn thuế",
                             },
-                            note: ce?.note_item,
+                            note: ce?.note,
                         }));
                         return {
                             id: e?.item?.id,
@@ -253,23 +244,23 @@ const Index = (props) => {
                         };
                     })
                 );
-                sCode(rResult?.reference_no);
-                sIdBranch({
-                    label: rResult?.branch_name,
-                    value: rResult?.branch_id,
+                sIdChange({
+                    code: rResult.code,
+                    date: moment(rResult?.date).toDate(),
+                    idBranch: {
+                        label: rResult?.branch_name,
+                        value: rResult?.branch_id,
+                    },
+                    idClient: {
+                        label: rResult?.client_name,
+                        value: rResult?.client_id,
+                    },
+                    idTreatment: {
+                        label: dataLang[rResult?.handling_solution] || rResult?.handling_solution,
+                        value: rResult?.id,
+                    },
+                    note: rResult?.note,
                 });
-                sStartDate(moment(rResult?.date).toDate());
-                sNote(rResult?.note);
-                sIdAddress({ label: rResult?.name_address_delivery, value: rResult?.address_delivery_id });
-                sIdClient({ label: rResult?.customer_name, value: rResult?.customer_id });
-                sIdStaff({ label: rResult?.staff_full_name, value: rResult?.staff_id });
-                sIdProductOrder({ label: rResult?.order_code, value: rResult?.order_id });
-                sIdContactPerson(
-                    rResult?.person_contact_id != 0 && {
-                        label: rResult?.person_contact_name,
-                        value: rResult?.person_contact_id,
-                    }
-                );
             }
             sFetchingData((e) => ({ ...e, onFetchingDetail: false }));
         });
@@ -503,8 +494,8 @@ const Index = (props) => {
                 ? generalTax
                 : {
                       label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
-                      value: value?.e?.tax_id_item,
-                      tax_rate: value?.e?.tax_rate,
+                      value: value?.e?.tax_id_item ? value?.e?.tax_id_item : "0",
+                      tax_rate: value?.e?.tax_rate ? value?.e?.tax_rate : "0",
                   },
             note: value?.e?.note_item,
         };
@@ -520,6 +511,7 @@ const Index = (props) => {
     };
 
     const _HandleAddChild = (parentId, value) => {
+        console.log("Value", value);
         const { newChild } = _DataValueItem(value);
         const newData = listData?.map((e) => {
             if (e?.id == parentId) {
@@ -538,6 +530,7 @@ const Index = (props) => {
         //     idChildAdd: newChildId,
         // });
     };
+    console.log("hi", listData);
 
     // useEffect(() => {
     //     validateQuantity(initsId.idParentAdd, initsId.idChildAdd);
