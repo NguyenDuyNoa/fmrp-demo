@@ -494,7 +494,7 @@ const Index = (props) => {
                 ? generalTax
                 : {
                       label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name,
-                      value: value?.e?.tax_id_item ? value?.e?.tax_id_item : "0",
+                      value: value?.e?.tax_id ? value?.e?.tax_id : "0",
                       tax_rate: value?.e?.tax_rate ? value?.e?.tax_rate : "0",
                   },
             note: value?.e?.note_item,
@@ -517,7 +517,7 @@ const Index = (props) => {
             if (e?.id == parentId) {
                 return {
                     ...e,
-                    child: [...e.child, { ...newChild, quantity: 0 }],
+                    child: [...e.child, { ...newChild, quantity: 0, note: "" }],
                 };
             } else {
                 return e;
