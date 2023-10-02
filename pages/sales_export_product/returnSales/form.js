@@ -257,7 +257,7 @@ const Index = (props) => {
                     },
                     idTreatment: {
                         label: dataLang[rResult?.handling_solution] || rResult?.handling_solution,
-                        value: rResult?.id,
+                        value: rResult?.handling_solution,
                     },
                     note: rResult?.note,
                 });
