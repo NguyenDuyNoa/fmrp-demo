@@ -245,7 +245,7 @@ const PopupDetail = (props) => {
                                         </h4>
                                         {/* <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4>  */}
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {props.dataLang?.returns_point || "returns_point"}
+                                            {props.dataLang?.delivery_receipt_warehouse || "delivery_receipt_warehouse"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                                             {"Tồn kho"}

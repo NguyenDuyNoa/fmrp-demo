@@ -1497,7 +1497,7 @@ const FilePDF = ({
                                         italics: true,
                                     },
                                     {
-                                        text: `${data?.reference_no}`,
+                                        text: `${data?.code}`,
                                         bold: true,
                                         fontSize: 8,
                                         italics: true,
@@ -1723,7 +1723,7 @@ const FilePDF = ({
                                       },
 
                                       {
-                                          text: item?.tax_rate_item ? `${item?.tax_rate_item + "%"}` : "",
+                                          text: item?.tax_rate ? `${item?.tax_rate + "%"}` : "",
                                           alignment: "center",
                                           fontSize: 10,
                                           margin: styleMarginChild,
@@ -2012,7 +2012,7 @@ const FilePDF = ({
                                         italics: true,
                                     },
                                     {
-                                        text: `${data?.reference_no}`,
+                                        text: `${data?.code}`,
                                         bold: true,
                                         fontSize: 8,
                                         italics: true,
@@ -2202,16 +2202,12 @@ const FilePDF = ({
                                       {
                                           stack: [
                                               {
-                                                  text: item?.item?.warehouse_location?.warehouse_name
-                                                      ? item?.item?.warehouse_location?.warehouse_name
-                                                      : "",
+                                                  text: item?.warehouse_name ? item?.warehouse_name : "",
                                                   fontSize: 10,
                                                   margin: styleMarginChild,
                                               },
                                               {
-                                                  text: item?.item?.warehouse_location?.location_name
-                                                      ? `(${item?.item?.warehouse_location?.location_name})`
-                                                      : "",
+                                                  text: item?.location_name ? `(${item?.location_name})` : "",
                                                   fontSize: 9,
                                                   italics: true,
                                                   margin: styleMarginChild,

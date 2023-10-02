@@ -315,6 +315,23 @@ const BtnAction = React.memo((props) => {
                 console.log(err);
             }
         }
+        if (props?.id && props?.type === "returnSales") {
+            try {
+                await Axios(
+                    "GET",
+                    `/api_web/Api_return_order/return_order/${props?.id}?csrf_protection=true`,
+                    {},
+                    (err, response) => {
+                        if (response && response.data) {
+                            let db = response.data;
+                            setData(db);
+                        }
+                    }
+                );
+            } catch (err) {
+                console.log(err);
+            }
+        }
     };
 
     useEffect(() => {

@@ -843,7 +843,7 @@ const Index = (props) => {
             "POST",
             `${
                 id
-                    ? `/api_web/Api_delivery/updateDelivery/${id}?csrf_protection=true`
+                    ? `/api_web/Api_return_order/return_order/${id}?csrf_protection=true`
                     : "/api_web/Api_return_order/return_order/?csrf_protection=true"
             }`,
             {
