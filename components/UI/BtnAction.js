@@ -360,7 +360,7 @@ const BtnAction = React.memo((props) => {
                                 {props.dataLang?.btn_table_edit || "btn_table_edit"}
                             </p>
                         </button>
-                        {props?.type == "deliveryReceipt" ? (
+                        {props?.type == "deliveryReceipt" || props?.type == "returnSales" ? (
                             <Popup_Pdf
                                 dataLang={props.dataLang}
                                 props={props}
