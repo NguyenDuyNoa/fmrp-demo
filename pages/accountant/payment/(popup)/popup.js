@@ -146,7 +146,8 @@ const Popup_dspc = (props) => {
         sNote("");
         sError(inistError);
         sOption([{ id: Date.now(), chiphi: "", sotien: null }]);
-        sFetch((e) => ({ ...e, onFetching: true, onFetching_LisObject: true }));
+        // sFetch((e) => ({ ...e, onFetching: true, onFetching_LisObject: true }));
+        // sFetch((e) => ({ ...e, onFetching: true }));
         sData(inistArrr);
     };
 
@@ -305,28 +306,75 @@ const Popup_dspc = (props) => {
     };
 
     useEffect(() => {
-        if (typeOfDocument?.value == "import" && listTypeOfDocument) {
-            sFetch((e) => ({ ...e, onFetchingTable: true }));
-        }
-        if (branch != null) {
-            sFetch((e) => ({ ...e, onFetching_ListCost: true }));
-        }
-        if (object != null) {
-            sFetch((e) => ({ ...e, onFetching_TypeOfDocument: true }));
-        }
-        if (typeOfDocument) {
-            sFetch((e) => ({ ...e, onFetching_ListTypeOfDocument: true }));
-        }
-        if (open) {
-            sFetch((e) => ({ ...e, onFetching: true }));
-        }
-        if (branch != null && object != null) {
-            sFetch((e) => ({ ...e, onFetching_LisObject: true }));
-        }
-        if (open && fetch.onFetchingDetail && props?.id) {
-            _ServerFetching_detail();
-        }
-    }, [listTypeOfDocument, branch, object, typeOfDocument, open]);
+        branch != null && sFetch((e) => ({ ...e, onFetching_ListCost: true }));
+    }, [branch]);
+    useEffect(() => {
+        typeOfDocument?.value == "import" && listTypeOfDocument && sFetch((e) => ({ ...e, onFetchingTable: true }));
+    }, [listTypeOfDocument]);
+
+    useEffect(() => {
+        open && sFetch((e) => ({ ...e, onFetching: true }));
+    }, [open]);
+    useEffect(() => {
+        branch != null && object != null && sFetch((e) => ({ ...e, onFetching_LisObject: true }));
+    }, [object, branch]);
+    useEffect(() => {
+        object != null && sFetch((e) => ({ ...e, onFetching_TypeOfDocument: true }));
+    }, [object]);
+    useEffect(() => {
+        typeOfDocument && sFetch((e) => ({ ...e, onFetching_ListTypeOfDocument: true }));
+    }, [typeOfDocument, branch, object]);
+
+    useEffect(() => {
+        fetch.onFetchingDetail && props?.id && _ServerFetching_detail();
+    }, [open]);
+
+    // useEffect(() => {
+    //     fetch.onFetching_ListCost && _ServerFetching_ListCost();
+    // }, [fetch.onFetching_ListCost]);
+
+    // useEffect(() => {
+    //     fetch.onFetchingTable && _ServerFetching_ListTable();
+    // }, [fetch.onFetchingTable]);
+    // useEffect(() => {
+    //     fetch.onFetching_TypeOfDocument && _ServerFetching_TypeOfDocument();
+    // }, [fetch.onFetching_TypeOfDocument]);
+    // useEffect(() => {
+    //     fetch.onFetching_ListTypeOfDocument && _ServerFetching_ListTypeOfDocument();
+    // }, [fetch.onFetching_ListTypeOfDocument]);
+    // useEffect(() => {
+    //     fetch.onFetching_LisObject && _ServerFetching_LisObject();
+    // }, [fetch.onFetching_LisObject]);
+    // useEffect(() => {
+    //     fetch.onFetching && _ServerFetching();
+    // }, [fetch.onFetching]);
+    // useEffect(() => {
+    //     fetch.onSending && _ServerSending();
+    // }, [fetch.onSending]);
+
+    // useEffect(() => {
+    //     if (typeOfDocument?.value == "import" && listTypeOfDocument) {
+    //         sFetch((e) => ({ ...e, onFetchingTable: true }));
+    //     }
+    //     if (branch != null) {
+    //         sFetch((e) => ({ ...e, onFetching_ListCost: true }));
+    //     }
+    //     if (object != null) {
+    //         sFetch((e) => ({ ...e, onFetching_TypeOfDocument: true }));
+    //     }
+    //     if (typeOfDocument) {
+    //         sFetch((e) => ({ ...e, onFetching_ListTypeOfDocument: true }));
+    //     }
+    //     if (open) {
+    //         sFetch((e) => ({ ...e, onFetching: true }));
+    //     }
+    //     if (branch != null && object != null) {
+    //         sFetch((e) => ({ ...e, onFetching_LisObject: true }));
+    //     }
+    //     if (open && fetch.onFetchingDetail && props?.id) {
+    //         _ServerFetching_detail();
+    //     }
+    // }, [listTypeOfDocument, branch, object, typeOfDocument, open]);
 
     useEffect(() => {
         if (fetch.onFetching) {
