@@ -61,7 +61,7 @@ const Index = (props) => {
     useEffect(() => {
         router.push({
             pathname: router.route,
-            query: { tab: router.query?.tab ? router.query?.tab : "-1" },
+            query: { tab: router.query?.tab ? router.query?.tab : -1 },
         });
     }, []);
 
@@ -75,9 +75,9 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
+                    status: tabPage ? tabPage : -1,
                     branch_id: idBranch != null ? idBranch.value : null,
                     delivery_id: idDelivery != null ? idDelivery?.value : null,
-                    status: tabPage ?? null,
                     customer_id: idCustomer != null ? idCustomer.value : null,
                     start_date: valueDate?.startDate != null ? valueDate?.startDate : null,
                     end_date: valueDate?.endDate != null ? valueDate?.endDate : null,
