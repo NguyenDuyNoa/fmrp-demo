@@ -44,6 +44,7 @@ import { data } from "autoprefixer";
 import { useDispatch } from "react-redux";
 import CreatableSelect from "react-select/creatable";
 import formatNumber from "components/UI/formanumber/formanumber";
+import ToatstNotifi from "components/UI/alerNotification/alerNotification";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -85,6 +86,7 @@ const Popup_dspc = (props) => {
         onFetching_ListTypeOfDocument: false,
         onFetching_ListCost: false,
         onFetchingDetail: false,
+        onFetchingTable: false,
     };
     const inistArrr = {
         dataBranch: [],
@@ -94,6 +96,7 @@ const Popup_dspc = (props) => {
         dataTypeofDoc: [],
         dataListTypeofDoc: [],
         dataListCost: [],
+        dataTable: [],
     };
     const inistError = {
         errBranch: false,
@@ -136,6 +139,7 @@ const Popup_dspc = (props) => {
         open && sObject(null);
         open && sListObject(null);
         open && sTypeOfDocument(null);
+        open && sListTypeOfDocument([]);
         open && sPrice("");
         open && sMethod(null);
         open && sNote("");
@@ -327,6 +331,7 @@ const Popup_dspc = (props) => {
     //Api Danh sách chứng từ: truyền Đối tượng vào biến type, truyền Loại chứng từ vào biến voucher_type, truyền Danh sách đối tượng vào object_id
 
     const _ServerFetching_ListTypeOfDocument = () => {
+        console.log("hi");
         Axios(
             "GET",
             "/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true",
@@ -342,8 +347,8 @@ const Popup_dspc = (props) => {
             (err, response) => {
                 if (!err) {
                     var db = response.data;
-                    sData((e) => ({
-                        ...e,
+                    sData((c) => ({
+                        ...c,
                         dataListTypeofDoc: db?.map((e) => ({
                             label: e?.code,
                             value: e?.id,
@@ -361,8 +366,8 @@ const Popup_dspc = (props) => {
     }, [fetch.onFetching_ListTypeOfDocument]);
 
     useEffect(() => {
-        sFetch((e) => ({ ...e, onFetching_ListTypeOfDocument: true }));
-    }, [typeOfDocument]);
+        typeOfDocument && sFetch((e) => ({ ...e, onFetching_ListTypeOfDocument: true }));
+    }, [typeOfDocument, branch, object]);
 
     let searchTimeout;
 
@@ -440,6 +445,38 @@ const Popup_dspc = (props) => {
     useEffect(() => {
         branch != null && sFetch((e) => ({ ...e, onFetching_ListCost: true }));
     }, [branch]);
+
+    const _ServerFetching_ListTable = () => {
+        let db = new FormData();
+        listTypeOfDocument.forEach((e, index) => {
+            db.append(`import_id[${index}]`, e?.value);
+        });
+        Axios(
+            "POST",
+            "/api_web/Api_expense_voucher/deductDeposit/?csrf_protection=true",
+            {
+                data: db,
+                headers: { "Content-Type": "multipart/form-data" },
+            },
+            (err, response) => {
+                if (!err) {
+                    var db = response.data;
+                    sData((e) => ({
+                        ...e,
+                        dataTable: db,
+                    }));
+                }
+            }
+        );
+        sFetch((e) => ({ ...e, onFetchingTable: false }));
+    };
+    useEffect(() => {
+        fetch.onFetchingTable && _ServerFetching_ListTable();
+    }, [fetch.onFetchingTable]);
+
+    useEffect(() => {
+        typeOfDocument?.value == "import" && listTypeOfDocument && sFetch((e) => ({ ...e, onFetchingTable: true }));
+    }, [listTypeOfDocument]);
 
     const _HandleChangeInput = (type, value) => {
         if (type == "date") {
@@ -763,18 +800,18 @@ const Popup_dspc = (props) => {
     };
 
     const _ServerSending = () => {
-        var formData = new FormData();
+        let formData = new FormData();
         formData.append("code", code == null ? "" : code);
         formData.append("date", moment(date).format("YYYY-MM-DD HH:mm:ss"));
-        formData.append("branch_id", branch.value);
-        formData.append("objects", object.value);
-        formData.append("type_vouchers", typeOfDocument ? typeOfDocument.value : "");
+        formData.append("branch_id", branch?.value);
+        formData.append("objects", object?.value);
+        formData.append("type_vouchers", typeOfDocument ? typeOfDocument?.value : "");
         formData.append("total", price);
-        formData.append("payment_modes", method.value);
+        formData.append("payment_modes", method?.value);
         if (object?.value == "other") {
-            formData.append("objects_text", listObject.value);
+            formData.append("objects_text", listObject?.value);
         } else {
-            formData.append("objects_id", listObject.value);
+            formData.append("objects_id", listObject?.value);
         }
         listTypeOfDocument?.forEach((e, index) => {
             formData.append(`voucher_id[${index}]`, e?.value);
@@ -799,10 +836,7 @@ const Popup_dspc = (props) => {
                 if (!err) {
                     var { isSuccess, message } = response.data;
                     if (isSuccess) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${dataLang[message]}`,
-                        });
+                        ToatstNotifi("success", `${dataLang[message]}`);
                         sDate(new Date());
                         sCode("");
                         sBranch(null);
@@ -818,55 +852,13 @@ const Popup_dspc = (props) => {
                         props.onRefresh && props.onRefresh();
                         sOpen(false);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${dataLang[message]}`,
-                        });
+                        ToatstNotifi("error", `${dataLang[message]}`);
                     }
                 }
                 sFetch((e) => ({ ...e, onSending: false }));
             }
         );
     };
-
-    const datat = [
-        {
-            codeImport: "Phiếu nhập 1",
-            codeOrder: "Phiếu cọc 1",
-            pricecan: 1000000,
-            pricecl: 3000000,
-        },
-        {
-            codeImport: "Phiếu nhập 2",
-            codeOrder: "Phiếu cọc 1",
-            pricecan: 1000000,
-            pricecl: 3000000,
-        },
-        {
-            codeImport: "Phiếu nhập 3",
-            codeOrder: "Phiếu cọc 1",
-            pricecan: 1000000,
-            pricecl: 3000000,
-        },
-        {
-            codeImport: "Phiếu nhập 4",
-            codeOrder: "Phiếu cọc 1",
-            pricecan: 1000000,
-            pricecl: 3000000,
-        },
-        {
-            codeImport: "Phiếu nhập 5",
-            codeOrder: "Phiếu cọc 1",
-            pricecan: 1000000,
-            pricecl: 3000000,
-        },
-        {
-            codeImport: "Phiếu nhập 5",
-            codeOrder: "Phiếu cọc 1",
-            pricecan: 1000000,
-            pricecl: 3000000,
-        },
-    ];
 
     return (
         <>
@@ -1352,7 +1344,7 @@ const Popup_dspc = (props) => {
                                             className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none "
                                         />
                                     </div>
-                                    {datat.length > 0 && (
+                                    {data.dataTable.length > 0 && (
                                         <div className="col-span-12 border border-b-0 rounded m-1 transition-all duration-200 ease-linear">
                                             <div className="col-span-12 grid grid-cols-4 items-center divide-x border border-l-0 border-t-0 border-r-0">
                                                 <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
@@ -1373,19 +1365,27 @@ const Popup_dspc = (props) => {
                                                 // speed={1}
                                                 // smoothScrolling={true}
                                                 className={`${
-                                                    datat.length > 5 ? " h-[170px] overflow-auto" : ""
+                                                    data.dataTable.length > 5 ? " h-[170px] overflow-auto" : ""
                                                 } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
                                             >
-                                                {datat.map((e) => {
+                                                {data.dataTable.map((e) => {
                                                     return (
                                                         <div className="col-span-12 grid grid-cols-4 items-center divide-x border-b">
-                                                            <h1 className="text-center text-xs p-2">{e.codeImport}</h1>
-                                                            <h1 className="text-center text-xs p-2">{e.codeOrder}</h1>
-                                                            <h1 className="text-center text-xs p-2">
-                                                                {formatNumber(e.pricecan)}
+                                                            <h1 className="text-center text-xs p-2 ">
+                                                                <span className="py-1 px-2 bg-purple-200 text-purple-500 rounded-xl">
+                                                                    {e.import_code}
+                                                                </span>
                                                             </h1>
                                                             <h1 className="text-center text-xs p-2">
-                                                                {formatNumber(e.pricecl)}
+                                                                <span className="py-1 px-2 bg-orange-200 text-orange-500 rounded-xl">
+                                                                    {e.payslip_code}
+                                                                </span>
+                                                            </h1>
+                                                            <h1 className="text-center text-xs p-2">
+                                                                {formatNumber(e.deposit_amount)}
+                                                            </h1>
+                                                            <h1 className="text-center text-xs p-2">
+                                                                {formatNumber(e.amount_left)}
                                                             </h1>
                                                         </div>
                                                     );
