@@ -211,6 +211,7 @@ const Popup_dspc = (props) => {
                             sotien: Number(e?.total),
                         }))
                     );
+                    sData((e) => ({ ...e, dataTable: db?.tbDeductDeposit }));
                 }
                 sFetch((e) => ({ ...e, onFetchingDetail: false }));
             }
