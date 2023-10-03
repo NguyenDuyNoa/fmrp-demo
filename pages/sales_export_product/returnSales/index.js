@@ -409,7 +409,7 @@ const Index = (props) => {
                     };
                     sCheckedWare(dataChecked);
                 }
-                setData([...data]);
+                sListData((e) => ({ ...e, data: [...e.data] }));
             });
         }
     };
@@ -420,7 +420,7 @@ const Index = (props) => {
         data.append("id", checkedWare?.id);
         Axios(
             "POST",
-            `/api_web/Api_delivery/confirmWarehouse?csrf_protection=true`,
+            `/api_web/Api_return_order/ConfirmWarehous?csrf_protection=true`,
             {
                 data: data,
                 headers: { "Content-Type": "multipart/form-data" },
