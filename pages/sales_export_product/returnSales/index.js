@@ -23,6 +23,7 @@ import ImageErrors from "components/UI/imageErrors";
 import PopupDetail from "./(popupDetail)/PopupDetail";
 import ToatstNotifi from "components/UI/alerNotification/alerNotification";
 import { routerReturnSales } from "components/UI/router/sellingGoods";
+import Popup_status from "./(popupDetail)/popupStatus";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -463,6 +464,9 @@ const Index = (props) => {
                 <title>{dataLang?.returnSales_titleLits || "returnSales_titleLits"} </title>
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
+                {data_export.length > 0 && (
+                    <Popup_status className="hidden" data_export={data_export} dataLang={dataLang} />
+                )}
                 {trangthaiExprired ? (
                     <div className="p-4"></div>
                 ) : (
