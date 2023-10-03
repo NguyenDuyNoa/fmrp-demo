@@ -560,12 +560,21 @@ const Index = (props) => {
         }
         if (typeOrder === "0") {
             inputValue != "" &&
-                Axios("POST", `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`, {}, (err, response) => {
-                    if (!err) {
-                        var { result } = response?.data.data;
-                        setDataItems(result);
+                Axios(
+                    "POST",
+                    `/api_web/Api_product/searchItemsVariant/?csrf_protection=true`,
+                    {
+                        data: {
+                            term: inputValue,
+                        },
+                    },
+                    (err, response) => {
+                        if (!err) {
+                            var { result } = response?.data.data;
+                            setDataItems(result);
+                        }
                     }
-                });
+                );
         }
     };
 
@@ -1960,7 +1969,7 @@ const Index = (props) => {
                                     } else {
                                         return (
                                             <>
-                                                {dataItems === [] ? (
+                                                {dataItems.length == 0 ? (
                                                     <Loading className="h-80" color="#0f4f9e" />
                                                 ) : (
                                                     <div className="flex items-center justify-between py-2">

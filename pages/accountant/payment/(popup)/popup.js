@@ -43,6 +43,7 @@ import Popup from "reactjs-popup";
 import { data } from "autoprefixer";
 import { useDispatch } from "react-redux";
 import CreatableSelect from "react-select/creatable";
+import formatNumber from "components/UI/formanumber/formanumber";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -828,6 +829,45 @@ const Popup_dspc = (props) => {
         );
     };
 
+    const datat = [
+        {
+            codeImport: "Phiếu nhập 1",
+            codeOrder: "Phiếu cọc 1",
+            pricecan: 1000000,
+            pricecl: 3000000,
+        },
+        {
+            codeImport: "Phiếu nhập 2",
+            codeOrder: "Phiếu cọc 1",
+            pricecan: 1000000,
+            pricecl: 3000000,
+        },
+        {
+            codeImport: "Phiếu nhập 3",
+            codeOrder: "Phiếu cọc 1",
+            pricecan: 1000000,
+            pricecl: 3000000,
+        },
+        {
+            codeImport: "Phiếu nhập 4",
+            codeOrder: "Phiếu cọc 1",
+            pricecan: 1000000,
+            pricecl: 3000000,
+        },
+        {
+            codeImport: "Phiếu nhập 5",
+            codeOrder: "Phiếu cọc 1",
+            pricecan: 1000000,
+            pricecl: 3000000,
+        },
+        {
+            codeImport: "Phiếu nhập 5",
+            codeOrder: "Phiếu cọc 1",
+            pricecan: 1000000,
+            pricecl: 3000000,
+        },
+    ];
+
     return (
         <>
             <PopupEdit
@@ -853,260 +893,63 @@ const Popup_dspc = (props) => {
                 <div className="w-[40vw]">
                     <form onSubmit={_HandleSubmit.bind(this)} className="">
                         <div className="">
-                            <div className="grid grid-cols-12 space-x-1 items-center">
-                                <div className="col-span-6 relative">
-                                    <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">
-                                        {dataLang?.serviceVoucher_day_vouchers}{" "}
-                                    </label>
-                                    <div className="custom-date-picker flex flex-row ">
-                                        <DatePicker
-                                            blur
-                                            fixedHeight
-                                            showTimeSelect
-                                            selected={date}
-                                            onSelect={(date) => _HandleChangeInput("date", date)}
-                                            onChange={(e) => _HandleChangeInput("date", e)}
-                                            placeholderText="DD/MM/YYYY HH:mm:ss"
-                                            dateFormat="dd/MM/yyyy h:mm:ss aa"
-                                            timeInputLabel={"Time: "}
-                                            placeholder={
-                                                dataLang?.price_quote_system_default || "price_quote_system_default"
-                                            }
-                                            className={`border  focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
-                                        />
-                                        {date && (
-                                            <>
-                                                <MdClear
-                                                    className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
-                                                    onClick={() => _HandleChangeInput("clear")}
-                                                />
-                                            </>
-                                        )}
-                                        <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                            <div className="grid grid-cols-12 gap-1 items-center ">
+                                <div className="col-span-12 grid grid-cols-12 items-center gap-1 overflow-auto 3xl:max-h-[400px] xxl:max-h-[300px] 2xl:max-h-[350px] xl:max-h-[300px] lg:max-h-[280px] max-h-[300px] scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                    <div className="col-span-6 relative">
+                                        <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">
+                                            {dataLang?.serviceVoucher_day_vouchers}{" "}
+                                        </label>
+                                        <div className="custom-date-picker flex flex-row ">
+                                            <DatePicker
+                                                blur
+                                                fixedHeight
+                                                showTimeSelect
+                                                selected={date}
+                                                onSelect={(date) => _HandleChangeInput("date", date)}
+                                                onChange={(e) => _HandleChangeInput("date", e)}
+                                                placeholderText="DD/MM/YYYY HH:mm:ss"
+                                                dateFormat="dd/MM/yyyy h:mm:ss aa"
+                                                timeInputLabel={"Time: "}
+                                                placeholder={
+                                                    dataLang?.price_quote_system_default || "price_quote_system_default"
+                                                }
+                                                className={`border  focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full z-[999] bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer `}
+                                            />
+                                            {date && (
+                                                <>
+                                                    <MdClear
+                                                        className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
+                                                        onClick={() => _HandleChangeInput("clear")}
+                                                    />
+                                                </>
+                                            )}
+                                            <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="col-span-6">
-                                    <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">
-                                        {dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}
-                                    </label>
-                                    <input
-                                        value={code}
-                                        onChange={_HandleChangeInput.bind(this, "code")}
-                                        placeholder={props.dataLang?.payment_systemDefaul || "payment_systemDefaul"}
-                                        type="text"
-                                        className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none "
-                                    />
-                                </div>
-                                <div className="col-span-6">
-                                    <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
-                                        {props.dataLang?.payment_branch || "payment_branch"}{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <Select
-                                        closeMenuOnSelect={true}
-                                        placeholder={props.dataLang?.payment_branch || "payment_branch"}
-                                        options={data.dataBranch}
-                                        isSearchable={true}
-                                        onChange={_HandleChangeInput.bind(this, "branch")}
-                                        value={branch}
-                                        LoadingIndicator
-                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                        maxMenuHeight="200px"
-                                        isClearable={true}
-                                        menuPortalTarget={document.body}
-                                        onMenuOpen={handleMenuOpen}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                                position: "absolute",
-                                            }),
-                                        }}
-                                        className={`${
-                                            error.errBranch ? "border-red-500" : "border-transparent"
-                                        } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
-                                    />
-                                    {error.errBranch && (
-                                        <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
-                                            {props.dataLang?.payment_errBranch || "payment_errBranch"}
+                                    <div className="col-span-6">
+                                        <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">
+                                            {dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}
                                         </label>
-                                    )}
-                                </div>
-                                <div className="col-span-6">
-                                    <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
-                                        {props.dataLang?.payment_method || "payment_method"}{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <Select
-                                        closeMenuOnSelect={true}
-                                        placeholder={props.dataLang?.payment_method || "payment_method"}
-                                        options={data.dataMethod}
-                                        isSearchable={true}
-                                        onChange={_HandleChangeInput.bind(this, "method")}
-                                        value={method}
-                                        LoadingIndicator
-                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                        maxMenuHeight="200px"
-                                        isClearable={true}
-                                        menuPortalTarget={document.body}
-                                        onMenuOpen={handleMenuOpen}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                                position: "absolute",
-                                            }),
-                                        }}
-                                        className={`${
-                                            error.errMethod ? "border-red-500" : "border-transparent"
-                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
-                                    />
-                                    {error.errMethod && (
-                                        <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
-                                            {props.dataLang?.payment_errMethod || "payment_errMethod"}
-                                        </label>
-                                    )}
-                                </div>
-                                <div className="col-span-6">
-                                    <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
-                                        {props.dataLang?.payment_ob || "payment_ob"}{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <Select
-                                        closeMenuOnSelect={true}
-                                        placeholder={props.dataLang?.payment_ob || "payment_ob"}
-                                        options={data.dataObject}
-                                        isSearchable={true}
-                                        onChange={_HandleChangeInput.bind(this, "object")}
-                                        value={object}
-                                        LoadingIndicator
-                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                        maxMenuHeight="200px"
-                                        isClearable={true}
-                                        menuPortalTarget={document.body}
-                                        onMenuOpen={handleMenuOpen}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                                position: "absolute",
-                                            }),
-                                        }}
-                                        className={`${
-                                            error.errObject ? "border-red-500" : "border-transparent"
-                                        } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
-                                    />
-                                    {error.errObject && (
-                                        <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
-                                            {props.dataLang?.payment_errOb || "payment_errOb"}
-                                        </label>
-                                    )}
-                                </div>
-                                <div className="col-span-6">
-                                    <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
-                                        {props.dataLang?.payment_listOb || "payment_listOb"}{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    {object?.value == "other" ? (
-                                        <CreatableSelect
-                                            options={data.dataList_Object}
-                                            placeholder={props.dataLang?.payment_listOb || "payment_listOb"}
-                                            onChange={_HandleChangeInput.bind(this, "listObject")}
-                                            isClearable={true}
-                                            value={listObject}
-                                            classNamePrefix="Select"
-                                            className={`${
-                                                error.errListObject ? "border-red-500" : "border-transparent"
-                                            } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
-                                            isSearchable={true}
-                                            noOptionsMessage={() => `Chưa có gợi ý`}
-                                            formatCreateLabel={(value) => `Tạo "${value}"`}
-                                            menuPortalTarget={document.body}
-                                            onMenuOpen={handleMenuOpen}
-                                            style={{
-                                                border: "none",
-                                                boxShadow: "none",
-                                                outline: "none",
-                                            }}
-                                            theme={(theme) => ({
-                                                ...theme,
-                                                colors: {
-                                                    ...theme.colors,
-                                                    primary25: "#EBF5FF",
-                                                    primary50: "#92BFF7",
-                                                    primary: "#0F4F9E",
-                                                },
-                                            })}
-                                            styles={{
-                                                placeholder: (base) => ({
-                                                    ...base,
-                                                    color: "#cbd5e1",
-                                                }),
-                                                menuPortal: (base) => ({
-                                                    ...base,
-                                                    zIndex: 9999,
-                                                    position: "absolute",
-                                                }),
-                                                control: (base, state) => ({
-                                                    ...base,
-                                                    boxShadow: "none",
-                                                    ...(state.isFocused && {
-                                                        border: "0 0 0 1px #92BFF7",
-                                                    }),
-                                                }),
-                                                dropdownIndicator: (base) => ({
-                                                    ...base,
-                                                    display: "none",
-                                                }),
-                                            }}
+                                        <input
+                                            value={code}
+                                            onChange={_HandleChangeInput.bind(this, "code")}
+                                            placeholder={props.dataLang?.payment_systemDefaul || "payment_systemDefaul"}
+                                            type="text"
+                                            className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none "
                                         />
-                                    ) : (
+                                    </div>
+                                    <div className="col-span-6">
+                                        <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
+                                            {props.dataLang?.payment_branch || "payment_branch"}{" "}
+                                            <span className="text-red-500">*</span>
+                                        </label>
                                         <Select
                                             closeMenuOnSelect={true}
-                                            placeholder={props.dataLang?.payment_listOb || "payment_listOb"}
-                                            options={data.dataList_Object}
+                                            placeholder={props.dataLang?.payment_branch || "payment_branch"}
+                                            options={data.dataBranch}
                                             isSearchable={true}
-                                            onChange={_HandleChangeInput.bind(this, "listObject")}
-                                            value={listObject}
+                                            onChange={_HandleChangeInput.bind(this, "branch")}
+                                            value={branch}
                                             LoadingIndicator
                                             noOptionsMessage={() => "Không có dữ liệu"}
                                             maxMenuHeight="200px"
@@ -1134,179 +977,422 @@ const Popup_dspc = (props) => {
                                                 }),
                                             }}
                                             className={`${
-                                                error.errListObject ? "border-red-500" : "border-transparent"
-                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                error.errBranch ? "border-red-500" : "border-transparent"
+                                            }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
                                         />
-                                    )}
-                                    {error.errListObject && (
-                                        <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
-                                            {props.dataLang?.payment_errListOb || "payment_errListOb"}
-                                        </label>
-                                    )}
-                                </div>
-                                <div className="col-span-6  ">
-                                    <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
-                                        {props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
-                                    </label>
-                                    <Select
-                                        closeMenuOnSelect={true}
-                                        placeholder={props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
-                                        options={data.dataTypeofDoc}
-                                        isSearchable={true}
-                                        onChange={_HandleChangeInput.bind(this, "typeOfDocument")}
-                                        value={typeOfDocument}
-                                        LoadingIndicator
-                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                        maxMenuHeight="200px"
-                                        isClearable={true}
-                                        menuPortalTarget={document.body}
-                                        onMenuOpen={handleMenuOpen}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                                position: "absolute",
-                                            }),
-                                        }}
-                                        className={`border-transparent 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
-                                    />
-                                </div>
-                                <div className="col-span-6  ">
-                                    <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
-                                        {props.dataLang?.payment_listOfDoc || "payment_listOfDoc"}
-                                    </label>
-                                    <Select
-                                        closeMenuOnSelect={false}
-                                        placeholder={props.dataLang?.payment_listOfDoc || "payment_listOfDoc"}
-                                        onInputChange={_HandleSeachApi.bind(this)}
-                                        options={data.dataListTypeofDoc}
-                                        isSearchable={true}
-                                        onChange={_HandleChangeInput.bind(this, "listTypeOfDocument")}
-                                        value={listTypeOfDocument}
-                                        components={{ MenuList, MultiValue }}
-                                        isMulti
-                                        LoadingIndicator
-                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                        maxMenuHeight="200px"
-                                        isClearable={true}
-                                        menuPortalTarget={document.body}
-                                        onMenuOpen={handleMenuOpen}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                                position: "absolute",
-                                            }),
-                                        }}
-                                        className={`${
-                                            error.errListTypeDoc &&
-                                            typeOfDocument != null &&
-                                            listTypeOfDocument?.length == 0
-                                                ? "border-red-500"
-                                                : "border-transparent"
-                                        } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
-                                    />
-                                    {error.errListTypeDoc &&
-                                        typeOfDocument != null &&
-                                        listTypeOfDocument?.length == 0 && (
-                                            <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
-                                                {props.dataLang?.payment_errlistOfDoc || "payment_errlistOfDoc"}
+                                        {error.errBranch && (
+                                            <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
+                                                {props.dataLang?.payment_errBranch || "payment_errBranch"}
                                             </label>
                                         )}
-                                </div>
-                                <div className="col-span-6">
-                                    <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
-                                        {props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <NumericFormat
-                                        value={price}
-                                        disabled={object === null || listObject === null}
-                                        onChange={_HandleChangeInput.bind(this, "price")}
-                                        allowNegative={false}
-                                        placeholder={
-                                            ((object == null || listObject == null) &&
-                                                (props.dataLang?.payment_errObList || "payment_errObList")) ||
-                                            (object != null && props.dataLang?.payment_amountOfMoney) ||
-                                            "payment_amountOfMoney"
-                                        }
-                                        decimalScale={0}
-                                        isNumericString={true}
-                                        isAllowed={(values) => {
-                                            if (!values.value) return true;
-                                            const { floatValue } = values;
-                                            if (object?.value && listTypeOfDocument?.length > 0) {
-                                                if (object?.value != "other") {
-                                                    let totalMoney = listTypeOfDocument.reduce(
-                                                        (total, item) => total + parseFloat(item.money),
-                                                        0
-                                                    );
-                                                    if (floatValue > totalMoney) {
-                                                        Toast.fire({
-                                                            icon: "error",
-                                                            title: `${
-                                                                props.dataLang?.payment_errPlease || "payment_errPlease"
-                                                            } ${totalMoney.toLocaleString("en")}`,
-                                                        });
+                                    </div>
+                                    <div className="col-span-6">
+                                        <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
+                                            {props.dataLang?.payment_method || "payment_method"}{" "}
+                                            <span className="text-red-500">*</span>
+                                        </label>
+                                        <Select
+                                            closeMenuOnSelect={true}
+                                            placeholder={props.dataLang?.payment_method || "payment_method"}
+                                            options={data.dataMethod}
+                                            isSearchable={true}
+                                            onChange={_HandleChangeInput.bind(this, "method")}
+                                            value={method}
+                                            LoadingIndicator
+                                            noOptionsMessage={() => "Không có dữ liệu"}
+                                            maxMenuHeight="200px"
+                                            isClearable={true}
+                                            menuPortalTarget={document.body}
+                                            onMenuOpen={handleMenuOpen}
+                                            theme={(theme) => ({
+                                                ...theme,
+                                                colors: {
+                                                    ...theme.colors,
+                                                    primary25: "#EBF5FF",
+                                                    primary50: "#92BFF7",
+                                                    primary: "#0F4F9E",
+                                                },
+                                            })}
+                                            styles={{
+                                                placeholder: (base) => ({
+                                                    ...base,
+                                                    color: "#cbd5e1",
+                                                }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
+                                                    position: "absolute",
+                                                }),
+                                            }}
+                                            className={`${
+                                                error.errMethod ? "border-red-500" : "border-transparent"
+                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
+                                        />
+                                        {error.errMethod && (
+                                            <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
+                                                {props.dataLang?.payment_errMethod || "payment_errMethod"}
+                                            </label>
+                                        )}
+                                    </div>
+                                    <div className="col-span-6">
+                                        <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
+                                            {props.dataLang?.payment_ob || "payment_ob"}{" "}
+                                            <span className="text-red-500">*</span>
+                                        </label>
+                                        <Select
+                                            closeMenuOnSelect={true}
+                                            placeholder={props.dataLang?.payment_ob || "payment_ob"}
+                                            options={data.dataObject}
+                                            isSearchable={true}
+                                            onChange={_HandleChangeInput.bind(this, "object")}
+                                            value={object}
+                                            LoadingIndicator
+                                            noOptionsMessage={() => "Không có dữ liệu"}
+                                            maxMenuHeight="200px"
+                                            isClearable={true}
+                                            menuPortalTarget={document.body}
+                                            onMenuOpen={handleMenuOpen}
+                                            theme={(theme) => ({
+                                                ...theme,
+                                                colors: {
+                                                    ...theme.colors,
+                                                    primary25: "#EBF5FF",
+                                                    primary50: "#92BFF7",
+                                                    primary: "#0F4F9E",
+                                                },
+                                            })}
+                                            styles={{
+                                                placeholder: (base) => ({
+                                                    ...base,
+                                                    color: "#cbd5e1",
+                                                }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
+                                                    position: "absolute",
+                                                }),
+                                            }}
+                                            className={`${
+                                                error.errObject ? "border-red-500" : "border-transparent"
+                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                        />
+                                        {error.errObject && (
+                                            <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
+                                                {props.dataLang?.payment_errOb || "payment_errOb"}
+                                            </label>
+                                        )}
+                                    </div>
+                                    <div className="col-span-6">
+                                        <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
+                                            {props.dataLang?.payment_listOb || "payment_listOb"}{" "}
+                                            <span className="text-red-500">*</span>
+                                        </label>
+                                        {object?.value == "other" ? (
+                                            <CreatableSelect
+                                                options={data.dataList_Object}
+                                                placeholder={props.dataLang?.payment_listOb || "payment_listOb"}
+                                                onChange={_HandleChangeInput.bind(this, "listObject")}
+                                                isClearable={true}
+                                                value={listObject}
+                                                classNamePrefix="Select"
+                                                className={`${
+                                                    error.errListObject ? "border-red-500" : "border-transparent"
+                                                } Select__custom removeDivide  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                                isSearchable={true}
+                                                noOptionsMessage={() => `Chưa có gợi ý`}
+                                                formatCreateLabel={(value) => `Tạo "${value}"`}
+                                                menuPortalTarget={document.body}
+                                                onMenuOpen={handleMenuOpen}
+                                                style={{
+                                                    border: "none",
+                                                    boxShadow: "none",
+                                                    outline: "none",
+                                                }}
+                                                theme={(theme) => ({
+                                                    ...theme,
+                                                    colors: {
+                                                        ...theme.colors,
+                                                        primary25: "#EBF5FF",
+                                                        primary50: "#92BFF7",
+                                                        primary: "#0F4F9E",
+                                                    },
+                                                })}
+                                                styles={{
+                                                    placeholder: (base) => ({
+                                                        ...base,
+                                                        color: "#cbd5e1",
+                                                    }),
+                                                    menuPortal: (base) => ({
+                                                        ...base,
+                                                        zIndex: 9999,
+                                                        position: "absolute",
+                                                    }),
+                                                    control: (base, state) => ({
+                                                        ...base,
+                                                        boxShadow: "none",
+                                                        ...(state.isFocused && {
+                                                            border: "0 0 0 1px #92BFF7",
+                                                        }),
+                                                    }),
+                                                    dropdownIndicator: (base) => ({
+                                                        ...base,
+                                                        display: "none",
+                                                    }),
+                                                }}
+                                            />
+                                        ) : (
+                                            <Select
+                                                closeMenuOnSelect={true}
+                                                placeholder={props.dataLang?.payment_listOb || "payment_listOb"}
+                                                options={data.dataList_Object}
+                                                isSearchable={true}
+                                                onChange={_HandleChangeInput.bind(this, "listObject")}
+                                                value={listObject}
+                                                LoadingIndicator
+                                                noOptionsMessage={() => "Không có dữ liệu"}
+                                                maxMenuHeight="200px"
+                                                isClearable={true}
+                                                menuPortalTarget={document.body}
+                                                onMenuOpen={handleMenuOpen}
+                                                theme={(theme) => ({
+                                                    ...theme,
+                                                    colors: {
+                                                        ...theme.colors,
+                                                        primary25: "#EBF5FF",
+                                                        primary50: "#92BFF7",
+                                                        primary: "#0F4F9E",
+                                                    },
+                                                })}
+                                                styles={{
+                                                    placeholder: (base) => ({
+                                                        ...base,
+                                                        color: "#cbd5e1",
+                                                    }),
+                                                    menuPortal: (base) => ({
+                                                        ...base,
+                                                        zIndex: 9999,
+                                                        position: "absolute",
+                                                    }),
+                                                }}
+                                                className={`${
+                                                    error.errListObject ? "border-red-500" : "border-transparent"
+                                                } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                            />
+                                        )}
+                                        {error.errListObject && (
+                                            <label className="mb-2  2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
+                                                {props.dataLang?.payment_errListOb || "payment_errListOb"}
+                                            </label>
+                                        )}
+                                    </div>
+                                    <div className="col-span-6  ">
+                                        <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
+                                            {props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
+                                        </label>
+                                        <Select
+                                            closeMenuOnSelect={true}
+                                            placeholder={
+                                                props.dataLang?.payment_typeOfDocument || "payment_typeOfDocument"
+                                            }
+                                            options={data.dataTypeofDoc}
+                                            isSearchable={true}
+                                            onChange={_HandleChangeInput.bind(this, "typeOfDocument")}
+                                            value={typeOfDocument}
+                                            LoadingIndicator
+                                            noOptionsMessage={() => "Không có dữ liệu"}
+                                            maxMenuHeight="200px"
+                                            isClearable={true}
+                                            menuPortalTarget={document.body}
+                                            onMenuOpen={handleMenuOpen}
+                                            theme={(theme) => ({
+                                                ...theme,
+                                                colors: {
+                                                    ...theme.colors,
+                                                    primary25: "#EBF5FF",
+                                                    primary50: "#92BFF7",
+                                                    primary: "#0F4F9E",
+                                                },
+                                            })}
+                                            styles={{
+                                                placeholder: (base) => ({
+                                                    ...base,
+                                                    color: "#cbd5e1",
+                                                }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
+                                                    position: "absolute",
+                                                }),
+                                            }}
+                                            className={`border-transparent placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
+                                        />
+                                    </div>
+                                    <div className="col-span-6  ">
+                                        <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
+                                            {props.dataLang?.payment_listOfDoc || "payment_listOfDoc"}
+                                        </label>
+                                        <Select
+                                            closeMenuOnSelect={false}
+                                            placeholder={props.dataLang?.payment_listOfDoc || "payment_listOfDoc"}
+                                            onInputChange={_HandleSeachApi.bind(this)}
+                                            options={data.dataListTypeofDoc}
+                                            isSearchable={true}
+                                            onChange={_HandleChangeInput.bind(this, "listTypeOfDocument")}
+                                            value={listTypeOfDocument}
+                                            components={{ MenuList, MultiValue }}
+                                            isMulti
+                                            LoadingIndicator
+                                            noOptionsMessage={() => "Không có dữ liệu"}
+                                            maxMenuHeight="200px"
+                                            isClearable={true}
+                                            menuPortalTarget={document.body}
+                                            onMenuOpen={handleMenuOpen}
+                                            theme={(theme) => ({
+                                                ...theme,
+                                                colors: {
+                                                    ...theme.colors,
+                                                    primary25: "#EBF5FF",
+                                                    primary50: "#92BFF7",
+                                                    primary: "#0F4F9E",
+                                                },
+                                            })}
+                                            styles={{
+                                                placeholder: (base) => ({
+                                                    ...base,
+                                                    color: "#cbd5e1",
+                                                }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
+                                                    position: "absolute",
+                                                }),
+                                            }}
+                                            className={`${
+                                                error.errListTypeDoc &&
+                                                typeOfDocument != null &&
+                                                listTypeOfDocument?.length == 0
+                                                    ? "border-red-500"
+                                                    : "border-transparent"
+                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                        />
+                                        {error.errListTypeDoc &&
+                                            typeOfDocument != null &&
+                                            listTypeOfDocument?.length == 0 && (
+                                                <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
+                                                    {props.dataLang?.payment_errlistOfDoc || "payment_errlistOfDoc"}
+                                                </label>
+                                            )}
+                                    </div>
+                                    <div className="col-span-6">
+                                        <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
+                                            {props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}{" "}
+                                            <span className="text-red-500">*</span>
+                                        </label>
+                                        <NumericFormat
+                                            value={price}
+                                            disabled={object === null || listObject === null}
+                                            onChange={_HandleChangeInput.bind(this, "price")}
+                                            allowNegative={false}
+                                            placeholder={
+                                                ((object == null || listObject == null) &&
+                                                    (props.dataLang?.payment_errObList || "payment_errObList")) ||
+                                                (object != null && props.dataLang?.payment_amountOfMoney) ||
+                                                "payment_amountOfMoney"
+                                            }
+                                            decimalScale={0}
+                                            isNumericString={true}
+                                            isAllowed={(values) => {
+                                                if (!values.value) return true;
+                                                const { floatValue } = values;
+                                                if (object?.value && listTypeOfDocument?.length > 0) {
+                                                    if (object?.value != "other") {
+                                                        let totalMoney = listTypeOfDocument.reduce(
+                                                            (total, item) => total + parseFloat(item.money),
+                                                            0
+                                                        );
+                                                        if (floatValue > totalMoney) {
+                                                            Toast.fire({
+                                                                icon: "error",
+                                                                title: `${
+                                                                    props.dataLang?.payment_errPlease ||
+                                                                    "payment_errPlease"
+                                                                } ${totalMoney.toLocaleString("en")}`,
+                                                            });
+                                                        }
+                                                        return floatValue <= totalMoney;
+                                                    } else {
+                                                        return true;
                                                     }
-                                                    return floatValue <= totalMoney;
                                                 } else {
                                                     return true;
                                                 }
-                                            } else {
-                                                return true;
-                                            }
-                                        }}
-                                        className={`${
-                                            error.errPrice
-                                                ? "border-red-500"
-                                                : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
-                                        } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
-                                        thousandSeparator=","
-                                    />
-                                    {error.errPrice && (
-                                        <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
-                                            {props.dataLang?.payment_errAmount || "payment_errAmount"}
+                                            }}
+                                            className={`${
+                                                error.errPrice
+                                                    ? "border-red-500"
+                                                    : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
+                                            } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
+                                            thousandSeparator=","
+                                        />
+                                        {error.errPrice && (
+                                            <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
+                                                {props.dataLang?.payment_errAmount || "payment_errAmount"}
+                                            </label>
+                                        )}
+                                    </div>
+                                    <div className="col-span-6">
+                                        <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">
+                                            {props.dataLang?.payment_note || "payment_note"}
                                         </label>
+                                        <input
+                                            value={note}
+                                            onChange={_HandleChangeInput.bind(this, "note")}
+                                            placeholder={props.dataLang?.payment_note || "payment_note"}
+                                            type="text"
+                                            className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none "
+                                        />
+                                    </div>
+                                    {datat.length > 0 && (
+                                        <div className="col-span-12 border border-b-0 rounded m-1 transition-all duration-200 ease-linear">
+                                            <div className="col-span-12 grid grid-cols-4 items-center divide-x border border-l-0 border-t-0 border-r-0">
+                                                <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
+                                                    Số phiếu nhập
+                                                </h1>
+                                                <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
+                                                    Số phiếu cọc
+                                                </h1>
+                                                <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
+                                                    Tiền cấn trừ
+                                                </h1>
+                                                <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
+                                                    Tiền còn lại
+                                                </h1>
+                                            </div>
+                                            <div
+                                                // ref={scrollAreaRef}
+                                                // speed={1}
+                                                // smoothScrolling={true}
+                                                className={`${
+                                                    datat.length > 5 ? " h-[170px] overflow-auto" : ""
+                                                } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
+                                            >
+                                                {datat.map((e) => {
+                                                    return (
+                                                        <div className="col-span-12 grid grid-cols-4 items-center divide-x border-b">
+                                                            <h1 className="text-center text-xs p-2">{e.codeImport}</h1>
+                                                            <h1 className="text-center text-xs p-2">{e.codeOrder}</h1>
+                                                            <h1 className="text-center text-xs p-2">
+                                                                {formatNumber(e.pricecan)}
+                                                            </h1>
+                                                            <h1 className="text-center text-xs p-2">
+                                                                {formatNumber(e.pricecl)}
+                                                            </h1>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
                                     )}
-                                </div>
-                                <div className="col-span-6">
-                                    <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] mb-1 ">
-                                        {props.dataLang?.payment_note || "payment_note"}
-                                    </label>
-                                    <input
-                                        value={note}
-                                        onChange={_HandleChangeInput.bind(this, "note")}
-                                        placeholder={props.dataLang?.payment_note || "payment_note"}
-                                        type="text"
-                                        className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none "
-                                    />
                                 </div>
                                 <h2 className="font-normal bg-[#ECF0F4] p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12 mt-0.5">
                                     {props.dataLang?.payment_costInfo || "payment_costInfo"}
