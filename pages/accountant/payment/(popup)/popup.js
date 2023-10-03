@@ -132,22 +132,26 @@ const Popup_dspc = (props) => {
     const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
     sortedArr.unshift(option[0]);
 
+    const initstialState = () => {
+        sDate(new Date());
+        sCode(null);
+        sBranch(null);
+        sObject(null);
+        sListObject(null);
+        sTypeOfDocument(null);
+        sListTypeOfDocument([]);
+        sPrice("");
+        sMethod(null);
+        sNote("");
+        sNote("");
+        sError(inistError);
+        sOption([{ id: Date.now(), chiphi: "", sotien: null }]);
+        sFetch((e) => ({ ...e, onFetching: true, onFetching_LisObject: true }));
+        sData(inistArrr);
+    };
+
     useEffect(() => {
-        open && sDate(new Date());
-        open && sCode(null);
-        open && sBranch(null);
-        open && sObject(null);
-        open && sListObject(null);
-        open && sTypeOfDocument(null);
-        open && sListTypeOfDocument([]);
-        open && sPrice("");
-        open && sMethod(null);
-        open && sNote("");
-        open && sNote("");
-        open && sError(inistError);
-        open && sOption([{ id: Date.now(), chiphi: "", sotien: null }]);
-        open && sFetch((e) => ({ ...e, onFetching: true, onFetching_LisObject: true }));
-        open && sData(inistArrr);
+        open && initstialState();
         props?.id && sFetch((e) => ({ ...e, onFetchingDetail: true }));
     }, [open]);
 
@@ -213,10 +217,6 @@ const Popup_dspc = (props) => {
         );
     };
 
-    useEffect(() => {
-        fetch.onFetchingDetail && props?.id && _ServerFetching_detail();
-    }, [open]);
-
     // Chi nhánh, PTTT, Đối tượng
     const _ServerFetching = () => {
         Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
@@ -249,14 +249,6 @@ const Popup_dspc = (props) => {
         sFetch((e) => ({ ...e, onFetching: false }));
     };
 
-    useEffect(() => {
-        fetch.onFetching && _ServerFetching();
-    }, [fetch.onFetching]);
-
-    useEffect(() => {
-        open && sFetch((e) => ({ ...e, onFetching: true }));
-    }, [open]);
-
     //Danh sách đối tượng
     //Api Danh sách đối tượng: truyền Đối tượng vào biến type, truyền Chi nhánh vào biến filter[branch_id]
 
@@ -282,14 +274,6 @@ const Popup_dspc = (props) => {
         );
         sFetch((e) => ({ ...e, onFetching_LisObject: false }));
     };
-
-    useEffect(() => {
-        fetch.onFetching_LisObject && _ServerFetching_LisObject();
-    }, [fetch.onFetching_LisObject]);
-
-    useEffect(() => {
-        branch != null && object != null && sFetch((e) => ({ ...e, onFetching_LisObject: true }));
-    }, [object, branch]);
 
     // Loại chứng từ
     //Api Loại chứng từ: truyền Đối tượng vào biến type
@@ -320,18 +304,65 @@ const Popup_dspc = (props) => {
     };
 
     useEffect(() => {
-        fetch.onFetching_TypeOfDocument && _ServerFetching_TypeOfDocument();
-    }, [fetch.onFetching_TypeOfDocument]);
+        if (typeOfDocument?.value == "import" && listTypeOfDocument) {
+            sFetch((e) => ({ ...e, onFetchingTable: true }));
+        }
+        if (branch != null) {
+            sFetch((e) => ({ ...e, onFetching_ListCost: true }));
+        }
+        if (object != null) {
+            sFetch((e) => ({ ...e, onFetching_TypeOfDocument: true }));
+        }
+        if (typeOfDocument) {
+            sFetch((e) => ({ ...e, onFetching_ListTypeOfDocument: true }));
+        }
+        if (open) {
+            sFetch((e) => ({ ...e, onFetching: true }));
+        }
+        if (branch != null && object != null) {
+            sFetch((e) => ({ ...e, onFetching_LisObject: true }));
+        }
+        if (open && fetch.onFetchingDetail && props?.id) {
+            _ServerFetching_detail();
+        }
+    }, [listTypeOfDocument, branch, object, typeOfDocument, open]);
 
     useEffect(() => {
-        object != null && sFetch((e) => ({ ...e, onFetching_TypeOfDocument: true }));
-    }, [object]);
+        if (fetch.onFetching) {
+            _ServerFetching();
+        }
+        if (fetch.onFetching_ListCost) {
+            _ServerFetching_ListCost();
+        }
+        if (fetch.onFetchingTable) {
+            _ServerFetching_ListTable();
+        }
+        if (fetch.onFetching_TypeOfDocument) {
+            _ServerFetching_TypeOfDocument();
+        }
+        if (fetch.onFetching_ListTypeOfDocument) {
+            _ServerFetching_ListTypeOfDocument();
+        }
+        if (fetch.onFetching_LisObject) {
+            _ServerFetching_LisObject();
+        }
+        if (fetch.onSending) {
+            _ServerSending();
+        }
+    }, [
+        fetch.onFetching_ListCost,
+        fetch.onFetchingTable,
+        fetch.onFetching_TypeOfDocument,
+        fetch.onFetching_ListTypeOfDocument,
+        fetch.onFetching_LisObject,
+        fetch.onFetching,
+        fetch.onSending,
+    ]);
 
     //Danh sách chứng từ
     //Api Danh sách chứng từ: truyền Đối tượng vào biến type, truyền Loại chứng từ vào biến voucher_type, truyền Danh sách đối tượng vào object_id
 
     const _ServerFetching_ListTypeOfDocument = () => {
-        console.log("hi");
         Axios(
             "GET",
             "/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true",
@@ -360,14 +391,6 @@ const Popup_dspc = (props) => {
         );
         sFetch((e) => ({ ...e, onFetching_ListTypeOfDocument: false }));
     };
-
-    useEffect(() => {
-        fetch.onFetching_ListTypeOfDocument && _ServerFetching_ListTypeOfDocument();
-    }, [fetch.onFetching_ListTypeOfDocument]);
-
-    useEffect(() => {
-        typeOfDocument && sFetch((e) => ({ ...e, onFetching_ListTypeOfDocument: true }));
-    }, [typeOfDocument, branch, object]);
 
     let searchTimeout;
 
@@ -438,19 +461,12 @@ const Popup_dspc = (props) => {
         sFetch((e) => ({ ...e, onFetching_ListCost: false }));
     };
 
-    useEffect(() => {
-        fetch.onFetching_ListCost && _ServerFetching_ListCost();
-    }, [fetch.onFetching_ListCost]);
-
-    useEffect(() => {
-        branch != null && sFetch((e) => ({ ...e, onFetching_ListCost: true }));
-    }, [branch]);
-
     const _ServerFetching_ListTable = () => {
         let db = new FormData();
         listTypeOfDocument.forEach((e, index) => {
             db.append(`import_id[${index}]`, e?.value);
         });
+        id && db.append("ignore_id", id ? id : "");
         Axios(
             "POST",
             "/api_web/Api_expense_voucher/deductDeposit/?csrf_protection=true",
@@ -470,13 +486,6 @@ const Popup_dspc = (props) => {
         );
         sFetch((e) => ({ ...e, onFetchingTable: false }));
     };
-    useEffect(() => {
-        fetch.onFetchingTable && _ServerFetching_ListTable();
-    }, [fetch.onFetchingTable]);
-
-    useEffect(() => {
-        typeOfDocument?.value == "import" && listTypeOfDocument && sFetch((e) => ({ ...e, onFetchingTable: true }));
-    }, [listTypeOfDocument]);
 
     const _HandleChangeInput = (type, value) => {
         if (type == "date") {
@@ -559,10 +568,7 @@ const Popup_dspc = (props) => {
                 if (listTypeOfDocument?.length > 0) {
                     if (priceChange > totalMoney) {
                         // Giá nhập vượt quá tổng số tiền, trả về tổng ban đầu
-                        Toast.fire({
-                            icon: "error",
-                            title: `${dataLang?.payment_err_aler || "payment_err_aler"}`,
-                        });
+                        ToatstNotifi("error", `${dataLang?.payment_err_aler || "payment_err_aler"}`);
                         sPrice(totalMoney);
                         isExceedTotal = true; // Đánh dấu trạng thái vượt quá giá trị
                     } else {
@@ -630,14 +636,14 @@ const Popup_dspc = (props) => {
                 errSotien: hasNullSotien,
                 errListTypeDoc: typeOfDocument != null && listTypeOfDocument?.length == 0,
             }));
-            Toast.fire({
-                icon: "error",
-                title: `${
+            ToatstNotifi(
+                "error",
+                `${
                     totalSotienErr < price
                         ? props?.dataLang.payment_err_alerTotalThan || "payment_err_alerTotalThan"
                         : props.dataLang?.required_field_null || "required_field_null"
-                }`,
-            });
+                }`
+            );
         } else {
             sFetch((e) => ({ ...e, onSending: true }));
         }
@@ -670,22 +676,12 @@ const Popup_dspc = (props) => {
         method != null,
     ]);
 
-    useEffect(() => {
-        fetch.onSending && _ServerSending();
-    }, [fetch.onSending]);
-
     const _HandleChangeInputOption = (id, type, value) => {
         var index = option.findIndex((x) => x.id === id);
         if (type === "chiphi") {
             const hasSelectedOption = option.some((o) => o.chiphi === value);
             if (hasSelectedOption) {
-                Toast.fire({
-                    title: `${props?.dataLang?.payment_err_alerselected || "payment_err_alerselected"}`,
-                    icon: "error",
-                    confirmButtonColor: "#296dc1",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: dataLang?.aler_yes,
-                });
+                ToatstNotifi("error", `${props?.dataLang?.payment_err_alerselected || "payment_err_alerselected"}`);
                 return; // Dừng xử lý tiếp theo nếu đã hiển thị thông báo lỗi
             } else {
                 option[index].chiphi = value;
@@ -701,14 +697,7 @@ const Popup_dspc = (props) => {
                         option[optIndex].sotien = currentValue; // Gán lại giá trị hiện tại
                     }
                 });
-                Toast.fire({
-                    title: `${props?.dataLang?.payment_err_alerExeeds || "payment_err_alerExeeds"}`,
-                    icon: "error",
-                    confirmButtonColor: "#296dc1",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: dataLang?.aler_yes,
-                    timer: 3000,
-                });
+                ToatstNotifi("error", `${props?.dataLang?.payment_err_alerExeeds || "payment_err_alerExeeds"}`);
             } else {
                 option[index].sotien = parseFloat(value?.value);
             }
@@ -722,13 +711,7 @@ const Popup_dspc = (props) => {
 
     const _HandleDelete = (id) => {
         if (id === option[0].id) {
-            return Toast.fire({
-                title: `${props.dataLang?.payment_err_alerNotDelete || "payment_err_alerNotDelete"}`,
-                icon: "error",
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${dataLang?.aler_yes}`,
-            });
+            return ToatstNotifi("error", `${props.dataLang?.payment_err_alerNotDelete || "payment_err_alerNotDelete"}`);
         }
         const newOption = option.filter((x) => x.id !== id); // loại bỏ phần tử cần xóa
         sOption(newOption); // cập nhật lại mảng
@@ -1275,6 +1258,55 @@ const Popup_dspc = (props) => {
                                                 </label>
                                             )}
                                     </div>
+                                    {data.dataTable.length > 0 && (
+                                        <div className="col-span-12 border border-b-0 rounded m-1 transition-all duration-200 ease-linear">
+                                            <div className="col-span-12 grid grid-cols-4 items-center divide-x border border-l-0 border-t-0 border-r-0">
+                                                <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
+                                                    {props.dataLang?.payment_numberEnterd || "payment_numberEnterd"}
+                                                </h1>
+                                                <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
+                                                    {props.dataLang?.payment_numberSlips || "payment_numberSlips"}
+                                                </h1>
+                                                <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
+                                                    {props.dataLang?.payment_deductionMoney || "payment_deductionMoney"}
+                                                </h1>
+                                                <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
+                                                    {props.dataLang?.payment_cashInReturn || "payment_cashInReturn"}
+                                                </h1>
+                                            </div>
+                                            <div
+                                                // ref={scrollAreaRef}
+                                                // speed={1}
+                                                // smoothScrolling={true}
+                                                className={`${
+                                                    data.dataTable.length > 5 ? " h-[170px] overflow-auto" : ""
+                                                } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
+                                            >
+                                                {data.dataTable.map((e) => {
+                                                    return (
+                                                        <div className="col-span-12 grid grid-cols-4 items-center divide-x border-b">
+                                                            <h1 className="text-center text-xs p-2 ">
+                                                                <span className="py-1 px-2 bg-purple-200 text-purple-500 rounded-xl">
+                                                                    {e.import_code}
+                                                                </span>
+                                                            </h1>
+                                                            <h1 className="text-center text-xs p-2">
+                                                                <span className="py-1 px-2 bg-orange-200 text-orange-500 rounded-xl">
+                                                                    {e.payslip_code}
+                                                                </span>
+                                                            </h1>
+                                                            <h1 className="text-center text-xs p-2">
+                                                                {formatNumber(e.deposit_amount)}
+                                                            </h1>
+                                                            <h1 className="text-center text-xs p-2">
+                                                                {formatNumber(e.amount_left)}
+                                                            </h1>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
                                     <div className="col-span-6">
                                         <label className="text-[#344054] font-normal 2xl:text-[12px] xl:text-[13px] text-[12px] ">
                                             {props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}{" "}
@@ -1344,55 +1376,6 @@ const Popup_dspc = (props) => {
                                             className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none "
                                         />
                                     </div>
-                                    {data.dataTable.length > 0 && (
-                                        <div className="col-span-12 border border-b-0 rounded m-1 transition-all duration-200 ease-linear">
-                                            <div className="col-span-12 grid grid-cols-4 items-center divide-x border border-l-0 border-t-0 border-r-0">
-                                                <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
-                                                    Số phiếu nhập
-                                                </h1>
-                                                <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
-                                                    Số phiếu cọc
-                                                </h1>
-                                                <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
-                                                    Tiền cấn trừ
-                                                </h1>
-                                                <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
-                                                    Tiền còn lại
-                                                </h1>
-                                            </div>
-                                            <div
-                                                // ref={scrollAreaRef}
-                                                // speed={1}
-                                                // smoothScrolling={true}
-                                                className={`${
-                                                    data.dataTable.length > 5 ? " h-[170px] overflow-auto" : ""
-                                                } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
-                                            >
-                                                {data.dataTable.map((e) => {
-                                                    return (
-                                                        <div className="col-span-12 grid grid-cols-4 items-center divide-x border-b">
-                                                            <h1 className="text-center text-xs p-2 ">
-                                                                <span className="py-1 px-2 bg-purple-200 text-purple-500 rounded-xl">
-                                                                    {e.import_code}
-                                                                </span>
-                                                            </h1>
-                                                            <h1 className="text-center text-xs p-2">
-                                                                <span className="py-1 px-2 bg-orange-200 text-orange-500 rounded-xl">
-                                                                    {e.payslip_code}
-                                                                </span>
-                                                            </h1>
-                                                            <h1 className="text-center text-xs p-2">
-                                                                {formatNumber(e.deposit_amount)}
-                                                            </h1>
-                                                            <h1 className="text-center text-xs p-2">
-                                                                {formatNumber(e.amount_left)}
-                                                            </h1>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                                 <h2 className="font-normal bg-[#ECF0F4] p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12 mt-0.5">
                                     {props.dataLang?.payment_costInfo || "payment_costInfo"}
