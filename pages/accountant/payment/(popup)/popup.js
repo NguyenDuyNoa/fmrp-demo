@@ -319,7 +319,7 @@ const Popup_dspc = (props) => {
     }, [fetch.onFetching_TypeOfDocument]);
 
     useEffect(() => {
-        object != null && sFetch((e) => ({ ...e, onFetching_ListTypeOfDocument: true }));
+        object != null && sFetch((e) => ({ ...e, onFetching_TypeOfDocument: true }));
     }, [object]);
 
     //Danh sách chứng từ
@@ -363,36 +363,44 @@ const Popup_dspc = (props) => {
         sFetch((e) => ({ ...e, onFetching_ListTypeOfDocument: true }));
     }, [typeOfDocument]);
 
+    let searchTimeout;
+
     const _HandleSeachApi = (inputValue) => {
-        Axios(
-            "POST",
-            `/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true`,
-            {
-                data: {
-                    term: inputValue,
-                },
-                params: {
-                    type: object?.value ? object?.value : null,
-                    voucher_type: typeOfDocument?.value ? typeOfDocument?.value : null,
-                    object_id: listObject?.value ? listObject?.value : null,
-                    "filter[branch_id]": branch?.value ? branch?.value : null,
-                    expense_voucher_id: id ? id : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    var db = response.data;
-                    sData((e) => ({
-                        ...e,
-                        dataListTypeofDoc: db?.map((e) => ({
-                            label: e?.code,
-                            value: e?.id,
-                            money: e?.money,
-                        })),
-                    }));
-                }
-            }
-        );
+        if (inputValue == "") return;
+        else {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                Axios(
+                    "POST",
+                    `/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true`,
+                    {
+                        data: {
+                            term: inputValue,
+                        },
+                        params: {
+                            type: object?.value ? object?.value : null,
+                            voucher_type: typeOfDocument?.value ? typeOfDocument?.value : null,
+                            object_id: listObject?.value ? listObject?.value : null,
+                            "filter[branch_id]": branch?.value ? branch?.value : null,
+                            expense_voucher_id: id ? id : "",
+                        },
+                    },
+                    (err, response) => {
+                        if (!err) {
+                            let db = response.data;
+                            sData((e) => ({
+                                ...e,
+                                dataListTypeofDoc: db?.map((e) => ({
+                                    label: e?.code,
+                                    value: e?.id,
+                                    money: e?.money,
+                                })),
+                            }));
+                        }
+                    }
+                );
+            }, 500);
+        }
     };
 
     //Loại chi phí
