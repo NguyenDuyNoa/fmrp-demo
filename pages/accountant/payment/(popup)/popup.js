@@ -118,7 +118,7 @@ const Popup_dspc = (props) => {
     const [listObject, sListObject] = useState(null);
     const [typeOfDocument, sTypeOfDocument] = useState(null);
     const [listTypeOfDocument, sListTypeOfDocument] = useState([]);
-    const [price, sPrice] = useState("");
+    const [price, sPrice] = useState(null);
     const [method, sMethod] = useState(null);
     const [note, sNote] = useState("");
     const [option, sOption] = useState([
@@ -140,7 +140,7 @@ const Popup_dspc = (props) => {
         sListObject(null);
         sTypeOfDocument(null);
         sListTypeOfDocument([]);
-        sPrice("");
+        sPrice(null);
         sMethod(null);
         sNote("");
         sNote("");
@@ -311,7 +311,6 @@ const Popup_dspc = (props) => {
     useEffect(() => {
         typeOfDocument?.value == "import" && listTypeOfDocument && sFetch((e) => ({ ...e, onFetchingTable: true }));
     }, [listTypeOfDocument]);
-
     useEffect(() => {
         open && sFetch((e) => ({ ...e, onFetching: true }));
     }, [open]);
@@ -324,7 +323,6 @@ const Popup_dspc = (props) => {
     useEffect(() => {
         typeOfDocument && sFetch((e) => ({ ...e, onFetching_ListTypeOfDocument: true }));
     }, [typeOfDocument, branch, object]);
-
     useEffect(() => {
         fetch.onFetchingDetail && props?.id && _ServerFetching_detail();
     }, [open]);
@@ -547,7 +545,7 @@ const Popup_dspc = (props) => {
             sBranch(value);
             sData((e) => ({ ...e, dataList_Object: [], dataListCost: [], dataListTypeofDoc: [] }));
             sListObject(null);
-            sPrice("");
+            sPrice(null);
             sListTypeOfDocument([]);
             sTypeOfDocument(null);
             const updatedOptions = option.map((item) => {
@@ -564,7 +562,7 @@ const Popup_dspc = (props) => {
             sData((e) => ({ ...e, dataList_Object: [], dataListTypeofDoc: [] }));
             sTypeOfDocument(null);
             sListTypeOfDocument([]);
-            sPrice("");
+            sPrice(null);
             sOption((prevOption) => {
                 const newOption = prevOption.map((item, index) => {
                     return { ...item, sotien: "" };
@@ -577,7 +575,7 @@ const Popup_dspc = (props) => {
             sTypeOfDocument(value);
             sData((e) => ({ ...e, dataListTypeofDoc: [] }));
             sListTypeOfDocument([]);
-            sPrice("");
+            sPrice(null);
             sOption((prevOption) => {
                 const newOption = prevOption.map((item, index) => {
                     return { ...item, sotien: "" };
@@ -601,7 +599,7 @@ const Popup_dspc = (props) => {
                     return newOption;
                 });
             } else if (value && value.length == 0) {
-                sPrice("");
+                sPrice(null);
                 sOption((prevOption) => {
                     const newOption = prevOption.map((item, index) => {
                         return { ...item, sotien: "" };
@@ -663,11 +661,12 @@ const Popup_dspc = (props) => {
         const hasNullLabel = option.some((item) => item.chiphi === "");
         const hasNullSotien = option.some((item) => item.sotien === "" || item.sotien === null);
         const totalSotienErr = option.reduce((total, item) => total + item.sotien, 0);
+        console.log("price", price);
         if (
             branch == null ||
             object == null ||
             listObject == null ||
-            price == "" ||
+            price == null ||
             method == null ||
             hasNullLabel ||
             hasNullSotien ||
@@ -679,7 +678,10 @@ const Popup_dspc = (props) => {
                 errBranch: branch == null,
                 errObject: object == null,
                 errListObject: listObject == null,
-                errPrice: price == "",
+                errPrice:
+                    typeOfDocument?.value == "import" && (price == 0 || price == null)
+                        ? true
+                        : price == 0 || price == null,
                 errMethod: method == null,
                 errCosts: hasNullLabel,
                 errSotien: hasNullSotien,
@@ -710,18 +712,18 @@ const Popup_dspc = (props) => {
         if (listObject != null) {
             sError((e) => ({ ...e, errListObject: false }));
         }
-        if (price != "") {
+        if (price != null) {
             sError((e) => ({ ...e, errPrice: false }));
         }
         if (method != null) {
             sError((e) => ({ ...e, errMethod: false }));
         }
     }, [
+        price != null,
         branch != null,
         object != null,
         typeOfDocument == null && listTypeOfDocument?.length > 0,
         listObject != null,
-        price != "",
         method != null,
     ]);
 
@@ -798,7 +800,7 @@ const Popup_dspc = (props) => {
 
     const handleDeselectAll = () => {
         sListTypeOfDocument([]);
-        sPrice("");
+        sPrice(null);
         sOption((prevOption) => {
             const newOption = prevOption.map((item) => {
                 return { ...item, sotien: null };
@@ -1401,7 +1403,7 @@ const Popup_dspc = (props) => {
                                                 }
                                             }}
                                             className={`${
-                                                error.errPrice
+                                                error.errPrice && price == null
                                                     ? "border-red-500"
                                                     : "focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300"
                                             } 3xl:placeholder:text-[13px] 2xl:placeholder:text-[12px] xl:placeholder:text-[10px] placeholder:text-[9px] placeholder:text-slate-300  w-full disabled:bg-slate-100 bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border p-[9.5px]`}
@@ -1505,9 +1507,9 @@ const Popup_dspc = (props) => {
                                                 <div className="col-span-4 text-center flex items-center justify-center">
                                                     <NumericFormat
                                                         value={e?.sotien}
-                                                        disabled={price == ""}
+                                                        disabled={price == null}
                                                         placeholder={
-                                                            price == "" &&
+                                                            price == null &&
                                                             (props.dataLang?.payment_errAmountAbove ||
                                                                 "payment_errAmountAbove")
                                                         }
