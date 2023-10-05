@@ -42,7 +42,7 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                         backgroundColor: ce?.bg,
                                     }}
                                     onClick={() => handleIsShowModel(e.id, ce.id)}
-                                    className={`w-full my-2 rounded group hover:scale-105 transition-all duration-200 ease-linear`}
+                                    className={`w-full my-2 rounded group hover:scale-[1.03] transition-all duration-200 ease-linear`}
                                 >
                                     <div className="p-4">
                                         <div
@@ -50,7 +50,7 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                                 backgroundColor: ce?.color,
                                             }}
                                             // className={`h-full bg-[${ce?.color}]/10 group-hover:scale-105 transition-all duration-200 ease-in-out
-                                            className={`h-full group-hover:scale-105 transition-all duration-200 ease-in-out 
+                                            className={`h-full group-hover:scale-[1.03] transition-all duration-200 ease-in-out 
                                                 p-2 text-[#11315B] text-[12px] font-medium w-fit rounded-lg`}
                                         >
                                             {ce.order}
@@ -79,7 +79,7 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                                     src={ce.image}
                                                     width={80}
                                                     height={84}
-                                                    className="w-full h-full object-cover rounded-xl group-hover:scale-105 group-hover:rotate-6 hover:scale-105 hover:rotate-6  transition-all duration-200 ease-in-out"
+                                                    className="w-full h-full object-cover rounded-xl group-hover:scale-[1.03] group-hover:rotate-6 hover:scale-105 hover:rotate-6  transition-all duration-200 ease-in-out"
                                                 />
                                             </div>
                                             <div className="col-span-7">
