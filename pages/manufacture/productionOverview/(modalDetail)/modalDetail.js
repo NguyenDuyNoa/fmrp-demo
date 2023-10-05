@@ -13,7 +13,7 @@ const ModalDetail = ({ data, isShow, fetch, handleIsShowModel, handleIsShow }) =
                 }}
                 className={`bg-[#FFFFFF] absolute 3xl:top-[70px] xxl:top-[53px] 2xl:top-[60px] xl:top-[52px] lg:top-[44px]  right-0  transition-all duration-300 ease-linear h-auto w-[500px] shadow-md z-[999]`}
             >
-                <div className="border-b-2 border-gray-300 flex justify-between py-4 px-6">
+                <div className="border-b border-gray-300 flex justify-between py-4 px-6">
                     <h1>Thông tin</h1>
                     <button
                         onClick={() => handleIsShowModel()}
@@ -79,7 +79,7 @@ const ModalDetail = ({ data, isShow, fetch, handleIsShowModel, handleIsShow }) =
                             </h3>
                         </div>
                         <div>
-                            <div className="grid grid-cols-12 border-t-2 border-gray-300 pt-4">
+                            <div className="grid grid-cols-12 border-t border-gray-300 pt-4">
                                 <div className="col-span-3 3xl:w-[80px] 3xl:h-[84px] xxl:w-[60px] xxl:h-[64px] 2xl:w-[60px] 2xl:h-[64px] xl:w-[60px] xl:h-[64px] lg:w-[50px] lg:h-[54px] w-[80px] h-[84px] rounded-xl">
                                     <Image
                                         src={"/manufacture/Image.png"}

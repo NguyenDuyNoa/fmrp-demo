@@ -120,7 +120,7 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                 </button>
                             ))}
                         </ScrollArea> */}
-                        <div className="3xl:h-[740px] xxl:h-[473px] 2xl:h-[555px] xl:h-[488px] lg:h-[498px] h-[565px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                        <div className="3xl:h-[730px] xxl:h-[473px] 2xl:h-[555px] xl:h-[488px] lg:h-[498px] h-[565px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                             {e.child.map((ce, ceIndex) => (
                                 <button
                                     type="button"
