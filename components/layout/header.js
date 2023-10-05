@@ -252,7 +252,11 @@ const Header = () => {
                 {
                     title: "Sản xuất",
                     img: "/icon/header/kho/sx.png",
-                    items: [{ name: "Lệnh sản xuất tổng" }, { name: "Lệnh sản xuất chi tiết" }],
+                    items: [
+                        { name: "Tổng quan sản xuất", link: "/manufacture/productionOverview" },
+                        { name: "Lệnh sản xuất tổng" },
+                        { name: "Lệnh sản xuất chi tiết" },
+                    ],
                 },
                 {
                     title: "Cảnh báo tồn kho",

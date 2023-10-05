@@ -7,10 +7,17 @@ const Zoom = (props) => {
             whileTap={{
                 scale: 1.05,
             }}
-            className="w-full"
+            className={props.className || "w-full"}
         >
             {props.children}
         </motion.button>
     );
 };
+{
+    /* <motion.a
+  whileHover={{ scale: 1.2 }}
+  onHoverStart={e => {}}
+  onHoverEnd={e => {}}
+/> */
+}
 export default Zoom;

@@ -325,3 +325,22 @@ body::-webkit-scrollbar-thumb:hover {
 .animate-bounce-custom {
     animation: bounce 1s infinite;
 }
+.columns {
+    display: flex;
+}
+
+.draggable {
+    user-select: none;
+    padding: 8px;
+    margin: 0 0 8px 0;
+    background-color: #ccc;
+    border-radius: 2px;
+}
+/* Trong file CSS của bạn */
+.draggable-item {
+    cursor: move;
+}
+
+.droppable-area {
+    user-select: none;
+}
