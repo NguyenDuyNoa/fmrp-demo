@@ -78,7 +78,7 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                                     src={ce.image}
                                                     width={80}
                                                     height={84}
-                                                    className="w-full h-full object-cover rounded-xl group-hover:scale-[1.03] group-hover:rotate-6 hover:scale-105 hover:rotate-6  transition-all duration-200 ease-in-out"
+                                                    className="w-full h-full object-cover rounded-xl "
                                                 />
                                             </div>
                                             <div className="col-span-7">
