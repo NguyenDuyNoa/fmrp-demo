@@ -35,29 +35,26 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                             smoothScrolling={true}
                         >
                             {e.child.map((ce, ceIndex) => (
-                                <div
+                                <button
+                                    type="button"
                                     key={ceIndex}
                                     style={{
                                         backgroundColor: ce?.bg,
                                     }}
-                                    className={` my-2 rounded group`}
-                                    // className={`bg-[${ce?.bg}]/5 my-2 rounded group`}
+                                    onClick={() => handleIsShowModel(e.id, ce.id)}
+                                    className={`w-full my-2 rounded group hover:scale-105 transition-all duration-200 ease-linear`}
                                 >
                                     <div className="p-4">
-                                        <Zoom className="none">
-                                            <button
-                                                onClick={() => handleIsShowModel(e.id, ce.id)}
-                                                type="button"
-                                                style={{
-                                                    backgroundColor: ce?.color,
-                                                }}
-                                                // className={`h-full bg-[${ce?.color}]/10 group-hover:scale-105 transition-all duration-200 ease-in-out
-                                                className={`h-full group-hover:scale-105 transition-all duration-200 ease-in-out 
+                                        <div
+                                            style={{
+                                                backgroundColor: ce?.color,
+                                            }}
+                                            // className={`h-full bg-[${ce?.color}]/10 group-hover:scale-105 transition-all duration-200 ease-in-out
+                                            className={`h-full group-hover:scale-105 transition-all duration-200 ease-in-out 
                                                 p-2 text-[#11315B] text-[12px] font-medium w-fit rounded-lg`}
-                                            >
-                                                {ce.order}
-                                            </button>
-                                        </Zoom>
+                                        >
+                                            {ce.order}
+                                        </div>
                                         <div className="flex items-center justify-between my-2">
                                             <div>
                                                 <h1 className="text-[10px] font-normal text-[#667085]">
@@ -119,7 +116,7 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </button>
                             ))}
                         </ScrollArea>
                     </div>
