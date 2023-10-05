@@ -60,7 +60,7 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                                 <h1 className="text-[10px] font-normal text-[#667085]">
                                                     {ce.titeLeft.top}
                                                 </h1>
-                                                <h1 className="text-xs font-medium text-[#000000]">
+                                                <h1 className="text-xs text-start font-medium text-[#000000]">
                                                     {ce.titeLeft.bottom}
                                                 </h1>
                                             </div>
@@ -68,13 +68,13 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                                 <h1 className="text-[10px] font-normal text-[#667085]">
                                                     {ce.titleRight.top}
                                                 </h1>
-                                                <h1 className="text-xs font-medium text-[#000000]">
+                                                <h1 className="text-xs text-start font-medium text-[#000000]">
                                                     {ce.titleRight.bottom}
                                                 </h1>
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-12">
-                                            <div className="col-span-5 w-[80px] h-[84px] rounded-xl  overflow-hidden">
+                                            <div className="col-span-4 w-[80px] h-[84px] rounded-xl  overflow-hidden">
                                                 <Image
                                                     src={ce.image}
                                                     width={80}
@@ -82,9 +82,11 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                                     className="w-full h-full object-cover rounded-xl group-hover:scale-105 group-hover:rotate-6 hover:scale-105 hover:rotate-6  transition-all duration-200 ease-in-out"
                                                 />
                                             </div>
-                                            <div className="col-span-6">
-                                                <h1 className="text-[#000000] font-semibold text-sm">{ce.name}</h1>
-                                                <h1 className="text-[10px] font-normal text-[#667085]">
+                                            <div className="col-span-7">
+                                                <h1 className="text-[#000000] text-start font-semibold text-sm">
+                                                    {ce.name}
+                                                </h1>
+                                                <h1 className="text-[10px]  text-start font-normal text-[#667085]">
                                                     {ce.desription}
                                                 </h1>
                                                 {ce.manufacture && (
@@ -96,7 +98,7 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                                     </h1>
                                                 )}
                                                 <div className="flex items-center justify-between">
-                                                    <div>
+                                                    <div className="">
                                                         <h1 className="text-[10px] font-normal text-[#667085]">
                                                             {ce.numberTitleLeft}
                                                         </h1>
