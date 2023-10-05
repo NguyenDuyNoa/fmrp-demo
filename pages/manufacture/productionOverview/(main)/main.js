@@ -1,13 +1,12 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import Zoom from "components/UI/zoomElement/zoomElement";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 const Main = ({ handleIsShowModel, sIsshow, data }) => {
     return (
         <>
-            <div className="relative flex item-center gap-4 w-full overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+            <div className="relative flex item-center gap-4  w-full overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                 {data.dataMain.map((e, index) => (
                     <div key={index} className="">
                         <div className="flex w-[330px] justify-center items-center gap-2">
@@ -29,9 +28,10 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                             }}
                             className="w-full h-2  rounded-2xl"
                         ></div>
+
                         <ScrollArea
-                            className="3xl:h-[760px] xxl:h-[483px] 2xl:h-[565px] xl:h-[498px] lg:h-[498px] h-[565px] overflow-auto"
-                            speed={1}
+                            className="3xl:h-[740px] xxl:h-[473px] 2xl:h-[555px] xl:h-[488px] lg:h-[498px] h-[565px] overflow-auto"
+                            speed={3}
                             smoothScrolling={true}
                         >
                             {e.child.map((ce, ceIndex) => (
@@ -49,7 +49,6 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                             style={{
                                                 backgroundColor: ce?.color,
                                             }}
-                                            // className={`h-full bg-[${ce?.color}]/10 group-hover:scale-105 transition-all duration-200 ease-in-out
                                             className={`h-full group-hover:scale-[1.03] transition-all duration-200 ease-in-out 
                                                 p-2 text-[#11315B] text-[12px] font-medium w-fit rounded-lg`}
                                         >

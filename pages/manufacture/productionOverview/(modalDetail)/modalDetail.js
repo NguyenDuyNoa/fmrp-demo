@@ -146,7 +146,7 @@ const ModalDetail = ({ data, isShow, fetch, handleIsShowModel, handleIsShow }) =
                         </Zoom>
                     </div>
                 </div>
-                <div className="mx-11 3xl:h-[275px] xxl:h-[161px] 2xl:h-[240px] xl:h-[190px] lg:h-[192px] h-[275px] overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                <div className="mx-11 3xl:h-[276px] xxl:h-[161px] 2xl:h-[240px] xl:h-[181px] lg:h-[192px] h-[275px] overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                     {fetch.fetchHistory ? (
                         <Loading />
                     ) : isShow.showHistory == 1 ? (
