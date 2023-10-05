@@ -1,15 +1,14 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { data } from "./data";
 import Zoom from "components/UI/zoomElement/zoomElement";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-const Main = ({ handleIsShowModel, sIsshow }) => {
+const Main = ({ handleIsShowModel, sIsshow, data }) => {
     return (
         <>
             <div className="relative flex item-center gap-4 w-full overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                {data.map((e, index) => (
+                {data.dataMain.map((e, index) => (
                     <div key={index} className="">
                         <div className="flex w-[330px] justify-center items-center gap-2">
                             <div className="w-[20px] h-[20px] my-2 mx-1">
@@ -36,13 +35,24 @@ const Main = ({ handleIsShowModel, sIsshow }) => {
                             smoothScrolling={true}
                         >
                             {e.child.map((ce, ceIndex) => (
-                                <div key={ceIndex} className={`bg-[${ce?.bg}]/5 my-2 rounded group`}>
+                                <div
+                                    key={ceIndex}
+                                    style={{
+                                        backgroundColor: ce?.bg,
+                                    }}
+                                    className={` my-2 rounded group`}
+                                    // className={`bg-[${ce?.bg}]/5 my-2 rounded group`}
+                                >
                                     <div className="p-4">
                                         <Zoom className="none">
                                             <button
                                                 onClick={() => handleIsShowModel(e.id, ce.id)}
                                                 type="button"
-                                                className={`hover:border-[${ce.color}] h-full bg-[${ce?.color}]/10 group-hover:scale-105 transition-all duration-200 ease-in-out 
+                                                style={{
+                                                    backgroundColor: ce?.color,
+                                                }}
+                                                // className={`h-full bg-[${ce?.color}]/10 group-hover:scale-105 transition-all duration-200 ease-in-out
+                                                className={`h-full group-hover:scale-105 transition-all duration-200 ease-in-out 
                                                 p-2 text-[#11315B] text-[12px] font-medium w-fit rounded-lg`}
                                             >
                                                 {ce.order}
