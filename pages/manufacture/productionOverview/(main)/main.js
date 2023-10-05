@@ -6,7 +6,7 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 const Main = ({ handleIsShowModel, sIsshow, data }) => {
     return (
         <>
-            <div className="relative flex item-center gap-4  w-full overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+            <div className="relative flex item-center gap-4  w-full overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                 {data.dataMain.map((e, index) => (
                     <div key={index} className="">
                         <div className="flex w-[330px] justify-center items-center gap-2">
@@ -120,7 +120,8 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                 </button>
                             ))}
                         </ScrollArea> */}
-                        <div className="3xl:h-[730px] xxl:h-[473px] 2xl:h-[555px] xl:h-[488px] lg:h-[498px] h-[565px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                        {/* <div className="3xl:h-[730px] xxl:h-[473px] 2xl:h-[555px] xl:h-[488px] lg:h-[498px] h-[565px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"> */}
+                        <div className="3xl:h-[80vh] xxl:h-[73.5vh] 2xl:h-[76.5vh] xl:h-[75.5vh] lg:h-[76vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                             {e.child.map((ce, ceIndex) => (
                                 <button
                                     type="button"
@@ -136,7 +137,7 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                             style={{
                                                 backgroundColor: ce?.color,
                                             }}
-                                            className={`h-full group-hover:scale-[1.03] transition-all duration-200 ease-in-out 
+                                            className={`h-full group-hover:scale-[1.03] transition-all duration-200 ease-in-out
                                                 p-2 text-[#11315B] text-[12px] font-medium w-fit rounded-lg`}
                                         >
                                             {ce.order}
