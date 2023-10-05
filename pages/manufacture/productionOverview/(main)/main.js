@@ -179,7 +179,7 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                                 {ce.manufacture && (
                                                     <h1
                                                         style={{ backgroundColor: ce.colorNo }}
-                                                        className="p-1 rounded-lg text-white text-xs text-center"
+                                                        className="p-1 my-1 rounded-lg text-white text-xs text-center"
                                                     >
                                                         {ce.no}
                                                     </h1>
