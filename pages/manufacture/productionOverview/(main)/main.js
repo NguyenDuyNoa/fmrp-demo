@@ -1,17 +1,25 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { PresentionChart } from "iconsax-react";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-const Main = ({ handleIsShowModel, sIsshow, data }) => {
+const Main = ({ handleIsShowModel, sIsshow, data, updatedData }) => {
     return (
         <>
             <div className="relative flex item-center gap-4  w-full overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                {data.dataMain.map((e, index) => (
+                {updatedData.map((e, index) => (
                     <div key={index} className="">
                         <div className="flex w-[330px] justify-center items-center gap-2">
                             <div className="w-[20px] h-[20px] my-2 mx-1">
-                                <Image src={e.icon} width={20} height={20} className="object-cover w-full h-full" />
+                                {/* <Image
+                                    alt=""
+                                    src={e.icon}
+                                    width={20}
+                                    height={20}
+                                    className="object-cover w-full h-full"
+                                /> */}
+                                <PresentionChart size="22" color={e?.color} variant="Bold" />
                             </div>
                             <h1
                                 style={{
@@ -163,6 +171,7 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                         <div className="grid grid-cols-12">
                                             <div className="col-span-4 w-[80px] h-[84px] rounded-xl  overflow-hidden">
                                                 <Image
+                                                    alt=""
                                                     src={ce.image}
                                                     width={80}
                                                     height={84}
@@ -179,7 +188,7 @@ const Main = ({ handleIsShowModel, sIsshow, data }) => {
                                                 {ce.manufacture && (
                                                     <h1
                                                         style={{ backgroundColor: ce.colorNo }}
-                                                        className="p-1 my-1 rounded-lg text-white text-xs text-center"
+                                                        className="p-2 my-1 rounded-lg text-white text-xs text-center"
                                                     >
                                                         {ce.no}
                                                     </h1>

@@ -13,6 +13,7 @@ const History = ({ data }) => {
                      w-[60px] h-[60px] rounded-xl"
                     >
                         <Image
+                            alt=""
                             src={"/manufacture/Image.png"}
                             width={60}
                             height={60}

@@ -21,6 +21,7 @@ const ModalDetail = ({ data, isShow, fetch, handleIsShowModel, handleIsShow }) =
                         className="w-[20px] h-[20px]  hover:animate-spin transition-all duration-300 ease-linear"
                     >
                         <Image
+                            alt=""
                             src={"/manufacture/x.png"}
                             width={20}
                             height={20}
@@ -82,6 +83,7 @@ const ModalDetail = ({ data, isShow, fetch, handleIsShowModel, handleIsShow }) =
                             <div className="grid grid-cols-12 border-t border-gray-300 pt-4">
                                 <div className="col-span-3 3xl:w-[80px] 3xl:h-[84px] xxl:w-[60px] xxl:h-[64px] 2xl:w-[60px] 2xl:h-[64px] xl:w-[60px] xl:h-[64px] lg:w-[50px] lg:h-[54px] w-[80px] h-[84px] rounded-xl">
                                     <Image
+                                        alt=""
                                         src={"/manufacture/Image.png"}
                                         width={80}
                                         height={84}

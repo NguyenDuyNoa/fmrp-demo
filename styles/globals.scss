@@ -336,11 +336,60 @@ body::-webkit-scrollbar-thumb:hover {
     background-color: #ccc;
     border-radius: 2px;
 }
-/* Trong file CSS của bạn */
-.draggable-item {
-    cursor: move;
-}
+// Trong tổng quan sản xuất/
 
-.droppable-area {
-    user-select: none;
+.customSlectFilter__control {
+    outline: none !important;
+    border: none !important;
+    background-color: #f9fafb !important;
+    border-radius: 8px !important;
+}
+.customSlectFilter__placeholder {
+    font-size: 11px !important;
+    color: #6b7280 !important;
+}
+.customSlectFilter__input-container {
+    padding: 8px 5px !important;
+    // font-size: 10px !important;
+}
+.customSlectFilter__indicator svg {
+    width: 12px !important;
+    height: 12px !important;
+}
+.customSlectFilter__indicator-separator {
+    display: none;
+}
+.customSlectFilter__single-value {
+    font-size: 14px;
+}
+.customSlectFilter__menu {
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    border: 1px solid #9ca3af !important;
+}
+.customSlectFilter__menu-list {
+    padding: 0 !important;
+    border-radius: 12px !important;
+}
+.customSlectFilter__option {
+    font-size: 13px !important;
+    color: #4b5563 !important;
+    background-color: #f1f5f9 !important;
+    transition: all 0.5s ease-in-out !important;
+}
+.customSlectFilter__option--is-selected {
+    background-color: #6b7280 !important;
+    color: white !important;
+}
+.customSlectFilter__option:hover {
+    transition: all 0.5s ease-in-out !important;
+    color: white !important;
+    background-color: #6b7280 !important;
+}
+.react-datepicker__close-icon::after {
+    color: gray !important;
+    background-color: transparent !important;
+}
+.react-datepicker-wrapper {
+    width: 100% !important;
 }
