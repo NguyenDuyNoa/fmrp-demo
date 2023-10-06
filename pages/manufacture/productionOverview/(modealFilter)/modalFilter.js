@@ -63,7 +63,7 @@ const ModalFilter = ({ isShow, handleIsShowFilter }) => {
                                     selected={startDate}
                                     onChange={(date) => setStartDate(date)}
                                     isClearable
-                                    placeholderText="Đến ngày"
+                                    placeholderText="Từ ngày"
                                     className="p-3 placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] my-1 w-full outline-none focus:outline-none border-none bg-[#f9fafb] rounded-lg"
                                 />
                             </div>
@@ -80,7 +80,7 @@ const ModalFilter = ({ isShow, handleIsShowFilter }) => {
                                     selected={startDate}
                                     onChange={(date) => setStartDate(date)}
                                     isClearable
-                                    placeholderText="Từ ngày"
+                                    placeholderText="Đến ngày"
                                     className="p-3 placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] my-1 w-full outline-none focus:outline-none border-none bg-[#f9fafb] rounded-lg"
                                 />
                             </div>
