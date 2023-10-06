@@ -16,9 +16,17 @@ const Step = ({ data }) => {
                             </p>
                         </div>
                         <div className="flex-col flex items-center">
-                            <div>
-                                <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#131313]/60">
-                                    <div className="bg-[#646776] w-3 h-3 rounded-full"></div>
+                            <div className="group">
+                                <div
+                                    className={`${
+                                        !e.last ? "border-[#131313]/60" : "border-green-500"
+                                    } flex h-5 w-5 items-center justify-center rounded-full border-2  group-hover:border-green-500 transition-all duration-200 ease-linear`}
+                                >
+                                    <div
+                                        className={`${
+                                            !e.last ? "bg-[#646776]" : " bg-green-500"
+                                        } group-hover:bg-green-500 border-green-500 transition-all duration-200 ease-linear w-3 h-3 rounded-full`}
+                                    ></div>
                                 </div>
                             </div>
                             {!e.last && <div className="h-full w-[2px] border-[#13131382] border-dashed border"></div>}
