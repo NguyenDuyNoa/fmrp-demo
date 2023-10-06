@@ -48,7 +48,6 @@ const Popup_dspt = (props) => {
         onFetching_LisObject: false,
         onFetching_TypeOfDocument: false,
         onFetching_ListTypeOfDocument: false,
-        onFetching_ListCost: false,
         onFetchingDetail: false,
         onFetchingTable: false,
     };
@@ -59,7 +58,6 @@ const Popup_dspt = (props) => {
         dataMethod: [],
         dataTypeofDoc: [],
         dataListTypeofDoc: [],
-        dataListCost: [],
         dataTable: [],
     };
     const inistError = {
@@ -69,7 +67,6 @@ const Popup_dspt = (props) => {
         errPrice: false,
         errMethod: false,
         errListTypeDoc: false,
-        errCosts: false,
         errSotien: false,
     };
     const inistialValue = {
@@ -328,34 +325,6 @@ const Popup_dspt = (props) => {
         }
     };
 
-    //Loại chi phí
-    const _ServerFetching_ListCost = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_cost/costCombobox/?csrf_protection=true",
-            {
-                params: {
-                    "filter[branch_id]": listValue.branch?.value,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult } = response.data;
-                    updateData({
-                        dataListCost: rResult.map((x) => ({
-                            label: `${x.name}`,
-                            value: x.id,
-                            level: x.level,
-                            code: x.code,
-                            parent_id: x.parent_id,
-                        })),
-                    });
-                }
-            }
-        );
-        updateFetch({ onFetching_ListCost: false });
-    };
-
     const _ServerFetching_ListTable = () => {
         let db = new FormData();
         listValue.listTypeOfDocument.forEach((e, index) => {
@@ -381,7 +350,7 @@ const Popup_dspt = (props) => {
 
     useEffect(() => {
         if (listValue.branch != null) {
-            updateFetch({ onFetching_ListCost: true });
+            // updateFetch({ onFetching_ListCost: true });
         }
         if (listValue.typeOfDocument?.value == "import" && listValue.listTypeOfDocument) {
             updateFetch({ onFetchingTable: true });
@@ -407,9 +376,6 @@ const Popup_dspt = (props) => {
         if (fetch.onFetching) {
             _ServerFetching();
         }
-        if (fetch.onFetching_ListCost) {
-            _ServerFetching_ListCost();
-        }
         if (fetch.onFetchingTable) {
             _ServerFetching_ListTable();
         }
@@ -426,7 +392,6 @@ const Popup_dspt = (props) => {
             _ServerSending();
         }
     }, [
-        fetch.onFetching_ListCost,
         fetch.onFetchingTable,
         fetch.onFetching_TypeOfDocument,
         fetch.onFetching_ListTypeOfDocument,
@@ -434,6 +399,7 @@ const Popup_dspt = (props) => {
         fetch.onFetching,
         fetch.onSending,
     ]);
+
     const _HandleChangeInput = (type, value) => {
         const totalMoney = listValue.listTypeOfDocument.reduce((total, item) => total + parseFloat(item.money), 0);
         let isExceedTotal = false;
@@ -452,7 +418,7 @@ const Popup_dspt = (props) => {
                     updateListValue({
                         branch: value,
                         listObject: null,
-                        price: null,
+                        price: "",
                         listTypeOfDocument: [],
                         typeOfDocument: null,
                     });
@@ -464,7 +430,7 @@ const Popup_dspt = (props) => {
                     updateListValue({
                         object: value,
                         listObject: null,
-                        price: null,
+                        price: "",
                         listTypeOfDocument: [],
                         typeOfDocument: null,
                     });
@@ -479,14 +445,13 @@ const Popup_dspt = (props) => {
                     updateListValue({
                         typeOfDocument: value,
                         listTypeOfDocument: [],
-                        price: null,
+                        price: "",
                     });
                     updateData({ dataListTypeofDoc: [] });
                 }
                 break;
             case "listTypeOfDocument":
                 updateListValue({ listTypeOfDocument: value });
-                console.log(value);
                 if (value && value.length > 0) {
                     const formattedTotal = parseFloat(
                         value.reduce((total, item) => total + parseFloat(item.money || 0), 0)
@@ -497,7 +462,9 @@ const Popup_dspt = (props) => {
                 }
                 break;
             case "price":
-                const priceChange = parseFloat(value?.target.value.replace(/,/g, ""));
+                // const priceChange = parseFloat(value?.target.value.replace(/,/g, ""));
+                const priceChange = value?.target.value;
+                console.log("priceChange", priceChange);
                 if (!isNaN(priceChange)) {
                     if (listValue.listTypeOfDocument.length > 0 && priceChange > totalMoney) {
                         ToatstNotifi("error", dataLang?.payment_err_aler || "payment_err_aler");
@@ -521,6 +488,7 @@ const Popup_dspt = (props) => {
                 break;
         }
     };
+
     const _HandleSubmit = (e) => {
         e.preventDefault();
         if (
@@ -536,9 +504,10 @@ const Popup_dspt = (props) => {
                 errObject: !listValue.object,
                 errListObject: !listValue.listObject,
                 errPrice:
-                    listValue.typeOfDocument?.value == "import" && (listValue.price == 0 || listValue.price == null)
+                    listValue.typeOfDocument?.value == "import" &&
+                    (listValue.price == 0 || listValue.price == "" || listValue.price == null)
                         ? true
-                        : listValue.price == 0 || listValue.price == null,
+                        : listValue.price == 0 || listValue.price == null || listValue.price == "",
                 errMethod: !listValue.method,
                 errListTypeDoc: listValue.typeOfDocument != null && listValue.listTypeOfDocument?.length == 0,
             });
@@ -547,30 +516,20 @@ const Popup_dspt = (props) => {
             updateFetch({ onSending: true });
         }
     };
+    console.log(listValue);
+
     useEffect(() => {
-        if (listValue.branch != null) {
-            updateError({ errBranch: false });
-        }
-        if (listValue.object != null) {
-            updateError({ errObject: false });
-        }
+        listValue.branch && updateError({ errBranch: false });
+        listValue.object && updateError({ errObject: false });
+        listValue.listObject && updateError({ errListObject: false });
+        listValue.price && updateError({ errPrice: false });
+        listValue.method && updateError({ errMethod: false });
         if (listValue.typeOfDocument == null && listValue.listTypeOfDocument?.length > 0) {
             updateError({ errListTypeDoc: false });
         }
-        if (listValue.listObject != null) {
-            updateError({ errListObject: false });
-        }
-        if (listValue.price != null) {
-            updateError({ errPrice: false });
-        }
-        if (listValue.method != null) {
-            updateError({ errMethod: false });
-        }
-        // if(listValue.typeOfDocument == null && listValue.listTypeOfDocument?.length < 0){
-
-        // }
     }, [
         listValue.price != null,
+        listValue.price != "",
         listValue.branch != null,
         listValue.object != null,
         listValue.typeOfDocument == null && listValue.listTypeOfDocument?.length > 0,
@@ -579,6 +538,7 @@ const Popup_dspt = (props) => {
     ]);
 
     const allItems = [...data.dataListTypeofDoc];
+
     const handleSelectAll = () => {
         updateListValue({ listTypeOfDocument: allItems });
         Promise.resolve()
