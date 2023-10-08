@@ -73,7 +73,7 @@ const Index = () => {
                                     <button
                                         type="button"
                                         onClick={() => router.push("/sales_export_product/salesOrder?tab=all")}
-                                        className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[100px] flex space-x-3 border-none   items-center justify-center   p-1 text-center px-3 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
+                                        className="group-hover:scale-[1.03] transition-all ease-in-out 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex space-x-3 border-none bg-[#E2F0FE] rounded-md  items-center justify-center"
                                     >
                                         <h5>Tạo đơn hàng</h5>
                                     </button>
@@ -141,11 +141,11 @@ const Index = () => {
                                     <IconRight size="32" color="#3276FA" variant="Outline" />
                                 </div>
 
-                                <div className="group 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[130px] flex space-x-3 border-none bg-[#E2F0FE] rounded-md  items-center justify-center relative">
+                                <div className="group 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex space-x-3 border-none bg-[#E2F0FE] rounded-md  items-center justify-center relative">
                                     <button
                                         type="button"
                                         onClick={() => router.push("/sales_export_product/deliveryReceipt?tab=all")}
-                                        className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[100px] flex space-x-3 border-none   items-center justify-center   p-1 text-center px-3 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
+                                        className="group-hover:scale-[1.03] transition-all ease-in-out 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex space-x-3 border-none bg-[#E2F0FE] rounded-md  items-center justify-center"
                                     >
                                         <h5>Xuất kho giao hàng</h5>
                                     </button>
