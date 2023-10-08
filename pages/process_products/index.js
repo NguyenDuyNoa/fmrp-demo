@@ -201,17 +201,19 @@ const Index = () => {
                                 </div>
 
                                 <div className="group 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex space-x-3 border-none bg-[#E2F0FE] rounded-md  items-center justify-center relative">
+                                    {/* <div className="group 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex space-x-3 border-none bg-[#E2F0FE] rounded-md  items-center justify-center relative"> */}
                                     {/* <h5>Công nợ</h5>
                                     <h5 className="h-4 w-4 top-[8%] 2xl:-left-[2%] xl:-left-[2%] lg:-left-[2%] 2xl:text-sm xl:text-sm lg:text-[12px] rounded-full flex flex-col justify-center items-center bg-[#3276FA] absolute text-white ">
                                         4
                                     </h5> */}
                                     <button
                                         onClick={() => router.push("/accountant/debt_suppliers?tab=all")}
-                                        className=" 3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px]   p-1 text-center px-14 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
+                                        // className=" 3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px]   p-1 text-center px-14 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
+                                        className="group-hover:scale-[1.03] transition-all ease-in-out 3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex space-x-3 border-none bg-[#E2F0FE] rounded-md  items-center justify-center"
                                     >
                                         <h5>Công nợ</h5>
                                     </button>
-                                    <h5 className="group-hover:scale-[1.03] xl:h-4 xl:w-4 lg:h-3 lg:w-3 2xl:text-sm  xl:text-sm lg:text-[10px] xl:top-[8%] lg:top-[6%] 2xl:-left-[2%] xl:-left-[6%] lg:-left-[6%] rounded-full flex flex-col justify-center items-center bg-[#3276FA] absolute text-white ">
+                                    <h5 className="group-hover:scale-[1.03] transition-all ease-in-out xl:h-4 xl:w-4 lg:h-3 lg:w-3 2xl:text-sm  xl:text-sm lg:text-[10px] xl:top-[8%] lg:top-[6%] 2xl:-left-[2%] xl:-left-[6%] lg:-left-[6%] rounded-full flex flex-col justify-center items-center bg-[#3276FA] absolute text-white ">
                                         4
                                     </h5>
 

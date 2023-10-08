@@ -52,7 +52,8 @@ const Index = () => {
                                 <button
                                     type="button"
                                     onClick={() => router.push("/purchase_order/purchases?tab=")}
-                                    className="3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-6 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
+                                    // className="3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-6 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
+                                    className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex items-center justify-center text-sm   p-1 text-center px-6 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
                                 >
                                     Yêu cầu mua hàng{" "}
                                 </button>
@@ -93,7 +94,7 @@ const Index = () => {
                                     type="button"
                                     onClick={() => router.push("/purchase_order/order?tab=all")}
                                     // className=" font-medium 2xl:max-w-[180px] xl:max-w-[140px] lg:max-w-[130px] p-1 text-center"
-                                    className="3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-3 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
+                                    className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex items-center justify-center text-sm   p-1 text-center px-3 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
                                 >
                                     Tạo đơn đặt hàng (PO)
                                 </button>
@@ -101,7 +102,7 @@ const Index = () => {
                                     2
                                 </h5>
 
-                                <div className="absolute 3xl:-top-[60%] 3xl:left-[45%] 2xl:-top-[55%] 2xl:left-[42%] xl:-top-[50%] xl:left-[42%] lg:-top-[50%] lg:left-[40%]">
+                                <div className="absolute 3xl:-top-[60%] 3xl:left-[45%] 2xl:-top-[55%] 2xl:left-1/2 xl:-top-[50%] xl:left-[42%] lg:-top-[50%] lg:left-[40%]">
                                     <div className=" border-[#B2B9C8] border-t-0 border-r-0 border-y-0 absolute mb-2">
                                         <IconRight
                                             className="text-[#B2B9C8] absolute top-0 left-0 -translate-x-[47%] -translate-y-[36%] -rotate-90"
@@ -111,7 +112,7 @@ const Index = () => {
                                     </div>
                                 </div>
 
-                                <div className="absolute 3xl:-top-[175%] 2xl:-top-[160%] xl:-top-[175%] lg:-top-[160%] ">
+                                <div className="absolute 3xl:-top-[175%] 2xl:-top-[160%]  xl:-top-[175%] lg:-top-[160%] ">
                                     <Image
                                         alt=""
                                         src="/process_products/Subtract.png"
@@ -149,7 +150,7 @@ const Index = () => {
                             <div className="flex space-x-3items-center justify-center relative">
                                 <button
                                     onClick={() => router.push("/purchase_order/import?tab=all")}
-                                    className=" 3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-14 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
+                                    className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex items-center justify-center text-sm   p-1 text-center px-14 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
                                 >
                                     Nhập kho
                                 </button>
@@ -182,7 +183,7 @@ const Index = () => {
                                     <button
                                         type="button"
                                         onClick={() => router.push("/warehouses/warehouse")}
-                                        className=" 3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-14 rounded py-9 border  hover:scale-[1.03] transition-all ease-in-out"
+                                        className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex items-center justify-center text-sm   p-1 text-center px-14 rounded py-9 border  hover:scale-[1.03] transition-all ease-in-out"
                                     >
                                         Kho hàng
                                     </button>
@@ -200,7 +201,7 @@ const Index = () => {
                                 </h5> */}
                                 <button
                                     onClick={() => router.push("/accountant/debt_suppliers?tab=all")}
-                                    className=" 3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-14 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
+                                    className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex items-center justify-center text-sm   p-1 text-center px-14 rounded py-9 bg-[#E2F0FE] hover:scale-[1.03] transition-all ease-in-out"
                                 >
                                     Công nợ
                                 </button>
@@ -222,7 +223,7 @@ const Index = () => {
                                 <div className="flex  3xl:h-[96px] 3xl:w-[180px] 2xl:h-[84px] 2xl:w-[160px] xl:h-[72px] xl:w-[140px] lg:h-[70px] lg:w-[120px] 3xl:top-[320%] 3xl:-left-[85%] 2xl:top-[280%] 2xl:-left-[90%] xl:top-[310%] xl:-left-[84%] lg:top-[330%] lg:-left-[83%]  items-center justify-center absolute  ">
                                     <button
                                         onClick={() => router.push("/purchase_order/returns")}
-                                        className="3xl:max-w-[180px] 2xl:max-w-[100px] xl:max-w-[100px] text-sm   p-1 text-center px-11 rounded py-9  hover:scale-[1.03] transition-all ease-in-out bg-[#FDE7AE]"
+                                        className="3xl:h-[96px] 3xl:w-[180px] 2xl:h-[80px] 2xl:w-[170px] xl:h-[64px] xl:w-[130px] lg:h-[60px] lg:w-[120px] flex items-center justify-center text-sm   p-1 text-center px-11 rounded py-9  hover:scale-[1.03] transition-all ease-in-out bg-[#FDE7AE]"
                                     >
                                         Trả lại hàng
                                     </button>
