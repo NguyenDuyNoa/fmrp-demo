@@ -7,30 +7,17 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 import ReactExport from "react-data-export";
-
 import Swal from "sweetalert2";
-import { NumericFormat } from "react-number-format";
-import { v4 as uuidv4 } from "uuid";
-
-import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
 import ModalImage from "react-modal-image";
-
 import {
     Edit as IconEdit,
     Grid6 as IconExcel,
     ArrowDown2 as IconDown,
-    TickCircle,
     Trash as IconDelete,
     SearchNormal1 as IconSearch,
     Add as IconAdd,
-    LocationTick,
-    User,
-    ArrowCircleDown,
-    Add,
     Refresh2,
 } from "iconsax-react";
 
@@ -45,13 +32,13 @@ import dynamic from "next/dynamic";
 import moment from "moment/moment";
 import Select, { components } from "react-select";
 import Popup from "reactjs-popup";
-import { data } from "autoprefixer";
-import { useDispatch, useSelector } from "react-redux";
-import CreatableSelect from "react-select/creatable";
+import { useSelector } from "react-redux";
 import Popup_chitietThere from "../detailThere";
 import FilePDF from "../FilePDF";
 import Popup_chitiet from "./(popup)/detail";
 import Popup_dspt from "./(popup)/popup";
+import styleDatePicker from "components/UI/configs/configDatePicker";
+import configSelectFillter from "components/UI/configs/configSelectFillter";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -64,50 +51,36 @@ const Toast = Swal.mixin({
     timerProgressBar: true,
 });
 
-const CustomSelectOption = ({ value, label, level, code }) => (
-    <div className="flex space-x-2 truncate">
-        {level == 1 && <span>--</span>}
-        {level == 2 && <span>----</span>}
-        {level == 3 && <span>------</span>}
-        {level == 4 && <span>--------</span>}
-        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
-    </div>
-);
-
 const Index = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
-    const tabPage = router.query?.tab;
-    const dispatch = useDispatch();
-
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const [fetching, sFetching] = useState({
+        onFetching: false,
+        onFetching_filter: false,
+    });
+    const updateFetch = (e) => sFetching((i) => ({ ...i, ...e }));
     const [keySearch, sKeySearch] = useState("");
     const [limit, sLimit] = useState(15);
-    const [totalItem, sTotalItems] = useState([]);
     const [total, sTotal] = useState({});
-
-    const [onFetching, sOnFetching] = useState(false);
-    const [onFetching_filter, sOnFetching_filter] = useState(false);
     const [data, sData] = useState({});
     const [data_ex, sData_ex] = useState([]);
+    const [listBr, sListBr] = useState([]);
+    const [totalItem, sTotalItems] = useState([]);
     const [dataMethod, sDataMethod] = useState([]);
     const [dataObject, sDataObject] = useState([]);
-
-    const [listBr, sListBr] = useState([]);
-    const [idBranch, sIdBranch] = useState(null);
-    const [idObject, sIdObject] = useState(null);
-    const [idMethod, sIdMethod] = useState(null);
-    const [valueDate, sValueDate] = useState({
-        startDate: null,
-        endDate: null,
+    const [value, sValue] = useState({
+        idBranch: null,
+        idObject: null,
+        idMethod: null,
+        valueDate: {
+            startDate: null,
+            endDate: null,
+        },
     });
-
-    const _HandleSelectTab = (e) => {
-        router.push({
-            pathname: router.route,
-            query: { tab: e },
-        });
+    const _HandleFresh = () => {
+        sFetching((e) => ({ ...e, onFetching: true, onFetching_filter: true }));
     };
-
     useEffect(() => {
         router.push({
             pathname: router.route,
@@ -123,11 +96,11 @@ const Index = (props) => {
                 params: {
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
-                    "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
-                    "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
-                    "filter[payment_mode]": idMethod != null ? idMethod.value : null,
-                    "filter[objects]": idObject != null ? idObject.value : null,
+                    "filter[branch_id]": value.idBranch != null ? value.idBranch.value : null,
+                    "filter[start_date]": value.valueDate?.startDate != null ? value.valueDate?.startDate : null,
+                    "filter[end_date]": value.valueDate?.endDate != null ? value.valueDate?.endDate : null,
+                    "filter[payment_mode]": value.idMethod != null ? value.idMethod.value : null,
+                    "filter[objects]": value.idObject != null ? value.idObject.value : null,
                     "filter[search]": keySearch,
                 },
             },
@@ -139,7 +112,7 @@ const Index = (props) => {
                     sData_ex(rResult);
                     sTotal(rTotal);
                 }
-                sOnFetching(false);
+                updateFetch({ onFetching: false });
             }
         );
     };
@@ -168,24 +141,12 @@ const Index = (props) => {
                 );
             }
         });
-        sOnFetching_filter(false);
+        updateFetch({ onFetching_filter: false });
     };
 
     useEffect(() => {
-        onFetching_filter && _ServerFetching_filter();
-    }, [onFetching_filter]);
-
-    const onchang_filter = (type, value) => {
-        if (type == "branch") {
-            sIdBranch(value);
-        } else if (type == "date") {
-            sValueDate(value);
-        } else if (type == "method") {
-            sIdMethod(value);
-        } else if (type == "object") {
-            sIdObject(value);
-        }
-    };
+        fetching.onFetching_filter && _ServerFetching_filter();
+    }, [fetching.onFetching_filter]);
 
     const _HandleOnChangeKeySearch = ({ target: { value } }) => {
         sKeySearch(value);
@@ -203,16 +164,6 @@ const Index = (props) => {
         }, 500);
     };
 
-    // const paginate = pageNumber => {
-    //   router.push({
-    //     pathname: router.route,
-    //     query: {
-    //       tab: router.query?.tab,
-    //       page: pageNumber
-    //     }
-    //   })
-    // }
-
     const paginate = (pageNumber) => {
         const queryParams = { ...router.query, page: pageNumber };
         router.push({
@@ -222,25 +173,21 @@ const Index = (props) => {
     };
 
     useEffect(() => {
-        onFetching && _ServerFetching();
-    }, [onFetching]);
-
-    //   useEffect(() => {
-    //       router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query?.tab && sOnFetching_filter(true) || idBranch != null && sOnFetching(true) ||valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true) || idMethod != null && sOnFetching(true) || idObject != null && sOnFetching(true)
-    // }, [limit,router.query?.page, router.query?.tab, idBranch, valueDate.endDate, valueDate.startDate, idMethod, idObject]);
+        fetching.onFetching && _ServerFetching();
+    }, [fetching.onFetching]);
 
     useEffect(() => {
-        (router.query.tab && sOnFetching(true)) ||
-            (keySearch && sOnFetching(true)) ||
-            (router.query?.tab && sOnFetching_filter(true));
+        (router.query.tab && updateFetch({ onFetching: true })) ||
+            (keySearch && updateFetch({ onFetching: true })) ||
+            (router.query?.tab && updateFetch({ onFetching_filter: true }));
     }, [limit, router.query?.page, router.query?.tab]);
 
     useEffect(() => {
         if (
-            idBranch != null ||
-            (valueDate.startDate != null && valueDate.endDate != null) ||
-            idMethod != null ||
-            idObject != null
+            value.idBranch != null ||
+            (value.valueDate.startDate != null && value.valueDate.endDate != null) ||
+            value.idMethod != null ||
+            value.idObject != null
         ) {
             router.push({
                 pathname: router.route,
@@ -249,15 +196,17 @@ const Index = (props) => {
                 },
             });
             setTimeout(() => {
-                (idBranch != null && sOnFetching(true)) ||
-                    (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
-                    (idMethod != null && sOnFetching(true)) ||
-                    (idObject != null && sOnFetching(true));
+                (value.idBranch != null && updateFetch({ onFetching: true })) ||
+                    (value.valueDate.startDate != null &&
+                        value.valueDate.endDate != null &&
+                        updateFetch({ onFetching: true })) ||
+                    (value.idMethod != null && updateFetch({ onFetching: true })) ||
+                    (value.idObject != null && updateFetch({ onFetching: true }));
             }, 300);
         } else {
-            sOnFetching(true);
+            updateFetch({ onFetching: true });
         }
-    }, [idBranch, valueDate.endDate, valueDate.startDate, idMethod, idObject]);
+    }, [value.idBranch, value.valueDate.endDate, value.valueDate.startDate, value.idMethod, value.idObject]);
 
     const formatNumber = (number) => {
         if (!number && number !== 0) return 0;
@@ -408,8 +357,6 @@ const Index = (props) => {
             ]),
         },
     ];
-    const _HandleFresh = () => sOnFetching(true);
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
 
     return (
         <React.Fragment>
@@ -440,7 +387,7 @@ const Index = (props) => {
                                     />
                                 </div>
                             </div>
-                            {/* <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
+                            <div className="space-y-2 2xl:h-[95%] h-[92%] overflow-hidden">
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded grid grid-cols-8 justify-between xl:p-3 p-2">
                                         <div className="col-span-7">
@@ -468,44 +415,10 @@ const Index = (props) => {
                                                             },
                                                             ...listBr,
                                                         ]}
-                                                        onChange={onchang_filter.bind(this, "branch")}
-                                                        value={idBranch}
+                                                        value={value.idBranch}
+                                                        onChange={(e) => sValue((i) => ({ ...i, idBranch: e }))}
                                                         placeholder={dataLang?.client_list_filterbrand}
-                                                        hideSelectedOptions={false}
-                                                        isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full  2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20 "
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        closeMenuOnSelect={true}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
+                                                        {...configSelectFillter}
                                                     />
                                                 </div>
                                                 <div className=" col-span-2">
@@ -519,44 +432,10 @@ const Index = (props) => {
                                                             },
                                                             ...dataMethod,
                                                         ]}
-                                                        onChange={onchang_filter.bind(this, "method")}
-                                                        value={idMethod}
+                                                        onChange={(e) => sValue((i) => ({ ...i, idMethod: e }))}
+                                                        value={value.idMethod}
                                                         placeholder={dataLang?.payment_TT_method || "payment_TT_method"}
-                                                        hideSelectedOptions={false}
-                                                        isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full  2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20 "
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        closeMenuOnSelect={true}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
+                                                        {...configSelectFillter}
                                                     />
                                                 </div>
                                                 <div className=" col-span-2">
@@ -570,76 +449,23 @@ const Index = (props) => {
                                                             },
                                                             ...dataObject,
                                                         ]}
-                                                        onChange={onchang_filter.bind(this, "object")}
-                                                        value={idObject}
+                                                        onChange={(e) => sValue((i) => ({ ...i, idObject: e }))}
+                                                        value={value.idObject}
                                                         placeholder={dataLang?.payment_ob || "payment_ob"}
-                                                        hideSelectedOptions={false}
-                                                        isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full  2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20 "
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        closeMenuOnSelect={true}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
+                                                        {...configSelectFillter}
                                                     />
                                                 </div>
                                                 <div className="z-20 col-span-2">
                                                     <Datepicker
-                                                        value={valueDate}
-                                                        i18n={"vi"}
-                                                        primaryColor={"blue"}
-                                                        onChange={onchang_filter.bind(this, "date")}
-                                                        showShortcuts={true}
-                                                        displayFormat={"DD/MM/YYYY"}
-                                                        configs={{
-                                                            shortcuts: {
-                                                                today: "Hôm nay",
-                                                                yesterday: "Hôm qua",
-                                                                past: (period) => `${period}  ngày qua`,
-                                                                currentMonth: "Tháng này",
-                                                                pastMonth: "Tháng trước",
-                                                            },
-                                                            footer: {
-                                                                cancel: "Từ bỏ",
-                                                                apply: "Áp dụng",
-                                                            },
-                                                        }}
-                                                        className="react-datepicker__input-container 2xl:placeholder:text-xs xl:placeholder:text-xs placeholder:text-[8px]"
-                                                        inputClassName="rounded-md w-full 2xl:p-2 xl:p-[11px] p-3 bg-white focus:outline-[#0F4F9E]  2xl:placeholder:text-xs xl:placeholder:text-xs placeholder:text-[8px] border-none  2xl:text-base xl:text-xs text-[10px]  focus:outline-none focus:ring-0 focus:border-transparent"
+                                                        {...styleDatePicker}
+                                                        value={value.valueDate}
+                                                        onChange={(e) => sValue((i) => ({ ...i, valueDate: e }))}
                                                     />
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
-                                                {" "}
                                                 <button
                                                     onClick={_HandleFresh.bind(this)}
                                                     type="button"
@@ -654,8 +480,8 @@ const Index = (props) => {
                                                 <div>
                                                     {data_ex?.length > 0 && (
                                                         <ExcelFile
-                                                            filename="Danh phiếu chi"
-                                                            title="DSPC"
+                                                            filename="Danh phiếu thu"
+                                                            title="DSPT"
                                                             element={
                                                                 <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
                                                                     <IconExcel
@@ -762,7 +588,7 @@ const Index = (props) => {
                                                 {dataLang?.payment_action || "payment_action"}
                                             </h4>
                                         </div>
-                                        {onFetching ? (
+                                        {fetching.onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <>
@@ -918,7 +744,7 @@ const Index = (props) => {
                                         )}
                                     </div>
                                 </div>
-                            </div> */}
+                            </div>
                         </div>
                         <div className="grid grid-cols-13 bg-gray-100 items-center">
                             <div className="col-span-8 p-2 text-center">

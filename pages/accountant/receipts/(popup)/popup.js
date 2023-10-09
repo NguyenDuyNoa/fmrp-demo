@@ -6,8 +6,6 @@ import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-import ReactExport from "react-data-export";
-import Swal from "sweetalert2";
 import { NumericFormat } from "react-number-format";
 import { MdClear } from "react-icons/md";
 import { BsCalendarEvent } from "react-icons/bs";
@@ -15,22 +13,24 @@ import "react-datepicker/dist/react-datepicker.css";
 import DatePicker, { registerLocale } from "react-datepicker";
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
 import dynamic from "next/dynamic";
 import moment from "moment/moment";
 import Select, { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import formatNumber from "components/UI/formanumber/formanumber";
 import ToatstNotifi from "components/UI/alerNotification/alerNotification";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
-
+import configSelectPopup from "components/UI/configs/configSelectPopup";
+import {
+    getListBranch,
+    getListLisObject,
+    getListObject,
+    getListMethod,
+    getListTypeOfDocument,
+    getTypeOfDocument,
+    getdataDetail,
+    postData,
+    postdataListTypeofDoc,
+} from "./api";
 const Popup_dspt = (props) => {
     let id = props?.id;
     const dataLang = props.dataLang;
@@ -39,28 +39,25 @@ const Popup_dspt = (props) => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
-    const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
 
-    const inistFetch = {
+    const inistialFetch = {
         onSending: false,
         onFetching: false,
-        onFetching_LisObject: false,
-        onFetching_TypeOfDocument: false,
-        onFetching_ListTypeOfDocument: false,
+        onFetchingLisObject: false,
+        onFetchingTypeOfDocument: false,
+        onFetchingListTypeOfDocument: false,
         onFetchingDetail: false,
-        onFetchingTable: false,
     };
-    const inistArrr = {
+    const inistialArrr = {
         dataBranch: [],
         dataObject: [],
-        dataList_Object: [],
+        dataListObject: [],
         dataMethod: [],
         dataTypeofDoc: [],
         dataListTypeofDoc: [],
         dataTable: [],
     };
-    const inistError = {
+    const inistialError = {
         errBranch: false,
         errObject: false,
         errListObject: false,
@@ -81,39 +78,35 @@ const Popup_dspt = (props) => {
         method: null,
         note: null,
     };
-
-    const [error, sError] = useState(inistError);
-    const [data, sData] = useState(inistArrr);
-    const [fetch, sFetch] = useState(inistFetch);
+    const [open, sOpen] = useState(false);
+    const [error, sError] = useState(inistialError);
+    const [data, sData] = useState(inistialArrr);
+    const [fetch, sFetch] = useState(inistialFetch);
     const [listValue, sListValue] = useState(inistialValue);
-
+    const _ToggleModal = (e) => sOpen(e);
     const initstialState = () => {
         sListValue(inistialValue);
-        sError(inistError);
-        sData(inistArrr);
+        sError(inistialError);
+        sData(inistialArrr);
     };
-
     const updateFetch = (update) => {
         sFetch((e) => ({
             ...e,
             ...update,
         }));
     };
-
     const updateListValue = (updates) => {
         sListValue((e) => ({
             ...e,
             ...updates,
         }));
     };
-
     const updateData = (update) => {
         sData((e) => ({
             ...e,
             ...update,
         }));
     };
-
     const updateError = (update) => {
         sError((e) => ({
             ...e,
@@ -128,79 +121,74 @@ const Popup_dspt = (props) => {
     }, [open]);
 
     const _ServerFetching_detail = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    let db = response.data;
-                    updateListValue({
-                        date: moment(db?.date).toDate(),
-                        code: db?.code,
-                        branch: { label: db?.branch_name, value: db?.branch_id },
-                        method: {
-                            label: db?.payment_mode_name,
-                            value: db?.payment_mode_id,
-                        },
-                        object: {
-                            label: dataLang[db?.objects] || db?.objects,
-                            value: db?.objects,
-                        },
-                        price: Number(db?.total),
-                        note: db?.note,
-                        listObject:
-                            db?.objects === "other"
-                                ? { label: db?.object_text, value: db?.object_text }
-                                : {
-                                      label: dataLang[db?.object_text] || db?.object_text,
-                                      value: db?.objects_id,
-                                  },
-                        typeOfDocument: db?.type_vouchers
-                            ? {
-                                  label: dataLang[db?.type_vouchers],
-                                  value: db?.type_vouchers,
-                              }
-                            : null,
-                        listTypeOfDocument: db?.type_vouchers
-                            ? db?.voucher?.map((e) => ({
-                                  label: e?.code,
-                                  value: e?.id,
-                                  money: e?.money,
-                              }))
-                            : [],
-                    });
-                    db?.type_vouchers == "import" && updateData({ dataTable: db?.tbDeductDeposit });
-                }
-                updateFetch({ onFetchingDetail: false });
-            }
-        );
+        getdataDetail(null, (err, result) => {
+            if (err) return console.error(err);
+            console.log("result", result);
+        });
+        // Axios(
+        //     "GET",
+        //     `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
+        //     {},
+        //     (err, response) => {
+        //         if (!err) {
+        //             let db = response.data;
+        //             updateListValue({
+        //                 date: moment(db?.date).toDate(),
+        //                 code: db?.code,
+        //                 branch: { label: db?.branch_name, value: db?.branch_id },
+        //                 method: {
+        //                     label: db?.payment_mode_name,
+        //                     value: db?.payment_mode_id,
+        //                 },
+        //                 object: {
+        //                     label: dataLang[db?.objects] || db?.objects,
+        //                     value: db?.objects,
+        //                 },
+        //                 price: Number(db?.total),
+        //                 note: db?.note,
+        //                 listObject:
+        //                     db?.objects === "other"
+        //                         ? { label: db?.object_text, value: db?.object_text }
+        //                         : {
+        //                               label: dataLang[db?.object_text] || db?.object_text,
+        //                               value: db?.objects_id,
+        //                           },
+        //                 typeOfDocument: db?.type_vouchers
+        //                     ? {
+        //                           label: dataLang[db?.type_vouchers],
+        //                           value: db?.type_vouchers,
+        //                       }
+        //                     : null,
+        //                 listTypeOfDocument: db?.type_vouchers
+        //                     ? db?.voucher?.map((e) => ({
+        //                           label: e?.code,
+        //                           value: e?.id,
+        //                           money: e?.money,
+        //                       }))
+        //                     : [],
+        //             });
+        //             db?.type_vouchers == "import" && updateData({ dataTable: db?.tbDeductDeposit });
+        //         }
+        //         updateFetch({ onFetchingDetail: false });
+        //     }
+        // );
+        updateFetch({ onFetchingDetail: false });
     };
 
     // Chi nhánh, PTTT, Đối tượng
+
     const _ServerFetching = () => {
-        Axios("GET", "/api_web/Api_Branch/branchCombobox/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { result } = response.data;
-                updateData({ dataBranch: result?.map((e) => ({ label: e.name, value: e.id })) });
-            }
+        getListBranch(null, (err, result) => {
+            if (err) return console.error(err);
+            updateData({ dataBranch: result?.map(({ name, id }) => ({ label: name, value: id })) });
         });
-        Axios("GET", "/api_web/Api_expense_voucher/object/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response.data;
-                updateData({
-                    dataObject: data?.map((e) => ({
-                        label: dataLang[e?.name],
-                        value: e?.id,
-                    })),
-                });
-            }
+        getListObject(null, (err, result) => {
+            if (err) return console.error(err);
+            updateData({ dataObject: result?.map(({ name, id }) => ({ label: dataLang[name], value: id })) });
         });
-        Axios("GET", "/api_web/Api_payment_method/payment_method/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                updateData({ dataMethod: rResult?.map((e) => ({ label: e?.name, value: e?.id })) });
-            }
+        getListMethod(null, (err, result) => {
+            if (err) return console.error(err);
+            updateData({ dataMethod: result?.map(({ name, id }) => ({ label: name, value: id })) });
         });
         updateFetch({ onFetching: false });
     };
@@ -208,82 +196,46 @@ const Popup_dspt = (props) => {
     //Danh sách đối tượng
     //Api Danh sách đối tượng: truyền Đối tượng vào biến type, truyền Chi nhánh vào biến filter[branch_id]
     const _ServerFetching_LisObject = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_expense_voucher/objectList/?csrf_protection=true",
-            {
-                params: {
-                    type: listValue.object?.value,
-                    "filter[branch_id]": listValue.branch?.value,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { rResult } = response.data;
-                    updateData({ dataList_Object: rResult?.map((e) => ({ label: e?.name, value: e?.id })) });
-                }
+        getListLisObject(
+            { type: listValue.object?.value, "filter[branch_id]": listValue.branch?.value },
+            (err, result) => {
+                if (err) return console.error(err);
+                updateData({
+                    dataListObject: result?.map(({ name, id }) => ({ label: dataLang[name] || name, value: id })),
+                });
             }
         );
-        updateFetch({ onFetching_LisObject: false });
+        updateFetch({ onFetchingLisObject: false });
     };
 
     // Loại chứng từ
     //Api Loại chứng từ: truyền Đối tượng vào biến type
 
     const _ServerFetching_TypeOfDocument = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_expense_voucher/voucher_type/?csrf_protection=true",
-            {
-                params: {
-                    type: listValue.object?.value,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let db = response.data;
-                    updateData({
-                        dataTypeofDoc: db?.map((e) => ({
-                            label: dataLang[e?.name],
-                            value: e?.id,
-                        })),
-                    });
-                }
-            }
-        );
-        updateFetch({ onFetching_TypeOfDocument: false });
+        getTypeOfDocument({ type: listValue.object?.value }, (err, result) => {
+            if (err) return console.error(err);
+            updateData({ dataTypeofDoc: result?.map(({ name, id }) => ({ label: dataLang[name], value: id })) });
+        });
+        updateFetch({ onFetchingTypeOfDocument: false });
     };
 
     //Danh sách chứng từ
     //Api Danh sách chứng từ: truyền Đối tượng vào biến type, truyền Loại chứng từ vào biến voucher_type, truyền Danh sách đối tượng vào object_id
-
+    let param = {
+        type: listValue.object?.value,
+        voucher_type: listValue.typeOfDocument?.value,
+        object_id: listValue.listObject?.value,
+        "filter[branch_id]": listValue.branch?.value,
+        expense_voucher_id: id ? id : "",
+    };
     const _ServerFetching_ListTypeOfDocument = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true",
-            {
-                params: {
-                    type: listValue.object?.value,
-                    voucher_type: listValue.typeOfDocument?.value,
-                    object_id: listValue.listObject?.value,
-                    "filter[branch_id]": listValue.branch?.value,
-                    expense_voucher_id: id ? id : "",
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let db = response.data;
-                    updateData({
-                        dataListTypeofDoc: db?.map((e) => ({
-                            label: e?.code,
-                            value: e?.id,
-                            money: e?.money,
-                        })),
-                    });
-                }
-            }
-        );
-        updateFetch({ onFetching_ListTypeOfDocument: false });
+        getListTypeOfDocument({ ...param }, (err, result) => {
+            if (err) return console.error(err);
+            updateData({
+                dataListTypeofDoc: result?.map(({ code, id, money }) => ({ label: code, value: id, money: money })),
+            });
+        });
+        updateFetch({ onFetchingListTypeOfDocument: false });
     };
 
     let searchTimeout;
@@ -293,71 +245,22 @@ const Popup_dspt = (props) => {
         else {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
-                Axios(
-                    "POST",
-                    `/api_web/Api_expense_voucher/voucher_list/?csrf_protection=true`,
-                    {
-                        data: {
-                            term: inputValue,
-                        },
-                        params: {
-                            type: listValue.object?.value ? listValue.object?.value : null,
-                            voucher_type: listValue.typeOfDocument?.value ? listValue.typeOfDocument?.value : null,
-                            object_id: listValue.listObject?.value ? listValue.listObject?.value : null,
-                            "filter[branch_id]": listValue.branch?.value ? listValue.branch?.value : null,
-                            expense_voucher_id: id ? id : "",
-                        },
-                    },
-                    (err, response) => {
-                        if (!err) {
-                            let db = response.data;
-                            updateData({
-                                dataListTypeofDoc: db?.map((e) => ({
-                                    label: e?.code,
-                                    value: e?.id,
-                                    money: e?.money,
-                                })),
-                            });
-                        }
-                    }
-                );
+                postdataListTypeofDoc({ ...param }, { data: inputValue }, (err, result) => {
+                    if (err) return console.error(err);
+                    updateData({
+                        dataListTypeofDoc: result?.map(({ code, id, money }) => ({
+                            label: code,
+                            value: id,
+                            money: money,
+                        })),
+                    });
+                });
             }, 500);
         }
     };
 
-    const _ServerFetching_ListTable = () => {
-        let db = new FormData();
-        listValue.listTypeOfDocument.forEach((e, index) => {
-            db.append(`import_id[${index}]`, e?.value);
-        });
-        id && db.append("ignore_id", id ? id : "");
-        Axios(
-            "POST",
-            "/api_web/Api_expense_voucher/deductDeposit/?csrf_protection=true",
-            {
-                data: db,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let db = response.data;
-                    updateData({ dataTable: db });
-                }
-            }
-        );
-        updateFetch({ onFetchingTable: false });
-    };
-
     useEffect(() => {
-        if (listValue.branch != null) {
-            // updateFetch({ onFetching_ListCost: true });
-        }
-        if (listValue.typeOfDocument?.value == "import" && listValue.listTypeOfDocument) {
-            updateFetch({ onFetchingTable: true });
-        }
-        if (listValue.object != null) {
-            updateFetch({ onFetching_TypeOfDocument: true });
-        }
+        listValue.object != null && updateFetch({ onFetchingTypeOfDocument: true });
     }, [listValue.branch, listValue.typeOfDocument, listValue.object]);
 
     useEffect(() => {
@@ -365,37 +268,33 @@ const Popup_dspt = (props) => {
     }, [open]);
 
     useEffect(() => {
-        listValue.branch != null && listValue.object != null && updateFetch({ onFetching_LisObject: true });
+        listValue.branch != null && listValue.object != null && updateFetch({ onFetchingLisObject: true });
     }, [listValue.object, listValue.branch]);
 
     useEffect(() => {
-        listValue.typeOfDocument && updateFetch({ onFetching_ListTypeOfDocument: true });
-    }, [listValue.typeOfDocument, listValue.branch, listValue.object]);
+        listValue.typeOfDocument && updateFetch({ onFetchingListTypeOfDocument: true });
+    }, [listValue.typeOfDocument, listValue.listObject, listValue.branch, listValue.object]);
 
     useEffect(() => {
         if (fetch.onFetching) {
             _ServerFetching();
         }
-        if (fetch.onFetchingTable) {
-            _ServerFetching_ListTable();
-        }
-        if (fetch.onFetching_TypeOfDocument) {
+        if (fetch.onFetchingTypeOfDocument) {
             _ServerFetching_TypeOfDocument();
         }
-        if (fetch.onFetching_ListTypeOfDocument) {
+        if (fetch.onFetchingListTypeOfDocument) {
             _ServerFetching_ListTypeOfDocument();
         }
-        if (fetch.onFetching_LisObject) {
+        if (fetch.onFetchingLisObject) {
             _ServerFetching_LisObject();
         }
         if (fetch.onSending) {
             _ServerSending();
         }
     }, [
-        fetch.onFetchingTable,
-        fetch.onFetching_TypeOfDocument,
-        fetch.onFetching_ListTypeOfDocument,
-        fetch.onFetching_LisObject,
+        fetch.onFetchingTypeOfDocument,
+        fetch.onFetchingListTypeOfDocument,
+        fetch.onFetchingLisObject,
         fetch.onFetching,
         fetch.onSending,
     ]);
@@ -403,6 +302,18 @@ const Popup_dspt = (props) => {
     const _HandleChangeInput = (type, value) => {
         const totalMoney = listValue.listTypeOfDocument.reduce((total, item) => total + parseFloat(item.money), 0);
         let isExceedTotal = false;
+        const valueType = {
+            [type]: value,
+            listObject: null,
+            price: "",
+            listTypeOfDocument: [],
+            typeOfDocument: null,
+        };
+        const dataEmty = {
+            branch: { dataListObject: [], dataListCost: [], dataListTypeofDoc: [] },
+            object: { dataListObject: [], dataListTypeofDoc: [] },
+            typeOfDocument: { dataListTypeofDoc: [] },
+        };
         switch (type) {
             case "date":
                 updateListValue({ date: value });
@@ -414,41 +325,26 @@ const Popup_dspt = (props) => {
                 updateListValue({ date: new Date() });
                 break;
             case "branch":
-                if (listValue.branch !== value) {
-                    updateListValue({
-                        branch: value,
-                        listObject: null,
-                        price: "",
-                        listTypeOfDocument: [],
-                        typeOfDocument: null,
-                    });
-                    updateData({ dataList_Object: [], dataListCost: [], dataListTypeofDoc: [] });
-                }
+                listValue[type] !== value && updateListValue(valueType);
+                listValue[type] !== value && updateData(dataEmty.branch);
                 break;
             case "object":
-                if (listValue.object !== value) {
-                    updateListValue({
-                        object: value,
-                        listObject: null,
-                        price: "",
-                        listTypeOfDocument: [],
-                        typeOfDocument: null,
-                    });
-                    updateData({ dataList_Object: [], dataListTypeofDoc: [] });
-                }
+                listValue[type] !== value && updateListValue(valueType);
+                listValue[type] !== value && updateData(dataEmty.object);
                 break;
             case "listObject":
                 updateListValue({ listObject: value });
+                listValue[type]?.value != value?.value && updateListValue({ listTypeOfDocument: [] });
+                listValue[type]?.value != value?.value && updateData(dataEmty.typeOfDocument);
                 break;
             case "typeOfDocument":
-                if (listValue.typeOfDocument !== value) {
+                listValue[type]?.value != value?.value &&
                     updateListValue({
-                        typeOfDocument: value,
+                        [type]: value,
                         listTypeOfDocument: [],
                         price: "",
                     });
-                    updateData({ dataListTypeofDoc: [] });
-                }
+                listValue[type]?.value != value?.value && updateData(dataEmty[type]);
                 break;
             case "listTypeOfDocument":
                 updateListValue({ listTypeOfDocument: value });
@@ -464,7 +360,6 @@ const Popup_dspt = (props) => {
             case "price":
                 // const priceChange = parseFloat(value?.target.value.replace(/,/g, ""));
                 const priceChange = value?.target.value;
-                console.log("priceChange", priceChange);
                 if (!isNaN(priceChange)) {
                     if (listValue.listTypeOfDocument.length > 0 && priceChange > totalMoney) {
                         ToatstNotifi("error", dataLang?.payment_err_aler || "payment_err_aler");
@@ -516,7 +411,6 @@ const Popup_dspt = (props) => {
             updateFetch({ onSending: true });
         }
     };
-    console.log(listValue);
 
     useEffect(() => {
         listValue.branch && updateError({ errBranch: false });
@@ -587,7 +481,7 @@ const Popup_dspt = (props) => {
 
     const _ServerSending = () => {
         let formData = new FormData();
-        formData.append("code", listValue.code == null ? "" : listValue.code);
+        formData.append("code", listValue.code ? listValue.code : "");
         formData.append("date", moment(listValue.date).format("YYYY-MM-DD HH:mm:ss"));
         formData.append("branch_id", listValue.branch?.value);
         formData.append("objects", listValue.object?.value);
@@ -603,63 +497,53 @@ const Popup_dspt = (props) => {
             formData.append(`voucher_id[${index}]`, e?.value);
         });
         formData.append("note", listValue.note);
-        Axios(
-            "POST",
-            `${
-                id
-                    ? `/api_web/Api_expense_voucher/expenseVoucher/${id}?csrf_protection=true`
-                    : "/api_web/Api_expense_voucher/expenseVoucher/?csrf_protection=true"
-            }`,
-            {
-                data: formData,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    let { isSuccess, message } = response.data;
-                    if (isSuccess) {
-                        ToatstNotifi("success", `${dataLang[message]}`);
-                        initstialState();
-                        sError(inistError);
-                        props.onRefresh && props.onRefresh();
-                        sOpen(false);
-                    } else {
-                        ToatstNotifi("error", `${dataLang[message]}`);
-                    }
+        postData(null, id, formData, (err, response) => {
+            if (!err) {
+                let { isSuccess, message } = response;
+                console.log(message);
+                if (isSuccess) {
+                    ToatstNotifi("success", `${dataLang[message]}`);
+                    initstialState();
+                    sError(inistialError);
+                    props.onRefresh && props.onRefresh();
+                    sOpen(false);
+                } else {
+                    ToatstNotifi("error", `${dataLang[message]}`);
                 }
-                updateFetch({ onSending: false });
+            } else {
+                console.error(err);
+                console.log(response.message);
             }
-        );
-    };
+        });
+        updateFetch({ onSending: false });
 
-    const style = {
-        closeMenuOnSelect: true,
-        isSearchable: true,
-        noOptionsMessage: () => "Không có dữ liệu",
-        maxMenuHeight: "200px",
-        isClearable: true,
-        menuPortalTarget: document.body,
-        onMenuOpen: handleMenuOpen,
-        theme: (theme) => ({
-            ...theme,
-            colors: {
-                ...theme.colors,
-                primary25: "#EBF5FF",
-                primary50: "#92BFF7",
-                primary: "#0F4F9E",
-            },
-        }),
-        styles: {
-            placeholder: (base) => ({
-                ...base,
-                color: "#cbd5e1",
-            }),
-            menuPortal: (base) => ({
-                ...base,
-                zIndex: 9999,
-                position: "absolute",
-            }),
-        },
+        // Axios(
+        //     "POST",
+        //     `${
+        //         id
+        //             ? `/api_web/Api_expense_voucher/expenseVoucher/${id}?csrf_protection=true`
+        //             : "/api_web/Api_expense_payslips/expenseCoupon/?csrf_protection=true"
+        //     }`,
+        //     {
+        //         data: formData,
+        //         headers: { "Content-Type": "multipart/form-data" },
+        //     },
+        //     (err, response) => {
+        //         if (!err) {
+        //             let { isSuccess, message } = response.data;
+        //             if (isSuccess) {
+        //                 ToatstNotifi("success", `${dataLang[message]}`);
+        //                 initstialState();
+        //                 sError(inistialError);
+        //                 props.onRefresh && props.onRefresh();
+        //                 sOpen(false);
+        //             } else {
+        //                 ToatstNotifi("error", `${dataLang[message]}`);
+        //             }
+        //         }
+        //         updateFetch({ onSending: false });
+        //     }
+        // );
     };
 
     return (
@@ -738,7 +622,8 @@ const Popup_dspt = (props) => {
                                             options={data.dataBranch}
                                             onChange={_HandleChangeInput.bind(this, "branch")}
                                             value={listValue.branch}
-                                            {...style}
+                                            closeMenuOnSelect={true}
+                                            {...configSelectPopup}
                                             className={`${
                                                 error.errBranch ? "border-red-500" : "border-transparent"
                                             }  placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
@@ -760,7 +645,8 @@ const Popup_dspt = (props) => {
                                             onChange={_HandleChangeInput.bind(this, "method")}
                                             value={listValue.method}
                                             maxMenuHeight="200px"
-                                            {...style}
+                                            closeMenuOnSelect={true}
+                                            {...configSelectPopup}
                                             className={`${
                                                 error.errMethod ? "border-red-500" : "border-transparent"
                                             } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px]  font-normal outline-none border `}
@@ -781,7 +667,10 @@ const Popup_dspt = (props) => {
                                             options={data.dataObject}
                                             onChange={_HandleChangeInput.bind(this, "object")}
                                             value={listValue.object}
-                                            {...style}
+                                            {...configSelectPopup}
+                                            menuPortalTarget={document.body}
+                                            onMenuOpen={handleMenuOpen}
+                                            closeMenuOnSelect={true}
                                             className={`${
                                                 error.errObject ? "border-red-500" : "border-transparent"
                                             } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
@@ -799,7 +688,7 @@ const Popup_dspt = (props) => {
                                         </label>
                                         {listValue.object?.value == "other" ? (
                                             <CreatableSelect
-                                                options={data.dataList_Object}
+                                                options={data.dataListObject}
                                                 placeholder={props.dataLang?.payment_listOb || "payment_listOb"}
                                                 onChange={_HandleChangeInput.bind(this, "listObject")}
                                                 isClearable={true}
@@ -853,10 +742,13 @@ const Popup_dspt = (props) => {
                                         ) : (
                                             <Select
                                                 placeholder={props.dataLang?.payment_listOb || "payment_listOb"}
-                                                options={data.dataList_Object}
+                                                options={data.dataListObject}
                                                 onChange={_HandleChangeInput.bind(this, "listObject")}
                                                 value={listValue.listObject}
-                                                {...style}
+                                                {...configSelectPopup}
+                                                menuPortalTarget={document.body}
+                                                onMenuOpen={handleMenuOpen}
+                                                closeMenuOnSelect={true}
                                                 className={`${
                                                     error.errListObject ? "border-red-500" : "border-transparent"
                                                 } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
@@ -879,7 +771,10 @@ const Popup_dspt = (props) => {
                                             options={data.dataTypeofDoc}
                                             onChange={_HandleChangeInput.bind(this, "typeOfDocument")}
                                             value={listValue.typeOfDocument}
-                                            {...style}
+                                            closeMenuOnSelect={true}
+                                            {...configSelectPopup}
+                                            menuPortalTarget={document.body}
+                                            onMenuOpen={handleMenuOpen}
                                             className={`border-transparent placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] 2xl:text-[12px] xl:text-[13px] text-[12px] font-normal outline-none border `}
                                         />
                                     </div>
@@ -890,12 +785,16 @@ const Popup_dspt = (props) => {
                                         <Select
                                             placeholder={props.dataLang?.payment_listOfDoc || "payment_listOfDoc"}
                                             options={data.dataListTypeofDoc}
+                                            closeMenuOnSelect={false}
+                                            hideSelectedOptions={false}
                                             onInputChange={_HandleSeachApi.bind(this)}
                                             onChange={_HandleChangeInput.bind(this, "listTypeOfDocument")}
                                             value={listValue.listTypeOfDocument}
                                             components={{ MenuList, MultiValue }}
-                                            {...style}
+                                            {...configSelectPopup}
                                             isMulti
+                                            menuPortalTarget={document.body}
+                                            onMenuOpen={handleMenuOpen}
                                             className={`${
                                                 error.errListTypeDoc &&
                                                 listValue.typeOfDocument != null &&
@@ -986,39 +885,46 @@ const Popup_dspt = (props) => {
                                     </div>
                                 </div>
                                 <h2 className="font-normal bg-[#ECF0F4] p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12 mt-0.5">
-                                    {props.dataLang?.payment_costInfo || "payment_costInfo"}
+                                    {"Thông tin đơn hàng"}
                                 </h2>
-                                <div className="col-span-12 grid grid-cols-4 items-center divide-x border border-l-0 border-t-0 border-r-0">
-                                    <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">{""}</h1>
-                                    <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">{""}</h1>
-                                    <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">{""}</h1>
-                                    <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">{""}</h1>
+                                <div className="col-span-12 grid grid-cols-12 items-center divide-x border border-l-0 border-t-0 border-r-0">
+                                    <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold col-span-2">
+                                        {"#"}
+                                    </h1>
+                                    <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold col-span-5">
+                                        {"Mã đơn hàng"}
+                                    </h1>
+                                    <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold col-span-5">
+                                        {"Số tiền"}
+                                    </h1>
                                 </div>
-                                {data.dataTable.length > 0 && (
-                                    <div className="col-span-12 border border-b-0 rounded m-1 transition-all duration-200 ease-linear">
+                                {listValue.listTypeOfDocument.length > 0 && (
+                                    <div className="col-span-12 border border-b-0 rounded transition-all duration-200 ease-linear">
                                         <div
                                             className={`${
-                                                data.dataTable.length > 5 ? " h-[170px] overflow-auto" : ""
+                                                listValue.listTypeOfDocument.length > 5
+                                                    ? " h-[170px] overflow-auto"
+                                                    : ""
                                             } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
                                         >
-                                            {data.dataTable.map((e) => {
+                                            {listValue.listTypeOfDocument.map((e, index) => {
                                                 return (
-                                                    <div className="col-span-12 grid grid-cols-4 items-center divide-x border-b">
-                                                        <h1 className="text-center text-xs p-2 ">
+                                                    <div
+                                                        key={e.value}
+                                                        className="col-span-12 grid grid-cols-12 items-center divide-x border-b"
+                                                    >
+                                                        <h1 className="text-center text-xs p-2 col-span-2">
+                                                            <span className="py-1 px-2 bg-purple-200 text-purple-500 rounded-xl animate-pulse">
+                                                                {index + 1}
+                                                            </span>
+                                                        </h1>
+                                                        <h1 className="text-center text-xs p-2 col-span-5 ">
                                                             <span className="py-1 px-2 bg-purple-200 text-purple-500 rounded-xl">
-                                                                {e.import_code}
+                                                                {e.label}
                                                             </span>
                                                         </h1>
-                                                        <h1 className="text-center text-xs p-2">
-                                                            <span className="py-1 px-2 bg-orange-200 text-orange-500 rounded-xl">
-                                                                {e.payslip_code}
-                                                            </span>
-                                                        </h1>
-                                                        <h1 className="text-center text-xs p-2">
-                                                            {formatNumber(e.deposit_amount)}
-                                                        </h1>
-                                                        <h1 className="text-center text-xs p-2">
-                                                            {formatNumber(e.amount_left)}
+                                                        <h1 className="text-right text-xs p-2 col-span-5">
+                                                            {formatNumber(e.money)}
                                                         </h1>
                                                     </div>
                                                 );
@@ -1072,7 +978,7 @@ const MoreSelectedBadge = ({ items }) => {
 };
 
 const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 1;
+    const maxToShow = 2;
     const overflow = getValue()
         .slice(maxToShow)
         .map((x) => x.label);
