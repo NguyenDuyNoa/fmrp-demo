@@ -12,7 +12,7 @@ import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
 import dynamic from "next/dynamic";
 import moment from "moment/moment";
-import { getdataDetail } from "./api";
+import { getdataDetail } from "./api/api";
 const Popup_chitiet = (props) => {
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
