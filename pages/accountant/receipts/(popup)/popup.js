@@ -39,7 +39,6 @@ const Popup_dspt = (props) => {
         const menuPortalTarget = scrollAreaRef.current;
         return { menuPortalTarget };
     };
-
     const inistialFetch = {
         onSending: false,
         onFetching: false,
@@ -78,40 +77,23 @@ const Popup_dspt = (props) => {
         method: null,
         note: null,
     };
+
     const [open, sOpen] = useState(false);
     const [error, sError] = useState(inistialError);
     const [data, sData] = useState(inistialArrr);
     const [fetch, sFetch] = useState(inistialFetch);
     const [listValue, sListValue] = useState(inistialValue);
+
     const _ToggleModal = (e) => sOpen(e);
+    const updateFetch = (update) => sFetch((e) => ({ ...e, ...update }));
+    const updateListValue = (updates) => sListValue((e) => ({ ...e, ...updates }));
+    const updateData = (update) => sData((e) => ({ ...e, ...update }));
+    const updateError = (update) => sError((e) => ({ ...e, ...update }));
+
     const initstialState = () => {
         sListValue(inistialValue);
         sError(inistialError);
         sData(inistialArrr);
-    };
-    const updateFetch = (update) => {
-        sFetch((e) => ({
-            ...e,
-            ...update,
-        }));
-    };
-    const updateListValue = (updates) => {
-        sListValue((e) => ({
-            ...e,
-            ...updates,
-        }));
-    };
-    const updateData = (update) => {
-        sData((e) => ({
-            ...e,
-            ...update,
-        }));
-    };
-    const updateError = (update) => {
-        sError((e) => ({
-            ...e,
-            ...update,
-        }));
     };
 
     useEffect(() => {
@@ -121,87 +103,79 @@ const Popup_dspt = (props) => {
     }, [open]);
 
     const _ServerFetching_detail = () => {
-        getdataDetail(null, (err, result) => {
+        getdataDetail(id, (err, result) => {
             if (err) return console.error(err);
-            console.log("result", result);
+            updateListValue({
+                date: moment(result?.date).toDate(),
+                code: result?.code,
+                branch: { label: result?.branch_name, value: result?.branch_id },
+                object: { label: dataLang[result?.objects] || result?.objects, value: result?.objects },
+                listObject:
+                    result?.objects === "other"
+                        ? { label: result?.object_text, value: result?.object_text }
+                        : { label: dataLang[result?.object_text] || result?.object_text, value: result?.objects_id },
+                typeOfDocument: result?.type_vouchers
+                    ? { label: dataLang[result?.type_vouchers] || result?.type_vouchers, value: result?.type_vouchers }
+                    : null,
+                listTypeOfDocument: result?.type_vouchers
+                    ? result?.voucher?.map(({ code, id, money }) => ({
+                          label: code,
+                          value: id,
+                          money: money,
+                      }))
+                    : [],
+                price: +result?.total,
+                method: { label: result?.payment_mode_name, value: result?.payment_mode_id },
+                note: result?.note,
+            });
         });
-        // Axios(
-        //     "GET",
-        //     `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
-        //     {},
-        //     (err, response) => {
-        //         if (!err) {
-        //             let db = response.data;
-        //             updateListValue({
-        //                 date: moment(db?.date).toDate(),
-        //                 code: db?.code,
-        //                 branch: { label: db?.branch_name, value: db?.branch_id },
-        //                 method: {
-        //                     label: db?.payment_mode_name,
-        //                     value: db?.payment_mode_id,
-        //                 },
-        //                 object: {
-        //                     label: dataLang[db?.objects] || db?.objects,
-        //                     value: db?.objects,
-        //                 },
-        //                 price: Number(db?.total),
-        //                 note: db?.note,
-        //                 listObject:
-        //                     db?.objects === "other"
-        //                         ? { label: db?.object_text, value: db?.object_text }
-        //                         : {
-        //                               label: dataLang[db?.object_text] || db?.object_text,
-        //                               value: db?.objects_id,
-        //                           },
-        //                 typeOfDocument: db?.type_vouchers
-        //                     ? {
-        //                           label: dataLang[db?.type_vouchers],
-        //                           value: db?.type_vouchers,
-        //                       }
-        //                     : null,
-        //                 listTypeOfDocument: db?.type_vouchers
-        //                     ? db?.voucher?.map((e) => ({
-        //                           label: e?.code,
-        //                           value: e?.id,
-        //                           money: e?.money,
-        //                       }))
-        //                     : [],
-        //             });
-        //             db?.type_vouchers == "import" && updateData({ dataTable: db?.tbDeductDeposit });
-        //         }
-        //         updateFetch({ onFetchingDetail: false });
-        //     }
-        // );
+
         updateFetch({ onFetchingDetail: false });
     };
 
     // Chi nhánh, PTTT, Đối tượng
-
     const _ServerFetching = () => {
         getListBranch(null, (err, result) => {
             if (err) return console.error(err);
-            updateData({ dataBranch: result?.map(({ name, id }) => ({ label: name, value: id })) });
+            updateData({
+                dataBranch: result?.map(({ name, id }) => ({
+                    label: name,
+                    value: id,
+                })),
+            });
         });
         getListObject(null, (err, result) => {
             if (err) return console.error(err);
-            updateData({ dataObject: result?.map(({ name, id }) => ({ label: dataLang[name], value: id })) });
+            updateData({
+                dataObject: result?.map(({ name, id }) => ({
+                    label: dataLang[name],
+                    value: id,
+                })),
+            });
         });
         getListMethod(null, (err, result) => {
             if (err) return console.error(err);
-            updateData({ dataMethod: result?.map(({ name, id }) => ({ label: name, value: id })) });
+            updateData({
+                dataMethod: result?.map(({ name, id }) => ({
+                    label: name,
+                    value: id,
+                })),
+            });
         });
         updateFetch({ onFetching: false });
     };
 
     //Danh sách đối tượng
-    //Api Danh sách đối tượng: truyền Đối tượng vào biến type, truyền Chi nhánh vào biến filter[branch_id]
     const _ServerFetching_LisObject = () => {
         getListLisObject(
             { type: listValue.object?.value, "filter[branch_id]": listValue.branch?.value },
             (err, result) => {
                 if (err) return console.error(err);
                 updateData({
-                    dataListObject: result?.map(({ name, id }) => ({ label: dataLang[name] || name, value: id })),
+                    dataListObject: result?.map(({ name, id }) => ({
+                        label: dataLang[name] || name,
+                        value: id,
+                    })),
                 });
             }
         );
@@ -209,18 +183,20 @@ const Popup_dspt = (props) => {
     };
 
     // Loại chứng từ
-    //Api Loại chứng từ: truyền Đối tượng vào biến type
-
     const _ServerFetching_TypeOfDocument = () => {
         getTypeOfDocument({ type: listValue.object?.value }, (err, result) => {
             if (err) return console.error(err);
-            updateData({ dataTypeofDoc: result?.map(({ name, id }) => ({ label: dataLang[name], value: id })) });
+            updateData({
+                dataTypeofDoc: result?.map(({ name, id }) => ({
+                    label: dataLang[name],
+                    value: id,
+                })),
+            });
         });
         updateFetch({ onFetchingTypeOfDocument: false });
     };
 
     //Danh sách chứng từ
-    //Api Danh sách chứng từ: truyền Đối tượng vào biến type, truyền Loại chứng từ vào biến voucher_type, truyền Danh sách đối tượng vào object_id
     let param = {
         type: listValue.object?.value,
         voucher_type: listValue.typeOfDocument?.value,
@@ -232,7 +208,11 @@ const Popup_dspt = (props) => {
         getListTypeOfDocument({ ...param }, (err, result) => {
             if (err) return console.error(err);
             updateData({
-                dataListTypeofDoc: result?.map(({ code, id, money }) => ({ label: code, value: id, money: money })),
+                dataListTypeofDoc: result?.map(({ code, id, money }) => ({
+                    label: code,
+                    value: id,
+                    money: money,
+                })),
             });
         });
         updateFetch({ onFetchingListTypeOfDocument: false });
@@ -360,7 +340,7 @@ const Popup_dspt = (props) => {
             case "price":
                 // const priceChange = parseFloat(value?.target.value.replace(/,/g, ""));
                 const priceChange = value?.target.value;
-                if (!isNaN(priceChange)) {
+                if (priceChange) {
                     if (listValue.listTypeOfDocument.length > 0 && priceChange > totalMoney) {
                         ToatstNotifi("error", dataLang?.payment_err_aler || "payment_err_aler");
                         updateListValue({ price: totalMoney });
@@ -434,25 +414,20 @@ const Popup_dspt = (props) => {
     const allItems = [...data.dataListTypeofDoc];
 
     const handleSelectAll = () => {
-        updateListValue({ listTypeOfDocument: allItems });
-        Promise.resolve()
-            .then(() => {
-                const totalMoney = allItems.reduce((total, item) => {
-                    if (!isNaN(parseFloat(item.money))) {
-                        return total + parseFloat(item.money);
-                    } else {
-                        return total;
-                    }
-                }, 0);
-                return totalMoney;
-            })
-            .then((formattedTotal) => {
-                updateListValue({ price: formattedTotal });
-            });
+        updateListValue({
+            listTypeOfDocument: allItems,
+            price: allItems.reduce((total, item) => {
+                if (item.money) {
+                    return total + parseFloat(item.money);
+                } else {
+                    return total;
+                }
+            }, 0),
+        });
     };
 
     const handleDeselectAll = () => {
-        updateListValue({ price: null, listTypeOfDocument: [] });
+        updateListValue({ price: "", listTypeOfDocument: [] });
     };
 
     const MenuList = (props) => {
@@ -496,7 +471,7 @@ const Popup_dspt = (props) => {
         listValue.listTypeOfDocument?.forEach((e, index) => {
             formData.append(`voucher_id[${index}]`, e?.value);
         });
-        formData.append("note", listValue.note);
+        formData.append("note", listValue.note ? listValue.note : "");
         postData(null, id, formData, (err, response) => {
             if (!err) {
                 let { isSuccess, message } = response;
@@ -516,40 +491,16 @@ const Popup_dspt = (props) => {
             }
         });
         updateFetch({ onSending: false });
-
-        // Axios(
-        //     "POST",
-        //     `${
-        //         id
-        //             ? `/api_web/Api_expense_voucher/expenseVoucher/${id}?csrf_protection=true`
-        //             : "/api_web/Api_expense_payslips/expenseCoupon/?csrf_protection=true"
-        //     }`,
-        //     {
-        //         data: formData,
-        //         headers: { "Content-Type": "multipart/form-data" },
-        //     },
-        //     (err, response) => {
-        //         if (!err) {
-        //             let { isSuccess, message } = response.data;
-        //             if (isSuccess) {
-        //                 ToatstNotifi("success", `${dataLang[message]}`);
-        //                 initstialState();
-        //                 sError(inistialError);
-        //                 props.onRefresh && props.onRefresh();
-        //                 sOpen(false);
-        //             } else {
-        //                 ToatstNotifi("error", `${dataLang[message]}`);
-        //             }
-        //         }
-        //         updateFetch({ onSending: false });
-        //     }
-        // );
     };
 
     return (
         <>
             <PopupEdit
-                title={props.id ? `${"Sửa phiếu thu"}` : `${"Tạo phiếu thu"}`}
+                title={
+                    props.id
+                        ? `${props.dataLang?.receipts_edit || "receipts_edit"}`
+                        : `${props.dataLang?.receipts_add || "receipts_add"}`
+                }
                 button={
                     props.id
                         ? props.dataLang?.payment_editVotes || "payment_editVotes"
@@ -847,7 +798,7 @@ const Popup_dspt = (props) => {
                                                                 `${
                                                                     props.dataLang?.payment_errPlease ||
                                                                     "payment_errPlease"
-                                                                } ${totalMoney.toLocaleString("en")}`
+                                                                } ${formatNumber(totalMoney)}`
                                                             );
                                                         }
                                                         return floatValue <= totalMoney;
@@ -885,17 +836,17 @@ const Popup_dspt = (props) => {
                                     </div>
                                 </div>
                                 <h2 className="font-normal bg-[#ECF0F4] p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12 mt-0.5">
-                                    {"Thông tin đơn hàng"}
+                                    {props.dataLang?.receipts_info || "receipts_info"}
                                 </h2>
                                 <div className="col-span-12 grid grid-cols-12 items-center divide-x border border-l-0 border-t-0 border-r-0">
                                     <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold col-span-2">
                                         {"#"}
                                     </h1>
                                     <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold col-span-5">
-                                        {"Mã đơn hàng"}
+                                        {props.dataLang?.receipts_code || "receipts_code"}
                                     </h1>
                                     <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold col-span-5">
-                                        {"Số tiền"}
+                                        {props.dataLang?.receipts_money || "receipts_money"}
                                     </h1>
                                 </div>
                                 {listValue.listTypeOfDocument.length > 0 && (
@@ -978,7 +929,7 @@ const MoreSelectedBadge = ({ items }) => {
 };
 
 const MultiValue = ({ index, getValue, ...props }) => {
-    const maxToShow = 2;
+    const maxToShow = 1;
     const overflow = getValue()
         .slice(maxToShow)
         .map((x) => x.label);

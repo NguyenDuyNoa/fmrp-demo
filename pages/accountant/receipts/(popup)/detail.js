@@ -1,58 +1,19 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-import ReactExport from "react-data-export";
-
-import Swal from "sweetalert2";
-import { NumericFormat } from "react-number-format";
-import { v4 as uuidv4 } from "uuid";
-
-import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
-import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
 import ModalImage from "react-modal-image";
-
-import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    ArrowDown2 as IconDown,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-} from "iconsax-react";
-
-import { BiEdit } from "react-icons/bi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { VscFilePdf } from "react-icons/vsc";
+import { SearchNormal1 as IconSearch } from "iconsax-react";
 
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
-import Pagination from "/components/UI/pagination";
 import dynamic from "next/dynamic";
 import moment from "moment/moment";
-import Select, { components } from "react-select";
-import Popup from "reactjs-popup";
-import { data } from "autoprefixer";
-import { useDispatch } from "react-redux";
-import CreatableSelect from "react-select/creatable";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
-
+import { getdataDetail } from "./api";
 const Popup_chitiet = (props) => {
-    const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
     const [data, sData] = useState();
@@ -71,29 +32,22 @@ const Popup_chitiet = (props) => {
         return roundedNumber.toLocaleString("en");
     };
 
-    const _ServerFetching_detailThere = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var db = response.data;
-                    sData(db);
-                }
-                sOnFetching(false);
-            }
-        );
+    const _ServerFetching_detail = () => {
+        getdataDetail(props?.id, (err, result) => {
+            if (err) return console.error(err);
+            sData(result);
+        });
+        sOnFetching(false);
     };
 
     useEffect(() => {
-        onFetching && _ServerFetching_detailThere();
+        onFetching && _ServerFetching_detail();
     }, [open]);
 
     return (
         <>
             <PopupEdit
-                title={props.dataLang?.payment_detail || "payment_detail"}
+                title={props.dataLang?.receipts_detail || "receipts_detail"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
@@ -101,11 +55,9 @@ const Popup_chitiet = (props) => {
                 classNameBtn={props?.className}
             >
                 <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
-                {/* <div className=" space-x-5 w-[530px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">         */}
                 <div className=" space-x-5 w-[530px] h-auto">
                     <div>
                         <div className="w-[530px]">
-                            {/* <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100"> */}
                             <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 <h2 className="font-semibold bg-[#ECF0F4] p-2 text-[13px]">
                                     {props.dataLang?.import_detail_info || "import_detail_info"}
@@ -140,7 +92,6 @@ const Popup_chitiet = (props) => {
                                                             }
                                                             className="h-6 w-6 rounded-full object-cover"
                                                         />
-                                                        {/* <img className='h-6 w-6 rounded-full object-cover' src={data?.profile_image ? data?.profile_image : '/user-placeholder.jpg'} alt=''></img> */}
                                                         <span className="h-1.5 w-1.5 absolute bottom-1/2 left-1/2 translate-x-[100%]">
                                                             <span className="inline-flex relative rounded-full h-1.5 w-1.5 bg-lime-500">
                                                                 <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
@@ -186,6 +137,11 @@ const Popup_chitiet = (props) => {
                                                     )) ||
                                                     (data?.type_vouchers === "service" && (
                                                         <span className="flex items-center justify-center gap-1 font-normal text-red-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-rose-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
+                                                            {props.dataLang[data?.type_vouchers] || data?.type_vouchers}
+                                                        </span>
+                                                    )) ||
+                                                    (data?.type_vouchers === "order" && (
+                                                        <span className="flex items-center justify-center gap-1 font-normal text-green-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-green-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
                                                             {props.dataLang[data?.type_vouchers] || data?.type_vouchers}
                                                         </span>
                                                     ))}
@@ -236,54 +192,9 @@ const Popup_chitiet = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                                {data?.type_vouchers == "import" && data.tbDeductDeposit?.length > 0 && (
-                                    <div className="col-span-12 border border-b-0 rounded m-1 transition-all duration-200 ease-linear">
-                                        <div className="col-span-12 grid grid-cols-4 items-center divide-x border border-l-0 border-t-0 border-r-0">
-                                            <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
-                                                {props.dataLang?.payment_numberEnterd || "payment_numberEnterd"}
-                                            </h1>
-                                            <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
-                                                {props.dataLang?.payment_numberSlips || "payment_numberSlips"}
-                                            </h1>
-                                            <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
-                                                {props.dataLang?.payment_deductionMoney || "payment_deductionMoney"}
-                                            </h1>
-                                            <h1 className="text-center text-xs p-1.5 text-zinc-800 font-semibold">
-                                                {props.dataLang?.payment_cashInReturn || "payment_cashInReturn"}
-                                            </h1>
-                                        </div>
-                                        <div
-                                            className={`${
-                                                data.tbDeductDeposit.length > 3 ? " h-[100px] overflow-auto" : ""
-                                            } scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
-                                        >
-                                            {data.tbDeductDeposit.map((e) => {
-                                                return (
-                                                    <div className="col-span-12 grid grid-cols-4 items-center divide-x border-b">
-                                                        <h1 className="text-center text-xs p-2 ">
-                                                            <span className="py-1 px-2 bg-purple-200 text-purple-500 rounded-xl">
-                                                                {e.import_code}
-                                                            </span>
-                                                        </h1>
-                                                        <h1 className="text-center text-xs p-2">
-                                                            <span className="py-1 px-2 bg-orange-200 text-orange-500 rounded-xl">
-                                                                {e.payslip_code}
-                                                            </span>
-                                                        </h1>
-                                                        <h1 className="text-center text-xs p-2">
-                                                            {formatNumber(e.deposit_amount)}
-                                                        </h1>
-                                                        <h1 className="text-center text-xs p-2">
-                                                            {formatNumber(e.amount_left)}
-                                                        </h1>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                )}
+
                                 <h2 className="font-semibold bg-[#ECF0F4]  p-1 2xl:text-[12px] xl:text-[13px] text-[12px]  w-full col-span-12 mt-0.5">
-                                    {props.dataLang?.payment_costInfo || "payment_costInfo"}
+                                    {props.dataLang?.receipts_info || "receipts_info"}
                                 </h2>
                                 <div className=" w-[100%] lx:w-[110%] ">
                                     <div className={`grid-cols-5 grid sticky top-0  bg-white shadow-lg  z-10 rounded`}>
@@ -291,15 +202,15 @@ const Popup_chitiet = (props) => {
                                             #
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2  text-center">
-                                            {props.dataLang?.payment_costs || "payment_costs"}
+                                            {props.dataLang?.receipts_code || "receipts_code"}
                                         </h4>
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center">
-                                            {props.dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
+                                            {props.dataLang?.receipts_money || "receipts_money"}
                                         </h4>
                                     </div>
                                     {onFetching ? (
                                         <Loading className="max-h-28" color="#0f4f9e" />
-                                    ) : data?.detail?.length > 0 ? (
+                                    ) : data?.voucher?.length > 0 ? (
                                         <>
                                             <ScrollArea
                                                 className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
@@ -307,7 +218,7 @@ const Popup_chitiet = (props) => {
                                                 smoothScrolling={true}
                                             >
                                                 <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
-                                                    {data?.detail?.map((e, index) => (
+                                                    {data?.voucher?.map((e, index) => (
                                                         <div
                                                             className="grid grid-cols-5 hover:bg-slate-50 items-center border-b"
                                                             key={e.id?.toString()}
@@ -316,10 +227,10 @@ const Popup_chitiet = (props) => {
                                                                 {index + 1}
                                                             </h6>
                                                             <h6 className="text-[13px] col-span-2 font-medium pl-2 py-2  text-left break-words">
-                                                                {e?.costs_name}
+                                                                {e?.code}
                                                             </h6>
                                                             <h6 className="text-[13px] col-span-2 font-medium pl-2 py-2  text-center">
-                                                                {formatNumber(e?.total)}
+                                                                {formatNumber(e?.money)}
                                                             </h6>
                                                         </div>
                                                     ))}

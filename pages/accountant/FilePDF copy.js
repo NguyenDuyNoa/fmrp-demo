@@ -161,7 +161,7 @@ const FilePDF = ({
         pageSize: "A5",
         pageOrientation: "landscape",
         info: {
-            title: `${`${props.dataLang?.receipts_title || "receipts_title"} - ${data?.code}`}`,
+            title: `${`${"Phiếu thu"} - ${data?.code}`}`,
             author: "Foso",
             subject: "Quotation",
             keywords: "PDF",
@@ -175,7 +175,7 @@ const FilePDF = ({
                 canvas: lineHeght(),
             },
             {
-                stack: titleDateOne(props, data, props.dataLang?.receipts_title || "receipts_title"),
+                stack: titleDateOne(props, data, "Phiếu thu"),
                 margin: [0, 8, 0, 0],
             },
             { stack: titleValue(props, data, capitalizedTotalAmountWord) },
@@ -196,7 +196,7 @@ const FilePDF = ({
         pageSize: "A5",
         pageOrientation: "landscape",
         info: {
-            title: `${`${props.dataLang?.receipts_title || "receipts_title"} - ${data?.code}`}`,
+            title: `${`${"Phiếu thu"} - ${data?.code}`}`,
             author: "Foso",
             subject: "Quotation",
             keywords: "PDF",
@@ -210,7 +210,7 @@ const FilePDF = ({
                 canvas: lineHeght(),
             },
             {
-                stack: titleDateTwo(props, data, props.dataLang?.receipts_title || "receipts_title"),
+                stack: titleDateTwo(props, data, "Phiếu thu"),
                 margin: [0, 8, 0, 0],
             },
             { stack: titleValue(props, data, capitalizedTotalAmountWord) },
@@ -225,7 +225,7 @@ const FilePDF = ({
                 canvas: lineHeght(),
             },
             {
-                stack: titleDateTwo(props, data, props.dataLang?.receipts_title || "receipts_title"),
+                stack: titleDateTwo(props, data, "Phiếu thu"),
                 margin: [0, 8, 0, 0],
             },
             { stack: titleValue(props, data, capitalizedTotalAmountWord) },
@@ -262,6 +262,38 @@ const FilePDF = ({
             });
             setOpenAction(false);
         }
+        // if (type == "oneLink" && data !== undefined && dataCompany !== undefined && props?.type == "payment") {
+        //     const pdfGenerator = pdfMake.createPdf(docDefinitionPayment);
+        //     pdfGenerator.open((blob) => {
+        //         const url = URL.createObjectURL(blob);
+        //         setUrl(url);
+        //     });
+        //     setOpenAction(false);
+        // }
+        // if (type == "twoLink" && data !== undefined && dataCompany !== undefined && props?.type == "payment") {
+        //     const pdfGenerator = pdfMake.createPdf(docDefinitionPaymentTwo);
+        //     pdfGenerator.open((blob) => {
+        //         const url = URL.createObjectURL(blob);
+        //         setUrl(url);
+        //     });
+        //     setOpenAction(false);
+        // }
+        // if (type == "oneLink" && data !== undefined && dataCompany !== undefined && props?.type == "receipts") {
+        //     const pdfGenerator = pdfMake.createPdf(docDefinitionReceipts);
+        //     pdfGenerator.open((blob) => {
+        //         const url = URL.createObjectURL(blob);
+        //         setUrl(url);
+        //     });
+        //     setOpenAction(false);
+        // }
+        // if (type == "twoLink" && data !== undefined && dataCompany !== undefined && props?.type == "receipts") {
+        //     const pdfGenerator = pdfMake.createPdf(docDefinitionReceiptsTwo);
+        //     pdfGenerator.open((blob) => {
+        //         const url = URL.createObjectURL(blob);
+        //         setUrl(url);
+        //     });
+        //     setOpenAction(false);
+        // }
     };
     return (
         <React.Fragment>

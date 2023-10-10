@@ -11,15 +11,7 @@ import Swal from "sweetalert2";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
 import ModalImage from "react-modal-image";
-import {
-    Edit as IconEdit,
-    Grid6 as IconExcel,
-    ArrowDown2 as IconDown,
-    Trash as IconDelete,
-    SearchNormal1 as IconSearch,
-    Add as IconAdd,
-    Refresh2,
-} from "iconsax-react";
+import { Grid6 as IconExcel, ArrowDown2 as IconDown, SearchNormal1 as IconSearch, Refresh2 } from "iconsax-react";
 
 import { BiEdit } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -39,48 +31,38 @@ import Popup_chitiet from "./(popup)/detail";
 import Popup_dspt from "./(popup)/popup";
 import styleDatePicker from "components/UI/configs/configDatePicker";
 import configSelectFillter from "components/UI/configs/configSelectFillter";
+import { data } from "autoprefixer";
+import ToatstNotifi from "components/UI/alerNotification/alerNotification";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
 
 const Index = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
-    const [fetching, sFetching] = useState({
-        onFetching: false,
-        onFetching_filter: false,
-    });
-    const updateFetch = (e) => sFetching((i) => ({ ...i, ...e }));
+    const inistialValue = {
+        idBranch: null,
+        idObject: null,
+        idMethod: null,
+        valueDate: { startDate: null, endDate: null },
+    };
+    const initstialData = { table: [], excel: [], total: {} };
+    const inistialFetch = { onFetching: false, onFetching_filter: false };
+
     const [keySearch, sKeySearch] = useState("");
     const [limit, sLimit] = useState(15);
-    const [total, sTotal] = useState({});
-    const [data, sData] = useState({});
-    const [data_ex, sData_ex] = useState([]);
     const [listBr, sListBr] = useState([]);
     const [totalItem, sTotalItems] = useState([]);
     const [dataMethod, sDataMethod] = useState([]);
     const [dataObject, sDataObject] = useState([]);
-    const [value, sValue] = useState({
-        idBranch: null,
-        idObject: null,
-        idMethod: null,
-        valueDate: {
-            startDate: null,
-            endDate: null,
-        },
-    });
-    const _HandleFresh = () => {
-        sFetching((e) => ({ ...e, onFetching: true, onFetching_filter: true }));
-    };
+    const [fetching, sFetching] = useState(inistialFetch);
+    const [dataTable, sDataTable] = useState(initstialData);
+    const [value, sValue] = useState(inistialValue);
+
+    const updateFetch = (e) => sFetching((i) => ({ ...i, ...e }));
+    const _HandleFresh = () => sFetching((e) => ({ ...e, onFetching: true, onFetching_filter: true }));
+
     useEffect(() => {
         router.push({
             pathname: router.route,
@@ -88,29 +70,28 @@ const Index = (props) => {
         });
     }, []);
 
+    const parameters = {
+        limit: limit,
+        page: router.query?.page || 1,
+        "filter[branch_id]": value.idBranch != null ? value.idBranch.value : null,
+        "filter[start_date]": value.valueDate?.startDate != null ? value.valueDate?.startDate : null,
+        "filter[end_date]": value.valueDate?.endDate != null ? value.valueDate?.endDate : null,
+        "filter[payment_mode]": value.idMethod != null ? value.idMethod.value : null,
+        "filter[objects]": value.idObject != null ? value.idObject.value : null,
+        "filter[search]": keySearch,
+    };
     const _ServerFetching = () => {
         Axios(
             "GET",
-            `/api_web/Api_expense_voucher/expenseVoucher/?csrf_protection=true`,
+            `/api_web/Api_expense_payslips/expenseCoupon/?csrf_protection=true`,
             {
-                params: {
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[branch_id]": value.idBranch != null ? value.idBranch.value : null,
-                    "filter[start_date]": value.valueDate?.startDate != null ? value.valueDate?.startDate : null,
-                    "filter[end_date]": value.valueDate?.endDate != null ? value.valueDate?.endDate : null,
-                    "filter[payment_mode]": value.idMethod != null ? value.idMethod.value : null,
-                    "filter[objects]": value.idObject != null ? value.idObject.value : null,
-                    "filter[search]": keySearch,
-                },
+                params: parameters,
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output, rTotal } = response.data;
-                    sData(rResult);
+                    let { rResult, output, rTotal } = response.data;
+                    sDataTable(() => ({ table: rResult, excel: rResult, total: rTotal }));
                     sTotalItems(output);
-                    sData_ex(rResult);
-                    sTotal(rTotal);
                 }
                 updateFetch({ onFetching: false });
             }
@@ -120,33 +101,24 @@ const Index = (props) => {
     const _ServerFetching_filter = () => {
         Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { isSuccess, result } = response.data;
-                sListBr(result?.map((e) => ({ label: e.name, value: e.id })));
+                let { result } = response.data;
+                sListBr(result?.map(({ name, id }) => ({ label: name, value: id })));
             }
         });
         Axios("GET", "/api_web/Api_payment_method/payment_method/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
-                sDataMethod(rResult?.map((e) => ({ label: e?.name, value: e?.id })));
+                let { rResult } = response.data;
+                sDataMethod(rResult?.map(({ name, id }) => ({ label: name, value: id })));
             }
         });
         Axios("GET", "/api_web/Api_expense_voucher/object/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var data = response.data;
-                sDataObject(
-                    data?.map((e) => ({
-                        label: dataLang[e?.name],
-                        value: e?.id,
-                    }))
-                );
+                let data = response.data;
+                sDataObject(data?.map(({ name, id }) => ({ label: dataLang[name], value: id })));
             }
         });
         updateFetch({ onFetching_filter: false });
     };
-
-    useEffect(() => {
-        fetching.onFetching_filter && _ServerFetching_filter();
-    }, [fetching.onFetching_filter]);
 
     const _HandleOnChangeKeySearch = ({ target: { value } }) => {
         sKeySearch(value);
@@ -158,9 +130,9 @@ const Index = (props) => {
         });
         setTimeout(() => {
             if (!value) {
-                sOnFetching(true);
+                updateFetch({ onFetching: true });
             }
-            sOnFetching(true);
+            updateFetch({ onFetching: true });
         }, 500);
     };
 
@@ -171,6 +143,10 @@ const Index = (props) => {
             query: queryParams,
         });
     };
+
+    useEffect(() => {
+        fetching.onFetching_filter && _ServerFetching_filter();
+    }, [fetching.onFetching_filter]);
 
     useEffect(() => {
         fetching.onFetching && _ServerFetching();
@@ -285,14 +261,6 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.payment_costs || "payment_costs"}`,
-                    width: { wch: 40 },
-                    style: {
-                        fill: { fgColor: { rgb: "C7DFFB" } },
-                        font: { bold: true },
-                    },
-                },
-                {
                     title: `${dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}`,
                     width: { wch: 40 },
                     style: {
@@ -326,30 +294,15 @@ const Index = (props) => {
                 },
             ],
 
-            data: data_ex?.map((e) => [
+            data: dataTable.excel?.map((e) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.date ? e?.date : ""}` },
                 { value: `${e?.code ? e?.code : ""}` },
-                {
-                    value: `${e?.objects ? (dataLang[e.objects] !== undefined ? dataLang[e.objects] : "") : ""}`,
-                },
+                { value: `${e?.objects ? (dataLang[e.objects] !== undefined ? dataLang[e.objects] : "") : ""}` },
                 { value: `${e?.object_text ? e?.object_text : ""}` },
-                {
-                    value: `${
-                        e?.type_vouchers
-                            ? dataLang[e?.type_vouchers] != undefined
-                                ? dataLang[e?.type_vouchers]
-                                : ""
-                            : ""
-                    }`,
-                },
-                {
-                    value: `${e?.voucher_code ? e?.voucher_code.join(", ") : ""}`,
-                },
-                {
-                    value: `${e?.payment_mode_name ? e?.payment_mode_name : ""}`,
-                },
-                { value: `${e?.cost_name ? e?.cost_name?.join(", ") : ""}` },
+                { value: `${e?.type_vouchers ? dataLang[e?.type_vouchers] || e?.type_vouchers : ""}` },
+                { value: `${e?.voucher ? e?.voucher.map((e) => e.code).join(", ") : ""}` },
+                { value: `${e?.payment_mode_name ? e?.payment_mode_name : ""}` },
                 { value: `${e?.total ? formatNumber(e?.total) : ""}` },
                 { value: `${e?.staff_name ? e?.staff_name : ""}` },
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },
@@ -357,20 +310,19 @@ const Index = (props) => {
             ]),
         },
     ];
-
     return (
         <React.Fragment>
             <Head>
-                <title>{"Phiếu thu"}</title>
+                <title>{dataLang?.receipts_title || "receipts_title"}</title>
             </Head>
             <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
                 {trangthaiExprired ? (
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">{"Phiếu thu"}</h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.receipts_title || "receipts_title"}</h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{"Phiếu thu"}</h6>
+                        <h6>{dataLang?.receipts_title || "receipts_title"}</h6>
                     </div>
                 )}
 
@@ -378,7 +330,9 @@ const Index = (props) => {
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-3 h-[96%] overflow-hidden">
                             <div className="flex justify-between">
-                                <h2 className="text-2xl text-[#52575E] capitalize">{"Phiếu thu"}</h2>
+                                <h2 className="text-2xl text-[#52575E] capitalize">
+                                    {dataLang?.receipts_title || "receipts_title"}
+                                </h2>
                                 <div className="flex justify-end items-center">
                                     <Popup_dspt
                                         onRefresh={_ServerFetching.bind(this)}
@@ -478,9 +432,9 @@ const Index = (props) => {
                                                     />
                                                 </button>
                                                 <div>
-                                                    {data_ex?.length > 0 && (
+                                                    {dataTable.excel?.length > 0 && (
                                                         <ExcelFile
-                                                            filename="Danh phiếu thu"
+                                                            filename={dataLang?.receipts_lits || "receipts_lits"}
                                                             title="DSPT"
                                                             element={
                                                                 <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
@@ -547,7 +501,7 @@ const Index = (props) => {
                                 </div>
                                 <div className="min:h-[200px] h-[88%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lx:w-[110%] ">
-                                        <div className="grid grid-cols-13 items-center sticky top-0  p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
+                                        <div className="grid grid-cols-12 items-center sticky top-0  p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
                                                 {dataLang?.payment_date || "payment_date"}
                                             </h4>
@@ -570,9 +524,6 @@ const Index = (props) => {
                                                 {"PTTT"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_costs || "payment_costs"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
                                                 {dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
@@ -590,12 +541,12 @@ const Index = (props) => {
                                         </div>
                                         {fetching.onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
-                                        ) : data?.length > 0 ? (
+                                        ) : dataTable.table?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                    {data?.map((e) => (
+                                                    {dataTable.table?.map((e) => (
                                                         <div
-                                                            className="grid grid-cols-13 items-center py-1.5 px-2 hover:bg-slate-100/40 "
+                                                            className="grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40 "
                                                             key={e.id.toString()}
                                                         >
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  rounded-md text-center">
@@ -652,35 +603,31 @@ const Index = (props) => {
                                                                                 {dataLang[e?.type_vouchers] ||
                                                                                     e?.type_vouchers}
                                                                             </span>
+                                                                        )) ||
+                                                                        (e?.type_vouchers === "order" && (
+                                                                            <span className="flex items-center justify-center gap-1 font-normal text-green-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-green-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
+                                                                                {dataLang[e?.type_vouchers] ||
+                                                                                    e?.type_vouchers}
+                                                                            </span>
                                                                         ))}
                                                                 </div>
                                                             </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out px-2 py-1  rounded-md text-center text-[#0F4F9E]">
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 py-1  rounded-md text-center text-[#0F4F9E]">
                                                                 {e?.voucher?.map((code, index) => (
-                                                                    <React.Fragment key={code.id}>
-                                                                        <Popup_chitietThere
-                                                                            key={code?.id}
-                                                                            dataLang={dataLang}
-                                                                            className="text-left"
-                                                                            type={code.voucher_type}
-                                                                            id={code.id}
-                                                                            name={code?.code}
-                                                                        >
-                                                                            {code?.code}
-                                                                        </Popup_chitietThere>
-                                                                    </React.Fragment>
+                                                                    <Popup_chitietThere
+                                                                        key={code?.id}
+                                                                        dataLang={dataLang}
+                                                                        className="text-left hover:text-blue-600 transition-all ease-in-out"
+                                                                        type={code.voucher_type}
+                                                                        id={code.id}
+                                                                        name={code?.code}
+                                                                    >
+                                                                        {code?.code}
+                                                                    </Popup_chitietThere>
                                                                 ))}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-center">
                                                                 {e?.payment_mode_name}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left">
-                                                                {e?.cost_name?.map((code, index) => (
-                                                                    <React.Fragment key={code}>
-                                                                        {code}
-                                                                        {index !== e.cost_name.length - 1 && ", "}
-                                                                    </React.Fragment>
-                                                                ))}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-right">
                                                                 {formatNumber(e?.total)}
@@ -718,7 +665,7 @@ const Index = (props) => {
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
                                                                 <BtnTacVu
-                                                                    type="payment"
+                                                                    type="receipts"
                                                                     onRefresh={_ServerFetching.bind(this)}
                                                                     dataLang={dataLang}
                                                                     id={e?.id}
@@ -746,8 +693,8 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="grid grid-cols-13 bg-gray-100 items-center">
-                            <div className="col-span-8 p-2 text-center">
+                        <div className="grid grid-cols-12 bg-gray-100 items-center">
+                            <div className="col-span-7 p-2 text-center">
                                 <h3 className="uppercase font-normal 2xl:text-base xl:text-xs text-[8px]">
                                     {dataLang?.purchase_order_table_total_outside ||
                                         "purchase_order_table_total_outside"}
@@ -755,7 +702,7 @@ const Index = (props) => {
                             </div>
                             <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
                                 <h3 className="font-normal 2xl:text-base xl:text-xs text-[8px]">
-                                    {formatNumber(total?.sum_total)}
+                                    {formatNumber(dataTable.total?.sum_total)}
                                 </h3>
                             </div>
                         </div>
@@ -783,37 +730,6 @@ const Index = (props) => {
 const BtnTacVu = React.memo((props) => {
     const [openTacvu, sOpenTacvu] = useState(false);
     const _ToggleModal = (e) => sOpenTacvu(e);
-
-    const [dataCompany, setDataCompany] = useState();
-    const [data, setData] = useState();
-
-    const fetchDataSettingsCompany = () => {
-        if (props?.id) {
-            Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
-                if (!err) {
-                    var { data } = response.data;
-                    setDataCompany(data);
-                }
-            });
-        }
-        if (props?.id) {
-            Axios(
-                "GET",
-                `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var db = response.data;
-                        setData(db);
-                    }
-                }
-            );
-        }
-    };
-    useEffect(() => {
-        openTacvu && fetchDataSettingsCompany();
-    }, [openTacvu]);
-
     const _HandleDelete = (id) => {
         Swal.fire({
             title: `${props.dataLang?.aler_ask}`,
@@ -827,22 +743,16 @@ const BtnTacVu = React.memo((props) => {
             if (result.isConfirmed) {
                 Axios(
                     "DELETE",
-                    `/api_web/Api_expense_voucher/expenseVoucher/${id}?csrf_protection=true`,
+                    `/api_web/Api_expense_payslips/expenseCoupon/${id}?csrf_protection=true`,
                     {},
                     (err, response) => {
                         if (!err) {
-                            var { isSuccess, message } = response.data;
+                            let { isSuccess, message } = response.data;
                             if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: props.dataLang[message],
-                                });
+                                ToatstNotifi("success", props.dataLang[message]);
                                 props.onRefresh && props.onRefresh();
                             } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: props.dataLang[message],
-                                });
+                                ToatstNotifi("error", props.dataLang[message]);
                             }
                         }
                     }
@@ -919,24 +829,15 @@ const BtnTacVu = React.memo((props) => {
 });
 
 const Popup_Pdf = (props) => {
-    const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
-    const [data, sData] = useState();
-    const [onFetching, sOnFetching] = useState(false);
-
-    useEffect(() => {
-        props?.id && sOnFetching(true);
-    }, [open]);
-
     const [dataPDF, setData] = useState();
     const [dataCompany, setDataCompany] = useState();
-
     const fetchDataSettingsCompany = () => {
         if (props?.id) {
             Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
                 if (!err) {
-                    var { data } = response.data;
+                    let { data } = response.data;
                     setDataCompany(data);
                 }
             });
@@ -944,11 +845,11 @@ const Popup_Pdf = (props) => {
         if (props?.id) {
             Axios(
                 "GET",
-                `/api_web/Api_expense_voucher/expenseVoucher/${props?.id}?csrf_protection=true`,
+                `/api_web/Api_expense_payslips/expenseCoupon/${props?.id}?csrf_protection=true`,
                 {},
                 (err, response) => {
                     if (!err) {
-                        var db = response.data;
+                        let db = response.data;
                         setData(db);
                     }
                 }

@@ -91,7 +91,7 @@ export const postdataListTypeofDoc = (params, data, callback) => {
     );
 };
 export const getdataDetail = (id, callback) => {
-    Axios("GET", `/api_web/Api_expense_voucher/expenseVoucher/${id}?csrf_protection=true`, {}, (err, response) => {
+    Axios("GET", `/api_web/Api_expense_payslips/expenseCoupon/${id}?csrf_protection=true`, {}, (err, response) => {
         if (!err) {
             let rResult = response.data;
             callback(null, rResult);
@@ -106,7 +106,7 @@ export const postData = (params, id, data, callback) => {
         "POST",
         `${
             id
-                ? `/api_web/Api_expense_voucher/expenseVoucher/${id}?csrf_protection=true`
+                ? `/api_web/Api_expense_payslips/expenseCoupon/${id}?csrf_protection=true`
                 : "/api_web/Api_expense_payslips/expenseCoupon/?csrf_protection=true"
         }`,
         { data: data, headers: { "Content-Type": "multipart/form-data" } },
