@@ -30,7 +30,7 @@ import {
     getdataDetail,
     postData,
     postdataListTypeofDoc,
-} from "../../../api/apiReceipts";
+} from "Api/apiReceipts/api";
 const Popup_dspt = (props) => {
     let id = props?.id;
     const dataLang = props.dataLang;
