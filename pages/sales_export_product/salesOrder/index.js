@@ -24,6 +24,8 @@ import { IoIosArrowDropright } from "react-icons/io";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 import OnResetData from "components/UI/btnResetData/btnReset";
+import { motion } from "framer-motion";
+import Popup from "reactjs-popup";
 registerLocale("vi", vi);
 
 const ExcelFile = ReactExport.ExcelFile;
@@ -100,7 +102,13 @@ const Index = (props) => {
                 if (!err && response && response.data) {
                     var { rResult, output, rTotal } = response.data;
                     setLoading(false);
-                    setData(rResult.map((e) => ({ ...e, show: false })));
+                    setData(
+                        rResult.map((e) => ({
+                            ...e,
+                            show: false,
+                            process: e.process.map((ce) => ({ ...ce, id: e?.id })),
+                        }))
+                    );
                     sTotalItems(output);
                     sDataExcel(rResult);
                     setTotal(rTotal);
@@ -448,7 +456,24 @@ const Index = (props) => {
         });
         setData([...newData]);
     };
+    const [activeProcess, setActiveProcess] = useState({
+        item: null,
+        process: null,
+        parent: null,
+        index: null,
+    });
 
+    const handleProgressBarClick = (item, idParent, index) => {
+        setActiveProcess(() => ({
+            item: item,
+            process: item.id,
+            parent: idParent,
+            index: index,
+        }));
+    };
+    console.log(activeProcess.process);
+    console.log(activeProcess.parent);
+    console.log(data[activeProcess.parent]?.process[activeProcess.process]?.id);
     return (
         <React.Fragment>
             <Head>
@@ -778,7 +803,7 @@ const Index = (props) => {
                                 {/* table */}
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lg:w-[100%] ">
-                                        <div className="grid grid-cols-12 items-center sticky top-0 bg-white p-2 z-10">
+                                        <div className="grid grid-cols-11 items-center sticky top-0 bg-white p-2 z-10">
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center whitespace-nowrap">
                                                 {dataLang?.sales_product_date || "sales_product_date"}
                                             </h4>
@@ -788,22 +813,25 @@ const Index = (props) => {
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-left">
                                                 {dataLang?.customer || "customer"}
                                             </h4>
-
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
                                                 {dataLang?.sales_product_type_order || "sales_product_type_order"}
                                             </h4>
-
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
                                                 {dataLang?.sales_product_total_into_money ||
                                                     "sales_product_total_into_money"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
-                                                {dataLang?.status_table || "status_table"}
+                                                {/* {dataLang?.status_table || "status_table"} */}
+                                                {"Trạng thái ĐH"}
+                                            </h4>
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
+                                                {/* {dataLang?.status_table || "status_table"} */}
+                                                {"Trạng thái TT"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
                                                 {dataLang?.branch || "branch"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-4 font-[600] text-center">
+                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-2 font-[600] text-center">
                                                 {dataLang?.sales_product_order_process || "sales_product_order_process"}
                                             </h4>
                                             <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
@@ -816,10 +844,10 @@ const Index = (props) => {
                                         ) : data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                                                    {data?.map((e) => (
+                                                    {data?.map((e, index) => (
                                                         <>
                                                             <div
-                                                                className="relative grid grid-cols-12 items-center py-1.5 px-2 hover:bg-slate-100/40"
+                                                                className="relative grid grid-cols-11 items-center py-1.5 px-2 hover:bg-slate-100/40"
                                                                 key={e.id.toString()}
                                                             >
                                                                 <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center">
@@ -869,7 +897,7 @@ const Index = (props) => {
                                                                     <h6 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer">
                                                                         {(e?.status === "approved" && (
                                                                             <div
-                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-lime-500 text-lime-500 hover:bg-lime-500 hover:text-white hover:-translate-y-0.5 border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
+                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] transition-all duration-300 ease-in-out 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-green-500 text-green-500 hover:bg-green-500 hover:text-white hover:-translate-y-0.5 border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
                                                                                 onClick={() => toggleStatus(e?.id)}
                                                                             >
                                                                                 Đã Duyệt
@@ -878,7 +906,7 @@ const Index = (props) => {
                                                                         )) ||
                                                                             (e?.status === "un_approved" && (
                                                                                 <div
-                                                                                    className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 hover:bg-red-500 hover:text-white hover:-translate-y-0.5 border border-red-500 px-0.5 py-1 rounded-md text-red-500 font-normal flex justify-center items-center gap-1"
+                                                                                    className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] transition-all duration-300 ease-in-out 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 hover:bg-red-500 hover:text-white hover:-translate-y-0.5 border border-red-500 px-0.5 py-1 rounded-md text-red-500 font-normal flex justify-center items-center gap-1"
                                                                                     onClick={() => toggleStatus(e?.id)}
                                                                                 >
                                                                                     Chưa Duyệt
@@ -888,40 +916,50 @@ const Index = (props) => {
                                                                     </h6>
                                                                 </h6>
                                                                 <h6 className="col-span-1 w-fit mx-auto">
+                                                                    <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-purple-500 font-[500] px-2 py-0.5 border border-purple-300 bg-purple-300 rounded-2xl">
+                                                                        {"Chưa thanh toán"}
+                                                                    </div>
+                                                                </h6>
+                                                                <h6 className="col-span-1 w-fit mx-auto">
                                                                     <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#086FFC] font-[300] px-1.5 py-0.5 border border-[#086FFC] bg-white rounded-[5.5px] uppercase">
                                                                         {e?.branch_name}
                                                                     </div>
                                                                 </h6>
-                                                                {!e?.show && (
-                                                                    <div className="items-center flex  mb-8 col-span-4 justify-center ml-11">
+                                                                <div className="col-span-2 mx-auto">
+                                                                    <div className="items-center flex mb-2  justify-center ">
                                                                         {e?.process.map((item, i) => {
                                                                             return (
-                                                                                <>
+                                                                                <div className="">
                                                                                     <div
-                                                                                        className="relative py-8"
+                                                                                        className="group"
                                                                                         key={`process-${i}`}
+                                                                                        onClick={() =>
+                                                                                            handleProgressBarClick(
+                                                                                                item,
+                                                                                                e?.id,
+                                                                                                index
+                                                                                            )
+                                                                                        }
                                                                                     >
                                                                                         {item?.code && (
-                                                                                            <>
-                                                                                                <div className="flex items-center  ">
-                                                                                                    <div
-                                                                                                        className={`${
-                                                                                                            item?.code ==
-                                                                                                                "production_plan" ||
-                                                                                                            item?.code ==
-                                                                                                                "produced_at_company" ||
-                                                                                                            item?.code ==
-                                                                                                                "import_warehouse" ||
-                                                                                                            item?.code ==
-                                                                                                                "delivery"
-                                                                                                                ? `h-2 w-2 rounded-full bg-green-500`
-                                                                                                                : `h-2 w-2 rounded-full bg-gray-400`
-                                                                                                        } `}
-                                                                                                    />
-                                                                                                    {item?.code !==
-                                                                                                    "delivery" ? (
+                                                                                            <div>
+                                                                                                <div
+                                                                                                    onClick={() =>
+                                                                                                        handleProgressBarClick(
+                                                                                                            item,
+                                                                                                            e?.id,
+                                                                                                            index
+                                                                                                        )
+                                                                                                    }
+                                                                                                    className="flex cursor-pointer items-center relative "
+                                                                                                >
+                                                                                                    {/* <motion.div
+                                                                                                        whileHover={{
+                                                                                                            scale: 1.8,
+                                                                                                        }}
+                                                                                                    >
                                                                                                         <div
-                                                                                                            className={`${
+                                                                                                            className={` ${
                                                                                                                 item?.code ==
                                                                                                                     "production_plan" ||
                                                                                                                 item?.code ==
@@ -930,64 +968,171 @@ const Index = (props) => {
                                                                                                                     "import_warehouse" ||
                                                                                                                 item?.code ==
                                                                                                                     "delivery"
-                                                                                                                    ? `sm:flex w-full bg-green-500 h-0.5 `
-                                                                                                                    : `sm:flex w-full bg-gray-200 h-0.5 dark:bg-gray-400`
-                                                                                                            }`}
-                                                                                                        />
-                                                                                                    ) : null}
-                                                                                                </div>
-                                                                                                <div className="mt-2 w-[90px]">
-                                                                                                    <div
-                                                                                                        className={`${
-                                                                                                            item?.code ==
+                                                                                                                    ? `h-[10px] w-[10px] rounded-full bg-green-500 animate-bounce`
+                                                                                                                    : `h-[10px] w-[10px] rounded-full bg-gray-400 animate-bounce`
+                                                                                                            } `}
+                                                                                                        ></div>
+                                                                                                    </motion.div> */}
+                                                                                                    <Popup
+                                                                                                        trigger={
+                                                                                                            <div className=" ">
+                                                                                                                <motion.div
+                                                                                                                    whileHover={{
+                                                                                                                        scale: 1.8,
+                                                                                                                    }}
+                                                                                                                >
+                                                                                                                    <div
+                                                                                                                        className={` ${
+                                                                                                                            item?.code ==
+                                                                                                                                "production_plan" ||
+                                                                                                                            item?.code ==
+                                                                                                                                "produced_at_company" ||
+                                                                                                                            item?.code ==
+                                                                                                                                "import_warehouse" ||
+                                                                                                                            item?.code ==
+                                                                                                                                "delivery"
+                                                                                                                                ? `h-[10px] w-[10px] rounded-full bg-green-500 animate-bounce`
+                                                                                                                                : `h-[10px] w-[10px] rounded-full bg-gray-400 animate-bounce`
+                                                                                                                        } `}
+                                                                                                                    ></div>
+                                                                                                                </motion.div>
+                                                                                                            </div>
+                                                                                                        }
+                                                                                                        position="top center"
+                                                                                                        on={[
+                                                                                                            "hover",
+                                                                                                            "focus",
+                                                                                                        ]}
+                                                                                                    >
+                                                                                                        <div className="flex flex-col transition-all duration-300 ease-linear bg-gray-700 px-2.5 py-0.5 rounded-xl">
+                                                                                                            <div
+                                                                                                                className={`text-center ${
+                                                                                                                    item?.code ==
+                                                                                                                        "production_plan" ||
+                                                                                                                    item?.code ==
+                                                                                                                        "produced_at_company" ||
+                                                                                                                    item?.code ==
+                                                                                                                        "import_warehouse" ||
+                                                                                                                    item?.code ==
+                                                                                                                        "delivery"
+                                                                                                                        ? "text-green-500"
+                                                                                                                        : "text-slate-500"
+                                                                                                                } text-[13px]  leading-none px-2.5 py-1.5 font-semibold   text-white`}
+                                                                                                            >
+                                                                                                                {
+                                                                                                                    dataLang[
+                                                                                                                        item
+                                                                                                                            ?.name
+                                                                                                                    ]
+                                                                                                                }
+                                                                                                            </div>
+                                                                                                            {item?.code ===
+                                                                                                                "keep_stock" ||
+                                                                                                            item?.code ===
+                                                                                                                "delivery" ? (
+                                                                                                                <p className="text-xs  p-0.5 border border-white text-white rounded-md font-normal">
+                                                                                                                    Chưa
+                                                                                                                    giữ
+                                                                                                                    kho
+                                                                                                                </p>
+                                                                                                            ) : null}
+                                                                                                            {item?.code ==
                                                                                                                 "production_plan" ||
                                                                                                             item?.code ==
                                                                                                                 "produced_at_company" ||
                                                                                                             item?.code ==
                                                                                                                 "import_warehouse" ||
                                                                                                             item?.code ==
-                                                                                                                "delivery"
-                                                                                                                ? "text-green-500"
-                                                                                                                : "text-slate-500"
-                                                                                                        } mb-2 text-[11px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
-                                                                                                    >
-                                                                                                        {
-                                                                                                            dataLang[
-                                                                                                                item
-                                                                                                                    ?.name
-                                                                                                            ]
-                                                                                                        }
-                                                                                                    </div>
+                                                                                                                "delivery" ? (
+                                                                                                                <p className="text-xs py-1 text-white">
+                                                                                                                    KHSX-030623012
+                                                                                                                </p>
+                                                                                                            ) : null}
+                                                                                                        </div>
+                                                                                                    </Popup>
+                                                                                                    {item?.code !=
+                                                                                                    "delivery" ? (
+                                                                                                        <div
+                                                                                                            className={`w-[35px] ${
+                                                                                                                item?.code ==
+                                                                                                                    "production_plan" ||
+                                                                                                                item?.code ==
+                                                                                                                    "produced_at_company" ||
+                                                                                                                item?.code ==
+                                                                                                                    "import_warehouse" ||
+                                                                                                                item?.code ==
+                                                                                                                    "delivery"
+                                                                                                                    ? ` bg-green-500 h-0.5 `
+                                                                                                                    : ` bg-gray-200 h-0.5 `
+                                                                                                            }`}
+                                                                                                        />
+                                                                                                    ) : null}
                                                                                                 </div>
-                                                                                            </>
+                                                                                            </div>
                                                                                         )}
-                                                                                        {/* {item?.code ===
-                                                                                                "keep_stock" ||
-                                                                                            item?.code ===
-                                                                                                "delivery" ? (
-                                                                                                <p className="font-medium my-3 3xl:max-w-[180px] 2xl:max-w-[150px] xl:max-w-[130px] max-w-[100px] text-[10px] absolute left-0 3xl:translate-x-[-40%] 2xl:translate-x-[-45%] xl:translate-x-[-45%] translate-x-[-45%] 3xl:translate-y-[100%] 2xl:translate-y-[120%] xl:translate-y-[110%] translate-y-[120%] p-0.5 border border-amber-600 text-amber-600 rounded ">
-                                                                                                    Chưa
-                                                                                                    giữ
-                                                                                                    kho
-                                                                                                </p>
-                                                                                            ) : null} */}
-                                                                                        {item?.code ==
-                                                                                            "production_plan" ||
-                                                                                        item?.code ==
-                                                                                            "produced_at_company" ||
-                                                                                        item?.code ==
-                                                                                            "import_warehouse" ||
-                                                                                        item?.code == "delivery" ? (
-                                                                                            <p className="text-indigo-700 3xl:w-[100px] 2xl:w-[100px] xl:w-[100px] w-[100px] text-[9.5px] absolute left-0 3xl:translate-x-[-25%] 2xl:translate-x-[-20%] xl:translate-x-[-25%] translate-x-[-25%] 3xl:translate-y-[100%] 2xl:translate-y-[120%] xl:translate-y-110%] translate-y-[120%] font-semibold">
-                                                                                                KHSX-030623012
-                                                                                            </p>
-                                                                                        ) : null}
                                                                                     </div>
-                                                                                </>
+                                                                                </div>
                                                                             );
                                                                         })}
                                                                     </div>
-                                                                )}
+                                                                    {/* {activeProcess.process == activeProcess.parent &&
+                                                                        index == activeProcess.index && (
+                                                                            <div className="w-full mx-auto">
+                                                                                <div
+                                                                                    className={`text-center ${
+                                                                                        activeProcess?.item?.code ==
+                                                                                            "production_plan" ||
+                                                                                        activeProcess?.item?.code ==
+                                                                                            "produced_at_company" ||
+                                                                                        activeProcess?.item?.code ==
+                                                                                            "import_warehouse" ||
+                                                                                        activeProcess?.item?.code ==
+                                                                                            "delivery"
+                                                                                            ? "text-green-500"
+                                                                                            : "text-slate-500"
+                                                                                    } text-[11px] font-semibold leading-none  dark:text-gray-500`}
+                                                                                >
+                                                                                    {
+                                                                                        dataLang[
+                                                                                            activeProcess?.item?.name
+                                                                                        ]
+                                                                                    }
+                                                                                </div>
+                                                                            </div>
+                                                                        )} */}
+                                                                </div>
+                                                                {/* <h6 className="col-span-1 w-fit mx-auto">
+                                                                    {activeProcess.process == activeProcess.parent &&
+                                                                    index == activeProcess.index &&
+                                                                    (activeProcess?.item?.code === "keep_stock" ||
+                                                                        activeProcess?.item?.code === "delivery") ? (
+                                                                        <p className=" 3xl:text-[12px] 2xl:text-[12px] xl:text-[10px] lg:text-[9px]  p-0.5 border border-amber-600 text-amber-600 rounded-md font-normal">
+                                                                            Chưa giữ kho
+                                                                        </p>
+                                                                    ) : null}
+                                                                    {activeProcess.process == activeProcess.parent &&
+                                                                    index == activeProcess.index &&
+                                                                    (activeProcess?.item?.code == "production_plan" ||
+                                                                        activeProcess?.item?.code ==
+                                                                            "produced_at_company" ||
+                                                                        activeProcess?.item?.code ==
+                                                                            "import_warehouse" ||
+                                                                        activeProcess?.item?.code == "delivery") ? (
+                                                                        <p className=" 3xl:text-[12px] 2xl:text-[12px] xl:text-[10px] lg:text-[10px]  font-normal">
+                                                                            KHSX-030623012
+                                                                        </p>
+                                                                    ) : null}
+                                                                    {activeProcess.process == activeProcess.parent &&
+                                                                    index == activeProcess.index &&
+                                                                    (activeProcess?.code == "production_plan" ||
+                                                                        activeProcess?.code == "produced_at_company" ||
+                                                                        activeProcess?.code == "import_warehouse" ||
+                                                                        activeProcess?.code == "delivery") ? (
+                                                                        <p className="text-indigo-700 3xl:w-[100px] 2xl:w-[100px] xl:w-[100px] w-[100px] text-[9.5px] absolute left-0 3xl:translate-x-[-25%] 2xl:translate-x-[-20%] xl:translate-x-[-25%] translate-x-[-25%] 3xl:translate-y-[100%] 2xl:translate-y-[120%] xl:translate-y-110%] translate-y-[120%] font-semibold">
+                                                                            KHSX-030623012
+                                                                        </p>
+                                                                    ) : null}
+                                                                </h6> */}
 
                                                                 <div className="col-span-1 flex justify-center">
                                                                     <BtnAction
@@ -1087,7 +1232,7 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="grid grid-cols-12 bg-gray-100 items-center">
+                        <div className="grid grid-cols-11 bg-gray-100 items-center">
                             <div className="col-span-3 p-2 text-center">
                                 <h3 className="uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
                                     {dataLang?.total_outside || "total_outside"}

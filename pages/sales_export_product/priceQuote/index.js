@@ -884,7 +884,7 @@ const Index = (props) => {
                                                                 <h6 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer">
                                                                     {(e?.status === "confirmed" && (
                                                                         <div
-                                                                            className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-lime-500 text-lime-500 hover:bg-lime-500 hover:text-white hover:-translate-y-0.5 border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
+                                                                            className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-green-500 text-green-500 hover:bg-green-500  transition-all duration-300 ease-in-out hover:text-white hover:-translate-y-0.5 border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
                                                                             onClick={() => _ToggleStatus(e?.id)}
                                                                         >
                                                                             Đã Duyệt
@@ -893,7 +893,7 @@ const Index = (props) => {
                                                                     )) ||
                                                                         (e?.status === "not_confirmed" && (
                                                                             <div
-                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 hover:bg-red-500 hover:text-white hover:-translate-y-0.5 border border-red-500 px-0.5 py-1 rounded-md text-red-500 font-normal flex justify-center items-center gap-1"
+                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 hover:bg-red-500 hover:text-white hover:-translate-y-0.5 border  transition-all duration-300 ease-in-out border-red-500 px-0.5 py-1 rounded-md text-red-500 font-normal flex justify-center items-center gap-1"
                                                                                 onClick={() => _ToggleStatus(e?.id)}
                                                                             >
                                                                                 Chưa Duyệt{" "}
@@ -902,7 +902,7 @@ const Index = (props) => {
                                                                         )) ||
                                                                         (e?.status === "no_confirmed" && (
                                                                             <div
-                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-sky-500 text-sky-500 hover:bg-sky-500 hover:text-white hover:-translate-y-0.5 border px-0.5 py-1 rounded-md font-normal flex justify-center items-center gap-1 "
+                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-sky-500 text-sky-500 hover:bg-sky-500  transition-all duration-300 ease-in-out hover:text-white hover:-translate-y-0.5 border px-0.5 py-1 rounded-md font-normal flex justify-center items-center gap-1 "
                                                                                 onClick={() => _ToggleStatus(e?.id)}
                                                                             >
                                                                                 Không Duyệt
@@ -911,7 +911,7 @@ const Index = (props) => {
                                                                         )) ||
                                                                         (e?.status === "ordered" && (
                                                                             <div
-                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-6 relative text-white border border-orange-400 rounded-md bg-orange-500 hover:bg-orange-600 text-left 3xl:px-3 3xl:py-5 3xl:pr-5 2xl:px-1 2xl:py-4 2xl:pr-5 xl:px-1 xl:py-3.5 xl:pr-4 lg:px-1 lg:py-2 lg:pr-3 font-normal flex justify-center items-center"
+                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-6 relative text-white border border-orange-400  transition-all duration-300 ease-in-out rounded-md bg-orange-500 hover:bg-orange-600 text-left 3xl:px-3 3xl:py-5 3xl:pr-5 2xl:px-1 2xl:py-4 2xl:pr-5 xl:px-1 xl:py-3.5 xl:pr-4 lg:px-1 lg:py-2 lg:pr-3 font-normal flex justify-center items-center"
                                                                                 onClick={() =>
                                                                                     handleToggleOrdered(e?.id)
                                                                                 }

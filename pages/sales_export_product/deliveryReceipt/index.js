@@ -24,6 +24,7 @@ import PopupDetail from "./(popupDetail)/PopupDetail";
 import ToatstNotifi from "components/UI/alerNotification/alerNotification";
 import PopupDetailProduct from "../salesOrder/(PopupDetail)/PopupDetailProduct";
 import { routerDeliveryReceipt } from "components/UI/router/sellingGoods";
+import ButtonWarehouse from "components/UI/btnWarehouse/btnWarehouse";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -925,7 +926,7 @@ const Index = (props) => {
                                                             </h6>
 
                                                             <h6 className=" 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1">
-                                                                <div
+                                                                {/* <div
                                                                     className={`${
                                                                         e?.warehouseman_id == "0"
                                                                             ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation "
@@ -985,7 +986,12 @@ const Index = (props) => {
                                                                             ? "Chưa duyệt kho"
                                                                             : "Đã duyệt kho"}
                                                                     </label>
-                                                                </div>
+                                                                </div> */}
+                                                                <ButtonWarehouse
+                                                                    warehouseman_id={e?.warehouseman_id}
+                                                                    _HandleChangeInput={_HandleChangeInput}
+                                                                    id={e?.id}
+                                                                />
                                                             </h6>
 
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right truncate">

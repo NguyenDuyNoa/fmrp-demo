@@ -49,6 +49,7 @@ import ExpandableContent from "components/UI/more";
 import Popup_chitiet from "./(popup)/pupup";
 import { useSelector } from "react-redux";
 import { routerReturns } from "components/UI/router/buyImportGoods";
+import ButtonWarehouse from "components/UI/btnWarehouse/btnWarehouse";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -920,7 +921,7 @@ const Index = (props) => {
                                                                         ))}
                                                                 </h6>
                                                                 <h6 className=" 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1">
-                                                                    <div
+                                                                    {/* <div
                                                                         className={`${
                                                                             e?.warehouseman_id == "0"
                                                                                 ? "bg-[#eff6ff]  transition-all bg-gradient-to-l from-[#eff6ff]  via-[#c7d2fe] to-[#dbeafe] btn-animation "
@@ -990,7 +991,12 @@ const Index = (props) => {
                                                                                     : "Đã duyệt kho"}
                                                                             </label>
                                                                         </div>
-                                                                    </div>
+                                                                    </div> */}
+                                                                    <ButtonWarehouse
+                                                                        warehouseman_id={e?.warehouseman_id}
+                                                                        _HandleChangeInput={_HandleChangeInput}
+                                                                        id={e?.id}
+                                                                    />
                                                                 </h6>
                                                                 <h6 className="col-span-1 w-fit ">
                                                                     <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2">
