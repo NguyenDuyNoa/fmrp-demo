@@ -4,7 +4,7 @@ const ButtonWarehouse = ({ _HandleChangeInput, warehouseman_id, id }) => {
         <Zoom>
             <div
                 className={`${
-                    warehouseman_id == "0" ? "bg-blue-400" : " bg-green-400"
+                    warehouseman_id == "0" ? "bg-blue-500" : " bg-green-500"
                 } rounded-md cursor-pointer hover:scale-105 ease-in-out transition-all flex items-center`}
             >
                 <label
@@ -12,11 +12,6 @@ const ButtonWarehouse = ({ _HandleChangeInput, warehouseman_id, id }) => {
                     htmlFor={id}
                     data-ripple-dark="true"
                 >
-                    {/* // ${
-                        //     warehouseman_id == "0"
-                        //         ? "checked:border-white checked:bg-blue-500 checked:before:bg-blue-500"
-                        //         : "checked:border-white checked:bg-green-500 border-white checked:before:bg-limborder-green-500"
-                        // } */}
                     <input
                         type="checkbox"
                         className={`
