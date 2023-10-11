@@ -4,7 +4,7 @@ const ButtonWarehouse = ({ _HandleChangeInput, warehouseman_id, id }) => {
         <Zoom>
             <div
                 className={`${
-                    warehouseman_id == "0" ? "bg-blue-500" : " bg-green-500"
+                    warehouseman_id == "0" ? "bg-blue-400" : " bg-green-400"
                 } rounded-md cursor-pointer hover:scale-105 ease-in-out transition-all flex items-center`}
             >
                 <label
@@ -12,13 +12,21 @@ const ButtonWarehouse = ({ _HandleChangeInput, warehouseman_id, id }) => {
                     htmlFor={id}
                     data-ripple-dark="true"
                 >
+                    {/* // ${
+                        //     warehouseman_id == "0"
+                        //         ? "checked:border-white checked:bg-blue-500 checked:before:bg-blue-500"
+                        //         : "checked:border-white checked:bg-green-500 border-white checked:before:bg-limborder-green-500"
+                        // } */}
                     <input
                         type="checkbox"
-                        className={`${
-                            warehouseman_id == "0"
-                                ? "checked:border-white checked:bg-blue-500 checked:before:bg-blue-500"
-                                : "checked:border-white checked:bg-green-500 border-white checked:before:bg-limborder-green-500"
-                        } before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-white border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
+                        className={`
+                      
+                         ${
+                             warehouseman_id == "0"
+                                 ? "checked:border-white checked:bg-blue-500 checked:before:bg-blue-500"
+                                 : "checked:border-white checked:bg-green-500 border-white checked:before:bg-limborder-green-500"
+                         }
+                         before:content[''] peer relative 2xl:h-5 2xl:w-5 h-4 w-4 cursor-pointer appearance-none 2xl:rounded-md rounded border-white border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity  hover:before:opacity-10`}
                         id={id}
                         value={warehouseman_id}
                         checked={warehouseman_id != "0" ? true : false}
