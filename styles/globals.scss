@@ -393,3 +393,6 @@ body::-webkit-scrollbar-thumb:hover {
 .react-datepicker-wrapper {
     width: 100% !important;
 }
+.clip-arrow {
+    clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 15% 50%, 0% 0%);
+}

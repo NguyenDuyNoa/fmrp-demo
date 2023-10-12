@@ -1456,6 +1456,7 @@ const Index = (props) => {
 
     // render option item in formatGroupLabel Item
     const selectItemsLabel = (option) => {
+        console.log("option", option);
         return (
             <div className="flex items-center justify-between">
                 <div className="flex items-center ">
@@ -1476,16 +1477,12 @@ const Index = (props) => {
                             </div>
                         )}
                     </div>
-
                     <div>
                         <h3 className="font-bold 3xl:text-[14px] 2xl:text-[11px] xl:text-[10px] text-[10px] whitespace-pre-wrap">
                             {option.e?.name}
                         </h3>
 
                         <div className="flex 3xl:gap-2 2xl:gap-1 xl:gap-1 gap-1">
-                            <h5 className="text-gray-400  3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
-                                {option.e?.codeProduct} :
-                            </h5>
                             <h5 className="3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
                                 {option.e?.product_variation}
                             </h5>
@@ -2004,9 +2001,6 @@ const Index = (props) => {
                                                                     {option.e?.name}
                                                                 </h3>
                                                                 <div className="flex gap-2">
-                                                                    <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                                                        {option.e?.codeProduct}
-                                                                    </h5>
                                                                     <h5 className="font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                                         {option.e?.product_variation}
                                                                     </h5>
@@ -2026,8 +2020,8 @@ const Index = (props) => {
                                                                             "purchase_survive"}
                                                                         :
                                                                     </h5>
-                                                                    <h5 className="text-[#0F4F9E] font-medium">
-                                                                        {option.e?.qty_warehouse || 0}
+                                                                    <h5 className=" font-medium">
+                                                                        {formatNumber(option.e?.qty_warehouse || 0)}
                                                                     </h5>
                                                                 </div>
                                                             </div>

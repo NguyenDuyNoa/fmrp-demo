@@ -2076,7 +2076,7 @@ const Index = (props) => {
                                                     <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                         {dataLang?.purchase_survive || "purchase_survive"}:
                                                     </h5>
-                                                    <h5 className="text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                    <h5 className=" font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                         {option.e?.qty_warehouse ?? 0}
                                                     </h5>
                                                 </div>
@@ -2314,7 +2314,7 @@ const Index = (props) => {
                                                                                     "purchase_survive"}
                                                                                 :
                                                                             </h5>
-                                                                            <h5 className="text-[#0F4F9E] font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                                                            <h5 className=" font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                                                                                 {option.e?.qty_warehouse ?? 0}
                                                                             </h5>
                                                                         </div>

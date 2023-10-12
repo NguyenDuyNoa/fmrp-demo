@@ -24,45 +24,42 @@ import { IoIosArrowDropright } from "react-icons/io";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 import OnResetData from "components/UI/btnResetData/btnReset";
-import { motion } from "framer-motion";
-import Popup from "reactjs-popup";
 registerLocale("vi", vi);
+import { motion } from "framer-motion";
+import ToatstNotifi from "components/UI/alerNotification/alerNotification";
+import Zoom from "components/UI/zoomElement/zoomElement";
+import HeaderTable from "components/UI/headerTable/headerTable";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
-
 const Index = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState([]);
-    const [dataExcel, sDataExcel] = useState([]);
+    const initialValue = {
+        idBranch: null,
+        idQuoteCode: null,
+        idCustomer: null,
+        valueDate: { startDate: null, endDate: null },
+    };
+    const initialData = {
+        data: [],
+        dataExcel: [],
+        listBr: [],
+        listQuoteCode: [],
+        listCustomer: [],
+        listTabStatus: [],
+    };
+
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+    const [initData, sInitData] = useState(initialData);
+    const [valueChange, sValueChange] = useState(initialValue);
     const [onFetching, sOnFetching] = useState(false);
     const [onFetching_filter, sOnFetching_filter] = useState(false);
     const [totalItems, sTotalItems] = useState([]);
     const [keySearch, sKeySearch] = useState("");
     const [limit, sLimit] = useState(15);
     const [total, setTotal] = useState({});
-    const [listBr, sListBr] = useState([]);
-    const [listQuoteCode, sListQuoteCode] = useState([]);
-    const [listCustomer, sListCustomer] = useState([]);
-    const [idBranch, sIdBranch] = useState(null);
-    const [idQuoteCode, sIdQuoteCode] = useState(null);
-    const [idCustomer, sIdCustomer] = useState(null);
-    const [listTabStatus, sListTabStatus] = useState();
-    const [valueDate, sValueDate] = useState({
-        startDate: null,
-        endDate: null,
-    });
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
 
     const _HandleSelectTab = (e) => {
         router.push({
@@ -70,6 +67,7 @@ const Index = (props) => {
             query: { tab: e },
         });
     };
+
     useEffect(() => {
         router.push({
             pathname: router.route,
@@ -77,10 +75,10 @@ const Index = (props) => {
         });
     }, []);
 
+    const updateData = (update) => sInitData((e) => ({ ...e, ...update }));
+
     const _ServerFetching = () => {
         const tabPage = router.query?.tab;
-        setLoading(true);
-        console.log("router.query?.page : ", router.query?.page);
         Axios(
             "GET",
             `/api_web/Api_sale_order/saleOrder/?csrf_protection=true`,
@@ -89,28 +87,20 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    // page: keySearch || idQuoteCode != null || idCustomer || valueDate?.startDate != null && valueDate?.endDate ? 1 : router.query?.page || 1,
-                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
-                    "filter[id]": idQuoteCode != null ? idQuoteCode?.value : null,
+                    "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
+                    "filter[id]": valueChange.idQuoteCode != null ? valueChange.idQuoteCode?.value : null,
                     "filter[status_bar]": tabPage ?? null,
-                    "filter[client_id]": idCustomer != null ? idCustomer.value : null,
-                    "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
-                    "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
+                    "filter[client_id]": valueChange.idCustomer != null ? valueChange.idCustomer.value : null,
+                    "filter[start_date]":
+                        valueChange.valueDate?.startDate != null ? valueChange.valueDate?.startDate : null,
+                    "filter[end_date]": valueChange.valueDate?.endDate != null ? valueChange.valueDate?.endDate : null,
                 },
             },
             (err, response) => {
                 if (!err && response && response.data) {
-                    var { rResult, output, rTotal } = response.data;
-                    setLoading(false);
-                    setData(
-                        rResult.map((e) => ({
-                            ...e,
-                            show: false,
-                            process: e.process.map((ce) => ({ ...ce, id: e?.id })),
-                        }))
-                    );
+                    let { rResult, output, rTotal } = response.data;
+                    updateData({ data: rResult.map((e) => ({ ...e, show: false })), dataExcel: rResult });
                     sTotalItems(output);
-                    sDataExcel(rResult);
                     setTotal(rTotal);
                     sOnFetching(false);
                 }
@@ -126,13 +116,13 @@ const Index = (props) => {
                 params: {
                     limit: 0,
                     search: keySearch,
-                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
+                    "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var data = response.data;
-                    sListTabStatus(data);
+                    let data = response.data;
+                    updateData({ listTabStatus: data });
                 }
                 sOnFetching(false);
             }
@@ -143,20 +133,20 @@ const Index = (props) => {
     const _ServerFetching_filter = async () => {
         await Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { rResult } = response.data;
-                sListBr(rResult);
+                let { rResult } = response.data;
+                updateData({ listBr: rResult?.map(({ name, id }) => ({ label: name, value: id })) });
             }
         });
         await Axios("GET", `/api_web/Api_sale_order/saleOrderCombobox?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var rResult = response.data.result;
-                sListQuoteCode(rResult);
+                let { result } = response.data;
+                updateData({ listQuoteCode: result?.map(({ code, id }) => ({ label: code, value: id })) });
             }
         });
         await Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var db = response.data.rResult;
-                sListCustomer(db?.map((e) => ({ label: e.name, value: e.id })));
+                let { rResult } = response.data;
+                updateData({ listCustomer: rResult?.map(({ name, id }) => ({ label: name, value: id })) });
             }
         });
         sOnFetching_filter(false);
@@ -165,23 +155,21 @@ const Index = (props) => {
     useEffect(() => {
         (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
     }, [onFetching]);
+
     useEffect(() => {
         onFetching_filter && _ServerFetching_filter();
     }, [onFetching_filter]);
 
-    // useEffect(() => {
-    //     router.query.tab && sOnFetching(true) || (keySearch && sOnFetching(true)) || router.query?.tab && sOnFetching_filter(true) || idBranch != null && sOnFetching(true) || idQuoteCode != null && sOnFetching(true) || idCustomer != null && sOnFetching(true) || valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)
-    // }, [limit, router.query?.page, router.query?.tab, idBranch, idQuoteCode, idCustomer, valueDate.endDate, valueDate.startDate]);
     useEffect(() => {
         (router.query.tab && sOnFetching(true)) || (router.query?.tab && sOnFetching_filter(true));
     }, [limit, router.query?.page, router.query?.tab]);
 
     useEffect(() => {
         if (
-            idBranch != null ||
-            (valueDate.startDate != null && valueDate.endDate != null) ||
-            idCustomer != null ||
-            idQuoteCode != null
+            valueChange.idBranch != null ||
+            (valueChange.valueDate.startDate != null && valueChange.valueDate.endDate != null) ||
+            valueChange.idCustomer != null ||
+            valueChange.idQuoteCode != null
         ) {
             router.push({
                 pathname: router.route,
@@ -190,33 +178,28 @@ const Index = (props) => {
                 },
             });
             setTimeout(() => {
-                (idBranch != null && sOnFetching(true)) ||
-                    (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
-                    (idCustomer != null && sOnFetching(true)) ||
-                    (idQuoteCode != null && sOnFetching(true)) ||
+                (valueChange.idBranch != null && sOnFetching(true)) ||
+                    (valueChange.valueDate.startDate != null &&
+                        valueChange.valueDate.endDate != null &&
+                        sOnFetching(true)) ||
+                    (valueChange.idCustomer != null && sOnFetching(true)) ||
+                    (valueChange.idQuoteCode != null && sOnFetching(true)) ||
                     (keySearch && sOnFetching(true));
             }, 300);
         } else {
             sOnFetching(true);
         }
-    }, [limit, idBranch, idQuoteCode, idCustomer, valueDate.endDate, valueDate.startDate]);
+    }, [
+        limit,
+        valueChange.idBranch,
+        valueChange.idQuoteCode,
+        valueChange.idCustomer,
+        valueChange.valueDate.endDate,
+        valueChange.valueDate.startDate,
+    ]);
 
-    const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
-
-    const listCode_filter = listQuoteCode ? listQuoteCode?.map((e) => ({ label: e.code, value: e.id })) : [];
-
-    const typeChange = {
-        branch: sIdBranch,
-        code: sIdQuoteCode,
-        customer: sIdCustomer,
-        date: sValueDate,
-    };
-
-    const onChangeFilter = async (type, value) => {
-        const updateFunction = await typeChange[type];
-        if (updateFunction) {
-            updateFunction(value);
-        }
+    const onChangeFilter = (type) => (event) => {
+        sValueChange((e) => ({ ...e, [type]: event }));
     };
 
     const paginate = (pageNumber) => {
@@ -346,7 +329,7 @@ const Index = (props) => {
                     },
                 },
             ],
-            data: dataExcel?.map((e) => [
+            data: initData.dataExcel?.map((e) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.date ? e?.date : ""}` },
                 { value: `${e?.code ? e?.code : ""}` },
@@ -367,7 +350,6 @@ const Index = (props) => {
                             : ""
                     }`,
                 },
-
                 { value: `${e?.process ? e?.process : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
 
@@ -378,7 +360,7 @@ const Index = (props) => {
 
     // chuyen doi trang thai don bao gia
     const toggleStatus = (id) => {
-        const index = data.findIndex((x) => x.id === id);
+        const index = initData.data.findIndex((x) => x.id === id);
 
         Swal.fire({
             title: `${"Thay đổi trạng thái"}`,
@@ -387,7 +369,7 @@ const Index = (props) => {
             confirmButtonColor: "#0F4F9E",
             cancelButtonColor: "#d33",
             confirmButtonText: `${
-                data[index].status === "approved" ? dataLang?.aler_not_yet_approved : dataLang?.aler_approved
+                initData.data[index].status === "approved" ? dataLang?.aler_not_yet_approved : dataLang?.aler_approved
             }`,
             cancelButtonText: `${dataLang?.aler_cancel}`,
             didOpen: () => {
@@ -399,10 +381,9 @@ const Index = (props) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 let newStatus = "";
-
-                if (data[index].status === "approved") {
+                if (initData.data[index].status === "approved") {
                     newStatus = "un_approved";
-                } else if (data[index].status === "un_approved") {
+                } else if (initData.data[index].status === "un_approved") {
                     newStatus = "approved";
                 }
 
@@ -413,7 +394,6 @@ const Index = (props) => {
 
     const handlePostStatus = (id, newStatus) => {
         const formData = new FormData();
-
         formData.append("id", id);
         formData.append("status", newStatus);
 
@@ -426,18 +406,12 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { isSuccess, message } = response.data;
+                    let { isSuccess, message } = response.data;
 
                     if (isSuccess !== false) {
-                        Toast.fire({
-                            icon: "success",
-                            title: `${dataLang?.change_status_when_order || "change_status_when_order"}`,
-                        });
+                        ToatstNotifi("success", `${dataLang?.change_status_when_order || "change_status_when_order"}`);
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: `${dataLang[message] || message}`,
-                        });
+                        ToatstNotifi("error", `${dataLang[message] || message}`);
                     }
                     _ServerFetching();
                     _ServerFetching_group();
@@ -447,33 +421,28 @@ const Index = (props) => {
     };
 
     // toggle show process product
-    const handleToggleShowProcessProduct = (id) => {
-        const newData = data.map((e) => {
-            if (e?.id == id) {
-                return { ...e, show: !e.show };
-            }
-            return e;
-        });
-        setData([...newData]);
-    };
-    const [activeProcess, setActiveProcess] = useState({
-        item: null,
-        process: null,
-        parent: null,
-        index: null,
-    });
+    // const handleToggleShowProcessProduct = (id) => {
+    //     const newData = data.map((e) => {
+    //         if (e?.id == id) {
+    //             return { ...e, show: !e.show };
+    //         }
+    //         return e;
+    //     });
+    //     setData([...newData]);
+    // };
+    const dataHeader = [
+        { name: dataLang?.sales_product_date || "sales_product_date", colspan: 1 },
+        { name: dataLang?.sales_product_code || "sales_product_code", colspan: 1 },
+        { name: dataLang?.customer || "customer", colspan: 1 },
+        { name: dataLang?.sales_product_type_order || "sales_product_type_order", colspan: 1 },
+        { name: dataLang?.sales_product_total_into_money || "sales_product_total_into_money", colspan: 1 },
+        { name: dataLang?.sales_product_status || "sales_product_status", colspan: 1 },
+        { name: dataLang?.sales_product_statusTT || "sales_product_statusTT", colspan: 1 },
+        { name: dataLang?.branch || "branch", colspan: 1 },
+        { name: dataLang?.sales_product_order_process || "sales_product_order_process", colspan: 4 },
+        { name: dataLang?.sales_product_action || "sales_product_action", colspan: 1 },
+    ];
 
-    const handleProgressBarClick = (item, idParent, index) => {
-        setActiveProcess(() => ({
-            item: item,
-            process: item.id,
-            parent: idParent,
-            index: index,
-        }));
-    };
-    console.log(activeProcess.process);
-    console.log(activeProcess.parent);
-    console.log(data[activeProcess.parent]?.process[activeProcess.process]?.id);
     return (
         <React.Fragment>
             <Head>
@@ -508,8 +477,8 @@ const Index = (props) => {
                             </div>
 
                             <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                {listTabStatus &&
-                                    listTabStatus.map((e) => {
+                                {initData.listTabStatus &&
+                                    initData.listTabStatus.map((e) => {
                                         return (
                                             <div>
                                                 <TabFilter
@@ -555,10 +524,10 @@ const Index = (props) => {
                                                                 label: dataLang?.select_branch || "select_branch",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listBr_filter,
+                                                            ...initData.listBr,
                                                         ]}
-                                                        onChange={onChangeFilter.bind(this, "branch")}
-                                                        value={idBranch}
+                                                        onChange={onChangeFilter("idBranch")}
+                                                        value={valueChange.idBranch}
                                                         placeholder={dataLang?.branch || "branch"}
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
@@ -600,7 +569,7 @@ const Index = (props) => {
                                                 </div>
                                                 <div className="col-span-1">
                                                     <Select
-                                                        isLoading={listQuoteCode == [] ? true : false}
+                                                        isLoading={initData.listQuoteCode == [] ? true : false}
                                                         options={[
                                                             {
                                                                 value: "",
@@ -609,10 +578,10 @@ const Index = (props) => {
                                                                     "sales_product_select_order",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listCode_filter,
+                                                            ...initData.listQuoteCode,
                                                         ]}
-                                                        onChange={onChangeFilter.bind(this, "code")}
-                                                        value={idQuoteCode}
+                                                        onChange={onChangeFilter("idQuoteCode")}
+                                                        value={valueChange.idQuoteCode}
                                                         placeholder={
                                                             dataLang?.sales_product_code || "sales_product_code"
                                                         }
@@ -660,10 +629,10 @@ const Index = (props) => {
                                                                 label: dataLang?.select_customer || "select_customer",
                                                                 isDisabled: true,
                                                             },
-                                                            ...listCustomer,
+                                                            ...initData.listCustomer,
                                                         ]}
-                                                        onChange={onChangeFilter.bind(this, "customer")}
-                                                        value={idCustomer}
+                                                        onChange={onChangeFilter("idCustomer")}
+                                                        value={valueChange.idCustomer}
                                                         placeholder={dataLang?.customer || "customer"}
                                                         hideSelectedOptions={false}
                                                         isClearable={true}
@@ -703,10 +672,10 @@ const Index = (props) => {
                                                 </div>
                                                 <div className="z-20 col-span-1">
                                                     <Datepicker
-                                                        value={valueDate}
+                                                        value={valueChange.valueDate}
                                                         i18n={"vi"}
                                                         primaryColor={"blue"}
-                                                        onChange={onChangeFilter.bind(this, "date")}
+                                                        onChange={onChangeFilter("valueDate")}
                                                         showShortcuts={true}
                                                         displayFormat={"DD/MM/YYYY"}
                                                         configs={{
@@ -732,7 +701,7 @@ const Index = (props) => {
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={sOnFetching} />
                                                 <div>
-                                                    {dataExcel?.length > 0 && (
+                                                    {initData.dataExcel?.length > 0 && (
                                                         <ExcelFile
                                                             filename="Danh sách đơn hàng bán"
                                                             title="DSĐHB"
@@ -803,60 +772,58 @@ const Index = (props) => {
                                 {/* table */}
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lg:w-[100%] ">
-                                        <div className="grid grid-cols-11 items-center sticky top-0 bg-white p-2 z-10">
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center whitespace-nowrap">
+                                        {/* <div className="grid grid-cols-13 items-center sticky top-0 bg-white p-2 z-10 shadow divide-x">
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center whitespace-nowrap">
                                                 {dataLang?.sales_product_date || "sales_product_date"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                                                 {dataLang?.sales_product_code || "sales_product_code"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-left">
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-left">
                                                 {dataLang?.customer || "customer"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                                                 {dataLang?.sales_product_type_order || "sales_product_type_order"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                                                 {dataLang?.sales_product_total_into_money ||
                                                     "sales_product_total_into_money"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
-                                                {/* {dataLang?.status_table || "status_table"} */}
-                                                {"Trạng thái ĐH"}
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
+                                                {dataLang?.sales_product_status || "sales_product_status"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
-                                                {/* {dataLang?.status_table || "status_table"} */}
-                                                {"Trạng thái TT"}
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
+                                                {dataLang?.sales_product_statusTT || "sales_product_statusTT"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                                                 {dataLang?.branch || "branch"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-2 font-[600] text-center">
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-4 font-[600] text-center">
                                                 {dataLang?.sales_product_order_process || "sales_product_order_process"}
                                             </h4>
-                                            <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[10px] text-[9px] text-[#667085] uppercase col-span-1 font-[600] text-center">
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                                                 {dataLang?.sales_product_action || "sales_product_action"}
                                             </h4>
-                                        </div>
+                                        </div> */}
+                                        <HeaderTable dataHeader={dataHeader} dataLang={dataLang} gridCol={13} />
                                         {/* {loading ? */}
-                                        {loading ? (
+                                        {onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
-                                        ) : data?.length > 0 ? (
+                                        ) : initData.data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                                                    {data?.map((e, index) => (
+                                                    {initData.data?.map((e) => (
                                                         <>
                                                             <div
-                                                                className="relative grid grid-cols-11 items-center py-1.5 px-2 hover:bg-slate-100/40"
+                                                                className="relative grid grid-cols-13 items-center py-1.5 px-2 hover:bg-slate-100/40"
                                                                 key={e.id.toString()}
                                                             >
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center">
+                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  text-zinc-600 px-2 col-span-1 text-center ">
                                                                     {e?.date != null
                                                                         ? moment(e?.date).format("DD/MM/YYYY")
                                                                         : ""}
                                                                 </h6>
-
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:font-normal cursor-pointer">
+                                                                <h6 className="3xl:text-base font-medium 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-in-out cursor-pointer">
                                                                     <PopupDetailProduct
                                                                         dataLang={dataLang}
                                                                         className="text-left"
@@ -865,31 +832,44 @@ const Index = (props) => {
                                                                     />
                                                                 </h6>
 
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] col-span-1 text-left ">
+                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  text-zinc-600 px-2 col-span-1 text-left ">
                                                                     {e?.client_name}
                                                                 </h6>
 
                                                                 {/* fix */}
                                                                 <div className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 text-center">
                                                                     {e?.quote_code !== null && e?.quote_id !== "0" ? (
-                                                                        <div className="border  rounded-xl mx-auto w-2/3 group  bg-lime-200 border-lime-200 text-lime-500">
-                                                                            <div>Phiếu báo giá</div>
-                                                                            {"("}
+                                                                        // <div className="border  rounded-xl mx-auto w-2/3 group bg-lime-200 border-lime-200 text-lime-500">
+                                                                        <Zoom
+                                                                            whileHover={{ scale: 1.1 }}
+                                                                            whileTap={{ scale: 0.9 }}
+                                                                        >
+                                                                            <div className="border font-medium flex justify-center items-center rounded-2xl mx-auto 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-16 3xl:h-6 2xl:h-6 xl:h-6 lg:h-5 px-1 bg-lime-200 border-lime-200 text-lime-500 ">
+                                                                                {/* <div>Phiếu báo giá</div> */}
+                                                                                {/* {"("}
                                                                             <PopupDetailQuote
                                                                                 dataLang={dataLang}
                                                                                 className="text-left group-hover:text-green-500"
                                                                                 name={e?.quote_code ? e.quote_code : ""}
                                                                                 id={e?.quote_id}
                                                                             />
-                                                                            {")"}
-                                                                        </div>
+                                                                            {")"} */}
+
+                                                                                <PopupDetailQuote
+                                                                                    dataLang={dataLang}
+                                                                                    className="text-left "
+                                                                                    name={"Phiếu báo giá"}
+                                                                                    id={e?.quote_id}
+                                                                                />
+                                                                            </div>
+                                                                        </Zoom>
                                                                     ) : (
-                                                                        <div className="border flex justify-center items-center rounded-2xl mx-auto 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-16 3xl:h-6 2xl:h-6 xl:h-6 lg:h-5 px-1 bg-red-200 border-red-200 text-red-500">
+                                                                        <div className="border font-medium flex justify-center items-center rounded-2xl mx-auto 3xl:w-24 2xl:w-20 xl:w-[74px] lg:w-16 3xl:h-6 2xl:h-6 xl:h-6 lg:h-5 px-1 bg-red-200 border-red-200 text-red-500">
                                                                             Tạo mới
                                                                         </div>
                                                                     )}
                                                                 </div>
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px] px-2 col-span-1 text-right">
+                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  text-zinc-600 px-2 col-span-1 text-right">
                                                                     {formatNumber(e.total_amount)}
                                                                 </h6>
 
@@ -897,7 +877,7 @@ const Index = (props) => {
                                                                     <h6 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9px] text-[8px] col-span-1 flex items-center justify-center text-center cursor-pointer">
                                                                         {(e?.status === "approved" && (
                                                                             <div
-                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] transition-all duration-300 ease-in-out 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-green-500 text-green-500 hover:bg-green-500 hover:text-white  border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
+                                                                                className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 border-green-500 transition-all duration-300 ease-in-out text-green-500 hover:bg-green-500 hover:text-white border 3xl:px-0.5 py-1 rounded-md  font-normal flex justify-center items-center gap-1"
                                                                                 onClick={() => toggleStatus(e?.id)}
                                                                             >
                                                                                 Đã Duyệt
@@ -906,7 +886,7 @@ const Index = (props) => {
                                                                         )) ||
                                                                             (e?.status === "un_approved" && (
                                                                                 <div
-                                                                                    className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] transition-all duration-300 ease-in-out 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 hover:bg-red-500 hover:text-white  border border-red-500 px-0.5 py-1 rounded-md text-red-500 font-normal flex justify-center items-center gap-1"
+                                                                                    className="3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px] 3xl:w-[120px] 3xl:h-8 2xl:w-[90px] 2xl:h-7 xl:w-[82px] xl:h-6 lg:w-[68px] lg:h-5 hover:bg-red-500 transition-all duration-300 ease-in-out hover:text-white border border-red-500 px-0.5 py-1 rounded-md text-red-500 font-normal flex justify-center items-center gap-1"
                                                                                     onClick={() => toggleStatus(e?.id)}
                                                                                 >
                                                                                     Chưa Duyệt
@@ -915,224 +895,118 @@ const Index = (props) => {
                                                                             ))}
                                                                     </h6>
                                                                 </h6>
-                                                                <h6 className="col-span-1 w-fit mx-auto">
-                                                                    <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-purple-500 font-[500] px-2 py-0.5 border border-purple-300 bg-purple-300 rounded-2xl">
-                                                                        {"Chưa thanh toán"}
-                                                                    </div>
+                                                                <h6 className="col-span-1 ">
+                                                                    {(["payment_unpaid"].includes(
+                                                                        e?.status_payment
+                                                                    ) && (
+                                                                        <span className="block font-normal text-sky-500  rounded-xl py-1 px-2 w-full  bg-sky-200 text-center text-[13px]">
+                                                                            {dataLang[e?.status_payment] ||
+                                                                                e?.status_payment}
+                                                                        </span>
+                                                                    )) ||
+                                                                        (["payment_partially_paid"].includes(
+                                                                            e?.status_payment
+                                                                        ) && (
+                                                                            <span className="block font-normal text-orange-500 rounded-xl py-1.5 px-2 w-full  bg-orange-200 text-center text-[13px]">
+                                                                                {dataLang[e?.status_payment] ||
+                                                                                    e?.status_payment}{" "}
+                                                                                {`(${formatNumber(e?.total_payment)})`}
+                                                                            </span>
+                                                                        )) ||
+                                                                        (["payment_paid"].includes(
+                                                                            e?.status_payment
+                                                                        ) && (
+                                                                            <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-full  bg-lime-200 text-center text-[13px]">
+                                                                                <TickCircle
+                                                                                    className="bg-lime-500 rounded-full"
+                                                                                    color="white"
+                                                                                    size={15}
+                                                                                />
+                                                                                {dataLang[e?.status_payment] ||
+                                                                                    e?.status_payment}
+                                                                            </span>
+                                                                        ))}
                                                                 </h6>
                                                                 <h6 className="col-span-1 w-fit mx-auto">
                                                                     <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#086FFC] font-[300] px-1.5 py-0.5 border border-[#086FFC] bg-white rounded-[5.5px] uppercase">
                                                                         {e?.branch_name}
                                                                     </div>
                                                                 </h6>
-                                                                <div className="col-span-2 mx-auto">
-                                                                    <div className="items-center flex mb-2  justify-center ">
-                                                                        {e?.process.map((item, i) => {
-                                                                            return (
-                                                                                <div className="">
-                                                                                    <div
-                                                                                        className="group"
-                                                                                        key={`process-${i}`}
-                                                                                        onClick={() =>
-                                                                                            handleProgressBarClick(
-                                                                                                item,
-                                                                                                e?.id,
-                                                                                                index
-                                                                                            )
-                                                                                        }
-                                                                                    >
-                                                                                        {item?.code && (
-                                                                                            <div>
+
+                                                                <div className="items-center flex  mb-8 col-span-4 justify-center ml-11">
+                                                                    {e?.process.map((item, i) => {
+                                                                        const isValue = [
+                                                                            "production_plan",
+                                                                            "produced_at_company",
+                                                                            "import_warehouse",
+                                                                            "delivery",
+                                                                        ].includes(item?.code);
+
+                                                                        const isValueDelivery = ["delivery"].includes(
+                                                                            item?.code
+                                                                        );
+
+                                                                        return (
+                                                                            <>
+                                                                                <div
+                                                                                    className="relative py-8"
+                                                                                    key={`process-${i}`}
+                                                                                >
+                                                                                    {![
+                                                                                        "keep_stock",
+                                                                                        "import_outsourcing",
+                                                                                    ].includes(item?.code) && (
+                                                                                        <>
+                                                                                            <div className="flex items-center  ">
                                                                                                 <div
-                                                                                                    onClick={() =>
-                                                                                                        handleProgressBarClick(
-                                                                                                            item,
-                                                                                                            e?.id,
-                                                                                                            index
-                                                                                                        )
-                                                                                                    }
-                                                                                                    className="flex cursor-pointer items-center relative "
+                                                                                                    className={`${
+                                                                                                        item?.active
+                                                                                                            ? `h-2 w-2 rounded-full bg-green-500`
+                                                                                                            : `h-2 w-2 rounded-full bg-gray-400`
+                                                                                                    } `}
+                                                                                                />
+                                                                                                {!isValueDelivery && (
+                                                                                                    <div
+                                                                                                        className={`${
+                                                                                                            item?.active
+                                                                                                                ? `w-full bg-green-500 h-0.5 `
+                                                                                                                : `w-full bg-gray-200 h-0.5 dark:bg-gray-400`
+                                                                                                        }`}
+                                                                                                    />
+                                                                                                )}
+                                                                                            </div>
+                                                                                            <div className="mt-2 w-[90px]">
+                                                                                                <div
+                                                                                                    className={`${
+                                                                                                        item?.active
+                                                                                                            ? "text-green-500"
+                                                                                                            : "text-slate-500"
+                                                                                                    } mb-2 text-[11px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
                                                                                                 >
-                                                                                                    {/* <motion.div
-                                                                                                        whileHover={{
-                                                                                                            scale: 1.8,
-                                                                                                        }}
-                                                                                                    >
-                                                                                                        <div
-                                                                                                            className={` ${
-                                                                                                                item?.code ==
-                                                                                                                    "production_plan" ||
-                                                                                                                item?.code ==
-                                                                                                                    "produced_at_company" ||
-                                                                                                                item?.code ==
-                                                                                                                    "import_warehouse" ||
-                                                                                                                item?.code ==
-                                                                                                                    "delivery"
-                                                                                                                    ? `h-[10px] w-[10px] rounded-full bg-green-500 animate-bounce`
-                                                                                                                    : `h-[10px] w-[10px] rounded-full bg-gray-400 animate-bounce`
-                                                                                                            } `}
-                                                                                                        ></div>
-                                                                                                    </motion.div> */}
-                                                                                                    <Popup
-                                                                                                        trigger={
-                                                                                                            <div className=" ">
-                                                                                                                <motion.div
-                                                                                                                    whileHover={{
-                                                                                                                        scale: 1.8,
-                                                                                                                    }}
-                                                                                                                >
-                                                                                                                    <div
-                                                                                                                        className={` ${
-                                                                                                                            item?.code ==
-                                                                                                                                "production_plan" ||
-                                                                                                                            item?.code ==
-                                                                                                                                "produced_at_company" ||
-                                                                                                                            item?.code ==
-                                                                                                                                "import_warehouse" ||
-                                                                                                                            item?.code ==
-                                                                                                                                "delivery"
-                                                                                                                                ? `h-[10px] w-[10px] rounded-full bg-green-500 animate-bounce`
-                                                                                                                                : `h-[10px] w-[10px] rounded-full bg-gray-400 animate-bounce`
-                                                                                                                        } `}
-                                                                                                                    ></div>
-                                                                                                                </motion.div>
-                                                                                                            </div>
-                                                                                                        }
-                                                                                                        position="top center"
-                                                                                                        on={[
-                                                                                                            "hover",
-                                                                                                            "focus",
-                                                                                                        ]}
-                                                                                                    >
-                                                                                                        <div className="flex flex-col transition-all duration-300 ease-linear bg-gray-700 px-2.5 py-0.5 rounded-xl">
-                                                                                                            <div
-                                                                                                                className={`text-center ${
-                                                                                                                    item?.code ==
-                                                                                                                        "production_plan" ||
-                                                                                                                    item?.code ==
-                                                                                                                        "produced_at_company" ||
-                                                                                                                    item?.code ==
-                                                                                                                        "import_warehouse" ||
-                                                                                                                    item?.code ==
-                                                                                                                        "delivery"
-                                                                                                                        ? "text-green-500"
-                                                                                                                        : "text-slate-500"
-                                                                                                                } text-[13px]  leading-none px-2.5 py-1.5 font-semibold   text-white`}
-                                                                                                            >
-                                                                                                                {
-                                                                                                                    dataLang[
-                                                                                                                        item
-                                                                                                                            ?.name
-                                                                                                                    ]
-                                                                                                                }
-                                                                                                            </div>
-                                                                                                            {item?.code ===
-                                                                                                                "keep_stock" ||
-                                                                                                            item?.code ===
-                                                                                                                "delivery" ? (
-                                                                                                                <p className="text-xs  p-0.5 border border-white text-white rounded-md font-normal">
-                                                                                                                    Chưa
-                                                                                                                    giữ
-                                                                                                                    kho
-                                                                                                                </p>
-                                                                                                            ) : null}
-                                                                                                            {item?.code ==
-                                                                                                                "production_plan" ||
-                                                                                                            item?.code ==
-                                                                                                                "produced_at_company" ||
-                                                                                                            item?.code ==
-                                                                                                                "import_warehouse" ||
-                                                                                                            item?.code ==
-                                                                                                                "delivery" ? (
-                                                                                                                <p className="text-xs py-1 text-white">
-                                                                                                                    KHSX-030623012
-                                                                                                                </p>
-                                                                                                            ) : null}
-                                                                                                        </div>
-                                                                                                    </Popup>
-                                                                                                    {item?.code !=
-                                                                                                    "delivery" ? (
-                                                                                                        <div
-                                                                                                            className={`w-[35px] ${
-                                                                                                                item?.code ==
-                                                                                                                    "production_plan" ||
-                                                                                                                item?.code ==
-                                                                                                                    "produced_at_company" ||
-                                                                                                                item?.code ==
-                                                                                                                    "import_warehouse" ||
-                                                                                                                item?.code ==
-                                                                                                                    "delivery"
-                                                                                                                    ? ` bg-green-500 h-0.5 `
-                                                                                                                    : ` bg-gray-200 h-0.5 `
-                                                                                                            }`}
-                                                                                                        />
-                                                                                                    ) : null}
+                                                                                                    {
+                                                                                                        dataLang[
+                                                                                                            item?.name
+                                                                                                        ]
+                                                                                                    }
                                                                                                 </div>
                                                                                             </div>
-                                                                                        )}
-                                                                                    </div>
+                                                                                        </>
+                                                                                    )}
+                                                                                    {isValueDelivery && (
+                                                                                        <p className="font-medium my-3 3xl:max-w-[180px] 2xl:max-w-[150px] xl:max-w-[130px] max-w-[100px] text-[10px] absolute left-0 3xl:translate-x-[-40%] 2xl:translate-x-[-45%] xl:translate-x-[-45%] translate-x-[-45%] 3xl:translate-y-[100%] 2xl:translate-y-[120%] xl:translate-y-[110%] translate-y-[120%] p-0.5 border border-amber-600 text-amber-600 rounded ">
+                                                                                            Chưa giao
+                                                                                        </p>
+                                                                                    )}
+                                                                                    {isValue && (
+                                                                                        <p className="text-blue-700 cursor-pointer 3xl:w-[100px] 2xl:w-[100px] xl:w-[100px] w-[100px] text-[9.5px] absolute left-0 3xl:translate-x-[-25%] 2xl:translate-x-[-20%] xl:translate-x-[-25%] translate-x-[-25%] 3xl:translate-y-[100%] 2xl:translate-y-[120%] xl:translate-y-110%] translate-y-[120%] font-semibold">
+                                                                                            KHSX-030623012
+                                                                                        </p>
+                                                                                    )}
                                                                                 </div>
-                                                                            );
-                                                                        })}
-                                                                    </div>
-                                                                    {/* {activeProcess.process == activeProcess.parent &&
-                                                                        index == activeProcess.index && (
-                                                                            <div className="w-full mx-auto">
-                                                                                <div
-                                                                                    className={`text-center ${
-                                                                                        activeProcess?.item?.code ==
-                                                                                            "production_plan" ||
-                                                                                        activeProcess?.item?.code ==
-                                                                                            "produced_at_company" ||
-                                                                                        activeProcess?.item?.code ==
-                                                                                            "import_warehouse" ||
-                                                                                        activeProcess?.item?.code ==
-                                                                                            "delivery"
-                                                                                            ? "text-green-500"
-                                                                                            : "text-slate-500"
-                                                                                    } text-[11px] font-semibold leading-none  dark:text-gray-500`}
-                                                                                >
-                                                                                    {
-                                                                                        dataLang[
-                                                                                            activeProcess?.item?.name
-                                                                                        ]
-                                                                                    }
-                                                                                </div>
-                                                                            </div>
-                                                                        )} */}
+                                                                            </>
+                                                                        );
+                                                                    })}
                                                                 </div>
-                                                                {/* <h6 className="col-span-1 w-fit mx-auto">
-                                                                    {activeProcess.process == activeProcess.parent &&
-                                                                    index == activeProcess.index &&
-                                                                    (activeProcess?.item?.code === "keep_stock" ||
-                                                                        activeProcess?.item?.code === "delivery") ? (
-                                                                        <p className=" 3xl:text-[12px] 2xl:text-[12px] xl:text-[10px] lg:text-[9px]  p-0.5 border border-amber-600 text-amber-600 rounded-md font-normal">
-                                                                            Chưa giữ kho
-                                                                        </p>
-                                                                    ) : null}
-                                                                    {activeProcess.process == activeProcess.parent &&
-                                                                    index == activeProcess.index &&
-                                                                    (activeProcess?.item?.code == "production_plan" ||
-                                                                        activeProcess?.item?.code ==
-                                                                            "produced_at_company" ||
-                                                                        activeProcess?.item?.code ==
-                                                                            "import_warehouse" ||
-                                                                        activeProcess?.item?.code == "delivery") ? (
-                                                                        <p className=" 3xl:text-[12px] 2xl:text-[12px] xl:text-[10px] lg:text-[10px]  font-normal">
-                                                                            KHSX-030623012
-                                                                        </p>
-                                                                    ) : null}
-                                                                    {activeProcess.process == activeProcess.parent &&
-                                                                    index == activeProcess.index &&
-                                                                    (activeProcess?.code == "production_plan" ||
-                                                                        activeProcess?.code == "produced_at_company" ||
-                                                                        activeProcess?.code == "import_warehouse" ||
-                                                                        activeProcess?.code == "delivery") ? (
-                                                                        <p className="text-indigo-700 3xl:w-[100px] 2xl:w-[100px] xl:w-[100px] w-[100px] text-[9.5px] absolute left-0 3xl:translate-x-[-25%] 2xl:translate-x-[-20%] xl:translate-x-[-25%] translate-x-[-25%] 3xl:translate-y-[100%] 2xl:translate-y-[120%] xl:translate-y-110%] translate-y-[120%] font-semibold">
-                                                                            KHSX-030623012
-                                                                        </p>
-                                                                    ) : null}
-                                                                </h6> */}
 
                                                                 <div className="col-span-1 flex justify-center">
                                                                     <BtnAction
@@ -1145,71 +1019,6 @@ const Index = (props) => {
                                                                     />
                                                                 </div>
                                                             </div>
-                                                            {/* process product */}
-                                                            {e?.show && (
-                                                                <div className="items-center flex pl-10 mb-8">
-                                                                    {e?.process.map((item, i) => {
-                                                                        return (
-                                                                            <>
-                                                                                <div
-                                                                                    className="relative 3xl:mb-8 2xl:mb-7 xl:mb-5 mb-4 3xl:pt-4 2xl:pt-2 xl:pt-2 pt-1"
-                                                                                    key={`process-${i}`}
-                                                                                >
-                                                                                    {item?.code && (
-                                                                                        <>
-                                                                                            <div className="flex items-center">
-                                                                                                <div
-                                                                                                    className={`${
-                                                                                                        item?.active ===
-                                                                                                        false
-                                                                                                            ? `h-3 w-3 rounded-full bg-gray-400`
-                                                                                                            : `h-3 w-3 rounded-full bg-green-500`
-                                                                                                    } `}
-                                                                                                />
-                                                                                                {item?.code !==
-                                                                                                "delivery" ? (
-                                                                                                    <div
-                                                                                                        className={`${
-                                                                                                            item?.active ===
-                                                                                                            false
-                                                                                                                ? `sm:flex xl:w-40 w-32 bg-gray-200 h-0.5 dark:bg-gray-400`
-                                                                                                                : `sm:flex xl:w-40 w-32 bg-gray-200 h-0.5 dark:bg-green-500`
-                                                                                                        }`}
-                                                                                                    />
-                                                                                                ) : null}
-                                                                                            </div>
-                                                                                            <div className="mt-2 w-24">
-                                                                                                <div className="3xl:max-w-[180px] lg:max-w-[150px] mb-2 xl:text-xs text-[10px] font-normal leading-none text-gray-400 dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]">
-                                                                                                    {
-                                                                                                        dataLang[
-                                                                                                            item?.name
-                                                                                                        ]
-                                                                                                    }
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </>
-                                                                                    )}
-                                                                                    {item?.code === "keep_stock" ||
-                                                                                    item?.code === "delivery" ? (
-                                                                                        <p className="3xl:max-w-[180px] 2xl:max-w-[150px] xl:max-w-[130px] max-w-[100px] 3xl:text-[12px] 2xl:text-[12px] xl:text-[10px] lg:text-[9px] absolute left-0 3xl:translate-x-[-40%] 2xl:translate-x-[-45%] xl:translate-x-[-45%] translate-x-[-45%] 3xl:translate-y-[100%] 2xl:translate-y-[120%] xl:translate-y-[110%] translate-y-[120%] p-0.5 border border-amber-600 text-amber-600 rounded-md font-normal">
-                                                                                            Chưa giữ kho
-                                                                                        </p>
-                                                                                    ) : null}
-                                                                                    {item?.code == "production_plan" ||
-                                                                                    item?.code ==
-                                                                                        "produced_at_company" ||
-                                                                                    item?.code == "import_warehouse" ||
-                                                                                    item?.code == "delivery" ? (
-                                                                                        <p className="3xl:w-[200px] 2xl:w-[200px] xl:w-[150px] w-[150px] 3xl:text-[12px] 2xl:text-[12px] xl:text-[10px] lg:text-[10px] absolute left-0 3xl:translate-x-[-25%] 2xl:translate-x-[-20%] xl:translate-x-[-25%] translate-x-[-25%] 3xl:translate-y-[50%] 2xl:translate-y-[60%] xl:translate-y-[60%] translate-y-[60%] font-normal">
-                                                                                            KHSX-030623012
-                                                                                        </p>
-                                                                                    ) : null}
-                                                                                </div>
-                                                                            </>
-                                                                        );
-                                                                    })}
-                                                                </div>
-                                                            )}
                                                         </>
                                                     ))}
                                                 </div>
@@ -1232,15 +1041,12 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="grid grid-cols-11 bg-gray-100 items-center">
+                        <div className="grid grid-cols-13 bg-gray-100 items-center">
                             <div className="col-span-3 p-2 text-center">
                                 <h3 className="uppercase font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
                                     {dataLang?.total_outside || "total_outside"}
                                 </h3>
                             </div>
-                            {/* <div className="col-span-1 text-right justify-end p-2 flex gap-2 flex-wrap">
-                                <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]"></h3>
-                            </div> */}
                             <div className="col-span-2 text-right justify-end pr-4 flex gap-2 flex-wrap ">
                                 <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]">
                                     {formatNumber(total?.total_amount)}
@@ -1250,7 +1056,7 @@ const Index = (props) => {
                                 <h3 className="font-normal 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] text-[9px]"></h3>
                             </div>
                         </div>
-                        {data?.length != 0 && (
+                        {initData.data?.length != 0 && (
                             <div className="flex space-x-5 items-center 3xl:mt-4 2xl:mt-4 xl:mt-4 lg:mt-2 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] lg:text-[14px]">
                                 <h6>
                                     {dataLang?.price_quote_total_outside} {totalItems?.iTotalDisplayRecords} đơn hàng

@@ -80,6 +80,7 @@ const Index = (props) => {
         "filter[objects]": value.idObject != null ? value.idObject.value : null,
         "filter[search]": keySearch,
     };
+
     const _ServerFetching = () => {
         Axios(
             "GET",
@@ -329,11 +330,11 @@ const Index = (props) => {
                 <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-3 h-[96%] overflow-hidden">
-                            <div className="flex justify-between">
+                            <div className="flex justify-between items-center">
                                 <h2 className="text-2xl text-[#52575E] capitalize">
                                     {dataLang?.receipts_title || "receipts_title"}
                                 </h2>
-                                <div className="flex justify-end items-center">
+                                <div className="flex justify-end items-center mr-1 mt-1">
                                     <Popup_dspt
                                         onRefresh={_ServerFetching.bind(this)}
                                         dataLang={dataLang}
