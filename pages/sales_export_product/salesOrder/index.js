@@ -29,6 +29,7 @@ import { motion } from "framer-motion";
 import ToatstNotifi from "components/UI/alerNotification/alerNotification";
 import Zoom from "components/UI/zoomElement/zoomElement";
 import HeaderTable from "components/UI/headerTable/headerTable";
+import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -40,7 +41,10 @@ const Index = (props) => {
         idBranch: null,
         idQuoteCode: null,
         idCustomer: null,
-        valueDate: { startDate: null, endDate: null },
+        valueDate: {
+            startDate: null,
+            endDate: null,
+        },
     };
     const initialData = {
         data: [],
@@ -50,7 +54,6 @@ const Index = (props) => {
         listCustomer: [],
         listTabStatus: [],
     };
-
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
     const [initData, sInitData] = useState(initialData);
     const [valueChange, sValueChange] = useState(initialValue);
@@ -75,8 +78,6 @@ const Index = (props) => {
         });
     }, []);
 
-    const updateData = (update) => sInitData((e) => ({ ...e, ...update }));
-
     const _ServerFetching = () => {
         const tabPage = router.query?.tab;
         Axios(
@@ -99,7 +100,7 @@ const Index = (props) => {
             (err, response) => {
                 if (!err && response && response.data) {
                     let { rResult, output, rTotal } = response.data;
-                    updateData({ data: rResult.map((e) => ({ ...e, show: false })), dataExcel: rResult });
+                    sInitData((e) => ({ ...e, data: rResult.map((e) => ({ ...e, show: false })), dataExcel: rResult }));
                     sTotalItems(output);
                     setTotal(rTotal);
                     sOnFetching(false);
@@ -122,7 +123,7 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     let data = response.data;
-                    updateData({ listTabStatus: data });
+                    sInitData((e) => ({ ...e, listTabStatus: data }));
                 }
                 sOnFetching(false);
             }
@@ -134,19 +135,25 @@ const Index = (props) => {
         await Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 let { rResult } = response.data;
-                updateData({ listBr: rResult?.map(({ name, id }) => ({ label: name, value: id })) });
+                sInitData((e) => ({ ...e, listBr: rResult?.map(({ name, id }) => ({ label: name, value: id })) }));
             }
         });
         await Axios("GET", `/api_web/Api_sale_order/saleOrderCombobox?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 let { result } = response.data;
-                updateData({ listQuoteCode: result?.map(({ code, id }) => ({ label: code, value: id })) });
+                sInitData((e) => ({
+                    ...e,
+                    listQuoteCode: result?.map(({ code, id }) => ({ label: code, value: id })),
+                }));
             }
         });
         await Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 let { rResult } = response.data;
-                updateData({ listCustomer: rResult?.map(({ name, id }) => ({ label: name, value: id })) });
+                sInitData((e) => ({
+                    ...e,
+                    listCustomer: rResult?.map(({ name, id }) => ({ label: name, value: id })),
+                }));
             }
         });
         sOnFetching_filter(false);
@@ -381,6 +388,7 @@ const Index = (props) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 let newStatus = "";
+
                 if (initData.data[index].status === "approved") {
                     newStatus = "un_approved";
                 } else if (initData.data[index].status === "un_approved") {
@@ -442,7 +450,11 @@ const Index = (props) => {
         { name: dataLang?.sales_product_order_process || "sales_product_order_process", colspan: 4 },
         { name: dataLang?.sales_product_action || "sales_product_action", colspan: 1 },
     ];
+    const [isExpanded, setIsExpanded] = useState(false);
 
+    const toggleShowAll = () => {
+        setIsExpanded(!isExpanded);
+    };
     return (
         <React.Fragment>
             <Head>
@@ -724,45 +736,7 @@ const Index = (props) => {
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <div className="font-[300] text-slate-400 3xl:text-xs 2xl:text-xs xl:text-[10px] lg:text-[6px]">
-                                                        {dataLang?.display}
-                                                    </div>
-                                                    <select
-                                                        className="outline-none  text-[10px] xl:text-xs 2xl:text-sm"
-                                                        onChange={(e) => sLimit(e.target.value)}
-                                                        value={limit}
-                                                    >
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm hidden"
-                                                            disabled
-                                                        >
-                                                            {limit == -1 ? "Tất cả" : limit}
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={15}
-                                                        >
-                                                            15
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={20}
-                                                        >
-                                                            20
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={40}
-                                                        >
-                                                            40
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={60}
-                                                        >
-                                                            60
-                                                        </option>
-                                                    </select>
+                                                    <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                                 </div>
                                             </div>
                                         </div>
@@ -899,7 +873,7 @@ const Index = (props) => {
                                                                     {(["payment_unpaid"].includes(
                                                                         e?.status_payment
                                                                     ) && (
-                                                                        <span className="block font-normal text-sky-500  rounded-xl py-1 px-2 w-full  bg-sky-200 text-center text-[13px]">
+                                                                        <span className="block font-normal text-sky-500  rounded-xl py-1 px-2 w-full  bg-sky-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
                                                                             {dataLang[e?.status_payment] ||
                                                                                 e?.status_payment}
                                                                         </span>
@@ -907,7 +881,7 @@ const Index = (props) => {
                                                                         (["payment_partially_paid"].includes(
                                                                             e?.status_payment
                                                                         ) && (
-                                                                            <span className="block font-normal text-orange-500 rounded-xl py-1.5 px-2 w-full  bg-orange-200 text-center text-[13px]">
+                                                                            <span className="block font-normal text-orange-500 rounded-xl py-1.5 px-2 w-full  bg-orange-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[7px]">
                                                                                 {dataLang[e?.status_payment] ||
                                                                                     e?.status_payment}{" "}
                                                                                 {`(${formatNumber(e?.total_payment)})`}
@@ -916,7 +890,7 @@ const Index = (props) => {
                                                                         (["payment_paid"].includes(
                                                                             e?.status_payment
                                                                         ) && (
-                                                                            <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-full  bg-lime-200 text-center text-[13px]">
+                                                                            <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 w-full  bg-lime-200 text-center 3xl:text-[13px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
                                                                                 <TickCircle
                                                                                     className="bg-lime-500 rounded-full"
                                                                                     color="white"
@@ -933,79 +907,133 @@ const Index = (props) => {
                                                                     </div>
                                                                 </h6>
 
-                                                                <div className="items-center flex  mb-8 col-span-4 justify-center ml-11">
-                                                                    {e?.process.map((item, i) => {
-                                                                        const isValue = [
-                                                                            "production_plan",
-                                                                            "produced_at_company",
-                                                                            "import_warehouse",
-                                                                            "delivery",
-                                                                        ].includes(item?.code);
+                                                                <div className=" col-span-4">
+                                                                    <div className="flex items-start py-2 ml-3">
+                                                                        {e?.process.map((item, i) => {
+                                                                            const isValue = [
+                                                                                "production_plan",
+                                                                                "produced_at_company",
+                                                                                "import_warehouse",
+                                                                                "delivery",
+                                                                            ].includes(item?.code);
 
-                                                                        const isValueDelivery = ["delivery"].includes(
-                                                                            item?.code
-                                                                        );
+                                                                            const isValueDelivery = [
+                                                                                "delivery",
+                                                                            ].includes(item?.code);
 
-                                                                        return (
-                                                                            <>
-                                                                                <div
-                                                                                    className="relative py-8"
-                                                                                    key={`process-${i}`}
-                                                                                >
-                                                                                    {![
-                                                                                        "keep_stock",
-                                                                                        "import_outsourcing",
-                                                                                    ].includes(item?.code) && (
-                                                                                        <>
-                                                                                            <div className="flex items-center  ">
-                                                                                                <div
-                                                                                                    className={`${
-                                                                                                        item?.active
-                                                                                                            ? `h-2 w-2 rounded-full bg-green-500`
-                                                                                                            : `h-2 w-2 rounded-full bg-gray-400`
-                                                                                                    } `}
-                                                                                                />
-                                                                                                {!isValueDelivery && (
+                                                                            return (
+                                                                                <>
+                                                                                    <div
+                                                                                        className="relative"
+                                                                                        key={`process-${i}`}
+                                                                                    >
+                                                                                        {![
+                                                                                            "keep_stock",
+                                                                                            "import_outsourcing",
+                                                                                        ].includes(item?.code) && (
+                                                                                            <>
+                                                                                                <div className="flex items-center">
                                                                                                     <div
                                                                                                         className={`${
                                                                                                             item?.active
-                                                                                                                ? `w-full bg-green-500 h-0.5 `
-                                                                                                                : `w-full bg-gray-200 h-0.5 dark:bg-gray-400`
-                                                                                                        }`}
+                                                                                                                ? `h-2 w-2 rounded-full bg-green-500`
+                                                                                                                : `h-2 w-2 rounded-full bg-gray-400`
+                                                                                                        } `}
                                                                                                     />
-                                                                                                )}
-                                                                                            </div>
-                                                                                            <div className="mt-2 w-[90px]">
-                                                                                                <div
-                                                                                                    className={`${
-                                                                                                        item?.active
-                                                                                                            ? "text-green-500"
-                                                                                                            : "text-slate-500"
-                                                                                                    } mb-2 text-[11px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
-                                                                                                >
-                                                                                                    {
-                                                                                                        dataLang[
-                                                                                                            item?.name
-                                                                                                        ]
-                                                                                                    }
+                                                                                                    {!isValueDelivery && (
+                                                                                                        <div
+                                                                                                            className={`${
+                                                                                                                item?.active
+                                                                                                                    ? `w-full bg-green-500 h-0.5 `
+                                                                                                                    : `w-full bg-gray-200 h-0.5 dark:bg-gray-400`
+                                                                                                            }`}
+                                                                                                        />
+                                                                                                    )}
                                                                                                 </div>
-                                                                                            </div>
-                                                                                        </>
-                                                                                    )}
-                                                                                    {isValueDelivery && (
-                                                                                        <p className="font-medium my-3 3xl:max-w-[180px] 2xl:max-w-[150px] xl:max-w-[130px] max-w-[100px] text-[10px] absolute left-0 3xl:translate-x-[-40%] 2xl:translate-x-[-45%] xl:translate-x-[-45%] translate-x-[-45%] 3xl:translate-y-[100%] 2xl:translate-y-[120%] xl:translate-y-[110%] translate-y-[120%] p-0.5 border border-amber-600 text-amber-600 rounded ">
-                                                                                            Chưa giao
+                                                                                                <div className="mt-2 3xl:w-[120px] xxl:w-[90px] 2xl:w-[90px] xl:w-[70px] lg:w-[50px]">
+                                                                                                    <div
+                                                                                                        className={`${
+                                                                                                            item?.active
+                                                                                                                ? "text-green-500"
+                                                                                                                : "text-slate-500"
+                                                                                                        } block w-full text-center mb-2 3xl:text-[10px] xxl:text-[8px] 2xl:text-[8px] xl:text-[6px] lg:text-[5px] font-semibold leading-none  dark:text-gray-500 absolute 3xl:translate-x-[-38%] 2xl:translate-x-[-40%] xl:translate-x-[-40%] translate-x-[-40%] 3xl:translate-y-[-10%] 2xl:translate-y-[-20%] xl:translate-y-[-20%] translate-y-[-20%]`}
+                                                                                                    >
+                                                                                                        <div className="flex justify-center items-center w-full gap-1">
+                                                                                                            <h6>
+                                                                                                                {
+                                                                                                                    dataLang[
+                                                                                                                        item
+                                                                                                                            ?.name
+                                                                                                                    ]
+                                                                                                                }
+                                                                                                            </h6>
+                                                                                                            {isValueDelivery && (
+                                                                                                                <h6
+                                                                                                                    className={`${
+                                                                                                                        item?.active &&
+                                                                                                                        isValueDelivery
+                                                                                                                            ? "text-green-500"
+                                                                                                                            : "text-orange-500"
+                                                                                                                    } 3xl:text-[8px] xxl:text-[7px] 2xl:text-[7px] xl:text-[6px] lg:text-[4.5px] text-[6px]`}
+                                                                                                                >{`(${
+                                                                                                                    dataLang[
+                                                                                                                        item
+                                                                                                                            ?.status
+                                                                                                                    ] ||
+                                                                                                                    item?.status
+                                                                                                                })`}</h6>
+                                                                                                            )}
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </>
+                                                                                        )}
+                                                                                        <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[15%] 2xl:-translate-x-1/4 xl:-translate-x-1/4 lg:-translate-x-1/4 -translate-x-1/4 py-2 font-semibold">
+                                                                                            {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
+                                                                                            {isValue &&
+                                                                                                item?.reference &&
+                                                                                                item?.reference
+                                                                                                    .slice(
+                                                                                                        0,
+                                                                                                        isExpanded
+                                                                                                            ? item
+                                                                                                                  ?.reference
+                                                                                                                  .length
+                                                                                                            : 2
+                                                                                                    )
+                                                                                                    .map(
+                                                                                                        (ci, index) => (
+                                                                                                            <div
+                                                                                                                className="flex-col flex"
+                                                                                                                key={
+                                                                                                                    index
+                                                                                                                }
+                                                                                                            >
+                                                                                                                {
+                                                                                                                    ci?.code
+                                                                                                                }
+                                                                                                            </div>
+                                                                                                        )
+                                                                                                    )}
+                                                                                            {item?.reference &&
+                                                                                                item?.reference.length >
+                                                                                                    2 && (
+                                                                                                    <button
+                                                                                                        onClick={
+                                                                                                            toggleShowAll
+                                                                                                        }
+                                                                                                    >
+                                                                                                        {isExpanded
+                                                                                                            ? "Rút gọn"
+                                                                                                            : "Xem thêm"}
+                                                                                                    </button>
+                                                                                                )}
                                                                                         </p>
-                                                                                    )}
-                                                                                    {isValue && (
-                                                                                        <p className="text-blue-700 cursor-pointer 3xl:w-[100px] 2xl:w-[100px] xl:w-[100px] w-[100px] text-[9.5px] absolute left-0 3xl:translate-x-[-25%] 2xl:translate-x-[-20%] xl:translate-x-[-25%] translate-x-[-25%] 3xl:translate-y-[100%] 2xl:translate-y-[120%] xl:translate-y-110%] translate-y-[120%] font-semibold">
-                                                                                            KHSX-030623012
-                                                                                        </p>
-                                                                                    )}
-                                                                                </div>
-                                                                            </>
-                                                                        );
-                                                                    })}
+                                                                                    </div>
+                                                                                </>
+                                                                            );
+                                                                        })}
+                                                                    </div>
                                                                 </div>
 
                                                                 <div className="col-span-1 flex justify-center">

@@ -22,8 +22,9 @@ const Popup_chitietDauki = (props) => {
     const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
-        (props?.id && sOnFetching(true)) || (currentPage && sOnFetching(true));
-        limit && sOnFetching(true);
+        open && props?.id && sOnFetching(true);
+        open && currentPage && sOnFetching(true);
+        open && limit && sOnFetching(true);
     }, [open, limit, currentPage]);
 
     const formatNumber = (number) => {
@@ -47,17 +48,12 @@ const Popup_chitietDauki = (props) => {
                 params: {
                     limit: limit,
                     page: currentPage,
-                    "filter[branch_id]":
-                        props?.idBranch != null ? props?.idBranch.value : null,
-                    "filter[supplier_id]": props?.idSupplier
-                        ? props?.idSupplier.value
-                        : null,
+                    "filter[branch_id]": props?.idBranch != null ? props?.idBranch.value : null,
+                    "filter[supplier_id]": props?.idSupplier ? props?.idSupplier.value : null,
                     "filter[start_date]": props?.date?.startDate
                         ? moment(props?.date?.startDate).format("YYYY-MM-DD")
                         : "",
-                    "filter[end_date]": props?.date?.endDate
-                        ? moment(props?.date?.endDate).format("YYYY-MM-DD")
-                        : "",
+                    "filter[end_date]": props?.date?.endDate ? moment(props?.date?.endDate).format("YYYY-MM-DD") : "",
                 },
             },
             (err, response) => {
@@ -84,10 +80,8 @@ const Popup_chitietDauki = (props) => {
         <>
             <PopupEdit
                 title={
-                    (props?.type == "no_start" &&
-                        dataLang?.debt_suppliers_detail_dk) ||
-                    (props?.type == "chi_start" &&
-                        dataLang?.debt_suppliers_detail_dkc)
+                    (props?.type == "no_start" && dataLang?.debt_suppliers_detail_dk) ||
+                    (props?.type == "chi_start" && dataLang?.debt_suppliers_detail_dkc)
                 }
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
@@ -100,8 +94,7 @@ const Popup_chitietDauki = (props) => {
                     <div>
                         <div className="bg-blue-400 rounded flex justify-between">
                             <h2 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-semibold p-2 text-white">
-                                {dataLang?.debt_suppliers_balance ||
-                                    "debt_suppliers_balance"}
+                                {dataLang?.debt_suppliers_balance || "debt_suppliers_balance"}
                             </h2>
                             <h2 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-semibold p-2 text-white">
                                 {formatNumber(total?.data?.debt_begin)}
@@ -110,34 +103,21 @@ const Popup_chitietDauki = (props) => {
                         <div className="bg-slate-100">
                             <div className=" flex gap-2 justify-between p-2">
                                 <h2 className="flex gap-2 font-semibold 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
-                                    {dataLang?.debt_suppliers_name_Detail ||
-                                        "debt_suppliers_name_Detail"}
+                                    {dataLang?.debt_suppliers_name_Detail || "debt_suppliers_name_Detail"}
                                     <h2 className="font-semibold capitalize text-blue-700 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
                                         {props?.supplier_name}
                                     </h2>
                                 </h2>
                                 <h2 className="font-medium flex gap-2 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
-                                    <h2>
-                                        {dataLang?.debt_suppliers_filter_Detail ||
-                                            "debt_suppliers_filter_Detail"}
-                                    </h2>
+                                    <h2>{dataLang?.debt_suppliers_filter_Detail || "debt_suppliers_filter_Detail"}</h2>
                                     <h2 className="text-blue-600">
                                         {props?.date?.startDate
-                                            ? moment(
-                                                  props?.date?.startDate
-                                              ).format("DD/MM/YYYY")
+                                            ? moment(props?.date?.startDate).format("DD/MM/YYYY")
                                             : "-"}
                                     </h2>
-                                    <h2>
-                                        {dataLang?.debt_suppliers_todate_Detail ||
-                                            "debt_suppliers_todate_Detail"}
-                                    </h2>
+                                    <h2>{dataLang?.debt_suppliers_todate_Detail || "debt_suppliers_todate_Detail"}</h2>
                                     <h2 className="text-blue-600 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
-                                        {props?.date?.endDate
-                                            ? moment(
-                                                  props?.date?.endDate
-                                              ).format("DD/MM/YYYY")
-                                            : "-"}
+                                        {props?.date?.endDate ? moment(props?.date?.endDate).format("DD/MM/YYYY") : "-"}
                                     </h2>
                                 </h2>
                             </div>
@@ -149,32 +129,25 @@ const Popup_chitietDauki = (props) => {
                                         className={`grid-cols-14  grid sticky top-0 rounded-xl shadow-md bg-white   z-10  divide-x`}
                                     >
                                         <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {dataLang?.debt_suppliers_day_vouchers ||
-                                                "debt_suppliers_day_vouchers"}
+                                            {dataLang?.debt_suppliers_day_vouchers || "debt_suppliers_day_vouchers"}
                                         </h4>
                                         <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {dataLang?.debt_suppliers_code_vouchers ||
-                                                "debt_suppliers_code_vouchers"}
+                                            {dataLang?.debt_suppliers_code_vouchers || "debt_suppliers_code_vouchers"}
                                         </h4>
                                         <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {dataLang?.debt_suppliers_type ||
-                                                "debt_suppliers_type"}
+                                            {dataLang?.debt_suppliers_type || "debt_suppliers_type"}
                                         </h4>
                                         <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {dataLang?.debt_suppliers_detail_owed ||
-                                                "debt_suppliers_detail_owed"}
+                                            {dataLang?.debt_suppliers_detail_owed || "debt_suppliers_detail_owed"}
                                         </h4>
                                         <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {dataLang?.debt_suppliers_detail_spent ||
-                                                "debt_suppliers_detail_spent"}
+                                            {dataLang?.debt_suppliers_detail_spent || "debt_suppliers_detail_spent"}
                                         </h4>
                                         <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {dataLang?.debt_suppliers_note ||
-                                                "debt_suppliers_note"}
+                                            {dataLang?.debt_suppliers_note || "debt_suppliers_note"}
                                         </h4>
                                         <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {dataLang?.import_branch ||
-                                                "import_branch"}
+                                            {dataLang?.import_branch || "import_branch"}
                                         </h4>
                                     </div>
                                     {onFetching ? (
@@ -196,81 +169,47 @@ const Popup_chitietDauki = (props) => {
                                                             key={e.id?.toString()}
                                                         >
                                                             <h6 className="text-[13px]   py-2 px-2 col-span-2 font-medium text-center ">
-                                                                {moment(
-                                                                    e?.date
-                                                                ).format(
-                                                                    "DD/MM/YYYY"
-                                                                )}
+                                                                {moment(e?.date).format("DD/MM/YYYY")}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 px-2 col-span-2 font-medium text-center ">
                                                                 {e?.code}
                                                             </h6>
                                                             <h6 className="text-[13px] flex items-center w-fit mx-auto  py-2 px-2 col-span-2 font-medium ">
                                                                 <div className="mx-auto">
-                                                                    {(e?.type ===
-                                                                        "import_title" && (
+                                                                    {(e?.type === "import_title" && (
                                                                         <span className="flex items-center justify-center font-normal text-purple-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-purple-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                            {dataLang[
-                                                                                e
-                                                                                    ?.type
-                                                                            ] ||
-                                                                                e?.type}
+                                                                            {dataLang[e?.type] || e?.type}
                                                                         </span>
                                                                     )) ||
-                                                                        (e?.type ===
-                                                                            "service" && (
+                                                                        (e?.type === "service" && (
                                                                             <span className=" flex items-center justify-center font-normal text-cyan-500 rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-cyan-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[
-                                                                                    e
-                                                                                        ?.type
-                                                                                ] ||
-                                                                                    e?.type}
+                                                                                {dataLang[e?.type] || e?.type}
                                                                             </span>
                                                                         )) ||
-                                                                        (e?.type ===
-                                                                            "returns_title" && (
+                                                                        (e?.type === "returns_title" && (
                                                                             <span className="flex items-center justify-center gap-1 font-normal text-red-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-rose-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[
-                                                                                    e
-                                                                                        ?.type
-                                                                                ] ||
-                                                                                    e?.type}
+                                                                                {dataLang[e?.type] || e?.type}
                                                                             </span>
                                                                         )) ||
-                                                                        (e?.type ===
-                                                                            "payment_title" && (
+                                                                        (e?.type === "payment_title" && (
                                                                             <span className="flex items-center justify-center gap-1 font-normal text-orange-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-orange-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[
-                                                                                    e
-                                                                                        ?.type
-                                                                                ] ||
-                                                                                    e?.type}
+                                                                                {dataLang[e?.type] || e?.type}
                                                                             </span>
                                                                         ))}
                                                                 </div>
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 px-2 col-span-2 font-medium text-right ">
-                                                                {formatNumber(
-                                                                    e?.no_amount
-                                                                )}
+                                                                {formatNumber(e?.no_amount)}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 px-2 col-span-2 font-medium text-right ">
-                                                                {formatNumber(
-                                                                    e?.chi_amount
-                                                                )}
+                                                                {formatNumber(e?.chi_amount)}
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2 px-2 col-span-2 font-medium text-left">
-                                                                <ExpandableContent
-                                                                    content={
-                                                                        e?.note
-                                                                    }
-                                                                />
+                                                                <ExpandableContent content={e?.note} />
                                                             </h6>
                                                             <h6 className="col-span-2 w-fit mx-auto">
                                                                 <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
-                                                                    {
-                                                                        e?.branch_name
-                                                                    }
+                                                                    {e?.branch_name}
                                                                 </div>
                                                             </h6>
                                                         </div>
@@ -285,8 +224,7 @@ const Popup_chitietDauki = (props) => {
                                                     <IconSearch />
                                                 </div>
                                                 <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                    {props.dataLang
-                                                        ?.purchase_order_table_item_not_found ||
+                                                    {props.dataLang?.purchase_order_table_item_not_found ||
                                                         "purchase_order_table_item_not_found"}
                                                 </h1>
                                                 <div className="flex items-center justify-around mt-6 ">
@@ -299,9 +237,7 @@ const Popup_chitietDauki = (props) => {
                                 <div className="flex space-x-5 items-center justify-between">
                                     <Pagination
                                         postsPerPage={limit}
-                                        totalPosts={Number(
-                                            totalItems?.iTotalDisplayRecords
-                                        )}
+                                        totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                         paginate={handlePageChange}
                                         currentPage={currentPage}
                                     />
@@ -309,9 +245,7 @@ const Popup_chitietDauki = (props) => {
                                         <div className="relative">
                                             <select
                                                 id="select-2"
-                                                onChange={(e) =>
-                                                    sLimit(e.target.value)
-                                                }
+                                                onChange={(e) => sLimit(e.target.value)}
                                                 value={limit}
                                                 className="py-1 px-4 pr-9 block  border-green-500 border rounded-md text-sm focus:border-green-500 focus:ring-green-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                             >
@@ -338,35 +272,27 @@ const Popup_chitietDauki = (props) => {
                                                 </svg>
                                             </div>
                                         </div>
-                                        <p className="text-sm text-green-600 mt-2">
-                                            Hiển thị
-                                        </p>
+                                        <p className="text-sm text-green-600 mt-2">Hiển thị</p>
                                     </div>
                                 </div>
                                 <div className="grid-cols-14 grid items-center  border-b-gray-200 border-b  border-t   border-t-gray-200  z-10 bg-slate-100  rounded">
                                     <h2 className="border-l font-semibold p-2 text-[13px] border-r border-b  col-span-6 text-center uppercase">
-                                        {dataLang?.debt_suppliers_totalAmount ||
-                                            "debt_suppliers_totalAmount"}
+                                        {dataLang?.debt_suppliers_totalAmount || "debt_suppliers_totalAmount"}
                                     </h2>
                                     <h2 className="font-medium p-2 text-[13px] border-r border-b    col-span-2 text-right">
                                         {formatNumber(total?.rTotal?.no_amount)}
                                     </h2>
                                     <h2 className="font-medium p-2 text-[13px] border-r border-b   col-span-2 text-right">
-                                        {formatNumber(
-                                            total?.rTotal?.chi_amount
-                                        )}
+                                        {formatNumber(total?.rTotal?.chi_amount)}
                                     </h2>
                                     <h2 className="font-medium p-[17px] text-[13px] border-r border-b  col-span-2 text-right"></h2>
                                     <h2 className="font-medium p-[17px] text-[13px] border-r border-b  col-span-2 text-right"></h2>
                                     <h2 className="border-l font-semibold p-2  text-[13px] border-r col-span-6 text-center uppercase">
-                                        {dataLang?.debt_suppliers_detail_Surplus ||
-                                            "debt_suppliers_detail_Surplus"}
+                                        {dataLang?.debt_suppliers_detail_Surplus || "debt_suppliers_detail_Surplus"}
                                     </h2>
                                     <h2 className="col-span-2 p-[17px]  "></h2>
                                     <h2 className=" font-medium p-2 text-[13px] border-r   col-span-2 text-right">
-                                        {formatNumber(
-                                            total?.rTotal?.total_amount
-                                        )}
+                                        {formatNumber(total?.rTotal?.total_amount)}
                                     </h2>
                                     <h2 className="col-span-2 p-[17px] border-r "></h2>
                                     <h2 className="col-span-2 p-[17px] border-r "></h2>

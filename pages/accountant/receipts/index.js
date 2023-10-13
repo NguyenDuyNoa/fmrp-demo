@@ -8,8 +8,6 @@ const ScrollArea = dynamic(() => import("react-scrollbar"), {
 });
 import ReactExport from "react-data-export";
 import Swal from "sweetalert2";
-import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
 import ModalImage from "react-modal-image";
 import { Grid6 as IconExcel, ArrowDown2 as IconDown, SearchNormal1 as IconSearch, Refresh2 } from "iconsax-react";
 
@@ -22,20 +20,21 @@ import Loading from "components/UI/loading";
 import Pagination from "/components/UI/pagination";
 import dynamic from "next/dynamic";
 import moment from "moment/moment";
-import Select, { components } from "react-select";
 import Popup from "reactjs-popup";
 import { useSelector } from "react-redux";
 import Popup_chitietThere from "../detailThere";
 import FilePDF from "../FilePDF";
 import Popup_chitiet from "./(popup)/detail";
 import Popup_dspt from "./(popup)/popup";
-import styleDatePicker from "components/UI/configs/configDatePicker";
-import configSelectFillter from "components/UI/configs/configSelectFillter";
 import { data } from "autoprefixer";
 import ToatstNotifi from "components/UI/alerNotification/alerNotification";
-
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+import DatepickerComponent from "components/UI/filterComponents/dateTodateComponent";
+import SelectComponent from "components/UI/filterComponents/selectComponent";
+import SearchComponent from "components/UI/filterComponents/searchComponent";
+import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
+import OnResetData from "components/UI/btnResetData/btnReset";
+import HeaderTable from "components/UI/headerTable/headerTable";
+import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
 
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -61,7 +60,6 @@ const Index = (props) => {
     const [value, sValue] = useState(inistialValue);
 
     const updateFetch = (e) => sFetching((i) => ({ ...i, ...e }));
-    const _HandleFresh = () => sFetching((e) => ({ ...e, onFetching: true, onFetching_filter: true }));
 
     useEffect(() => {
         router.push({
@@ -311,6 +309,20 @@ const Index = (props) => {
             ]),
         },
     ];
+    const dataHeader = [
+        { name: dataLang?.payment_date || "payment_date", colspan: 1 },
+        { name: dataLang?.payment_code || "payment_code", colspan: 1 },
+        { name: dataLang?.payment_obType || "payment_obType", colspan: 1 },
+        { name: dataLang?.payment_ob || "payment_ob", colspan: 1 },
+        { name: dataLang?.payment_typeOfDocument || "payment_typeOfDocument", colspan: 1 },
+        { name: dataLang?.payment_voucherCode || "payment_voucherCode", colspan: 1 },
+        { name: "PTTT", colspan: 1 },
+        { name: dataLang?.payment_amountOfMoney || "payment_amountOfMoney", colspan: 1 },
+        { name: dataLang?.payment_creator || "payment_creator", colspan: 1 },
+        { name: dataLang?.payment_branch || "payment_branch", colspan: 1 },
+        { name: dataLang?.payment_note || "payment_note", colspan: 1 },
+        { name: dataLang?.payment_action || "payment_action", colspan: 1 },
+    ];
     return (
         <React.Fragment>
             <Head>
@@ -347,154 +359,77 @@ const Index = (props) => {
                                     <div className="bg-slate-100 w-full rounded grid grid-cols-8 justify-between xl:p-3 p-2">
                                         <div className="col-span-7">
                                             <div className="grid grid-cols-10 items-center space-x-1">
-                                                <div className="col-span-2">
-                                                    <form className="flex items-center relative ">
-                                                        <IconSearch className="absolute 3xl:h-[20px] 2xl:h-[20px] xl:h-[19px] lg:h-[18px] 3xl:w-[20px] 2xl:w-[18px] xl:w-[19px] lg:w-[18px] z-10 3xl:left-[4%] 2xl:left-[4%] xl:left-[8%] lg:left-[10%] text-[#cccccc]" />
-                                                        <input
-                                                            className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] 3xl:h-[40px] 2xl:h-[40px] xl:h-[38px] lg:h-[39px]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  xl:py-2.5 lg:py-[11px] rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-[199px] lg:w-[160px]  relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E] "
-                                                            type="text"
-                                                            onChange={_HandleOnChangeKeySearch.bind(this)}
-                                                            placeholder={dataLang?.branch_search}
-                                                        />
-                                                    </form>
-                                                </div>
-                                                <div className="col-span-2">
-                                                    <Select
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label:
-                                                                    dataLang?.payment_select_branch ||
-                                                                    "payment_select_branch",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...listBr,
-                                                        ]}
-                                                        value={value.idBranch}
-                                                        onChange={(e) => sValue((i) => ({ ...i, idBranch: e }))}
-                                                        placeholder={dataLang?.client_list_filterbrand}
-                                                        {...configSelectFillter}
-                                                    />
-                                                </div>
-                                                <div className=" col-span-2">
-                                                    <Select
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label:
-                                                                    dataLang?.payment_TT_method || "payment_TT_method",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...dataMethod,
-                                                        ]}
-                                                        onChange={(e) => sValue((i) => ({ ...i, idMethod: e }))}
-                                                        value={value.idMethod}
-                                                        placeholder={dataLang?.payment_TT_method || "payment_TT_method"}
-                                                        {...configSelectFillter}
-                                                    />
-                                                </div>
-                                                <div className=" col-span-2">
-                                                    <Select
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label:
-                                                                    dataLang?.payment_select_ob || "payment_select_ob",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...dataObject,
-                                                        ]}
-                                                        onChange={(e) => sValue((i) => ({ ...i, idObject: e }))}
-                                                        value={value.idObject}
-                                                        placeholder={dataLang?.payment_ob || "payment_ob"}
-                                                        {...configSelectFillter}
-                                                    />
-                                                </div>
-                                                <div className="z-20 col-span-2">
-                                                    <Datepicker
-                                                        {...styleDatePicker}
-                                                        value={value.valueDate}
-                                                        onChange={(e) => sValue((i) => ({ ...i, valueDate: e }))}
-                                                    />
-                                                </div>
+                                                <SearchComponent
+                                                    dataLang={dataLang}
+                                                    onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                    colSpan={2}
+                                                />
+                                                <SelectComponent
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label:
+                                                                dataLang?.payment_select_branch ||
+                                                                "payment_select_branch",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...listBr,
+                                                    ]}
+                                                    value={value.idBranch}
+                                                    onChange={(e) => sValue((i) => ({ ...i, idBranch: e }))}
+                                                    placeholder={dataLang?.client_list_filterbrand}
+                                                    colSpan={2}
+                                                />
+                                                <SelectComponent
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label: dataLang?.payment_TT_method || "payment_TT_method",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...dataMethod,
+                                                    ]}
+                                                    onChange={(e) => sValue((i) => ({ ...i, idMethod: e }))}
+                                                    value={value.idMethod}
+                                                    placeholder={dataLang?.payment_TT_method || "payment_TT_method"}
+                                                    colSpan={2}
+                                                />
+                                                <SelectComponent
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label: dataLang?.payment_select_ob || "payment_select_ob",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...dataObject,
+                                                    ]}
+                                                    onChange={(e) => sValue((i) => ({ ...i, idObject: e }))}
+                                                    value={value.idObject}
+                                                    placeholder={dataLang?.payment_ob || "payment_ob"}
+                                                    colSpan={2}
+                                                />
+                                                <DatepickerComponent
+                                                    colSpan={2}
+                                                    value={value.valueDate}
+                                                    onChange={(e) => sValue((i) => ({ ...i, valueDate: e }))}
+                                                />
                                             </div>
                                         </div>
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
-                                                <button
-                                                    onClick={_HandleFresh.bind(this)}
-                                                    type="button"
-                                                    className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none"
-                                                >
-                                                    <Refresh2
-                                                        className="group-hover:-rotate-45 transition-all ease-in-out "
-                                                        size="22"
-                                                        color="green"
-                                                    />
-                                                </button>
+                                                <OnResetData sOnFetching={sFetching} />
                                                 <div>
                                                     {dataTable.excel?.length > 0 && (
-                                                        <ExcelFile
+                                                        <ExcelFileComponent
+                                                            multiDataSet={multiDataSet}
                                                             filename={dataLang?.receipts_lits || "receipts_lits"}
                                                             title="DSPT"
-                                                            element={
-                                                                <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                                    <IconExcel
-                                                                        className="2xl:scale-100 xl:scale-100 scale-75"
-                                                                        size={18}
-                                                                    />
-                                                                    <span>{dataLang?.client_list_exportexcel}</span>
-                                                                </button>
-                                                            }
-                                                        >
-                                                            <ExcelSheet
-                                                                dataSet={multiDataSet}
-                                                                data={multiDataSet}
-                                                                name="Organization"
-                                                            />
-                                                        </ExcelFile>
+                                                            dataLang={dataLang}
+                                                        />
                                                     )}
                                                 </div>
                                                 <div className="">
-                                                    <div className="font-[300] text-slate-400 2xl:text-xs xl:text-sm text-[8px]">
-                                                        {dataLang?.display}
-                                                    </div>
-                                                    <select
-                                                        className="outline-none  text-[10px] xl:text-xs 2xl:text-sm"
-                                                        onChange={(e) => sLimit(e.target.value)}
-                                                        value={limit}
-                                                    >
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm hidden"
-                                                            disabled
-                                                        >
-                                                            {limit == -1 ? "Tất cả" : limit}
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={15}
-                                                        >
-                                                            15
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={20}
-                                                        >
-                                                            20
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={40}
-                                                        >
-                                                            40
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={60}
-                                                        >
-                                                            60
-                                                        </option>
-                                                    </select>
+                                                    <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                                 </div>
                                             </div>
                                         </div>
@@ -502,44 +437,7 @@ const Index = (props) => {
                                 </div>
                                 <div className="min:h-[200px] h-[88%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lx:w-[110%] ">
-                                        <div className="grid grid-cols-12 items-center sticky top-0  p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_date || "payment_date"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_code || "payment_code"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_obType || "payment_obType"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_ob || "payment_ob"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_voucherCode || "payment_voucherCode"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {"PTTT"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_creator || "payment_creator"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_branch || "payment_branch"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_note || "payment_note"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_action || "payment_action"}
-                                            </h4>
-                                        </div>
+                                        <HeaderTable dataHeader={dataHeader} dataLang={dataLang} gridCol={12} />
                                         {fetching.onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
                                         ) : dataTable.table?.length > 0 ? (

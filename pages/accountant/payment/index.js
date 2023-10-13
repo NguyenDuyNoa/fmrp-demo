@@ -23,15 +23,9 @@ import {
     Edit as IconEdit,
     Grid6 as IconExcel,
     ArrowDown2 as IconDown,
-    TickCircle,
     Trash as IconDelete,
     SearchNormal1 as IconSearch,
     Add as IconAdd,
-    LocationTick,
-    User,
-    ArrowCircleDown,
-    Add,
-    Refresh2,
 } from "iconsax-react";
 
 import { BiEdit } from "react-icons/bi";
@@ -43,18 +37,19 @@ import Loading from "components/UI/loading";
 import Pagination from "/components/UI/pagination";
 import dynamic from "next/dynamic";
 import moment from "moment/moment";
-import Select, { components } from "react-select";
 import Popup from "reactjs-popup";
-import { data } from "autoprefixer";
 import { useDispatch, useSelector } from "react-redux";
-import CreatableSelect from "react-select/creatable";
 import Popup_chitietThere from "../detailThere";
 import FilePDF from "../FilePDF";
 import Popup_chitiet from "./(popup)/detail";
 import Popup_dspc from "./(popup)/popup";
-
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+import SearchComponent from "components/UI/filterComponents/searchComponent";
+import SelectComponent from "components/UI/filterComponents/selectComponent";
+import DatepickerComponent from "components/UI/filterComponents/dateTodateComponent";
+import OnResetData from "components/UI/btnResetData/btnReset";
+import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
+import HeaderTable from "components/UI/headerTable/headerTable";
+import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -64,24 +59,12 @@ const Toast = Swal.mixin({
     timerProgressBar: true,
 });
 
-const CustomSelectOption = ({ value, label, level, code }) => (
-    <div className="flex space-x-2 truncate">
-        {level == 1 && <span>--</span>}
-        {level == 2 && <span>----</span>}
-        {level == 3 && <span>------</span>}
-        {level == 4 && <span>--------</span>}
-        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">
-            {label}
-        </span>
-    </div>
-);
-
 const Index = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
     const tabPage = router.query?.tab;
     const dispatch = useDispatch();
-
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
     const [keySearch, sKeySearch] = useState("");
     const [limit, sLimit] = useState(15);
     const [totalItem, sTotalItems] = useState([]);
@@ -103,13 +86,6 @@ const Index = (props) => {
         endDate: null,
     });
 
-    const _HandleSelectTab = (e) => {
-        router.push({
-            pathname: router.route,
-            query: { tab: e },
-        });
-    };
-
     useEffect(() => {
         router.push({
             pathname: router.route,
@@ -125,16 +101,10 @@ const Index = (props) => {
                 params: {
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[branch_id]":
-                        idBranch != null ? idBranch.value : null,
-                    "filter[start_date]":
-                        valueDate?.startDate != null
-                            ? valueDate?.startDate
-                            : null,
-                    "filter[end_date]":
-                        valueDate?.endDate != null ? valueDate?.endDate : null,
-                    "filter[payment_mode]":
-                        idMethod != null ? idMethod.value : null,
+                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
+                    "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
+                    "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
+                    "filter[payment_mode]": idMethod != null ? idMethod.value : null,
                     "filter[objects]": idObject != null ? idObject.value : null,
                     "filter[search]": keySearch,
                 },
@@ -153,48 +123,29 @@ const Index = (props) => {
     };
 
     const _ServerFetching_filter = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, result } = response.data;
-                    sListBr(
-                        result?.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                }
+        Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, result } = response.data;
+                sListBr(result?.map((e) => ({ label: e.name, value: e.id })));
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/Api_payment_method/payment_method/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataMethod(
-                        rResult?.map((e) => ({ label: e?.name, value: e?.id }))
-                    );
-                }
+        });
+        Axios("GET", "/api_web/Api_payment_method/payment_method/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sDataMethod(rResult?.map((e) => ({ label: e?.name, value: e?.id })));
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/Api_expense_voucher/object/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sDataObject(
-                        data?.map((e) => ({
-                            label: dataLang[e?.name],
-                            value: e?.id,
-                        }))
-                    );
-                }
+        });
+        Axios("GET", "/api_web/Api_expense_voucher/object/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sDataObject(
+                    data?.map((e) => ({
+                        label: dataLang[e?.name],
+                        value: e?.id,
+                    }))
+                );
             }
-        );
+        });
         sOnFetching_filter(false);
     };
 
@@ -277,9 +228,7 @@ const Index = (props) => {
             });
             setTimeout(() => {
                 (idBranch != null && sOnFetching(true)) ||
-                    (valueDate.startDate != null &&
-                        valueDate.endDate != null &&
-                        sOnFetching(true)) ||
+                    (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
                     (idMethod != null && sOnFetching(true)) ||
                     (idObject != null && sOnFetching(true));
             }, 300);
@@ -341,10 +290,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.payment_typeOfDocument ||
-                        "payment_typeOfDocument"
-                    }`,
+                    title: `${dataLang?.payment_typeOfDocument || "payment_typeOfDocument"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -352,9 +298,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.payment_voucherCode || "payment_voucherCode"
-                    }`,
+                    title: `${dataLang?.payment_voucherCode || "payment_voucherCode"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -362,9 +306,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.payment_TT_method || "payment_TT_method"
-                    }`,
+                    title: `${dataLang?.payment_TT_method || "payment_TT_method"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -380,10 +322,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.payment_amountOfMoney ||
-                        "payment_amountOfMoney"
-                    }`,
+                    title: `${dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -421,13 +360,7 @@ const Index = (props) => {
                 { value: `${e?.date ? e?.date : ""}` },
                 { value: `${e?.code ? e?.code : ""}` },
                 {
-                    value: `${
-                        e?.objects
-                            ? dataLang[e.objects] !== undefined
-                                ? dataLang[e.objects]
-                                : ""
-                            : ""
-                    }`,
+                    value: `${e?.objects ? (dataLang[e.objects] !== undefined ? dataLang[e.objects] : "") : ""}`,
                 },
                 { value: `${e?.object_text ? e?.object_text : ""}` },
                 {
@@ -440,14 +373,10 @@ const Index = (props) => {
                     }`,
                 },
                 {
-                    value: `${
-                        e?.voucher_code ? e?.voucher_code.join(", ") : ""
-                    }`,
+                    value: `${e?.voucher_code ? e?.voucher_code.join(", ") : ""}`,
                 },
                 {
-                    value: `${
-                        e?.payment_mode_name ? e?.payment_mode_name : ""
-                    }`,
+                    value: `${e?.payment_mode_name ? e?.payment_mode_name : ""}`,
                 },
                 { value: `${e?.cost_name ? e?.cost_name?.join(", ") : ""}` },
                 { value: `${e?.total ? formatNumber(e?.total) : ""}` },
@@ -457,8 +386,22 @@ const Index = (props) => {
             ]),
         },
     ];
-    const _HandleFresh = () => sOnFetching(true);
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+
+    const dataHeader = [
+        { name: dataLang?.payment_date || "payment_date", colspan: 1 },
+        { name: dataLang?.payment_code || "payment_code", colspan: 1 },
+        { name: dataLang?.payment_obType || "payment_obType", colspan: 1 },
+        { name: dataLang?.payment_ob || "payment_ob", colspan: 1 },
+        { name: dataLang?.payment_typeOfDocument || "payment_typeOfDocument", colspan: 1 },
+        { name: dataLang?.payment_voucherCode || "payment_voucherCode", colspan: 1 },
+        { name: "PTTT", colspan: 1 },
+        { name: dataLang?.payment_costs || "payment_costs", colspan: 1 },
+        { name: dataLang?.payment_amountOfMoney || "payment_amountOfMoney", colspan: 1 },
+        { name: dataLang?.payment_creator || "payment_creator", colspan: 1 },
+        { name: dataLang?.payment_branch || "payment_branch", colspan: 1 },
+        { name: dataLang?.payment_note || "payment_note", colspan: 1 },
+        { name: dataLang?.payment_action || "payment_action", colspan: 1 },
+    ];
 
     return (
         <React.Fragment>
@@ -470,9 +413,7 @@ const Index = (props) => {
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.payment_title || "payment_title"}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.payment_title || "payment_title"}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.payment_title || "payment_title"}</h6>
                     </div>
@@ -498,369 +439,78 @@ const Index = (props) => {
                                     <div className="bg-slate-100 w-full rounded grid grid-cols-8 justify-between xl:p-3 p-2">
                                         <div className="col-span-7">
                                             <div className="grid grid-cols-10 items-center space-x-1">
-                                                <div className="col-span-2">
-                                                    <form className="flex items-center relative ">
-                                                        <IconSearch className="absolute 3xl:h-[20px] 2xl:h-[20px] xl:h-[19px] lg:h-[18px] 3xl:w-[20px] 2xl:w-[18px] xl:w-[19px] lg:w-[18px] z-10 3xl:left-[4%] 2xl:left-[4%] xl:left-[8%] lg:left-[10%] text-[#cccccc]" />
-                                                        <input
-                                                            className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] 3xl:h-[40px] 2xl:h-[40px] xl:h-[38px] lg:h-[39px]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  xl:py-2.5 lg:py-[11px] rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-[199px] lg:w-[160px]  relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E] "
-                                                            type="text"
-                                                            onChange={_HandleOnChangeKeySearch.bind(
-                                                                this
-                                                            )}
-                                                            placeholder={
-                                                                dataLang?.branch_search
-                                                            }
-                                                        />
-                                                    </form>
-                                                </div>
-                                                <div className="col-span-2">
-                                                    <Select
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label:
-                                                                    dataLang?.payment_select_branch ||
-                                                                    "payment_select_branch",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...listBr,
-                                                        ]}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "branch"
-                                                        )}
-                                                        value={idBranch}
-                                                        placeholder={
-                                                            dataLang?.client_list_filterbrand
-                                                        }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
-                                                        isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full  2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20 "
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
-                                                        closeMenuOnSelect={true}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow:
-                                                                    "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className=" col-span-2">
-                                                    <Select
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label:
-                                                                    dataLang?.payment_TT_method ||
-                                                                    "payment_TT_method",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...dataMethod,
-                                                        ]}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "method"
-                                                        )}
-                                                        value={idMethod}
-                                                        placeholder={
-                                                            dataLang?.payment_TT_method ||
-                                                            "payment_TT_method"
-                                                        }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
-                                                        isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full  2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20 "
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
-                                                        closeMenuOnSelect={true}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow:
-                                                                    "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className=" col-span-2">
-                                                    <Select
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label:
-                                                                    dataLang?.payment_select_ob ||
-                                                                    "payment_select_ob",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...dataObject,
-                                                        ]}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "object"
-                                                        )}
-                                                        value={idObject}
-                                                        placeholder={
-                                                            dataLang?.payment_ob ||
-                                                            "payment_ob"
-                                                        }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
-                                                        isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[16px] lg:text-[12px] 3xl:w-full 2xl:w-full xl:w-full lg:w-[160px] 3xl:h-full 2xl:h-full  2xl:text-base xl:text-xs text-[10px] rounded-md bg-white z-20 "
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
-                                                        closeMenuOnSelect={true}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow:
-                                                                    "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className="z-20 col-span-2">
-                                                    <Datepicker
-                                                        value={valueDate}
-                                                        i18n={"vi"}
-                                                        primaryColor={"blue"}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "date"
-                                                        )}
-                                                        showShortcuts={true}
-                                                        displayFormat={
-                                                            "DD/MM/YYYY"
-                                                        }
-                                                        configs={{
-                                                            shortcuts: {
-                                                                today: "Hôm nay",
-                                                                yesterday:
-                                                                    "Hôm qua",
-                                                                past: (
-                                                                    period
-                                                                ) =>
-                                                                    `${period}  ngày qua`,
-                                                                currentMonth:
-                                                                    "Tháng này",
-                                                                pastMonth:
-                                                                    "Tháng trước",
-                                                            },
-                                                            footer: {
-                                                                cancel: "Từ bỏ",
-                                                                apply: "Áp dụng",
-                                                            },
-                                                        }}
-                                                        className="react-datepicker__input-container 2xl:placeholder:text-xs xl:placeholder:text-xs placeholder:text-[8px]"
-                                                        inputClassName="rounded-md w-full 2xl:p-2 xl:p-[11px] p-3 bg-white focus:outline-[#0F4F9E]  2xl:placeholder:text-xs xl:placeholder:text-xs placeholder:text-[8px] border-none  2xl:text-base xl:text-xs text-[10px]  focus:outline-none focus:ring-0 focus:border-transparent"
-                                                    />
-                                                </div>
+                                                <SearchComponent
+                                                    dataLang={dataLang}
+                                                    onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                    colSpan={2}
+                                                />
+                                                <SelectComponent
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label:
+                                                                dataLang?.payment_select_branch ||
+                                                                "payment_select_branch",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...listBr,
+                                                    ]}
+                                                    onChange={onchang_filter.bind(this, "branch")}
+                                                    value={idBranch}
+                                                    placeholder={dataLang?.client_list_filterbrand}
+                                                    colSpan={2}
+                                                />
+                                                <SelectComponent
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label: dataLang?.payment_TT_method || "payment_TT_method",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...dataMethod,
+                                                    ]}
+                                                    onChange={onchang_filter.bind(this, "method")}
+                                                    value={idMethod}
+                                                    placeholder={dataLang?.payment_TT_method || "payment_TT_method"}
+                                                    colSpan={2}
+                                                />
+                                                <SelectComponent
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label: dataLang?.payment_select_ob || "payment_select_ob",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...dataObject,
+                                                    ]}
+                                                    onChange={onchang_filter.bind(this, "object")}
+                                                    value={idObject}
+                                                    placeholder={dataLang?.payment_ob || "payment_ob"}
+                                                    colSpan={2}
+                                                />
+                                                <DatepickerComponent
+                                                    colSpan={2}
+                                                    value={valueDate}
+                                                    onChange={onchang_filter.bind(this, "date")}
+                                                />
                                             </div>
                                         </div>
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
                                                 {" "}
-                                                <button
-                                                    onClick={_HandleFresh.bind(
-                                                        this
-                                                    )}
-                                                    type="button"
-                                                    className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none"
-                                                >
-                                                    <Refresh2
-                                                        className="group-hover:-rotate-45 transition-all ease-in-out "
-                                                        size="22"
-                                                        color="green"
-                                                    />
-                                                </button>
+                                                <OnResetData sOnFetching={sOnFetching} />
                                                 <div>
                                                     {data_ex?.length > 0 && (
-                                                        <ExcelFile
+                                                        <ExcelFileComponent
+                                                            multiDataSet={multiDataSet}
                                                             filename="Danh phiếu chi"
                                                             title="DSPC"
-                                                            element={
-                                                                <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                                    <IconExcel
-                                                                        className="2xl:scale-100 xl:scale-100 scale-75"
-                                                                        size={
-                                                                            18
-                                                                        }
-                                                                    />
-                                                                    <span>
-                                                                        {
-                                                                            dataLang?.client_list_exportexcel
-                                                                        }
-                                                                    </span>
-                                                                </button>
-                                                            }
-                                                        >
-                                                            <ExcelSheet
-                                                                dataSet={
-                                                                    multiDataSet
-                                                                }
-                                                                data={
-                                                                    multiDataSet
-                                                                }
-                                                                name="Organization"
-                                                            />
-                                                        </ExcelFile>
+                                                            dataLang={dataLang}
+                                                        />
                                                     )}
                                                 </div>
                                                 <div className="">
-                                                    <div className="font-[300] text-slate-400 2xl:text-xs xl:text-sm text-[8px]">
-                                                        {dataLang?.display}
-                                                    </div>
-                                                    <select
-                                                        className="outline-none  text-[10px] xl:text-xs 2xl:text-sm"
-                                                        onChange={(e) =>
-                                                            sLimit(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        value={limit}
-                                                    >
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm hidden"
-                                                            disabled
-                                                        >
-                                                            {limit == -1
-                                                                ? "Tất cả"
-                                                                : limit}
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={15}
-                                                        >
-                                                            15
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={20}
-                                                        >
-                                                            20
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={40}
-                                                        >
-                                                            40
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={60}
-                                                        >
-                                                            60
-                                                        </option>
-                                                    </select>
+                                                    <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                                 </div>
                                             </div>
                                         </div>
@@ -868,64 +518,9 @@ const Index = (props) => {
                                 </div>
                                 <div className="min:h-[200px] h-[88%] max:h-[500px]  overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lx:w-[110%] ">
-                                        <div className="grid grid-cols-13 items-center sticky top-0  p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_date ||
-                                                    "payment_date"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_code ||
-                                                    "payment_code"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_obType ||
-                                                    "payment_obType"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_ob ||
-                                                    "payment_ob"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_typeOfDocument ||
-                                                    "payment_typeOfDocument"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_voucherCode ||
-                                                    "payment_voucherCode"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {"PTTT"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_costs ||
-                                                    "payment_costs"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_amountOfMoney ||
-                                                    "payment_amountOfMoney"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_creator ||
-                                                    "payment_creator"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_branch ||
-                                                    "payment_branch"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_note ||
-                                                    "payment_note"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center whitespace-nowrap">
-                                                {dataLang?.payment_action ||
-                                                    "payment_action"}
-                                            </h4>
-                                        </div>
+                                        <HeaderTable dataHeader={dataHeader} dataLang={dataLang} gridCol={13} />
                                         {onFetching ? (
-                                            <Loading
-                                                className="h-80"
-                                                color="#0f4f9e"
-                                            />
+                                            <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
@@ -936,55 +531,32 @@ const Index = (props) => {
                                                         >
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  rounded-md text-center">
                                                                 {e?.date != null
-                                                                    ? moment(
-                                                                          e?.date
-                                                                      ).format(
-                                                                          "DD/MM/YYYY"
-                                                                      )
+                                                                    ? moment(e?.date).format("DD/MM/YYYY")
                                                                     : ""}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out  rounded-md text-center text-[#0F4F9E]">
                                                                 <Popup_chitiet
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
+                                                                    dataLang={dataLang}
                                                                     className="text-center"
-                                                                    name={
-                                                                        e?.code
-                                                                    }
+                                                                    name={e?.code}
                                                                     id={e?.id}
                                                                 />
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  col-span-1 flex items-center w-fit mx-auto">
                                                                 <div className="mx-auto">
-                                                                    {(e?.objects ===
-                                                                        "client" && (
+                                                                    {(e?.objects === "client" && (
                                                                         <span className="flex items-center justify-center font-normal text-sky-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                            {dataLang[
-                                                                                e
-                                                                                    ?.objects
-                                                                            ] ||
-                                                                                e?.objects}
+                                                                            {dataLang[e?.objects] || e?.objects}
                                                                         </span>
                                                                     )) ||
-                                                                        (e?.objects ===
-                                                                            "supplier" && (
+                                                                        (e?.objects === "supplier" && (
                                                                             <span className=" flex items-center justify-center font-normal text-orange-500 rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-orange-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[
-                                                                                    e
-                                                                                        ?.objects
-                                                                                ] ||
-                                                                                    e?.objects}
+                                                                                {dataLang[e?.objects] || e?.objects}
                                                                             </span>
                                                                         )) ||
-                                                                        (e?.objects ===
-                                                                            "other" && (
+                                                                        (e?.objects === "other" && (
                                                                             <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-lime-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[
-                                                                                    e
-                                                                                        ?.objects
-                                                                                ] ||
-                                                                                    e?.objects}
+                                                                                {dataLang[e?.objects] || e?.objects}
                                                                             </span>
                                                                         ))}
                                                                 </div>
@@ -994,109 +566,56 @@ const Index = (props) => {
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  col-span-1 flex items-center w-fit mx-auto">
                                                                 <div className="mx-auto">
-                                                                    {(e?.type_vouchers ===
-                                                                        "import" && (
+                                                                    {(e?.type_vouchers === "import" && (
                                                                         <span className="flex items-center justify-center font-normal text-purple-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-purple-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                            {dataLang[
-                                                                                e
-                                                                                    ?.type_vouchers
-                                                                            ] ||
+                                                                            {dataLang[e?.type_vouchers] ||
                                                                                 e?.type_vouchers}
                                                                         </span>
                                                                     )) ||
-                                                                        (e?.type_vouchers ===
-                                                                            "deposit" && (
+                                                                        (e?.type_vouchers === "deposit" && (
                                                                             <span className=" flex items-center justify-center font-normal text-cyan-500 rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-cyan-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[
-                                                                                    e
-                                                                                        ?.type_vouchers
-                                                                                ] ||
+                                                                                {dataLang[e?.type_vouchers] ||
                                                                                     e?.type_vouchers}
                                                                             </span>
                                                                         )) ||
-                                                                        (e?.type_vouchers ===
-                                                                            "service" && (
+                                                                        (e?.type_vouchers === "service" && (
                                                                             <span className="flex items-center justify-center gap-1 font-normal text-red-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-rose-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[
-                                                                                    e
-                                                                                        ?.type_vouchers
-                                                                                ] ||
+                                                                                {dataLang[e?.type_vouchers] ||
                                                                                     e?.type_vouchers}
                                                                             </span>
                                                                         ))}
                                                                 </div>
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out px-2 py-1  rounded-md text-center text-[#0F4F9E]">
-                                                                {e?.voucher?.map(
-                                                                    (
-                                                                        code,
-                                                                        index
-                                                                    ) => (
-                                                                        <React.Fragment
-                                                                            key={
-                                                                                code.id
-                                                                            }
+                                                                {e?.voucher?.map((code, index) => (
+                                                                    <React.Fragment key={code.id}>
+                                                                        <Popup_chitietThere
+                                                                            key={code?.id}
+                                                                            dataLang={dataLang}
+                                                                            className="text-left"
+                                                                            type={code.voucher_type}
+                                                                            id={code.id}
+                                                                            name={code?.code}
                                                                         >
-                                                                            <Popup_chitietThere
-                                                                                key={
-                                                                                    code?.id
-                                                                                }
-                                                                                dataLang={
-                                                                                    dataLang
-                                                                                }
-                                                                                className="text-left"
-                                                                                type={
-                                                                                    code.voucher_type
-                                                                                }
-                                                                                id={
-                                                                                    code.id
-                                                                                }
-                                                                                name={
-                                                                                    code?.code
-                                                                                }
-                                                                            >
-                                                                                {
-                                                                                    code?.code
-                                                                                }
-                                                                            </Popup_chitietThere>
-                                                                            {/* {index !== e.voucher.length - 1 && ', '} */}
-                                                                        </React.Fragment>
-                                                                    )
-                                                                )}
+                                                                            {code?.code}
+                                                                        </Popup_chitietThere>
+                                                                        {/* {index !== e.voucher.length - 1 && ', '} */}
+                                                                    </React.Fragment>
+                                                                ))}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-center">
-                                                                {
-                                                                    e?.payment_mode_name
-                                                                }
+                                                                {e?.payment_mode_name}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left">
-                                                                {e?.cost_name?.map(
-                                                                    (
-                                                                        code,
-                                                                        index
-                                                                    ) => (
-                                                                        <React.Fragment
-                                                                            key={
-                                                                                code
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                code
-                                                                            }
-                                                                            {index !==
-                                                                                e
-                                                                                    .cost_name
-                                                                                    .length -
-                                                                                    1 &&
-                                                                                ", "}
-                                                                        </React.Fragment>
-                                                                    )
-                                                                )}
+                                                                {e?.cost_name?.map((code, index) => (
+                                                                    <React.Fragment key={code}>
+                                                                        {code}
+                                                                        {index !== e.cost_name.length - 1 && ", "}
+                                                                    </React.Fragment>
+                                                                ))}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-right">
-                                                                {formatNumber(
-                                                                    e?.total
-                                                                )}
+                                                                {formatNumber(e?.total)}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
                                                                 <div className="relative">
@@ -1120,18 +639,12 @@ const Index = (props) => {
                                                                         </span>
                                                                     </span>
                                                                 </div>
-                                                                <h6 className="capitalize">
-                                                                    {
-                                                                        e?.staff_name
-                                                                    }
-                                                                </h6>
+                                                                <h6 className="capitalize">{e?.staff_name}</h6>
                                                             </h6>
                                                             {/* <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left"><span className="mr-2 mb-1 w-fit 2xl:text-base xl:text-xs text-[8px] px-2 text-[#0F4F9E] font-[300] py-0.5 border border-[#0F4F9E] rounded-[5.5px]">{e?.branch_name}</span></h6> */}
                                                             <h6 className="col-span-1 w-fit ">
                                                                 <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
-                                                                    {
-                                                                        e?.branch_name
-                                                                    }
+                                                                    {e?.branch_name}
                                                                 </div>
                                                             </h6>
                                                             <h6 className="2xl:text-base xl:text-xs text-[8px]  px-2 py-0.5 col-span-1  rounded-md text-left truncate">
@@ -1140,12 +653,8 @@ const Index = (props) => {
                                                             <div className="col-span-1 flex justify-center">
                                                                 <BtnTacVu
                                                                     type="payment"
-                                                                    onRefresh={_ServerFetching.bind(
-                                                                        this
-                                                                    )}
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    dataLang={dataLang}
                                                                     id={e?.id}
                                                                     className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
                                                                 />
@@ -1187,16 +696,12 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display}{" "}
-                                    {totalItem?.iTotalDisplayRecords}{" "}
-                                    {dataLang?.among} {totalItem?.iTotalRecords}{" "}
-                                    {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(
-                                        totalItem?.iTotalDisplayRecords
-                                    )}
+                                    totalPosts={Number(totalItem?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />
@@ -1218,17 +723,12 @@ const BtnTacVu = React.memo((props) => {
 
     const fetchDataSettingsCompany = () => {
         if (props?.id) {
-            Axios(
-                "GET",
-                `/api_web/Api_setting/CompanyInfo?csrf_protection=true`,
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var { data } = response.data;
-                        setDataCompany(data);
-                    }
+            Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+                if (!err) {
+                    var { data } = response.data;
+                    setDataCompany(data);
                 }
-            );
+            });
         }
         if (props?.id) {
             Axios(
@@ -1289,16 +789,8 @@ const BtnTacVu = React.memo((props) => {
         <div>
             <Popup
                 trigger={
-                    <button
-                        type="button"
-                        className={
-                            `flex space-x-1 items-center ` + props.className
-                        }
-                    >
-                        <span>
-                            {props.dataLang?.purchase_action ||
-                                "purchase_action"}
-                        </span>
+                    <button type="button" className={`flex space-x-1 items-center ` + props.className}>
+                        <span>{props.dataLang?.purchase_action || "purchase_action"}</span>
                         <IconDown size={12} />
                     </button>
                 }
@@ -1325,8 +817,7 @@ const BtnTacVu = React.memo((props) => {
                                 id={props?.id}
                                 className=" 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded "
                             >
-                                {props.dataLang?.purchase_order_table_edit ||
-                                    "purchase_order_table_edit"}
+                                {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
                             </Popup_dspc>
                         </div>
                         <div className=" transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full">
@@ -1351,8 +842,7 @@ const BtnTacVu = React.memo((props) => {
                                 className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
                             />
                             <p className="group-hover:text-[#f87171]">
-                                {props.dataLang?.purchase_deleteVoites ||
-                                    "purchase_deleteVoites"}
+                                {props.dataLang?.purchase_deleteVoites || "purchase_deleteVoites"}
                             </p>
                         </button>
                     </div>
@@ -1378,17 +868,12 @@ const Popup_Pdf = (props) => {
 
     const fetchDataSettingsCompany = () => {
         if (props?.id) {
-            Axios(
-                "GET",
-                `/api_web/Api_setting/CompanyInfo?csrf_protection=true`,
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var { data } = response.data;
-                        setDataCompany(data);
-                    }
+            Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+                if (!err) {
+                    var { data } = response.data;
+                    setDataCompany(data);
                 }
-            );
+            });
         }
         if (props?.id) {
             Axios(

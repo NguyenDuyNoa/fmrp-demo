@@ -652,7 +652,10 @@ const Header = () => {
                 {
                     title: "Công nợ bán",
                     img: "/icon/header/banxuat/cnb.png",
-                    items: [{ name: "Phiếu thu", link: "/accountant/receipts" }, { name: "Công nợ khách hàng" }],
+                    items: [
+                        { name: "Phiếu thu", link: "/accountant/receipts" },
+                        { name: "Công nợ khách hàng", link: "/accountant/customerDebt" },
+                    ],
                 },
             ],
         },

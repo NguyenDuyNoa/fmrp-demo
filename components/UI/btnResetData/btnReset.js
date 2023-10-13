@@ -1,9 +1,8 @@
 import { Refresh2 } from "iconsax-react";
 
 const OnResetData = ({ sOnFetching }) => {
-    const _HandleFresh = () => {
-        sOnFetching(true);
-    };
+    const _HandleFresh = () =>
+        sOnFetching(true) || sOnFetching((prev) => ({ ...prev, onFetching: true, onFetching_filter: true }));
     return (
         <div>
             <button

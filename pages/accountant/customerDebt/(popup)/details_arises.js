@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import PopupEdit from "/components/UI/popup";
 import { SearchNormal1 as IconSearch } from "iconsax-react";
 import Loading from "components/UI/loading";
@@ -12,20 +12,23 @@ import Pagination from "/components/UI/pagination";
 import ExpandableContent from "/components/UI/more";
 const Popup_chitietPhatsinh = (props) => {
     const dataLang = props?.dataLang;
-    const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
-    const [data, sData] = useState();
-    const [onFetching, sOnFetching] = useState(false);
-    const [total, sTotal] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalItems, sTotalItems] = useState([]);
-    const [limit, sLimit] = useState(15);
+    const initialState = {
+        open: false,
+        data: [],
+        onFetching: false,
+        total: null,
+        totalItems: [],
+        currentPage: 1,
+        limit: 15,
+    };
+    const _ToggleModal = (e) => sIsState((pver) => ({ ...pver, open: e }));
+    const [isState, sIsState] = useState(initialState);
 
     useEffect(() => {
-        open && props?.id && sOnFetching(true);
-        open && currentPage && sOnFetching(true);
-        open && limit && sOnFetching(true);
-    }, [open, limit, currentPage]);
+        isState.open && props?.id && sIsState((pver) => ({ ...pver, onFetching: true }));
+        isState.open && isState.currentPage && sIsState((pver) => ({ ...pver, onFetching: true }));
+        isState.open && isState.limit && sIsState((pver) => ({ ...pver, onFetching: true }));
+    }, [isState.open, isState.limit, isState.currentPage]);
 
     const formatNumber = (number) => {
         if (!number && number !== 0) return 0;
@@ -38,11 +41,11 @@ const Popup_chitietPhatsinh = (props) => {
     const _ServerFetching_detail = async () => {
         await Axios(
             "GET",
-            `/api_web/Api_debt_supplier/debtDetail/${props?.id}/${props?.type}?csrf_protection=true`,
+            `/api_web/Api_debt_client/debtDetail/${props?.id}/${props?.type}?csrf_protection=true`,
             {
                 params: {
-                    limit: limit,
-                    page: currentPage,
+                    limit: isState.limit,
+                    page: isState.currentPage,
                     "filter[branch_id]": props?.idBranch != null ? props?.idBranch.value : null,
                     "filter[supplier_id]": props?.idSupplier ? props?.idSupplier.value : null,
                     "filter[start_date]": props?.date?.startDate
@@ -54,32 +57,65 @@ const Popup_chitietPhatsinh = (props) => {
             (err, response) => {
                 if (!err) {
                     var { rResult, rTotal, output } = response.data;
-                    sData(rResult);
-                    sTotal(rTotal?.total_amount);
-                    sTotalItems(output);
+                    sIsState((pver) => ({ ...pver, total: rTotal?.total_amount, data: rResult, totalItems: output }));
                 }
-                sOnFetching(false);
+                sIsState((pver) => ({ ...pver, onFetching: false }));
             }
         );
     };
+    const getRandomColors = () => {
+        const colors = [
+            ["#f0f9ff", "#0ea5e9"],
+            ["#f0f9ff", "#3b82f6"],
+            ["#fff7ed", "#ea580c"],
+            ["#faf5ff", "#a855f7"],
+            ["#fdf2f8", "#ec4899"],
+            ["#f0fdf4", "#22c55e"],
+            ["#fff1f2", "#f43f5e"],
+            ["#ecfdf5", "#10b981"],
+            ["#fefce8", "#eab308"],
+            ["#f8fafc", "#64748b"],
+            ["#fdf4ff", "#d946ef"],
+        ];
+
+        const randomIndex = Math.floor(Math.random() * colors.length);
+        return colors[randomIndex];
+    };
+
+    const updatedData = useMemo(() => {
+        const typeToColors = {};
+
+        return isState.data.map((item) => {
+            if (!typeToColors[item.type]) {
+                typeToColors[item.type] = getRandomColors();
+            }
+            const randomColors = typeToColors[item.type];
+
+            return {
+                ...item,
+                text: randomColors[1],
+                bg: randomColors[0],
+            };
+        });
+    }, [isState.data]);
 
     useEffect(() => {
-        onFetching && _ServerFetching_detail();
-    }, [onFetching]);
+        isState.onFetching && _ServerFetching_detail();
+    }, [isState.onFetching]);
 
     const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
+        sIsState((pver) => ({ ...pver, currentPage: pageNumber }));
     };
     return (
         <>
             <PopupEdit
                 title={
                     (props?.type == "no_debt" && dataLang?.debt_suppliers_detail_ps) ||
-                    (props?.type == "chi_debt" && dataLang?.debt_suppliers_detail_c)
+                    (props?.type == "thu_debt" && dataLang?.debt_suppliers_detail_c)
                 }
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
-                open={open}
+                open={isState.open}
                 onClose={_ToggleModal.bind(this, false)}
                 classNameBtn={props?.className}
             >
@@ -124,7 +160,7 @@ const Popup_chitietPhatsinh = (props) => {
                                             {dataLang?.debt_suppliers_type || "debt_suppliers_type"}
                                         </h4>
                                         <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {dataLang?.debt_suppliers_into_money || "debt_suppliers_into_money"}
+                                            {dataLang?.customerDebt || "customerDebt"}
                                         </h4>
                                         <h4 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                                             {dataLang?.debt_suppliers_note || "debt_suppliers_note"}
@@ -133,12 +169,12 @@ const Popup_chitietPhatsinh = (props) => {
                                             {dataLang?.import_branch || "import_branch"}
                                         </h4>
                                     </div>
-                                    {onFetching ? (
+                                    {isState.onFetching ? (
                                         <Loading
                                             className="3xl:max-h-auto  2xl:max-h-auto xl:max-h-auto lg:max-h-[400px] max-h-[500px]"
                                             color="#0f4f9e"
                                         />
-                                    ) : data?.length > 0 ? (
+                                    ) : updatedData?.length > 0 ? (
                                         <>
                                             <ScrollArea
                                                 className="min-h-[90px] max-h-[170px] 3xl:max-h-[364px] 2xl:max-h-[250px] xl:max-h-[350px] lg:max-h-[186px] overflow-hidden"
@@ -146,7 +182,7 @@ const Popup_chitietPhatsinh = (props) => {
                                                 smoothScrolling={true}
                                             >
                                                 <div className="divide-y divide-slate-100 min:h-[170px]  max:h-[170px]">
-                                                    {data?.map((e) => (
+                                                    {updatedData?.map((e) => (
                                                         <div
                                                             className="grid grid-cols-12 hover:bg-slate-50 items-center border-b"
                                                             key={e.id?.toString()}
@@ -159,26 +195,15 @@ const Popup_chitietPhatsinh = (props) => {
                                                             </h6>
                                                             <h6 className="text-[13px] flex items-center w-fit mx-auto  py-2.5 px-2 col-span-2 font-medium ">
                                                                 <div className="mx-auto">
-                                                                    {(e?.type === "import_title" && (
-                                                                        <span className="flex items-center justify-center font-normal text-purple-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-purple-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                            {dataLang[e?.type] || e?.type}
-                                                                        </span>
-                                                                    )) ||
-                                                                        (e?.type === "service" && (
-                                                                            <span className=" flex items-center justify-center font-normal text-cyan-500 rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-cyan-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[e?.type] || e?.type}
-                                                                            </span>
-                                                                        )) ||
-                                                                        (e?.type === "returns_title" && (
-                                                                            <span className="flex items-center justify-center gap-1 font-normal text-red-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-rose-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[e?.type] || e?.type}
-                                                                            </span>
-                                                                        )) ||
-                                                                        (e?.type === "payment_title" && (
-                                                                            <span className="flex items-center justify-center gap-1 font-normal text-orange-500  rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]  bg-orange-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]">
-                                                                                {dataLang[e?.type] || e?.type}
-                                                                            </span>
-                                                                        ))}
+                                                                    <span
+                                                                        style={{
+                                                                            color: `${e?.text}`,
+                                                                            backgroundColor: `${e?.bg}`,
+                                                                        }}
+                                                                        className="flex items-center justify-center gap-1 font-normal   rounded-xl py-1 px-2 xl:min-w-[100px] min-w-[70px]   text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]"
+                                                                    >
+                                                                        {dataLang[e?.type] || e?.type}
+                                                                    </span>
                                                                 </div>
                                                             </h6>
                                                             <h6 className="text-[13px]   py-2.5 px-2 col-span-2 font-medium text-right ">
@@ -216,17 +241,19 @@ const Popup_chitietPhatsinh = (props) => {
                                 </div>
                                 <div className="flex space-x-5 items-center justify-between">
                                     <Pagination
-                                        postsPerPage={limit}
-                                        totalPosts={Number(totalItems?.iTotalDisplayRecords)}
+                                        postsPerPage={isState.limit}
+                                        totalPosts={Number(isState.totalItems?.iTotalDisplayRecords)}
                                         paginate={handlePageChange}
-                                        currentPage={currentPage}
+                                        currentPage={isState.currentPage}
                                     />
                                     <div className="flex items-center gap-2">
                                         <div className="relative">
                                             <select
                                                 id="select-2"
-                                                onChange={(e) => sLimit(e.target.value)}
-                                                value={limit}
+                                                onChange={(e) =>
+                                                    sIsState((pver) => ({ ...pver, limit: e.target.value }))
+                                                }
+                                                value={isState.limit}
                                                 className="py-1 px-4 pr-9 block  border-green-500 border rounded-md text-sm focus:border-green-500 focus:ring-green-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                             >
                                                 <option selected value={15}>
@@ -260,7 +287,7 @@ const Popup_chitietPhatsinh = (props) => {
                                         {dataLang?.debt_suppliers_totalAmount || "debt_suppliers_totalAmount"}
                                     </h2>
                                     <h2 className="font-medium p-2 text-[13px]   col-span-2 text-right border-r">
-                                        {formatNumber(total)}
+                                        {formatNumber(isState.total)}
                                     </h2>
                                     <h2 className="font-medium p-[17px] text-[13px]   col-span-2 text-right border-r"></h2>
                                     <h2 className="font-medium p-[17px] text-[13px]   col-span-2 text-right border-r"></h2>

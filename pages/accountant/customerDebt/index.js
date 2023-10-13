@@ -1,116 +1,90 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import "react-datepicker/dist/react-datepicker.css";
-
 import { Grid6 as IconExcel, SearchNormal1 as IconSearch, Refresh2 } from "iconsax-react";
-
-import Select from "react-select";
-import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
-import vi from "date-fns/locale/vi";
-registerLocale("vi", vi);
 
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
 import Pagination from "/components/UI/pagination";
-
-import Swal from "sweetalert2";
-
-import ReactExport from "react-data-export";
-import { useEffect } from "react";
 import Popup_chitietPhatsinh from "./(popup)/details_arises";
 import Popup_chitietDauki from "./(popup)/details_first";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
-import styleDatePicker from "components/UI/configs/configDatePicker";
-import configSelectFillter from "components/UI/configs/configSelectFillter";
 import SearchComponent from "components/UI/filterComponents/searchComponent";
 import SelectComponent from "components/UI/filterComponents/selectComponent";
 import DatepickerComponent from "components/UI/filterComponents/dateTodateComponent";
-import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
 import OnResetData from "components/UI/btnResetData/btnReset";
-
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
 
 const Index = (props) => {
+    const initialData = {
+        data: [],
+        dataExcel: [],
+        listBr: [],
+        listSupplier: [],
+    };
+    const initialValue = {
+        idSupplier: null,
+        idBranch: null,
+        valueDate: {
+            startDate: null,
+            endDate: null,
+        },
+    };
+    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
     const dataLang = props.dataLang;
     const router = useRouter();
-
-    const [data, sData] = useState([]);
-    const [dataExcel, sDataExcel] = useState([]);
-
     const [onFetching, sOnFetching] = useState(false);
     const [onFetching_filter, sOnFetching_filter] = useState(false);
-
     const [totalItems, sTotalItems] = useState([]);
     const [keySearch, sKeySearch] = useState("");
     const [limit, sLimit] = useState(15);
     const [total, sTotal] = useState({});
-
-    const [listBr, sListBr] = useState([]);
-    const [lisCode, sListCode] = useState([]);
-    const [listSupplier, sListSupplier] = useState([]);
-
-    const [idCode, sIdCode] = useState(null);
-    const [idSupplier, sIdSupplier] = useState(null);
-    const [idBranch, sIdBranch] = useState(null);
-    const [valueDate, sValueDate] = useState({
-        startDate: null,
-        endDate: null,
-    });
-    const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
-
-    const _HandleSelectTab = (e) => {
-        router.push({
-            pathname: router.route,
-            query: { tab: e },
-        });
-    };
+    const [dataTable, sDataTable] = useState(initialData);
+    const [valueChange, sValueChange] = useState(initialValue);
 
     useEffect(() => {
         router.push({
             pathname: router.route,
             query: { tab: router.query?.tab ? router.query?.tab : "all" },
         });
+        const pastDays = 30;
+        const today = new Date();
+        const pastDate = new Date(today);
+        pastDate.setDate(today.getDate() - pastDays);
+        sValueChange((e) => ({ ...e, valueDate: { startDate: pastDate, endDate: today } }));
     }, []);
 
     const _ServerFetching = async () => {
         await Axios(
             "GET",
-            `/api_web/Api_debt_supplier/GetDebtSuppliers?csrf_protection=true&cong=true`,
+            `/api_web/Api_debt_client/debtClient?csrf_protection=true`,
             {
                 params: {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
-                    "filter[supplier_id]": idSupplier ? idSupplier.value : null,
+                    "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
+                    "filter[supplier_id]": valueChange.idSupplier ? valueChange.idSupplier.value : null,
                     "filter[start_date]":
-                        valueDate?.startDate != null ? moment(valueDate?.startDate).format("YYYY-MM-DD") : null,
+                        valueChange.valueDate?.startDate != null
+                            ? moment(valueChange.valueDate?.startDate).format("YYYY-MM-DD")
+                            : null,
                     "filter[end_date]":
-                        valueDate?.endDate != null ? moment(valueDate?.endDate).format("YYYY-MM-DD") : null,
+                        valueChange.valueDate?.endDate != null
+                            ? moment(valueChange.valueDate?.endDate).format("YYYY-MM-DD")
+                            : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output, rTotal } = response.data;
-                    sData(rResult);
+                    let { rResult, output, rTotal } = response.data;
+                    sDataTable((e) => ({ ...e, data: rResult, dataExcel: rResult }));
                     sTotalItems(output);
-                    sDataExcel(rResult);
                     sTotal(rTotal);
                 }
                 sOnFetching(false);
@@ -121,17 +95,16 @@ const Index = (props) => {
     const _ServerFetching_filter = async () => {
         await Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
-                var { isSuccess, result } = response.data;
-                sListBr(result);
+                let { result } = response.data;
+                sDataTable((e) => ({ ...e, listBr: result?.map((e) => ({ label: e.name, value: e.id })) }));
             }
         });
         await Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
-                var db = response.data.rResult;
-                sListSupplier(db?.map((e) => ({ label: e.name, value: e.id })));
+                let { rResult } = response.data;
+                sDataTable((e) => ({ ...e, listSupplier: rResult?.map((e) => ({ label: e.name, value: e.id })) }));
             }
         });
-
         sOnFetching_filter(false);
     };
 
@@ -147,19 +120,17 @@ const Index = (props) => {
         (router.query.tab && sOnFetching(true)) ||
             (keySearch && sOnFetching(true)) ||
             (router.query?.tab && sOnFetching_filter(true)) ||
-            (idBranch != null && sOnFetching(true)) ||
-            (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true)) ||
-            (idSupplier != null && sOnFetching(true)) ||
-            (idCode != null && sOnFetching(true));
+            (valueChange.idBranch != null && sOnFetching(true)) ||
+            (valueChange.valueDate.startDate != null && valueChange.valueDate.endDate != null && sOnFetching(true)) ||
+            (valueChange.idSupplier != null && sOnFetching(true));
     }, [
         limit,
         router.query?.page,
         router.query?.tab,
-        idBranch,
-        valueDate.endDate,
-        valueDate.startDate,
-        idSupplier,
-        idCode,
+        valueChange.idBranch,
+        valueChange.valueDate.endDate,
+        valueChange.valueDate.startDate,
+        valueChange.idSupplier,
     ]);
 
     const formatNumber = (number) => {
@@ -197,23 +168,8 @@ const Index = (props) => {
         });
     };
 
-    const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
+    const onchangFilter = (type) => (value) => sValueChange((e) => ({ ...e, [type]: value }));
 
-    const onchang_filter = (type, value) => {
-        if (type == "branch") {
-            sIdBranch(value);
-        } else if (type == "date") {
-            sValueDate(value);
-        } else if (type == "supplier") {
-            sIdSupplier(value);
-        } else if (type == "code") {
-            sIdCode(value);
-        }
-    };
-
-    const _HandleFresh = () => {
-        sOnFetching(true);
-    };
     const multiDataSet = [
         {
             columns: [
@@ -226,7 +182,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.debt_suppliers_code || "debt_suppliers_code"}`,
+                    title: `${"Mã KH"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -234,7 +190,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.debt_suppliers_name || "debt_suppliers_name"}`,
+                    title: `${"Tên khách hàng"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -290,61 +246,39 @@ const Index = (props) => {
                     },
                 },
             ],
-            data: dataExcel?.map((e) => [
+            data: dataTable.dataExcel?.map((e) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.code ? e?.code : ""}` },
                 { value: `${e?.name ? e?.name : ""}` },
                 { value: `${e?.no_start ? formatNumber(e?.no_start) : ""}` },
-                { value: `${e?.chi_start ? formatNumber(e?.chi_start) : ""}` },
+                { value: `${e?.thu_start ? formatNumber(e?.thu_start) : ""}` },
                 { value: `${e?.no_debt ? formatNumber(e?.no_debt) : ""}` },
-                { value: `${e?.chi_debt ? formatNumber(e?.chi_debt) : ""}` },
+                { value: `${e?.thu_debt ? formatNumber(e?.thu_debt) : ""}` },
                 { value: `${e?.no_end ? formatNumber(e?.no_end) : ""}` },
-                { value: `${e?.chi_end ? formatNumber(e?.chi_end) : ""}` },
+                { value: `${e?.thu_end ? formatNumber(e?.thu_end) : ""}` },
             ]),
         },
     ];
-    // useEffect(() => {
-    //   // Set the default value to the current month
-    //   const today = new Date();
-    //   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    //   const lastDayOfMonth = new Date(
-    //     today.getFullYear(),
-    //     today.getMonth() + 1,
-    //     0
-    //   );
 
-    //   sValueDate({
-    //     startDate: firstDayOfMonth,
-    //     endDate: lastDayOfMonth,
-    //   });
-    // }, []);
-
-    useEffect(() => {
-        // Calculate the past period (e.g., 30 days ago)
-        const pastDays = 30;
-        const today = new Date();
-        const pastDate = new Date(today);
-        pastDate.setDate(today.getDate() - pastDays);
-
-        sValueDate({
-            startDate: pastDate,
-            endDate: today,
-        });
-    }, []);
+    const propsPopup = {
+        dataLang,
+        date: valueChange.valueDate,
+        idBranch: valueChange.idBranch,
+        idSupplier: valueChange.idSupplier,
+    };
     return (
         <React.Fragment>
             <Head>
-                <title>{dataLang?.debt_suppliers || "debt_suppliers"} </title>
+                <title>{"Công nợ khách hàng"} </title>
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
-                {/* trangthaiExprired */}
                 {trangthaiExprired ? (
                     <div className="p-3"></div>
                 ) : (
                     <div className={` flex space-x-3 xl:text-[14.5px] text-[12px]`}>
-                        <h6 className="text-[#141522]/40">{dataLang?.debt_suppliers || "debt_suppliers"}</h6>
+                        <h6 className="text-[#141522]/40">{"Công nợ khách hàng"}</h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{dataLang?.debt_suppliers || "debt_suppliers"}</h6>
+                        <h6>{"Công nợ khách hàng"}</h6>
                     </div>
                 )}
 
@@ -352,9 +286,7 @@ const Index = (props) => {
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className="flex justify-between">
-                                <h2 className="text-2xl text-[#52575E] capitalize">
-                                    {dataLang?.debt_suppliers || "debt_suppliers"}
-                                </h2>
+                                <h2 className="text-2xl text-[#52575E] capitalize">{"Công nợ khách hàng"}</h2>
                             </div>
                             <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
                                 <div className="xl:space-y-3 space-y-2">
@@ -374,10 +306,10 @@ const Index = (props) => {
                                                                 "purchase_order_branch",
                                                             isDisabled: true,
                                                         },
-                                                        ...listBr_filter,
+                                                        ...dataTable.listBr,
                                                     ]}
-                                                    value={idBranch}
-                                                    onChange={onchang_filter.bind(this, "branch")}
+                                                    value={valueChange.idBranch}
+                                                    onChange={onchangFilter("idBranch")}
                                                     placeholder={
                                                         dataLang?.purchase_order_table_branch ||
                                                         "purchase_order_table_branch"
@@ -388,22 +320,22 @@ const Index = (props) => {
                                                         {
                                                             value: "",
                                                             label:
-                                                                dataLang?.purchase_order_branch ||
-                                                                "purchase_order_branch",
+                                                                dataLang?.purchase_order_supplier ||
+                                                                "purchase_order_supplier",
                                                             isDisabled: true,
                                                         },
-                                                        ...listBr_filter,
+                                                        ...dataTable.listSupplier,
                                                     ]}
-                                                    value={idSupplier}
-                                                    onChange={onchang_filter.bind(this, "supplier")}
+                                                    onChange={onchangFilter("idSupplier")}
+                                                    value={valueChange.idSupplier}
                                                     placeholder={
                                                         dataLang?.purchase_order_table_supplier ||
                                                         "purchase_order_table_supplier"
                                                     }
                                                 />
                                                 <DatepickerComponent
-                                                    value={valueDate}
-                                                    onChange={onchang_filter.bind(this, "date")}
+                                                    value={valueChange.valueDate}
+                                                    onChange={onchangFilter("valueDate")}
                                                 />
                                             </div>
                                         </div>
@@ -411,11 +343,11 @@ const Index = (props) => {
                                             <div className="flex justify-end items-center gap-2">
                                                 <OnResetData sOnFetching={sOnFetching} />
                                                 <div>
-                                                    {dataExcel?.length > 0 && (
+                                                    {dataTable.dataExcel?.length > 0 && (
                                                         <ExcelFileComponent
                                                             multiDataSet={multiDataSet}
-                                                            filename={"Danh sách công nợ nhà cung cấp"}
-                                                            title="DSCNNCC"
+                                                            filename={"Danh sách công nợ khách hàng"}
+                                                            title="DSCNKH"
                                                             dataLang={dataLang}
                                                         />
                                                     )}
@@ -432,12 +364,12 @@ const Index = (props) => {
                                         <div className="grid grid-cols-12  sticky top-0 z-10 rounded-xl shadow-md bg-gray-50 divide-x">
                                             <div className="col-span-1 grid items-center">
                                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]   text-center ">
-                                                    {dataLang?.debt_suppliers_code || "debt_suppliers_code"}
+                                                    {dataLang?.customerDebt_code || "customerDebt_code"}
                                                 </h4>
                                             </div>
                                             <div className="col-span-2 grid items-center">
                                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]   text-center ">
-                                                    {dataLang?.debt_suppliers_name || "debt_suppliers_name"}
+                                                    {dataLang?.customerDebt_suppliert || "customerDebt_suppliert"}
                                                 </h4>
                                             </div>
                                             <div className="col-span-3 grid grid-cols-4  items-center justify-center">
@@ -448,7 +380,7 @@ const Index = (props) => {
                                                     {dataLang?.debt_suppliers_inDebt || "debt_suppliers_inDebt"}
                                                 </h4>
                                                 <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.debt_suppliers_Spend || "debt_suppliers_Spend"}
+                                                    {dataLang?.customerDebt_collect || "customerDebt_collect"}
                                                 </h4>
                                             </div>
                                             <div className="col-span-3 grid grid-cols-4   items-center justify-center">
@@ -459,7 +391,7 @@ const Index = (props) => {
                                                     {dataLang?.debt_suppliers_inDebt || "debt_suppliers_inDebt"}
                                                 </h4>
                                                 <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.debt_suppliers_Spend || "debt_suppliers_Spend"}
+                                                    {dataLang?.customerDebt_collect || "customerDebt_collect"}
                                                 </h4>
                                             </div>
                                             <div className="col-span-3 grid grid-cols-4  items-center justify-center">
@@ -470,16 +402,16 @@ const Index = (props) => {
                                                     {dataLang?.debt_suppliers_inDebt || "debt_suppliers_inDebt"}
                                                 </h4>
                                                 <h4 className="2xl:text-[14px] pt-1 xl:text-[10px]  text-[8px] px-2 py-0.5  text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                    {dataLang?.debt_suppliers_Spend || "debt_suppliers_Spend"}
+                                                    {dataLang?.customerDebt_collect || "customerDebt_collect"}
                                                 </h4>
                                             </div>
                                         </div>
                                         {onFetching ? (
                                             <Loading className="h-80" color="#0f4f9e" />
-                                        ) : data?.length > 0 ? (
+                                        ) : dataTable.data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                    {data?.map((e) => (
+                                                    {dataTable.data?.map((e) => (
                                                         <div
                                                             className="relative  grid grid-cols-12 items-center py-1.5  hover:bg-slate-100/40 group"
                                                             key={e.id.toString()}
@@ -496,8 +428,6 @@ const Index = (props) => {
                                                                         "-"
                                                                     ) : (
                                                                         <Popup_chitietDauki
-                                                                            dataLang={dataLang}
-                                                                            className="text-left"
                                                                             name={
                                                                                 e.no_start == "0"
                                                                                     ? "-"
@@ -505,31 +435,26 @@ const Index = (props) => {
                                                                             }
                                                                             id={e?.id}
                                                                             type={"no_start"}
-                                                                            date={valueDate}
+                                                                            className="text-left"
                                                                             supplier_name={e.name}
-                                                                            idBranch={idBranch}
-                                                                            idSupplier={idSupplier}
+                                                                            {...propsPopup}
                                                                         />
                                                                     )}
                                                                 </h4>
                                                                 <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                    {e.chi_start == "0" ? (
+                                                                    {e.thu_start == "0" ? (
                                                                         "-"
                                                                     ) : (
                                                                         <Popup_chitietDauki
-                                                                            dataLang={dataLang}
-                                                                            className="text-left"
                                                                             name={
-                                                                                e.chi_start == "0"
+                                                                                e.thu_start == "0"
                                                                                     ? "-"
-                                                                                    : formatNumber(e.chi_start)
+                                                                                    : formatNumber(e.thu_start)
                                                                             }
-                                                                            date={valueDate}
-                                                                            supplier_name={e.name}
                                                                             id={e?.id}
-                                                                            type={"chi_start"}
-                                                                            idBranch={idBranch}
-                                                                            idSupplier={idSupplier}
+                                                                            className="text-left"
+                                                                            supplier_name={e.name}
+                                                                            {...propsPopup}
                                                                         />
                                                                     )}
                                                                 </h4>
@@ -540,41 +465,35 @@ const Index = (props) => {
                                                                         "-"
                                                                     ) : (
                                                                         <Popup_chitietPhatsinh
-                                                                            dataLang={dataLang}
-                                                                            className="text-left uppercase"
-                                                                            supplier_name={e.name}
                                                                             name={
                                                                                 e.no_debt == "0"
                                                                                     ? "-"
                                                                                     : formatNumber(e.no_debt)
                                                                             }
+                                                                            className="text-left uppercase"
                                                                             id={e?.id}
-                                                                            date={valueDate}
                                                                             type={"no_debt"}
-                                                                            idBranch={idBranch}
-                                                                            idSupplier={idSupplier}
+                                                                            supplier_name={e.name}
+                                                                            {...propsPopup}
                                                                         />
                                                                     )}
                                                                 </h4>
 
                                                                 <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-[#0F4F9E] hover:text-blue-600 transition-all duration-300 ease-in-out px-2 col-span-2 capitalize">
-                                                                    {e.chi_debt == "0" ? (
+                                                                    {e.thu_debt == "0" ? (
                                                                         "-"
                                                                     ) : (
                                                                         <Popup_chitietPhatsinh
-                                                                            dataLang={dataLang}
                                                                             className="text-left uppercase"
-                                                                            supplier_name={e.name}
                                                                             name={
-                                                                                e.chi_debt == "0"
+                                                                                e.thu_debt == "0"
                                                                                     ? "-"
-                                                                                    : formatNumber(e.chi_debt)
+                                                                                    : formatNumber(e.thu_debt)
                                                                             }
                                                                             id={e?.id}
-                                                                            date={valueDate}
-                                                                            type={"chi_debt"}
-                                                                            idBranch={idBranch}
-                                                                            idSupplier={idSupplier}
+                                                                            type={"thu_debt"}
+                                                                            supplier_name={e.name}
+                                                                            {...propsPopup}
                                                                         />
                                                                     )}
                                                                 </h4>
@@ -585,7 +504,7 @@ const Index = (props) => {
                                                                     {e.no_end == "0" ? "-" : formatNumber(e.no_end)}
                                                                 </h4>
                                                                 <h4 className="text-right 3xl:text-base 2xl:text-[12.5px] py-2 xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 capitalize">
-                                                                    {e.chi_end == "0" ? "-" : formatNumber(e.chi_end)}
+                                                                    {e.thu_end == "0" ? "-" : formatNumber(e.thu_end)}
                                                                 </h4>
                                                             </div>
                                                         </div>
@@ -622,7 +541,7 @@ const Index = (props) => {
                                     {formatNumber(total?.no_start)}
                                 </h3>
                                 <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                    {formatNumber(total?.chi_start)}
+                                    {formatNumber(total?.thu_start)}
                                 </h3>
                             </div>
                             <div className="col-span-3 grid grid-cols-4  items-center justify-center">
@@ -630,7 +549,7 @@ const Index = (props) => {
                                     {formatNumber(total?.no_debt)}
                                 </h3>
                                 <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right border-r">
-                                    {formatNumber(total?.chi_debt)}
+                                    {formatNumber(total?.thu_debt)}
                                 </h3>
                             </div>
                             <div className="col-span-3 grid grid-cols-4  items-center justify-center">
@@ -638,11 +557,11 @@ const Index = (props) => {
                                     {formatNumber(total?.no_end)}
                                 </h3>
                                 <h3 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-zinc-600 font-medium text-[8px] px-4 col-span-2 text-right ">
-                                    {formatNumber(total?.chi_end)}
+                                    {formatNumber(total?.thu_end)}
                                 </h3>
                             </div>
                         </div>
-                        {data?.length != 0 && (
+                        {dataTable.data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6 className="">
                                     {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
@@ -662,5 +581,4 @@ const Index = (props) => {
         </React.Fragment>
     );
 };
-
 export default Index;

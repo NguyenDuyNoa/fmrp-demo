@@ -1,0 +1,14 @@
+import styleDatePicker from "../configs/configDatePicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Datepicker from "react-tailwindcss-datepicker";
+import DatePicker, { registerLocale } from "react-datepicker";
+import vi from "date-fns/locale/vi";
+registerLocale("vi", vi);
+const DatepickerComponent = ({ value, onChange, colSpan }) => {
+    return (
+        <div className="z-20 ml-1 " style={{ gridColumn: `span ${colSpan || 1}` }}>
+            <Datepicker {...styleDatePicker} value={value} onChange={onChange} />
+        </div>
+    );
+};
+export default DatepickerComponent;
