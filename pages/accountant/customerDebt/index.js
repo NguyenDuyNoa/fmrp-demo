@@ -25,10 +25,10 @@ const Index = (props) => {
         data: [],
         dataExcel: [],
         listBr: [],
-        listSupplier: [],
+        listClients: [],
     };
     const initialValue = {
-        idSupplier: null,
+        idClient: null,
         idBranch: null,
         valueDate: {
             startDate: null,
@@ -69,7 +69,7 @@ const Index = (props) => {
                     limit: limit,
                     page: router.query?.page || 1,
                     "filter[branch_id]": valueChange.idBranch != null ? valueChange.idBranch.value : null,
-                    "filter[supplier_id]": valueChange.idSupplier ? valueChange.idSupplier.value : null,
+                    "filter[client_id]": valueChange.idClient ? valueChange.idClient.value : null,
                     "filter[start_date]":
                         valueChange.valueDate?.startDate != null
                             ? moment(valueChange.valueDate?.startDate).format("YYYY-MM-DD")
@@ -99,13 +99,46 @@ const Index = (props) => {
                 sDataTable((e) => ({ ...e, listBr: result?.map((e) => ({ label: e.name, value: e.id })) }));
             }
         });
-        await Axios("GET", "/api_web/api_supplier/supplier/?csrf_protection=true", {}, (err, response) => {
+        await Axios("GET", "/api_web/api_client/client_option/?csrf_protection=true", {}, (err, response) => {
             if (!err) {
                 let { rResult } = response.data;
-                sDataTable((e) => ({ ...e, listSupplier: rResult?.map((e) => ({ label: e.name, value: e.id })) }));
+                sDataTable((e) => ({
+                    ...e,
+                    listClients: rResult?.map(({ name, id }) => ({ label: name, value: id })),
+                }));
             }
         });
         sOnFetching_filter(false);
+    };
+
+    let searchTimeout;
+
+    const _HandleSeachApi = (inputValue) => {
+        if (inputValue == "") {
+            return;
+        } else {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                Axios(
+                    "POST",
+                    `/api_web/api_client/client_option/?csrf_protection=true`,
+                    {
+                        data: {
+                            term: inputValue,
+                        },
+                    },
+                    (err, response) => {
+                        if (!err) {
+                            let { rResult } = response.data;
+                            sDataTable((e) => ({
+                                ...e,
+                                listClients: rResult?.map(({ name, id }) => ({ label: name, value: id })),
+                            }));
+                        }
+                    }
+                );
+            }, 500);
+        }
     };
 
     useEffect(() => {
@@ -122,7 +155,7 @@ const Index = (props) => {
             (router.query?.tab && sOnFetching_filter(true)) ||
             (valueChange.idBranch != null && sOnFetching(true)) ||
             (valueChange.valueDate.startDate != null && valueChange.valueDate.endDate != null && sOnFetching(true)) ||
-            (valueChange.idSupplier != null && sOnFetching(true));
+            (valueChange.idClient != null && sOnFetching(true));
     }, [
         limit,
         router.query?.page,
@@ -130,7 +163,7 @@ const Index = (props) => {
         valueChange.idBranch,
         valueChange.valueDate.endDate,
         valueChange.valueDate.startDate,
-        valueChange.idSupplier,
+        valueChange.idClient,
     ]);
 
     const formatNumber = (number) => {
@@ -264,7 +297,7 @@ const Index = (props) => {
         dataLang,
         date: valueChange.valueDate,
         idBranch: valueChange.idBranch,
-        idSupplier: valueChange.idSupplier,
+        idClient: valueChange.idClient,
     };
     return (
         <React.Fragment>
@@ -318,21 +351,21 @@ const Index = (props) => {
                                                     }
                                                 />
                                                 <SelectComponent
+                                                    // onInputChange={_HandleSeachApi.bind(this)}
                                                     options={[
                                                         {
                                                             value: "",
                                                             label:
-                                                                dataLang?.purchase_order_supplier ||
-                                                                "purchase_order_supplier",
+                                                                dataLang?.customerDebt_suppliert ||
+                                                                "customerDebt_suppliert",
                                                             isDisabled: true,
                                                         },
-                                                        ...dataTable.listSupplier,
+                                                        ...dataTable.listClients,
                                                     ]}
-                                                    onChange={onchangFilter("idSupplier")}
-                                                    value={valueChange.idSupplier}
+                                                    onChange={onchangFilter("idClient")}
+                                                    value={valueChange.idClient}
                                                     placeholder={
-                                                        dataLang?.purchase_order_table_supplier ||
-                                                        "purchase_order_table_supplier"
+                                                        dataLang?.customerDebt_suppliert || "customerDebt_suppliert"
                                                     }
                                                 />
                                                 <DatepickerComponent
