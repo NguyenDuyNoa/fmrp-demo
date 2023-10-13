@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import "react-datepicker/dist/react-datepicker.css";
-import { Grid6 as IconExcel, SearchNormal1 as IconSearch, Refresh2 } from "iconsax-react";
+import { Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";

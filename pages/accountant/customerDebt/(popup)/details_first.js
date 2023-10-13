@@ -18,7 +18,7 @@ const Popup_chitietDauki = (props) => {
         data: [],
         onFetching: false,
         total: null,
-        totalItems: [],
+        totalItems: { output: null, data: null },
         currentPage: 1,
         limit: 15,
     };
@@ -62,7 +62,12 @@ const Popup_chitietDauki = (props) => {
             (err, response) => {
                 if (!err) {
                     var { rResult, rTotal, data, output } = response.data;
-                    sIsState((pver) => ({ ...pver, total: rTotal?.total_amount, data: rResult, totalItems: output }));
+                    sIsState((pver) => ({
+                        ...pver,
+                        total: { rTotal: rTotal },
+                        data: rResult,
+                        totalItems: { output: output, data: data },
+                    }));
                 }
                 sIsState((pver) => ({ ...pver, onFetching: false }));
             }
@@ -106,10 +111,7 @@ const Popup_chitietDauki = (props) => {
     }, [isState.data]);
 
     // Hàm để xử lý sự kiện chuyển trang
-    const handlePageChange = (pageNumber) => {
-        sIsState((pver) => ({ ...pver, currentPage: pageNumber }));
-    };
-
+    const handlePageChange = (pageNumber) => sIsState((pver) => ({ ...pver, currentPage: pageNumber }));
     return (
         <>
             <PopupEdit
@@ -131,7 +133,7 @@ const Popup_chitietDauki = (props) => {
                                 {dataLang?.debt_suppliers_balance || "debt_suppliers_balance"}
                             </h2>
                             <h2 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-semibold p-2 text-white">
-                                {formatNumber(data.total?.data?.debt_begin)}
+                                {formatNumber(isState.totalItems?.data?.debt_begin)}
                             </h2>
                         </div>
                         <div className="bg-slate-100">
@@ -260,7 +262,7 @@ const Popup_chitietDauki = (props) => {
                                 <div className="flex space-x-5 items-center justify-between">
                                     <Pagination
                                         postsPerPage={isState.limit}
-                                        totalPosts={Number(isState.totalItems?.iTotalDisplayRecords)}
+                                        totalPosts={Number(isState.totalItems?.output?.iTotalDisplayRecords)}
                                         paginate={handlePageChange}
                                         currentPage={isState.currentPage}
                                     />
@@ -308,7 +310,7 @@ const Popup_chitietDauki = (props) => {
                                         {formatNumber(isState.total?.rTotal?.no_amount)}
                                     </h2>
                                     <h2 className="font-medium p-2 text-[13px] border-r border-b   col-span-2 text-right">
-                                        {formatNumber(isState.total?.rTotal?.chi_amount)}
+                                        {formatNumber(isState.total?.rTotal?.thu_amount)}
                                     </h2>
                                     <h2 className="font-medium p-[17px] text-[13px] border-r border-b  col-span-2 text-right"></h2>
                                     <h2 className="font-medium p-[17px] text-[13px] border-r border-b  col-span-2 text-right"></h2>
