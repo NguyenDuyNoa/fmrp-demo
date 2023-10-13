@@ -269,16 +269,16 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{"Công nợ khách hàng"} </title>
+                <title>{dataLang?.customerDebt_title || "customerDebt_title"} </title>
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
                 {trangthaiExprired ? (
                     <div className="p-3"></div>
                 ) : (
                     <div className={` flex space-x-3 xl:text-[14.5px] text-[12px]`}>
-                        <h6 className="text-[#141522]/40">{"Công nợ khách hàng"}</h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.customerDebt_title || "customerDebt_title"}</h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{"Công nợ khách hàng"}</h6>
+                        <h6>{dataLang?.customerDebt_lits || "customerDebt_lits"}</h6>
                     </div>
                 )}
 
@@ -286,7 +286,9 @@ const Index = (props) => {
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className="flex justify-between">
-                                <h2 className="text-2xl text-[#52575E] capitalize">{"Công nợ khách hàng"}</h2>
+                                <h2 className="text-2xl text-[#52575E] capitalize">
+                                    {dataLang?.customerDebt_lits || "customerDebt_lits"}
+                                </h2>
                             </div>
                             <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
                                 <div className="xl:space-y-3 space-y-2">
@@ -346,7 +348,9 @@ const Index = (props) => {
                                                     {dataTable.dataExcel?.length > 0 && (
                                                         <ExcelFileComponent
                                                             multiDataSet={multiDataSet}
-                                                            filename={"Danh sách công nợ khách hàng"}
+                                                            filename={
+                                                                dataLang?.customerDebt_lits || "customerDebt_lits"
+                                                            }
                                                             title="DSCNKH"
                                                             dataLang={dataLang}
                                                         />

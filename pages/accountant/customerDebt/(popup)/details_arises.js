@@ -125,7 +125,7 @@ const Popup_chitietPhatsinh = (props) => {
                         <div className="bg-slate-100">
                             <div className=" flex gap-2 justify-between p-2">
                                 <h2 className="flex gap-2 font-semibold 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
-                                    {dataLang?.debt_suppliers_name_Detail || "debt_suppliers_name_Detail"}
+                                    {dataLang?.customerDebt_suppliert || "customerDebt_suppliert"}:
                                     <h2 className="font-semibold capitalize text-blue-700 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
                                         {props?.supplier_name}
                                     </h2>
@@ -240,12 +240,16 @@ const Popup_chitietPhatsinh = (props) => {
                                     )}
                                 </div>
                                 <div className="flex space-x-5 items-center justify-between">
-                                    <Pagination
-                                        postsPerPage={isState.limit}
-                                        totalPosts={Number(isState.totalItems?.iTotalDisplayRecords)}
-                                        paginate={handlePageChange}
-                                        currentPage={isState.currentPage}
-                                    />
+                                    {isState.data?.length > 0 ? (
+                                        <Pagination
+                                            postsPerPage={isState.limit}
+                                            totalPosts={Number(isState.totalItems?.iTotalDisplayRecords)}
+                                            paginate={handlePageChange}
+                                            currentPage={isState.currentPage}
+                                        />
+                                    ) : (
+                                        <div></div>
+                                    )}
                                     <div className="flex items-center gap-2">
                                         <div className="relative">
                                             <select

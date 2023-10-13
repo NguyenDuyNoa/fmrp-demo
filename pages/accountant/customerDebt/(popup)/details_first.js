@@ -139,7 +139,7 @@ const Popup_chitietDauki = (props) => {
                         <div className="bg-slate-100">
                             <div className=" flex gap-2 justify-between p-2">
                                 <h2 className="flex gap-2 font-semibold 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
-                                    {dataLang?.debt_suppliers_name_Detail || "debt_suppliers_name_Detail"}
+                                    {dataLang?.customerDebt_suppliert || "customerDebt_suppliert"}:
                                     <h2 className="font-semibold capitalize text-blue-700 3xl:text-base 2xl:text-[12.5px] xl:text-[11px]">
                                         {props?.supplier_name}
                                     </h2>
@@ -252,20 +252,22 @@ const Popup_chitietDauki = (props) => {
                                                     {props.dataLang?.purchase_order_table_item_not_found ||
                                                         "purchase_order_table_item_not_found"}
                                                 </h1>
-                                                <div className="flex items-center justify-around mt-6 ">
-                                                    {/* <Popup_dskh onRefresh={_ServerFetching.bind(this)} dataLang={dataLang} className="xl:text-xs text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105" />     */}
-                                                </div>
+                                                <div className="flex items-center justify-around mt-6 "></div>
                                             </div>
                                         </div>
                                     )}
                                 </div>
                                 <div className="flex space-x-5 items-center justify-between">
-                                    <Pagination
-                                        postsPerPage={isState.limit}
-                                        totalPosts={Number(isState.totalItems?.output?.iTotalDisplayRecords)}
-                                        paginate={handlePageChange}
-                                        currentPage={isState.currentPage}
-                                    />
+                                    {isState.data?.length > 0 ? (
+                                        <Pagination
+                                            postsPerPage={isState.limit}
+                                            totalPosts={Number(isState.totalItems?.output?.iTotalDisplayRecords)}
+                                            paginate={handlePageChange}
+                                            currentPage={isState.currentPage}
+                                        />
+                                    ) : (
+                                        <div></div>
+                                    )}
                                     <div className="flex items-center gap-2">
                                         <div className="relative">
                                             <select
