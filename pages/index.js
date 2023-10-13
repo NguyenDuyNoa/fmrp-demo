@@ -3,27 +3,14 @@ import Head from "next/head";
 import dynamic from "next/dynamic";
 import { useSelector, useDispatch } from "react-redux";
 
-import {
-    ArrowUp as IconArrowUp,
-    ArrowDown as IconArrowDown,
-    ArrowRight2 as IconArrowRight2,
-} from "iconsax-react";
+import { ArrowUp as IconArrowUp, ArrowDown as IconArrowDown, ArrowRight2 as IconArrowRight2 } from "iconsax-react";
 import Expirred from "components/UI/expired";
 const Pie = dynamic(() => import("@ant-design/plots").then(({ Pie }) => Pie), {
     ssr: false,
 });
-const DualAxes = dynamic(
-    () => import("@ant-design/plots").then(({ DualAxes }) => DualAxes),
-    { ssr: false }
-);
-const Column = dynamic(
-    () => import("@ant-design/plots").then(({ Column }) => Column),
-    { ssr: false }
-);
-const Area = dynamic(
-    () => import("@ant-design/plots").then(({ Area }) => Area),
-    { ssr: false }
-);
+const DualAxes = dynamic(() => import("@ant-design/plots").then(({ DualAxes }) => DualAxes), { ssr: false });
+const Column = dynamic(() => import("@ant-design/plots").then(({ Column }) => Column), { ssr: false });
+const Area = dynamic(() => import("@ant-design/plots").then(({ Area }) => Area), { ssr: false });
 const Bar = dynamic(() => import("@ant-design/plots").then(({ Bar }) => Bar), {
     ssr: false,
 });
@@ -62,14 +49,8 @@ const Index = () => {
                         }}
                     />
                 )}
-                <div
-                    className={`${
-                        trangthaiExprired ? "mt-7" : ""
-                    } flex   space-x-5 justify-between`}
-                >
-                    <h3 className="text-[#11315B] text-lg font-medium not-italic	leading-6">
-                        Lệnh sản xuất
-                    </h3>
+                <div className={`${trangthaiExprired ? "mt-7" : ""} flex   space-x-5 justify-between`}>
+                    <h3 className="text-[#11315B] text-lg font-medium not-italic	leading-6">Lệnh sản xuất</h3>
                     <button
                         style={{
                             zIndex: dataPstWH && 99999,
@@ -141,14 +122,8 @@ const ListTask = React.memo(() => {
     return (
         <div className="grid grid-cols-5 gap-5">
             {data.map((e, i) => (
-                <div
-                    className={`w-full p-4 rounded space-y-1.5`}
-                    style={{ backgroundColor: `${e.bgColor}` }}
-                    key={i}
-                >
-                    <h4 className="text-[#3A3E4C] font-normal text-sm">
-                        {e.title}
-                    </h4>
+                <div className={`w-full p-4 rounded space-y-1.5`} style={{ backgroundColor: `${e.bgColor}` }} key={i}>
+                    <h4 className="text-[#3A3E4C] font-normal text-sm">{e.title}</h4>
                     <div className="flex justify-between items-end">
                         <h6
                             className="text-lg font-medium text-white w-12 h-12 flex flex-col justify-center items-center rounded"
@@ -208,9 +183,7 @@ const TienDoSX = React.memo(() => {
                 <button
                     onClick={_HandleTab.bind(this, 0)}
                     className={`${
-                        tab === 0
-                            ? "text-black bg-white"
-                            : "text-[#667085] bg-[#F9FAFB] hover:text-black"
+                        tab === 0 ? "text-black bg-white" : "text-[#667085] bg-[#F9FAFB] hover:text-black"
                     } px-3 py-2 border`}
                 >
                     Tất cả
@@ -218,9 +191,7 @@ const TienDoSX = React.memo(() => {
                 <button
                     onClick={_HandleTab.bind(this, 1)}
                     className={`${
-                        tab === 1
-                            ? "text-black bg-white"
-                            : "text-[#667085] bg-[#F9FAFB] hover:text-black"
+                        tab === 1 ? "text-black bg-white" : "text-[#667085] bg-[#F9FAFB] hover:text-black"
                     } px-3 py-2 border`}
                 >
                     Đang thực hiện
@@ -228,9 +199,7 @@ const TienDoSX = React.memo(() => {
                 <button
                     onClick={_HandleTab.bind(this, 2)}
                     className={`${
-                        tab === 2
-                            ? "text-black bg-white"
-                            : "text-[#667085] bg-[#F9FAFB] hover:text-black"
+                        tab === 2 ? "text-black bg-white" : "text-[#667085] bg-[#F9FAFB] hover:text-black"
                     } px-3 py-2 border`}
                 >
                     Chưa thực hiện
@@ -238,9 +207,7 @@ const TienDoSX = React.memo(() => {
                 <button
                     onClick={_HandleTab.bind(this, 3)}
                     className={`${
-                        tab === 3
-                            ? "text-black bg-white"
-                            : "text-[#667085] bg-[#F9FAFB] hover:text-black"
+                        tab === 3 ? "text-black bg-white" : "text-[#667085] bg-[#F9FAFB] hover:text-black"
                     } px-3 py-2 border`}
                 >
                     Tạm dừng
@@ -248,31 +215,22 @@ const TienDoSX = React.memo(() => {
             </div>
             <div className="py-3 divide-y divide-slate-200">
                 {data.map((e) => (
-                    <div
-                        className="flex items-center justify-between py-2 hover:bg-slate-100/30"
-                        key={e.name}
-                    >
+                    <div className="flex items-center justify-between py-2 hover:bg-slate-100/30" key={e.name}>
                         <div className="flex space-x-2 items-center w-[45%]">
                             <div className="min-w-[48px] h-12 rounded-full bg-slate-300" />
                             <div className="w-fit">
                                 <h6 className="line-clamp-1">{e.name}</h6>
-                                <p className="text-[#9295A4] font-[300] text-[13px]">
-                                    {e.date}
-                                </p>
+                                <p className="text-[#9295A4] font-[300] text-[13px]">{e.date}</p>
                             </div>
                         </div>
                         <div
                             className={`${
-                                e.percent >= 50
-                                    ? "bg-[#EBF5FF]"
-                                    : "bg-[#f6e8cd6d]"
+                                e.percent >= 50 ? "bg-[#EBF5FF]" : "bg-[#f6e8cd6d]"
                             } w-[28%] relative h-2 rounded-full bg-[#EBF5FF]`}
                         >
                             <div
                                 className={`${
-                                    e.percent >= 50
-                                        ? "bg-[#5599EC]"
-                                        : "bg-[#FF8F0D]"
+                                    e.percent >= 50 ? "bg-[#5599EC]" : "bg-[#FF8F0D]"
                                 } h-2 rounded-full absolute left-0`}
                                 style={{ width: `${e.percent}%` }}
                             />
@@ -327,9 +285,7 @@ const TienDoSX_1 = React.memo(() => {
                 <button
                     onClick={_HandleTab.bind(this, 0)}
                     className={`${
-                        tab === 0
-                            ? "text-black bg-white"
-                            : "text-[#667085] bg-[#F9FAFB] hover:text-black"
+                        tab === 0 ? "text-black bg-white" : "text-[#667085] bg-[#F9FAFB] hover:text-black"
                     } px-3 py-2 border`}
                 >
                     Tất cả
@@ -337,9 +293,7 @@ const TienDoSX_1 = React.memo(() => {
                 <button
                     onClick={_HandleTab.bind(this, 1)}
                     className={`${
-                        tab === 1
-                            ? "text-black bg-white"
-                            : "text-[#667085] bg-[#F9FAFB] hover:text-black"
+                        tab === 1 ? "text-black bg-white" : "text-[#667085] bg-[#F9FAFB] hover:text-black"
                     } px-3 py-2 border`}
                 >
                     Đang thực hiện
@@ -347,9 +301,7 @@ const TienDoSX_1 = React.memo(() => {
                 <button
                     onClick={_HandleTab.bind(this, 2)}
                     className={`${
-                        tab === 2
-                            ? "text-black bg-white"
-                            : "text-[#667085] bg-[#F9FAFB] hover:text-black"
+                        tab === 2 ? "text-black bg-white" : "text-[#667085] bg-[#F9FAFB] hover:text-black"
                     } px-3 py-2 border`}
                 >
                     Chưa thực hiện
@@ -357,9 +309,7 @@ const TienDoSX_1 = React.memo(() => {
                 <button
                     onClick={_HandleTab.bind(this, 3)}
                     className={`${
-                        tab === 3
-                            ? "text-black bg-white"
-                            : "text-[#667085] bg-[#F9FAFB] hover:text-black"
+                        tab === 3 ? "text-black bg-white" : "text-[#667085] bg-[#F9FAFB] hover:text-black"
                     } px-3 py-2 border`}
                 >
                     Tạm dừng
@@ -367,26 +317,18 @@ const TienDoSX_1 = React.memo(() => {
             </div>
             <div className="py-3 divide-y divide-slate-200">
                 {data.map((e) => (
-                    <div
-                        className="flex items-center justify-between py-2 hover:bg-slate-100/30"
-                        key={e.name}
-                    >
+                    <div className="flex items-center justify-between py-2 hover:bg-slate-100/30" key={e.name}>
                         <div className="flex space-x-2 items-center w-[50%] h-12">
                             <div className="w-fit">
                                 <h6 className="line-clamp-1">{e.name}</h6>
-                                <p className="text-[#9295A4] font-[300] text-[13px] line-clamp-1">
-                                    {e.group}
-                                </p>
+                                <p className="text-[#9295A4] font-[300] text-[13px] line-clamp-1">{e.group}</p>
                             </div>
                         </div>
                         <h6
                             className={`${
-                                (e.status === 1 &&
-                                    "text-[#0BAA2E] bg-[#EBFEF2]") ||
-                                (e.status === 2 &&
-                                    "text-[#FF8F0D] bg-[#FEF8EC]") ||
-                                (e.status === 3 &&
-                                    "text-[#EE1E1E] bg-[#FFEEF0]")
+                                (e.status === 1 && "text-[#0BAA2E] bg-[#EBFEF2]") ||
+                                (e.status === 2 && "text-[#FF8F0D] bg-[#FEF8EC]") ||
+                                (e.status === 3 && "text-[#EE1E1E] bg-[#FFEEF0]")
                             } py-2 px-3 text-center rounded-md`}
                         >
                             {e.status === 1 && "Đang thực hiện"}
@@ -475,21 +417,11 @@ const Table_NVL = React.memo(() => {
             <div>
                 <div className="grid grid-cols-8 gap-3 pl-3 pr-4 py-5 bg-slate-50">
                     <h5 className="text-[#667085] text-[13px]">STT</h5>
-                    <h5 className="text-[#667085] text-[13px] col-span-2 text-center">
-                        Mã NVL
-                    </h5>
-                    <h5 className="text-[#667085] text-[13px] col-span-3">
-                        Tên NVL
-                    </h5>
-                    <h5 className="text-[#667085] text-[13px] col-span-2 text-right">
-                        Số lượng
-                    </h5>
+                    <h5 className="text-[#667085] text-[13px] col-span-2 text-center">Mã NVL</h5>
+                    <h5 className="text-[#667085] text-[13px] col-span-3">Tên NVL</h5>
+                    <h5 className="text-[#667085] text-[13px] col-span-2 text-right">Số lượng</h5>
                 </div>
-                <ScrollArea
-                    className=" h-[350px] overflow-hidden"
-                    speed={1}
-                    smoothScrolling={true}
-                >
+                <ScrollArea className=" h-[350px] overflow-hidden" speed={1} smoothScrolling={true}>
                     <div className="divide-y divide-slate-100">
                         {data.map((e) => (
                             <div
@@ -497,15 +429,9 @@ const Table_NVL = React.memo(() => {
                                 key={e.stt.toString()}
                             >
                                 <h6>{e.stt}</h6>
-                                <h6 className="col-span-2 text-center">
-                                    {e.id}
-                                </h6>
-                                <h6 className="col-span-3 line-clamp-1">
-                                    {e.name}
-                                </h6>
-                                <h6 className="col-span-2 text-right">
-                                    {e.quantity?.toLocaleString()}
-                                </h6>
+                                <h6 className="col-span-2 text-center">{e.id}</h6>
+                                <h6 className="col-span-3 line-clamp-1">{e.name}</h6>
+                                <h6 className="col-span-2 text-right">{e.quantity?.toLocaleString()}</h6>
                             </div>
                         ))}
                     </div>
@@ -566,6 +492,7 @@ const PieChart_TopSP = React.memo(() => {
                     whiteSpace: "pre-wrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
+                    lineHeight: "1.2",
                 },
                 content: `Tổng\n ${132}`,
             },
