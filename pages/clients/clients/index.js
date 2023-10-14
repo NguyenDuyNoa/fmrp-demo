@@ -30,6 +30,10 @@ import ImageErrors from "components/UI/imageErrors";
 import { Tooltip } from "react-tippy";
 import { useSelector } from "react-redux";
 import OnResetData from "components/UI/btnResetData/btnReset";
+import SelectComponent from "components/UI/filterComponents/selectComponent";
+import SearchComponent from "components/UI/filterComponents/searchComponent";
+import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
+import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -415,117 +419,42 @@ const Index = (props) => {
                                     <div className="bg-slate-100 w-full rounded-lg grid grid-cols-6 justify-between xl:p-3 p-2">
                                         <div className="col-span-4">
                                             <div className="grid grid-cols-5 gap-2">
-                                                <div className="col-span-1">
-                                                    <form className="flex items-center relative">
-                                                        <IconSearch
-                                                            size={20}
-                                                            className="absolute 2xl:left-3 z-10  text-[#cccccc] xl:left-[4%] left-[1%]"
-                                                        />
-                                                        <input
-                                                            className=" relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  py-2.5 rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
-                                                            type="text"
-                                                            onChange={_HandleOnChangeKeySearch.bind(this)}
-                                                            placeholder={dataLang?.branch_search}
-                                                        />
-                                                    </form>
-                                                </div>
-                                                <div
-                                                    className={`${
-                                                        idBranch?.length > 2 ? "col-span-2" : "col-span-1"
-                                                    } ml-1 `}
-                                                >
-                                                    <Select
-                                                        // options={options}
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label: "Chọn chi nhánh",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...options,
-                                                        ]}
-                                                        onChange={onchang_filterBr.bind(this, "branch")}
-                                                        value={idBranch}
-                                                        placeholder={dataLang?.client_list_filterbrand}
-                                                        hideSelectedOptions={false}
-                                                        isMulti
-                                                        isClearable={true}
-                                                        className="rounded-md bg-white  xl:text-base text-[14.5px] z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        components={{
-                                                            MultiValue,
-                                                        }}
-                                                        closeMenuOnSelect={false}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
-                                                    />
-                                                </div>
+                                                <SearchComponent
+                                                    dataLang={dataLang}
+                                                    onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                    colSpan={1}
+                                                />
+                                                <SelectComponent
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label: "Chọn chi nhánh",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...options,
+                                                    ]}
+                                                    onChange={onchang_filterBr.bind(this, "branch")}
+                                                    value={idBranch}
+                                                    placeholder={dataLang?.client_list_filterbrand}
+                                                    colSpan={idBranch?.length > 1 ? 2 : 1}
+                                                    components={{ MultiValue }}
+                                                    isMulti={true}
+                                                    closeMenuOnSelect={false}
+                                                />
                                             </div>
                                         </div>
                                         <div className="col-span-2">
                                             <div className="flex space-x-2 items-center justify-end">
                                                 <OnResetData sOnFetching={sOnFetching} />
                                                 {data_ex?.length > 0 && (
-                                                    <ExcelFile
+                                                    <ExcelFileComponent
+                                                        multiDataSet={multiDataSet}
                                                         filename="Danh sách khách hàng"
                                                         title="Dskh"
-                                                        element={
-                                                            <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                                <IconExcel size={18} />
-                                                                <span>{dataLang?.client_list_exportexcel}</span>
-                                                            </button>
-                                                        }
-                                                    >
-                                                        <ExcelSheet
-                                                            dataSet={multiDataSet}
-                                                            data={multiDataSet}
-                                                            name="Organization"
-                                                        />
-                                                    </ExcelFile>
+                                                        dataLang={dataLang}
+                                                    />
                                                 )}
-                                                <label className="font-[300] text-slate-400">{dataLang?.display}</label>
-                                                <select
-                                                    className="outline-none"
-                                                    onChange={(e) => sLimit(e.target.value)}
-                                                    value={limit}
-                                                >
-                                                    <option disabled className="hidden">
-                                                        {limit == -1 ? "Tất cả" : limit}
-                                                    </option>
-                                                    <option value={15}>15</option>
-                                                    <option value={20}>20</option>
-                                                    <option value={40}>40</option>
-                                                    <option value={60}>60</option>
-                                                    <option value={-1}>Tất cả</option>
-                                                </select>
+                                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
                                         </div>
                                     </div>

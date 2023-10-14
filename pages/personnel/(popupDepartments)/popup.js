@@ -1,12 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import Select, { components } from "react-select";
+import { _ServerInstance as Axios } from "/services/axios";
 import PopupEdit from "/components/UI/popup";
-import {
-    Edit as IconEdit,
-    Trash as IconDelete,
-    Grid6 as IconExcel,
-    SearchNormal1 as IconSearch,
-} from "iconsax-react";
+import { Edit as IconEdit, Trash as IconDelete, Grid6 as IconExcel, SearchNormal1 as IconSearch } from "iconsax-react";
 import Swal from "sweetalert2";
 
 const Toast = Swal.mixin({
@@ -48,9 +44,7 @@ const Popup_phongban = (props) => {
                                   label: e.name,
                                   value: Number(e.id),
                               }))
-                              ?.filter((e) =>
-                                  valueBr?.some((x) => e.label !== x.label)
-                              ),
+                              ?.filter((e) => valueBr?.some((x) => e.label !== x.label)),
                       ]
                     : []
                 : props.listBr
@@ -166,13 +160,7 @@ const Popup_phongban = (props) => {
                     ? `${props.dataLang?.personnels_deparrtments_edit}`
                     : `${props.dataLang?.personnels_deparrtments_add}`
             }
-            button={
-                props.id ? (
-                    <IconEdit />
-                ) : (
-                    `${props.dataLang?.branch_popup_create_new}`
-                )
-            }
+            button={props.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
             onClickOpen={_ToggleModal.bind(this, true)}
             open={open}
             onClose={_ToggleModal.bind(this, false)}
@@ -183,8 +171,7 @@ const Popup_phongban = (props) => {
                     <div>
                         <div className="flex flex-wrap justify-between">
                             <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                {props.dataLang?.personnels_deparrtments_name}{" "}
-                                <span className="text-red-500">*</span>
+                                {props.dataLang?.personnels_deparrtments_name} <span className="text-red-500">*</span>
                             </label>
                             <input
                                 value={name}
@@ -192,17 +179,12 @@ const Popup_phongban = (props) => {
                                 name="fname"
                                 type="text"
                                 className={`${
-                                    errInput
-                                        ? "border-red-500"
-                                        : "focus:border-[#92BFF7] border-[#d0d5dd]"
+                                    errInput ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"
                                 } placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2`}
                             />
                             {errInput && (
                                 <label className="mb-2  text-[14px] text-red-500">
-                                    {
-                                        props.dataLang
-                                            ?.personnels_deparrtments_please
-                                    }
+                                    {props.dataLang?.personnels_deparrtments_please}
                                 </label>
                             )}
                         </div>
@@ -213,18 +195,14 @@ const Popup_phongban = (props) => {
                             </label>
                             <input
                                 value={email}
-                                onChange={_HandleChangeInput.bind(
-                                    this,
-                                    "email"
-                                )}
+                                onChange={_HandleChangeInput.bind(this, "email")}
                                 name="email"
                                 type="email"
                                 className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-lg text-[#52575E] font-normal p-2 border outline-none mb-2"
                             />
                         </div>
                         <label className="text-[#344054] font-normal text-sm mb-1 ">
-                            {props.dataLang?.client_list_brand}{" "}
-                            <span className="text-red-500">*</span>
+                            {props.dataLang?.client_list_brand} <span className="text-red-500">*</span>
                         </label>
                         <Select
                             closeMenuOnSelect={false}
@@ -259,9 +237,7 @@ const Popup_phongban = (props) => {
                                 control: (provided) => ({
                                     ...provided,
                                     //   border: '1px solid #d0d5dd',
-                                    borderColor: `${
-                                        errInputBr ? "red" : "#d0d5dd"
-                                    }`,
+                                    borderColor: `${errInputBr ? "red" : "#d0d5dd"}`,
                                     "&:hover": {
                                         borderColor: "none",
                                     },
@@ -276,9 +252,7 @@ const Popup_phongban = (props) => {
                             // className={`${errInputBr ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd]"} placeholder:text-slate-300 w-full  text-[#52575E] font-normal border outline-none rounded-lg bg-white border-none xl:text-base text-[14.5px]`}
                         />
                         {errInputBr && (
-                            <label className="mb-2  text-[14px] text-red-500">
-                                {props.dataLang?.client_list_bran}
-                            </label>
+                            <label className="mb-2  text-[14px] text-red-500">{props.dataLang?.client_list_bran}</label>
                         )}
 
                         <div className="text-right mt-5 space-x-2">

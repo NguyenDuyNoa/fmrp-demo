@@ -35,6 +35,11 @@ import Popup_dsncc from "./(popup)/popup";
 import Popup_chitiet from "./(popup)/detail";
 import TabClient from "./(tab)/tab";
 import TabFilter from "components/UI/TabFilter";
+import SearchComponent from "components/UI/filterComponents/searchComponent";
+import OnResetData from "components/UI/btnResetData/btnReset";
+import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
+import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
+import SelectComponent from "components/UI/filterComponents/selectComponent";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -86,12 +91,8 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[supplier_group_id]":
-                        tabPage !== "0" ? (tabPage !== "-1" ? id : -1) : null,
-                    "filter[branch_id]":
-                        idBranch?.length > 0
-                            ? idBranch.map((e) => e.value)
-                            : null,
+                    "filter[supplier_group_id]": tabPage !== "0" ? (tabPage !== "-1" ? id : -1) : null,
+                    "filter[branch_id]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
                 },
             },
             (err, response) => {
@@ -125,9 +126,7 @@ const Index = (props) => {
         );
     };
 
-    const listBr_filter = listBr
-        ? listBr?.map((e) => ({ label: e.name, value: e.id }))
-        : [];
+    const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
     const [idBranch, sIdBranch] = useState(null);
     const onchang_filterBr = (type, value) => {
         if (type == "branch") {
@@ -135,9 +134,7 @@ const Index = (props) => {
         }
     };
     const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
-    const options = listBr_filter?.filter(
-        (x) => !hiddenOptions.includes(x.value)
-    );
+    const options = listBr_filter?.filter((x) => !hiddenOptions.includes(x.value));
 
     const _ServerFetching_group = () => {
         Axios(
@@ -147,10 +144,7 @@ const Index = (props) => {
                 params: {
                     limit: 0,
                     search: keySearch,
-                    "filter[branch_id]":
-                        idBranch?.length > 0
-                            ? idBranch.map((e) => e.value)
-                            : null,
+                    "filter[branch_id]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
                 },
             },
             (err, response) => {
@@ -228,29 +222,24 @@ const Index = (props) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 const id = event;
-                Axios(
-                    "DELETE",
-                    `/api_web/api_supplier/supplier/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var { isSuccess, message } = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: dataLang[message],
-                                });
-                            } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: dataLang[message],
-                                });
-                            }
+                Axios("DELETE", `/api_web/api_supplier/supplier/${id}?csrf_protection=true`, {}, (err, response) => {
+                    if (!err) {
+                        var { isSuccess, message } = response.data;
+                        if (isSuccess) {
+                            Toast.fire({
+                                icon: "success",
+                                title: dataLang[message],
+                            });
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                title: dataLang[message],
+                            });
                         }
-                        _ServerFetching();
-                        _ServerFetching_group();
                     }
-                );
+                    _ServerFetching();
+                    _ServerFetching_group();
+                });
             }
         });
     };
@@ -349,11 +338,7 @@ const Index = (props) => {
                 { value: `${e.phone_number ? e.phone_number : ""}` },
                 { value: `${e.address ? e.address : ""}` },
                 {
-                    value: `${
-                        e.supplier_group
-                            ? e.supplier_group?.map((i) => i.name)
-                            : ""
-                    }`,
+                    value: `${e.supplier_group ? e.supplier_group?.map((i) => i.name) : ""}`,
                 },
                 { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
                 { value: `${e.date_create ? e.date_create : ""}` },
@@ -376,9 +361,7 @@ const Index = (props) => {
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                        <h6 className="text-[#141522]/40">
-                            {dataLang?.suppliers_supplier_title}
-                        </h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.suppliers_supplier_title}</h6>
                         <span className="text-[#141522]/40">/</span>
                         <h6>{dataLang?.suppliers_supplier_title}</h6>
                     </div>
@@ -395,9 +378,7 @@ const Index = (props) => {
                                         listBr={listBr}
                                         listSelectCt={listSelectCt}
                                         onRefresh={_ServerFetching.bind(this)}
-                                        onRefreshGroup={_ServerFetching_group.bind(
-                                            this
-                                        )}
+                                        onRefreshGroup={_ServerFetching_group.bind(this)}
                                         dataLang={dataLang}
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     />
@@ -413,20 +394,14 @@ const Index = (props) => {
                                             <div>
                                                 <TabClient
                                                     style={{
-                                                        backgroundColor:
-                                                            "#e2f0fe",
+                                                        backgroundColor: "#e2f0fe",
                                                     }}
                                                     dataLang={dataLang}
                                                     key={e.id}
-                                                    onClick={_HandleSelectTab.bind(
-                                                        this,
-                                                        `${e.id}`
-                                                    )}
+                                                    onClick={_HandleSelectTab.bind(this, `${e.id}`)}
                                                     total={e.count}
                                                     active={e.id}
-                                                    className={
-                                                        "text-[#0F4F9E] "
-                                                    }
+                                                    className={"text-[#0F4F9E] "}
                                                 >
                                                     {/* {(e.name == "all_group" && dataLang.all_group) ||
                             (e.name == "no_group" && dataLang.no_group) ||
@@ -444,177 +419,42 @@ const Index = (props) => {
                                     <div className="bg-slate-100 w-full rounded grid grid-cols-6 items-center justify-between xl:p-3 p-2">
                                         <div className="col-span-4">
                                             <div className="grid grid-cols-5 gap-2">
-                                                <div className="col-span-1">
-                                                    <form className="flex items-center relative">
-                                                        <IconSearch
-                                                            size={20}
-                                                            className="absolute 2xl:left-3 z-10  text-[#cccccc] xl:left-[4%] left-[1%]"
-                                                        />
-                                                        <input
-                                                            className=" relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  py-2.5 rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
-                                                            type="text"
-                                                            onChange={_HandleOnChangeKeySearch.bind(
-                                                                this
-                                                            )}
-                                                            placeholder={
-                                                                dataLang?.branch_search
-                                                            }
-                                                        />
-                                                    </form>
-                                                </div>
-                                                <div className="ml-1 col-span-1">
-                                                    <Select
-                                                        //  options={listBr_filter}
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label: "Chọn chi nhánh",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...listBr_filter,
-                                                        ]}
-                                                        onChange={onchang_filterBr.bind(
-                                                            this,
-                                                            "branch"
-                                                        )}
-                                                        value={idBranch}
-                                                        placeholder={
-                                                            dataLang?.client_list_filterbrand
-                                                        }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
-                                                        isMulti
-                                                        isClearable={true}
-                                                        className="rounded-md bg-white  xl:text-base text-[14.5px] z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
-                                                        components={{
-                                                            MultiValue,
-                                                        }}
-                                                        closeMenuOnSelect={
-                                                            false
-                                                        }
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow:
-                                                                    "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
-                                                    />
-                                                </div>
+                                                <SearchComponent
+                                                    dataLang={dataLang}
+                                                    onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                    colSpan={1}
+                                                />
+                                                <SelectComponent
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label: "Chọn chi nhánh",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...listBr_filter,
+                                                    ]}
+                                                    onChange={onchang_filterBr.bind(this, "branch")}
+                                                    value={idBranch}
+                                                    placeholder={dataLang?.client_list_filterbrand}
+                                                    colSpan={idBranch?.length > 1 ? 3 : 1}
+                                                    components={{ MultiValue }}
+                                                    isMulti={true}
+                                                    closeMenuOnSelect={false}
+                                                />
                                             </div>
                                         </div>
                                         <div className="col-span-2">
                                             <div className="flex space-x-2 items-center justify-end">
-                                                <button
-                                                    onClick={_HandleFresh.bind(
-                                                        this
-                                                    )}
-                                                    type="button"
-                                                    className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out"
-                                                >
-                                                    <Refresh2
-                                                        className="group-hover:-rotate-45 transition-all ease-in-out"
-                                                        size="22"
-                                                        color="green"
-                                                    />
-                                                </button>
+                                                <OnResetData sOnFetching={sOnFetching} />
                                                 {data_ex?.length > 0 && (
-                                                    <ExcelFile
+                                                    <ExcelFileComponent
+                                                        multiDataSet={multiDataSet}
                                                         filename="Danh sách nhà cung cấp"
                                                         title="Dsncc"
-                                                        element={
-                                                            <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                                <IconExcel
-                                                                    size={18}
-                                                                />
-                                                                <span>
-                                                                    {
-                                                                        dataLang?.client_list_exportexcel
-                                                                    }
-                                                                </span>
-                                                            </button>
-                                                        }
-                                                    >
-                                                        <ExcelSheet
-                                                            dataSet={
-                                                                multiDataSet
-                                                            }
-                                                            data={multiDataSet}
-                                                            name="Organization"
-                                                        />
-                                                    </ExcelFile>
+                                                        dataLang={dataLang}
+                                                    />
                                                 )}
-                                                <label className="font-[300] text-slate-400">
-                                                    {dataLang?.display}
-                                                </label>
-                                                <select
-                                                    className="outline-none"
-                                                    onChange={(e) =>
-                                                        sLimit(e.target.value)
-                                                    }
-                                                    value={limit}
-                                                >
-                                                    <option
-                                                        disabled
-                                                        className="hidden"
-                                                    >
-                                                        {limit == -1
-                                                            ? "Tất cả"
-                                                            : limit}
-                                                    </option>
-                                                    <option value={15}>
-                                                        15
-                                                    </option>
-                                                    <option value={20}>
-                                                        20
-                                                    </option>
-                                                    <option value={40}>
-                                                        40
-                                                    </option>
-                                                    <option value={60}>
-                                                        60
-                                                    </option>
-                                                    <option value={-1}>
-                                                        Tất cả
-                                                    </option>
-                                                </select>
+                                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                             </div>
                                         </div>
                                     </div>
@@ -624,50 +464,33 @@ const Index = (props) => {
                                     <div className="pr-2 w-[100%] ">
                                         <div className="grid grid-cols-8 items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x  p-2 z-10">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {
-                                                    dataLang?.suppliers_supplier_code
-                                                }
+                                                {dataLang?.suppliers_supplier_code}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {
-                                                    dataLang?.suppliers_supplier_name
-                                                }
+                                                {dataLang?.suppliers_supplier_name}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {
-                                                    dataLang?.suppliers_supplier_taxcode
-                                                }
+                                                {dataLang?.suppliers_supplier_taxcode}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {
-                                                    dataLang?.suppliers_supplier_phone
-                                                }
+                                                {dataLang?.suppliers_supplier_phone}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {
-                                                    dataLang?.suppliers_supplier_adress
-                                                }
+                                                {dataLang?.suppliers_supplier_adress}
                                             </h4>
                                             {/* <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[20%] font-[600] text-center">{dataLang?.client_group_statusclient}</h4> */}
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {
-                                                    dataLang?.suppliers_supplier_group
-                                                }
+                                                {dataLang?.suppliers_supplier_group}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
                                                 {dataLang?.client_list_brand}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase col-span-1 font-[600] text-center">
-                                                {
-                                                    dataLang?.branch_popup_properties
-                                                }
+                                                {dataLang?.branch_popup_properties}
                                             </h4>
                                         </div>
                                         {onFetching ? (
-                                            <Loading
-                                                className="h-80"
-                                                color="#0f4f9e"
-                                            />
+                                            <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
@@ -681,13 +504,9 @@ const Index = (props) => {
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 py-0.5 col-span-1   rounded-md text-left text-[#0F4F9E] hover:text-blue-600 transition-all ease-linear">
                                                                 <Popup_chitiet
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
+                                                                    dataLang={dataLang}
                                                                     className="text-left"
-                                                                    name={
-                                                                        e.name
-                                                                    }
+                                                                    name={e.name}
                                                                     id={e?.id}
                                                                 />
                                                             </h6>
@@ -702,42 +521,29 @@ const Index = (props) => {
                                                             </h6>
 
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  px-2 py-0.5 col-span-1   rounded-md text-left flex justify-start flex-wrap ">
-                                                                {e.supplier_group?.map(
-                                                                    (h) => {
-                                                                        return (
-                                                                            <span
-                                                                                key={
-                                                                                    h.id
-                                                                                }
-                                                                                style={{
-                                                                                    backgroundColor:
-                                                                                        "#e2f0fe",
-                                                                                }}
-                                                                                className={`text-[#0F4F9E]  mr-2 mb-1 w-fit 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-normal text-[9px] px-2 rounded-md py-0.5`}
-                                                                            >
-                                                                                {
-                                                                                    h.name
-                                                                                }
-                                                                            </span>
-                                                                        );
-                                                                    }
-                                                                )}
+                                                                {e.supplier_group?.map((h) => {
+                                                                    return (
+                                                                        <span
+                                                                            key={h.id}
+                                                                            style={{
+                                                                                backgroundColor: "#e2f0fe",
+                                                                            }}
+                                                                            className={`text-[#0F4F9E]  mr-2 mb-1 w-fit 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-normal text-[9px] px-2 rounded-md py-0.5`}
+                                                                        >
+                                                                            {h.name}
+                                                                        </span>
+                                                                    );
+                                                                })}
                                                             </h6>
                                                             <h6 className="col-span-1  flex  gap-1 flex-wrap">
-                                                                {e.branch?.map(
-                                                                    (i) => (
-                                                                        <span
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                            className="cursor-default w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2"
-                                                                        >
-                                                                            {
-                                                                                i.name
-                                                                            }
-                                                                        </span>
-                                                                    )
-                                                                )}
+                                                                {e.branch?.map((i) => (
+                                                                    <span
+                                                                        key={i}
+                                                                        className="cursor-default w-fit 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2"
+                                                                    >
+                                                                        {i.name}
+                                                                    </span>
+                                                                ))}
                                                             </h6>
                                                             {/* <h6 className="xl:text-base text-xs  px-2 py-0.5 w-[18%]  rounded-md text-center">{moment(e.date_create).format('DD/MM/YYYY, h:mm:ss')}</h6>                 */}
                                                             <div
@@ -745,72 +551,30 @@ const Index = (props) => {
                                text-center mx-auto"
                                                             >
                                                                 <Popup_dsncc
-                                                                    listBr={
-                                                                        listBr
-                                                                    }
-                                                                    listSelectCt={
-                                                                        listSelectCt
-                                                                    }
-                                                                    onRefresh={_ServerFetching.bind(
-                                                                        this
-                                                                    )}
+                                                                    listBr={listBr}
+                                                                    listSelectCt={listSelectCt}
+                                                                    onRefresh={_ServerFetching.bind(this)}
                                                                     className="xl:text-base text-xs "
-                                                                    listDs={
-                                                                        listDs
-                                                                    }
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
-                                                                    name={
-                                                                        e.name
-                                                                    }
-                                                                    representative={
-                                                                        e.representative
-                                                                    }
-                                                                    code={
-                                                                        e.code
-                                                                    }
-                                                                    tax_code={
-                                                                        e.tax_code
-                                                                    }
-                                                                    phone_number={
-                                                                        e.phone_number
-                                                                    }
-                                                                    address={
-                                                                        e.address
-                                                                    }
-                                                                    date_incorporation={
-                                                                        e.date_incorporation
-                                                                    }
-                                                                    note={
-                                                                        e.note
-                                                                    }
-                                                                    email={
-                                                                        e.email
-                                                                    }
-                                                                    website={
-                                                                        e.website
-                                                                    }
-                                                                    debt_begin={
-                                                                        e.debt_begin
-                                                                    }
-                                                                    city={
-                                                                        e.city
-                                                                    }
-                                                                    district={
-                                                                        e.district
-                                                                    }
-                                                                    ward={
-                                                                        e.ward
-                                                                    }
+                                                                    listDs={listDs}
+                                                                    dataLang={dataLang}
+                                                                    name={e.name}
+                                                                    representative={e.representative}
+                                                                    code={e.code}
+                                                                    tax_code={e.tax_code}
+                                                                    phone_number={e.phone_number}
+                                                                    address={e.address}
+                                                                    date_incorporation={e.date_incorporation}
+                                                                    note={e.note}
+                                                                    email={e.email}
+                                                                    website={e.website}
+                                                                    debt_begin={e.debt_begin}
+                                                                    city={e.city}
+                                                                    district={e.district}
+                                                                    ward={e.ward}
                                                                     id={e?.id}
                                                                 />
                                                                 <button
-                                                                    onClick={() =>
-                                                                        handleDelete(
-                                                                            e.id
-                                                                        )
-                                                                    }
+                                                                    onClick={() => handleDelete(e.id)}
                                                                     className="xl:text-base text-xs "
                                                                 >
                                                                     <IconDelete color="red" />
@@ -842,16 +606,12 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display}{" "}
-                                    {totalItem?.iTotalDisplayRecords}{" "}
-                                    {dataLang?.among} {totalItem?.iTotalRecords}{" "}
-                                    {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItem?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {totalItem?.iTotalRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(
-                                        totalItem?.iTotalDisplayRecords
-                                    )}
+                                    totalPosts={Number(totalItem?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />

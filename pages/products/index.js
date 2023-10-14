@@ -29,16 +29,17 @@ import { NumericFormat } from "react-number-format";
 import Select, { components } from "react-select";
 import Swal from "sweetalert2";
 import ModalImage from "react-modal-image";
-import {
-    SortableContainer,
-    SortableElement,
-    sortableHandle,
-} from "react-sortable-hoc";
+import { SortableContainer, SortableElement, sortableHandle } from "react-sortable-hoc";
 import { arrayMoveImmutable } from "array-move";
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
 import ReactExport from "react-data-export";
+import SearchComponent from "components/UI/filterComponents/searchComponent";
+import SelectComponent from "components/UI/filterComponents/selectComponent";
+import OnResetData from "components/UI/btnResetData/btnReset";
+import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
+import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -57,9 +58,7 @@ const CustomSelectOption = ({ value, label, level, code }) => (
         {level == 2 && <span>----</span>}
         {level == 3 && <span>------</span>}
         {level == 4 && <span>--------</span>}
-        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">
-            {label}
-        </span>
+        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
     </div>
 );
 
@@ -147,12 +146,8 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[branch_id][]":
-                        idBranch?.length > 0
-                            ? idBranch.map((e) => e.value)
-                            : null,
-                    "filter[type_products]":
-                        router.query?.tab === "all" ? 0 : router.query?.tab,
+                    "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
+                    "filter[type_products]": router.query?.tab === "all" ? 0 : router.query?.tab,
                 },
             },
             (err, response) => {
@@ -171,9 +166,7 @@ const Index = (props) => {
     }, [onFetching]);
 
     useEffect(() => {
-        sOnFetching(true) ||
-            (keySearch && sOnFetching(true)) ||
-            (idBranch?.length > 0 && sOnFetching(true));
+        sOnFetching(true) || (keySearch && sOnFetching(true)) || (idBranch?.length > 0 && sOnFetching(true));
     }, [limit, router.query?.page, idBranch, router.query?.tab]);
 
     const paginate = (pageNumber) => {
@@ -195,144 +188,100 @@ const Index = (props) => {
     };
 
     const _ServerFetchingAnother = () => {
-        Axios(
-            "GET",
-            "/api_web/Api_Branch/branch/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataBranchOption(
-                        rResult.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                    dispatch({
-                        type: "branch/update",
-                        payload: rResult.map((e) => ({
-                            label: e.name,
-                            value: e.id,
-                        })),
-                    });
-                }
+        Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sDataBranchOption(rResult.map((e) => ({ label: e.name, value: e.id })));
+                dispatch({
+                    type: "branch/update",
+                    payload: rResult.map((e) => ({
+                        label: e.name,
+                        value: e.id,
+                    })),
+                });
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/api_product/productType/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    dispatch({
-                        type: "type_finishedProduct/update",
-                        payload: data.map((e) => ({
-                            label: dataLang[e.name],
-                            value: e.code,
-                        })),
-                    });
-                }
+        });
+        Axios("GET", "/api_web/api_product/productType/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                dispatch({
+                    type: "type_finishedProduct/update",
+                    payload: data.map((e) => ({
+                        label: dataLang[e.name],
+                        value: e.code,
+                    })),
+                });
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/Api_unit/unit/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    dispatch({
-                        type: "unit_finishedProduct/update",
-                        payload: rResult.map((e) => ({
-                            label: e.unit,
-                            value: e.id,
-                        })),
-                    });
-                }
+        });
+        Axios("GET", "/api_web/Api_unit/unit/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                dispatch({
+                    type: "unit_finishedProduct/update",
+                    payload: rResult.map((e) => ({
+                        label: e.unit,
+                        value: e.id,
+                    })),
+                });
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/Api_variation/variation?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    dispatch({
-                        type: "variant_NVL/update",
-                        payload: rResult.map((e) => ({
-                            label: e.name,
-                            value: e.id,
-                            option: e.option,
-                        })),
-                    });
-                }
+        });
+        Axios("GET", "/api_web/Api_variation/variation?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                dispatch({
+                    type: "variant_NVL/update",
+                    payload: rResult.map((e) => ({
+                        label: e.name,
+                        value: e.id,
+                        option: e.option,
+                    })),
+                });
             }
-        );
-        Axios(
-            "GET",
-            "api_web/api_product/categoryOption/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataCategory(
-                        rResult.map((e) => ({
-                            label: `${e.name + " " + "(" + e.code + ")"}`,
-                            value: e.id,
-                            level: e.level,
-                            code: e.code,
-                            parent_id: e.parent_id,
-                        }))
-                    );
-                }
+        });
+        Axios("GET", "api_web/api_product/categoryOption/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sDataCategory(
+                    rResult.map((e) => ({
+                        label: `${e.name + " " + "(" + e.code + ")"}`,
+                        value: e.id,
+                        level: e.level,
+                        code: e.code,
+                        parent_id: e.parent_id,
+                    }))
+                );
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/api_product/product/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataFinishedPro(
-                        rResult.map((e) => ({
-                            label: `${e.code} (${e.name})`,
-                            value: e.id,
-                        }))
-                    );
-                    sDataExcel(rResult);
-                }
+        });
+        Axios("GET", "/api_web/api_product/product/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sDataFinishedPro(
+                    rResult.map((e) => ({
+                        label: `${e.code} (${e.name})`,
+                        value: e.id,
+                    }))
+                );
+                sDataExcel(rResult);
             }
-        );
-        Axios(
-            "GET",
-            `/api_web/api_product/stage/?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    dispatch({
-                        type: "congdoan_finishedProduct/update",
-                        payload: rResult?.map((e) => ({
-                            label: e.name,
-                            value: e.id,
-                        })),
-                    });
-                }
+        });
+        Axios("GET", `/api_web/api_product/stage/?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                dispatch({
+                    type: "congdoan_finishedProduct/update",
+                    payload: rResult?.map((e) => ({
+                        label: e.name,
+                        value: e.id,
+                    })),
+                });
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/api_setting/feature/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sDataProductExpiry(
-                        data.find((x) => x.code == "product_expiry")
-                    );
-                }
+        });
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
             }
-        );
+        });
         sOnFetchingAnother(false);
     };
 
@@ -356,9 +305,7 @@ const Index = (props) => {
 
     //Set data cho bộ lọc chi nhánh
     const hiddenOptions = idBranch?.length > 2 ? idBranch?.slice(0, 2) : [];
-    const options = dataBranchOption.filter(
-        (x) => !hiddenOptions.includes(x.value)
-    );
+    const options = dataBranchOption.filter((x) => !hiddenOptions.includes(x.value));
     const _HandleFresh = () => {
         sOnFetchingAnother(true);
         sOnFetching(true);
@@ -454,18 +401,12 @@ const Index = (props) => {
                 { value: `${e.code ? e.code : ""}` },
                 { value: `${e.name ? e.name : ""}` },
                 {
-                    value: `${
-                        e?.type_products?.name ? e?.type_products?.name : ""
-                    }`,
+                    value: `${e?.type_products?.name ? e?.type_products?.name : ""}`,
                 },
                 { value: `${e.unit ? e.unit : ""}` },
                 { value: `${e.variation ? e.variation?.length : 0}` },
                 {
-                    value: `${
-                        e.stock_quantity
-                            ? Number(e?.stock_quantity).toLocaleString()
-                            : ""
-                    }`,
+                    value: `${e.stock_quantity ? Number(e?.stock_quantity).toLocaleString() : ""}`,
                 },
                 { value: `${e.note ? e.note : ""}` },
                 { value: `${e.branch ? e.branch?.map((i) => i.name) : ""}` },
@@ -485,23 +426,15 @@ const Index = (props) => {
                         <div className="p-2"></div>
                     ) : (
                         <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">
-                                {dataLang?.list_btn_seting_category}
-                            </h6>
+                            <h6 className="text-[#141522]/40">{dataLang?.list_btn_seting_category}</h6>
                             <span className="text-[#141522]/40">/</span>
-                            <h6 className="text-[#141522]/40">
-                                {dataLang?.header_category_material}
-                            </h6>
+                            <h6 className="text-[#141522]/40">{dataLang?.header_category_material}</h6>
                             <span className="text-[#141522]/40">/</span>
-                            <h6>
-                                {dataLang?.header_category_finishedProduct_list}
-                            </h6>
+                            <h6>{dataLang?.header_category_finishedProduct_list}</h6>
                         </div>
                     )}
                     <div className="flex justify-between items-center">
-                        <h2 className="xl:text-3xl text-xl font-medium ">
-                            {dataLang?.list_finishedProduct_title}
-                        </h2>
+                        <h2 className="xl:text-3xl text-xl font-medium ">{dataLang?.list_finishedProduct_title}</h2>
                         <div className="flex space-x-3 items-center">
                             <Popup_ThanhPham
                                 onRefresh={_ServerFetching.bind(this)}
@@ -535,34 +468,24 @@ const Index = (props) => {
                             {dataLang?.product}
                         </button>
                         <button
-                            onClick={_HandleSelectTab.bind(
-                                this,
-                                "semi_products"
-                            )}
+                            onClick={_HandleSelectTab.bind(this, "semi_products")}
                             className={`${
                                 router.query?.tab === "semi_products"
                                     ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
                                     : "hover:text-[#0F4F9E] "
                             } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                         >
-                            {
-                                dataLang?.catagory_finishedProduct_type_semi_products
-                            }
+                            {dataLang?.catagory_finishedProduct_type_semi_products}
                         </button>
                         <button
-                            onClick={_HandleSelectTab.bind(
-                                this,
-                                "semi_products_outside"
-                            )}
+                            onClick={_HandleSelectTab.bind(this, "semi_products_outside")}
                             className={`${
                                 router.query?.tab === "semi_products_outside"
                                     ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
                                     : "hover:text-[#0F4F9E] "
                             } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                         >
-                            {
-                                dataLang?.catagory_finishedProduct_type_semi_products_outside
-                            }
+                            {dataLang?.catagory_finishedProduct_type_semi_products_outside}
                         </button>
                     </div>
                     {/* <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
@@ -767,261 +690,73 @@ const Index = (props) => {
           </div> */}
                     <div className="bg-slate-100 w-full rounded grid grid-cols-7 justify-between xl:p-3 p-2">
                         <div className="col-span-5 grid grid-cols-5 items-center gap-2">
-                            <div className="col-span-1">
-                                <form className="flex items-center relative">
-                                    <IconSearch
-                                        size={20}
-                                        className="absolute 2xl:left-3 z-10  text-[#cccccc] xl:left-[4%] left-[1%]"
-                                    />
-                                    <input
-                                        className=" relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  py-2.5 rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
-                                        type="text"
-                                        onChange={_HandleOnChangeKeySearch.bind(
-                                            this
-                                        )}
-                                        placeholder={dataLang?.branch_search}
-                                    />
-                                </form>
-                            </div>
-                            <div className="col-span-1">
-                                {" "}
-                                <Select
-                                    options={[
-                                        {
-                                            value: "",
-                                            label: `${dataLang?.client_list_brand}`,
-                                            isDisabled: true,
-                                        },
-                                        ...options,
-                                    ]}
-                                    onChange={_HandleFilterOpt.bind(
-                                        this,
-                                        "branch"
-                                    )}
-                                    value={idBranch}
-                                    isClearable={true}
-                                    isMulti
-                                    closeMenuOnSelect={false}
-                                    hideSelectedOptions={false}
-                                    placeholder={
-                                        dataLang?.client_list_brand ||
-                                        "client_list_brand"
-                                    }
-                                    className="rounded-md  bg-white border-none  2xl:text-base xl:text-xs text-[10px] z-20"
-                                    isSearchable={true}
-                                    components={{ MultiValue }}
-                                    style={{
-                                        border: "none",
-                                        boxShadow: "none",
-                                        outline: "none",
-                                    }}
-                                    theme={(theme) => ({
-                                        ...theme,
-                                        colors: {
-                                            ...theme.colors,
-                                            primary25: "#EBF5FF",
-                                            primary50: "#92BFF7",
-                                            primary: "#0F4F9E",
-                                        },
-                                    })}
-                                    styles={{
-                                        placeholder: (base) => ({
-                                            ...base,
-                                            color: "#cbd5e1",
-                                        }),
-                                        control: (base, state) => ({
-                                            ...base,
-                                            border: "none",
-                                            outline: "none",
-                                            boxShadow: "none",
-                                            ...(state.isFocused && {
-                                                boxShadow:
-                                                    "0 0 0 1.5px #0F4F9E",
-                                            }),
-                                        }),
-                                    }}
-                                />
-                            </div>
-                            <div className="col-span-1">
-                                {" "}
-                                <Select
-                                    options={[
-                                        {
-                                            value: "",
-                                            label: `${dataLang?.category_titel}`,
-                                            isDisabled: true,
-                                        },
-                                        ...dataCategory,
-                                    ]}
-                                    formatOptionLabel={CustomSelectOption}
-                                    onChange={_HandleFilterOpt.bind(
-                                        this,
-                                        "category"
-                                    )}
-                                    value={valueCategory}
-                                    noOptionsMessage={() =>
-                                        `${dataLang?.no_data_found}`
-                                    }
-                                    isClearable={true}
-                                    placeholder={
-                                        dataLang?.category_material_group_name ||
-                                        "category_material_group_name"
-                                    }
-                                    className="rounded-md  bg-white border-none  2xl:text-base xl:text-xs text-[10px] z-20"
-                                    isSearchable={true}
-                                    style={{
-                                        border: "none",
-                                        boxShadow: "none",
-                                        outline: "none",
-                                    }}
-                                    theme={(theme) => ({
-                                        ...theme,
-                                        colors: {
-                                            ...theme.colors,
-                                            primary25: "#EBF5FF",
-                                            primary50: "#92BFF7",
-                                            primary: "#0F4F9E",
-                                        },
-                                    })}
-                                    styles={{
-                                        placeholder: (base) => ({
-                                            ...base,
-                                            color: "#cbd5e1",
-                                        }),
-                                        control: (base, state) => ({
-                                            ...base,
-                                            border: "none",
-                                            outline: "none",
-                                            boxShadow: "none",
-                                            ...(state.isFocused && {
-                                                boxShadow:
-                                                    "0 0 0 1.5px #0F4F9E",
-                                            }),
-                                        }),
-                                    }}
-                                />
-                            </div>
-                            <div className="col-span-1">
-                                <Select
-                                    options={[
-                                        {
-                                            value: "",
-                                            label: `${dataLang?.product}`,
-                                            isDisabled: true,
-                                        },
-                                        ...dataFinishedPro,
-                                    ]}
-                                    onChange={_HandleFilterOpt.bind(
-                                        this,
-                                        "finishedPro"
-                                    )}
-                                    value={valueFinishedPro}
-                                    noOptionsMessage={() =>
-                                        `${dataLang?.no_data_found}`
-                                    }
-                                    isClearable={true}
-                                    isMulti
-                                    closeMenuOnSelect={false}
-                                    hideSelectedOptions={false}
-                                    placeholder={dataLang?.product}
-                                    className="rounded-md  bg-white border-none  2xl:text-base xl:text-xs text-[10px] z-20"
-                                    isSearchable={true}
-                                    components={{ MultiValue }}
-                                    style={{
-                                        border: "none",
-                                        boxShadow: "none",
-                                        outline: "none",
-                                    }}
-                                    theme={(theme) => ({
-                                        ...theme,
-                                        colors: {
-                                            ...theme.colors,
-                                            primary25: "#EBF5FF",
-                                            primary50: "#92BFF7",
-                                            primary: "#0F4F9E",
-                                        },
-                                    })}
-                                    styles={{
-                                        placeholder: (base) => ({
-                                            ...base,
-                                            color: "#cbd5e1",
-                                        }),
-                                        control: (base, state) => ({
-                                            ...base,
-                                            border: "none",
-                                            outline: "none",
-                                            boxShadow: "none",
-                                            ...(state.isFocused && {
-                                                boxShadow:
-                                                    "0 0 0 1.5px #0F4F9E",
-                                            }),
-                                        }),
-                                    }}
-                                />
-                            </div>
+                            <SearchComponent
+                                dataLang={dataLang}
+                                onChange={_HandleOnChangeKeySearch.bind(this)}
+                                colSpan={1}
+                            />
+                            <SelectComponent
+                                options={[
+                                    {
+                                        value: "",
+                                        label: `${dataLang?.client_list_brand}`,
+                                        isDisabled: true,
+                                    },
+                                    ...options,
+                                ]}
+                                onChange={_HandleFilterOpt.bind(this, "branch")}
+                                value={idBranch}
+                                placeholder={dataLang?.client_list_filterbrand}
+                                colSpan={idBranch?.length > 1 ? 2 : 1}
+                                components={{ MultiValue }}
+                                isMulti={true}
+                                closeMenuOnSelect={false}
+                            />
+                            <SelectComponent
+                                options={[
+                                    {
+                                        value: "",
+                                        label: `${dataLang?.category_titel}`,
+                                        isDisabled: true,
+                                    },
+                                    ...dataCategory,
+                                ]}
+                                formatOptionLabel={CustomSelectOption}
+                                onChange={_HandleFilterOpt.bind(this, "category")}
+                                value={valueCategory}
+                                placeholder={dataLang?.category_material_group_name || "category_material_group_name"}
+                            />
+                            <SelectComponent
+                                options={[
+                                    {
+                                        value: "",
+                                        label: `${dataLang?.product}`,
+                                        isDisabled: true,
+                                    },
+                                    ...dataFinishedPro,
+                                ]}
+                                onChange={_HandleFilterOpt.bind(this, "finishedPro")}
+                                value={valueFinishedPro}
+                                placeholder={dataLang?.product}
+                                colSpan={1}
+                                components={{ MultiValue }}
+                                isMulti={true}
+                                closeMenuOnSelect={false}
+                            />
                         </div>
                         <div className="col-span-2 ">
                             <div className="flex space-x-2 items-center justify-end">
-                                <button
-                                    onClick={_HandleFresh.bind(this)}
-                                    type="button"
-                                    className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out"
-                                >
-                                    <Refresh2
-                                        className="group-hover:-rotate-45 transition-all ease-in-out"
-                                        size="22"
-                                        color="green"
-                                    />
-                                </button>
+                                <OnResetData sOnFetching={sOnFetching} />
+
                                 {data.length != 0 && (
-                                    <div className="flex space-x-6">
-                                        <ExcelFile
+                                    <div className="flex space-x-2 items-center">
+                                        <ExcelFileComponent
+                                            multiDataSet={multiDataSet}
                                             filename={dataLang?.product}
-                                            element={
-                                                <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                    <IconExcel size={18} />
-                                                    <span>
-                                                        {
-                                                            dataLang?.client_list_exportexcel
-                                                        }
-                                                    </span>
-                                                </button>
-                                            }
-                                        >
-                                            <ExcelSheet
-                                                dataSet={multiDataSet}
-                                                data={multiDataSet}
-                                                name={dataLang?.product}
-                                            />
-                                        </ExcelFile>
-                                        <div className="flex space-x-2 items-center">
-                                            <label className="font-[300] text-slate-400">
-                                                {dataLang?.display} :
-                                            </label>
-                                            <select
-                                                className="outline-none"
-                                                onChange={(e) =>
-                                                    sLimit(e.target.value)
-                                                }
-                                                value={limit}
-                                            >
-                                                <option
-                                                    disabled
-                                                    className="hidden"
-                                                >
-                                                    {limit == -1
-                                                        ? "Tất cả"
-                                                        : limit}
-                                                </option>
-                                                <option value={15}>15</option>
-                                                <option value={20}>20</option>
-                                                <option value={40}>40</option>
-                                                <option value={60}>60</option>
-                                                <option value={-1}>
-                                                    Tất cả
-                                                </option>
-                                            </select>
-                                        </div>
+                                            title="DSTP"
+                                            dataLang={dataLang}
+                                        />
+                                        <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                                     </div>
                                 )}
                             </div>
@@ -1049,8 +784,7 @@ const Index = (props) => {
                                     {dataLang?.unit || "unit"}
                                 </h4>
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[6%] font-[600] text-center">
-                                    {dataLang?.category_material_list_variant ||
-                                        "category_material_list_variant"}
+                                    {dataLang?.category_material_list_variant || "category_material_list_variant"}
                                 </h4>
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[6%] font-[600] text-center">
                                     {dataLang?.stock || "stock"}
@@ -1059,19 +793,16 @@ const Index = (props) => {
                                     {dataLang?.bom_finishedProduct}
                                 </h4>
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[10%] font-[600] text-center">
-                                    {dataLang?.settings_category_stages_title ||
-                                        "settings_category_stages_title"}
+                                    {dataLang?.settings_category_stages_title || "settings_category_stages_title"}
                                 </h4>
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[7%] font-[600] text-center">
                                     {dataLang?.note || "note"}
                                 </h4>
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[8%] font-[600] text-center">
-                                    {dataLang?.client_list_brand ||
-                                        "client_list_brand"}
+                                    {dataLang?.client_list_brand || "client_list_brand"}
                                 </h4>
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[7%] font-[600] text-center">
-                                    {dataLang?.branch_popup_properties ||
-                                        "branch_popup_properties"}
+                                    {dataLang?.branch_popup_properties || "branch_popup_properties"}
                                 </h4>
                             </div>
                             {onFetching ? (
@@ -1085,18 +816,14 @@ const Index = (props) => {
                                                     <IconSearch />
                                                 </div>
                                                 <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                    {dataLang?.no_data_found ||
-                                                        "no_data_found"}
+                                                    {dataLang?.no_data_found || "no_data_found"}
                                                 </h1>
                                             </div>
                                         </div>
                                     )}
                                     <div className="divide-y divide-slate-200">
                                         {data.map((e) => (
-                                            <div
-                                                key={e?.id.toString()}
-                                                className="flex p-2 hover:bg-slate-50 relative"
-                                            >
+                                            <div key={e?.id.toString()} className="flex p-2 hover:bg-slate-50 relative">
                                                 <div className="w-[5%]  justify-center flex self-center">
                                                     {e?.images == null ? (
                                                         // <img src="/no_image.png" className='w-full h-12 rounded object-contain' />
@@ -1120,9 +847,7 @@ const Index = (props) => {
                                                 <div className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  w-[10%]">
                                                     <Popup_ThongTin
                                                         id={e?.id}
-                                                        dataProductExpiry={
-                                                            dataProductExpiry
-                                                        }
+                                                        dataProductExpiry={dataProductExpiry}
                                                         dataLang={dataLang}
                                                     >
                                                         <button className=" text-[#0F4F9E] hover:text-blue-500 transition-all ease-linear w-fit outline-none">
@@ -1136,21 +861,15 @@ const Index = (props) => {
                                                 <h6 className="px-2 py-2.5 xl:text-[13px] text-xs w-[10%]">
                                                     <span
                                                         className={`xl:py-[1px] xl:px-1.5 px-0.5 rounded border h-fit font-[300] break-words leading-relaxed ${
-                                                            (e?.type_products
-                                                                ?.id === 0 &&
+                                                            (e?.type_products?.id === 0 &&
                                                                 "text-lime-500 border-lime-500") ||
-                                                            (e?.type_products
-                                                                ?.id === 1 &&
+                                                            (e?.type_products?.id === 1 &&
                                                                 "text-orange-500 border-orange-500") ||
-                                                            (e?.type_products
-                                                                ?.id === 2 &&
+                                                            (e?.type_products?.id === 2 &&
                                                                 "text-sky-500 border-sky-500")
                                                         }`}
                                                     >
-                                                        {dataLang[
-                                                            e?.type_products
-                                                                ?.name
-                                                        ] || ""}
+                                                        {dataLang[e?.type_products?.name] || ""}
                                                     </span>
                                                 </h6>
                                                 <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 w-[5%] text-center">
@@ -1160,40 +879,25 @@ const Index = (props) => {
                                                     {Number(e?.variation_count)}
                                                 </h6>
                                                 <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 w-[6%] text-center">
-                                                    {Number(
-                                                        e?.stock_quantity
-                                                    ).toLocaleString()}
+                                                    {Number(e?.stock_quantity).toLocaleString()}
                                                 </h6>
                                                 <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 w-[9%] flex justify-center">
-                                                    {Number(
-                                                        e?.variation_count
-                                                    ) == 0 ? (
-                                                        Number(
-                                                            e?.ct_versions
-                                                        ) != 0 && (
+                                                    {Number(e?.variation_count) == 0 ? (
+                                                        Number(e?.ct_versions) != 0 && (
                                                             <IconTick className="text-green-500" />
                                                         )
-                                                    ) : Number(
-                                                          e?.variation_count
-                                                      ) >
-                                                      Number(e?.ct_versions) ? (
-                                                        Number(
-                                                            e?.ct_versions
-                                                        ) == 0 ? (
+                                                    ) : Number(e?.variation_count) > Number(e?.ct_versions) ? (
+                                                        Number(e?.ct_versions) == 0 ? (
                                                             ""
                                                         ) : (
-                                                            Number(
-                                                                e?.ct_versions
-                                                            )
+                                                            Number(e?.ct_versions)
                                                         )
                                                     ) : (
                                                         <IconTick className="text-green-500" />
                                                     )}
                                                 </h6>
                                                 <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 text-xs w-[10%] flex justify-center">
-                                                    {Number(
-                                                        e?.ct_versions_stage
-                                                    ) == 0 ? (
+                                                    {Number(e?.ct_versions_stage) == 0 ? (
                                                         ""
                                                     ) : (
                                                         <IconTick className="text-green-500" />
@@ -1214,22 +918,14 @@ const Index = (props) => {
                                                 </div>
                                                 <div className="pl-2 py-2.5 w-[7%] flex space-x-2 justify-center">
                                                     <BtnTacVu
-                                                        dataProductExpiry={
-                                                            dataProductExpiry
-                                                        }
+                                                        dataProductExpiry={dataProductExpiry}
                                                         dataLang={dataLang}
                                                         id={e.id}
                                                         name={e.name}
                                                         code={e.code}
-                                                        bom={Number(
-                                                            e?.ct_versions
-                                                        )}
-                                                        stage={Number(
-                                                            e?.ct_versions_stage
-                                                        )}
-                                                        onRefresh={_ServerFetching.bind(
-                                                            this
-                                                        )}
+                                                        bom={Number(e?.ct_versions)}
+                                                        stage={Number(e?.ct_versions_stage)}
+                                                        onRefresh={_ServerFetching.bind(this)}
                                                         keepTooltipInside=".tooltipBoundary"
                                                         className="bg-slate-100 xl:px-2 px-1 xl:py-2 py-1.5 rounded xl:text-[13px] text-xs"
                                                     />
@@ -1245,14 +941,11 @@ const Index = (props) => {
                 {data?.length != 0 && (
                     <div className="flex space-x-5 items-center">
                         <h6>
-                            Hiển thị {totalItems?.iTotalDisplayRecords} trong số{" "}
-                            {totalItems?.iTotalRecords} biến thể
+                            Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords} biến thể
                         </h6>
                         <Pagination
                             postsPerPage={limit}
-                            totalPosts={Number(
-                                totalItems?.iTotalDisplayRecords
-                            )}
+                            totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                             paginate={paginate}
                             currentPage={router.query?.page || 1}
                         />
@@ -1283,28 +976,23 @@ const BtnTacVu = React.memo((props) => {
             cancelButtonText: `${props.dataLang?.aler_cancel}`,
         }).then((result) => {
             if (result.isConfirmed) {
-                Axios(
-                    "DELETE",
-                    `/api_web/api_product/product/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var { isSuccess, message } = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: props.dataLang[message],
-                                });
-                                props.onRefresh && props.onRefresh();
-                            } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: props.dataLang[message],
-                                });
-                            }
+                Axios("DELETE", `/api_web/api_product/product/${id}?csrf_protection=true`, {}, (err, response) => {
+                    if (!err) {
+                        var { isSuccess, message } = response.data;
+                        if (isSuccess) {
+                            Toast.fire({
+                                icon: "success",
+                                title: props.dataLang[message],
+                            });
+                            props.onRefresh && props.onRefresh();
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                title: props.dataLang[message],
+                            });
                         }
                     }
-                );
+                });
             }
         });
     };
@@ -1312,11 +1000,7 @@ const BtnTacVu = React.memo((props) => {
         <div>
             <Popup
                 trigger={
-                    <button
-                        className={
-                            `flex space-x-1 items-center ` + props.className
-                        }
-                    >
+                    <button className={`flex space-x-1 items-center ` + props.className}>
                         <span>Tác vụ</span>
                         <IconDown size={12} />
                     </button>
@@ -1445,17 +1129,11 @@ const Popup_ThanhPham = React.memo((props) => {
     const [dataTotalVariant, sDataTotalVariant] = useState([]);
     const [dataVariantSending, sDataVariantSending] = useState([]);
     useEffect(() => {
-        sOptVariantMain(
-            dataOptVariant?.find((e) => e.value == variantMain)?.option
-        );
+        sOptVariantMain(dataOptVariant?.find((e) => e.value == variantMain)?.option);
         // variantMain && optSelectedVariantMain?.length === 0 && sOptSelectedVariantMain([])
         prevVariantMain === undefined && sOptSelectedVariantMain([]);
         !variantMain && sOptSelectedVariantMain([]);
-        if (
-            variantMain === variantSub &&
-            variantSub != null &&
-            variantMain != null
-        ) {
+        if (variantMain === variantSub && variantSub != null && variantMain != null) {
             sVariantSub(null);
             Toast.fire({
                 icon: "error",
@@ -1465,17 +1143,11 @@ const Popup_ThanhPham = React.memo((props) => {
     }, [variantMain]);
 
     useEffect(() => {
-        sOptVariantSub(
-            dataOptVariant?.find((e) => e.value == variantSub)?.option
-        );
+        sOptVariantSub(dataOptVariant?.find((e) => e.value == variantSub)?.option);
         // variantSub && optSelectedVariantSub?.length === 0 && sOptSelectedVariantSub([])
         prevVariantSub === undefined && sOptSelectedVariantSub([]);
         !variantSub && sOptSelectedVariantSub([]);
-        if (
-            variantSub === variantMain &&
-            variantSub != null &&
-            variantMain != null
-        ) {
+        if (variantSub === variantMain && variantSub != null && variantMain != null) {
             sVariantSub(null);
             Toast.fire({
                 icon: "error",
@@ -1484,8 +1156,7 @@ const Popup_ThanhPham = React.memo((props) => {
         }
     }, [variantSub]);
 
-    const checkEqual = (prevValue, nextValue) =>
-        prevValue && nextValue && prevValue === nextValue;
+    const checkEqual = (prevValue, nextValue) => prevValue && nextValue && prevValue === nextValue;
 
     const _HandleSelectedVariant = (type, event) => {
         if (type == "main") {
@@ -1493,16 +1164,11 @@ const Popup_ThanhPham = React.memo((props) => {
             const id = event?.target.id;
             if (event?.target.checked) {
                 // Thêm giá trị và id vào mảng khi input được chọn
-                const updatedOptions = [
-                    ...optSelectedVariantMain,
-                    { name, id },
-                ];
+                const updatedOptions = [...optSelectedVariantMain, { name, id }];
                 sOptSelectedVariantMain(updatedOptions);
             } else {
                 // Xóa giá trị và id khỏi mảng khi input được bỏ chọn
-                const updatedOptions = optSelectedVariantMain.filter(
-                    (option) => option.id !== id
-                );
+                const updatedOptions = optSelectedVariantMain.filter((option) => option.id !== id);
                 sOptSelectedVariantMain(updatedOptions);
             }
         } else if (type == "sub") {
@@ -1512,9 +1178,7 @@ const Popup_ThanhPham = React.memo((props) => {
                 const updatedOptions = [...optSelectedVariantSub, { name, id }];
                 sOptSelectedVariantSub(updatedOptions);
             } else {
-                const updatedOptions = optSelectedVariantSub.filter(
-                    (option) => option.id !== id
-                );
+                const updatedOptions = optSelectedVariantSub.filter((option) => option.id !== id);
                 sOptSelectedVariantSub(updatedOptions);
             }
         }
@@ -1523,29 +1187,17 @@ const Popup_ThanhPham = React.memo((props) => {
     const _HandleSelectedAllVariant = (type) => {
         if (type == "main") {
             const uncheckedOptions = optVariantMain.filter(
-                (option) =>
-                    !optSelectedVariantMain.some(
-                        (selectedOpt) => selectedOpt.id === option.id
-                    )
+                (option) => !optSelectedVariantMain.some((selectedOpt) => selectedOpt.id === option.id)
             );
             // Thêm tất cả các option chưa được chọn vào mảng optSelectedVariantMain
-            const updatedOptions = [
-                ...optSelectedVariantMain,
-                ...uncheckedOptions,
-            ];
+            const updatedOptions = [...optSelectedVariantMain, ...uncheckedOptions];
             sOptSelectedVariantMain(updatedOptions);
             // Lấy tất cả các option chưa được chọn
         } else if (type == "sub") {
             const uncheckedOptions = optVariantSub.filter(
-                (option) =>
-                    !optSelectedVariantSub.some(
-                        (selectedOpt) => selectedOpt.id === option.id
-                    )
+                (option) => !optSelectedVariantSub.some((selectedOpt) => selectedOpt.id === option.id)
             );
-            const updatedOptions = [
-                ...optSelectedVariantSub,
-                ...uncheckedOptions,
-            ];
+            const updatedOptions = [...optSelectedVariantSub, ...uncheckedOptions];
             sOptSelectedVariantSub(updatedOptions);
         }
     };
@@ -1558,24 +1210,20 @@ const Popup_ThanhPham = React.memo((props) => {
                           ...item1,
                           image: null,
                           price: null,
-                          variation_option_2: optSelectedVariantSub?.map(
-                              (item2) => ({
-                                  ...item2,
-                                  price: null,
-                              })
-                          ),
+                          variation_option_2: optSelectedVariantSub?.map((item2) => ({
+                              ...item2,
+                              price: null,
+                          })),
                       }))
                     : optSelectedVariantSub?.map((item2) => ({ ...item2 }))),
             ]);
             sDataVariantSending([
                 {
-                    name: dataOptVariant.find((e) => e.value == variantMain)
-                        ?.label,
+                    name: dataOptVariant.find((e) => e.value == variantMain)?.label,
                     option: optSelectedVariantMain.map((e) => ({ id: e.id })),
                 },
                 {
-                    name: dataOptVariant.find((e) => e.value == variantSub)
-                        ?.label,
+                    name: dataOptVariant.find((e) => e.value == variantSub)?.label,
                     option: optSelectedVariantSub.map((e) => ({ id: e.id })),
                 },
             ]);
@@ -1682,49 +1330,44 @@ const Popup_ThanhPham = React.memo((props) => {
     }, [thumb]);
 
     const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/api_product/product/${props?.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var list = response.data;
+        Axios("GET", `/api_web/api_product/product/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var list = response.data;
 
-                    sUnit({ label: list?.unit, value: list?.unit_id });
-                    sDataVariantSending(list?.variation);
-                    sVariantMain(list?.variation[0]?.id);
-                    sVariantSub(list?.variation[1]?.id);
+                sUnit({ label: list?.unit, value: list?.unit_id });
+                sDataVariantSending(list?.variation);
+                sVariantMain(list?.variation[0]?.id);
+                sVariantSub(list?.variation[1]?.id);
 
-                    sOptSelectedVariantMain(list?.variation[0]?.option);
-                    sOptSelectedVariantSub(list?.variation[1]?.option);
-                    sDataTotalVariant(list?.variation_option_value);
+                sOptSelectedVariantMain(list?.variation[0]?.option);
+                sOptSelectedVariantSub(list?.variation[1]?.option);
+                sDataTotalVariant(list?.variation_option_value);
 
-                    sMinimumAmount(Number(list?.quantity_minimum));
-                    sExpiry(Number(list?.expiry));
-                    sThumb(list?.images);
-                    sBranch(
-                        list?.branch?.map((e) => ({
-                            label: e.name,
-                            value: e.id,
-                        }))
-                    );
-                    sCategory({
-                        label: list?.category_name,
-                        value: list?.category_id,
-                    });
-                    sType({
-                        label: props.dataLang[list?.type_products?.name],
-                        value: list?.type_products?.code,
-                    });
-                    sCode(list?.code);
-                    sName(list?.name);
-                    sPrice(Number(list?.price_sell));
-                    sExpiry(Number(data?.expiry));
-                    sNote(list?.note);
-                }
-                sOnFetching(false);
+                sMinimumAmount(Number(list?.quantity_minimum));
+                sExpiry(Number(list?.expiry));
+                sThumb(list?.images);
+                sBranch(
+                    list?.branch?.map((e) => ({
+                        label: e.name,
+                        value: e.id,
+                    }))
+                );
+                sCategory({
+                    label: list?.category_name,
+                    value: list?.category_id,
+                });
+                sType({
+                    label: props.dataLang[list?.type_products?.name],
+                    value: list?.type_products?.code,
+                });
+                sCode(list?.code);
+                sName(list?.name);
+                sPrice(Number(list?.price_sell));
+                sExpiry(Number(data?.expiry));
+                sNote(list?.note);
             }
-        );
+            sOnFetching(false);
+        });
     };
 
     useEffect(() => {
@@ -1740,8 +1383,7 @@ const Popup_ThanhPham = React.memo((props) => {
             "api_web/api_product/categoryOption/?csrf_protection=true",
             {
                 params: {
-                    "filter[branch_id][]":
-                        branch?.length > 0 ? branch.map((e) => e.value) : 0,
+                    "filter[branch_id][]": branch?.length > 0 ? branch.map((e) => e.value) : 0,
                 },
             },
             (err, response) => {
@@ -1789,41 +1431,23 @@ const Popup_ThanhPham = React.memo((props) => {
         for (let i = 0; i < dataTotalVariant.length; i++) {
             var item = dataTotalVariant[i];
 
-            formData.set(
-                `variation_option_value[${i}][variation_option_1_id]`,
-                item.id
-            );
-            formData.set(
-                `variation_option_value[${i}][image]`,
-                item.image || ""
-            );
+            formData.set(`variation_option_value[${i}][variation_option_1_id]`, item.id);
+            formData.set(`variation_option_value[${i}][image]`, item.image || "");
 
             if (item.variation_option_2?.length > 0) {
                 for (let j = 0; j < item.variation_option_2?.length; j++) {
                     var subItem = item.variation_option_2[j];
-                    formData.set(
-                        `variation_option_value[${i}][variation_option_2][${j}][id]`,
-                        subItem.id
-                    );
-                    formData.set(
-                        `variation_option_value[${i}][variation_option_2][${j}][price]`,
-                        subItem.price || ""
-                    );
+                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][id]`, subItem.id);
+                    formData.set(`variation_option_value[${i}][variation_option_2][${j}][price]`, subItem.price || "");
                 }
             } else {
-                formData.set(
-                    `variation_option_value[${i}][price]`,
-                    item.price || ""
-                );
+                formData.set(`variation_option_value[${i}][price]`, item.price || "");
             }
         }
 
         for (let i = 0; i < dataVariantSending.length; i++) {
             for (let j = 0; j < dataVariantSending[i].option.length; j++) {
-                formData.append(
-                    `variation[${i}][option_id][${j}]`,
-                    dataVariantSending[i].option[j].id
-                );
+                formData.append(`variation[${i}][option_id][${j}]`, dataVariantSending[i].option[j].id);
             }
         }
 
@@ -1902,12 +1526,8 @@ const Popup_ThanhPham = React.memo((props) => {
 
     const _HandleChangePrice = (parentId, id, value) => {
         var parentIndex = dataTotalVariant?.findIndex((x) => x.id === parentId);
-        var index = dataTotalVariant[parentIndex].variation_option_2.findIndex(
-            (x) => x.id === id
-        );
-        dataTotalVariant[parentIndex].variation_option_2[index].price = Number(
-            value.value
-        );
+        var index = dataTotalVariant[parentIndex].variation_option_2.findIndex((x) => x.id === id);
+        dataTotalVariant[parentIndex].variation_option_2[index].price = Number(value.value);
         sDataTotalVariant([...dataTotalVariant]);
     };
 
@@ -1925,48 +1545,35 @@ const Popup_ThanhPham = React.memo((props) => {
                 const newData = dataTotalVariant
                     .map((item) => {
                         if (item.id === parentId) {
-                            item.variation_option_2 =
-                                item.variation_option_2.filter(
-                                    (opt) => opt.id !== id
-                                );
+                            item.variation_option_2 = item.variation_option_2.filter((opt) => opt.id !== id);
                         }
                         return item;
                     })
                     .filter((item) => item.variation_option_2.length > 0);
                 sDataTotalVariant(newData);
 
-                const foundParent = newData.some(
-                    (item) => item.id === parentId
-                );
+                const foundParent = newData.some((item) => item.id === parentId);
                 if (foundParent === false) {
                     const newData2 = dataVariantSending.map((item) => {
                         return {
                             ...item,
-                            option: item.option.filter(
-                                (opt) => opt.id !== parentId
-                            ),
+                            option: item.option.filter((opt) => opt.id !== parentId),
                         };
                     });
                     if (newData2[0].option?.length === 0) {
-                        sDataVariantSending(
-                            newData2.map((item) => ({ name: item.name }))
-                        );
+                        sDataVariantSending(newData2.map((item) => ({ name: item.name })));
                     } else {
                         sDataVariantSending(newData2);
                     }
                 } else {
                     const found = dataTotalVariant.some((item) => {
-                        return item.variation_option_2.some(
-                            (opt) => opt.id === id
-                        );
+                        return item.variation_option_2.some((opt) => opt.id === id);
                     });
                     if (found === false) {
                         const newData2 = dataVariantSending.map((item) => {
                             return {
                                 ...item,
-                                option: item.option.filter(
-                                    (opt) => opt.id !== id
-                                ),
+                                option: item.option.filter((opt) => opt.id !== id),
                             };
                         });
                         sDataVariantSending(newData2);
@@ -1987,12 +1594,8 @@ const Popup_ThanhPham = React.memo((props) => {
             cancelButtonText: `${props.dataLang?.aler_cancel}`,
         }).then((result) => {
             if (result.isConfirmed) {
-                sDataTotalVariant([
-                    ...dataTotalVariant.filter((x) => x.id !== id),
-                ]);
-                const filteredOption = dataVariantSending[0].option.filter(
-                    (opt) => opt.id !== id
-                );
+                sDataTotalVariant([...dataTotalVariant.filter((x) => x.id !== id)]);
+                const filteredOption = dataVariantSending[0].option.filter((opt) => opt.id !== id);
                 const updatedData = [...dataVariantSending];
                 updatedData[0] = {
                     ...dataVariantSending[0],
@@ -2007,20 +1610,10 @@ const Popup_ThanhPham = React.memo((props) => {
         <PopupEdit
             title={
                 props?.id
-                    ? `${
-                          props.dataLang?.edit_finishedProduct ||
-                          "edit_finishedProduct"
-                      }`
-                    : `${
-                          props.dataLang?.addNew_finishedProduct ||
-                          "addNew_finishedProduct"
-                      }`
+                    ? `${props.dataLang?.edit_finishedProduct || "edit_finishedProduct"}`
+                    : `${props.dataLang?.addNew_finishedProduct || "addNew_finishedProduct"}`
             }
-            button={
-                props?.id
-                    ? `${props.dataLang?.edit || "edit"}`
-                    : `${props.dataLang?.branch_popup_create_new}`
-            }
+            button={props?.id ? `${props.dataLang?.edit || "edit"}` : `${props.dataLang?.branch_popup_create_new}`}
             onClickOpen={_ToggleModal.bind(this, true)}
             open={props.isOpen}
             onClose={_ToggleModal.bind(this, false)}
@@ -2031,9 +1624,7 @@ const Popup_ThanhPham = React.memo((props) => {
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
                         className={`${
-                            tab === 0
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
+                            tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                         } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                     >
                         {props.dataLang?.information || "information"}
@@ -2041,21 +1632,13 @@ const Popup_ThanhPham = React.memo((props) => {
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
                         className={`${
-                            tab === 1
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
+                            tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                         } 2xl:text-base text-[15px] px-4 2xl:py-2 py-1 outline-none font-medium`}
                     >
-                        {props.dataLang?.category_material_list_variant ||
-                            "category_material_list_variant"}
+                        {props.dataLang?.category_material_list_variant || "category_material_list_variant"}
                     </button>
                 </div>
-                <ScrollArea
-                    className="max-h-[580px]"
-                    speed={1}
-                    smoothScrolling={true}
-                    ref={scrollAreaRef}
-                >
+                <ScrollArea className="max-h-[580px]" speed={1} smoothScrolling={true} ref={scrollAreaRef}>
                     {onFetching ? (
                         <Loading className="h-80" color="#0f4f9e" />
                     ) : (
@@ -2065,36 +1648,22 @@ const Popup_ThanhPham = React.memo((props) => {
                                     <div className="2xl:space-y-3 space-y-2">
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                {props.dataLang
-                                                    ?.client_list_brand ||
-                                                    "client_list_brand"}{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {props.dataLang?.client_list_brand || "client_list_brand"}{" "}
+                                                <span className="text-red-500">*</span>
                                             </label>
                                             <Select
                                                 options={dataOptBranch}
                                                 value={branch}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "branch"
-                                                )}
+                                                onChange={_HandleChangeInput.bind(this, "branch")}
                                                 isClearable={true}
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.client_list_brand ||
-                                                    "client_list_brand"
-                                                }
+                                                placeholder={props.dataLang?.client_list_brand || "client_list_brand"}
                                                 isMulti
-                                                noOptionsMessage={() =>
-                                                    `${props.dataLang?.no_data_found}`
-                                                }
+                                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                 closeMenuOnSelect={false}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
                                                 className={`${
-                                                    errBranch &&
-                                                    branch?.length == 0
+                                                    errBranch && branch?.length == 0
                                                         ? "border-red-500"
                                                         : "border-transparent"
                                                 } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
@@ -2119,45 +1688,28 @@ const Popup_ThanhPham = React.memo((props) => {
                                                     }),
                                                 }}
                                             />
-                                            {errBranch &&
-                                                branch?.length == 0 && (
-                                                    <label className="text-sm text-red-500">
-                                                        {props.dataLang
-                                                            ?.client_list_bran ||
-                                                            "client_list_bran"}
-                                                    </label>
-                                                )}
+                                            {errBranch && branch?.length == 0 && (
+                                                <label className="text-sm text-red-500">
+                                                    {props.dataLang?.client_list_bran || "client_list_bran"}
+                                                </label>
+                                            )}
                                         </div>
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                {props.dataLang?.category_titel}{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {props.dataLang?.category_titel} <span className="text-red-500">*</span>
                                             </label>
                                             <Select
                                                 options={dataCategory}
-                                                formatOptionLabel={
-                                                    CustomSelectOption
-                                                }
+                                                formatOptionLabel={CustomSelectOption}
                                                 value={category}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "category"
-                                                )}
+                                                onChange={_HandleChangeInput.bind(this, "category")}
                                                 isClearable={true}
-                                                noOptionsMessage={() =>
-                                                    `${props.dataLang?.no_data_found}`
-                                                }
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.category_titel
-                                                }
+                                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                placeholder={props.dataLang?.category_titel}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
                                                 className={`${
-                                                    errGroup &&
-                                                    category?.value == null
+                                                    errGroup && category?.value == null
                                                         ? "border-red-500"
                                                         : "border-transparent"
                                                 } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
@@ -2182,39 +1734,22 @@ const Popup_ThanhPham = React.memo((props) => {
                                                     }),
                                                 }}
                                             />
-                                            {errGroup &&
-                                                category?.value == null && (
-                                                    <label className="text-sm text-red-500">
-                                                        {
-                                                            props.dataLang
-                                                                ?.category_material_group_err_name
-                                                        }
-                                                    </label>
-                                                )}
+                                            {errGroup && category?.value == null && (
+                                                <label className="text-sm text-red-500">
+                                                    {props.dataLang?.category_material_group_err_name}
+                                                </label>
+                                            )}
                                         </div>
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                {
-                                                    props.dataLang
-                                                        ?.code_finishedProduct
-                                                }{" "}
-                                                {props?.id && (
-                                                    <span className="text-red-500">
-                                                        *
-                                                    </span>
-                                                )}
+                                                {props.dataLang?.code_finishedProduct}{" "}
+                                                {props?.id && <span className="text-red-500">*</span>}
                                             </label>
                                             <input
                                                 value={code}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "code"
-                                                )}
+                                                onChange={_HandleChangeInput.bind(this, "code")}
                                                 type="text"
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.client_popup_sytem
-                                                }
+                                                placeholder={props.dataLang?.client_popup_sytem}
                                                 className={`${
                                                     errCode && code == ""
                                                         ? "border-red-500"
@@ -2223,34 +1758,20 @@ const Popup_ThanhPham = React.memo((props) => {
                                             />
                                             {errCode && code == "" && (
                                                 <label className="text-sm text-red-500">
-                                                    {
-                                                        props.dataLang
-                                                            ?.please_fill_code_finishedProduct
-                                                    }
+                                                    {props.dataLang?.please_fill_code_finishedProduct}
                                                 </label>
                                             )}
                                         </div>
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                {
-                                                    props.dataLang
-                                                        ?.name_finishedProduct
-                                                }{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {props.dataLang?.name_finishedProduct}{" "}
+                                                <span className="text-red-500">*</span>
                                             </label>
                                             <input
                                                 value={name}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "name"
-                                                )}
+                                                onChange={_HandleChangeInput.bind(this, "name")}
                                                 type="text"
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.name_finishedProduct
-                                                }
+                                                placeholder={props.dataLang?.name_finishedProduct}
                                                 className={`${
                                                     errName && name == ""
                                                         ? "border-red-500"
@@ -2259,10 +1780,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                             />
                                             {errName && name == "" && (
                                                 <label className="text-sm text-red-500">
-                                                    {
-                                                        props.dataLang
-                                                            ?.please_fill_name_finishedProduct
-                                                    }
+                                                    {props.dataLang?.please_fill_name_finishedProduct}
                                                 </label>
                                             )}
                                         </div>
@@ -2273,61 +1791,42 @@ const Popup_ThanhPham = React.memo((props) => {
                                             <NumericFormat
                                                 thousandSeparator=","
                                                 value={price}
-                                                onValueChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "price"
-                                                )}
+                                                onValueChange={_HandleChangeInput.bind(this, "price")}
                                                 placeholder="Giá bán"
                                                 className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
                                             />
                                         </div>
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                {props.dataLang
-                                                    ?.minimum_amount ||
-                                                    "minimum_amount"}
+                                                {props.dataLang?.minimum_amount || "minimum_amount"}
                                             </label>
                                             <NumericFormat
                                                 thousandSeparator=","
                                                 value={minimumAmount}
-                                                onValueChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "minimumAmount"
-                                                )}
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.minimum_amount ||
-                                                    "minimum_amount"
-                                                }
+                                                onValueChange={_HandleChangeInput.bind(this, "minimumAmount")}
+                                                placeholder={props.dataLang?.minimum_amount || "minimum_amount"}
                                                 className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
                                             />
                                         </div>
-                                        {props.dataProductExpiry?.is_enable ===
-                                            "1" && (
+                                        {props.dataProductExpiry?.is_enable === "1" && (
                                             <div className="2xl:space-y-1">
                                                 <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                    {props.dataLang
-                                                        ?.category_material_list_expiry_date ||
+                                                    {props.dataLang?.category_material_list_expiry_date ||
                                                         "category_material_list_expiry_date"}
                                                 </label>
                                                 <div className="relative flex flex-col justify-center items-center">
                                                     <NumericFormat
                                                         thousandSeparator=","
                                                         value={expiry}
-                                                        onValueChange={_HandleChangeInput.bind(
-                                                            this,
-                                                            "expiry"
-                                                        )}
+                                                        onValueChange={_HandleChangeInput.bind(this, "expiry")}
                                                         placeholder={
-                                                            props.dataLang
-                                                                ?.category_material_list_expiry_date ||
+                                                            props.dataLang?.category_material_list_expiry_date ||
                                                             "category_material_list_expiry_date"
                                                         }
                                                         className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 pr-14 border outline-none`}
                                                     />
                                                     <span className="absolute right-2 text-slate-400 select-none">
-                                                        {props.dataLang?.date ||
-                                                            "date"}
+                                                        {props.dataLang?.date || "date"}
                                                     </span>
                                                 </div>
                                             </div>
@@ -2336,34 +1835,20 @@ const Popup_ThanhPham = React.memo((props) => {
                                     <div className="2xl:space-y-3 space-y-2">
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                {
-                                                    props.dataLang
-                                                        ?.type_finishedProduct
-                                                }{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {props.dataLang?.type_finishedProduct}{" "}
+                                                <span className="text-red-500">*</span>
                                             </label>
                                             <Select
                                                 options={dataOptType}
                                                 value={type}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "type"
-                                                )}
+                                                onChange={_HandleChangeInput.bind(this, "type")}
                                                 isClearable={true}
-                                                placeholder={
-                                                    props.dataLang
-                                                        ?.type_finishedProduct
-                                                }
-                                                noOptionsMessage={() =>
-                                                    `${props.dataLang?.no_data_found}`
-                                                }
+                                                placeholder={props.dataLang?.type_finishedProduct}
+                                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
                                                 className={`${
-                                                    errType &&
-                                                    type?.value == null
+                                                    errType && type?.value == null
                                                         ? "border-red-500"
                                                         : "border-transparent"
                                                 } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
@@ -2390,39 +1875,25 @@ const Popup_ThanhPham = React.memo((props) => {
                                             />
                                             {errType && type?.value == null && (
                                                 <label className="text-sm text-red-500">
-                                                    {
-                                                        props.dataLang
-                                                            ?.please_choose_type_finishedProduct
-                                                    }
+                                                    {props.dataLang?.please_choose_type_finishedProduct}
                                                 </label>
                                             )}
                                         </div>
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                {props.dataLang?.unit}{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
+                                                {props.dataLang?.unit} <span className="text-red-500">*</span>
                                             </label>
                                             <Select
                                                 options={dataOptUnit}
                                                 value={unit}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "unit"
-                                                )}
+                                                onChange={_HandleChangeInput.bind(this, "unit")}
                                                 isClearable={true}
-                                                noOptionsMessage={() =>
-                                                    `${props.dataLang?.no_data_found}`
-                                                }
-                                                placeholder={
-                                                    props.dataLang?.unit
-                                                }
+                                                noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                placeholder={props.dataLang?.unit}
                                                 menuPortalTarget={document.body}
                                                 onMenuOpen={handleMenuOpen}
                                                 className={`${
-                                                    errUnit &&
-                                                    unit?.value == null
+                                                    errUnit && unit?.value == null
                                                         ? "border-red-500"
                                                         : "border-transparent"
                                                 } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
@@ -2449,17 +1920,13 @@ const Popup_ThanhPham = React.memo((props) => {
                                             />
                                             {errUnit && unit?.value == null && (
                                                 <label className="text-sm text-red-500">
-                                                    {
-                                                        props.dataLang
-                                                            ?.please_fill_unit
-                                                    }
+                                                    {props.dataLang?.please_fill_unit}
                                                 </label>
                                             )}
                                         </div>
                                         <div className="2xl:space-y-1">
                                             <label className="text-[#344054] font-normal 2xl:text-base text-[15px]">
-                                                {props.dataLang?.avatar ||
-                                                    "avatar"}
+                                                {props.dataLang?.avatar || "avatar"}
                                             </label>
                                             <div className="flex justify-center">
                                                 <div className="relative h-36 w-36 rounded bg-slate-200">
@@ -2469,12 +1936,9 @@ const Popup_ThanhPham = React.memo((props) => {
                                                             height={120}
                                                             quality={100}
                                                             src={
-                                                                typeof thumb ===
-                                                                "string"
+                                                                typeof thumb === "string"
                                                                     ? thumb
-                                                                    : URL.createObjectURL(
-                                                                          thumb
-                                                                      )
+                                                                    : URL.createObjectURL(thumb)
                                                             }
                                                             alt="thumb type"
                                                             className="w-36 h-36 rounded object-contain"
@@ -2490,9 +1954,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                                     )}
                                                     <div className="absolute bottom-0 -right-12 flex flex-col space-y-2">
                                                         <input
-                                                            onChange={_HandleChangeFileThumb.bind(
-                                                                this
-                                                            )}
+                                                            onChange={_HandleChangeFileThumb.bind(this)}
                                                             type="file"
                                                             id={`upload`}
                                                             accept="image/png, image/jpeg"
@@ -2500,29 +1962,15 @@ const Popup_ThanhPham = React.memo((props) => {
                                                         />
                                                         <label
                                                             htmlFor={`upload`}
-                                                            title={
-                                                                props.dataLang
-                                                                    ?.edit ||
-                                                                "edit"
-                                                            }
+                                                            title={props.dataLang?.edit || "edit"}
                                                             className="cursor-pointer w-8 h-8 rounded-full bg-slate-100 flex flex-col justify-center items-center"
                                                         >
                                                             <IconEditImg size="17" />
                                                         </label>
                                                         <button
-                                                            disabled={
-                                                                !thumb
-                                                                    ? true
-                                                                    : false
-                                                            }
-                                                            onClick={_DeleteThumb.bind(
-                                                                this
-                                                            )}
-                                                            title={
-                                                                props.dataLang
-                                                                    ?.delete ||
-                                                                "delete"
-                                                            }
+                                                            disabled={!thumb ? true : false}
+                                                            onClick={_DeleteThumb.bind(this)}
+                                                            title={props.dataLang?.delete || "delete"}
                                                             className="w-8 h-8 rounded-full bg-red-500 disabled:opacity-30 flex flex-col justify-center items-center text-white"
                                                         >
                                                             <IconDelete size="17" />
@@ -2538,15 +1986,9 @@ const Popup_ThanhPham = React.memo((props) => {
                                             <textarea
                                                 value={note}
                                                 type="text"
-                                                placeholder={
-                                                    props.dataLang?.note ||
-                                                    "note"
-                                                }
+                                                placeholder={props.dataLang?.note || "note"}
                                                 rows={5}
-                                                onChange={_HandleChangeInput.bind(
-                                                    this,
-                                                    "note"
-                                                )}
+                                                onChange={_HandleChangeInput.bind(this, "note")}
                                                 className="focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none resize-none"
                                             />
                                         </div>
@@ -2559,8 +2001,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                         <div className="space-y-3">
                                             <div className="space-y-1">
                                                 <label>
-                                                    {props.dataLang
-                                                        ?.category_material_list_variant_main ||
+                                                    {props.dataLang?.category_material_list_variant_main ||
                                                         "category_material_list_variant_main"}
                                                 </label>
                                                 <Select
@@ -2569,71 +2010,52 @@ const Popup_ThanhPham = React.memo((props) => {
                                                         variantMain
                                                             ? {
                                                                   label: dataOptVariant.find(
-                                                                      (e) =>
-                                                                          e.value ==
-                                                                          variantMain
+                                                                      (e) => e.value == variantMain
                                                                   )?.label,
                                                                   value: variantMain,
                                                               }
                                                             : null
                                                     }
-                                                    onChange={_HandleChangeInput.bind(
-                                                        this,
-                                                        "variantMain"
-                                                    )}
+                                                    onChange={_HandleChangeInput.bind(this, "variantMain")}
                                                     isClearable={true}
                                                     placeholder={
-                                                        props.dataLang
-                                                            ?.category_material_list_variant_main ||
+                                                        props.dataLang?.category_material_list_variant_main ||
                                                         "category_material_list_variant_main"
                                                     }
-                                                    noOptionsMessage={() =>
-                                                        `${props.dataLang?.no_data_found}`
-                                                    }
-                                                    menuPortalTarget={
-                                                        document.body
-                                                    }
+                                                    noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                    menuPortalTarget={document.body}
                                                     onMenuOpen={handleMenuOpen}
                                                     className={` placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                     theme={(theme) => ({
                                                         ...theme,
                                                         colors: {
                                                             ...theme.colors,
-                                                            primary25:
-                                                                "#EBF5FF",
-                                                            primary50:
-                                                                "#92BFF7",
+                                                            primary25: "#EBF5FF",
+                                                            primary50: "#92BFF7",
                                                             primary: "#0F4F9E",
                                                         },
                                                     })}
                                                     styles={{
-                                                        placeholder: (
-                                                            base
-                                                        ) => ({
+                                                        placeholder: (base) => ({
                                                             ...base,
                                                             color: "#cbd5e1",
                                                         }),
                                                         menuPortal: (base) => ({
                                                             ...base,
                                                             zIndex: 9999,
-                                                            position:
-                                                                "absolute",
+                                                            position: "absolute",
                                                         }),
                                                     }}
                                                 />
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <h5 className="text-slate-400 text-sm">
-                                                    {props.dataLang
-                                                        ?.branch_popup_variant_option ||
+                                                    {props.dataLang?.branch_popup_variant_option ||
                                                         "branch_popup_variant_option"}
                                                 </h5>
                                                 {optVariantMain && (
                                                     <button
-                                                        onClick={_HandleSelectedAllVariant.bind(
-                                                            this,
-                                                            "main"
-                                                        )}
+                                                        onClick={_HandleSelectedAllVariant.bind(this, "main")}
                                                         className="text-sm font-medium"
                                                     >
                                                         Chọn tất cả
@@ -2653,76 +2075,55 @@ const Popup_ThanhPham = React.memo((props) => {
                                                 smoothScrolling={true}
                                             >
                                                 <div className="flex flex-col">
-                                                    {optVariantMain?.map(
-                                                        (e) => (
-                                                            <div
-                                                                key={e?.id.toString()}
-                                                                className="flex items-center "
+                                                    {optVariantMain?.map((e) => (
+                                                        <div key={e?.id.toString()} className="flex items-center ">
+                                                            <label
+                                                                className="relative flex cursor-pointer items-center rounded-full p-2"
+                                                                htmlFor={e.id}
+                                                                data-ripple-dark="true"
                                                             >
-                                                                <label
-                                                                    className="relative flex cursor-pointer items-center rounded-full p-2"
-                                                                    htmlFor={
-                                                                        e.id
-                                                                    }
-                                                                    data-ripple-dark="true"
-                                                                >
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
-                                                                        id={
-                                                                            e.id
-                                                                        }
-                                                                        value={
-                                                                            e.name
-                                                                        }
-                                                                        checked={optSelectedVariantMain.some(
-                                                                            (
-                                                                                selectedOpt
-                                                                            ) =>
-                                                                                selectedOpt.id ===
-                                                                                e.id
-                                                                        )}
-                                                                        onChange={_HandleSelectedVariant.bind(
-                                                                            this,
-                                                                            "main"
-                                                                        )}
-                                                                    />
-                                                                    <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                                                        <svg
-                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                            className="h-3.5 w-3.5"
-                                                                            viewBox="0 0 20 20"
-                                                                            fill="currentColor"
-                                                                            stroke="currentColor"
-                                                                            stroke-width="1"
-                                                                        >
-                                                                            <path
-                                                                                fill-rule="evenodd"
-                                                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                                clip-rule="evenodd"
-                                                                            ></path>
-                                                                        </svg>
-                                                                    </div>
-                                                                </label>
-                                                                <label
-                                                                    htmlFor={
-                                                                        e.id
-                                                                    }
-                                                                    className="text-[#344054] font-normal text-sm cursor-pointer"
-                                                                >
-                                                                    {e.name}
-                                                                </label>
-                                                            </div>
-                                                        )
-                                                    )}
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
+                                                                    id={e.id}
+                                                                    value={e.name}
+                                                                    checked={optSelectedVariantMain.some(
+                                                                        (selectedOpt) => selectedOpt.id === e.id
+                                                                    )}
+                                                                    onChange={_HandleSelectedVariant.bind(this, "main")}
+                                                                />
+                                                                <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        className="h-3.5 w-3.5"
+                                                                        viewBox="0 0 20 20"
+                                                                        fill="currentColor"
+                                                                        stroke="currentColor"
+                                                                        stroke-width="1"
+                                                                    >
+                                                                        <path
+                                                                            fill-rule="evenodd"
+                                                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                            clip-rule="evenodd"
+                                                                        ></path>
+                                                                    </svg>
+                                                                </div>
+                                                            </label>
+                                                            <label
+                                                                htmlFor={e.id}
+                                                                className="text-[#344054] font-normal text-sm cursor-pointer"
+                                                            >
+                                                                {e.name}
+                                                            </label>
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             </ScrollArea>
                                         </div>
                                         <div className="space-y-3">
                                             <div className="space-y-1">
                                                 <label>
-                                                    {props.dataLang
-                                                        ?.category_material_list_variant_sub ||
+                                                    {props.dataLang?.category_material_list_variant_sub ||
                                                         "category_material_list_variant_sub"}
                                                 </label>
                                                 <Select
@@ -2731,71 +2132,52 @@ const Popup_ThanhPham = React.memo((props) => {
                                                         variantSub
                                                             ? {
                                                                   label: dataOptVariant.find(
-                                                                      (e) =>
-                                                                          e.value ==
-                                                                          variantSub
+                                                                      (e) => e.value == variantSub
                                                                   )?.label,
                                                                   value: variantSub,
                                                               }
                                                             : null
                                                     }
-                                                    onChange={_HandleChangeInput.bind(
-                                                        this,
-                                                        "variantSub"
-                                                    )}
+                                                    onChange={_HandleChangeInput.bind(this, "variantSub")}
                                                     isClearable={true}
                                                     placeholder={
-                                                        props.dataLang
-                                                            ?.category_material_list_variant_sub ||
+                                                        props.dataLang?.category_material_list_variant_sub ||
                                                         "category_material_list_variant_sub"
                                                     }
-                                                    noOptionsMessage={() =>
-                                                        `${props.dataLang?.no_data_found}`
-                                                    }
-                                                    menuPortalTarget={
-                                                        document.body
-                                                    }
+                                                    noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                    menuPortalTarget={document.body}
                                                     onMenuOpen={handleMenuOpen}
                                                     className={` placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                                                     theme={(theme) => ({
                                                         ...theme,
                                                         colors: {
                                                             ...theme.colors,
-                                                            primary25:
-                                                                "#EBF5FF",
-                                                            primary50:
-                                                                "#92BFF7",
+                                                            primary25: "#EBF5FF",
+                                                            primary50: "#92BFF7",
                                                             primary: "#0F4F9E",
                                                         },
                                                     })}
                                                     styles={{
-                                                        placeholder: (
-                                                            base
-                                                        ) => ({
+                                                        placeholder: (base) => ({
                                                             ...base,
                                                             color: "#cbd5e1",
                                                         }),
                                                         menuPortal: (base) => ({
                                                             ...base,
                                                             zIndex: 9999,
-                                                            position:
-                                                                "absolute",
+                                                            position: "absolute",
                                                         }),
                                                     }}
                                                 />
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <h5 className="text-slate-400 text-sm">
-                                                    {props.dataLang
-                                                        ?.branch_popup_variant_option ||
+                                                    {props.dataLang?.branch_popup_variant_option ||
                                                         "branch_popup_variant_option"}
                                                 </h5>
                                                 {optVariantSub && (
                                                     <button
-                                                        onClick={_HandleSelectedAllVariant.bind(
-                                                            this,
-                                                            "sub"
-                                                        )}
+                                                        onClick={_HandleSelectedAllVariant.bind(this, "sub")}
                                                         className="text-sm font-medium"
                                                     >
                                                         Chọn tất cả
@@ -2816,10 +2198,7 @@ const Popup_ThanhPham = React.memo((props) => {
                                             >
                                                 <div className="flex flex-col space-y-0.5">
                                                     {optVariantSub?.map((e) => (
-                                                        <div
-                                                            key={e?.id.toString()}
-                                                            className="flex items-center "
-                                                        >
+                                                        <div key={e?.id.toString()} className="flex items-center ">
                                                             <label
                                                                 className="relative flex cursor-pointer items-center rounded-full p-2"
                                                                 htmlFor={e.id}
@@ -2829,20 +2208,11 @@ const Popup_ThanhPham = React.memo((props) => {
                                                                     type="checkbox"
                                                                     className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-indigo-500 checked:bg-indigo-500 checked:before:bg-indigo-500 hover:before:opacity-10"
                                                                     id={e.id}
-                                                                    value={
-                                                                        e.name
-                                                                    }
+                                                                    value={e.name}
                                                                     checked={optSelectedVariantSub.some(
-                                                                        (
-                                                                            selectedOpt
-                                                                        ) =>
-                                                                            selectedOpt.id ===
-                                                                            e.id
+                                                                        (selectedOpt) => selectedOpt.id === e.id
                                                                     )}
-                                                                    onChange={_HandleSelectedVariant.bind(
-                                                                        this,
-                                                                        "sub"
-                                                                    )}
+                                                                    onChange={_HandleSelectedVariant.bind(this, "sub")}
                                                                 />
                                                                 <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
                                                                     <svg
@@ -2875,14 +2245,10 @@ const Popup_ThanhPham = React.memo((props) => {
                                     </div>
                                     <div className="flex justify-end py-2">
                                         <button
-                                            onClick={_HandleApplyVariant.bind(
-                                                this
-                                            )}
+                                            onClick={_HandleApplyVariant.bind(this)}
                                             disabled={
-                                                optSelectedVariantMain?.length ==
-                                                    0 &&
-                                                optSelectedVariantSub?.length ==
-                                                    0
+                                                optSelectedVariantMain?.length == 0 &&
+                                                optSelectedVariantSub?.length == 0
                                                     ? true
                                                     : false
                                             }
@@ -2891,194 +2257,146 @@ const Popup_ThanhPham = React.memo((props) => {
                                             {props.dataLang?.apply || "apply"}
                                         </button>
                                     </div>
-                                    {Object.keys(dataTotalVariant).length !==
-                                        0 && (
+                                    {Object.keys(dataTotalVariant).length !== 0 && (
                                         <div className="space-y-1">
                                             <h4 className="text-[#344054] font-medium">
-                                                {props.dataLang?.list_variant ||
-                                                    "list_variant"}
+                                                {props.dataLang?.list_variant || "list_variant"}
                                             </h4>
                                             <div
                                                 className={`${
-                                                    dataTotalVariant[0]
-                                                        ?.variation_option_2
-                                                        ?.length > 0
+                                                    dataTotalVariant[0]?.variation_option_2?.length > 0
                                                         ? "grid-cols-9"
                                                         : "grid-cols-7"
                                                 } grid gap-5 p-1`}
                                             >
                                                 <h4 className="text-[15px] text-center font-[300] text-slate-400 col-span-2">
-                                                    {props.dataLang?.avatar ||
-                                                        "avatar"}
+                                                    {props.dataLang?.avatar || "avatar"}
                                                 </h4>
                                                 <h4 className="text-[15px] font-[300] text-slate-400 col-span-2">
-                                                    {
-                                                        dataVariantSending[0]
-                                                            ?.name
-                                                    }
+                                                    {dataVariantSending[0]?.name}
                                                 </h4>
-                                                {dataTotalVariant[0]
-                                                    ?.variation_option_2
-                                                    ?.length > 0 && (
+                                                {dataTotalVariant[0]?.variation_option_2?.length > 0 && (
                                                     <h4 className="text-[15px] font-[300] text-slate-400 col-span-2">
-                                                        {
-                                                            dataVariantSending[1]
-                                                                ?.name
-                                                        }
+                                                        {dataVariantSending[1]?.name}
                                                     </h4>
                                                 )}
                                                 <h4 className="text-[15px] text-center font-[300] text-slate-400 col-span-2">
                                                     {"Giá"}
                                                 </h4>
                                                 <h4 className="text-[15px] text-center font-[300] text-slate-400">
-                                                    {props.dataLang
-                                                        ?.branch_popup_properties ||
+                                                    {props.dataLang?.branch_popup_properties ||
                                                         "branch_popup_properties"}
                                                 </h4>
                                             </div>
-                                            <ScrollArea
-                                                className="max-h-[230px]"
-                                                speed={1}
-                                                smoothScrolling={true}
-                                            >
+                                            <ScrollArea className="max-h-[230px]" speed={1} smoothScrolling={true}>
                                                 <div className="space-y-0.5">
-                                                    {dataTotalVariant?.map(
-                                                        (e) => (
-                                                            <div
-                                                                className={`${
-                                                                    e
-                                                                        ?.variation_option_2
-                                                                        ?.length >
-                                                                    0
-                                                                        ? "grid-cols-9"
-                                                                        : "grid-cols-7"
-                                                                } grid gap-5 items-center bg-slate-50 hover:bg-slate-100 p-1`}
-                                                                key={e?.id.toString()}
-                                                            >
-                                                                <div className="w-full h-full flex flex-col justify-center items-center col-span-2">
-                                                                    <input
-                                                                        onChange={_HandleChangeVariant.bind(
-                                                                            this,
-                                                                            e?.id,
-                                                                            "image"
-                                                                        )}
-                                                                        type="file"
-                                                                        id={`uploadImg+${e?.id}`}
-                                                                        accept="image/png, image/jpeg"
-                                                                        hidden
-                                                                    />
-                                                                    <label
-                                                                        htmlFor={`uploadImg+${e?.id}`}
-                                                                        className="h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 cursor-pointer rounded"
-                                                                    >
-                                                                        {e.image ==
-                                                                        null ? (
-                                                                            <React.Fragment>
-                                                                                <div className="h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 cursor-pointer rounded">
-                                                                                    <IconImage />
-                                                                                </div>
-                                                                            </React.Fragment>
-                                                                        ) : (
-                                                                            <Image
-                                                                                width={
-                                                                                    64
-                                                                                }
-                                                                                height={
-                                                                                    64
-                                                                                }
-                                                                                src={
-                                                                                    typeof e.image ===
-                                                                                    "string"
-                                                                                        ? e.image
-                                                                                        : URL.createObjectURL(
-                                                                                              e.image
-                                                                                          )
-                                                                                }
-                                                                                className="h-14 w-14 object-contain"
-                                                                            />
-                                                                        )}
-                                                                    </label>
-                                                                </div>
-                                                                <div className=" col-span-2 truncate">
-                                                                    {e.name}
-                                                                </div>
-                                                                {e
-                                                                    ?.variation_option_2
-                                                                    ?.length >
-                                                                0 ? (
-                                                                    <div className="col-span-5 grid grid-cols-5 gap-1 items-center">
-                                                                        {e?.variation_option_2?.map(
-                                                                            (
-                                                                                ce
-                                                                            ) => (
-                                                                                <React.Fragment
-                                                                                    key={ce.id?.toString()}
-                                                                                >
-                                                                                    <div className="col-span-2 truncate">
-                                                                                        {
-                                                                                            ce.name
-                                                                                        }
-                                                                                    </div>
-                                                                                    <NumericFormat
-                                                                                        thousandSeparator=","
-                                                                                        value={
-                                                                                            ce.price
-                                                                                        }
-                                                                                        onValueChange={_HandleChangePrice.bind(
-                                                                                            this,
-                                                                                            e.id,
-                                                                                            ce.id
-                                                                                        )}
-                                                                                        placeholder="Giá"
-                                                                                        className={`col-span-2 focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
-                                                                                    />
-                                                                                    <div className="flex justify-center">
-                                                                                        <button
-                                                                                            onClick={_HandleDeleteVariant.bind(
-                                                                                                this,
-                                                                                                e.id,
-                                                                                                ce.id
-                                                                                            )}
-                                                                                            className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
-                                                                                        >
-                                                                                            <IconDelete size="22" />
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </React.Fragment>
-                                                                            )
-                                                                        )}
-                                                                    </div>
-                                                                ) : (
-                                                                    <React.Fragment>
-                                                                        <NumericFormat
-                                                                            thousandSeparator=","
-                                                                            value={
-                                                                                e?.price
+                                                    {dataTotalVariant?.map((e) => (
+                                                        <div
+                                                            className={`${
+                                                                e?.variation_option_2?.length > 0
+                                                                    ? "grid-cols-9"
+                                                                    : "grid-cols-7"
+                                                            } grid gap-5 items-center bg-slate-50 hover:bg-slate-100 p-1`}
+                                                            key={e?.id.toString()}
+                                                        >
+                                                            <div className="w-full h-full flex flex-col justify-center items-center col-span-2">
+                                                                <input
+                                                                    onChange={_HandleChangeVariant.bind(
+                                                                        this,
+                                                                        e?.id,
+                                                                        "image"
+                                                                    )}
+                                                                    type="file"
+                                                                    id={`uploadImg+${e?.id}`}
+                                                                    accept="image/png, image/jpeg"
+                                                                    hidden
+                                                                />
+                                                                <label
+                                                                    htmlFor={`uploadImg+${e?.id}`}
+                                                                    className="h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 cursor-pointer rounded"
+                                                                >
+                                                                    {e.image == null ? (
+                                                                        <React.Fragment>
+                                                                            <div className="h-14 w-14 flex flex-col justify-center items-center bg-slate-200/50 cursor-pointer rounded">
+                                                                                <IconImage />
+                                                                            </div>
+                                                                        </React.Fragment>
+                                                                    ) : (
+                                                                        <Image
+                                                                            width={64}
+                                                                            height={64}
+                                                                            src={
+                                                                                typeof e.image === "string"
+                                                                                    ? e.image
+                                                                                    : URL.createObjectURL(e.image)
                                                                             }
-                                                                            onValueChange={_HandleChangeVariant.bind(
-                                                                                this,
-                                                                                e.id,
-                                                                                "price"
-                                                                            )}
-                                                                            placeholder="Giá"
-                                                                            className={`col-span-2 focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
+                                                                            className="h-14 w-14 object-contain"
                                                                         />
-                                                                        <div className="flex justify-center">
-                                                                            <button
-                                                                                onClick={_HandleDeleteVariantItems.bind(
-                                                                                    this,
-                                                                                    e.id
-                                                                                )}
-                                                                                className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
-                                                                            >
-                                                                                <IconDelete size="22" />
-                                                                            </button>
-                                                                        </div>
-                                                                    </React.Fragment>
-                                                                )}
+                                                                    )}
+                                                                </label>
                                                             </div>
-                                                        )
-                                                    )}
+                                                            <div className=" col-span-2 truncate">{e.name}</div>
+                                                            {e?.variation_option_2?.length > 0 ? (
+                                                                <div className="col-span-5 grid grid-cols-5 gap-1 items-center">
+                                                                    {e?.variation_option_2?.map((ce) => (
+                                                                        <React.Fragment key={ce.id?.toString()}>
+                                                                            <div className="col-span-2 truncate">
+                                                                                {ce.name}
+                                                                            </div>
+                                                                            <NumericFormat
+                                                                                thousandSeparator=","
+                                                                                value={ce.price}
+                                                                                onValueChange={_HandleChangePrice.bind(
+                                                                                    this,
+                                                                                    e.id,
+                                                                                    ce.id
+                                                                                )}
+                                                                                placeholder="Giá"
+                                                                                className={`col-span-2 focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
+                                                                            />
+                                                                            <div className="flex justify-center">
+                                                                                <button
+                                                                                    onClick={_HandleDeleteVariant.bind(
+                                                                                        this,
+                                                                                        e.id,
+                                                                                        ce.id
+                                                                                    )}
+                                                                                    className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
+                                                                                >
+                                                                                    <IconDelete size="22" />
+                                                                                </button>
+                                                                            </div>
+                                                                        </React.Fragment>
+                                                                    ))}
+                                                                </div>
+                                                            ) : (
+                                                                <React.Fragment>
+                                                                    <NumericFormat
+                                                                        thousandSeparator=","
+                                                                        value={e?.price}
+                                                                        onValueChange={_HandleChangeVariant.bind(
+                                                                            this,
+                                                                            e.id,
+                                                                            "price"
+                                                                        )}
+                                                                        placeholder="Giá"
+                                                                        className={`col-span-2 focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
+                                                                    />
+                                                                    <div className="flex justify-center">
+                                                                        <button
+                                                                            onClick={_HandleDeleteVariantItems.bind(
+                                                                                this,
+                                                                                e.id
+                                                                            )}
+                                                                            className="p-1.5 text-red-500 hover:scale-110 transition hover:text-red-600"
+                                                                        >
+                                                                            <IconDelete size="22" />
+                                                                        </button>
+                                                                    </div>
+                                                                </React.Fragment>
+                                                            )}
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             </ScrollArea>
                                         </div>
@@ -3131,17 +2449,12 @@ const Popup_ThongTin = React.memo((props) => {
     const [selectedListBom, sSelectedListBom] = useState([]);
 
     const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/api_product/product/${props.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    sList({ ...response.data });
-                }
-                sOnFetching(false);
+        Axios("GET", `/api_web/api_product/product/${props.id}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                sList({ ...response.data });
             }
-        );
+            sOnFetching(false);
+        });
     };
 
     useEffect(() => {
@@ -3149,18 +2462,13 @@ const Popup_ThongTin = React.memo((props) => {
     }, [onFetching]);
 
     const _ServerFetchingStage = () => {
-        Axios(
-            "GET",
-            `/api_web/api_product/getDesignStages/${props.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sDataStage(data);
-                }
-                sOnFetchingStage(false);
+        Axios("GET", `/api_web/api_product/getDesignStages/${props.id}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sDataStage(data);
             }
-        );
+            sOnFetchingStage(false);
+        });
     };
 
     useEffect(() => {
@@ -3180,9 +2488,7 @@ const Popup_ThongTin = React.memo((props) => {
                 if (!err) {
                     var { data } = response.data;
                     sDataBom(data?.variations || []);
-                    sTabBom(
-                        data?.variations[0]?.product_variation_option_value_id
-                    );
+                    sTabBom(data?.variations[0]?.product_variation_option_value_id);
                 }
                 sOnFetchingBom(false);
             }
@@ -3209,20 +2515,8 @@ const Popup_ThongTin = React.memo((props) => {
     }, [openBom == false]);
 
     useEffect(() => {
-        open &&
-            tabBom &&
-            sSelectedListBom(
-                dataBom.find(
-                    (item) => item.product_variation_option_value_id === tabBom
-                )
-            );
-        open &&
-            dataBom &&
-            sSelectedListBom(
-                dataBom.find(
-                    (item) => item.product_variation_option_value_id === tabBom
-                )
-            );
+        open && tabBom && sSelectedListBom(dataBom.find((item) => item.product_variation_option_value_id === tabBom));
+        open && dataBom && sSelectedListBom(dataBom.find((item) => item.product_variation_option_value_id === tabBom));
     }, [tabBom, dataBom]);
 
     return (
@@ -3239,9 +2533,7 @@ const Popup_ThongTin = React.memo((props) => {
                     <button
                         onClick={_HandleSelectTab.bind(this, 0)}
                         className={`${
-                            tab === 0
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
+                            tab === 0 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                         }  px-4 py-2 outline-none font-medium`}
                     >
                         {props.dataLang?.information || "information"}
@@ -3249,35 +2541,26 @@ const Popup_ThongTin = React.memo((props) => {
                     <button
                         onClick={_HandleSelectTab.bind(this, 1)}
                         className={`${
-                            tab === 1
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
+                            tab === 1 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                         }  px-4 py-2 outline-none font-medium`}
                     >
-                        {props.dataLang?.category_material_list_variant ||
-                            "category_material_list_variant"}
+                        {props.dataLang?.category_material_list_variant || "category_material_list_variant"}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 2)}
                         className={`${
-                            tab === 2
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
+                            tab === 2 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                         }  px-4 py-2 outline-none font-medium`}
                     >
-                        {props.dataLang?.bom_finishedProduct ||
-                            "bom_finishedProduct"}
+                        {props.dataLang?.bom_finishedProduct || "bom_finishedProduct"}
                     </button>
                     <button
                         onClick={_HandleSelectTab.bind(this, 3)}
                         className={`${
-                            tab === 3
-                                ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]"
-                                : "hover:text-[#0F4F9E] "
+                            tab === 3 ? "text-[#0F4F9E]  border-b-2 border-[#0F4F9E]" : "hover:text-[#0F4F9E] "
                         }  px-4 py-2 outline-none font-medium`}
                     >
-                        {props.dataLang?.stage_finishedProduct ||
-                            "stage_finishedProduct"}
+                        {props.dataLang?.stage_finishedProduct || "stage_finishedProduct"}
                     </button>
                 </div>
                 {onFetching ? (
@@ -3290,17 +2573,11 @@ const Popup_ThongTin = React.memo((props) => {
                                     <div className="space-y-3 bg-slate-100/40 p-2 rounded-md">
                                         <div className="flex justify-between">
                                             <h5 className="text-slate-400 text-sm w-[40%]">
-                                                {props.dataLang
-                                                    ?.client_list_brand ||
-                                                    "client_list_brand"}
-                                                :
+                                                {props.dataLang?.client_list_brand || "client_list_brand"}:
                                             </h5>
                                             <div className="w-[55%] flex flex-col items-end">
                                                 {list?.branch?.map((e) => (
-                                                    <h6
-                                                        key={e.id.toString()}
-                                                        className="w-fit text-right"
-                                                    >
+                                                    <h6 key={e.id.toString()} className="w-fit text-right">
                                                         {e.name}
                                                     </h6>
                                                 ))}
@@ -3308,116 +2585,66 @@ const Popup_ThongTin = React.memo((props) => {
                                         </div>
                                         <div className="flex justify-between">
                                             <h5 className="text-slate-400 text-sm w-[40%]">
-                                                {props.dataLang?.category_titel}
-                                                :
+                                                {props.dataLang?.category_titel}:
                                             </h5>
-                                            <h6 className="w-[55%] text-right">
-                                                {list?.category_name}
-                                            </h6>
+                                            <h6 className="w-[55%] text-right">{list?.category_name}</h6>
                                         </div>
                                         <div className="flex justify-between">
                                             <h5 className="text-slate-400 text-sm w-[40%]">
-                                                {
-                                                    props.dataLang
-                                                        ?.code_finishedProduct
-                                                }
-                                                :
+                                                {props.dataLang?.code_finishedProduct}:
                                             </h5>
-                                            <h6 className="w-[55%] text-right">
-                                                {list?.code}
-                                            </h6>
+                                            <h6 className="w-[55%] text-right">{list?.code}</h6>
                                         </div>
                                         <div className="flex justify-between">
                                             <h5 className="text-slate-400 text-sm w-[40%]">
-                                                {
-                                                    props.dataLang
-                                                        ?.name_finishedProduct
-                                                }
-                                                :
+                                                {props.dataLang?.name_finishedProduct}:
                                             </h5>
-                                            <h6 className="w-[55%] text-right">
-                                                {list?.name}
-                                            </h6>
+                                            <h6 className="w-[55%] text-right">{list?.name}</h6>
                                         </div>
                                         <div className="flex justify-between">
                                             <h5 className="text-slate-400 text-sm w-[40%]">
-                                                {
-                                                    props.dataLang
-                                                        ?.type_finishedProduct
-                                                }
-                                                :
+                                                {props.dataLang?.type_finishedProduct}:
                                             </h5>
                                             <h6 className="w-[55%] text-right">
-                                                {
-                                                    props.dataLang[
-                                                        list?.type_products
-                                                            ?.name
-                                                    ]
-                                                }
+                                                {props.dataLang[list?.type_products?.name]}
                                             </h6>
                                         </div>
                                         <div className="flex justify-between">
-                                            <h5 className="text-slate-400 text-sm w-[40%]">
-                                                {props.dataLang?.unit}:
-                                            </h5>
-                                            <h6 className="w-[55%] text-right">
-                                                {list?.unit}
-                                            </h6>
+                                            <h5 className="text-slate-400 text-sm w-[40%]">{props.dataLang?.unit}:</h5>
+                                            <h6 className="w-[55%] text-right">{list?.unit}</h6>
                                         </div>
                                         <div className="flex justify-between">
-                                            <h5 className="text-slate-400 text-sm w-[40%]">
-                                                {props.dataLang?.stock}:
-                                            </h5>
+                                            <h5 className="text-slate-400 text-sm w-[40%]">{props.dataLang?.stock}:</h5>
                                             <h6 className="w-[55%] text-right">
-                                                {Number(
-                                                    list?.stock_quantity
-                                                ).toLocaleString()}
+                                                {Number(list?.stock_quantity).toLocaleString()}
                                             </h6>
                                         </div>
-                                        {props.dataProductExpiry?.is_enable ===
-                                            "1" && (
+                                        {props.dataProductExpiry?.is_enable === "1" && (
                                             <div className="flex justify-between">
                                                 <h5 className="text-slate-400 text-sm w-[40%]">
-                                                    {
-                                                        props.dataLang
-                                                            ?.category_material_list_expiry_date
-                                                    }
-                                                    :
+                                                    {props.dataLang?.category_material_list_expiry_date}:
                                                 </h5>
-                                                <h6 className="w-[55%] text-right">
-                                                    {list?.expiry}
-                                                </h6>
+                                                <h6 className="w-[55%] text-right">{list?.expiry}</h6>
                                             </div>
                                         )}
                                         <div className="flex justify-between">
-                                            <h5 className="text-slate-400 text-sm w-[40%]">
-                                                {props.dataLang?.note}:
-                                            </h5>
-                                            <h6 className="w-[55%] text-right">
-                                                {list?.note}
-                                            </h6>
+                                            <h5 className="text-slate-400 text-sm w-[40%]">{props.dataLang?.note}:</h5>
+                                            <h6 className="w-[55%] text-right">{list?.note}</h6>
                                         </div>
                                     </div>
                                     <div className="space-y-3 bg-slate-100/40 p-2 rounded-md">
                                         <div className="flex justify-between">
-                                            <h5 className="text-slate-400 text-sm w-[40%]">
-                                                Giá bán:
-                                            </h5>
+                                            <h5 className="text-slate-400 text-sm w-[40%]">Giá bán:</h5>
                                             <h6 className="w-[55%] text-right">
-                                                {Number(
-                                                    list?.price_sell
-                                                ).toLocaleString()}
+                                                {Number(list?.price_sell).toLocaleString()}
                                             </h6>
                                         </div>
                                         <div className="flex justify-between">
                                             <h5 className="text-slate-400 text-sm w-[40%]">
-                                                {props.dataLang?.minimum_amount}
-                                                :
+                                                {props.dataLang?.minimum_amount}:
                                             </h5>
                                             <h6 className="w-[55%] text-right">
-                                                {Number(
-                                                    list?.quantity_minimum
-                                                ).toLocaleString()}
+                                                {Number(list?.quantity_minimum).toLocaleString()}
                                             </h6>
                                         </div>
                                     </div>
@@ -3425,8 +2652,7 @@ const Popup_ThongTin = React.memo((props) => {
                                 <div className="space-y-3 flex flex-col justify-between">
                                     <div className="flex bg-slate-100/40 p-2 rounded-md">
                                         <h5 className="text-slate-400 text-sm w-[40%]">
-                                            {props.dataLang?.avatar || "avatar"}
-                                            :
+                                            {props.dataLang?.avatar || "avatar"}:
                                         </h5>
                                         {list?.images == null ? (
                                             <img
@@ -3451,29 +2677,19 @@ const Popup_ThongTin = React.memo((props) => {
                                     <div className="bg-slate-100/40 p-2 rounded-md space-y-3">
                                         <h4 className="flex space-x-2">
                                             <IconUserEdit size={20} />
-                                            <span className="text-[15px] font-medium">
-                                                Người lập phiếu
-                                            </span>
+                                            <span className="text-[15px] font-medium">Người lập phiếu</span>
                                         </h4>
                                         <div className="flex justify-between">
                                             <h5 className="text-slate-400 text-sm w-[30%]">
-                                                {props.dataLang?.creator ||
-                                                    "creator"}
-                                                :
+                                                {props.dataLang?.creator || "creator"}:
                                             </h5>
-                                            <h6 className="w-[65%] text-right">
-                                                ABC
-                                            </h6>
+                                            <h6 className="w-[65%] text-right">ABC</h6>
                                         </div>
                                         <div className="flex justify-between">
                                             <h5 className="text-slate-400 text-sm w-[30%]">
-                                                {props.dataLang?.date_created ||
-                                                    "date_created"}
-                                                :
+                                                {props.dataLang?.date_created || "date_created"}:
                                             </h5>
-                                            <h6 className="w-[65%] text-right">
-                                                dasd
-                                            </h6>
+                                            <h6 className="w-[65%] text-right">dasd</h6>
                                         </div>
                                     </div>
                                 </div>
@@ -3485,9 +2701,7 @@ const Popup_ThongTin = React.memo((props) => {
                                     <div className="space-y-0.5 min-h-[384px]">
                                         <div
                                             className={`${
-                                                list?.variation[1]
-                                                    ? "grid-cols-4"
-                                                    : "grid-cols-3"
+                                                list?.variation[1] ? "grid-cols-4" : "grid-cols-3"
                                             } grid gap-2 px-2 py-1.5 bg-slate-100/40 rounded`}
                                         >
                                             <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center">
@@ -3502,8 +2716,7 @@ const Popup_ThongTin = React.memo((props) => {
                                                 </h5>
                                             )}
                                             <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-right">
-                                                {props.dataLang?.price ||
-                                                    "price"}
+                                                {props.dataLang?.price || "price"}
                                             </h5>
                                         </div>
                                         <ScrollArea
@@ -3512,85 +2725,58 @@ const Popup_ThongTin = React.memo((props) => {
                                             smoothScrolling={true}
                                         >
                                             <div className="divide-y divide-slate-200">
-                                                {list?.variation_option_value?.map(
-                                                    (e) => (
-                                                        <div
-                                                            key={e?.id.toString()}
-                                                            className={`${
-                                                                e
-                                                                    ?.variation_option_2
-                                                                    ?.length > 0
-                                                                    ? "grid-cols-4"
-                                                                    : "grid-cols-3"
-                                                            } grid gap-2 px-2 py-2.5 hover:bg-slate-50`}
-                                                        >
-                                                            <div className="flex justify-center self-center">
-                                                                {e?.image ==
-                                                                null ? (
-                                                                    <img
-                                                                        src="/no_image.png"
-                                                                        className="w-auto h-20 rounded object-contain select-none pointer-events-none"
-                                                                    />
-                                                                ) : (
-                                                                    <Image
-                                                                        width={
-                                                                            200
-                                                                        }
-                                                                        height={
-                                                                            200
-                                                                        }
-                                                                        quality={
-                                                                            100
-                                                                        }
-                                                                        src={
-                                                                            e?.image
-                                                                        }
-                                                                        alt="thumb type"
-                                                                        className="w-auto h-20 rounded object-contain select-none pointer-events-none"
-                                                                        loading="lazy"
-                                                                        crossOrigin="anonymous"
-                                                                        blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                                                                    />
-                                                                )}
-                                                            </div>
-                                                            <h6 className="px-2 xl:text-base text-xs self-center">
-                                                                {e?.name}
-                                                            </h6>
-                                                            {e
-                                                                ?.variation_option_2
-                                                                ?.length > 0 ? (
-                                                                <div className="self-center space-y-0.5 col-span-2 grid grid-cols-2">
-                                                                    {e?.variation_option_2?.map(
-                                                                        (
-                                                                            ce
-                                                                        ) => (
-                                                                            <React.Fragment
-                                                                                key={ce.id?.toString()}
-                                                                            >
-                                                                                <h6 className="px-2 xl:text-base text-xs">
-                                                                                    {
-                                                                                        ce.name
-                                                                                    }
-                                                                                </h6>
-                                                                                <h6 className="px-2 xl:text-base text-xs text-right">
-                                                                                    {Number(
-                                                                                        ce.price
-                                                                                    ).toLocaleString()}
-                                                                                </h6>
-                                                                            </React.Fragment>
-                                                                        )
-                                                                    )}
-                                                                </div>
+                                                {list?.variation_option_value?.map((e) => (
+                                                    <div
+                                                        key={e?.id.toString()}
+                                                        className={`${
+                                                            e?.variation_option_2?.length > 0
+                                                                ? "grid-cols-4"
+                                                                : "grid-cols-3"
+                                                        } grid gap-2 px-2 py-2.5 hover:bg-slate-50`}
+                                                    >
+                                                        <div className="flex justify-center self-center">
+                                                            {e?.image == null ? (
+                                                                <img
+                                                                    src="/no_image.png"
+                                                                    className="w-auto h-20 rounded object-contain select-none pointer-events-none"
+                                                                />
                                                             ) : (
-                                                                <h6 className="px-2 xl:text-base text-xs self-center text-right">
-                                                                    {Number(
-                                                                        e?.price
-                                                                    ).toLocaleString()}
-                                                                </h6>
+                                                                <Image
+                                                                    width={200}
+                                                                    height={200}
+                                                                    quality={100}
+                                                                    src={e?.image}
+                                                                    alt="thumb type"
+                                                                    className="w-auto h-20 rounded object-contain select-none pointer-events-none"
+                                                                    loading="lazy"
+                                                                    crossOrigin="anonymous"
+                                                                    blurDataURL="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                                                />
                                                             )}
                                                         </div>
-                                                    )
-                                                )}
+                                                        <h6 className="px-2 xl:text-base text-xs self-center">
+                                                            {e?.name}
+                                                        </h6>
+                                                        {e?.variation_option_2?.length > 0 ? (
+                                                            <div className="self-center space-y-0.5 col-span-2 grid grid-cols-2">
+                                                                {e?.variation_option_2?.map((ce) => (
+                                                                    <React.Fragment key={ce.id?.toString()}>
+                                                                        <h6 className="px-2 xl:text-base text-xs">
+                                                                            {ce.name}
+                                                                        </h6>
+                                                                        <h6 className="px-2 xl:text-base text-xs text-right">
+                                                                            {Number(ce.price).toLocaleString()}
+                                                                        </h6>
+                                                                    </React.Fragment>
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            <h6 className="px-2 xl:text-base text-xs self-center text-right">
+                                                                {Number(e?.price).toLocaleString()}
+                                                            </h6>
+                                                        )}
+                                                    </div>
+                                                ))}
                                             </div>
                                         </ScrollArea>
                                     </div>
@@ -3623,16 +2809,13 @@ const Popup_ThongTin = React.memo((props) => {
                                                                 e.product_variation_option_value_id
                                                             )}
                                                             className={`${
-                                                                tabBom ===
-                                                                e.product_variation_option_value_id
+                                                                tabBom === e.product_variation_option_value_id
                                                                     ? "text-[#0F4F9E] bg-[#0F4F9E10]"
                                                                     : "hover:text-[#0F4F9E] bg-slate-50/50"
                                                             } outline-none min-w-fit px-3 py-1.5 rounded relative flex items-center`}
                                                         >
                                                             <span>
-                                                                {e.name_variation?.includes(
-                                                                    "NONE"
-                                                                )
+                                                                {e.name_variation?.includes("NONE")
                                                                     ? "Mặc định"
                                                                     : e.name_variation}
                                                             </span>
@@ -3646,33 +2829,24 @@ const Popup_ThongTin = React.memo((props) => {
                             {props.dataLang?.no || "no"}
                           </h5> */}
                                                     <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2">
-                                                        {props.dataLang
-                                                            ?.warehouses_detail_type ||
+                                                        {props.dataLang?.warehouses_detail_type ||
                                                             "warehouses_detail_type"}
                                                     </h5>
                                                     <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2">
-                                                        {props.dataLang?.name ||
-                                                            "name"}
+                                                        {props.dataLang?.name || "name"}
                                                     </h5>
                                                     <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center text-center col-span-2">
                                                         {props.dataLang?.unit}
                                                     </h5>
                                                     <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2">
-                                                        {props.dataLang
-                                                            ?.norm_finishedProduct ||
-                                                            "norm_finishedProduct"}
+                                                        {props.dataLang?.norm_finishedProduct || "norm_finishedProduct"}
                                                     </h5>
                                                     <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2">
                                                         %
-                                                        {props.dataLang
-                                                            ?.loss_finishedProduct ||
-                                                            "loss_finishedProduct"}
+                                                        {props.dataLang?.loss_finishedProduct || "loss_finishedProduct"}
                                                     </h5>
                                                     <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-3">
-                                                        {
-                                                            props.dataLang
-                                                                ?.stage_usage_finishedProduct
-                                                        }
+                                                        {props.dataLang?.stage_usage_finishedProduct}
                                                     </h5>
                                                 </div>
                                                 <ScrollArea
@@ -3681,67 +2855,46 @@ const Popup_ThongTin = React.memo((props) => {
                                                     smoothScrolling={true}
                                                 >
                                                     <div className="divide-y divide-slate-200">
-                                                        {selectedListBom?.items?.map(
-                                                            (e, index) => (
-                                                                <div
-                                                                    key={e?.id.toString()}
-                                                                    className={`grid grid-cols-13 px-2 py-2.5 hover:bg-slate-50 items-center`}
-                                                                >
-                                                                    {/* <h6 className="px-2 xl:text-base text-xs text-center col-span-1">
+                                                        {selectedListBom?.items?.map((e, index) => (
+                                                            <div
+                                                                key={e?.id.toString()}
+                                                                className={`grid grid-cols-13 px-2 py-2.5 hover:bg-slate-50 items-center`}
+                                                            >
+                                                                {/* <h6 className="px-2 xl:text-base text-xs text-center col-span-1">
                                   {index + 1}
                                 </h6> */}
-                                                                    <h6 className="px-2 xl:text-[15px] text-xs col-span-2">
-                                                                        {
-                                                                            e?.str_type_item
-                                                                        }
-                                                                    </h6>
-                                                                    <h6 className="px-2 xl:text-base text-xs col-span-2">
-                                                                        <div className="grid grid-cols-1">
-                                                                            <h5>
-                                                                                {
-                                                                                    e?.item_name
-                                                                                }
-                                                                            </h5>
-                                                                            <h5 className="text-xs italic">
-                                                                                {
-                                                                                    e?.variation_name
-                                                                                }
-                                                                            </h5>
-                                                                        </div>
-                                                                    </h6>
-                                                                    <h6 className="px-2 xl:text-base text-xs col-span-2 text-center">
-                                                                        {
-                                                                            e?.unit_name
-                                                                        }
-                                                                    </h6>
-                                                                    <h6 className="px-2 xl:text-base text-xs  col-span-2 text-center">
-                                                                        {Number(
-                                                                            e?.quota
-                                                                        ).toLocaleString()}
-                                                                    </h6>
-                                                                    <h6 className="px-2 xl:text-base text-xs  col-span-2 text-center">
-                                                                        {Number(
-                                                                            e?.loss
-                                                                        ).toLocaleString()}
-                                                                        %
-                                                                    </h6>
-                                                                    <h6 className="px-2 xl:text-base text-xs col-span-3">
-                                                                        {
-                                                                            e?.stage_name
-                                                                        }
-                                                                    </h6>
-                                                                </div>
-                                                            )
-                                                        )}
+                                                                <h6 className="px-2 xl:text-[15px] text-xs col-span-2">
+                                                                    {e?.str_type_item}
+                                                                </h6>
+                                                                <h6 className="px-2 xl:text-base text-xs col-span-2">
+                                                                    <div className="grid grid-cols-1">
+                                                                        <h5>{e?.item_name}</h5>
+                                                                        <h5 className="text-xs italic">
+                                                                            {e?.variation_name}
+                                                                        </h5>
+                                                                    </div>
+                                                                </h6>
+                                                                <h6 className="px-2 xl:text-base text-xs col-span-2 text-center">
+                                                                    {e?.unit_name}
+                                                                </h6>
+                                                                <h6 className="px-2 xl:text-base text-xs  col-span-2 text-center">
+                                                                    {Number(e?.quota).toLocaleString()}
+                                                                </h6>
+                                                                <h6 className="px-2 xl:text-base text-xs  col-span-2 text-center">
+                                                                    {Number(e?.loss).toLocaleString()}%
+                                                                </h6>
+                                                                <h6 className="px-2 xl:text-base text-xs col-span-3">
+                                                                    {e?.stage_name}
+                                                                </h6>
+                                                            </div>
+                                                        ))}
                                                     </div>
                                                 </ScrollArea>
                                                 <div className="flex items-center space-x-3 justify-end">
                                                     <Popup_Bom
                                                         setOpen={sOpenBom}
                                                         isOpen={openBom}
-                                                        dataLang={
-                                                            props.dataLang
-                                                        }
+                                                        dataLang={props.dataLang}
                                                         id={props.id}
                                                         name={list?.name}
                                                         code={list?.code}
@@ -3756,10 +2909,7 @@ const Popup_ThongTin = React.memo((props) => {
                                                     <IconSearch />
                                                 </div>
                                                 <h1 className="text-[#141522] text-base opacity-90 font-medium">
-                                                    {
-                                                        props.dataLang
-                                                            ?.no_data_found
-                                                    }
+                                                    {props.dataLang?.no_data_found}
                                                 </h1>
                                             </div>
                                         )}
@@ -3779,26 +2929,16 @@ const Popup_ThongTin = React.memo((props) => {
                                                     className={`grid-cols-8 grid gap-2 px-2 py-1.5 bg-slate-100/40 rounded`}
                                                 >
                                                     <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center">
-                                                        {props.dataLang?.no ||
-                                                            "no"}
+                                                        {props.dataLang?.no || "no"}
                                                     </h5>
                                                     <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] col-span-2">
-                                                        {
-                                                            props.dataLang
-                                                                ?.stage_finishedProduct
-                                                        }
+                                                        {props.dataLang?.stage_finishedProduct}
                                                     </h5>
                                                     <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] col-span-3">
-                                                        {
-                                                            props.dataLang
-                                                                ?.check_first_stage_finishedProduct
-                                                        }
+                                                        {props.dataLang?.check_first_stage_finishedProduct}
                                                     </h5>
                                                     <h5 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase font-[300] text-center col-span-2">
-                                                        {
-                                                            props.dataLang
-                                                                ?.stage_last_finishedProduct
-                                                        }
+                                                        {props.dataLang?.stage_last_finishedProduct}
                                                     </h5>
                                                 </div>
                                                 <ScrollArea
@@ -3807,45 +2947,32 @@ const Popup_ThongTin = React.memo((props) => {
                                                     smoothScrolling={true}
                                                 >
                                                     <div className="divide-y divide-slate-200">
-                                                        {dataStage?.map(
-                                                            (e, index) => (
-                                                                <div
-                                                                    key={e?.id.toString()}
-                                                                    className={`grid-cols-8 grid gap-2 px-2 py-2.5 hover:bg-slate-50 items-center`}
-                                                                >
-                                                                    <h6 className="text-center px-2 xl:text-base text-xs">
-                                                                        {index +
-                                                                            1}
-                                                                    </h6>
-                                                                    <h6 className="px-2 xl:text-base text-xs col-span-2">
-                                                                        {
-                                                                            e?.stage_name
-                                                                        }
-                                                                    </h6>
-                                                                    <h6 className="px-2 xl:text-base text-xs col-span-3 flex justify-center text-green-600">
-                                                                        {e?.type ==
-                                                                            "2" && (
-                                                                            <IconTick />
-                                                                        )}
-                                                                    </h6>
-                                                                    <h6 className="px-2 xl:text-base text-xs col-span-2 flex justify-center text-green-600">
-                                                                        {e?.final_stage ==
-                                                                            "1" && (
-                                                                            <IconTick />
-                                                                        )}
-                                                                    </h6>
-                                                                </div>
-                                                            )
-                                                        )}
+                                                        {dataStage?.map((e, index) => (
+                                                            <div
+                                                                key={e?.id.toString()}
+                                                                className={`grid-cols-8 grid gap-2 px-2 py-2.5 hover:bg-slate-50 items-center`}
+                                                            >
+                                                                <h6 className="text-center px-2 xl:text-base text-xs">
+                                                                    {index + 1}
+                                                                </h6>
+                                                                <h6 className="px-2 xl:text-base text-xs col-span-2">
+                                                                    {e?.stage_name}
+                                                                </h6>
+                                                                <h6 className="px-2 xl:text-base text-xs col-span-3 flex justify-center text-green-600">
+                                                                    {e?.type == "2" && <IconTick />}
+                                                                </h6>
+                                                                <h6 className="px-2 xl:text-base text-xs col-span-2 flex justify-center text-green-600">
+                                                                    {e?.final_stage == "1" && <IconTick />}
+                                                                </h6>
+                                                            </div>
+                                                        ))}
                                                     </div>
                                                 </ScrollArea>
                                                 <div className="flex items-center space-x-3 justify-end">
                                                     <Popup_GiaiDoan
                                                         setOpen={sOpenStage}
                                                         isOpen={openStage}
-                                                        dataLang={
-                                                            props.dataLang
-                                                        }
+                                                        dataLang={props.dataLang}
                                                         id={props.id}
                                                         name={list?.name}
                                                         code={list?.code}
@@ -3860,10 +2987,7 @@ const Popup_ThongTin = React.memo((props) => {
                                                     <IconSearch />
                                                 </div>
                                                 <h1 className="text-[#141522] text-base opacity-90 font-medium">
-                                                    {
-                                                        props.dataLang
-                                                            ?.no_data_found
-                                                    }
+                                                    {props.dataLang?.no_data_found}
                                                 </h1>
                                             </div>
                                         )}
@@ -3885,8 +3009,7 @@ const Popup_GiaiDoan = React.memo((props) => {
 
     const scrollAreaRef = useRef(null);
     const handleMenuOpen = () => {
-        const menuPortalTarget =
-            scrollAreaRef != null ? scrollAreaRef.current : scrollAreaRef;
+        const menuPortalTarget = scrollAreaRef != null ? scrollAreaRef.current : scrollAreaRef;
         return { menuPortalTarget };
     };
 
@@ -3921,31 +3044,26 @@ const Popup_GiaiDoan = React.memo((props) => {
     }, [option]);
 
     const _ServerFetching = () => {
-        Axios(
-            "GET",
-            `/api_web/api_product/getDesignStages/${props.id}?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var data = response.data;
-                    sOption(
-                        data.map((e) => ({
-                            id: Number(e.id),
-                            name: { label: e.stage_name, value: e.stage_id },
-                            radio1: e.type !== "0" ? 1 : 0,
-                            radio2: e.final_stage !== "0" ? 1 : 0,
-                        }))
-                    );
-                    sListCdChosen(
-                        data.map((e) => ({
-                            label: e.stage_name,
-                            value: e.stage_id,
-                        }))
-                    );
-                }
-                sOnFetching(false);
+        Axios("GET", `/api_web/api_product/getDesignStages/${props.id}?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sOption(
+                    data.map((e) => ({
+                        id: Number(e.id),
+                        name: { label: e.stage_name, value: e.stage_id },
+                        radio1: e.type !== "0" ? 1 : 0,
+                        radio2: e.final_stage !== "0" ? 1 : 0,
+                    }))
+                );
+                sListCdChosen(
+                    data.map((e) => ({
+                        label: e.stage_name,
+                        value: e.stage_id,
+                    }))
+                );
             }
-        );
+            sOnFetching(false);
+        });
     };
 
     useEffect(() => {
@@ -4012,10 +3130,7 @@ const Popup_GiaiDoan = React.memo((props) => {
     //Draggable
 
     const _HandleAddNew = () => {
-        sOption([
-            ...option,
-            { id: Date.now(), name: name, radio1: radio1, radio2: radio2 },
-        ]);
+        sOption([...option, { id: Date.now(), name: name, radio1: radio1, radio2: radio2 }]);
         sName(null);
         sRadio1(0);
         sRadio2(0);
@@ -4032,11 +3147,7 @@ const Popup_GiaiDoan = React.memo((props) => {
             sListCdRest(
                 listCd?.filter(
                     (item1) =>
-                        !listCdChosen.some(
-                            (item2) =>
-                                item1.label === item2?.label &&
-                                item1.value === item2?.value
-                        )
+                        !listCdChosen.some((item2) => item1.label === item2?.label && item1.value === item2?.value)
                 )
             );
     }, [listCdChosen]);
@@ -4073,10 +3184,7 @@ const Popup_GiaiDoan = React.memo((props) => {
 
     const ItemDragHandle = sortableHandle(() => {
         return (
-            <button
-                type="button"
-                className="text-blue-500 relative flex flex-col justify-center items-center"
-            >
+            <button type="button" className="text-blue-500 relative flex flex-col justify-center items-center">
                 <IconMax size="18" className="-rotate-45" />
                 <IconMax size="18" className="rotate-45 absolute" />
             </button>
@@ -4103,114 +3211,95 @@ const Popup_GiaiDoan = React.memo((props) => {
         );
     });
 
-    const SortableItem = SortableElement(
-        ({ value, indexItem, onClickDelete }) => {
-            const handleDeleteClick = () => {
-                onClickDelete(value.id);
-            };
+    const SortableItem = SortableElement(({ value, indexItem, onClickDelete }) => {
+        const handleDeleteClick = () => {
+            onClickDelete(value.id);
+        };
 
-            return (
-                <div className="flex items-center z-[999] py-1 hover:bg-slate-50 bg-white">
-                    <h6 className="w-[5%] text-center px-2">{indexItem + 1}</h6>
-                    <div className="w-[30%] px-2">
-                        <Select
-                            closeMenuOnSelect={true}
-                            placeholder={props.dataLang?.stage_finishedProduct}
-                            options={listCdRest}
-                            value={value.name}
-                            onChange={handleSelectChange.bind(this, value.id)}
-                            isSearchable={true}
-                            noOptionsMessage={() => "Không có dữ liệu"}
-                            maxMenuHeight="200px"
-                            isClearable={true}
-                            menuPortalTarget={document.body}
-                            onMenuOpen={handleMenuOpen}
-                            styles={{
-                                placeholder: (base) => ({
-                                    ...base,
-                                    color: "#cbd5e1",
-                                }),
-                                menuPortal: (base) => ({
-                                    ...base,
-                                    zIndex: 9999,
-                                    position: "absolute",
-                                }),
-                            }}
-                            className={`${
-                                errName && value.name == null
-                                    ? "border-red-500"
-                                    : "border-transparent"
-                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                        />
-                    </div>
-                    <div className="w-[30%] flex items-center justify-center">
-                        <input
-                            type="radio"
-                            id={`radio1 + ${value.id}`}
-                            onChange={handleRatioChange.bind(
-                                this,
-                                value.id,
-                                "radio1"
-                            )}
-                            checked={value.radio1 === 0 ? false : true}
-                            name="radio1"
-                            className="scale-150 outline-none accent-blue-500"
-                        />
-                        <label
-                            htmlFor={`radio1 + ${value.id}`}
-                            className="relative flex cursor-pointer items-center rounded-full p-3"
-                            data-ripple-dark="true"
-                        >
-                            {"Chọn"}
-                        </label>
-                    </div>
-                    <div className="w-[20%] flex items-center justify-center">
-                        <input
-                            type="radio"
-                            id={`radio2 + ${value.id}`}
-                            onChange={handleRatioChange.bind(
-                                this,
-                                value.id,
-                                "radio2"
-                            )}
-                            checked={value.radio2 === 0 ? false : true}
-                            name="radio2"
-                            className="scale-150 outline-none accent-blue-500"
-                        />
-                        <label
-                            htmlFor={`radio2 + ${value.id}`}
-                            className="relative flex cursor-pointer items-center rounded-full p-3"
-                            data-ripple-dark="true"
-                        >
-                            {"Chọn"}
-                        </label>
-                    </div>
-                    <div className="w-[15%] flex items-center justify-center space-x-4">
-                        <ItemDragHandle />
-                        <button
-                            onClick={handleDeleteClick.bind(this)}
-                            type="button"
-                            className="text-red-500"
-                        >
-                            <IconDelete />
-                        </button>
-                    </div>
+        return (
+            <div className="flex items-center z-[999] py-1 hover:bg-slate-50 bg-white">
+                <h6 className="w-[5%] text-center px-2">{indexItem + 1}</h6>
+                <div className="w-[30%] px-2">
+                    <Select
+                        closeMenuOnSelect={true}
+                        placeholder={props.dataLang?.stage_finishedProduct}
+                        options={listCdRest}
+                        value={value.name}
+                        onChange={handleSelectChange.bind(this, value.id)}
+                        isSearchable={true}
+                        noOptionsMessage={() => "Không có dữ liệu"}
+                        maxMenuHeight="200px"
+                        isClearable={true}
+                        menuPortalTarget={document.body}
+                        onMenuOpen={handleMenuOpen}
+                        styles={{
+                            placeholder: (base) => ({
+                                ...base,
+                                color: "#cbd5e1",
+                            }),
+                            menuPortal: (base) => ({
+                                ...base,
+                                zIndex: 9999,
+                                position: "absolute",
+                            }),
+                        }}
+                        className={`${
+                            errName && value.name == null ? "border-red-500" : "border-transparent"
+                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                    />
                 </div>
-            );
-        }
-    );
+                <div className="w-[30%] flex items-center justify-center">
+                    <input
+                        type="radio"
+                        id={`radio1 + ${value.id}`}
+                        onChange={handleRatioChange.bind(this, value.id, "radio1")}
+                        checked={value.radio1 === 0 ? false : true}
+                        name="radio1"
+                        className="scale-150 outline-none accent-blue-500"
+                    />
+                    <label
+                        htmlFor={`radio1 + ${value.id}`}
+                        className="relative flex cursor-pointer items-center rounded-full p-3"
+                        data-ripple-dark="true"
+                    >
+                        {"Chọn"}
+                    </label>
+                </div>
+                <div className="w-[20%] flex items-center justify-center">
+                    <input
+                        type="radio"
+                        id={`radio2 + ${value.id}`}
+                        onChange={handleRatioChange.bind(this, value.id, "radio2")}
+                        checked={value.radio2 === 0 ? false : true}
+                        name="radio2"
+                        className="scale-150 outline-none accent-blue-500"
+                    />
+                    <label
+                        htmlFor={`radio2 + ${value.id}`}
+                        className="relative flex cursor-pointer items-center rounded-full p-3"
+                        data-ripple-dark="true"
+                    >
+                        {"Chọn"}
+                    </label>
+                </div>
+                <div className="w-[15%] flex items-center justify-center space-x-4">
+                    <ItemDragHandle />
+                    <button onClick={handleDeleteClick.bind(this)} type="button" className="text-red-500">
+                        <IconDelete />
+                    </button>
+                </div>
+            </div>
+        );
+    });
 
     return (
         <PopupEdit
-            title={`${
-                props.dataLang?.stage_finishedProduct || "stage_finishedProduct"
-            } (${props.code} - ${props.name})`}
+            title={`${props.dataLang?.stage_finishedProduct || "stage_finishedProduct"} (${props.code} - ${
+                props.name
+            })`}
             button={
                 props.type == "add"
-                    ? `${
-                          props.dataLang?.stage_design_finishedProduct ||
-                          "stage_design_finishedProduct"
-                      }`
+                    ? `${props.dataLang?.stage_design_finishedProduct || "stage_design_finishedProduct"}`
                     : `${props.dataLang?.edit || "edit"}`
             }
             onClickOpen={_ToggleModal.bind(this, true)}
@@ -4227,8 +3316,7 @@ const Popup_GiaiDoan = React.memo((props) => {
                         {props.dataLang?.stage_name_finishedProduct}
                     </h4>
                     <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[30%] font-[400] text-left">
-                        {props.dataLang?.check_first_stage_finishedProduct ||
-                            "check_first_stage_finishedProduct"}
+                        {props.dataLang?.check_first_stage_finishedProduct || "check_first_stage_finishedProduct"}
                     </h4>
                     <h4 className="xl:text-[14px] text-[12px] px-2 text-[#667085] uppercase w-[20%] font-[400] text-center">
                         {props.dataLang?.stage_last_finishedProduct}
@@ -4260,9 +3348,7 @@ const Popup_GiaiDoan = React.memo((props) => {
                                 disabled={statusBtnAdd}
                                 title="Thêm"
                                 className={`${
-                                    statusBtnAdd
-                                        ? "opacity-50"
-                                        : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]"
+                                    statusBtnAdd ? "opacity-50" : "opacity-100 hover:text-[#0F4F9E] hover:bg-[#e2f0fe]"
                                 } transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}
                             >
                                 <IconAdd />
@@ -4319,11 +3405,7 @@ const Popup_Bom = React.memo((props) => {
 
     const [dataSelectedVariant, sDataSelectedVariant] = useState([]);
     const dataRestVariant = dataVariant?.filter(
-        (item1) =>
-            !dataSelectedVariant?.some(
-                (item2) =>
-                    item1.label === item2?.label && item1.value === item2?.value
-            )
+        (item1) => !dataSelectedVariant?.some((item2) => item1.label === item2?.label && item1.value === item2?.value)
     );
     const [currentData, sCurrentData] = useState([]);
 
@@ -4417,27 +3499,18 @@ const Popup_Bom = React.memo((props) => {
     }, [onFetching]);
 
     const _ServerFetchingCd = () => {
-        Axios(
-            "GET",
-            "/api_web/api_product/getDataDesignBom?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { data } = response.data;
-                    sDataTypeCd(
-                        Object.entries(data.typeDesignBom).map(
-                            ([key, value]) => ({
-                                label: value,
-                                value: key,
-                            })
-                        )
-                    );
-                    sDataCd(
-                        data.stages.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                }
+        Axios("GET", "/api_web/api_product/getDataDesignBom?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { data } = response.data;
+                sDataTypeCd(
+                    Object.entries(data.typeDesignBom).map(([key, value]) => ({
+                        label: value,
+                        value: key,
+                    }))
+                );
+                sDataCd(data.stages.map((e) => ({ label: e.name, value: e.id })));
             }
-        );
+        });
         Axios(
             "GET",
             `/api_web/api_product/productVariationOption/${props.id}?csrf_protection=true`,
@@ -4470,11 +3543,8 @@ const Popup_Bom = React.memo((props) => {
         onFetchingCd && _ServerFetchingCd();
     }, [onFetchingCd]);
 
-    const hiddenOptions =
-        valueVariant?.length > 2 ? valueVariant?.slice(0, 2) : [];
-    const options = dataRestVariant.filter(
-        (x) => !hiddenOptions.includes(x.value)
-    );
+    const hiddenOptions = valueVariant?.length > 2 ? valueVariant?.slice(0, 2) : [];
+    const options = dataRestVariant.filter((x) => !hiddenOptions.includes(x.value));
 
     const _HandleChangeSelect = (value) => {
         sValueVariant(value);
@@ -4520,9 +3590,7 @@ const Popup_Bom = React.memo((props) => {
     };
 
     const _HandleDeleteItemBOM = (parentId, id) => {
-        const index = dataSelectedVariant.findIndex(
-            (obj) => obj?.value === parentId
-        );
+        const index = dataSelectedVariant.findIndex((obj) => obj?.value === parentId);
         const newData = [...dataSelectedVariant];
         const newChild = newData[index].child.filter((item) => item.id !== id);
         newData[index] = { ...newData[index], child: newChild };
@@ -4555,8 +3623,7 @@ const Popup_Bom = React.memo((props) => {
                         ...e,
                         child: e.child.map((ce, ceIndex) => ({
                             ...ce,
-                            dataName:
-                                ceIndex === childIndex ? getdata : ce.dataName,
+                            dataName: ceIndex === childIndex ? getdata : ce.dataName,
                         })),
                     }));
 
@@ -4572,10 +3639,7 @@ const Popup_Bom = React.memo((props) => {
                     if (child.id === childId) {
                         return {
                             ...child,
-                            [type]:
-                                type === "norm" || type === "loss"
-                                    ? Number(value.value)
-                                    : value,
+                            [type]: type === "norm" || type === "loss" ? Number(value.value) : value,
                         };
                     }
                     return child;
@@ -4607,26 +3671,21 @@ const Popup_Bom = React.memo((props) => {
                                 const { data } = response.data;
                                 const updatedData = newData.map((parent) => {
                                     if (parent.value === parentId) {
-                                        const newChild = parent.child.map(
-                                            (child) => {
-                                                if (child.id === childId) {
-                                                    return {
-                                                        ...child,
-                                                        dataName: data?.items
-                                                            ? data?.items.map(
-                                                                  (e) => ({
-                                                                      label: e.name,
-                                                                      value: e.id,
-                                                                      product_variation:
-                                                                          e?.product_variation,
-                                                                  })
-                                                              )
-                                                            : [],
-                                                    };
-                                                }
-                                                return child;
+                                        const newChild = parent.child.map((child) => {
+                                            if (child.id === childId) {
+                                                return {
+                                                    ...child,
+                                                    dataName: data?.items
+                                                        ? data?.items.map((e) => ({
+                                                              label: e.name,
+                                                              value: e.id,
+                                                              product_variation: e?.product_variation,
+                                                          }))
+                                                        : [],
+                                                };
                                             }
-                                        );
+                                            return child;
+                                        });
                                         return { ...parent, child: newChild };
                                     }
                                     return parent;
@@ -4659,24 +3718,20 @@ const Popup_Bom = React.memo((props) => {
                                 const { data } = response.data;
                                 const updatedData = newData.map((parent) => {
                                     if (parent.value === parentId) {
-                                        const newChild = parent.child.map(
-                                            (child) => {
-                                                if (child.id === childId) {
-                                                    return {
-                                                        ...child,
-                                                        dataUnit: data?.units
-                                                            ? data?.units.map(
-                                                                  (e) => ({
-                                                                      label: e.unit,
-                                                                      value: e.unitid,
-                                                                  })
-                                                              )
-                                                            : [],
-                                                    };
-                                                }
-                                                return child;
+                                        const newChild = parent.child.map((child) => {
+                                            if (child.id === childId) {
+                                                return {
+                                                    ...child,
+                                                    dataUnit: data?.units
+                                                        ? data?.units.map((e) => ({
+                                                              label: e.unit,
+                                                              value: e.unitid,
+                                                          }))
+                                                        : [],
+                                                };
                                             }
-                                        );
+                                            return child;
+                                        });
                                         return { ...parent, child: newChild };
                                     }
                                     return parent;
@@ -4691,9 +3746,7 @@ const Popup_Bom = React.memo((props) => {
     };
 
     const _HandleDeleteBOM = (id) => {
-        const newData = [
-            ...dataSelectedVariant.filter((item) => item?.value !== id),
-        ];
+        const newData = [...dataSelectedVariant.filter((item) => item?.value !== id)];
         sDataSelectedVariant(newData);
         sTab(newData[0]?.value);
     };
@@ -4701,24 +3754,17 @@ const Popup_Bom = React.memo((props) => {
     useEffect(() => {
         props.isOpen &&
             (tab || dataSelectedVariant) &&
-            sSelectedList(
-                dataSelectedVariant?.find((item) => item?.value === tab)
-            );
+            sSelectedList(dataSelectedVariant?.find((item) => item?.value === tab));
     }, [tab, dataSelectedVariant]);
 
     const checkEqual = (prevValue, nextValue) =>
-        prevValue &&
-        nextValue &&
-        JSON.stringify(prevValue) === JSON.stringify(nextValue);
+        prevValue && nextValue && JSON.stringify(prevValue) === JSON.stringify(nextValue);
 
     useEffect(() => {
         // props.isOpen && sTab(dataSelectedVariant[0]?.value);
         // props.isOpen && sTab(0);
 
-        props.isOpen &&
-            props.type == "edit" &&
-            dataSelectedVariant.length == 0 &&
-            _ServerFetching();
+        props.isOpen && props.type == "edit" && dataSelectedVariant.length == 0 && _ServerFetching();
 
         if (checkEqual(currentData, dataSelectedVariant)) {
             dataSelectedVariant.forEach((e) => {
@@ -4775,30 +3821,15 @@ const Popup_Bom = React.memo((props) => {
         formData.append("product_id", props?.id);
 
         dataSelectedVariant.forEach((item, i) => {
-            formData.append(
-                `items[${i}][product_variation_option_value_id]`,
-                item?.value
-            );
+            formData.append(`items[${i}][product_variation_option_value_id]`, item?.value);
 
             item?.child.forEach((child, j) => {
-                formData.append(
-                    `items[${i}][child][${j}][type_item]`,
-                    child.type?.value
-                );
-                formData.append(
-                    `items[${i}][child][${j}][item_id]`,
-                    child.name?.value
-                );
-                formData.append(
-                    `items[${i}][child][${j}][unit_id]`,
-                    child.unit?.value
-                );
+                formData.append(`items[${i}][child][${j}][type_item]`, child.type?.value);
+                formData.append(`items[${i}][child][${j}][item_id]`, child.name?.value);
+                formData.append(`items[${i}][child][${j}][unit_id]`, child.unit?.value);
                 formData.append(`items[${i}][child][${j}][quota]`, child.norm);
                 formData.append(`items[${i}][child][${j}][loss]`, child.loss);
-                formData.append(
-                    `items[${i}][child][${j}][stage_id]`,
-                    child.stage?.value || null
-                );
+                formData.append(`items[${i}][child][${j}][stage_id]`, child.stage?.value || null);
             });
         });
 
@@ -4837,12 +3868,8 @@ const Popup_Bom = React.memo((props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-        const errNullType = dataSelectedVariant.map((item) =>
-            item.child.some((itemChild) => itemChild.type === null)
-        );
-        const errNullName = dataSelectedVariant.map((item) =>
-            item.child.some((itemChild) => itemChild.name === null)
-        );
+        const errNullType = dataSelectedVariant.map((item) => item.child.some((itemChild) => itemChild.type === null));
+        const errNullName = dataSelectedVariant.map((item) => item.child.some((itemChild) => itemChild.name === null));
         if (errType || errName) {
             errNullType && sErrType(true);
             errNullName && sErrName(true);
@@ -4865,16 +3892,12 @@ const Popup_Bom = React.memo((props) => {
 
     return (
         <PopupEdit
-            title={`${
-                props.dataLang?.bom_design_finishedProduct ||
-                "bom_design_finishedProduct"
-            } (${props.code} - ${props.name})`}
+            title={`${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"} (${props.code} - ${
+                props.name
+            })`}
             button={
                 props.type == "add"
-                    ? `${
-                          props.dataLang?.bom_design_finishedProduct ||
-                          "bom_design_finishedProduct"
-                      }`
+                    ? `${props.dataLang?.bom_design_finishedProduct || "bom_design_finishedProduct"}`
                     : `${props.dataLang?.edit}`
             }
             onClickOpen={_ToggleModal.bind(this, true)}
@@ -4890,18 +3913,12 @@ const Popup_Bom = React.memo((props) => {
                         <div className="flex justify-between items-end pb-2">
                             <div className="w-2/3">
                                 <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                    {
-                                        props.dataLang
-                                            ?.category_material_list_variant
-                                    }{" "}
+                                    {props.dataLang?.category_material_list_variant}{" "}
                                     <span className="text-red-500">*</span>
                                 </label>
                                 <Select
                                     closeMenuOnSelect={false}
-                                    placeholder={
-                                        props.dataLang
-                                            ?.category_material_list_variant
-                                    }
+                                    placeholder={props.dataLang?.category_material_list_variant}
                                     options={options}
                                     isSearchable={true}
                                     onChange={_HandleChangeSelect.bind(this)}
@@ -4936,9 +3953,7 @@ const Popup_Bom = React.memo((props) => {
                             </div>
                             <button
                                 onClick={_HandleApplyVariant.bind(this)}
-                                disabled={
-                                    valueVariant?.length > 0 ? false : true
-                                }
+                                disabled={valueVariant?.length > 0 ? false : true}
                                 className="disabled:grayscale outline-none px-4 py-2 rounded-lg bg-[#E2F0FE] text-sm font-medium hover:scale-105 disabled:hover:scale-100 disabled:opacity-50 transition"
                             >
                                 {props.dataLang?.apply || "apply"}
@@ -4949,27 +3964,17 @@ const Popup_Bom = React.memo((props) => {
                                 {dataSelectedVariant.map((e) => (
                                     <button
                                         key={e?.value}
-                                        onClick={_HandleSelectTab.bind(
-                                            this,
-                                            e?.value
-                                        )}
+                                        onClick={_HandleSelectTab.bind(this, e?.value)}
                                         className={`${
                                             tab == e?.value
                                                 ? "text-[#0F4F9E] bg-[#0F4F9E10]"
                                                 : "hover:text-[#0F4F9E] bg-slate-50/50"
                                         } outline-none min-w-fit pl-3 pr-10 py-1.5 rounded relative flex items-center`}
                                     >
-                                        <span>
-                                            {e?.label?.includes("NONE")
-                                                ? "Mặc định"
-                                                : e?.label}
-                                        </span>
+                                        <span>{e?.label?.includes("NONE") ? "Mặc định" : e?.label}</span>
                                         <button
                                             type="button"
-                                            onClick={_HandleDeleteBOM.bind(
-                                                this,
-                                                e?.value
-                                            )}
+                                            onClick={_HandleDeleteBOM.bind(this, e?.value)}
                                             className="text-red-500 absolute right-0 px-2"
                                         >
                                             <IconDelete />
@@ -4990,22 +3995,16 @@ const Popup_Bom = React.memo((props) => {
                                     {props.dataLang?.unit}
                                 </h4>
                                 <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase col-span-2 font-[400] text-left">
-                                    {props.dataLang?.norm_finishedProduct ||
-                                        "norm_finishedProduct"}
+                                    {props.dataLang?.norm_finishedProduct || "norm_finishedProduct"}
                                 </h4>
                                 <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase col-span-2 font-[400] text-left">
-                                    %
-                                    {props.dataLang?.loss_finishedProduct ||
-                                        "loss_finishedProduct"}
+                                    %{props.dataLang?.loss_finishedProduct || "loss_finishedProduct"}
                                 </h4>
                                 <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase col-span-2 font-[400] text-left">
-                                    {props.dataLang
-                                        ?.stage_usage_finishedProduct ||
-                                        "stage_usage_finishedProduct"}
+                                    {props.dataLang?.stage_usage_finishedProduct || "stage_usage_finishedProduct"}
                                 </h4>
                                 <h4 className="xl:text-[13.5px] text-[12px] px-1 text-[#667085] uppercase col-span-1 font-[400] text-center">
-                                    {props.dataLang?.branch_popup_properties ||
-                                        "branch_popup_properties"}
+                                    {props.dataLang?.branch_popup_properties || "branch_popup_properties"}
                                 </h4>
                             </div>
                             <ScrollArea
@@ -5015,422 +4014,281 @@ const Popup_Bom = React.memo((props) => {
                             >
                                 <div className="divide-y divide-slate-100 min:h-[170px]  max:h-[170px]">
                                     {loadingData ? (
-                                        <Loading
-                                            className="h-40"
-                                            color="#0f4f9e"
-                                        />
+                                        <Loading className="h-40" color="#0f4f9e" />
                                     ) : (
                                         <>
-                                            {selectedList?.child?.map(
-                                                (e, index) => (
-                                                    <div
-                                                        key={e.id}
-                                                        className="py-1 px-2 grid grid-cols-13 w-full hover:bg-slate-100 items-center"
-                                                    >
-                                                        {/* <h6 className="col-span-1 px-1 text-center">
+                                            {selectedList?.child?.map((e, index) => (
+                                                <div
+                                                    key={e.id}
+                                                    className="py-1 px-2 grid grid-cols-13 w-full hover:bg-slate-100 items-center"
+                                                >
+                                                    {/* <h6 className="col-span-1 px-1 text-center">
                             {index + 1}
                           </h6> */}
-                                                        <div className="col-span-2 ">
-                                                            <Select
-                                                                options={
-                                                                    dataTypeCd
-                                                                }
-                                                                value={e.type}
-                                                                onChange={_HandleChangeItemBOM.bind(
-                                                                    this,
-                                                                    selectedList?.value,
-                                                                    e.id,
-                                                                    "type"
-                                                                )}
-                                                                placeholder={
-                                                                    props
-                                                                        .dataLang
-                                                                        ?.warehouses_detail_type ||
-                                                                    "warehouses_detail_type"
-                                                                }
-                                                                noOptionsMessage={() =>
-                                                                    `${props.dataLang?.no_data_found}`
-                                                                }
-                                                                menuPortalTarget={
-                                                                    document.body
-                                                                }
-                                                                onMenuOpen={
-                                                                    handleMenuOpen
-                                                                }
-                                                                classNamePrefix="Select"
-                                                                className={`${
-                                                                    errType &&
-                                                                    e.type ==
-                                                                        null
-                                                                        ? "border-red-500"
-                                                                        : "border-transparent"
-                                                                } Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
-                                                                theme={(
-                                                                    theme
-                                                                ) => ({
-                                                                    ...theme,
-                                                                    colors: {
-                                                                        ...theme.colors,
-                                                                        primary25:
-                                                                            "#EBF5FF",
-                                                                        primary50:
-                                                                            "#92BFF7",
-                                                                        primary:
-                                                                            "#0F4F9E",
-                                                                    },
-                                                                })}
-                                                                styles={{
-                                                                    placeholder:
-                                                                        (
-                                                                            base
-                                                                        ) => ({
-                                                                            ...base,
-                                                                            color: "#cbd5e1",
-                                                                        }),
-                                                                    menuPortal:
-                                                                        (
-                                                                            base
-                                                                        ) => ({
-                                                                            ...base,
-                                                                            zIndex: 9999,
-                                                                            position:
-                                                                                "absolute",
-                                                                        }),
-                                                                }}
-                                                            />{" "}
-                                                        </div>
-                                                        <div className="col-span-2">
-                                                            <Select
-                                                                options={
-                                                                    e.dataName
-                                                                }
-                                                                value={e.name}
-                                                                onChange={_HandleChangeItemBOM.bind(
-                                                                    this,
-                                                                    selectedList?.value,
-                                                                    e.id,
-                                                                    "name"
-                                                                )}
-                                                                onInputChange={_HandleSeachApi.bind(
-                                                                    this,
-                                                                    e.id,
-                                                                    e?.type
-                                                                )}
-                                                                formatOptionLabel={(
-                                                                    option
-                                                                ) => (
-                                                                    <div className="">
-                                                                        <div className="flex gap-1">
-                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-normal">
-                                                                                {
-                                                                                    "Tên"
-                                                                                }
-
-                                                                                :
-                                                                            </h2>
-                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-normal">
-                                                                                {
-                                                                                    option?.label
-                                                                                }
-                                                                            </h2>
-                                                                        </div>
-                                                                        <div className="flex gap-1">
-                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-normal">
-                                                                                {
-                                                                                    "Biến thể"
-                                                                                }
-
-                                                                                :
-                                                                            </h2>
-                                                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-normal">
-                                                                                {
-                                                                                    option?.product_variation
-                                                                                }
-                                                                            </h2>
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-                                                                // formatOptionLabel={(option) => {
-                                                                //   console.log("option", option);
-                                                                // }}
-                                                                placeholder={
-                                                                    props
-                                                                        .dataLang
-                                                                        ?.name ||
-                                                                    "name"
-                                                                }
-                                                                noOptionsMessage={() =>
-                                                                    `${props.dataLang?.no_data_found}`
-                                                                }
-                                                                menuPortalTarget={
-                                                                    document.body
-                                                                }
-                                                                onMenuOpen={
-                                                                    handleMenuOpen
-                                                                }
-                                                                classNamePrefix="Select "
-                                                                className={`${
-                                                                    errName &&
-                                                                    e.name ==
-                                                                        null
-                                                                        ? "border-red-500"
-                                                                        : "border-transparent"
-                                                                } Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
-                                                                theme={(
-                                                                    theme
-                                                                ) => ({
-                                                                    ...theme,
-                                                                    colors: {
-                                                                        ...theme.colors,
-                                                                        primary25:
-                                                                            "#EBF5FF",
-                                                                        primary50:
-                                                                            "#92BFF7",
-                                                                        primary:
-                                                                            "#0F4F9E",
-                                                                    },
-                                                                })}
-                                                                styles={{
-                                                                    placeholder:
-                                                                        (
-                                                                            base
-                                                                        ) => ({
-                                                                            ...base,
-                                                                            color: "#cbd5e1",
-                                                                        }),
-                                                                    menuPortal:
-                                                                        (
-                                                                            base
-                                                                        ) => ({
-                                                                            ...base,
-                                                                            zIndex: 9999,
-                                                                            position:
-                                                                                "absolute",
-                                                                        }),
-                                                                    menu: (
-                                                                        provided,
-                                                                        state
-                                                                    ) => ({
-                                                                        ...provided,
-                                                                        width: "180%",
-                                                                    }),
-                                                                }}
-                                                            />
-                                                        </div>
-                                                        <div className="col-span-2">
-                                                            <Select
-                                                                options={
-                                                                    e.dataUnit
-                                                                }
-                                                                value={e.unit}
-                                                                onChange={_HandleChangeItemBOM.bind(
-                                                                    this,
-                                                                    selectedList?.value,
-                                                                    e.id,
-                                                                    "unit"
-                                                                )}
-                                                                placeholder={
-                                                                    props
-                                                                        .dataLang
-                                                                        ?.unit
-                                                                }
-                                                                noOptionsMessage={() =>
-                                                                    `${props.dataLang?.no_data_found}`
-                                                                }
-                                                                menuPortalTarget={
-                                                                    document.body
-                                                                }
-                                                                onMenuOpen={
-                                                                    handleMenuOpen
-                                                                }
-                                                                classNamePrefix="Select"
-                                                                className={`${
-                                                                    errName &&
-                                                                    e.name ==
-                                                                        null
-                                                                        ? "border-red-500"
-                                                                        : "border-transparent"
-                                                                } Select__custom placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
-                                                                theme={(
-                                                                    theme
-                                                                ) => ({
-                                                                    ...theme,
-                                                                    colors: {
-                                                                        ...theme.colors,
-                                                                        primary25:
-                                                                            "#EBF5FF",
-                                                                        primary50:
-                                                                            "#92BFF7",
-                                                                        primary:
-                                                                            "#0F4F9E",
-                                                                    },
-                                                                })}
-                                                                styles={{
-                                                                    placeholder:
-                                                                        (
-                                                                            base
-                                                                        ) => ({
-                                                                            ...base,
-                                                                            color: "#cbd5e1",
-                                                                        }),
-                                                                    menuPortal:
-                                                                        (
-                                                                            base
-                                                                        ) => ({
-                                                                            ...base,
-                                                                            zIndex: 9999,
-                                                                            position:
-                                                                                "absolute",
-                                                                        }),
-                                                                }}
-                                                            />
-                                                        </div>
-                                                        <div className="col-span-2 px-1">
-                                                            <NumericFormat
-                                                                value={e?.norm}
-                                                                onValueChange={_HandleChangeItemBOM.bind(
-                                                                    this,
-                                                                    selectedList?.value,
-                                                                    e.id,
-                                                                    "norm"
-                                                                )}
-                                                                thousandSeparator=","
-                                                                placeholder={
-                                                                    props
-                                                                        .dataLang
-                                                                        ?.norm_finishedProduct ||
-                                                                    "norm_finishedProduct"
-                                                                }
-                                                                className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
-                                                            />
-                                                        </div>
-                                                        <div className="col-span-2 px-1">
-                                                            <NumericFormat
-                                                                isAllowed={(
-                                                                    values
-                                                                ) => {
-                                                                    const {
-                                                                        floatValue,
-                                                                    } = values;
-                                                                    return (
-                                                                        floatValue >=
-                                                                            0 &&
-                                                                        floatValue <=
-                                                                            100
-                                                                    );
-                                                                }}
-                                                                value={e?.loss}
-                                                                onValueChange={_HandleChangeItemBOM.bind(
-                                                                    this,
-                                                                    selectedList?.value,
-                                                                    e.id,
-                                                                    "loss"
-                                                                )}
-                                                                suffix="%"
-                                                                thousandSeparator=","
-                                                                placeholder={`%${
-                                                                    props
-                                                                        .dataLang
-                                                                        ?.loss_finishedProduct ||
-                                                                    "loss_finishedProduct"
-                                                                }`}
-                                                                className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
-                                                            />
-                                                        </div>
-                                                        <div className="col-span-2 px-1">
-                                                            <Select
-                                                                options={dataCd}
-                                                                value={e.stage}
-                                                                onChange={_HandleChangeItemBOM.bind(
-                                                                    this,
-                                                                    selectedList?.value,
-                                                                    e.id,
-                                                                    "stage"
-                                                                )}
-                                                                placeholder={
-                                                                    props
-                                                                        .dataLang
-                                                                        ?.stage_usage_finishedProduct ||
-                                                                    "stage_usage_finishedProduct"
-                                                                }
-                                                                noOptionsMessage={() =>
-                                                                    `${props.dataLang?.no_data_found}`
-                                                                }
-                                                                menuPortalTarget={
-                                                                    document.body
-                                                                }
-                                                                onMenuOpen={
-                                                                    handleMenuOpen
-                                                                }
-                                                                className={`border-transparent placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
-                                                                theme={(
-                                                                    theme
-                                                                ) => ({
-                                                                    ...theme,
-                                                                    colors: {
-                                                                        ...theme.colors,
-                                                                        primary25:
-                                                                            "#EBF5FF",
-                                                                        primary50:
-                                                                            "#92BFF7",
-                                                                        primary:
-                                                                            "#0F4F9E",
-                                                                    },
-                                                                })}
-                                                                styles={{
-                                                                    placeholder:
-                                                                        (
-                                                                            base
-                                                                        ) => ({
-                                                                            ...base,
-                                                                            color: "#cbd5e1",
-                                                                        }),
-                                                                    menuPortal:
-                                                                        (
-                                                                            base
-                                                                        ) => ({
-                                                                            ...base,
-                                                                            zIndex: 9999,
-                                                                            position:
-                                                                                "absolute",
-                                                                        }),
-                                                                }}
-                                                            />
-                                                        </div>
-                                                        <div className="col-span-1 px-1 text-center">
-                                                            <button
-                                                                onClick={_HandleDeleteItemBOM.bind(
-                                                                    this,
-                                                                    selectedList?.value,
-                                                                    e.id
-                                                                )}
-                                                                type="button"
-                                                                className="text-red-500"
-                                                            >
-                                                                <IconDelete />
-                                                            </button>
-                                                        </div>
+                                                    <div className="col-span-2 ">
+                                                        <Select
+                                                            options={dataTypeCd}
+                                                            value={e.type}
+                                                            onChange={_HandleChangeItemBOM.bind(
+                                                                this,
+                                                                selectedList?.value,
+                                                                e.id,
+                                                                "type"
+                                                            )}
+                                                            placeholder={
+                                                                props.dataLang?.warehouses_detail_type ||
+                                                                "warehouses_detail_type"
+                                                            }
+                                                            noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                            menuPortalTarget={document.body}
+                                                            onMenuOpen={handleMenuOpen}
+                                                            classNamePrefix="Select"
+                                                            className={`${
+                                                                errType && e.type == null
+                                                                    ? "border-red-500"
+                                                                    : "border-transparent"
+                                                            } Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
+                                                            theme={(theme) => ({
+                                                                ...theme,
+                                                                colors: {
+                                                                    ...theme.colors,
+                                                                    primary25: "#EBF5FF",
+                                                                    primary50: "#92BFF7",
+                                                                    primary: "#0F4F9E",
+                                                                },
+                                                            })}
+                                                            styles={{
+                                                                placeholder: (base) => ({
+                                                                    ...base,
+                                                                    color: "#cbd5e1",
+                                                                }),
+                                                                menuPortal: (base) => ({
+                                                                    ...base,
+                                                                    zIndex: 9999,
+                                                                    position: "absolute",
+                                                                }),
+                                                            }}
+                                                        />{" "}
                                                     </div>
-                                                )
-                                            )}
+                                                    <div className="col-span-2">
+                                                        <Select
+                                                            options={e.dataName}
+                                                            value={e.name}
+                                                            onChange={_HandleChangeItemBOM.bind(
+                                                                this,
+                                                                selectedList?.value,
+                                                                e.id,
+                                                                "name"
+                                                            )}
+                                                            onInputChange={_HandleSeachApi.bind(this, e.id, e?.type)}
+                                                            formatOptionLabel={(option) => (
+                                                                <div className="">
+                                                                    <div className="flex gap-1">
+                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-normal">
+                                                                            {"Tên"}:
+                                                                        </h2>
+                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-normal">
+                                                                            {option?.label}
+                                                                        </h2>
+                                                                    </div>
+                                                                    <div className="flex gap-1">
+                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-normal">
+                                                                            {"Biến thể"}:
+                                                                        </h2>
+                                                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-normal">
+                                                                            {option?.product_variation}
+                                                                        </h2>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                            // formatOptionLabel={(option) => {
+                                                            //   console.log("option", option);
+                                                            // }}
+                                                            placeholder={props.dataLang?.name || "name"}
+                                                            noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                            menuPortalTarget={document.body}
+                                                            onMenuOpen={handleMenuOpen}
+                                                            classNamePrefix="Select "
+                                                            className={`${
+                                                                errName && e.name == null
+                                                                    ? "border-red-500"
+                                                                    : "border-transparent"
+                                                            } Select__custom placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
+                                                            theme={(theme) => ({
+                                                                ...theme,
+                                                                colors: {
+                                                                    ...theme.colors,
+                                                                    primary25: "#EBF5FF",
+                                                                    primary50: "#92BFF7",
+                                                                    primary: "#0F4F9E",
+                                                                },
+                                                            })}
+                                                            styles={{
+                                                                placeholder: (base) => ({
+                                                                    ...base,
+                                                                    color: "#cbd5e1",
+                                                                }),
+                                                                menuPortal: (base) => ({
+                                                                    ...base,
+                                                                    zIndex: 9999,
+                                                                    position: "absolute",
+                                                                }),
+                                                                menu: (provided, state) => ({
+                                                                    ...provided,
+                                                                    width: "180%",
+                                                                }),
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-2">
+                                                        <Select
+                                                            options={e.dataUnit}
+                                                            value={e.unit}
+                                                            onChange={_HandleChangeItemBOM.bind(
+                                                                this,
+                                                                selectedList?.value,
+                                                                e.id,
+                                                                "unit"
+                                                            )}
+                                                            placeholder={props.dataLang?.unit}
+                                                            noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                            menuPortalTarget={document.body}
+                                                            onMenuOpen={handleMenuOpen}
+                                                            classNamePrefix="Select"
+                                                            className={`${
+                                                                errName && e.name == null
+                                                                    ? "border-red-500"
+                                                                    : "border-transparent"
+                                                            } Select__custom placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px] `}
+                                                            theme={(theme) => ({
+                                                                ...theme,
+                                                                colors: {
+                                                                    ...theme.colors,
+                                                                    primary25: "#EBF5FF",
+                                                                    primary50: "#92BFF7",
+                                                                    primary: "#0F4F9E",
+                                                                },
+                                                            })}
+                                                            styles={{
+                                                                placeholder: (base) => ({
+                                                                    ...base,
+                                                                    color: "#cbd5e1",
+                                                                }),
+                                                                menuPortal: (base) => ({
+                                                                    ...base,
+                                                                    zIndex: 9999,
+                                                                    position: "absolute",
+                                                                }),
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-2 px-1">
+                                                        <NumericFormat
+                                                            value={e?.norm}
+                                                            onValueChange={_HandleChangeItemBOM.bind(
+                                                                this,
+                                                                selectedList?.value,
+                                                                e.id,
+                                                                "norm"
+                                                            )}
+                                                            thousandSeparator=","
+                                                            placeholder={
+                                                                props.dataLang?.norm_finishedProduct ||
+                                                                "norm_finishedProduct"
+                                                            }
+                                                            className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-2 px-1">
+                                                        <NumericFormat
+                                                            isAllowed={(values) => {
+                                                                const { floatValue } = values;
+                                                                return floatValue >= 0 && floatValue <= 100;
+                                                            }}
+                                                            value={e?.loss}
+                                                            onValueChange={_HandleChangeItemBOM.bind(
+                                                                this,
+                                                                selectedList?.value,
+                                                                e.id,
+                                                                "loss"
+                                                            )}
+                                                            suffix="%"
+                                                            thousandSeparator=","
+                                                            placeholder={`%${
+                                                                props.dataLang?.loss_finishedProduct ||
+                                                                "loss_finishedProduct"
+                                                            }`}
+                                                            className={`focus:border-[#92BFF7] border-[#d0d5dd] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 border outline-none`}
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-2 px-1">
+                                                        <Select
+                                                            options={dataCd}
+                                                            value={e.stage}
+                                                            onChange={_HandleChangeItemBOM.bind(
+                                                                this,
+                                                                selectedList?.value,
+                                                                e.id,
+                                                                "stage"
+                                                            )}
+                                                            placeholder={
+                                                                props.dataLang?.stage_usage_finishedProduct ||
+                                                                "stage_usage_finishedProduct"
+                                                            }
+                                                            noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
+                                                            menuPortalTarget={document.body}
+                                                            onMenuOpen={handleMenuOpen}
+                                                            className={`border-transparent placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border text-[13px]`}
+                                                            theme={(theme) => ({
+                                                                ...theme,
+                                                                colors: {
+                                                                    ...theme.colors,
+                                                                    primary25: "#EBF5FF",
+                                                                    primary50: "#92BFF7",
+                                                                    primary: "#0F4F9E",
+                                                                },
+                                                            })}
+                                                            styles={{
+                                                                placeholder: (base) => ({
+                                                                    ...base,
+                                                                    color: "#cbd5e1",
+                                                                }),
+                                                                menuPortal: (base) => ({
+                                                                    ...base,
+                                                                    zIndex: 9999,
+                                                                    position: "absolute",
+                                                                }),
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-1 px-1 text-center">
+                                                        <button
+                                                            onClick={_HandleDeleteItemBOM.bind(
+                                                                this,
+                                                                selectedList?.value,
+                                                                e.id
+                                                            )}
+                                                            type="button"
+                                                            className="text-red-500"
+                                                        >
+                                                            <IconDelete />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </>
                                     )}
                                 </div>
                             </ScrollArea>
                             {dataSelectedVariant?.length > 0 && (
                                 <button
-                                    onClick={_HandleAddNew.bind(
-                                        this,
-                                        selectedList?.value
-                                    )}
+                                    onClick={_HandleAddNew.bind(this, selectedList?.value)}
                                     type="button"
                                     title="Thêm"
                                     className={`hover:text-[#0F4F9E] hover:bg-[#e2f0fe] transition mt-5 w-full min-h-[100px] h-35 rounded-[5.5px] bg-slate-100 flex flex-col justify-center items-center`}
                                 >
                                     <IconAdd />
-                                    {props.dataLang
-                                        ?.bom_design_add_finishedProduct ||
-                                        "bom_design_add_finishedProduct"}
+                                    {props.dataLang?.bom_design_add_finishedProduct || "bom_design_add_finishedProduct"}
                                 </button>
                             )}
                         </div>

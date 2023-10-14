@@ -20,6 +20,11 @@ import {
 import Swal from "sweetalert2";
 import Select, { components } from "react-select";
 import ReactExport from "react-data-export";
+import SearchComponent from "components/UI/filterComponents/searchComponent";
+import SelectComponent from "components/UI/filterComponents/selectComponent";
+import OnResetData from "components/UI/btnResetData/btnReset";
+import ExcelFileComponent from "components/UI/filterComponents/excelFilecomponet";
+import DropdowLimit from "components/UI/dropdowLimit/dropdowLimit";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -38,9 +43,7 @@ const CustomSelectOption = ({ value, label, level, code }) => (
         {level == 2 && <span>----</span>}
         {level == 3 && <span>------</span>}
         {level == 4 && <span>--------</span>}
-        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">
-            {label}
-        </span>
+        <span className="2xl:max-w-[300px] max-w-[150px] w-fit truncate">{label}</span>
     </div>
 );
 
@@ -83,10 +86,7 @@ const Index = (props) => {
                     limit: limit,
                     page: router.query?.page || 1,
                     "filter[id]": idCategory?.value ? idCategory?.value : null,
-                    "filter[branch_id][]":
-                        idBranch?.length > 0
-                            ? idBranch.map((e) => e.value)
-                            : null,
+                    "filter[branch_id][]": idBranch?.length > 0 ? idBranch.map((e) => e.value) : null,
                 },
             },
             (err, response) => {
@@ -101,45 +101,33 @@ const Index = (props) => {
     };
 
     const _ServerFetchingOtp = () => {
-        Axios(
-            "GET",
-            "/api_web/api_material/categoryOption?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataOption(
-                        rResult.map((x) => ({
-                            label: `${x.name + " " + "(" + x.code + ")"}`,
-                            value: x.id,
-                            level: x.level,
-                            code: x.code,
-                            parent_id: x.parent_id,
-                        }))
-                    );
-                }
+        Axios("GET", "/api_web/api_material/categoryOption?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sDataOption(
+                    rResult.map((x) => ({
+                        label: `${x.name + " " + "(" + x.code + ")"}`,
+                        value: x.id,
+                        level: x.level,
+                        code: x.code,
+                        parent_id: x.parent_id,
+                    }))
+                );
             }
-        );
-        Axios(
-            "GET",
-            "/api_web/Api_Branch/branch/?csrf_protection=true",
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sDataBranchOption(
-                        rResult.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                    dispatch({
-                        type: "branch/update",
-                        payload: rResult.map((e) => ({
-                            label: e.name,
-                            value: e.id,
-                        })),
-                    });
-                }
+        });
+        Axios("GET", "/api_web/Api_Branch/branch/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sDataBranchOption(rResult.map((e) => ({ label: e.name, value: e.id })));
+                dispatch({
+                    type: "branch/update",
+                    payload: rResult.map((e) => ({
+                        label: e.name,
+                        value: e.id,
+                    })),
+                });
             }
-        );
+        });
         sOnFetchingOpt(false);
     };
 
@@ -228,9 +216,7 @@ const Index = (props) => {
 
     //Set data cho bộ lọc chi nhánh
     const hiddenOptions = idBranch?.length > 3 ? idBranch?.slice(0, 3) : [];
-    const options = dataBranchOption.filter(
-        (x) => !hiddenOptions.includes(x.value)
-    );
+    const options = dataBranchOption.filter((x) => !hiddenOptions.includes(x.value));
 
     const _HandleFresh = () => {
         sOnFetching(true);
@@ -248,21 +234,15 @@ const Index = (props) => {
                         <div className="p-2"></div>
                     ) : (
                         <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">
-                                {dataLang?.list_btn_seting_category}
-                            </h6>
+                            <h6 className="text-[#141522]/40">{dataLang?.list_btn_seting_category}</h6>
                             <span className="text-[#141522]/40">/</span>
-                            <h6 className="text-[#141522]/40">
-                                {dataLang?.header_category_material}
-                            </h6>
+                            <h6 className="text-[#141522]/40">{dataLang?.header_category_material}</h6>
                             <span className="text-[#141522]/40">/</span>
                             <h6>{dataLang?.header_category_material_group}</h6>
                         </div>
                     )}
                     <div className="flex justify-between items-center">
-                        <h2 className="xl:text-3xl text-xl font-medium ">
-                            {dataLang?.category_material_group_title}
-                        </h2>
+                        <h2 className="xl:text-3xl text-xl font-medium ">{dataLang?.category_material_group_title}</h2>
                         <div className="flex space-x-3 items-center">
                             <Popup_NVL
                                 onRefresh={_ServerFetching.bind(this)}
@@ -277,81 +257,44 @@ const Index = (props) => {
                     <div className="bg-slate-100 w-full rounded grid grid-cols-6 items-center justify-between xl:p-3 p-2">
                         <div className="col-span-4">
                             <div className="grid grid-cols-5 gap-2">
-                                <div className="col-span-1">
-                                    <form className="flex items-center relative">
-                                        <IconSearch
-                                            size={20}
-                                            className="absolute 2xl:left-3 z-10  text-[#cccccc] xl:left-[4%] left-[1%]"
-                                        />
-                                        <input
-                                            className=" relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  py-2.5 rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
-                                            type="text"
-                                            onChange={_HandleOnChangeKeySearch.bind(
-                                                this
-                                            )}
-                                            placeholder={
-                                                dataLang?.branch_search
-                                            }
-                                        />
-                                    </form>
-                                </div>
-                                <div className=" ml-1 col-span-1">
-                                    <Select
-                                        // options={options}
-                                        options={[
-                                            {
-                                                value: "",
-                                                label: "Chọn chi nhánh",
-                                                isDisabled: true,
-                                            },
-                                            ...options,
-                                        ]}
-                                        onChange={_HandleFilterOpt.bind(
-                                            this,
-                                            "branch"
-                                        )}
-                                        value={idBranch}
-                                        isClearable={true}
-                                        isMulti
-                                        closeMenuOnSelect={false}
-                                        hideSelectedOptions={false}
-                                        placeholder="Chọn chi nhánh"
-                                        className="rounded-md bg-white  xl:text-base text-[14.5px] z-20"
-                                        isSearchable={true}
-                                        components={{ MultiValue }}
-                                        style={{
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none",
-                                        }}
-                                        theme={(theme) => ({
-                                            ...theme,
-                                            colors: {
-                                                ...theme.colors,
-                                                primary25: "#EBF5FF",
-                                                primary50: "#92BFF7",
-                                                primary: "#0F4F9E",
-                                            },
-                                        })}
-                                        styles={{
-                                            placeholder: (base) => ({
-                                                ...base,
-                                                color: "#cbd5e1",
-                                            }),
-                                            control: (base, state) => ({
-                                                ...base,
-                                                border: "none",
-                                                outline: "none",
-                                                boxShadow: "none",
-                                                ...(state.isFocused && {
-                                                    boxShadow:
-                                                        "0 0 0 1.5px #0F4F9E",
-                                                }),
-                                            }),
-                                        }}
-                                    />
-                                </div>
-                                <div className="ml-1 col-span-1">
+                                <SearchComponent
+                                    dataLang={dataLang}
+                                    onChange={_HandleOnChangeKeySearch.bind(this)}
+                                    colSpan={1}
+                                />
+                                <SelectComponent
+                                    options={[
+                                        {
+                                            value: "",
+                                            label: "Chọn chi nhánh",
+                                            isDisabled: true,
+                                        },
+                                        ...options,
+                                    ]}
+                                    onChange={_HandleFilterOpt.bind(this, "branch")}
+                                    value={idBranch}
+                                    placeholder={dataLang?.client_list_filterbrand}
+                                    colSpan={idBranch?.length > 1 ? 3 : 1}
+                                    components={{ MultiValue }}
+                                    isMulti={true}
+                                    closeMenuOnSelect={false}
+                                />
+                                <SelectComponent
+                                    options={[
+                                        {
+                                            value: "",
+                                            label: "Chọn mã danh mục",
+                                            isDisabled: true,
+                                        },
+                                        ...dataOption,
+                                    ]}
+                                    onChange={_HandleFilterOpt.bind(this, "category")}
+                                    value={idCategory}
+                                    placeholder="Chọn mã danh mục"
+                                    colSpan={1}
+                                    formatOptionLabel={CustomSelectOption}
+                                />
+                                {/* <div className="ml-1 col-span-1">
                                     <Select
                                         // options={dataOption}
                                         options={[
@@ -363,10 +306,7 @@ const Index = (props) => {
                                             ...dataOption,
                                         ]}
                                         formatOptionLabel={CustomSelectOption}
-                                        onChange={_HandleFilterOpt.bind(
-                                            this,
-                                            "category"
-                                        )}
+                                        onChange={_HandleFilterOpt.bind(this, "category")}
                                         value={idCategory}
                                         isClearable={true}
                                         placeholder="Chọn mã danh mục"
@@ -397,70 +337,27 @@ const Index = (props) => {
                                                 outline: "none",
                                                 boxShadow: "none",
                                                 ...(state.isFocused && {
-                                                    boxShadow:
-                                                        "0 0 0 1.5px #0F4F9E",
+                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                 }),
                                             }),
                                         }}
                                     />
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                         <div className="col-span-2">
                             <div className="flex space-x-2 items-center justify-end">
-                                <button
-                                    onClick={_HandleFresh.bind(this)}
-                                    type="button"
-                                    className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out"
-                                >
-                                    <Refresh2
-                                        className="group-hover:-rotate-45 transition-all ease-in-out"
-                                        size="22"
-                                        color="green"
-                                    />
-                                </button>
+                                <OnResetData sOnFetching={sOnFetching} />
                                 {data.length != 0 && (
-                                    <ExcelFile
-                                        filename="nhóm nvl"
+                                    <ExcelFileComponent
+                                        multiDataSet={multiDataSet}
+                                        filename="Nhóm nvl"
                                         title="Hiii"
-                                        element={
-                                            <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                <IconExcel size={18} />
-                                                <span>
-                                                    {
-                                                        dataLang?.client_list_exportexcel
-                                                    }
-                                                </span>
-                                            </button>
-                                        }
-                                    >
-                                        <ExcelSheet
-                                            dataSet={multiDataSet}
-                                            data={multiDataSet}
-                                            name="Nhóm NVL"
-                                        />
-                                    </ExcelFile>
+                                        dataLang={dataLang}
+                                    />
                                 )}
 
-                                <div className="flex space-x-2 items-center">
-                                    <label className="font-[300] text-slate-400">
-                                        {dataLang?.display} :
-                                    </label>
-                                    <select
-                                        className="outline-none"
-                                        onChange={(e) => sLimit(e.target.value)}
-                                        value={limit}
-                                    >
-                                        <option disabled className="hidden">
-                                            {limit == -1 ? "Tất cả" : limit}
-                                        </option>
-                                        <option value={15}>15</option>
-                                        <option value={20}>20</option>
-                                        <option value={40}>40</option>
-                                        <option value={60}>60</option>
-                                        <option value={-1}>Tất cả</option>
-                                    </select>
-                                </div>
+                                <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
                             </div>
                         </div>
                     </div>
@@ -468,10 +365,7 @@ const Index = (props) => {
                         <div className="xl:w-[100%] w-[110%] pr-2">
                             <div className="flex items-center sticky top-0 rounded-xl shadow-sm bg-white divide-x p-2 z-10 ">
                                 <div className="w-[2%] flex justify-center">
-                                    <input
-                                        type="checkbox"
-                                        className="scale-125"
-                                    />
+                                    <input type="checkbox" className="scale-125" />
                                 </div>
                                 <h4 className="w-[8%]" />
                                 <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase w-[16%] font-[600] text-center">
@@ -497,12 +391,8 @@ const Index = (props) => {
                                     ) : data?.length > 0 ? (
                                         data.map((e) => (
                                             <Items
-                                                onRefresh={_ServerFetching.bind(
-                                                    this
-                                                )}
-                                                onRefreshOpt={_ServerFetchingOtp.bind(
-                                                    this
-                                                )}
+                                                onRefresh={_ServerFetching.bind(this)}
+                                                onRefreshOpt={_ServerFetchingOtp.bind(this)}
                                                 dataLang={dataLang}
                                                 key={e.id}
                                                 data={e}
@@ -531,14 +421,11 @@ const Index = (props) => {
                 {data?.length != 0 && (
                     <div className="flex space-x-5 items-center">
                         <h6>
-                            Hiển thị {totalItems?.iTotalDisplayRecords} trong số{" "}
-                            {totalItems?.iTotalRecords} biến thể
+                            Hiển thị {totalItems?.iTotalDisplayRecords} trong số {totalItems?.iTotalRecords} biến thể
                         </h6>
                         <Pagination
                             postsPerPage={limit}
-                            totalPosts={Number(
-                                totalItems?.iTotalDisplayRecords
-                            )}
+                            totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                             paginate={paginate}
                             currentPage={router.query?.page || 1}
                         />
@@ -564,29 +451,24 @@ const Items = React.memo((props) => {
             cancelButtonText: `${props.dataLang?.aler_cancel}`,
         }).then((result) => {
             if (result.isConfirmed) {
-                Axios(
-                    "DELETE",
-                    `/api_web/api_material/category/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var { isSuccess, message } = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: props.dataLang[message],
-                                });
-                            } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: props.dataLang[message],
-                                });
-                            }
+                Axios("DELETE", `/api_web/api_material/category/${id}?csrf_protection=true`, {}, (err, response) => {
+                    if (!err) {
+                        var { isSuccess, message } = response.data;
+                        if (isSuccess) {
+                            Toast.fire({
+                                icon: "success",
+                                title: props.dataLang[message],
+                            });
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                title: props.dataLang[message],
+                            });
                         }
-                        props.onRefresh && props.onRefresh();
-                        props.onRefreshOpt && props.onRefreshOpt();
                     }
-                );
+                    props.onRefresh && props.onRefresh();
+                    props.onRefreshOpt && props.onRefreshOpt();
+                });
             }
         });
     };
@@ -603,23 +485,14 @@ const Items = React.memo((props) => {
                 </div>
                 <div className="w-[8%] flex justify-center">
                     <button
-                        disabled={
-                            props.data?.children?.length > 0 ? false : true
-                        }
+                        disabled={props.data?.children?.length > 0 ? false : true}
                         onClick={_ToggleHasChild.bind(this)}
                         className={`${
-                            hasChild
-                                ? "bg-red-600"
-                                : "bg-green-600 disabled:bg-slate-300"
+                            hasChild ? "bg-red-600" : "bg-green-600 disabled:bg-slate-300"
                         } hover:opacity-80 hover:disabled:opacity-100 transition relative flex flex-col justify-center items-center h-5 w-5 rounded-full text-white outline-none`}
                     >
                         <IconMinus size={16} />
-                        <IconMinus
-                            size={16}
-                            className={`${
-                                hasChild ? "" : "rotate-90"
-                            } transition absolute`}
-                        />
+                        <IconMinus size={16} className={`${hasChild ? "" : "rotate-90"} transition absolute`} />
                     </button>
                 </div>
                 <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 w-[16%]">
@@ -679,10 +552,7 @@ const Items = React.memo((props) => {
                                     grandchild="1"
                                     children={e?.children?.map((e) => (
                                         <ItemsChild
-                                            onClick={_HandleDelete.bind(
-                                                this,
-                                                e.id
-                                            )}
+                                            onClick={_HandleDelete.bind(this, e.id)}
                                             onRefresh={props.onRefresh}
                                             onRefreshOpt={props.onRefreshOpt}
                                             dataLang={props.dataLang}
@@ -704,9 +574,7 @@ const Items = React.memo((props) => {
 const ItemsChild = React.memo((props) => {
     return (
         <React.Fragment key={props.data?.id}>
-            <div
-                className={`flex items-center py-2.5 px-2 hover:bg-slate-100/40 `}
-            >
+            <div className={`flex items-center py-2.5 px-2 hover:bg-slate-100/40 `}>
                 {props.data?.level == "3" && (
                     <div className="w-[10%] h-full flex justify-center items-center pl-24">
                         <IconDown className="rotate-45" />
@@ -755,10 +623,7 @@ const ItemsChild = React.memo((props) => {
                         dataLang={props.dataLang}
                         data={props.data}
                     />
-                    <button
-                        onClick={props.onClick}
-                        className="xl:text-base text-xs"
-                    >
+                    <button onClick={props.onClick} className="xl:text-base text-xs">
                         <IconDelete color="red" />
                     </button>
                 </div>
@@ -794,8 +659,7 @@ const Popup_NVL = React.memo((props) => {
         open && sCode(props.data?.code ? props.data?.code : "");
         open && sName(props.data?.name ? props.data?.name : "");
         open && sEditorValue(props.data?.note ? props.data?.note : "");
-        open &&
-            sIdCategory(props.data?.parent_id ? props.data?.parent_id : null);
+        open && sIdCategory(props.data?.parent_id ? props.data?.parent_id : null);
         open &&
             sBranch(
                 props.data?.branch?.length > 0
@@ -940,13 +804,7 @@ const Popup_NVL = React.memo((props) => {
                     ? `${props.dataLang?.category_material_group_edit}`
                     : `${props.dataLang?.category_material_group_addnew}`
             }
-            button={
-                props.data?.id ? (
-                    <IconEdit />
-                ) : (
-                    `${props.dataLang?.branch_popup_create_new}`
-                )
-            }
+            button={props.data?.id ? <IconEdit /> : `${props.dataLang?.branch_popup_create_new}`}
             onClickOpen={_ToggleModal.bind(this, true)}
             open={open}
             onClose={_ToggleModal.bind(this, false)}
@@ -955,8 +813,7 @@ const Popup_NVL = React.memo((props) => {
             <div className="py-4 w-[600px] space-y-5">
                 <div className="space-y-1">
                     <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.client_list_brand ||
-                            "client_list_brand"}{" "}
+                        {props.dataLang?.client_list_brand || "client_list_brand"}{" "}
                         <span className="text-red-500">*</span>
                     </label>
                     <Select
@@ -965,14 +822,9 @@ const Popup_NVL = React.memo((props) => {
                         value={branch}
                         onChange={_HandleChangeInput.bind(this, "branch")}
                         isClearable={true}
-                        placeholder={
-                            props.dataLang?.client_list_brand ||
-                            "client_list_brand"
-                        }
+                        placeholder={props.dataLang?.client_list_brand || "client_list_brand"}
                         isMulti
-                        noOptionsMessage={() =>
-                            `${props.dataLang?.no_data_found}`
-                        }
+                        noOptionsMessage={() => `${props.dataLang?.no_data_found}`}
                         closeMenuOnSelect={false}
                         className={`${
                             errBranch ? "border-red-500" : "border-transparent"
@@ -995,27 +847,21 @@ const Popup_NVL = React.memo((props) => {
                     />
                     {errBranch && (
                         <label className="text-sm text-red-500">
-                            {props.dataLang?.client_list_bran ||
-                                "client_list_bran"}
+                            {props.dataLang?.client_list_bran || "client_list_bran"}
                         </label>
                     )}
                 </div>
                 <div className="space-y-1">
                     <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.category_material_group_code}{" "}
-                        <span className="text-red-500">*</span>
+                        {props.dataLang?.category_material_group_code} <span className="text-red-500">*</span>
                     </label>
                     <input
                         value={code}
                         onChange={_HandleChangeInput.bind(this, "code")}
                         type="text"
-                        placeholder={
-                            props.dataLang?.category_material_group_code
-                        }
+                        placeholder={props.dataLang?.category_material_group_code}
                         className={`${
-                            errCode
-                                ? "border-red-500"
-                                : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                            errCode ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
                         } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                     />
                     {errCode && (
@@ -1026,20 +872,15 @@ const Popup_NVL = React.memo((props) => {
                 </div>
                 <div className="space-y-1">
                     <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.category_material_group_name}{" "}
-                        <span className="text-red-500">*</span>
+                        {props.dataLang?.category_material_group_name} <span className="text-red-500">*</span>
                     </label>
                     <input
                         value={name}
                         onChange={_HandleChangeInput.bind(this, "name")}
                         type="text"
-                        placeholder={
-                            props.dataLang?.category_material_group_name
-                        }
+                        placeholder={props.dataLang?.category_material_group_name}
                         className={`${
-                            errName
-                                ? "border-red-500"
-                                : "focus:border-[#92BFF7] border-[#d0d5dd] "
+                            errName ? "border-red-500" : "focus:border-[#92BFF7] border-[#d0d5dd] "
                         } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal  p-2 border outline-none`}
                     />
                     {errName && (
@@ -1061,12 +902,8 @@ const Popup_NVL = React.memo((props) => {
                                       label: `${props.dataLang?.category_material_group_level}`,
                                   }
                                 : {
-                                      label: dataOption.find(
-                                          (x) => x?.parent_id == idCategory
-                                      )?.label,
-                                      code: dataOption.find(
-                                          (x) => x?.parent_id == idCategory
-                                      )?.code,
+                                      label: dataOption.find((x) => x?.parent_id == idCategory)?.label,
+                                      code: dataOption.find((x) => x?.parent_id == idCategory)?.code,
                                       value: idCategory,
                                   }
                         }
@@ -1074,20 +911,14 @@ const Popup_NVL = React.memo((props) => {
                             idCategory == "0" || !idCategory
                                 ? { label: "Nhóm cha", code: "nhóm cha" }
                                 : {
-                                      label: dataOption.find(
-                                          (x) => x?.value == idCategory
-                                      )?.label,
-                                      code: dataOption.find(
-                                          (x) => x?.value == idCategory
-                                      )?.code,
+                                      label: dataOption.find((x) => x?.value == idCategory)?.label,
+                                      code: dataOption.find((x) => x?.value == idCategory)?.code,
                                       value: idCategory,
                                   }
                         }
                         onChange={valueIdCategory.bind(this)}
                         isClearable={true}
-                        placeholder={
-                            props.dataLang?.category_material_group_level
-                        }
+                        placeholder={props.dataLang?.category_material_group_level}
                         className="placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none"
                         isSearchable={true}
                         theme={(theme) => ({
@@ -1102,9 +933,7 @@ const Popup_NVL = React.memo((props) => {
                     />
                 </div>
                 <div className="space-y-1">
-                    <label className="text-[#344054] font-normal text-base">
-                        {props.dataLang?.client_popup_note}
-                    </label>
+                    <label className="text-[#344054] font-normal text-base">{props.dataLang?.client_popup_note}</label>
                     <textarea
                         type="text"
                         placeholder={props.dataLang?.client_popup_note}

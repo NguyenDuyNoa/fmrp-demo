@@ -1,6 +1,17 @@
 import configSelectFillter from "../configs/configSelectFillter";
 import Select from "react-select";
-const SelectComponent = ({ options, value, onChange, onInputChange, placeholder, colSpan }) => {
+const SelectComponent = ({
+    options,
+    value,
+    onChange,
+    onInputChange,
+    placeholder,
+    colSpan,
+    isMulti,
+    components,
+    closeMenuOnSelect,
+    formatOptionLabel,
+}) => {
     return (
         <div className="ml-1" style={{ gridColumn: `span ${colSpan || 1}` }}>
             <Select
@@ -10,6 +21,10 @@ const SelectComponent = ({ options, value, onChange, onInputChange, placeholder,
                 onChange={onChange}
                 placeholder={placeholder}
                 {...configSelectFillter}
+                isMulti={isMulti ? isMulti : false}
+                components={components}
+                closeMenuOnSelect={closeMenuOnSelect}
+                formatOptionLabel={formatOptionLabel}
             />
         </div>
     );
