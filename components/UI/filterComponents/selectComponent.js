@@ -11,6 +11,8 @@ const SelectComponent = ({
     components,
     closeMenuOnSelect,
     formatOptionLabel,
+    classNamePrefix,
+    classNames,
 }) => {
     return (
         <div className="ml-1" style={{ gridColumn: `span ${colSpan || 1}` }}>
@@ -25,6 +27,8 @@ const SelectComponent = ({
                 components={components}
                 closeMenuOnSelect={closeMenuOnSelect}
                 formatOptionLabel={formatOptionLabel}
+                classNamePrefix={classNamePrefix}
+                classNames={classNames}
             />
         </div>
     );

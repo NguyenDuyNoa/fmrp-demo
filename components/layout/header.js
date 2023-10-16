@@ -247,7 +247,7 @@ const Header = () => {
                 {
                     title: "Điều độ sản xuất",
                     img: "/icon/header/kho/dieudo.png",
-                    link: "#",
+                    link: "/manufacture/productionSmoothing",
                 },
                 {
                     title: "Sản xuất",

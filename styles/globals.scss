@@ -393,6 +393,24 @@ body::-webkit-scrollbar-thumb:hover {
 .react-datepicker-wrapper {
     width: 100% !important;
 }
+
+/// select trong model  Điều độ sản xuất productionSmoothing
+.productionSmoothing__control {
+    border: 1px solid #d8dae5 !important;
+    border-radius: 6px !important;
+}
+.productionSmoothing__indicator-separator {
+    display: none !important;
+}
+.productionSmoothing__indicator svg {
+    width: 15px !important;
+    height: 15px !important;
+}
+.productionSmoothing__placeholder {
+    font-size: 12px !important;
+    color: #6b7280 !important;
+}
+
 .clip-arrow {
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 15% 50%, 0% 0%);
 }
