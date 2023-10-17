@@ -53,8 +53,8 @@ const MainTable = ({
                                         <Image
                                             src={"/productionSmoothing/tick-circle.png"}
                                             alt=""
-                                            width={20}
-                                            height={20}
+                                            width={1920}
+                                            height={1280}
                                             className="object-cover w-full h-full"
                                         />
                                     </div>
@@ -80,13 +80,15 @@ const MainTable = ({
                             >
                                 <div className="p-5">
                                     <div className="grid grid-cols-13 items-center gap-1 justify-center">
-                                        <Image
-                                            src={e.image}
-                                            alt=""
-                                            className="object-cover col-span-3"
-                                            width={44}
-                                            height={44}
-                                        />
+                                        <div className="col-span-3 w-[44px] h-[44px]">
+                                            <Image
+                                                src={e.image}
+                                                alt=""
+                                                className="object-cover  w-full h-full"
+                                                width={150}
+                                                height={150}
+                                            />
+                                        </div>
                                         <div className="col-span-10">
                                             <h3 className="text-[#0F4F9E] text-sm font-semibold my-0.5">{e.name}</h3>
                                             <h3 className="text-[#52575E] text-sm font-normal">{e.desriptions}</h3>
