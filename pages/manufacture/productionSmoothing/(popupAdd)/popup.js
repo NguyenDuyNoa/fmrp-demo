@@ -117,7 +117,11 @@ const PopupAdd = ({ data }) => {
                         </div>
                     </div>
                 </div>
+<<<<<<< HEAD
                 {/* <div className="flex gap-2 items-center">
+=======
+                <div className="flex gap-2 items-center">
+>>>>>>> 5d6beb6219fe5ed3de934d04c075b6aeb0f3b6cf
                     <h2 className="text-[#344054] font-normal">Chọn lệnh sản xuất</h2>
                     <button
                         onClick={() => handleSelectAll()}
@@ -273,7 +277,11 @@ const PopupAdd = ({ data }) => {
                     >
                         {"Thực hiện"}
                     </button>
+<<<<<<< HEAD
                 </div> */}
+=======
+                </div>
+>>>>>>> 5d6beb6219fe5ed3de934d04c075b6aeb0f3b6cf
             </div>
         </PopupEdit>
     );
