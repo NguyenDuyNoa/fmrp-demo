@@ -1,7 +1,8 @@
 import Zoom from "components/UI/zoomElement/zoomElement";
 import Image from "next/image";
+import PopupAdd from "../(popupAdd)/popup";
 
-const Header = ({}) => {
+const Header = ({ data }) => {
     return (
         <>
             <div className="flex items-center justify-between">
@@ -12,24 +13,11 @@ const Header = ({}) => {
                 </div>
                 <div>
                     <Zoom>
-                        <button
-                            type="button"
-                            className="bg-[#0F4F9E] rounded-xl hover:scale-105 transition-all duration-200 ease-linear"
-                        >
-                            <button
-                                type="button"
-                                className="3xl:py-2.5 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 flex items-center gap-2"
-                            >
-                                <h3 className="text-white font-semibold transition-all duration-200 ease-linear text-sm">
-                                    Xuất báo cáo
-                                </h3>
-                            </button>
-                        </button>
+                        <PopupAdd data={data} className="text-left" />
                     </Zoom>
                 </div>
             </div>
             <h1 className="text-lg font-medium text-[#11315B]">Điều độ sản xuất</h1>
-            {/* <ModalFilter isShow={isShow} handleIsShowFilter={handleIsShowFilter} /> */}
         </>
     );
 };

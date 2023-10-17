@@ -410,6 +410,55 @@ body::-webkit-scrollbar-thumb:hover {
     font-size: 12px !important;
     color: #6b7280 !important;
 }
+/// select trong model  Điều độ sản xuất productionSmoothing popup
+
+//nhân viên
+.productionSmoothingPopupStaf__control {
+    border: 1px solid #e1e1e1 !important;
+    border-radius: 9px !important;
+}
+.productionSmoothingPopupStaf__indicator-separator {
+    display: none !important;
+}
+.productionSmoothingPopupStaf__indicator svg {
+    width: 20px !important;
+    height: 20px !important;
+}
+.productionSmoothingPopupStaf__placeholder {
+    font-size: 12px !important;
+    color: #6b7280 !important;
+}
+.productionSmoothingPopupStaf__input-container {
+    padding: 4px !important;
+}
+.productionSmoothingPopupStaf__multi-value {
+    background-color: transparent !important;
+}
+.productionSmoothingPopupStaf__multi-value__remove {
+    left: 0 !important;
+    transform: translate(-150%, 0);
+    background-color: transparent !important;
+}
+.productionSmoothingPopupStaf__multi-value__remove svg {
+    color: #1556d9 !important;
+}
+
+///công đoạn
+.productionSmoothingPopupStages__control {
+    border: 1px solid #e1e1e1 !important;
+    border-radius: 9px !important;
+}
+.productionSmoothingPopupStages__indicator-separator {
+    display: none !important;
+}
+.productionSmoothingPopupStages__indicator svg {
+    width: 20px !important;
+    height: 20px !important;
+}
+.productionSmoothingPopupStages__placeholder {
+    font-size: 12px !important;
+    color: #6b7280 !important;
+}
 
 .clip-arrow {
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 15% 50%, 0% 0%);
