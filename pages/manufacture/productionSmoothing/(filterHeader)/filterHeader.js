@@ -74,16 +74,6 @@ const FilterHeader = () => {
                             Loại thống kê
                         </label>
                         <div className="w-full relative">
-                            {/* <DatePicker
-                                id="start"
-                                calendarClassName="rasta-stripes"
-                                clearButtonClassName="text"
-                                // selected={startDate}
-                                // onChange={(date) => setStartDate(date)}
-                                isClearable
-                                placeholderText="Theo tháng"
-                                className="p-2 placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none border-[#d8dae5] border  rounded-md"
-                            /> */}
                             <DatePicker
                                 // selected={new Date()}
                                 renderMonthContent={renderMonthContent}

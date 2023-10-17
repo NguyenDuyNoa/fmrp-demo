@@ -13,6 +13,11 @@ const SelectComponent = ({
     formatOptionLabel,
     classNamePrefix,
     classNames,
+    maxMenuHeight,
+    isClearable,
+    menuPortalTarget,
+    className,
+    styles,
 }) => {
     return (
         <div className="ml-1" style={{ gridColumn: `span ${colSpan || 1}` }}>
@@ -23,12 +28,16 @@ const SelectComponent = ({
                 onChange={onChange}
                 placeholder={placeholder}
                 {...configSelectFillter}
+                className={className}
                 isMulti={isMulti ? isMulti : false}
                 components={components}
                 closeMenuOnSelect={closeMenuOnSelect}
                 formatOptionLabel={formatOptionLabel}
                 classNamePrefix={classNamePrefix}
-                classNames={classNames}
+                maxMenuHeight={`${maxMenuHeight}`}
+                isClearable={isClearable}
+                menuPortalTarget={menuPortalTarget}
+                styles={styles}
             />
         </div>
     );
