@@ -11,13 +11,15 @@ const Header = ({ data, listStaff }) => {
                     <span className="text-[#141522]/40">/</span>
                     <h6>{"Điều độ sản xuất"}</h6>
                 </div>
+            </div>
+            <div className="flex justify-between items-center">
+                <h1 className="text-2xl font-medium text-[#11315B]">Điều độ sản xuất</h1>
                 <div>
                     <Zoom>
                         <PopupAdd data={data} listStaff={listStaff} className="text-left" />
                     </Zoom>
                 </div>
             </div>
-            <h1 className="text-lg font-medium text-[#11315B]">Điều độ sản xuất</h1>
         </>
     );
 };

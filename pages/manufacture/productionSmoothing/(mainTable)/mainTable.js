@@ -68,7 +68,7 @@ const MainTable = ({
             <div className="flex border border-t-0 !mt-0">
                 <div
                     className="overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 
-                3xl:h-[67vh] border-r xxl:h-[53.4vh] 2xl:h-[59.5vh]  xl:h-[55.5vh] lg:h-[56.5vh] h-[60vh] !m-0  overflow-y-auto min-w-[300px] "
+                3xl:h-[67.7vh] border-r xxl:h-[54.5vh] 2xl:h-[60.4vh]  xl:h-[55.7vh] lg:h-[57.2vh] h-[60vh] !m-0  overflow-y-auto min-w-[300px] "
                 >
                     {data.data.map((e, index) => (
                         <div className={`border-[#E7EAEE] bg-white ${index == 0 ? "" : ""} border-b`}>
@@ -152,7 +152,7 @@ const MainTable = ({
                         ref={container1Ref}
                         onScroll={handleScroll}
                         className="flex flex-col   overflow-x-auto  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 
-                    3xl:h-[67vh] xxl:h-[53.4vh] 2xl:h-[59.5vh] xl:h-[55.5vh] lg:h-[56.5vh] h-[52vh] !m-0  overflow-y-auto"
+                    3xl:h-[67.7vh] xxl:h-[54.5vh] 2xl:h-[60.4vh] xl:h-[55.7vh] lg:h-[57.2vh] h-[52vh] !m-0  overflow-y-auto"
                     >
                         {isOpen &&
                             dataFind?.child.map((ce, ceIndex) => {
