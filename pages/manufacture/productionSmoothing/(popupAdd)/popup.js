@@ -7,7 +7,7 @@ import { v4 as uuid } from "uuid";
 import vi from "date-fns/locale/vi";
 import { components } from "react-select";
 import SelectComponent from "components/UI/filterComponents/selectComponent";
-const PopupAdd = ({ data }) => {
+const PopupAdd = ({ data, listStaff }) => {
     const [isOpenPopup, sIsOpenPopup] = useState(false);
     const initialValue = {
         startDate: null,
@@ -35,6 +35,44 @@ const PopupAdd = ({ data }) => {
         );
     };
     const handleChange = (type) => (event) => sValueChange((e) => ({ ...e, [type]: event }));
+
+    const CustomOption = (props) => (
+        <div className="">
+            <components.Option {...props}>
+                <div className="flex items-center gap-2 cursor-pointer">
+                    <label
+                        className="relative flex items-center cursor-pointer rounded-[4px] p-0.5"
+                        htmlFor={props.value}
+                    >
+                        <input
+                            type="checkbox"
+                            id={props.value}
+                            className="peer relative h-[18px] w-[18px] cursor-pointer appearance-none rounded-[4px] border border-gray-200 transition-all  checked:border-blue-500 checked:bg-blue-500 "
+                            checked={props.isSelected}
+                            // onChange={() => props.selectProps.onChange(props.data)}
+                        />
+                        <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-3 w-3"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                stroke="currentColor"
+                                stroke-width="1"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clip-rule="evenodd"
+                                ></path>
+                            </svg>
+                        </div>
+                    </label>
+                    <h1 className="font-normal text-xs ">{props.label}</h1>
+                </div>
+            </components.Option>
+        </div>
+    );
 
     return (
         <PopupEdit
@@ -64,10 +102,13 @@ const PopupAdd = ({ data }) => {
             // classNameBtn={props?.className}
         >
             <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
-            <div className="space-x-1 3xl:w-[950px] 2xl:w-[600] xl:w-[500px] lg:w-[500px] w-[700px] 3xl:h-auto  2xl:h-auto xl:h-auto lg:h-[400px] h-[500px] ">
+            <div className="space-x-1 3xl:w-[950px]  xxl:w-[650px] 2xl:w-[650px] xl:w-[640px] lg:w-[640px] w-[700px] 3xl:h-auto xxl:h-[480px]  2xl:h-[520px] xl:h-[480px] lg:h-[500px] h-[500px] ">
                 <div className="flex gap-6 items-center my-4">
-                    <div class="w-1/2">
-                        <label htmlFor="start" className="text-sm text-[#344054] font-normal ml-1">
+                    <div class="w-1/2 z-[999]">
+                        <label
+                            htmlFor="start"
+                            className="3xl:text-sm xxl:text-[13px] 2xl:text-xs xl:text-[11px] lg:text-[10px] text-[13px]  text-[#344054] font-normal ml-1"
+                        >
                             Ngày bắt đầu
                         </label>
                         <div className="w-full relative">
@@ -78,6 +119,7 @@ const PopupAdd = ({ data }) => {
                                 // selected={startDate}
                                 onChange={handleChange("startDate")}
                                 isClearable
+                                portalId="menu-time"
                                 placeholderText="Ngày bắt đầu"
                                 className="p-2.5 placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none 
                                     border-[#E1E1E1] focus:border-[#0F4F9E] focus:border-2 border  rounded-[9px]"
@@ -91,8 +133,11 @@ const PopupAdd = ({ data }) => {
                             />
                         </div>
                     </div>
-                    <div class="w-1/2">
-                        <label htmlFor="start" className="text-sm text-[#344054] font-normal ml-1">
+                    <div class="w-1/2 ">
+                        <label
+                            htmlFor="start"
+                            className="3xl:text-sm xxl:text-[13px] 2xl:text-xs xl:text-[11px] lg:text-[10px] text-[13px]  text-[#344054] font-normal ml-1"
+                        >
                             Ngày kết thúc
                         </label>
                         <div className="w-full relative">
@@ -101,11 +146,12 @@ const PopupAdd = ({ data }) => {
                                 calendarClassName="rasta-stripes"
                                 clearButtonClassName="text"
                                 // selected={startDate}
+                                portalId="menu-time"
                                 onChange={handleChange("endDate")}
                                 isClearable
                                 placeholderText="Ngày kết thúc"
                                 className="p-2.5 placeholder:text-[12px] placeholder:text-[#6b7280] text-[14px] w-full outline-none focus:outline-none 
-                                    border-[#E1E1E1] focus:border-[#0F4F9E] focus:border-2 border  rounded-[9px]"
+                                    border-[#E1E1E1] focus:border-[#0F4F9E] focus:border-2 border  rounded-[9px] z-[999]"
                             />
                             <Image
                                 alt=""
@@ -117,12 +163,14 @@ const PopupAdd = ({ data }) => {
                         </div>
                     </div>
                 </div>
-                {/* <div className="flex gap-2 items-center">
-                    <h2 className="text-[#344054] font-normal">Chọn lệnh sản xuất</h2>
+                <div className="flex gap-2 items-center">
+                    <h2 className="text-[#344054] font-normal 3xl:text-sm xxl:text-[13px] 2xl:text-xs xl:text-[11px] lg:text-[10px] text-[13px]">
+                        Chọn lệnh sản xuất
+                    </h2>
                     <button
                         onClick={() => handleSelectAll()}
                         type="button"
-                        className="text-[#3276FA] text-sm font-normal transition-all duration-200 ease-linear hover:text-blue-700"
+                        className="text-[#3276FA] 3xl:text-sm xxl:text-[13px] 2xl:text-xs xl:text-[11px] lg:text-[10px] text-[13px] font-normal transition-all duration-200 ease-linear hover:text-blue-700"
                     >
                         {checkboxes.filter((e) => e.checked).length > 0
                             ? `Bỏ chọn tất cả (${checkboxes.filter((e) => e.checked).length})`
@@ -130,20 +178,40 @@ const PopupAdd = ({ data }) => {
                     </button>
                 </div>
                 <div
-                    className={` flex flex-wrap justify-between ${
-                        checkboxes?.length > 9 ? "max-h-[250px] overflow-y-auto overflow-x-hidden" : ""
-                    } scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 `}
+                    className={` flex flex-wrap justify-between 3xl:max-h-[250px] xxl:max-h-[150px] 2xl:max-h-[190px] xl:max-h-[150px] lg:max-h-[170px] overflow-y-auto overflow-x-hidden
+                   scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 `}
                 >
                     {checkboxes.map((checkbox) => (
-                        <div key={checkbox.id} className="border border-[#D0D5DD] my-3 mx-1 rounded-lg shadow">
+                        <div key={checkbox.id} className="border border-[#D0D5DD] my-3 mx-1 rounded-lg ">
                             <label htmlFor={checkbox.id} className="flex items-center p-2 gap-2 cursor-pointer">
-                                <input
-                                    id={checkbox.id}
-                                    className=""
-                                    type="checkbox"
-                                    checked={checkbox.checked}
-                                    onChange={() => handleCheckboxChange(checkbox.id)}
-                                />
+                                <label
+                                    className="relative flex items-center cursor-pointer rounded-[4px] p-0.5"
+                                    htmlFor={checkbox.id}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        id={checkbox.id}
+                                        className="peer relative h-[18px] w-[18px] cursor-pointer appearance-none rounded-[4px] border border-blue-gray-200 transition-all  checked:border-blue-500 checked:bg-blue-500 "
+                                        checked={checkbox.checked}
+                                        onChange={() => handleCheckboxChange(checkbox.id)}
+                                    />
+                                    <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-3 w-3"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                            stroke="currentColor"
+                                            stroke-width="1"
+                                        >
+                                            <path
+                                                fill-rule="evenodd"
+                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                clip-rule="evenodd"
+                                            ></path>
+                                        </svg>
+                                    </div>
+                                </label>
                                 <div className="grid grid-cols-13 items-center gap-1 justify-center  ">
                                     <Image
                                         src={checkbox.image}
@@ -153,8 +221,12 @@ const PopupAdd = ({ data }) => {
                                         height={44}
                                     />
                                     <div className="col-span-10">
-                                        <h3 className="text-[#0F4F9E] text-sm font-semibold my-0.5">{checkbox.name}</h3>
-                                        <h3 className="text-[#52575E] text-sm font-normal">{checkbox.desriptions}</h3>
+                                        <h3 className="text-[#0F4F9E] 3xl:text-sm xxl:text-[14px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] text-[14px] font-semibold my-0.5">
+                                            {checkbox.name}
+                                        </h3>
+                                        <h3 className="text-[#52575E] 3xl:text-sm xxl:text-[14px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] text-[14px] font-normal">
+                                            {checkbox.desriptions}
+                                        </h3>
                                     </div>
                                 </div>
                             </label>
@@ -162,41 +234,38 @@ const PopupAdd = ({ data }) => {
                     ))}
                 </div>
                 <div className="">
-                    <h2 className="text-[#344054] font-normal my-3">Chọn công đoạn</h2>
+                    <h2 className="text-[#344054] font-normal my-3 3xl:text-sm xxl:text-[13px] 2xl:text-xs xl:text-[11px] lg:text-[10px] text-[13px]">
+                        Chọn công đoạn
+                    </h2>
                     <SelectComponent
                         isMulti={true}
                         closeMenuOnSelect={false}
                         value={valueChange.stages}
                         onChange={handleChange("stages")}
                         options={[
-                            { label: "test1", value: "1" },
-                            { label: "test2", value: "2" },
+                            { label: "Cắt", value: "1" },
+                            { label: "May", value: "2" },
+                            { label: "Thêu", value: "3" },
+                            { label: "In", value: "4" },
+                            { label: "Giat", value: "5" },
+                            { label: "Sấy", value: "6" },
+                            { label: "Khâu", value: "7" },
                         ]}
-                        components={{ MultiValue }}
+                        components={{ MultiValue, Option: CustomOption }}
                         classNamePrefix={"productionSmoothingPopupStages"}
                         placeholder={"Chọn 1 hoặc nhiều công đoạn"}
-                        formatOptionLabel={(option) => (
-                            <div className="flex items-center  justify-between  cursor-pointer">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-fit">
-                                        <div className="">
-                                            <h1 className="font-normal text-xs ">{option.label}</h1>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
                         styles={{
                             multiValue: (base) => ({
                                 ...base,
                                 backgroundColor: "#1760B9", // Đặt màu nền cho giá trị đã chọn,
                                 borderRadius: "4px",
-                                padding: "4px 0px", // Thêm padding 5px
+                                padding: "2px 0px", // Thêm padding 5px
                                 color: "white", // Đặt màu chữ cho giá trị đã chọn
                             }),
                             multiValueLabel: (styles, { data }) => ({
                                 ...styles,
                                 color: "white",
+                                fontSize: "12px",
                             }),
                             multiValueRemove: (styles, { data }) => ({
                                 ...styles,
@@ -212,57 +281,83 @@ const PopupAdd = ({ data }) => {
                                     backgroundColor: isDisabled
                                         ? undefined
                                         : isSelected
-                                        ? "#3A3E4C"
+                                        ? "#1760B9"
                                         : isFocused
                                         ? "white"
                                         : undefined,
                                     cursor: isDisabled ? "not-allowed" : "default",
-                                    color: !isDisabled ? (isSelected ? "white" : "#3A3E4C") : undefined,
+                                    color: !isDisabled ? (isSelected ? "white" : "black") : undefined,
+                                    fontWeight: "500",
                                     ":active": {
                                         ...styles[":active"],
-                                        backgroundColor: !isDisabled ? (isSelected ? "#3A3E4C" : "white") : undefined,
+                                        backgroundColor: !isDisabled ? (isSelected ? "#1760B9" : "white") : undefined,
                                         color: "white",
                                     },
                                 };
                             },
                         }}
+                        maxMenuHeight="120px"
                         className="z-[999]"
                     />
                 </div>
                 <div className="">
-                    <h2 className="text-[#344054] font-normal my-3">Chọn nhân viên</h2>
+                    <h2 className="text-[#344054] font-normal my-3 3xl:text-sm xxl:text-[13px] 2xl:text-xs xl:text-[11px] lg:text-[10px] text-[13px]">
+                        Chọn nhân viên
+                    </h2>
                     <SelectComponent
                         isMulti={true}
                         closeMenuOnSelect={false}
                         value={valueChange.satff}
                         onChange={handleChange("satff")}
-                        options={[{ label: "test", value: "1" }]}
+                        options={listStaff}
                         components={{ MultiValue }}
                         classNamePrefix={"productionSmoothingPopupStaf"}
                         placeholder={"Chọn 1 hoặc nhiều nhân viên"}
                         formatOptionLabel={(option) => (
-                            <div className="flex items-center  justify-between  cursor-pointer">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-fit">
-                                        <div className="text-[#0F4F9E] w-full flex items-center  gap-1 font-medium text-sm py-1 pl-2 pr-10 bg-[#EBF5FF] rounded-2xl ">
-                                            <div className="bg-gradient-to-l from-blue-400/80 to-[#1556D9] text-sm  rounded-full h-[24px]  w-[24px] text-[#FFFFFF] flex items-center justify-center">
-                                                {option.label[0]}
-                                            </div>
-                                            <h1>{option.label}</h1>
-                                        </div>
-                                    </div>
+                            <div className="text-[#0F4F9E] w-fit flex items-center gap-1 py-1 pl-1 pr-8  font-medium text-sm bg-[#EBF5FF] rounded-2xl ">
+                                <div
+                                    style={{
+                                        backgroundImage: `linear-gradient(to left, ${option.bland}, ${option.drak})`,
+                                    }}
+                                    // className="bg-gradient-to-l from-blue-400/80 to-[#1556D9] text-sm  rounded-full h-[20px]  w-[20px] text-[#FFFFFF] flex items-center justify-center">
+                                    className="bg-gradient-to-l from-blue-400/80 to-[#1556D9] text-xs  rounded-full h-[20px]  w-[20px] text-[#FFFFFF] flex items-center justify-center"
+                                >
+                                    {option.label[0]}
                                 </div>
+                                <h1>{option.label}</h1>
                             </div>
                         )}
-                        // maxMenuHeight="200px"
-                        // isClearable={true}
-                        // menuPortalTarget={document.body}
+                        styles={{
+                            multiValue: (base) => ({
+                                ...base,
+                                backgroundColor: "transparent", // Đặt màu nền cho giá trị đã chọn,
+                                borderRadius: "4px",
+                                color: "white", // Đặt màu chữ cho giá trị đã chọn
+                                borderRadius: "12px",
+                            }),
+                            multiValueLabel: (styles, { data }) => ({
+                                ...styles,
+                                color: "white",
+                                padding: "0",
+                            }),
+                            multiValueRemove: (styles, { data }) => ({
+                                ...styles,
+                                color: "#0F4F9E",
+                                left: 0,
+                                transform: "translate(-150%, 0)",
+                                ":hover": {
+                                    backgroundColor: "transparent",
+                                    color: "#0F4F9E",
+                                },
+                            }),
+                        }}
+                        maxMenuHeight="120px"
                     />
                 </div>
                 <div className="text-right mt-5 space-x-2">
                     <button
                         type="button"
-                        // onClick={_ToggleModal.bind(this, false)}
+                        onClick={() => handleOpenPopup(false)}
                         className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD] hover:scale-105 transition-all ease-linear"
                     >
                         {"Hủy"}
@@ -273,7 +368,7 @@ const PopupAdd = ({ data }) => {
                     >
                         {"Thực hiện"}
                     </button>
-                </div> */}
+                </div>
             </div>
         </PopupEdit>
     );

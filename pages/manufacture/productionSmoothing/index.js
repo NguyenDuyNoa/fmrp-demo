@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import Header from "./(header)/header";
 import FilterHeader from "./(filterHeader)/filterHeader";
 import MainTable from "./(mainTable)/mainTable";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { v4 as uuid } from "uuid";
 const Index = (props) => {
     const dataLang = props.dataLang;
@@ -64,14 +64,14 @@ const Index = (props) => {
                                 id: uuid(),
                                 type: "f",
                                 db: [
-                                    { id: uuid(), name: "Thanh VN f" },
-                                    { id: uuid(), name: "Thanh VN f1" },
+                                    { id: uuid(), name: "Khanh VN f" },
+                                    { id: uuid(), name: "Khanh VN f1" },
                                 ],
                             },
-                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
-                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
-                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
-                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Quynh VN g" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Quynh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Hanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Hanh VN b" }] },
                         ],
                     },
                     {
@@ -93,7 +93,71 @@ const Index = (props) => {
                             rank: "T2",
                             days: "30",
                         },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [{ id: uuid(), name: "Thanh VN f" }],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN c" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Khanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Tung VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Manh VN b" }] },
+                            { id: uuid(), type: "d", db: [{ id: uuid(), name: "Thanh VN d" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
                         dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [{ id: uuid(), name: "Thanh VN f" }],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN c" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                            { id: uuid(), type: "d", db: [{ id: uuid(), name: "Thanh VN d" }] },
+                        ],
                     },
                     {
                         date: {
@@ -133,31 +197,27 @@ const Index = (props) => {
                             rank: "T2",
                             days: "30",
                         },
-                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
-                    },
-                    {
-                        date: {
-                            month: "Tháng 10",
-                            rank: "T2",
-                            days: "30",
-                        },
-                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
-                    },
-                    {
-                        date: {
-                            month: "Tháng 10",
-                            rank: "T2",
-                            days: "30",
-                        },
-                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
-                    },
-                    {
-                        date: {
-                            month: "Tháng 10",
-                            rank: "T2",
-                            days: "30",
-                        },
-                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [{ id: uuid(), name: "Thanh VN f" }],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN c" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                            { id: uuid(), type: "d", db: [{ id: uuid(), name: "Thanh VN d" }] },
+                        ],
                     },
                     {
                         date: {
@@ -179,7 +239,7 @@ const Index = (props) => {
             },
             {
                 id: uuid(),
-                name: "LSXCT-112912731",
+                name: "LSXCT-112912732",
                 image: "/productionSmoothing/Image.png",
                 desriptions: "Kính CL dán 11 ly trắng sữa 1",
                 process: [
@@ -210,7 +270,7 @@ const Index = (props) => {
                 ],
                 dateStart: "12/9/2023",
                 dateEnd: "12/9/2023",
-                customer: "Công ty thời trang YODY",
+                customer: "Công ty may",
                 child: [
                     {
                         date: {
@@ -224,7 +284,7 @@ const Index = (props) => {
                                 type: "e",
                                 db: [
                                     { id: uuid(), name: "Thanh VN e" },
-                                    { id: uuid(), name: "Thanh VN e1" },
+                                    { id: uuid(), name: "Thanh VN e" },
                                 ],
                             },
                             {
@@ -232,13 +292,102 @@ const Index = (props) => {
                                 type: "f",
                                 db: [
                                     { id: uuid(), name: "Thanh VN f" },
-                                    { id: uuid(), name: "Thanh VN f1" },
+                                    { id: uuid(), name: "Thanh VN f" },
                                 ],
                             },
                             { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
                             { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
                             { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
                             { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN f" },
+                                    { id: uuid(), name: "Thanh VN f" },
+                                ],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T4",
+                            days: "28",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN f" },
+                                    { id: uuid(), name: "Thanh VN f" },
+                                ],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                            { id: uuid(), type: "i", db: [{ id: uuid(), name: "Huy VN i" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T5",
+                            days: "27",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "a",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN a" },
+                                    { id: uuid(), name: "Thanh VN a" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "b",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN b" },
+                                    { id: uuid(), name: "Thanh VN b" },
+                                ],
+                            },
+                            { id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN c" }] },
+                            { id: uuid(), type: "d", db: [{ id: uuid(), name: "Thanh VN d" }] },
+                            { id: uuid(), type: "e", db: [{ id: uuid(), name: "Thanh VN e" }] },
+                            { id: uuid(), type: "f", db: [{ id: uuid(), name: "Thanh VN f" }] },
+                            { id: uuid(), type: "i", db: [{ id: uuid(), name: "Huy VN i" }] },
                         ],
                     },
                 ],
@@ -358,6 +507,388 @@ const Index = (props) => {
                 id: uuid(),
                 name: "LSXCT-112912731",
                 image: "/productionSmoothing/Image.png",
+                desriptions: "Kính CL dán 11 ly trắng sữa",
+                process: [
+                    {
+                        id: uuid(),
+                        active: true,
+                    },
+                    {
+                        id: uuid(),
+                        active: true,
+                    },
+                    {
+                        id: uuid(),
+                        active: false,
+                    },
+                    {
+                        id: uuid(),
+                        active: true,
+                    },
+                    {
+                        id: uuid(),
+                        active: true,
+                    },
+                    {
+                        id: uuid(),
+                        active: false,
+                    },
+                ],
+                dateStart: "12/9/2023",
+                dateEnd: "12/9/2023",
+                customer: "Công ty thời trang YODY",
+                child: [
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e1" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [
+                                    { id: uuid(), name: "Khanh VN f" },
+                                    { id: uuid(), name: "Khanh VN f1" },
+                                ],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Quynh VN g" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Quynh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Hanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Hanh VN b" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "i", db: [{ id: uuid(), name: "Thanh VN i" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [{ id: uuid(), name: "Thanh VN f" }],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN c" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Khanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Tung VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Manh VN b" }] },
+                            { id: uuid(), type: "d", db: [{ id: uuid(), name: "Thanh VN d" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [{ id: uuid(), name: "Thanh VN f" }],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN c" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                            { id: uuid(), type: "d", db: [{ id: uuid(), name: "Thanh VN d" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [{ id: uuid(), name: "Thanh VN f" }],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN c" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                            { id: uuid(), type: "d", db: [{ id: uuid(), name: "Thanh VN d" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                ],
+            },
+            {
+                id: uuid(),
+                name: "LSXCT-112912732",
+                image: "/productionSmoothing/Image.png",
+                desriptions: "Kính CL dán 11 ly trắng sữa 1",
+                process: [
+                    {
+                        id: uuid(),
+                        active: true,
+                    },
+                    {
+                        id: uuid(),
+                        active: true,
+                    },
+                    {
+                        id: uuid(),
+                        active: false,
+                    },
+                    {
+                        id: uuid(),
+                        active: true,
+                    },
+                    {
+                        id: uuid(),
+                        active: true,
+                    },
+                    {
+                        id: uuid(),
+                        active: false,
+                    },
+                ],
+                dateStart: "12/9/2023",
+                dateEnd: "12/9/2023",
+                customer: "Công ty may",
+                child: [
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN f" },
+                                    { id: uuid(), name: "Thanh VN f" },
+                                ],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN f" },
+                                    { id: uuid(), name: "Thanh VN f" },
+                                ],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T4",
+                            days: "28",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN f" },
+                                    { id: uuid(), name: "Thanh VN f" },
+                                ],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                            { id: uuid(), type: "i", db: [{ id: uuid(), name: "Huy VN i" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T5",
+                            days: "27",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "a",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN a" },
+                                    { id: uuid(), name: "Thanh VN a" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "b",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN b" },
+                                    { id: uuid(), name: "Thanh VN b" },
+                                ],
+                            },
+                            { id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN c" }] },
+                            { id: uuid(), type: "d", db: [{ id: uuid(), name: "Thanh VN d" }] },
+                            { id: uuid(), type: "e", db: [{ id: uuid(), name: "Thanh VN e" }] },
+                            { id: uuid(), type: "f", db: [{ id: uuid(), name: "Thanh VN f" }] },
+                            { id: uuid(), type: "i", db: [{ id: uuid(), name: "Huy VN i" }] },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: uuid(),
+                name: "LSXCT-112912731",
+                image: "/productionSmoothing/Image.png",
                 desriptions: "Kính CL dán 11 ly trắng sữa 2",
                 process: [
                     {
@@ -395,7 +926,28 @@ const Index = (props) => {
                             rank: "T2",
                             days: "30",
                         },
-                        dataChild: [],
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e1" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN f" },
+                                    { id: uuid(), name: "Thanh VN f1" },
+                                ],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                        ],
                     },
                 ],
             },
@@ -448,7 +1000,7 @@ const Index = (props) => {
                 id: uuid(),
                 name: "LSXCT-112912731",
                 image: "/productionSmoothing/Image.png",
-                desriptions: "Kính CL dán 11 ly trắng sữa 2",
+                desriptions: "Kính CL dán 11 ly trắng sữa",
                 process: [
                     {
                         id: uuid(),
@@ -485,7 +1037,344 @@ const Index = (props) => {
                             rank: "T2",
                             days: "30",
                         },
-                        dataChild: [],
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e1" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [
+                                    { id: uuid(), name: "Khanh VN f" },
+                                    { id: uuid(), name: "Khanh VN f1" },
+                                ],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Quynh VN g" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Quynh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Hanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Hanh VN b" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "i", db: [{ id: uuid(), name: "Thanh VN i" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [{ id: uuid(), name: "Thanh VN f" }],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN c" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Khanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Tung VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Manh VN b" }] },
+                            { id: uuid(), type: "d", db: [{ id: uuid(), name: "Thanh VN d" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [{ id: uuid(), name: "Thanh VN f" }],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN c" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                            { id: uuid(), type: "d", db: [{ id: uuid(), name: "Thanh VN d" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [{ id: uuid(), name: "Thanh VN f" }],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN c" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                            { id: uuid(), type: "d", db: [{ id: uuid(), name: "Thanh VN d" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [{ id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN g" }] }],
+                    },
+                ],
+            },
+            {
+                id: uuid(),
+                name: "LSXCT-112912732",
+                image: "/productionSmoothing/Image.png",
+                desriptions: "Kính CL dán 11 ly trắng sữa 1",
+                process: [
+                    {
+                        id: uuid(),
+                        active: true,
+                    },
+                    {
+                        id: uuid(),
+                        active: true,
+                    },
+                    {
+                        id: uuid(),
+                        active: false,
+                    },
+                    {
+                        id: uuid(),
+                        active: true,
+                    },
+                    {
+                        id: uuid(),
+                        active: true,
+                    },
+                    {
+                        id: uuid(),
+                        active: false,
+                    },
+                ],
+                dateStart: "12/9/2023",
+                dateEnd: "12/9/2023",
+                customer: "Công ty may",
+                child: [
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN f" },
+                                    { id: uuid(), name: "Thanh VN f" },
+                                ],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T2",
+                            days: "30",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN f" },
+                                    { id: uuid(), name: "Thanh VN f" },
+                                ],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T4",
+                            days: "28",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN f" },
+                                    { id: uuid(), name: "Thanh VN f" },
+                                ],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                            { id: uuid(), type: "i", db: [{ id: uuid(), name: "Huy VN i" }] },
+                        ],
+                    },
+                    {
+                        date: {
+                            month: "Tháng 10",
+                            rank: "T5",
+                            days: "27",
+                        },
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "a",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN a" },
+                                    { id: uuid(), name: "Thanh VN a" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "b",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN b" },
+                                    { id: uuid(), name: "Thanh VN b" },
+                                ],
+                            },
+                            { id: uuid(), type: "c", db: [{ id: uuid(), name: "Thanh VN c" }] },
+                            { id: uuid(), type: "d", db: [{ id: uuid(), name: "Thanh VN d" }] },
+                            { id: uuid(), type: "e", db: [{ id: uuid(), name: "Thanh VN e" }] },
+                            { id: uuid(), type: "f", db: [{ id: uuid(), name: "Thanh VN f" }] },
+                            { id: uuid(), type: "i", db: [{ id: uuid(), name: "Huy VN i" }] },
+                        ],
                     },
                 ],
             },
@@ -530,187 +1419,28 @@ const Index = (props) => {
                             rank: "T2",
                             days: "30",
                         },
-                        dataChild: [],
-                    },
-                ],
-            },
-            {
-                id: uuid(),
-                name: "LSXCT-112912731",
-                image: "/productionSmoothing/Image.png",
-                desriptions: "Kính CL dán 11 ly trắng sữa 2",
-                process: [
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: false,
-                    },
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: false,
-                    },
-                ],
-                dateStart: "12/9/2023",
-                dateEnd: "12/9/2023",
-                customer: "Công ty thời trang YODY",
-                child: [
-                    {
-                        date: {
-                            month: "Tháng 10",
-                            rank: "T2",
-                            days: "30",
-                        },
-                        dataChild: [],
-                    },
-                ],
-            },
-            {
-                id: uuid(),
-                name: "LSXCT-112912731",
-                image: "/productionSmoothing/Image.png",
-                desriptions: "Kính CL dán 11 ly trắng sữa 2",
-                process: [
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: false,
-                    },
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: false,
-                    },
-                ],
-                dateStart: "12/9/2023",
-                dateEnd: "12/9/2023",
-                customer: "Công ty thời trang YODY",
-                child: [
-                    {
-                        date: {
-                            month: "Tháng 10",
-                            rank: "T2",
-                            days: "30",
-                        },
-                        dataChild: [],
-                    },
-                ],
-            },
-            {
-                id: uuid(),
-                name: "LSXCT-112912731",
-                image: "/productionSmoothing/Image.png",
-                desriptions: "Kính CL dán 11 ly trắng sữa 2",
-                process: [
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: false,
-                    },
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: false,
-                    },
-                ],
-                dateStart: "12/9/2023",
-                dateEnd: "12/9/2023",
-                customer: "Công ty thời trang YODY",
-                child: [
-                    {
-                        date: {
-                            month: "Tháng 10",
-                            rank: "T2",
-                            days: "30",
-                        },
-                        dataChild: [],
-                    },
-                ],
-            },
-            {
-                id: uuid(),
-                name: "LSXCT-112912731",
-                image: "/productionSmoothing/Image.png",
-                desriptions: "Kính CL dán 11 ly trắng sữa 2",
-                process: [
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: false,
-                    },
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: true,
-                    },
-                    {
-                        id: uuid(),
-                        active: false,
-                    },
-                ],
-                dateStart: "12/9/2023",
-                dateEnd: "12/9/2023",
-                customer: "Công ty thời trang YODY",
-                child: [
-                    {
-                        date: {
-                            month: "Tháng 10",
-                            rank: "T2",
-                            days: "30",
-                        },
-                        dataChild: [],
+                        dataChild: [
+                            {
+                                id: uuid(),
+                                type: "e",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN e" },
+                                    { id: uuid(), name: "Thanh VN e1" },
+                                ],
+                            },
+                            {
+                                id: uuid(),
+                                type: "f",
+                                db: [
+                                    { id: uuid(), name: "Thanh VN f" },
+                                    { id: uuid(), name: "Thanh VN f1" },
+                                ],
+                            },
+                            { id: uuid(), type: "g", db: [{ id: uuid(), name: "Thanh VN g" }] },
+                            { id: uuid(), type: "h", db: [{ id: uuid(), name: "Thanh VN h" }] },
+                            { id: uuid(), type: "a", db: [{ id: uuid(), name: "Thanh VN a" }] },
+                            { id: uuid(), type: "b", db: [{ id: uuid(), name: "Thanh VN b" }] },
+                        ],
                     },
                 ],
             },
@@ -850,10 +1580,27 @@ const Index = (props) => {
     const [isLoading, sIsLoading] = useState(false);
     const [idParent, sIdParent] = useState(null);
 
+    const getRandomColors = () => {
+        const colors = [
+            ["#38bdf8", "#0ea5e9"],
+            ["#38bdf8", "#3b82f6"],
+            ["#fb923c", "#ea580c"],
+            ["#d8b4fe", "#a855f7"],
+            ["#c084fc", "#ec4899"],
+            ["#4ade80", "#22c55e"],
+            ["#fb7185", "#f43f5e"],
+            ["#34d399", "#10b981"],
+            ["#facc15", "#eab308"],
+            ["#94a3b8", "#64748b"],
+            ["#e879f9", "#d946ef"],
+        ];
+
+        const randomIndex = Math.floor(Math.random() * colors.length);
+        return colors[randomIndex];
+    };
     ///Tìm theo vị trí công đoạn
     const updateDataChild = (data, idParent) => {
         const dataFind = data.data.find((e) => e.id === idParent);
-
         if (dataFind) {
             const sortedChild = dataFind.child.map((childItem) => {
                 const sortedDataChild = {};
@@ -862,9 +1609,20 @@ const Index = (props) => {
                     sortedDataChild[stage.type] = filteredData.length > 0 ? filteredData : [{ id: uuid() }];
                 });
                 const flattenedDataChild = Object.values(sortedDataChild).flat();
+                const newFlattenedDataChild = flattenedDataChild.map((e) => {
+                    const newDb = e.db?.map((i) => {
+                        const randomColors = getRandomColors();
+                        return {
+                            ...i,
+                            drak: randomColors[1],
+                            bland: randomColors[0],
+                        };
+                    });
+                    return { ...e, db: newDb };
+                });
                 return {
                     ...childItem,
-                    dataChild: flattenedDataChild,
+                    dataChild: newFlattenedDataChild,
                 };
             });
 
@@ -880,14 +1638,42 @@ const Index = (props) => {
     };
     const dataFind = updateDataChild(data, idParent);
 
+    useEffect(() => {
+        // sIdParent(data.data[0].id ? data.data[0].id : null);
+        // sIsOpen(data.data[0].id ? true : false);
+        sIdParent(idParent ? idParent : data.data[0].id ? data.data[0].id : null);
+        sIsOpen(idParent ? true : data.data[0].id ? true : false);
+    }, [idParent, isOpen]);
+    // }, [data]);
+
     const handleShowProgress = (id) => {
-        sIsOpen(!isOpen);
-        sIdParent(id);
-        sIsLoading(true);
-        setTimeout(() => {
-            sIsLoading(false);
-        }, 1000);
+        if (id != idParent) {
+            sIsOpen(!isOpen);
+            sIdParent(id);
+            sIsLoading(true);
+            setTimeout(() => {
+                sIsLoading(false);
+            }, 1000);
+        }
     };
+
+    const initialListStaff = [
+        { label: "Huy Trần", value: "1" },
+        { label: "Nhân viên 2", value: "2" },
+        { label: "Nhân viên 3", value: "3" },
+        { label: "Nhân viên 4", value: "4" },
+        { label: "Nhân viên 5", value: "5" },
+        { label: "Nhân viên 6", value: "6" },
+        { label: "Nhân viên 7", value: "7" },
+    ];
+    const listStaff = initialListStaff.map((e) => {
+        const randomColors = getRandomColors();
+        return {
+            ...e,
+            drak: randomColors[1],
+            bland: randomColors[0],
+        };
+    });
 
     return (
         <>
@@ -895,7 +1681,7 @@ const Index = (props) => {
                 <title>{"Điều độ sản xuất"}</title>
             </Head>
             <div className="relative  3xl:pt-[88px] xxl:pt-[80px] 2xl:pt-[78px] xl:pt-[75px] lg:pt-[70px] pt-70 3xl:px-10 3xl:pb-10 2xl:px-10 2xl:pb-8 xl:px-10 xl:pb-10 lg:px-5 lg:pb-10 space-y-1 overflow-hidden h-screen">
-                {trangthaiExprired ? <div className="p-4"></div> : <Header data={data}></Header>}
+                {trangthaiExprired ? <div className="p-4"></div> : <Header data={data} listStaff={listStaff}></Header>}
                 <FilterHeader />
                 <MainTable
                     data={data}

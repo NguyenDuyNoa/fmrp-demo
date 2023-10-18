@@ -2,7 +2,7 @@ import Zoom from "components/UI/zoomElement/zoomElement";
 import Image from "next/image";
 import PopupAdd from "../(popupAdd)/popup";
 
-const Header = ({ data }) => {
+const Header = ({ data, listStaff }) => {
     return (
         <>
             <div className="flex items-center justify-between">
@@ -13,7 +13,7 @@ const Header = ({ data }) => {
                 </div>
                 <div>
                     <Zoom>
-                        <PopupAdd data={data} className="text-left" />
+                        <PopupAdd data={data} listStaff={listStaff} className="text-left" />
                     </Zoom>
                 </div>
             </div>

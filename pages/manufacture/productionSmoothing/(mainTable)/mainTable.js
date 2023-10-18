@@ -181,7 +181,13 @@ const MainTable = ({
                                                             <div className="m-auto">
                                                                 <div className="w-fit">
                                                                     <div className="text-[#0F4F9E] w-full flex items-center  gap-1 font-medium text-sm py-1 px-2 bg-[#EBF5FF] rounded-2xl my-1">
-                                                                        <div className="bg-gradient-to-l from-blue-400/80 to-[#1556D9] text-sm  rounded-full h-[24px]  w-[24px] text-[#FFFFFF] flex items-center justify-center">
+                                                                        <div
+                                                                            style={{
+                                                                                backgroundImage: `linear-gradient(to left, ${i.bland}, ${i.drak})`,
+                                                                            }}
+                                                                            className=" text-sm  rounded-full h-[24px]  w-[24px] text-[#FFFFFF] flex items-center justify-center"
+                                                                        >
+                                                                            {/* className="bg-gradient-to-l from-blue-400/80 to-[#1556D9] text-sm  rounded-full h-[24px]  w-[24px] text-[#FFFFFF] flex items-center justify-center"> */}
                                                                             {i.name[0]}
                                                                         </div>
                                                                         <h1>{i.name}</h1>
