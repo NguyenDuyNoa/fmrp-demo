@@ -185,9 +185,9 @@ const PopupAdd = ({ data, listStaff }) => {
                     {checkboxes.map((checkbox) => (
                         <Zoom className="w-fit" whileHover={{ scale: 1.01 }} whileTap={{ scale: 1.02 }}>
                             <div key={checkbox.id} className="border border-[#D0D5DD] my-3 mx-1 rounded-lg ">
-                                <label htmlFor={checkbox.id} className="flex items-center p-2 gap-2 cursor-pointer">
+                                <label htmlFor={checkbox.id} className="flex items-center  p-2 gap-2 cursor-pointer">
                                     <label
-                                        className="relative flex items-center cursor-pointer rounded-[4px] p-0.5"
+                                        className="relative flex items-center  cursor-pointer rounded-[4px] p-0.5"
                                         htmlFor={checkbox.id}
                                     >
                                         <input
@@ -223,10 +223,10 @@ const PopupAdd = ({ data, listStaff }) => {
                                             height={44}
                                         />
                                         <div className="col-span-10">
-                                            <h3 className="text-[#0F4F9E] 3xl:text-sm xxl:text-[14px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] text-[14px] font-semibold my-0.5">
+                                            <h3 className="text-[#0F4F9E] text-left 3xl:text-sm xxl:text-[14px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] text-[14px] font-semibold my-0.5">
                                                 {checkbox.name}
                                             </h3>
-                                            <h3 className="text-[#52575E] 3xl:text-sm xxl:text-[14px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] text-[14px] font-normal">
+                                            <h3 className="text-[#52575E] text-left 3xl:text-sm xxl:text-[14px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] text-[14px] font-normal">
                                                 {checkbox.desriptions}
                                             </h3>
                                         </div>
