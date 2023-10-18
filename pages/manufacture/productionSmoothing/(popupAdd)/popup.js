@@ -7,6 +7,7 @@ import { v4 as uuid } from "uuid";
 import vi from "date-fns/locale/vi";
 import { components } from "react-select";
 import SelectComponent from "components/UI/filterComponents/selectComponent";
+import Zoom from "components/UI/zoomElement/zoomElement";
 const PopupAdd = ({ data, listStaff }) => {
     const [isOpenPopup, sIsOpenPopup] = useState(false);
     const initialValue = {
@@ -182,55 +183,57 @@ const PopupAdd = ({ data, listStaff }) => {
                    scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 `}
                 >
                     {checkboxes.map((checkbox) => (
-                        <div key={checkbox.id} className="border border-[#D0D5DD] my-3 mx-1 rounded-lg ">
-                            <label htmlFor={checkbox.id} className="flex items-center p-2 gap-2 cursor-pointer">
-                                <label
-                                    className="relative flex items-center cursor-pointer rounded-[4px] p-0.5"
-                                    htmlFor={checkbox.id}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        id={checkbox.id}
-                                        className="peer relative h-[18px] w-[18px] cursor-pointer appearance-none rounded-[4px] border border-blue-gray-200 transition-all  checked:border-blue-500 checked:bg-blue-500 "
-                                        checked={checkbox.checked}
-                                        onChange={() => handleCheckboxChange(checkbox.id)}
-                                    />
-                                    <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="h-3 w-3"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            stroke="currentColor"
-                                            stroke-width="1"
-                                        >
-                                            <path
-                                                fill-rule="evenodd"
-                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                clip-rule="evenodd"
-                                            ></path>
-                                        </svg>
+                        <Zoom className="w-fit" whileHover={{ scale: 1.01 }} whileTap={{ scale: 1.02 }}>
+                            <div key={checkbox.id} className="border border-[#D0D5DD] my-3 mx-1 rounded-lg ">
+                                <label htmlFor={checkbox.id} className="flex items-center p-2 gap-2 cursor-pointer">
+                                    <label
+                                        className="relative flex items-center cursor-pointer rounded-[4px] p-0.5"
+                                        htmlFor={checkbox.id}
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            id={checkbox.id}
+                                            className="peer relative h-[18px] w-[18px] cursor-pointer appearance-none rounded-[4px] border border-blue-gray-200 transition-all  checked:border-blue-500 checked:bg-blue-500 "
+                                            checked={checkbox.checked}
+                                            onChange={() => handleCheckboxChange(checkbox.id)}
+                                        />
+                                        <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="h-3 w-3"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                                stroke="currentColor"
+                                                stroke-width="1"
+                                            >
+                                                <path
+                                                    fill-rule="evenodd"
+                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                    clip-rule="evenodd"
+                                                ></path>
+                                            </svg>
+                                        </div>
+                                    </label>
+                                    <div className="grid grid-cols-13 items-center gap-1 justify-center  ">
+                                        <Image
+                                            src={checkbox.image}
+                                            alt=""
+                                            className="object-cover col-span-3"
+                                            width={44}
+                                            height={44}
+                                        />
+                                        <div className="col-span-10">
+                                            <h3 className="text-[#0F4F9E] 3xl:text-sm xxl:text-[14px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] text-[14px] font-semibold my-0.5">
+                                                {checkbox.name}
+                                            </h3>
+                                            <h3 className="text-[#52575E] 3xl:text-sm xxl:text-[14px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] text-[14px] font-normal">
+                                                {checkbox.desriptions}
+                                            </h3>
+                                        </div>
                                     </div>
                                 </label>
-                                <div className="grid grid-cols-13 items-center gap-1 justify-center  ">
-                                    <Image
-                                        src={checkbox.image}
-                                        alt=""
-                                        className="object-cover col-span-3"
-                                        width={44}
-                                        height={44}
-                                    />
-                                    <div className="col-span-10">
-                                        <h3 className="text-[#0F4F9E] 3xl:text-sm xxl:text-[14px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] text-[14px] font-semibold my-0.5">
-                                            {checkbox.name}
-                                        </h3>
-                                        <h3 className="text-[#52575E] 3xl:text-sm xxl:text-[14px] 2xl:text-[14px] xl:text-[14px] lg:text-[14px] text-[14px] font-normal">
-                                            {checkbox.desriptions}
-                                        </h3>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
+                            </div>
+                        </Zoom>
                     ))}
                 </div>
                 <div className="">
