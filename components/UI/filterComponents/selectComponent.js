@@ -28,7 +28,7 @@ const SelectComponent = ({
                 onChange={onChange}
                 placeholder={placeholder}
                 {...configSelectFillter}
-                className={className}
+                className={className ? className : configSelectFillter.className}
                 isMulti={isMulti ? isMulti : false}
                 components={components}
                 closeMenuOnSelect={closeMenuOnSelect}
@@ -37,7 +37,7 @@ const SelectComponent = ({
                 maxMenuHeight={`${maxMenuHeight}`}
                 isClearable={isClearable}
                 menuPortalTarget={menuPortalTarget}
-                styles={styles}
+                styles={styles ? styles : configSelectFillter.styles}
             />
         </div>
     );

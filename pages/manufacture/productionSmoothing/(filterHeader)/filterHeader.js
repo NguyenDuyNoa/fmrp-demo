@@ -24,6 +24,7 @@ const FilterHeader = () => {
                         <div className="w-full relative">
                             <DatePicker
                                 id="start"
+                                portalId="menu-time"
                                 calendarClassName="rasta-stripes"
                                 clearButtonClassName="text"
                                 // selected={startDate}
@@ -48,6 +49,7 @@ const FilterHeader = () => {
                         <div className="w-full relative">
                             <DatePicker
                                 id="start"
+                                portalId="menu-time"
                                 calendarClassName="rasta-stripes"
                                 clearButtonClassName="text"
                                 // selected={startDate}
