@@ -1,8 +1,9 @@
-import SelectComponent from "components/UI/filterComponents/selectComponent";
+import dynamic from "next/dynamic";
+const SelectComponent = dynamic(() => import("@/components/UI/filterComponents/selectComponent"), {
+    ssr: false,
+});
 import { ArrowDown2 } from "iconsax-react";
-import { useState } from "react";
 import DatePicker from "react-datepicker";
-import { v4 as uuid } from "uuid";
 import vi from "date-fns/locale/vi"; // Import ngôn ngữ tiếng Việt
 const FilterHeader = () => {
     const renderMonthContent = (month, shortMonth, longMonth) => {
