@@ -2015,13 +2015,13 @@ const BodyGantt = (props) => {
                 <div className={`${isLoading && "border-b"} flex  gap-4 divide-x border-l `}>
                     {timeLine.map((e) => (
                         <div key={e.id} className="">
-                            <div className="text-[#202236] font-semibold text-sm px-1">{e.title}</div>
+                            <div className="text-[#202236] font-semibold text-sm px-1 py-1">{e.title}</div>
                             <div className="flex items-end gap-2 divide-x">
                                 {e.days.map((i, iIndex) => {
                                     const parts = i.day.split(" ");
                                     return (
                                         <div key={i.id} className="flex items-center gap-2 w-[70.5px]">
-                                            <h1 className="text-[#667085] font-light 3xl:text-base text-sm py-0.5 3xl:px-1.5 px-3">
+                                            <h1 className="text-[#667085] font-light 3xl:text-base text-sm  3xl:px-1.5 px-3">
                                                 {parts[0]}
                                             </h1>
                                             {iIndex == e.days.length - 1 ? (
