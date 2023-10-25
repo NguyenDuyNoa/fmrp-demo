@@ -2207,7 +2207,7 @@ const BodyGantt = (props) => {
                                                                             ci.active && ci.outDate
                                                                                 ? "bg-[#5599EC] hover:bg-sky-200"
                                                                                 : ""
-                                                                        } py-2.5 px-1.5  w-[80px] relative my-4 hover:scale-y-110 transition-all duration-200 ease-in-out `}
+                                                                        } py-2.5 px-1.5  w-[80px] relative my-4 transition-all duration-200 ease-in-out `}
                                                                     >
                                                                         <div
                                                                             className={`${
@@ -2215,7 +2215,7 @@ const BodyGantt = (props) => {
                                                                                     ? "bg-[#EE1E1E] hover:bg-red-200"
                                                                                     : ""
                                                                             } 
-                                                                            py-2.5 px-1.5  w-[80px] absolute top-0 left-0 hover:scale-y-110 transition-all duration-200 ease-in-out  `}
+                                                                            py-2.5 px-1.5  w-[80px] absolute top-0 left-0 transition-all duration-200 ease-in-out  `}
                                                                         ></div>
                                                                     </div>
                                                                 }
