@@ -1963,10 +1963,10 @@ const BodyGantt = (props) => {
             }
         });
         sData(updatedData);
-        sIsLoading(true);
-        setTimeout(() => {
-            sIsLoading(false);
-        }, 1000);
+        // sIsLoading(true);
+        // setTimeout(() => {
+        //     sIsLoading(false);
+        // }, 1000);
     };
 
     const container1Ref = useRef();
@@ -2146,7 +2146,7 @@ const BodyGantt = (props) => {
                             {e.show &&
                                 e.listProducts.map((i, iIndex) => (
                                     <div className={`flex items-center w-full divide-x`}>
-                                        <div className="cursor-pointer  px-0.5 w-[35%] py-2 border-b hover:bg-[#BCD0EF]/30 transition-all duration-150 ease-linear">
+                                        <div className="cursor-pointer  px-0.5 w-[35%] py-2 border-b hover:bg-[#BCD0EF]/50 transition-all duration-150 ease-linear">
                                             <div className="grid grid-cols-12 items-center">
                                                 <div className="flex items-center 3xl:gap-2 gap-1 col-span-3">
                                                     <input type="radio" className="" />
