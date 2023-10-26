@@ -2,7 +2,7 @@ import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import Popup from "reactjs-popup";
-const BodyGantt = ({ handleShowSub, handleSort, data, isAscending, timeLine }) => {
+const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending, timeLine }) => {
     const header = [
         { id: uuid(), name: "Đơn hàng" },
         { id: uuid(), name: "Trạng thái" },
@@ -22,6 +22,7 @@ const BodyGantt = ({ handleShowSub, handleSort, data, isAscending, timeLine }) =
         container1Ref.current.scrollTop = e.target.scrollTop;
         container3Ref.current.scrollTop = e.target.scrollTop;
     };
+
     const handleScrollContainer2 = (e) => {
         container1Ref.current.scrollTop = e.target.scrollTop;
         container3Ref.current.scrollTop = e.target.scrollTop;
@@ -165,9 +166,19 @@ const BodyGantt = ({ handleShowSub, handleSort, data, isAscending, timeLine }) =
                                         </div>
                                         {e.show &&
                                             e.listProducts.map((i, iIndex) => (
-                                                <div className="grid grid-cols-12 items-center my-2 ">
+                                                <label
+                                                    key={i.id}
+                                                    htmlFor={i.id}
+                                                    className="cursor-pointer grid grid-cols-12 items-center my-2 "
+                                                >
                                                     <div className="flex items-center 3xl:gap-2 gap-1 col-span-3">
-                                                        <input type="radio" className="" />
+                                                        <input
+                                                            id={i.id}
+                                                            type="radio"
+                                                            className=""
+                                                            checked={i.checked}
+                                                            onChange={() => handleCheked(e.id, i.id)}
+                                                        />
                                                         <Image
                                                             src={i.images}
                                                             width={36}
@@ -201,7 +212,7 @@ const BodyGantt = ({ handleShowSub, handleSort, data, isAscending, timeLine }) =
                                                     <h3 className="text-[#667085] border-b w-fit font-medium 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3 ">
                                                         {i.actions}
                                                     </h3>
-                                                </div>
+                                                </label>
                                             ))}
                                     </div>
                                 </div>

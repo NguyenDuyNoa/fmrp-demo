@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
 import { v4 as uuid } from "uuid";
 import { useState } from "react";
+import { useMemo } from "react";
 
 const Header = dynamic(() => import("./(header)/header"), { ssr: false });
 
@@ -2053,11 +2054,13 @@ const Index = (props) => {
                 });
                 return {
                     ...i,
+
                     days: check,
                 };
             });
             return {
                 ...product,
+                checked: false,
                 processArr: newArrDays,
             };
         });
@@ -2106,6 +2109,25 @@ const Index = (props) => {
         sData(updatedData);
     };
 
+    const handleCheked = useMemo(() => {
+        return (idParent, idChild) => {
+            const updatedData = data.map((e) => {
+                if (e.id === idParent) {
+                    const newListProducts = e.listProducts.map((i) => {
+                        if (i.id === idChild) {
+                            return { ...i, checked: !i.checked };
+                        }
+                        return { ...i, checked: false };
+                    });
+                    return { ...e, listProducts: newListProducts };
+                }
+                return e;
+            });
+
+            sData(updatedData); // Cập nhật trạng thái
+        };
+    }, [data]);
+
     const handleSort = (e) => {
         const updatedData = [...data];
         updatedData.sort((a, b) => {
@@ -2135,6 +2157,7 @@ const Index = (props) => {
                     data={data}
                     timeLine={timeLine}
                     isAscending={isAscending}
+                    handleCheked={handleCheked}
                 />
             </div>
         </>
