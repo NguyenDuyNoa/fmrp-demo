@@ -3,7 +3,7 @@ const url = "/manufacture";
 // Kế hoạch nội bộ
 
 const routerInternalPlan = {
-    home: `${url}/internalPlan`,
-    form: `${url}/internalPlan/form`,
+    home: `${url}/internal_plan`,
+    form: `${url}/internal_plan/form`,
 };
 export { routerInternalPlan };

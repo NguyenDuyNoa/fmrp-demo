@@ -169,7 +169,8 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
                                                 <label
                                                     key={i.id}
                                                     htmlFor={i.id}
-                                                    className="cursor-pointer grid grid-cols-12 items-center my-2 "
+                                                    className={`
+                                                       cursor-pointer grid grid-cols-12 items-center my-2 `}
                                                 >
                                                     <div className="flex items-center 3xl:gap-2 gap-1 col-span-3">
                                                         <input

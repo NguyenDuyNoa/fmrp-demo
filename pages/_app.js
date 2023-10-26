@@ -31,6 +31,7 @@ const Toast = Swal.mixin({
     timer: 2000,
     timerProgressBar: true,
 });
+``;
 
 const Default = (props) => {
     return (

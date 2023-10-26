@@ -76,7 +76,7 @@ const Index = (props) => {
     const _ServerFetching = () => {
         Axios(
             "GET",
-            `/api_web/Api_return_order/return_order/?csrf_protection=true`,
+            `/api_web/api_internal_plan/getInternalPlan?csrf_protection=true`,
             {
                 params: {
                     search: keySearch,
@@ -93,7 +93,7 @@ const Index = (props) => {
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output, rTotal } = response.data;
+                    var { rResult, output, rTotal } = response.data?.data;
                     sListData((e) => ({
                         ...e,
                         data: rResult,
@@ -110,9 +110,10 @@ const Index = (props) => {
     const _ServerFetching_group = async () => {
         await Axios(
             "GET",
-            `/api_web/Api_return_order/filterBar/?csrf_protection=true`,
+            `/api_web/api_internal_plan/getInternalPlan?csrf_protection=true`,
             {
                 params: {
+                    // &branch_id&start_date&end_date&status&search
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
@@ -515,7 +516,7 @@ const Index = (props) => {
                                             </div>
                                         );
                                     })}
-                            </div>
+                            </div> */}
                             <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded-lg grid grid-cols-7 justify-between xl:p-3 p-2">
@@ -797,30 +798,22 @@ const Index = (props) => {
                                 </div>
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lg:w-[100%] ">
-                                        <div className="grid grid-cols-10 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
+                                        <div className="grid grid-cols-8 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                             </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.returnSales_client || "returnSales_client"}
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
+                                                {"Tên kế hoạch"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.import_total_amount || "import_total_amount"}
+                                                {"Người tạo"}
                                             </h4>
+
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.import_tax_money || "import_tax_money"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.import_into_money || "import_into_money"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.returns_form || "returns_form"}
-                                            </h4>
-                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}
+                                                {"Ghi chú"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.import_branch || "import_branch"}
@@ -836,7 +829,7 @@ const Index = (props) => {
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                                     {listData?.data?.map((e) => (
                                                         <div
-                                                            className="relative  grid grid-cols-10 items-center py-1.5  hover:bg-slate-100/40 group"
+                                                            className="relative  grid grid-cols-8 items-center py-1.5  hover:bg-slate-100/40 group"
                                                             key={e.id.toString()}
                                                         >
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
@@ -848,46 +841,56 @@ const Index = (props) => {
                                                                 <PopupDetail
                                                                     dataLang={dataLang}
                                                                     className="text-left"
-                                                                    name={e?.code}
+                                                                    name={e?.reference_no}
                                                                     id={e?.id}
                                                                 />
+                                                            </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-left capitalize">
+                                                                {e.plan_name}
+                                                            </h6>
+                                                            <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
+                                                                <div className="relative">
+                                                                    <ModalImage
+                                                                        small={
+                                                                            e?.created_by_profile_image
+                                                                                ? e?.created_by_profile_image
+                                                                                : "/user-placeholder.jpg"
+                                                                        }
+                                                                        large={
+                                                                            e?.created_by_profile_image
+                                                                                ? e?.created_by_profile_image
+                                                                                : "/user-placeholder.jpg"
+                                                                        }
+                                                                        className="h-6 w-6 rounded-full object-cover "
+                                                                    >
+                                                                        <div className="">
+                                                                            <ImageErrors
+                                                                                src={e?.created_by_profile_image}
+                                                                                width={25}
+                                                                                height={25}
+                                                                                defaultSrc="/user-placeholder.jpg"
+                                                                                alt="Image"
+                                                                                className="object-cover  rounded-[100%] text-left cursor-pointer"
+                                                                            />
+                                                                        </div>
+                                                                    </ModalImage>
+                                                                    <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
+                                                                        <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
+                                                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                                        </span>
+                                                                    </span>
+                                                                </div>
+                                                                <h6 className="capitalize">
+                                                                    {e?.created_by_full_name}
+                                                                </h6>
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
-                                                                {e.client_name}
+                                                                {e.note}
                                                             </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(e.total_price)}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(e.total_tax_price)}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(e.total_amount)}
-                                                            </h6>
-                                                            <h6 className="col-span-1 mx-auto">
-                                                                {(e?.handling_solution === "pay_down" && (
-                                                                    <div className="cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full min-w-auto text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-lime-500 bg-lime-200  border-lime-200  px-2 py-0.5 border  rounded-2xl ml-2">
-                                                                        {dataLang[e?.handling_solution] ||
-                                                                            e?.handling_solution}
-                                                                    </div>
-                                                                )) ||
-                                                                    (e?.handling_solution === "debt_reduction" && (
-                                                                        <div className="cursor-default max-w-[120px] 3xl:w-[120px] 2xl:w-[108px] xl:w-[95px] w-full text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-orange-500 bg-orange-200  border-orange-200 px-2 py-0.5 border   rounded-2xl ml-2">
-                                                                            {dataLang[e?.handling_solution] ||
-                                                                                e?.handling_solution}
-                                                                        </div>
-                                                                    ))}
-                                                            </h6>
-                                                            <h6 className=" 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1">
-                                                                <ButtonWarehouse
-                                                                    warehouseman_id={e?.warehouseman_id}
-                                                                    _HandleChangeInput={_HandleChangeInput}
-                                                                    id={e?.id}
-                                                                />
-                                                            </h6>
+
                                                             <h6 className="col-span-1 w-fit ">
                                                                 <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2">
-                                                                    {e?.branch_name}
+                                                                    {e?.name_branch}
                                                                 </div>
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
@@ -921,7 +924,7 @@ const Index = (props) => {
                                         )}
                                     </div>
                                 </div>
-                            </div> */}
+                            </div>
                         </div>
                         {/* <div className="grid grid-cols-10 bg-gray-100 items-center rounded-md">
                             <div className="col-span-3 p-2 text-center">
@@ -944,7 +947,7 @@ const Index = (props) => {
                                     {formatNumber(total?.total_amount)}
                                 </h3>
                             </div>
-                        </div>
+                        </div> */}
                         {listData.data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6 className="">
@@ -958,7 +961,7 @@ const Index = (props) => {
                                     currentPage={router.query?.page || 1}
                                 />
                             </div>
-                        )} */}
+                        )}
                     </div>
                 </div>
             </div>

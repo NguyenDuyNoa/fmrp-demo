@@ -2117,7 +2117,7 @@ const Index = (props) => {
                         if (i.id === idChild) {
                             return { ...i, checked: !i.checked };
                         }
-                        return { ...i, checked: false };
+                        return i;
                     });
                     return { ...e, listProducts: newListProducts };
                 }

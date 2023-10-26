@@ -232,12 +232,12 @@ const Header = () => {
                 {
                     title: "Kế hoạch nội bộ",
                     img: "/icon/header/kho/kehoach.png",
-                    link: "/manufacture/internalPlan",
+                    link: "/manufacture/internal_plan",
                 },
                 {
                     title: "Kế hoạch sản xuất",
                     img: "/icon/header/kho/kehoach.png",
-                    link: "/manufacture/productionPlan",
+                    link: "/manufacture/production_lan",
                 },
                 {
                     title: "Kế hoạch NVL",
@@ -247,13 +247,13 @@ const Header = () => {
                 {
                     title: "Điều độ sản xuất",
                     img: "/icon/header/kho/dieudo.png",
-                    link: "/manufacture/productionSmoothing",
+                    link: "/manufacture/production_smoothing",
                 },
                 {
                     title: "Sản xuất",
                     img: "/icon/header/kho/sx.png",
                     items: [
-                        { name: "Tổng quan sản xuất", link: "/manufacture/productionOverview" },
+                        { name: "Tổng quan sản xuất", link: "/manufacture/production_overview" },
                         { name: "Lệnh sản xuất tổng" },
                         { name: "Lệnh sản xuất chi tiết" },
                     ],
