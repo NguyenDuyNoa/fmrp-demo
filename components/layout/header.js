@@ -237,7 +237,7 @@ const Header = () => {
                 {
                     title: "Kế hoạch sản xuất",
                     img: "/icon/header/kho/kehoach.png",
-                    link: "/manufacture/production_lan",
+                    link: "/manufacture/production_plan",
                 },
                 {
                     title: "Kế hoạch NVL",
