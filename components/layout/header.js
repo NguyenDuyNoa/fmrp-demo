@@ -242,7 +242,7 @@ const Header = () => {
                 {
                     title: "Kế hoạch NVL",
                     img: "/icon/header/kho/kehoach.png",
-                    link: "#",
+                    link: "/manufacture/materials_planning",
                 },
                 {
                     title: "Điều độ sản xuất",

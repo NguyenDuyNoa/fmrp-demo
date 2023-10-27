@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Header from "./(header)/header";
 import { useSelector } from "react-redux";
-import Main from "./(main)/main";
+import Main from "./(mainTable)/main";
 import { useState } from "react";
 import Image from "next/image";
 import Zoom from "components/UI/zoomElement/zoomElement";
