@@ -153,39 +153,6 @@ const MainTable = () => {
                                     quantityPreventive: "8.000",
                                     quantityTotal: "16.000",
                                 },
-                                {
-                                    id: uddid(),
-                                    image: "/materials_planning/products.png",
-                                    name: "Cổ cáo",
-                                    subName: "COAOTHUN",
-                                    quantity: "8.000",
-                                    quantityPreventive: "8.000",
-                                    quantityTotal: "16.000",
-                                },
-                            ],
-                        },
-                        {
-                            id: uddid(),
-                            title: "PO-223428",
-                            arrListData: [
-                                {
-                                    id: uddid(),
-                                    image: "/materials_planning/products.png",
-                                    name: "Cổ cáo",
-                                    subName: "COAOTHUN",
-                                    quantity: "8.000",
-                                    quantityPreventive: "8.000",
-                                    quantityTotal: "16.000",
-                                },
-                                {
-                                    id: uddid(),
-                                    image: "/materials_planning/products.png",
-                                    name: "Cổ cáo",
-                                    subName: "COAOTHUN",
-                                    quantity: "8.000",
-                                    quantityPreventive: "8.000",
-                                    quantityTotal: "16.000",
-                                },
                             ],
                         },
                     ],
@@ -218,6 +185,7 @@ const MainTable = () => {
             const newListData = i.listData.map((o) => {
                 return {
                     ...o,
+                    showLits: true,
                     showChild: true,
                 };
             });
@@ -233,47 +201,66 @@ const MainTable = () => {
         };
     });
 
-    const [dataTable, sDataTable] = useState(newData);
-    const [findDataTable, sFindDataTable] = useState({});
-    const [filterItem, sFilterItem] = useState({});
+    const [dataTable, sDataTable] = useState({
+        dataBox: newData,
+        dataTables: [],
+    });
     const [isTab, sIsTab] = useState("item");
+    const [isId, sIsId] = useState(null);
 
     const handleFindDataTable = (id) => {
-        // const data = [...dataTable];
-        // sFindDataTable(data.find((e) => e.id == id));
-        // data.forEach((i) => {
-        //     if (i.id === id) {
-        //         i.showParent = i.showParent ? i.showParent : !i.showParent;
-        //     } else {
-        //         i.showParent = false;
-        //     }
-        // });
-        // sDataTable(data);
-    };
-
-    useEffect(() => {
-        handleFindDataTable(dataTable[0].id);
-    }, []);
-
-    const handleActiveTab = (e) => sIsTab(e);
-
-    useEffect(() => {
-        const newrData = findDataTable?.arrDataTab?.find((e) => e.type == isTab);
-        sFilterItem(newrData);
-    }, [findDataTable]);
-
-    // Show mặt hàng table
-    const handShowItem = (id) => {
-        sFilterItem((e) => ({
-            ...e,
-            listData: filterItem.listData.map((e) => {
+        const data = [...dataTable.dataBox];
+        const newData = data.map((e) => {
+            const newArrDataTab = e.arrDataTab.map((i) => {
+                const newListData = i.listData.map((o) => {
+                    return {
+                        ...o,
+                        showLits: e.id === id ? !e.showParent : false,
+                        showChild: true,
+                    };
+                });
+                return {
+                    ...i,
+                    listData: newListData,
+                };
+            });
+            return {
+                ...e,
+                showParent: e.id === id ? !e.showParent : false,
+                arrDataTab: newArrDataTab,
+            };
+        });
+        const newData2 = data.map((e) => {
+            if (e.id == id) {
+                const newArrDataTab = e.arrDataTab.map((i) => {
+                    const newListData = i.listData.map((o) => {
+                        return {
+                            ...o,
+                            showLits: !e.showParent,
+                            showChild: true,
+                        };
+                    });
+                    return {
+                        ...i,
+                        listData: newListData,
+                    };
+                });
                 return {
                     ...e,
-                    showChild: e.id == id ? !e.showChild : e.showChild,
+                    showParent: !e.showParent,
+                    arrDataTab: newArrDataTab,
                 };
-            }),
-        }));
+            }
+        });
+        const dataFind = newData2
+            .find((e) => (e.id = id))
+            .arrDataTab.map((e) => e.listData)
+            .flat();
+        sDataTable((e) => ({ ...e, dataBox: newData, dataTables: dataFind }));
     };
+
+    const handleActiveTab = (e) => sIsTab(e);
+    console.log("dataTable?.dataTables", dataTable?.dataTables);
     return (
         <React.Fragment>
             <div className="!mt-[14px]">
@@ -294,14 +281,14 @@ const MainTable = () => {
                             </form>
                         </div>
                         <div>
-                            {dataTable.map((e, eIndex) => (
+                            {dataTable.dataBox.map((e, eIndex) => (
                                 <div
                                     key={e.id}
                                     onClick={() => handleFindDataTable(e.id)}
                                     className={`p-2 ${
                                         e.showParent && "bg-[#F0F7FF]"
                                     } hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${
-                                        dataTable.length - 1 == eIndex ? "border-b-none" : "border-b"
+                                        dataTable.dataBox.length - 1 == eIndex ? "border-b-none" : "border-b"
                                     } `}
                                 >
                                     <div className="flex justify-between">
@@ -364,7 +351,7 @@ const MainTable = () => {
                             <div>
                                 <h1 className="text-[#52575E] font-normal text-xs uppercase">Kế hoạch NVL</h1>
                                 <h1 className="text-[#3276FA] font-medium text-[20px] uppercase">
-                                    {findDataTable?.title}
+                                    {"findDataTable?.title"}
                                 </h1>
                             </div>
                             <div className="flex gap-4">
@@ -430,57 +417,60 @@ const MainTable = () => {
                                         </div>
                                     </React.Fragment>
                                 )}
+
                                 {["item"].includes(isTab) &&
-                                    filterItem?.listData?.map((e) => (
+                                    dataTable?.dataTables?.map((e, index) => (
                                         <>
-                                            <div className="grid grid-cols-10 items-center ">
-                                                <div
-                                                    onClick={() => handShowItem(e.id)}
-                                                    className="col-span-10 bg-[#EEF4FD] flex items-center gap-0.5 my-1 rounded cursor-pointer"
-                                                >
-                                                    <Image
-                                                        src={"/materials_planning/dow.png"}
-                                                        width={14}
-                                                        height={17}
-                                                        className={`object-cover ${
-                                                            e.showChild ? "" : "-rotate-90"
-                                                        } transition-all duration-150 ease-linear`}
-                                                    />
-                                                    <h1 className="text-[#52575E] font-semibold text-sm py-2">
-                                                        {e.title}
-                                                    </h1>
+                                            {e.showLits && (
+                                                <div className="grid grid-cols-10 items-center ">
+                                                    <div
+                                                        onClick={() => handShowItem(e.id)}
+                                                        className="col-span-10 bg-[#EEF4FD] flex items-center gap-0.5 my-1 rounded"
+                                                    >
+                                                        <Image
+                                                            src={"/materials_planning/dow.png"}
+                                                            width={14}
+                                                            height={17}
+                                                            className={`object-cover ${
+                                                                e.showChild ? "" : "-rotate-90"
+                                                            } transition-all duration-150 ease-linear`}
+                                                        />
+                                                        <h1 className="text-[#52575E] font-semibold text-sm py-2">
+                                                            {e.title}
+                                                        </h1>
+                                                    </div>
+                                                    {e.showChild &&
+                                                        e.arrListData.map((i) => (
+                                                            <div className="grid grid-cols-10 items-center col-span-10">
+                                                                <h4 className="col-span-4 text-[#344054] font-normal text-xs flex items-center py-2 px-4 gap-2">
+                                                                    <Image
+                                                                        src={i.image}
+                                                                        width={36}
+                                                                        height={36}
+                                                                        className="object-cover rounded"
+                                                                    />
+                                                                    <div className="flex flex-col gap-0.5">
+                                                                        <h1 className="text-[#000000] font-semibold text-sm">
+                                                                            {i.name}
+                                                                        </h1>
+                                                                        <h1 className="text-[#9295A4] font-normal text-[10px]">
+                                                                            {i.subName}
+                                                                        </h1>
+                                                                    </div>
+                                                                </h4>
+                                                                <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
+                                                                    {i.quantity}
+                                                                </h4>
+                                                                <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
+                                                                    {i.quantityPreventive}
+                                                                </h4>
+                                                                <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
+                                                                    {i.quantityTotal}
+                                                                </h4>
+                                                            </div>
+                                                        ))}
                                                 </div>
-                                                {e.showChild &&
-                                                    e.arrListData.map((i) => (
-                                                        <div className="grid grid-cols-10 items-center col-span-10">
-                                                            <h4 className="col-span-4 text-[#344054] font-normal text-xs flex items-center py-2 px-4 gap-2">
-                                                                <Image
-                                                                    src={i.image}
-                                                                    width={36}
-                                                                    height={36}
-                                                                    className="object-cover rounded"
-                                                                />
-                                                                <div className="flex flex-col gap-0.5">
-                                                                    <h1 className="text-[#000000] font-semibold text-sm">
-                                                                        {i.name}
-                                                                    </h1>
-                                                                    <h1 className="text-[#9295A4] font-normal text-[10px]">
-                                                                        {i.subName}
-                                                                    </h1>
-                                                                </div>
-                                                            </h4>
-                                                            <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
-                                                                {i.quantity}
-                                                            </h4>
-                                                            <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
-                                                                {i.quantityPreventive}
-                                                            </h4>
-                                                            <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
-                                                                {i.quantityTotal}
-                                                            </h4>
-                                                        </div>
-                                                    ))}
-                                            </div>
+                                            )}
                                         </>
                                     ))}
                             </div>
