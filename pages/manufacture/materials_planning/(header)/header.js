@@ -15,43 +15,23 @@ const Header = ({}) => {
             </div>
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-medium text-[#11315B]">Kế hoạch nguyên vật liệu</h1>
-                <div className="flex items-center gap-4">
-                    <div>
-                        <Zoom>
-                            <button
-                                type="button"
-                                className="bg-[#0F4F9E] rounded-md hover:scale-105 transition-all duration-200 ease-linear 3xl:py-2.5 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 flex items-center gap-2"
-                            >
-                                <Image
-                                    src={"/productionPlan/Icon.png"}
-                                    width={16}
-                                    height={16}
-                                    className="object-cover"
-                                />
-                                <h3 className="text-white font-medium transition-all duration-200 ease-linear text-sm">
-                                    Lập kế hoạch NVL
-                                </h3>
-                            </button>
-                        </Zoom>
-                    </div>
-                    <div>
-                        <Zoom>
-                            <button
-                                type="button"
-                                className="bg-white border-[#D0D5DD] border rounded-md hover:scale-105 transition-all duration-200 ease-linear 3xl:py-2.5 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 flex items-center gap-2"
-                            >
-                                <Image
-                                    src={"/productionPlan/Icondow.png"}
-                                    width={16}
-                                    height={16}
-                                    className="object-cover"
-                                />
-                                <h3 className="text-[#141522] font-medium transition-all duration-200 ease-linear text-sm">
-                                    Xuất báo cáo
-                                </h3>
-                            </button>
-                        </Zoom>
-                    </div>
+                <div>
+                    <Zoom>
+                        <button
+                            type="button"
+                            className="bg-white border-[#D0D5DD] border rounded-md hover:scale-105 transition-all duration-200 ease-linear 3xl:py-2.5 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 flex items-center gap-2"
+                        >
+                            <Image
+                                src={"/productionPlan/Icondow.png"}
+                                width={16}
+                                height={16}
+                                className="object-cover"
+                            />
+                            <h3 className="text-[#141522] font-medium transition-all duration-200 ease-linear text-sm">
+                                Xuất báo cáo
+                            </h3>
+                        </button>
+                    </Zoom>
                 </div>
             </div>
         </>

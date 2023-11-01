@@ -1,10 +1,11 @@
 import Head from "next/head";
 import dynamic from "next/dynamic";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
 import { v4 as uuid } from "uuid";
 import { useState } from "react";
 import { useMemo } from "react";
+import { useEffect } from "react";
 
 const Header = dynamic(() => import("./(header)/header"), { ssr: false });
 
@@ -15,6 +16,7 @@ const BodyGantt = dynamic(() => import("./(gantt)"), { ssr: false });
 const Index = (props) => {
     const dataLang = props.dataLang;
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
+
     const propss = {
         dataLang,
     };
@@ -2123,10 +2125,14 @@ const Index = (props) => {
                 }
                 return e;
             });
-
-            sData(updatedData); // Cập nhật trạng thái
+            localStorage.setItem("arrData", JSON.stringify(updatedData));
+            sData(updatedData);
         };
     }, [data]);
+
+    useEffect(() => {
+        localStorage.removeItem("arrData");
+    }, []);
 
     const handleSort = (e) => {
         const updatedData = [...data];
@@ -2141,6 +2147,8 @@ const Index = (props) => {
         sData(updatedData);
         sIsAscending(!isAscending); // Đảo ngược trạng thái sắp xếp
     };
+
+    
 
     return (
         <>

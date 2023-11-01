@@ -1,10 +1,27 @@
-import Zoom from "@/components/UI/zoomElement/zoomElement";
-import { SearchNormal1 } from "iconsax-react";
 import Image from "next/image";
-import React, { useEffect } from "react";
-import { useState } from "react";
+import Swal from "sweetalert2";
+import dynamic from "next/dynamic";
 import { v4 as uddid } from "uuid";
-const MainTable = () => {
+import { SearchNormal1 } from "iconsax-react";
+import React, { useEffect, useState } from "react";
+import Zoom from "@/components/UI/zoomElement/zoomElement";
+import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+
+const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
+
+const TabItem = dynamic(() => import("./tabItem"), {
+    ssr: false,
+});
+
+const TabPlan = dynamic(() => import("./tabPlan"), {
+    ssr: false,
+});
+
+const TabKeepStock = dynamic(() => import("./tabKeepStock"), {
+    ssr: false,
+});
+
+const MainTable = ({ dataLang }) => {
     const arrButton = [
         {
             id: uddid(),
@@ -101,9 +118,451 @@ const MainTable = () => {
                         },
                     ],
                 },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [
+                        {
+                            id: uddid(),
+                            type: "materials",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exchange: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "materials",
+                            name: "Kính dán gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exchange: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "materials",
+                            name: "Kính dán gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exchange: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "materials",
+                            name: "Kính dán gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exchange: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "materials",
+                            name: "Kính dán gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exchange: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+
+                        {
+                            id: uddid(),
+                            type: "materials",
+                            name: "Kính dán gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exchange: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "materials",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exchange: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "materials",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exchange: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                    ],
+                },
+                {
+                    id: uddid(),
+                    type: "keepStock",
+                    listData: [
+                        {
+                            id: uddid(),
+                            title: "YCMH-121203122",
+                            time: "13/10/2023 09:23:00",
+                            user: "Tuyet Admin",
+                            arrListData: [
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: false, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: false, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                            ],
+                        },
+                        {
+                            id: uddid(),
+                            title: "YCMH-121203122",
+                            time: "13/10/2023 09:23:00",
+                            user: "Tuyet Admin",
+                            arrListData: [
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: false, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                            ],
+                        },
+                        {
+                            id: uddid(),
+                            title: "YCMH-121203122",
+                            time: "13/10/2023 09:23:00",
+                            user: "Tuyet Admin",
+                            arrListData: [
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: false, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [
+                        {
+                            id: uddid(),
+                            type: "materials",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exchange: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Gương",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                    ],
+                },
             ],
             note: "",
         },
+
         {
             id: uddid(),
             title: "KHNVL-20132223",
@@ -162,6 +621,33 @@ const MainTable = () => {
                                     quantityPreventive: "8.000",
                                     quantityTotal: "16.000",
                                 },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/products.png",
+                                    name: "Cổ cáo",
+                                    subName: "COAOTHUN",
+                                    quantity: "8.000",
+                                    quantityPreventive: "8.000",
+                                    quantityTotal: "16.000",
+                                },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/products.png",
+                                    name: "Cổ cáo",
+                                    subName: "COAOTHUN",
+                                    quantity: "8.000",
+                                    quantityPreventive: "8.000",
+                                    quantityTotal: "16.000",
+                                },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/products.png",
+                                    name: "Cổ cáo",
+                                    subName: "COAOTHUN",
+                                    quantity: "8.000",
+                                    quantityPreventive: "8.000",
+                                    quantityTotal: "16.000",
+                                },
                             ],
                         },
                         {
@@ -189,6 +675,651 @@ const MainTable = () => {
                             ],
                         },
                     ],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [
+                        {
+                            id: uddid(),
+                            type: "materials",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exchange: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        {
+                            id: uddid(),
+                            type: "semiProducts",
+                            name: "Kính",
+                            image: "/materials_planning/kinh.png",
+                            unit: "Cái",
+                            use: "1",
+                            exist: "1",
+                            lack: "1",
+                        },
+                        // {
+                        //     id: uddid(),
+                        //     type: "materials",
+                        //     materials: [
+                        //         {
+                        //             id: uddid(),
+                        //             type: "materials",
+                        //             name: "Kính",
+                        //             unit: "Cái",
+                        //             use: "1",
+                        //             exchange: "1",
+                        //             exist: "1",
+                        //             lack: "1",
+                        //         },
+                        //     ],
+                        // },
+                        // {
+                        //     id: uddid(),
+                        //     type: "semiProducts",
+                        //     semiProducts: [
+                        //         {
+                        //             id: uddid(),
+                        //             type: "semiProducts",
+                        //             name: "Kính",
+                        //             unit: "Cái",
+                        //             use: "1",
+                        //             exist: "1",
+                        //             lack: "1",
+                        //         },
+                        //     ],
+                        // },
+                    ],
+                },
+                {
+                    id: uddid(),
+                    type: "keepStock",
+                    listData: [
+                        {
+                            id: uddid(),
+                            title: "YCMH-121203122",
+                            time: "13/10/2023 09:23:00",
+                            user: "Tuyet Admin",
+                            arrListData: [
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                            ],
+                        },
+                        {
+                            id: uddid(),
+                            title: "YCMH-121203122",
+                            time: "13/10/2023 09:23:00",
+                            user: "Tuyet Admin",
+                            arrListData: [
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                            ],
+                        },
+                        {
+                            id: uddid(),
+                            title: "YCMH-121203122",
+                            time: "13/10/2023 09:23:00",
+                            user: "Tuyet Admin",
+                            arrListData: [
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                                {
+                                    id: uddid(),
+                                    image: "/materials_planning/kinh.png",
+                                    name: "Phần thân (Upper)",
+                                    quantity: "4",
+                                    unit: "Cái",
+                                    processBar: [
+                                        { id: uddid(), active: true, title: "Đặt hàng", quantity: 200 },
+                                        { id: uddid(), active: true, title: "Nhập hàng", quantity: 200 },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+            note: "",
+        },
+        {
+            id: uddid(),
+            title: "KHNVL-20132224",
+            time: "13/10/2023 09:23:00",
+            name: "PhuongPTM",
+            productionOrder: [
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+            ],
+            followUp: [
+                {
+                    id: uddid(),
+                    nameFollow: "SO-121203122",
+                    typeFollow: "Đơn hàng",
+                },
+            ],
+            arrDataTab: [
+                {
+                    id: uddid(),
+                    type: "item",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "keepStock",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+            ],
+            note: "",
+        },
+        {
+            id: uddid(),
+            title: "KHNVL-20132225",
+            time: "13/10/2023 09:23:00",
+            name: "PhuongPTM",
+            productionOrder: [
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+            ],
+            followUp: [
+                {
+                    id: uddid(),
+                    nameFollow: "SO-121203122",
+                    typeFollow: "Đơn hàng",
+                },
+            ],
+            arrDataTab: [
+                {
+                    id: uddid(),
+                    type: "item",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "keepStock",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+            ],
+            note: "",
+        },
+        {
+            id: uddid(),
+            title: "KHNVL-20132226",
+            time: "13/10/2023 09:23:00",
+            name: "PhuongPTM",
+            productionOrder: [
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+            ],
+            followUp: [
+                {
+                    id: uddid(),
+                    nameFollow: "SO-121203122",
+                    typeFollow: "Đơn hàng",
+                },
+            ],
+            arrDataTab: [
+                {
+                    id: uddid(),
+                    type: "item",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "keepStock",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+            ],
+            note: "",
+        },
+        {
+            id: uddid(),
+            title: "KHNVL-20132227",
+            time: "13/10/2023 09:23:00",
+            name: "PhuongPTM",
+            productionOrder: [
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+            ],
+            followUp: [
+                {
+                    id: uddid(),
+                    nameFollow: "SO-121203122",
+                    typeFollow: "Đơn hàng",
+                },
+            ],
+            arrDataTab: [
+                {
+                    id: uddid(),
+                    type: "item",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "keepStock",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+            ],
+            note: "",
+        },
+        {
+            id: uddid(),
+            title: "KHNVL-20132228",
+            time: "13/10/2023 09:23:00",
+            name: "PhuongPTM",
+            productionOrder: [
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+            ],
+            followUp: [
+                {
+                    id: uddid(),
+                    nameFollow: "SO-121203122",
+                    typeFollow: "Đơn hàng",
+                },
+            ],
+            arrDataTab: [
+                {
+                    id: uddid(),
+                    type: "item",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "keepStock",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+            ],
+            note: "",
+        },
+        {
+            id: uddid(),
+            title: "KHNVL-20132229",
+            time: "13/10/2023 09:23:00",
+            name: "PhuongPTM",
+            productionOrder: [
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+            ],
+            followUp: [
+                {
+                    id: uddid(),
+                    nameFollow: "SO-121203122",
+                    typeFollow: "Đơn hàng",
+                },
+            ],
+            arrDataTab: [
+                {
+                    id: uddid(),
+                    type: "item",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "keepStock",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+            ],
+            note: "",
+        },
+        {
+            id: uddid(),
+            title: "KHNVL-20132230",
+            time: "13/10/2023 09:23:00",
+            name: "PhuongPTM",
+            productionOrder: [
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+            ],
+            followUp: [
+                {
+                    id: uddid(),
+                    nameFollow: "SO-121203122",
+                    typeFollow: "Đơn hàng",
+                },
+            ],
+            arrDataTab: [
+                {
+                    id: uddid(),
+                    type: "item",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "keepStock",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+            ],
+            note: "",
+        },
+        {
+            id: uddid(),
+            title: "KHNVL-20132231",
+            time: "13/10/2023 09:23:00",
+            name: "PhuongPTM",
+            productionOrder: [
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+                {
+                    id: uddid(),
+                    nameProduction: "LSX-514684654",
+                },
+            ],
+            followUp: [
+                {
+                    id: uddid(),
+                    nameFollow: "SO-121203122",
+                    typeFollow: "Đơn hàng",
+                },
+            ],
+            arrDataTab: [
+                {
+                    id: uddid(),
+                    type: "item",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "keepStock",
+                    listData: [],
+                },
+                {
+                    id: uddid(),
+                    type: "plan",
+                    listData: [],
                 },
             ],
             note: "",
@@ -218,6 +1349,7 @@ const MainTable = () => {
             const newListData = i.listData.map((o) => {
                 return {
                     ...o,
+                    showList: true,
                     showChild: true,
                 };
             });
@@ -237,32 +1369,100 @@ const MainTable = () => {
     const [findDataTable, sFindDataTable] = useState({});
     const [filterItem, sFilterItem] = useState({});
     const [isTab, sIsTab] = useState("item");
+    const [isFetching, sIsFetChing] = useState(false);
+
+    const updateListData = (listData, showList) => {
+        return listData.map((o) => ({
+            ...o,
+            showList: showList,
+            showChild: true,
+        }));
+    };
+
+    const updateArrDataTab = (arrDataTab, showParent) => {
+        return arrDataTab.map((i) => ({
+            ...i,
+            listData: updateListData(i.listData, showParent),
+        }));
+    };
 
     const handleFindDataTable = (id) => {
-        // const data = [...dataTable];
-        // sFindDataTable(data.find((e) => e.id == id));
-        // data.forEach((i) => {
-        //     if (i.id === id) {
-        //         i.showParent = i.showParent ? i.showParent : !i.showParent;
-        //     } else {
-        //         i.showParent = false;
-        //     }
-        // });
-        // sDataTable(data);
+        const updatedData = dataTable.map((e) => {
+            const showParent = e.id === id ? !e.showParent : false;
+            return {
+                ...e,
+                showParent: showParent,
+                arrDataTab: updateArrDataTab(e.arrDataTab, showParent),
+            };
+        });
+        fetchingData();
+        sFindDataTable(updatedData.find((e) => e.id === id));
+        sDataTable(updatedData);
     };
 
     useEffect(() => {
         handleFindDataTable(dataTable[0].id);
     }, []);
 
-    const handleActiveTab = (e) => sIsTab(e);
+    // const handleFindDataTable = (id) => {
+    //     let data = dataTable;
+    //     data.forEach((i) => {
+    //         if (i.id === id) {
+    //             i.showParent = !i.showParent;
+    //             i.arrDataTab.forEach((tab) => {
+    //                 tab.listData.forEach((item) => {
+    //                     item.showList = i.showParent;
+    //                 });
+    //             });
+    //         } else {
+    //             i.showParent = false;
+    //         }
+    //     });
+    //     sFindDataTable({ ...data.find((e) => e.id == id) });
+    //     sDataTable([...data]);
+    // };
+
+    // useEffect(() => {
+    //     const newData = dataTable.map((e, index) => {
+    //         const newArrDataTab = e.arrDataTab.map((i) => {
+    //             const newListData = i.listData.map((o) => {
+    //                 return {
+    //                     ...o,
+    //                     showList: index == 0,
+    //                     showChild: true,
+    //                 };
+    //             });
+    //             return {
+    //                 ...i,
+    //                 listData: newListData,
+    //             };
+    //         });
+    //         return {
+    //             ...e,
+    //             showParent: index == 0,
+    //             arrDataTab: newArrDataTab,
+    //         };
+    //     });
+    //     sFindDataTable(newData.find((e) => e.id == newData[0].id));
+    //     sDataTable(newData);
+    // }, []);
 
     useEffect(() => {
-        const newrData = findDataTable?.arrDataTab?.find((e) => e.type == isTab);
-        sFilterItem(newrData);
-    }, [findDataTable]);
+        sFilterItem(findDataTable?.arrDataTab?.find((e) => e.type == isTab));
+    }, [findDataTable, isTab]);
 
-    // Show mặt hàng table
+    const handleActiveTab = (e) => {
+        sIsTab(e);
+        fetchingData();
+    };
+
+    const fetchingData = () => {
+        sIsFetChing(true);
+        setTimeout(() => {
+            sIsFetChing(false);
+        }, 1500);
+    };
+
     const handShowItem = (id) => {
         sFilterItem((e) => ({
             ...e,
@@ -274,6 +1474,29 @@ const MainTable = () => {
             }),
         }));
     };
+
+    const handDeleteItem = (id) => {
+        Swal.fire({
+            title: `Xóa kế hoạch NVL`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#296dc1",
+            cancelButtonColor: "#d33",
+            confirmButtonText: `${dataLang?.aler_yes}`,
+            cancelButtonText: `${dataLang?.aler_cancel}`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                sFilterItem((e) => ({
+                    ...e,
+                    listData: filterItem.listData.filter((e) => e.id != id),
+                }));
+                ToatstNotifi("success", "Xóa kế hoạch NVL thành công");
+            }
+        });
+    };
+
+    const shareProps = { filterItem, handShowItem, handDeleteItem, isFetching };
+
     return (
         <React.Fragment>
             <div className="!mt-[14px]">
@@ -293,52 +1516,68 @@ const MainTable = () => {
                                 />
                             </form>
                         </div>
-                        <div>
+                        <ScrollArea
+                            className="3xl:h-[65vh] xxl:h-[52vh] 2xl:h-[56.5vh] xl:h-[52.5vh] lg:h-[55vh] h-[35vh] overflow-y-auto  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 "
+                            speed={1}
+                            smoothScrolling={true}
+                        >
                             {dataTable.map((e, eIndex) => (
                                 <div
                                     key={e.id}
                                     onClick={() => handleFindDataTable(e.id)}
-                                    className={`p-2 ${
+                                    className={`py-2 pl-2 pr-3 ${
                                         e.showParent && "bg-[#F0F7FF]"
                                     } hover:bg-[#F0F7FF] cursor-pointer transition-all ease-linear ${
                                         dataTable.length - 1 == eIndex ? "border-b-none" : "border-b"
                                     } `}
                                 >
                                     <div className="flex justify-between">
-                                        <h1 className="text-base font-medium text-[#0F4F9E]">{e.title}</h1>
-                                        <div className="flex flex-col items-end my-1">
-                                            <h3 className="text-[#667085] font-normal text-xs">
+                                        <h1 className="3xl:text-base xxl:text-base 2xl:text-sm xl:text-xs lg:text-xs text-sm font-medium text-[#0F4F9E]">
+                                            {e.title}
+                                        </h1>
+                                        <div className="flex flex-col items-end 3xl:my-1 xxl:my-1 2xl:my-1 xl:my-0 my-0">
+                                            <h3 className="text-[#667085] font-normal 3xl:text-xs text-[11px]">
                                                 Tạo vào{" "}
-                                                <span className="text-[#141522] font-medium text-xs">{e.time}</span>
+                                                <span className="text-[#141522] font-medium 3xl:text-xs text-[11px]">
+                                                    {e.time}
+                                                </span>
                                             </h3>
-                                            <h3 className="text-[#667085] font-normal text-xs">
-                                                bởi <span className="text-[#141522] font-medium text-xs">{e.name}</span>
+                                            <h3 className="text-[#667085] font-normal 3xl:text-xs text-[11px]">
+                                                bởi{" "}
+                                                <span className="text-[#141522] font-medium 3xl:text-xs text-[11px]">
+                                                    {e.name}
+                                                </span>
                                             </h3>
                                         </div>
                                     </div>
                                     {e.showParent && (
                                         <div className="flex flex-col gap-2">
                                             <div className="flex">
-                                                <h3 className="w-[30%] text-[#52575E] font-normal text-sm">
+                                                <h3 className="w-[30%] text-[#52575E] font-normal 3xl:text-sm text-xs">
                                                     Số lệnh sản xuất
                                                 </h3>
                                                 <div className="flex flex-col w-[70%]">
                                                     {e.productionOrder.map((i) => (
-                                                        <h2 className="text-[#191D23] font-medium text-sm">
+                                                        <h2
+                                                            key={i.id}
+                                                            className="text-[#191D23] font-medium 3xl:text-sm text-xs"
+                                                        >
                                                             {i.nameProduction}
                                                         </h2>
                                                     ))}
                                                 </div>
                                             </div>
                                             <div className="flex">
-                                                <h3 className="w-[30%] text-[#52575E] font-normal text-sm">Lập theo</h3>
+                                                <h3 className="w-[30%] text-[#52575E] font-normal 3xl:text-sm text-xs">
+                                                    Lập theo
+                                                </h3>
                                                 <div className="flex flex-col w-[70%]">
                                                     {e.followUp.map((i) => (
-                                                        <React.Fragment>
-                                                            <h2 className="text-[#191D23] font-medium text-sm">
+                                                        <React.Fragment key={i.id}>
+                                                            <h2 className="text-[#191D23] font-medium 3xl:text-sm text-xs">
                                                                 {i.nameFollow}
                                                             </h2>
-                                                            <h2 className="text-[#9295A4] font-normal text-sm">
+                                                            <h2 className="text-[#9295A4] font-normal 3xl:text-sm text-xs">
                                                                 {i.typeFollow}
                                                             </h2>
                                                         </React.Fragment>
@@ -346,9 +1585,11 @@ const MainTable = () => {
                                                 </div>
                                             </div>
                                             <div className="flex">
-                                                <h3 className="w-[30%] text-[#52575E] font-normal text-sm">Ghi chú</h3>
+                                                <h3 className="w-[30%] text-[#52575E] font-normal 3xl:text-sm text-xs">
+                                                    Ghi chú
+                                                </h3>
                                                 <div className="flex flex-col w-[70%]">
-                                                    <h2 className="text-[#191D23] font-medium text-sm">
+                                                    <h2 className="text-[#191D23] font-medium 3xl:text-sm text-xs">
                                                         {e.note ? e.note : "Không có ghi chú"}
                                                     </h2>
                                                 </div>
@@ -357,13 +1598,13 @@ const MainTable = () => {
                                     )}
                                 </div>
                             ))}
-                        </div>
+                        </ScrollArea>
                     </div>
                     <div className="w-[75%] border border-[#d8dae5] ">
                         <div className="flex items-center justify-between py-1 px-4 border-b">
                             <div>
                                 <h1 className="text-[#52575E] font-normal text-xs uppercase">Kế hoạch NVL</h1>
-                                <h1 className="text-[#3276FA] font-medium text-[20px] uppercase">
+                                <h1 className="text-[#3276FA] font-medium 3xl:text-[20px] text-[16px] uppercase">
                                     {findDataTable?.title}
                                 </h1>
                             </div>
@@ -376,7 +1617,9 @@ const MainTable = () => {
                                         >
                                             <div className="flex items-center gap-2 py-2 px-3 ">
                                                 <Image height={16} width={16} src={e.icon} className="object-cover" />
-                                                <h3 className="text-[#141522] font-medium text-base">{e.name}</h3>
+                                                <h3 className="text-[#141522] font-medium 3xl:text-base text-xs">
+                                                    {e.name}
+                                                </h3>
                                             </div>
                                         </button>
                                     </Zoom>
@@ -397,7 +1640,7 @@ const MainTable = () => {
                                             <h3
                                                 className={`py-[10px] px-2  font-normal ${
                                                     isTab == e.type ? "text-[#0F4F9E]" : "text-[#667085]"
-                                                } text-base group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}
+                                                } 3xl:text-base text-sm group-hover:text-[#0F4F9E] transition-all duration-200 ease-linear`}
                                             >
                                                 {e.name}
                                             </h3>
@@ -406,83 +1649,9 @@ const MainTable = () => {
                                 </div>
                             </div>
                             <div>
-                                {isTab == "item" && (
-                                    <React.Fragment>
-                                        <h1 className="text-[#11315B] font-normal text-lg">
-                                            Danh sách sản phẩm (theo đơn hàng)
-                                        </h1>
-
-                                        <div className="my-4">
-                                            <div className="grid grid-cols-10 my-4">
-                                                <h4 className="col-span-4 px-4 text-[#344054] font-normal text-xs uppercase">
-                                                    Đơn hàng
-                                                </h4>
-                                                <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
-                                                    Số lượng
-                                                </h4>
-                                                <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
-                                                    Số lượng dự phòng
-                                                </h4>
-                                                <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
-                                                    Tổng số lượng
-                                                </h4>
-                                            </div>
-                                        </div>
-                                    </React.Fragment>
-                                )}
-                                {["item"].includes(isTab) &&
-                                    filterItem?.listData?.map((e) => (
-                                        <>
-                                            <div className="grid grid-cols-10 items-center ">
-                                                <div
-                                                    onClick={() => handShowItem(e.id)}
-                                                    className="col-span-10 bg-[#EEF4FD] flex items-center gap-0.5 my-1 rounded cursor-pointer"
-                                                >
-                                                    <Image
-                                                        src={"/materials_planning/dow.png"}
-                                                        width={14}
-                                                        height={17}
-                                                        className={`object-cover ${
-                                                            e.showChild ? "" : "-rotate-90"
-                                                        } transition-all duration-150 ease-linear`}
-                                                    />
-                                                    <h1 className="text-[#52575E] font-semibold text-sm py-2">
-                                                        {e.title}
-                                                    </h1>
-                                                </div>
-                                                {e.showChild &&
-                                                    e.arrListData.map((i) => (
-                                                        <div className="grid grid-cols-10 items-center col-span-10">
-                                                            <h4 className="col-span-4 text-[#344054] font-normal text-xs flex items-center py-2 px-4 gap-2">
-                                                                <Image
-                                                                    src={i.image}
-                                                                    width={36}
-                                                                    height={36}
-                                                                    className="object-cover rounded"
-                                                                />
-                                                                <div className="flex flex-col gap-0.5">
-                                                                    <h1 className="text-[#000000] font-semibold text-sm">
-                                                                        {i.name}
-                                                                    </h1>
-                                                                    <h1 className="text-[#9295A4] font-normal text-[10px]">
-                                                                        {i.subName}
-                                                                    </h1>
-                                                                </div>
-                                                            </h4>
-                                                            <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
-                                                                {i.quantity}
-                                                            </h4>
-                                                            <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
-                                                                {i.quantityPreventive}
-                                                            </h4>
-                                                            <h4 className="col-span-2 text-center text-[#344054] font-normal text-xs uppercase">
-                                                                {i.quantityTotal}
-                                                            </h4>
-                                                        </div>
-                                                    ))}
-                                            </div>
-                                        </>
-                                    ))}
+                                {isTab == "item" && <TabItem {...shareProps} />}
+                                {isTab == "plan" && <TabPlan {...shareProps} />}
+                                {isTab == "keepStock" && <TabKeepStock {...shareProps} />}
                             </div>
                         </div>
                     </div>

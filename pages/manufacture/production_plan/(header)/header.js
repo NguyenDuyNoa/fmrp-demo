@@ -1,9 +1,9 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
-const Zoom = dynamic(() => import("@/components/UI/zoomElement/zoomElement"), {
-    ssr: false,
-});
+import { useRouter } from "next/router";
+const Zoom = dynamic(() => import("@/components/UI/zoomElement/zoomElement"), { ssr: false });
 const Header = ({ data, listStaff }) => {
+    const router = useRouter();
     return (
         <>
             <div className="flex items-center justify-between">
@@ -20,6 +20,7 @@ const Header = ({ data, listStaff }) => {
                         <Zoom>
                             <button
                                 type="button"
+                                onClick={() => router.push("/manufacture/production_plan/form")}
                                 className="bg-[#0F4F9E] rounded-md hover:scale-105 transition-all duration-200 ease-linear 3xl:py-2.5 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 flex items-center gap-2"
                             >
                                 <Image

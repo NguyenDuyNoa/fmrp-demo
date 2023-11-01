@@ -18,6 +18,7 @@ const SelectComponent = ({
     menuPortalTarget,
     className,
     styles,
+    noOptionsMessage,
 }) => {
     return (
         <div className="ml-1" style={{ gridColumn: `span ${colSpan || 1}` }}>
@@ -31,6 +32,7 @@ const SelectComponent = ({
                 className={className ? className : configSelectFillter.className}
                 isMulti={isMulti ? isMulti : false}
                 components={components}
+                noOptionsMessage={noOptionsMessage ? noOptionsMessage : configSelectFillter.noOptionsMessage}
                 closeMenuOnSelect={closeMenuOnSelect}
                 formatOptionLabel={formatOptionLabel}
                 classNamePrefix={classNamePrefix}
