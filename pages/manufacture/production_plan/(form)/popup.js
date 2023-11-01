@@ -191,3 +191,18 @@
 //     );
 // };
 // export default PopupEditer;
+
+import Image from "next/image";
+import { useState } from "react";
+import { v4 as uuid } from "uuid";
+import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
+import Zoom from "@/components/UI/zoomElement/zoomElement";
+import TransitionMotion from "@/components/UI/transition/motionTransition";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+const PopupEditer = ({ isLoading }) => {
+    const [isOpenPopup, sIsOpenPopup] = useState(false);
+    const handleOpenPopup = (e) => sIsOpenPopup(e);
+    return <>hi</>;
+};
+export default PopupEditer;
