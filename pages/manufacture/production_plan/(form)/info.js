@@ -24,10 +24,7 @@ const InFo = ({ data, handleRemoveBtn }) => {
             <div className="bg-[#ECF0F4] font text-[#141522] font-medium 3xl:text-sm text-xs p-3 rounded">
                 Thông tin
             </div>
-            <div
-                className="grid grid-cols-12 items-center 3xl:gap-x-6 3xl:gap-y-6 xxl:gap-y-0 xxl:gap-x-6
-             2xl:gap-y-1 2xl:gap-x-5 xl:gap-y-1 xl:gap-x-5 lg:gap-2 gap-2"
-            >
+            <div className="grid grid-cols-12 items-center 3xl:gap-x-6 3xl:gap-y-6 xxl:gap-y-0 xxl:gap-x-6  2xl:gap-y-1 2xl:gap-x-5 xl:gap-y-1 xl:gap-x-5 lg:gap-2 gap-2">
                 <div className="flex flex-col col-span-6">
                     <label htmlFor="" className="text-[#344054] font-normal 3xl:text-sm text-xs">
                         Số kế hoạch NVL <span className="text-red-500 3xl:text-sm text-xs">*</span>
