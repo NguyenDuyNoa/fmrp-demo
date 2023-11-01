@@ -1,13 +1,14 @@
 import { data } from "autoprefixer";
 import Image from "next/image";
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Datepicker from "react-tailwindcss-datepicker";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import TransitionMotion from "@/components/UI/transition/motionTransition";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-import ScrollArea from "react-scrollbar";
+const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 const InFo = ({ data, handleRemoveBtn }) => {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
