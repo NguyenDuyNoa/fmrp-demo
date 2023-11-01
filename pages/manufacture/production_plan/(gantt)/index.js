@@ -1,7 +1,7 @@
 import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import Popup from "reactjs-popup";
+import React, { useEffect, useRef, useState } from "react";
 import TransitionMotion from "@/components/UI/transition/motionTransition";
 
 const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending, timeLine }) => {
@@ -173,7 +173,7 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
                                                         key={i.id}
                                                         htmlFor={i.id}
                                                         className={`
-                                                       cursor-pointer grid grid-cols-12 items-center my-2 `}
+                                                       cursor-pointer grid grid-cols-12 items-center my-2`}
                                                     >
                                                         <div className="flex items-center 3xl:gap-2 gap-1 col-span-3">
                                                             {/* <input

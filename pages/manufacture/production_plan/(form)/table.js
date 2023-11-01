@@ -61,7 +61,7 @@ const Table = ({ data, isLoading, handleRemoveItem }) => {
                     </h3>
                 </div>
             </div>
-            <div className="3xl:h-[36vh] xxl:h-[24vh] 2xl:h-[30vh] xl:h-[23vh] lg:h-[20vh] h-[30vh] overflow-y-auto overflow-hidden  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 ">
+            <div className="3xl:h-[34vh] xxl:h-[24vh] 2xl:h-[26vh] xl:h-[22vh] lg:h-[22vh] h-[30vh] overflow-y-auto overflow-hidden  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 ">
                 {isLoading ? (
                     <Loading className="h-80" color="#0f4f9e" />
                 ) : dataNew?.length > 0 ? (

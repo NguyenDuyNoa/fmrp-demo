@@ -21,10 +21,7 @@ const FormAdd = (props) => {
 
     /// Check điều kiện và lọc listProducts có check == true
     useEffect(() => {
-        sIsLoading(true);
-        setTimeout(() => {
-            sIsLoading(false);
-        }, 1000);
+        checkLoading();
         if (dataLocals?.length < 1) {
             backPage();
         } else {
@@ -95,6 +92,13 @@ const FormAdd = (props) => {
         sData(data);
         sIsCheckRemove(true);
         ToatstNotifi("success", "Xóa đơn hàng thành công");
+    };
+
+    const checkLoading = () => {
+        sIsLoading(true);
+        setTimeout(() => {
+            sIsLoading(false);
+        }, 1000);
     };
 
     ///Khi data thay đổi nếu < 1 thì trở về trang trước

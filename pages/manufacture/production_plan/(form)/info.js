@@ -7,7 +7,7 @@ import Datepicker from "react-tailwindcss-datepicker";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import TransitionMotion from "@/components/UI/transition/motionTransition";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-
+import ScrollArea from "react-scrollbar";
 const InFo = ({ data, handleRemoveBtn }) => {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
@@ -82,7 +82,6 @@ const InFo = ({ data, handleRemoveBtn }) => {
                             clearButtonClassName="text"
                             // selected={startDate}
                             monthsShown={2}
-                            locale="pt-BR"
                             showTimeSelect
                             timeFormat="p"
                             timeIntervals={15}
@@ -247,33 +246,39 @@ const InFo = ({ data, handleRemoveBtn }) => {
                     </div>
                 </div>
                 <div className="col-span-6 ">
-                    <TransitionMotion>
-                        <div className="flex items-start justify-start gap-4 flex-wrap">
-                            {data?.map((e) => (
-                                <Zoom className="w-fit h-full">
-                                    <button
-                                        key={e.id}
-                                        onClick={() => handleRemoveBtn(e.id)}
-                                        type="button"
-                                        className="bg-[#F3F4F6] h-full rounded-lg outline-none focus:outline-none 3xl:py-2 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 "
-                                    >
-                                        <div className="flex items-center gap-[10px]">
-                                            <span className="text-[#141522] font-normal 3xl:text-base text-sm">
-                                                {e.nameOrder}
-                                            </span>
-                                            <Image
-                                                alt=""
-                                                src={"/productionPlan/x.png"}
-                                                width={16}
-                                                height={16}
-                                                className="object-cover"
-                                            />
-                                        </div>
-                                    </button>
-                                </Zoom>
-                            ))}
-                        </div>
-                    </TransitionMotion>
+                    <ScrollArea
+                        className="3xl:h-[10.5vh] xxl:h-[8vh] 2xl:h-[12vh] xl:h-[10vh] lg:h-[9vh] h-[10vh] overflow-y-auto overflow-hidden  scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 "
+                        speed={1}
+                        smoothScrolling={true}
+                    >
+                        <TransitionMotion>
+                            <div className="flex items-start justify-start gap-x-4 gap-y-2 flex-wrap">
+                                {data?.map((e) => (
+                                    <Zoom className="w-fit h-full">
+                                        <button
+                                            key={e.id}
+                                            onClick={() => handleRemoveBtn(e.id)}
+                                            type="button"
+                                            className="bg-[#F3F4F6] h-full rounded-lg outline-none focus:outline-none 3xl:py-2 xxl:py-2 2xl:py-2 xl:py-1 lg:py-1 py-3  px-4 "
+                                        >
+                                            <div className="flex items-center gap-[10px]">
+                                                <span className="text-[#141522] font-normal 3xl:text-base text-sm">
+                                                    {e.nameOrder}
+                                                </span>
+                                                <Image
+                                                    alt=""
+                                                    src={"/productionPlan/x.png"}
+                                                    width={16}
+                                                    height={16}
+                                                    className="object-cover"
+                                                />
+                                            </div>
+                                        </button>
+                                    </Zoom>
+                                ))}
+                            </div>
+                        </TransitionMotion>
+                    </ScrollArea>
                 </div>
             </div>
         </>

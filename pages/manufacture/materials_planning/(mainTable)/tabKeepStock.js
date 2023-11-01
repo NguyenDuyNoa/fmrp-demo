@@ -152,7 +152,7 @@ const TabKeepStock = ({ filterItem, handShowItem, handDeleteItem, isFetching }) 
                                                                                                 j.active
                                                                                                     ? "bg-[#00C170]"
                                                                                                     : "bg-gray-500"
-                                                                                            } w-2 h-2 rounded-full`}
+                                                                                            } w-[10px] h-[10px] rounded-full`}
                                                                                         />
                                                                                     )}
                                                                                     <div
@@ -160,7 +160,7 @@ const TabKeepStock = ({ filterItem, handShowItem, handDeleteItem, isFetching }) 
                                                                                             j.active
                                                                                                 ? "bg-[#00C170]"
                                                                                                 : "bg-gray-500"
-                                                                                        } 3xl:w-[187px] xxl:w-[120px] 2xl:w-[137px] xl:w-[105px] lg:w-[75px] w-[120px] h-[1px]`}
+                                                                                        } 3xl:w-[167px] xxl:w-[110px] 2xl:w-[127px] xl:w-[100px] lg:w-[65px] w-[110px] h-[2px]`}
                                                                                     />
                                                                                     {index ===
                                                                                         i.processBar.length - 1 && (
@@ -169,7 +169,7 @@ const TabKeepStock = ({ filterItem, handShowItem, handDeleteItem, isFetching }) 
                                                                                                 j.active
                                                                                                     ? "bg-[#00C170]"
                                                                                                     : "bg-gray-500"
-                                                                                            } w-2 h-2 rounded-full`}
+                                                                                            } w-[10px] h-[10px] rounded-full`}
                                                                                         />
                                                                                     )}
                                                                                 </div>

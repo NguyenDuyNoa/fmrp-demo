@@ -19,6 +19,7 @@ const SelectComponent = ({
     className,
     styles,
     noOptionsMessage,
+    menuShouldBlockScroll,
 }) => {
     return (
         <div className="ml-1" style={{ gridColumn: `span ${colSpan || 1}` }}>
@@ -39,6 +40,7 @@ const SelectComponent = ({
                 maxMenuHeight={`${maxMenuHeight}`}
                 isClearable={isClearable}
                 menuPortalTarget={menuPortalTarget}
+                menuShouldBlockScroll={menuShouldBlockScroll}
                 styles={styles ? styles : configSelectFillter.styles}
             />
         </div>
