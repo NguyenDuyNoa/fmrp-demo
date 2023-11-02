@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
-
 import {
     Grid6 as IconExcel,
     Filter as IconFilter,
@@ -15,33 +14,17 @@ import {
     TickCircle,
 } from "iconsax-react";
 
-import { BiEdit } from "react-icons/bi";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { VscFilePdf } from "react-icons/vsc";
-
-import Select from "react-select";
-import "react-datepicker/dist/react-datepicker.css";
-import Datepicker from "react-tailwindcss-datepicker";
-import DatePicker, { registerLocale } from "react-datepicker";
-import Popup from "reactjs-popup";
 import moment from "moment/moment";
-import vi from "date-fns/locale/vi";
-registerLocale("vi", vi);
 
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-
 import PopupEdit from "/components/UI/popup";
 import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
-import Pagination from "/components/UI/pagination";
-
 import Swal from "sweetalert2";
-
 import ReactExport from "react-data-export";
 import { useEffect } from "react";
-
 import ExpandableContent from "components/UI/more";
 import ImageErrors from "components/UI/imageErrors";
 
@@ -54,7 +37,6 @@ const Toast = Swal.mixin({
 });
 
 const PopupDetail = (props) => {
-    const scrollAreaRef = useRef(null);
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
     const [data, sData] = useState();
@@ -76,12 +58,13 @@ const PopupDetail = (props) => {
     const _ServerFetching_detailOrder = () => {
         Axios(
             "GET",
-            `/api_web/Api_return_order/return_order/${props?.id}?csrf_protection=true`,
+            `/api_web/api_internal_plan/detailInternalPlan/${props?.id}?csrf_protection=true`,
             {},
             (err, response) => {
                 if (!err) {
-                    var db = response.data;
-                    sData(db);
+                    let { data } = response?.data;
+                    console.log("db", data);
+                    sData(data);
                 }
                 sOnFetching(false);
             }
@@ -111,7 +94,7 @@ const PopupDetail = (props) => {
     return (
         <>
             <PopupEdit
-                title={props.dataLang?.returnSales_detail || "returnSales_detail"}
+                title={props.dataLang?.internal_plan_detail || "internal_plan_detail"}
                 button={props?.name}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
@@ -119,21 +102,23 @@ const PopupDetail = (props) => {
                 classNameBtn={props?.className}
             >
                 <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
-                <div className=" space-x-5 3xl:w-[1200px] 2xl:w-[1150px] w-[1100px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">
+                <div className=" space-x-5 3xl:w-[1000px] 2xl:w-[900px] w-[900px] 3xl:h-auto  2xl:h-auto xl:h-[540px] h-[500px] ">
                     <div>
-                        <div className="3xl:w-[1200px] 2xl:w-[1150px] w-[1100px]">
+                        <div className="3xl:w-[1000px] 2xl:w-[900px] w-[900px]">
                             <div className="min:h-[170px] h-[72%] max:h-[100px]  customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                 <h2 className="font-medium bg-[#ECF0F4] p-2 text-[13px]">
                                     {props.dataLang?.import_detail_info || "import_detail_info"}
                                 </h2>
-                                <div className="grid grid-cols-9  min-h-[100px] px-2 items-center bg-zinc-50">
+                                <div className="grid grid-cols-9  min-h-[70px] px-2  bg-zinc-50">
                                     <div className="col-span-3">
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
                                                 {props.dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h3>
                                             <h3 className=" text-[13px]  font-medium">
-                                                {data?.date != null ? moment(data?.date).format("DD/MM/YYYY") : ""}
+                                                {data?.internalPlans?.date != null
+                                                    ? moment(data?.internalPlans?.date).format("DD/MM/YYYY")
+                                                    : ""}
                                             </h3>
                                         </div>
                                         <div className="grid grid-cols-2 col-span-2 items-center">
@@ -145,7 +130,7 @@ const PopupDetail = (props) => {
                                                 <div className="flex items-center gap-2">
                                                     <div className="relative">
                                                         <ImageErrors
-                                                            src={data?.staff_create?.profile_image}
+                                                            src={data?.internalPlans?.created_by_profile_image}
                                                             width={25}
                                                             height={25}
                                                             defaultSrc="/user-placeholder.jpg"
@@ -158,161 +143,90 @@ const PopupDetail = (props) => {
                                                             </span>
                                                         </span>
                                                     </div>
-                                                    <h6 className="capitalize">{data?.staff_create?.full_name}</h6>
+                                                    <h6 className="capitalize">
+                                                        {data?.internalPlans?.created_by_full_name}
+                                                    </h6>
                                                 </div>
-                                            </div>{" "}
-                                        </div>
-                                        <div className="my-2 font-medium grid grid-cols-2">
-                                            <h3 className=" text-[13px] ">
-                                                {props.dataLang?.import_code_vouchers || "import_code_vouchers"}
-                                            </h3>
-                                            <h3 className=" text-[13px]  font-medium text-blue-600 capitalize">
-                                                {data?.code}
-                                            </h3>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="col-span-3">
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang?.returns_form || "returns_form"}
+                                                {props.dataLang?.import_code_vouchers || "import_code_vouchers"}
                                             </h3>
-                                            <div className="flex flex-wrap  gap-2 items-center">
-                                                {(data?.handling_solution === "pay_down" && (
-                                                    <div className="cursor-default min-w-[135px] min-w-auto text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-lime-500 bg-lime-200  border-lime-200  px-2 py-1 border  rounded-2xl">
-                                                        {props.dataLang[data?.handling_solution] ||
-                                                            data?.handling_solution}
-                                                    </div>
-                                                )) ||
-                                                    (data?.handling_solution === "debt_reduction" && (
-                                                        <div className="cursor-default min-w-[135px] text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] font-medium text-orange-500 bg-orange-200  border-orange-200 px-2 py-1 border   rounded-2xl">
-                                                            {props.dataLang[data?.handling_solution] ||
-                                                                data?.handling_solution}
-                                                        </div>
-                                                    ))}
-                                            </div>
+                                            <h3 className=" text-[13px]  font-medium text-blue-600 capitalize">
+                                                {data?.internalPlans?.reference_no}
+                                            </h3>
                                         </div>
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className=" text-[13px] ">
-                                                {props.dataLang?.import_from_browse || "import_from_browse"}
+                                                {props.dataLang?.internal_plan_name || "internal_plan_name"}
                                             </h3>
-                                            <div className="flex flex-wrap  gap-2 items-center ">
-                                                {(data?.warehouseman_id === "0" && (
-                                                    <div className=" font-medium text-[#3b82f6]  rounded-2xl py-1 px-2 min-w-[135px]  bg-[#bfdbfe] text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px]">
-                                                        {"Chưa duyệt kho"}
-                                                    </div>
-                                                )) ||
-                                                    (data?.warehouseman_id != "0" && (
-                                                        <div className=" font-medium gap-1  text-lime-500   rounded-2xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center 3xl:text-[11px] 2xl:text-[10px] xl:text-[8px] text-[7px] flex items-center justify-center">
-                                                            <TickCircle
-                                                                className="bg-lime-500 rounded-full animate-pulse "
-                                                                color="white"
-                                                                size={15}
-                                                            />
-                                                            <span>Đã duyệt kho</span>
-                                                        </div>
-                                                    ))}
-                                            </div>
+                                            <h3 className=" text-[13px]  font-medium capitalize">
+                                                {data?.internalPlans?.plan_name}
+                                            </h3>
                                         </div>
                                     </div>
                                     <div className="col-span-3 ">
                                         <div className="my-2 font-medium grid grid-cols-2">
                                             <h3 className="text-[13px]">
-                                                {props.dataLang?.returnSales_client || "returnSales_client"}
-                                            </h3>
-                                            <h3 className="text-[13px] font-medium capitalize">{data?.client_name}</h3>
-                                        </div>
-
-                                        <div className="my-2 font-medium grid grid-cols-2">
-                                            <h3 className="text-[13px]">
                                                 {props.dataLang?.import_branch || "import_branch"}
                                             </h3>
                                             <h3 className="3xl:items-center 3xl-text-[16px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase w-fit">
-                                                {data?.branch_name}
+                                                {data?.internalPlans?.name_branch}
                                             </h3>
                                         </div>
+                                        <div className="my-2 font-medium grid grid-cols-2"></div>
                                     </div>
                                 </div>
                                 <div className=" w-[100%]">
-                                    {/* <div className={`${dataProductSerial.is_enable == "1" ? 
-                      (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
-                       (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid sticky top-0 bg-white shadow-lg  z-10`}> */}
                                     <div
-                                        className={`grid-cols-14  grid sticky top-0 bg-white shadow-lg  z-10 rounded `}
+                                        className={`grid-cols-12  grid sticky top-0 bg-white shadow-lg  z-10 rounded `}
                                     >
-                                        {/* <h4 className="text-[13px] px-2 text-gray-400 uppercase  font-[500] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_image || "import_detail_image"}</h4> */}
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-3 text-center whitespace-nowrap">
+                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-4 text-center whitespace-nowrap">
                                             {props.dataLang?.import_detail_items || "import_detail_items"}
                                         </h4>
-                                        {/* <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">{props.dataLang?.import_detail_variant || "import_detail_variant"}</h4>  */}
                                         <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
-                                            {props.dataLang?.delivery_receipt_warehouse || "delivery_receipt_warehouse"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                            {"Tồn kho"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
                                             {"ĐVT"}
                                         </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                                             {props.dataLang?.import_from_quantity || "import_from_quantity"}
                                         </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                            {props.dataLang?.import_from_unit_price || "import_from_unit_price"}
+                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                            {props.dataLang?.internal_plan_date || "internal_plan_date"}
                                         </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                            {"% CK"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                            {props.dataLang?.import_from_price_affter || "import_from_price_affter"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                            {props.dataLang?.import_from_tax || "import_from_tax"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
-                                            {props.dataLang?.import_into_money || "import_into_money"}
-                                        </h4>
-                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                                        <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
                                             {props.dataLang?.import_from_note || "import_from_note"}
                                         </h4>
                                     </div>
                                     {onFetching ? (
                                         <Loading className="max-h-28" color="#0f4f9e" />
-                                    ) : data?.items?.length > 0 ? (
+                                    ) : data?.internalPlansItems?.length > 0 ? (
                                         <>
                                             <ScrollArea
-                                                className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
+                                                className="min-h-[250px] max-h-[250px] 2xl:max-h-[250px] overflow-hidden"
                                                 speed={1}
                                                 smoothScrolling={true}
                                             >
-                                                <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
-                                                    {data?.items?.map((e) => (
-                                                        // <div className={`${dataProductSerial.is_enable == "1" ?
-                                                        // (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
-                                                        // (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid hover:bg-slate-50 `} key={e.id?.toString()}>
+                                                <div className="divide-y divide-slate-200 min:h-[250px]  max:h-[250px]">
+                                                    {data?.internalPlansItems?.map((e) => (
                                                         <div
-                                                            className="grid grid-cols-14 hover:bg-slate-50 items-center border-b"
+                                                            className="grid grid-cols-12 hover:bg-slate-50 items-center border-b"
                                                             key={e.id?.toString()}
                                                         >
-                                                            {/* <h6 className="text-[13px]   py-0.5 col-span-1 text-center">
-                            {e?.item?.images != null ? (<ModalImage   small={e?.item?.images} large={e?.item?.images} alt="Product Image"  className='custom-modal-image object-cover rounded w-[50px] h-[60px] mx-auto' />):
-                              <div className='w-[50px] h-[60px] object-cover  mx-auto'>
-                                <ModalImage small="/no_img.png" large="/no_img.png" className='w-full h-full rounded object-contain p-1' > </ModalImage>
-                              </div>
-                            }
-                            </h6>     
-                                        */}
-                                                            <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left ">
+                                                            <h6 className="text-[13px]  px-2 py-2 col-span-4 text-left ">
                                                                 <div className="flex items-center gap-2">
-                                                                    <div>
-                                                                        {e?.item?.images != null ? (
+                                                                    <div className="">
+                                                                        {e?.images != null ? (
                                                                             <ModalImage
-                                                                                small={e?.item?.images}
-                                                                                large={e?.item?.images}
+                                                                                small={e?.images}
+                                                                                large={e?.images}
                                                                                 alt="Product Image"
-                                                                                className="custom-modal-image object-cover rounded w-[40px] h-[50px] mx-auto"
+                                                                                className="custom-modal-image object-cover rounded w-[40px] h-[40px] mx-auto"
                                                                             />
                                                                         ) : (
-                                                                            <div className="w-[40px] h-[50px] object-cover  mx-auto">
+                                                                            <div className="w-[40px] h-[40px] object-cover  mx-auto ">
                                                                                 <ModalImage
                                                                                     small="/no_img.png"
                                                                                     large="/no_img.png"
@@ -325,15 +239,14 @@ const PopupDetail = (props) => {
                                                                     </div>
                                                                     <div>
                                                                         <h6 className="text-[13px] text-left font-medium capitalize">
-                                                                            {e?.item?.name}
+                                                                            {e?.item_name}
                                                                         </h6>
                                                                         <h6 className="text-[13px] text-left font-medium capitalize">
-                                                                            {e?.item?.product_variation}
+                                                                            {e?.product_variation}
                                                                         </h6>
-                                                                        <div className="flex items-center font-oblique flex-wrap">
+                                                                        {/* <div className="flex items-center font-oblique flex-wrap">
                                                                             {dataProductSerial.is_enable === "1" ? (
                                                                                 <div className="flex gap-0.5">
-                                                                                    {/* <h6 className="text-[12px]">Serial:</h6><h6 className="text-[12px]  px-2   w-[full] text-left ">{e.serial == null || e.serial == "" ? "-" : e.serial}</h6>                               */}
                                                                                     <h6 className="text-[12px]">
                                                                                         Serial:
                                                                                     </h6>
@@ -378,46 +291,23 @@ const PopupDetail = (props) => {
                                                                             ) : (
                                                                                 ""
                                                                             )}
-                                                                        </div>
+                                                                        </div> */}
                                                                     </div>
                                                                 </div>
                                                             </h6>
-                                                            {/* <h6 className="text-[13px]   px-2 py-2 col-span-1 text-center break-words">{e?.item?.product_variation}</h6>                 */}
-                                                            <h6 className="text-[13px]   px-2 py-2 col-span-2 text-left break-words">
-                                                                <h6 className="font-medium">
-                                                                    {e?.warehouse_name ? e?.warehouse_name : ""}
-                                                                </h6>
-                                                                <h6 className="font-medium">
-                                                                    {e.location_name ? e.location_name : ""}
-                                                                </h6>
+                                                            <h6 className="text-[13px]   py-2 col-span-2 font-medium text-center ">
+                                                                {e?.unit_name}
                                                             </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
-                                                                {formatNumber(e?.item?.quantity_left)}
-                                                            </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
-                                                                {e?.item?.unit_name}
-                                                            </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center mr-1">
+                                                            <h6 className="text-[13px]   py-2 col-span-2 font-medium text-center ">
                                                                 {formatNumber(e?.quantity)}
                                                             </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center">
-                                                                {formatNumber(e?.price)}
+                                                            <h6 className="text-[13px]   py-2 col-span-2 font-medium text-center ">
+                                                                {moment(e?.date_needed).format("DD/MM/YYYY")}
                                                             </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center">
-                                                                {e?.discount_percent + "%"}
-                                                            </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center">
-                                                                {formatNumber(e?.price_after_discount)}
-                                                            </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center">
-                                                                {formatNumber(e?.tax_rate) + "%"}
-                                                            </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-1 font-medium text-right ">
-                                                                {formatNumber(e?.amount)}
-                                                            </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-1 font-medium text-left ml-3.5">
-                                                                {e?.note != undefined ? (
-                                                                    <ExpandableContent content={e?.note} />
+
+                                                            <h6 className="text-[13px]   py-2 col-span-2 font-medium text-left ml-3.5">
+                                                                {e?.note_item != undefined ? (
+                                                                    <ExpandableContent content={e?.note_item} />
                                                                 ) : (
                                                                     ""
                                                                 )}
@@ -455,62 +345,18 @@ const PopupDetail = (props) => {
                                         <textarea
                                             className="resize-none text-[13px] scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 placeholder:text-slate-300 w-[90%] min-h-[90px] max-h-[90px] bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1 outline-none "
                                             disabled
-                                            value={data?.note}
+                                            value={data?.internalPlans?.note}
                                         />
                                     </div>
                                     <div className="col-span-2 space-y-1 text-right">
                                         <div className="font-medium text-left text-[13px]">
-                                            <h3>
-                                                {props.dataLang?.import_detail_total_amount ||
-                                                    "import_detail_total_amount"}
-                                            </h3>
-                                        </div>
-                                        <div className="font-medium text-left text-[13px]">
-                                            <h3>
-                                                {props.dataLang?.import_detail_discount || "import_detail_discount"}
-                                            </h3>
-                                        </div>
-                                        <div className="font-medium text-left text-[13px]">
-                                            <h3>
-                                                {props.dataLang?.import_detail_affter_discount ||
-                                                    "import_detail_affter_discount"}
-                                            </h3>
-                                        </div>
-                                        <div className="font-medium text-left text-[13px]">
-                                            <h3>
-                                                {props.dataLang?.import_detail_tax_money || "import_detail_tax_money"}
-                                            </h3>
-                                        </div>
-                                        <div className="font-medium text-left text-[13px]">
-                                            <h3>
-                                                {props.dataLang?.import_detail_into_money || "import_detail_into_money"}
-                                            </h3>
+                                            <h3>{props.dataLang?.internal_plan_total || "internal_plan_total"}</h3>
                                         </div>
                                     </div>
                                     <div className="col-span-3 space-y-1 text-right">
                                         <div className="font-medium mr-2.5">
                                             <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatNumber(data?.total_price)}
-                                            </h3>
-                                        </div>
-                                        <div className="font-medium mr-2.5">
-                                            <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatNumber(data?.total_discount)}
-                                            </h3>
-                                        </div>
-                                        <div className="font-medium mr-2.5">
-                                            <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatNumber(data?.total_price_after_discount)}
-                                            </h3>
-                                        </div>
-                                        <div className="font-medium mr-2.5">
-                                            <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatNumber(data?.total_tax)}
-                                            </h3>
-                                        </div>
-                                        <div className="font-medium mr-2.5">
-                                            <h3 className="text-right text-blue-600 text-[13px]">
-                                                {formatNumber(data?.total_amount)}
+                                                {formatNumber(data?.internalPlans?.total_quantity)}
                                             </h3>
                                         </div>
                                     </div>

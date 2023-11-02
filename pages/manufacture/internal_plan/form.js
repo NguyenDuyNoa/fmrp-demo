@@ -1,37 +1,23 @@
-import React, { useRef, useState } from "react";
-import { useRouter } from "next/router";
 import Head from "next/head";
-import { _ServerInstance as Axios } from "/services/axios";
-import { v4 as uuidv4 } from "uuid";
-import dynamic from "next/dynamic";
-import Loading from "components/UI/loading";
-
-import { MdClear } from "react-icons/md";
-import { BsCalendarEvent } from "react-icons/bs";
-import DatePicker from "react-datepicker";
-
-const ScrollArea = dynamic(() => import("react-scrollbar"), {
-    ssr: false,
-});
-import Select, { components, MenuListProps } from "react-select";
-
-import { Add, Trash as IconDelete, Image as IconImage, MaximizeCircle, Minus, TableDocument } from "iconsax-react";
-import Swal from "sweetalert2";
-import { useEffect } from "react";
-import { NumericFormat } from "react-number-format";
 import Link from "next/link";
+import Swal from "sweetalert2";
 import moment from "moment/moment";
-import Popup from "reactjs-popup";
+import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/router";
+import { MdClear } from "react-icons/md";
+import DatePicker from "react-datepicker";
 import { useSelector } from "react-redux";
-import ToatstNotifi from "components/UI/alerNotification/alerNotification";
+import Loading from "@/components/UI/loading";
+import { BsCalendarEvent } from "react-icons/bs";
+import { NumericFormat } from "react-number-format";
+import React, { useState, useEffect } from "react";
+import { _ServerInstance as Axios } from "/services/axios";
+import Select, { components } from "react-select";
 import { routerInternalPlan } from "@/components/UI/router/internalPlan";
-import { useQuery } from "react-query";
-import axios from "axios";
+import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
 
 const Index = (props) => {
-    const router = useRouter();
-    const id = router.query?.id;
-
     const initsFetching = {
         onFetching: false,
         onFetchingDetail: false,
@@ -48,10 +34,7 @@ const Index = (props) => {
         errPlan: false,
         errDate: false,
     };
-    const initsArr = {
-        dataBranch: [],
-        dataItems: [],
-    };
+    const initsArr = { dataBranch: [], dataItems: [] };
     const initsValue = {
         code: "",
         date: new Date(),
@@ -60,6 +43,8 @@ const Index = (props) => {
         note: "",
         dateAll: null,
     };
+    const router = useRouter();
+    const id = router.query?.id;
     const dataLang = props?.dataLang;
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
     const [fetChingData, sFetchingData] = useState(initsFetching);
@@ -70,7 +55,6 @@ const Index = (props) => {
     const [idChange, sIdChange] = useState(initsValue);
     const [errors, sErrors] = useState(initsErors);
     const [listData, sListData] = useState([]);
-
     const resetAllStates = () => {
         sIdChange(initsValue);
         sErrors(initsErors);
@@ -107,10 +91,7 @@ const Index = (props) => {
                 sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
                 sDataProductSerial(data.find((x) => x.code == "product_serial"));
             }
-            sFetchingData((e) => ({
-                ...e,
-                onFetchingCondition: true,
-            }));
+            sFetchingData((e) => ({ ...e, onFetchingCondition: true }));
         });
     };
 
@@ -119,21 +100,14 @@ const Index = (props) => {
     }, [fetChingData.onFetchingCondition]);
 
     useEffect(() => {
-        id &&
-            sFetchingData((e) => ({
-                ...e,
-                onFetchingCondition: true,
-            }));
+        id && sFetchingData((e) => ({ ...e, onFetchingCondition: true }));
     }, []);
 
     useEffect(() => {
         JSON.stringify(dataMaterialExpiry) === "{}" &&
             JSON.stringify(dataProductExpiry) === "{}" &&
             JSON.stringify(dataProductSerial) === "{}" &&
-            sFetchingData((e) => ({
-                ...e,
-                onFetchingCondition: true,
-            }));
+            sFetchingData((e) => ({ ...e, onFetchingCondition: true }));
     }, [
         JSON.stringify(dataMaterialExpiry) === "{}",
         JSON.stringify(dataProductExpiry) === "{}",
@@ -158,33 +132,17 @@ const Index = (props) => {
                 let rResult = response.data;
                 sListData(
                     rResult?.items.map((e) => {
-                        const child = e?.child.map((ce) => ({
+                        const newData = {
                             id: Number(ce?.id),
-                            idChildBackEnd: Number(ce?.id),
                             disabledDate:
                                 (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
                                 (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
                                 (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
                                 (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
-                            warehouse: {
-                                label: ce?.location_name,
-                                value: ce?.location_warehouses_id,
-                                warehouse_name: ce?.warehouse_name,
-                            },
-                            quantityDelivered: e?.item?.quantity_create,
-                            quantityPay: e?.item?.quantity_returned,
-                            quantityLeft: e?.item?.quantity_left,
                             unit: e?.item?.unit_name,
-                            quantity: Number(ce?.quantity),
-                            price: Number(ce?.price),
-                            discount: Number(ce?.discount_percent),
-                            tax: {
-                                tax_rate: ce?.tax_rate || "0",
-                                value: ce?.tax_id || "0",
-                                label: ce?.tax_name || "Miễn thuế",
-                            },
-                            note: ce?.note,
-                        }));
+                            quantity: Number(e?.quantity),
+                            note: e?.note,
+                        };
                         return {
                             id: e?.item?.id,
                             idParenBackend: e?.item?.id,
@@ -195,7 +153,7 @@ const Index = (props) => {
                                 }</span>`,
                                 value: e.item?.id,
                             },
-                            child: child,
+                            ...newData,
                         };
                     })
                 );
@@ -206,14 +164,7 @@ const Index = (props) => {
                         label: rResult?.branch_name,
                         value: rResult?.branch_id,
                     },
-                    idClient: {
-                        label: rResult?.client_name,
-                        value: rResult?.client_id,
-                    },
-                    idTreatment: {
-                        label: dataLang[rResult?.handling_solution] || rResult?.handling_solution,
-                        value: rResult?.handling_solution,
-                    },
+                    namePlan: "",
                     note: rResult?.note,
                 });
             }
@@ -249,10 +200,7 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     let { result } = response.data.data;
-                    sDataSelect((e) => ({
-                        ...e,
-                        dataItems: result,
-                    }));
+                    sDataSelect((e) => ({ ...e, dataItems: result }));
                 }
             }
         );
@@ -280,10 +228,7 @@ const Index = (props) => {
                     (err, response) => {
                         if (!err) {
                             let { result } = response.data.data;
-                            sDataSelect((e) => ({
-                                ...e,
-                                dataItems: result,
-                            }));
+                            sDataSelect((e) => ({ ...e, dataItems: result }));
                         }
                     }
                 );
@@ -311,38 +256,67 @@ const Index = (props) => {
         });
     };
 
+    const sIdBranch = (e) => {
+        sIdChange((list) => ({ ...list, idBranch: e }));
+    };
+
+    const checkValue = (data) => {
+        sIdChange((e) => ({ ...e, ...data }));
+    };
+
+    const handleChangeCode = (value) => {
+        checkValue({ code: value.target.value });
+    };
+
+    const handleChangeDate = (value) => {
+        checkValue({ date: moment(value).format("YYYY-MM-DD HH:mm:ss") });
+    };
+
+    const handleStartDate = () => {
+        checkValue({ date: new Date() });
+    };
+
+    const handleChangeNamePlan = (value) => {
+        checkValue({ namePlan: value.target.value });
+    };
+
+    const handleChangeNote = (value) => {
+        checkValue({ note: value.target.value });
+    };
+
+    const handleBranchChange = (value) => {
+        if (idChange.idBranch !== value) {
+            if (listData?.length > 0) {
+                checkListData(value, sDataSelect, sListData, sIdBranch, idChange.idBranch);
+            } else {
+                checkValue({ idBranch: value });
+            }
+        }
+    };
+
+    const handleDateAllChange = (value) => {
+        checkValue({ dateAll: value });
+        if (listData?.length > 0) {
+            const newData = listData.map((e) => ({
+                ...e,
+                date: value,
+            }));
+            sListData(newData);
+        }
+    };
+
     const _HandleChangeInput = (type, value) => {
-        const sIdBranch = (e) => {
-            sIdChange((list) => ({ ...list, idBranch: e }));
-        };
         const onChange = {
-            code: () => sIdChange((e) => ({ ...e, code: value.target.value })),
-            date: () => sIdChange((e) => ({ ...e, date: moment(value).format("YYYY-MM-DD HH:mm:ss") })),
-            startDate: () => sIdChange((e) => ({ ...e, date: new Date() })),
-            namePlan: () => sIdChange((e) => ({ ...e, namePlan: value.target.value })),
-            note: () => sIdChange((e) => ({ ...e, note: value.target.value })),
-            branch: () => {
-                if (idChange.idBranch != value)
-                    if (listData?.length > 0) {
-                        checkListData(value, sDataSelect, sListData, sIdBranch, idChange.idBranch);
-                    } else {
-                        sIdChange((e) => ({ ...e, idBranch: value }));
-                    }
-            },
-            dateAll: () => {
-                sIdChange((e) => ({ ...e, dateAll: value }));
-                if (listData?.length > 0) {
-                    const newData = listData.map((e) => {
-                        return {
-                            ...e,
-                            date: value,
-                        };
-                    });
-                    sListData(newData);
-                }
-            },
+            code: () => handleChangeCode(value),
+            date: () => handleChangeDate(value),
+            startDate: () => handleStartDate(),
+            namePlan: () => handleChangeNamePlan(value),
+            note: () => handleChangeNote(value),
+            branch: () => handleBranchChange(value),
+            dateAll: () => handleDateAllChange(value),
         };
-        onChange[type] && onChange[type]();
+
+        onChange[type]?.();
     };
 
     useEffect(() => {
@@ -370,7 +344,6 @@ const Index = (props) => {
     const _DataValueItem = (value) => {
         const newChild = {
             id: uuidv4(),
-            idChildBackEnd: "",
             disabledDate:
                 (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
                 (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
@@ -401,7 +374,7 @@ const Index = (props) => {
         }
     };
 
-    const _HandleDeleteChild = (parentId) => {
+    const _HandleDeleteParent = (parentId) => {
         const newData = listData.filter((e) => e?.id !== parentId);
         sListData([...newData]);
     };
@@ -493,7 +466,6 @@ const Index = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
-
         const hasNullQuantity = listData.some((e) => e.quantity == "" || e.quantity == null || e.quantity == 0);
         const hasNullDate = listData.some((e) => e.date == null || e.date == "");
 
@@ -507,7 +479,7 @@ const Index = (props) => {
                 errPlan: !idChange.namePlan,
                 errDate: hasNullDate,
             }));
-            if (!idChange.idBranch) {
+            if (!idChange.idBranch || !idChange.namePlan) {
                 ToatstNotifi("error", `${dataLang?.required_field_null}`);
             } else if (isEmpty) {
                 ToatstNotifi("error", `Chưa nhập thông tin mặt hàng`);
@@ -533,9 +505,9 @@ const Index = (props) => {
         listData.forEach((item, index) => {
             formData.append(`items[${index}][id]`, id ? item?.idParenBackend : "");
             formData.append(`items[${index}][item_id]`, item?.matHang?.value);
-            formData.append(`items[${index}][quantity]`, item?.quantity);
+            formData.append(`items[${index}][quantity]`, item?.quantity ? item?.quantity : "");
             formData.append(`items[${index}][date_needed]`, item?.date ? moment(item?.date).format("DD/MM/YYYY") : "");
-            formData.append(`items[${index}][note_item]`, item?.note);
+            formData.append(`items[${index}][note_item]`, item?.note ? item?.note : "");
         });
         await Axios(
             "POST",
@@ -572,7 +544,11 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>{id ? "Sửa kế hoạch nội bộ" : "Tạo kế hoạch nội bộ"}</title>
+                <title>
+                    {id
+                        ? dataLang?.internal_plan_edit || "internal_plan_edit"
+                        : dataLang?.internal_plan_add || "internal_plan_add"}
+                </title>
             </Head>
             <div className="xl:px-10 px-3 xl:pt-24 pt-[88px] pb-3 space-y-2.5 flex flex-col justify-between">
                 <div className="h-[97%] space-y-3 overflow-hidden">
@@ -580,13 +556,17 @@ const Index = (props) => {
                         <div className="p-2"></div>
                     ) : (
                         <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
-                            <h6 className="text-[#141522]/40">{"Kho & sản xuất"}</h6>
+                            <h6 className="text-[#141522]/40">{dataLang?.internal_planEnd || "internal_planEnd"}</h6>
                             <span className="text-[#141522]/40">/</span>
-                            <h6>{id ? "Sửa kế hoạch nội bộ" : "Tạo kế hoạch nội bộ"}</h6>
+                            <h6>
+                                {id
+                                    ? dataLang?.internal_plan_edit || "internal_plan_edit"
+                                    : dataLang?.internal_plan_add || "internal_plan_add"}
+                            </h6>
                         </div>
                     )}
                     <div className="flex justify-between items-center">
-                        <h2 className="xl:text-2xl text-xl ">{"Tạo kế hoạch nội bộ"}</h2>
+                        <h2 className="xl:text-2xl text-xl ">{dataLang?.internal_plan_add || "internal_plan_add"}</h2>
                         <div className="flex justify-end items-center">
                             <button
                                 onClick={() => router.push(routerInternalPlan.home)}
@@ -708,20 +688,24 @@ const Index = (props) => {
                                     )}
                                 </div>
                                 <div className="col-span-2">
-                                    <label className="text-[#344054] font-normal text-sm mb-1 ">{"Tên kế hoạch"}</label>{" "}
+                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
+                                        {dataLang?.internal_plan_name || "internal_plan_name"}
+                                    </label>{" "}
                                     <span className="text-red-500">*</span>
                                     <input
                                         value={idChange.namePlan}
                                         onChange={_HandleChangeInput.bind(this, "namePlan")}
                                         name="fname"
                                         type="text"
-                                        placeholder={"Tên kế hoạch"}
+                                        placeholder={dataLang?.internal_plan_name || "internal_plan_name"}
                                         className={`focus:border-[#92BFF7] ${
                                             errors.errPlan ? "border-red-500 " : "border-[#d0d5dd]"
                                         }   placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal   p-2 border outline-none`}
                                     />
                                     {errors.errPlan && (
-                                        <label className="text-sm text-red-500">{"Vui lòng nhập tên kế hoạch"}</label>
+                                        <label className="text-sm text-red-500">
+                                            {dataLang?.internal_plan_errName || "internal_plan_errName"}
+                                        </label>
                                     )}
                                 </div>
                             </div>
@@ -745,7 +729,7 @@ const Index = (props) => {
                                     {dataLang?.import_from_quantity || "import_from_quantity"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                                    {"Ngày cần hàng"}
+                                    {dataLang?.internal_plan_dateFrom || "internal_plan_dateFrom"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] px-2  text-[#667085] uppercase  col-span-1    text-center    truncate font-[400]">
                                     {dataLang?.import_from_note || "import_from_note"}
@@ -985,7 +969,7 @@ const Index = (props) => {
                                                     <div>
                                                         <button
                                                             title="Xóa"
-                                                            onClick={_HandleDeleteChild.bind(this, e.id)}
+                                                            onClick={_HandleDeleteParent.bind(this, e.id)}
                                                             className=" text-red-500 flex p-1 justify-center items-center hover:scale-110 bg-red-50  rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
                                                         >
                                                             <IconDelete size={24} />
@@ -1001,7 +985,7 @@ const Index = (props) => {
                     </div>
                     <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
                         <div className="col-span-4  flex items-center gap-2">
-                            <h2>{"Ngày cần hàng"}</h2>
+                            <h2>{dataLang?.internal_plan_dateFrom || "internal_plan_dateFrom"}</h2>
                             <div className="col-span-2 text-center flex items-center justify-center">
                                 <DatePicker
                                     selected={idChange.dateAll}
@@ -1037,7 +1021,7 @@ const Index = (props) => {
                         <div className="flex justify-between "></div>
                         <div className="flex justify-between ">
                             <div className="font-normal ">
-                                <h3>{"Tổng số lượng"}</h3>
+                                <h3>{dataLang?.internal_plan_total || "internal_plan_total"}</h3>
                             </div>
                             <div className="font-normal">
                                 <h3 className="text-blue-600">

@@ -196,6 +196,38 @@ const BtnAction = React.memo((props) => {
                 }
             });
         }
+
+        ///Kế hoạc nội bộ internal_plan
+        if (props?.id && props?.type === "internal_plan") {
+            Swal.fire({
+                title: `${props.dataLang?.aler_ask}`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#296dc1",
+                cancelButtonColor: "#d33",
+                confirmButtonText: `${props.dataLang?.aler_yes}`,
+                cancelButtonText: `${props.dataLang?.aler_cancel}`,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Axios(
+                        "DELETE",
+                        `/api_web/api_internal_plan/deleteInternalPlan/${props?.id}?csrf_protection=true`,
+                        {},
+                        (err, response) => {
+                            if (!err) {
+                                var { isSuccess, message } = response.data;
+                                if (isSuccess) {
+                                    ToatstNotifi("success", props.dataLang[message] || message);
+                                    props.onRefresh && props.onRefresh();
+                                } else {
+                                    ToatstNotifi("error", props.dataLang[message] || message);
+                                }
+                            }
+                        }
+                    );
+                }
+            });
+        }
     };
 
     const handleClick = () => {
@@ -324,6 +356,23 @@ const BtnAction = React.memo((props) => {
                     (err, response) => {
                         if (response && response.data) {
                             let db = response.data;
+                            setData(db);
+                        }
+                    }
+                );
+            } catch (err) {
+                console.log(err);
+            }
+        }
+        if (props?.id && props?.type === "internal_plan") {
+            try {
+                await Axios(
+                    "GET",
+                    `/api_web/api_internal_plan/detailInternalPlan/${props?.id}?csrf_protection=true`,
+                    {},
+                    (err, response) => {
+                        if (response && response.data) {
+                            let db = response.data.data;
                             setData(db);
                         }
                     }

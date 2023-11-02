@@ -1,71 +1,46 @@
-import React, { useState } from "react";
-import Select from "react-select";
-import BtnAction from "../../../components/UI/BtnAction";
-import TabFilter from "../../../components/UI/TabFilter";
-import Pagination from "/components/UI/pagination";
-import Loading from "components/UI/loading";
-import Swal from "sweetalert2";
-import ReactExport from "react-data-export";
 import Head from "next/head";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import moment from "moment/moment";
-import Datepicker from "react-tailwindcss-datepicker";
 import { useRouter } from "next/router";
-import { _ServerInstance as Axios } from "/services/axios";
-import { useEffect } from "react";
-import { debounce } from "lodash";
-import { Grid6 as IconExcel, SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
-import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
-import OnResetData from "components/UI/btnResetData/btnReset";
 import ModalImage from "react-modal-image";
-import ImageErrors from "components/UI/imageErrors";
-import PopupDetail from "./(popupDetail)/PopupDetail";
-import ToatstNotifi from "components/UI/alerNotification/alerNotification";
-import Popup_status from "./(popupDetail)/popupStatus";
-import ButtonWarehouse from "components/UI/btnWarehouse/btnWarehouse";
+import "react-datepicker/dist/react-datepicker.css";
+import { _ServerInstance as Axios } from "/services/axios";
+import { SearchNormal1 as IconSearch } from "iconsax-react";
+import React, { useState, useEffect, useTransition } from "react";
+import Loading from "@/components/UI/loading";
+import BtnAction from "@/components/UI/BtnAction";
+import Pagination from "@/components/UI/pagination";
+import ImageErrors from "@/components/UI/imageErrors";
+import OnResetData from "@/components/UI/btnResetData/btnReset";
+import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import { routerInternalPlan } from "@/components/UI/router/internalPlan";
-
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+import SearchComponent from "@/components/UI/filterComponents/searchComponent";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
+import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
+import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
+const PopupDetail = dynamic(() => import("./(popupDetail)/PopupDetail"), { ssr: false });
 
 const Index = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
-    const tabPage = router.query?.tab;
-    const initsArr = {
-        data: [],
-        dataExcel: [],
-        listBr: [],
-        listCode: [],
-        listClient: [],
-        listStatus: [],
-    };
+    const initsArr = { data: [], dataExcel: [], listBr: [] };
     const initsId = {
         idBranch: null,
-        idCode: null,
-        idClient: null,
-        valueDate: {
-            startDate: null,
-            endDate: null,
-        },
+        valueDate: { startDate: null, endDate: null },
     };
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
-    const [idFillter, sIdFillter] = useState(initsId);
     const [listData, sListData] = useState(initsArr);
+    const [idFillter, sIdFillter] = useState(initsId);
     const [onFetching, sOnFetching] = useState(false);
     const [onFetching_filter, sOnFetching_filter] = useState(false);
-    const [totalItems, sTotalItems] = useState([]);
-    const [keySearch, sKeySearch] = useState("");
     const [limit, sLimit] = useState(15);
     const [total, sTotal] = useState({});
+    const [keySearch, sKeySearch] = useState("");
+    const [totalItems, sTotalItems] = useState([]);
+    const [isEvent, startEvent] = useTransition();
 
-    const _HandleSelectTab = (e) => {
-        router.push({
-            pathname: router.route,
-            query: { tab: e },
-        });
-    };
     useEffect(() => {
         router.push({
             pathname: router.route,
@@ -82,18 +57,20 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[status_bar]": tabPage ?? null,
-                    "filter[id]": idFillter.idCode != null ? idFillter.idCode?.value : null,
-                    "filter[branch_id]": idFillter.idBranch != null ? idFillter.idBranch.value : null,
-                    "filter[client_id]": idFillter?.idClient ? idFillter?.idClient.value : null,
-                    "filter[start_date]":
-                        idFillter?.valueDate?.startDate != null ? idFillter?.valueDate?.startDate : null,
-                    "filter[end_date]": idFillter?.valueDate?.endDate != null ? idFillter?.valueDate?.endDate : null,
+                    branch_id: idFillter.idBranch != null ? idFillter.idBranch.value : null,
+                    start_date:
+                        idFillter?.valueDate?.startDate != null
+                            ? moment(idFillter?.valueDate?.startDate).format("DD/MM/YYYY")
+                            : null,
+                    end_date:
+                        idFillter?.valueDate?.endDate != null
+                            ? moment(idFillter?.valueDate?.endDate).format("DD/MM/YYYY")
+                            : null,
                 },
             },
             (err, response) => {
                 if (!err) {
-                    var { rResult, output, rTotal } = response.data?.data;
+                    let { rResult, output, rTotal } = response.data?.data;
                     sListData((e) => ({
                         ...e,
                         data: rResult,
@@ -106,35 +83,6 @@ const Index = (props) => {
             }
         );
     };
-    // fetch tab filter
-    const _ServerFetching_group = async () => {
-        await Axios(
-            "GET",
-            `/api_web/api_internal_plan/getInternalPlan?csrf_protection=true`,
-            {
-                params: {
-                    // &branch_id&start_date&end_date&status&search
-                    search: keySearch,
-                    limit: limit,
-                    page: router.query?.page || 1,
-                    "filter[status_bar]": tabPage ?? null,
-                    "filter[id]": idFillter.idCode != null ? idFillter.idCode?.value : null,
-                    "filter[branch_id]": idFillter.idBranch != null ? idFillter.idBranch.value : null,
-                    "filter[client_id]": idFillter?.idClient ? idFillter?.idClient.value : null,
-                    "filter[start_date]":
-                        idFillter?.valueDate?.startDate != null ? idFillter?.valueDate?.startDate : null,
-                    "filter[end_date]": idFillter?.valueDate?.endDate != null ? idFillter?.valueDate?.endDate : null,
-                },
-            },
-            (err, response) => {
-                if (!err) {
-                    let data = response.data;
-                    sListData((e) => ({ ...e, listStatus: data }));
-                }
-                sOnFetching(false);
-            }
-        );
-    };
 
     // filter
     const _ServerFetching_filter = async () => {
@@ -144,51 +92,7 @@ const Index = (props) => {
                 sListData((e) => ({ ...e, listBr: rResult.map((e) => ({ label: e.name, value: e.id })) }));
             }
         });
-        await Axios("GET", `/api_web/api_client/client_option/?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let { rResult } = response.data;
-                sListData((e) => ({ ...e, listClient: rResult.map((e) => ({ label: e.name, value: e.id })) }));
-            }
-        });
-        await Axios(
-            "GET",
-            `/api_web/Api_return_order/returnOrderCombobox/?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    let { result } = response.data;
-                    sListData((e) => ({ ...e, listCode: result.map((e) => ({ label: e.code, value: e.id })) }));
-                }
-            }
-        );
-
         sOnFetching_filter(false);
-    };
-
-    let searchTimeout;
-
-    const _HandleSeachApi = (inputValue) => {
-        if (inputValue == "") return;
-        else {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                Axios(
-                    "POST",
-                    `/api_web/Api_return_order/returnOrderCombobox/?csrf_protection=true`,
-                    {
-                        data: {
-                            term: inputValue,
-                        },
-                    },
-                    (err, response) => {
-                        if (!err) {
-                            let { result } = response.data;
-                            sListData((e) => ({ ...e, listCode: result.map((e) => ({ label: e.code, value: e.id })) }));
-                        }
-                    }
-                );
-            }, 500);
-        }
     };
 
     useEffect(() => {
@@ -196,30 +100,21 @@ const Index = (props) => {
     }, [onFetching_filter]);
 
     useEffect(() => {
-        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
+        onFetching && _ServerFetching();
     }, [onFetching]);
 
     useEffect(() => {
-        (router.query.tab && sOnFetching(true)) || (router.query?.tab && sOnFetching_filter(true));
-    }, [limit, router.query?.page, router.query?.tab]);
+        sOnFetching(true);
+        sOnFetching_filter(true);
+    }, []);
 
     useEffect(() => {
         if (
             idFillter.idBranch != null ||
-            (idFillter.valueDate.startDate != null && idFillter.valueDate.endDate != null) ||
-            idFillter.idClient != null ||
-            idFillter.idCode != null
+            (idFillter.valueDate.startDate != null && idFillter.valueDate.endDate != null)
         ) {
-            router.push({
-                pathname: router.route,
-                query: {
-                    tab: router.query?.tab,
-                },
-            });
             setTimeout(() => {
                 (idFillter.idBranch != null && sOnFetching(true)) ||
-                    (idFillter.idClient != null && sOnFetching(true)) ||
-                    (idFillter.idCode != null && sOnFetching(true)) ||
                     (idFillter.valueDate.startDate != null &&
                         idFillter.valueDate.endDate != null &&
                         sOnFetching(true)) ||
@@ -228,18 +123,9 @@ const Index = (props) => {
         } else {
             sOnFetching(true);
         }
-    }, [
-        limit,
-        idFillter.idBranch,
-        idFillter.idClient,
-        idFillter.idCode,
-        idFillter.valueDate.endDate,
-        idFillter.valueDate.startDate,
-    ]);
+    }, [limit, idFillter.idBranch, idFillter.valueDate.endDate, idFillter.valueDate.startDate]);
 
-    const onChangeFilter = (type, value) => {
-        sIdFillter((e) => ({ ...e, [type]: value }));
-    };
+    const onChangeFilter = (type) => (event) => sIdFillter((e) => ({ ...e, [type]: event }));
 
     const paginate = (pageNumber) => {
         router.push({
@@ -250,23 +136,19 @@ const Index = (props) => {
             },
         });
     };
-
-    const handleOnChangeKeySearch = debounce(({ target: { value } }) => {
-        sKeySearch(value);
-        router.replace({
-            pathname: router.route,
-            query: {
-                tab: router.query?.tab,
-            },
+    const handleOnChangeKeySearch = ({ target: { value } }) => {
+        startEvent(() => {
+            sKeySearch(value);
+            router.replace({
+                pathname: router.route,
+                query: {
+                    tab: router.query?.tab,
+                },
+            });
+            sOnFetching(true);
         });
-        sOnFetching(true);
-    }, 500);
-
-    const formatNumber = (number) => {
-        if (!number && number !== 0) return 0;
-        const integerPart = Math.floor(number);
-        return integerPart.toLocaleString("en");
     };
+
     // excel
     const multiDataSet = [
         {
@@ -296,7 +178,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.import_supplier || "import_supplier"}`,
+                    title: `${dataLang?.internal_plan_name || "internal_plan_name"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -304,7 +186,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.import_total_amount || "import_total_amount"}`,
+                    title: `${dataLang?.internal_plan_status || "internal_plan_status"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -312,39 +194,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${dataLang?.import_tax_money || "import_tax_money"}`,
-                    width: { wch: 40 },
-                    style: {
-                        fill: { fgColor: { rgb: "C7DFFB" } },
-                        font: { bold: true },
-                    },
-                },
-                {
-                    title: `${dataLang?.import_into_money || "import_into_money"}`,
-                    width: { wch: 40 },
-                    style: {
-                        fill: { fgColor: { rgb: "C7DFFB" } },
-                        font: { bold: true },
-                    },
-                },
-                {
-                    title: `${"Hình thức"}`,
-                    width: { wch: 40 },
-                    style: {
-                        fill: { fgColor: { rgb: "C7DFFB" } },
-                        font: { bold: true },
-                    },
-                },
-                {
-                    title: `${dataLang?.import_brow_storekeepers || "import_brow_storekeepers"}`,
-                    width: { wch: 40 },
-                    style: {
-                        fill: { fgColor: { rgb: "C7DFFB" } },
-                        font: { bold: true },
-                    },
-                },
-                {
-                    title: `${dataLang?.import_branch || "import_branch"}`,
+                    title: `${dataLang?.internal_plan_creators || "internal_plan_creators"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -359,123 +209,41 @@ const Index = (props) => {
                         font: { bold: true },
                     },
                 },
+                {
+                    title: `${dataLang?.import_branch || "import_branch"}`,
+                    width: { wch: 40 },
+                    style: {
+                        fill: { fgColor: { rgb: "C7DFFB" } },
+                        font: { bold: true },
+                    },
+                },
             ],
             data: listData?.dataExcel?.map((e) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.date ? e?.date : ""}` },
-                { value: `${e?.code ? e?.code : ""}` },
-                { value: `${e?.client_name ? e?.client_name : ""}` },
-                {
-                    value: `${e?.total_price ? formatNumber(e?.total_price) : ""}`,
-                },
-                {
-                    value: `${e?.total_tax_price ? formatNumber(e?.total_tax_price) : ""}`,
-                },
-                {
-                    value: `${e?.total_amount ? formatNumber(e?.total_amount) : ""}`,
-                },
-                {
-                    value: `${e?.handling_solution ? dataLang[e?.handling_solution] || e?.handling_solution : ""}`,
-                },
-                {
-                    value: `${e?.warehouseman_id === "0" ? "Chưa duyệt kho" : "Đã duyệt kho"}`,
-                },
-                { value: `${e?.branch_name ? e?.branch_name : ""}` },
+                { value: `${e?.reference_no ? e?.reference_no : ""}` },
+                { value: `${e?.plan_name ? e?.plan_name : ""}` },
+                { value: `` },
+                { value: `${e?.created_by_full_name ? e?.created_by_full_name : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
+                { value: `${e?.name_branch ? e?.name_branch : ""}` },
             ]),
         },
     ];
 
-    const [checkedWare, sCheckedWare] = useState({});
-    const [onSending, sOnSending] = useState(false);
-    const [data_export, sData_export] = useState([]);
-
-    const _HandleChangeInput = (id, checkedUn, type, value) => {
-        if (type === "browser") {
-            Swal.fire({
-                title: `${"Thay đổi trạng thái"}`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#296dc1",
-                cancelButtonColor: "#d33",
-                confirmButtonText: `${dataLang?.aler_yes}`,
-                cancelButtonText: `${dataLang?.aler_cancel}`,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const checked = value.target.checked;
-                    const warehousemanId = value.target.value;
-                    const dataChecked = {
-                        checked: checked,
-                        warehousemanId: warehousemanId,
-                        id: id,
-                        checkedpost: checkedUn,
-                    };
-                    sCheckedWare(dataChecked);
-                }
-                sListData((e) => ({ ...e, data: [...e.data] }));
-            });
-        }
-    };
-
-    const _ServerSending = () => {
-        var data = new FormData();
-        data.append("warehouseman_id", checkedWare?.checkedpost != "0" ? checkedWare?.checkedpost : "");
-        data.append("id", checkedWare?.id);
-        Axios(
-            "POST",
-            `/api_web/Api_return_order/ConfirmWarehous?csrf_protection=true`,
-            {
-                data: data,
-                headers: { "Content-Type": "multipart/form-data" },
-            },
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, message, alert_type, data_export } = response.data;
-                    if (isSuccess) {
-                        ToatstNotifi(alert_type, dataLang[message]);
-                        setTimeout(() => {
-                            sOnFetching(true);
-                        }, 300);
-                    } else {
-                        ToatstNotifi("error", dataLang[message]);
-                    }
-                    if (data_export?.length > 0) {
-                        sData_export(data_export);
-                    }
-                }
-                sOnSending(false);
-            }
-        );
-    };
-
-    useEffect(() => {
-        onSending && _ServerSending();
-    }, [onSending]);
-
-    useEffect(() => {
-        checkedWare.id != null && sOnSending(true);
-    }, [checkedWare]);
-
-    useEffect(() => {
-        checkedWare.id != null && sOnSending(true);
-    }, [checkedWare.id != null]);
-
     return (
         <React.Fragment>
             <Head>
-                <title>{"Kế hoạch nội bộ"} </title>
+                <title>{dataLang?.internal_plan || "internal_plan"} </title>
             </Head>
             <div className="3xl:pt-[88px] 2xl:pt-[74px] xl:pt-[60px] lg:pt-[60px] 3xl:px-6 3xl:pb-10 2xl:px-4 2xl:pb-8 xl:px-4 xl:pb-10 px-4 lg:pb-10 space-y-1 overflow-hidden h-screen">
-                {data_export.length > 0 && (
-                    <Popup_status className="hidden" data_export={data_export} dataLang={dataLang} />
-                )}
                 {trangthaiExprired ? (
                     <div className="p-4"></div>
                 ) : (
                     <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                        <h6 className="text-[#141522]/40">{"Kho & Sản xuất"}</h6>
+                        <h6 className="text-[#141522]/40">{dataLang?.internal_planEnd || "internal_planEnd"}</h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>{"Kế hoạch nội bộ"}</h6>
+                        <h6>{dataLang?.internal_plan || "internal_plan"}</h6>
                     </div>
                 )}
 
@@ -484,7 +252,7 @@ const Index = (props) => {
                         <div className="space-y-0.5 h-[96%] overflow-hidden">
                             <div className="flex justify-between  mt-1 mr-2">
                                 <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-base text-[#52575E] capitalize">
-                                    {"Kế hoạch nội bộ"}
+                                    {dataLang?.internal_plan || "internal_plan"}
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Link
@@ -495,232 +263,43 @@ const Index = (props) => {
                                     </Link>
                                 </div>
                             </div>
-                            {/* <div className="flex 2xl:space-x-3 lg:space-x-3 items-center 3xl:h-[8vh] 2xl:h-[7vh] xl:h-[8vh] lg:h-[7vh] justify-start overflow-hidden scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-                                {listData.listStatus &&
-                                    listData.listStatus.map((e) => {
-                                        return (
-                                            <div>
-                                                <TabFilter
-                                                    style={{
-                                                        backgroundColor: "#e2f0fe",
-                                                    }}
-                                                    dataLang={dataLang}
-                                                    key={e?.id}
-                                                    onClick={_HandleSelectTab.bind(this, `${e?.id}`)}
-                                                    total={e?.count}
-                                                    active={e?.id}
-                                                    className={"text-[#0F4F9E]"}
-                                                >
-                                                    {dataLang[e?.name] || e?.name}
-                                                </TabFilter>
-                                            </div>
-                                        );
-                                    })}
-                            </div> */}
                             <div className="space-y-2 3xl:h-[92%] 2xl:h-[88%] xl:h-[95%] lg:h-[90%] overflow-hidden">
                                 <div className="xl:space-y-3 space-y-2">
                                     <div className="bg-slate-100 w-full rounded-lg grid grid-cols-7 justify-between xl:p-3 p-2">
                                         <div className="col-span-6">
                                             <div className="grid grid-cols-5 gap-2">
-                                                <div className="col-span-1">
-                                                    <form className="flex items-center relative ">
-                                                        <IconSearch className="absolute 3xl:h-[20px] 2xl:h-[20px] xl:h-[19px] lg:h-[18px] 3xl:w-[20px] 2xl:w-[18px] xl:w-[19px] lg:w-[18px] z-10 3xl:left-[4%] 2xl:left-[4%] xl:left-[8%] lg:left-[10%] text-[#cccccc]" />
-                                                        <input
-                                                            className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  xl:py-2.5 lg:py-[11px] rounded 2xl:text-base text-xs xl:text-center text-center w-full  relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E] "
-                                                            type="text"
-                                                            onChange={handleOnChangeKeySearch.bind(this)}
-                                                            placeholder={dataLang?.branch_search}
-                                                        />
-                                                    </form>
-                                                </div>
-                                                <div className="col-span-1">
-                                                    <Select
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label:
-                                                                    dataLang?.price_quote_branch ||
-                                                                    "price_quote_branch",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...listData.listBr,
-                                                        ]}
-                                                        onChange={onChangeFilter.bind(this, "idBranch")}
-                                                        value={idFillter.idBranch}
-                                                        placeholder={
-                                                            dataLang?.price_quote_select_branch ||
-                                                            "price_quote_select_branch"
-                                                        }
-                                                        hideSelectedOptions={false}
-                                                        isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-xl bg-white z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        closeMenuOnSelect={true}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className="col-span-1">
-                                                    <Select
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label:
-                                                                    dataLang?.purchase_order_table_code ||
-                                                                    "purchase_order_table_code",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...listData.listCode,
-                                                        ]}
-                                                        onInputChange={_HandleSeachApi.bind(this)}
-                                                        onChange={onChangeFilter.bind(this, "idCode")}
-                                                        value={idFillter.idCode}
-                                                        placeholder={
-                                                            dataLang?.purchase_order_table_code ||
-                                                            "purchase_order_table_code"
-                                                        }
-                                                        hideSelectedOptions={false}
-                                                        isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className="col-span-1">
-                                                    <Select
-                                                        options={[
-                                                            {
-                                                                value: "",
-                                                                label:
-                                                                    dataLang?.price_quote_select_customer ||
-                                                                    "price_quote_select_customer",
-                                                                isDisabled: true,
-                                                            },
-                                                            ...listData.listClient,
-                                                        ]}
-                                                        onChange={onChangeFilter.bind(this, "idClient")}
-                                                        value={idFillter.idClient}
-                                                        placeholder={
-                                                            dataLang?.price_quote_customer || "price_quote_customer"
-                                                        }
-                                                        hideSelectedOptions={false}
-                                                        isClearable={true}
-                                                        className="3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[12px] w-full rounded-md bg-white z-20"
-                                                        isSearchable={true}
-                                                        noOptionsMessage={() => "Không có dữ liệu"}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                border: "none",
-                                                                outline: "none",
-                                                                boxShadow: "none",
-                                                                ...(state.isFocused && {
-                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
-                                                                }),
-                                                            }),
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className="z-20 col-span-1">
-                                                    <Datepicker
-                                                        value={idFillter.valueDate}
-                                                        i18n={"vi"}
-                                                        primaryColor={"blue"}
-                                                        onChange={onChangeFilter.bind(this, "valueDate")}
-                                                        showShortcuts={true}
-                                                        displayFormat={"DD/MM/YYYY"}
-                                                        configs={{
-                                                            shortcuts: {
-                                                                today: "Hôm nay",
-                                                                yesterday: "Hôm qua",
-                                                                past: (period) => `${period}  ngày qua`,
-                                                                currentMonth: "Tháng này",
-                                                                pastMonth: "Tháng trước",
-                                                            },
-                                                            footer: {
-                                                                cancel: "Từ bỏ",
-                                                                apply: "Áp dụng",
-                                                            },
-                                                        }}
-                                                        className="react-datepicker__input-container"
-                                                        inputClassName="rounded-md w-full 2xl:p-2 xl:p-[9px] py-[11px] xl:px-0 px-2 bg-white focus:outline-[#0F4F9E] 3xl:text-[16px] 2xl:text-[16px] xl:text-[13px] lg:text-[10px] 3xl:placeholder:text-xs 2xl:placeholder:text-[13px] xl:placeholder:text-[10px] lg:placeholder:text-[8px] border-none focus:outline-none focus:ring-0 focus:border-transparent"
-                                                    />
-                                                </div>
+                                                <SearchComponent
+                                                    dataLang={dataLang}
+                                                    colSpan={1}
+                                                    onChange={handleOnChangeKeySearch.bind(this)}
+                                                />
+                                                <SelectComponent
+                                                    colSpan={1}
+                                                    options={[
+                                                        {
+                                                            value: "",
+                                                            label: dataLang?.price_quote_branch || "price_quote_branch",
+                                                            isDisabled: true,
+                                                        },
+                                                        ...listData.listBr,
+                                                    ]}
+                                                    onChange={onChangeFilter("idBranch")}
+                                                    value={idFillter.idBranch}
+                                                    placeholder={
+                                                        dataLang?.price_quote_select_branch ||
+                                                        "price_quote_select_branch"
+                                                    }
+                                                    hideSelectedOptions={false}
+                                                    isClearable={true}
+                                                    isSearchable={true}
+                                                    noOptionsMessage={() => "Không có dữ liệu"}
+                                                    closeMenuOnSelect={true}
+                                                />
+                                                <DatepickerComponent
+                                                    value={idFillter.valueDate}
+                                                    onChange={onChangeFilter("valueDate")}
+                                                    colSpan={1}
+                                                />
                                             </div>
                                         </div>
                                         <div className="col-span-1">
@@ -728,69 +307,16 @@ const Index = (props) => {
                                                 <OnResetData sOnFetching={sOnFetching} />
                                                 <div>
                                                     {listData.dataExcel?.length > 0 && (
-                                                        <ExcelFile
-                                                            filename={
-                                                                dataLang?.returnSales_titleEx || "returnSales_titleEx"
-                                                            }
-                                                            title="DSTLHB"
-                                                            element={
-                                                                <button className="3xl:px-4 2xl:px-3 xl:px-3 lg:px-2 3xl:py-2.5 2xl:py-2 xl:py-2 lg:py-2.5 3xl:text-[15px] 2xl:text-[13px] xl:text-[12px] lg:text-[8px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                                    <IconExcel
-                                                                        className="3xl:scale-100 2xl:scale-100 xl:scale-100 lg:scale-75"
-                                                                        size={18}
-                                                                    />
-                                                                    <span>{dataLang?.client_list_exportexcel}</span>
-                                                                </button>
-                                                            }
-                                                        >
-                                                            <ExcelSheet
-                                                                dataSet={multiDataSet}
-                                                                data={multiDataSet}
-                                                                name="Organization"
-                                                            />
-                                                        </ExcelFile>
+                                                        <ExcelFileComponent
+                                                            dataLang={dataLang}
+                                                            filename={"Danh sách kế hoạch nội bộ"}
+                                                            multiDataSet={multiDataSet}
+                                                            title="DSKHNB"
+                                                        />
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <div className="font-[300] text-slate-400 3xl:text-xs 2xl:text-xs xl:text-[10px] lg:text-[6px]">
-                                                        {dataLang?.display}
-                                                    </div>
-                                                    <select
-                                                        className="outline-none text-[10px] xl:text-xs 2xl:text-sm"
-                                                        onChange={(e) => sLimit(e.target.value)}
-                                                        value={limit}
-                                                    >
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm hidden"
-                                                            disabled
-                                                        >
-                                                            {limit == -1 ? "Tất cả" : limit}
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={15}
-                                                        >
-                                                            15
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={20}
-                                                        >
-                                                            20
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={40}
-                                                        >
-                                                            40
-                                                        </option>
-                                                        <option
-                                                            className="text-[10px] xl:text-xs 2xl:text-sm"
-                                                            value={60}
-                                                        >
-                                                            60
-                                                        </option>
-                                                    </select>
+                                                    <DropdowLimit dataLang={dataLang} sLimit={sLimit} limit={limit} />
                                                 </div>
                                             </div>
                                         </div>
@@ -798,7 +324,7 @@ const Index = (props) => {
                                 </div>
                                 <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lg:w-[100%] ">
-                                        <div className="grid grid-cols-8 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
+                                        <div className="grid grid-cols-9 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.import_day_vouchers || "import_day_vouchers"}
                                             </h4>
@@ -806,17 +332,19 @@ const Index = (props) => {
                                                 {dataLang?.import_code_vouchers || "import_code_vouchers"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2 text-center ">
-                                                {"Tên kế hoạch"}
+                                                {dataLang?.internal_plan_name || "internal_plan_name"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {"Người tạo"}
+                                                {dataLang?.internal_plan_status || "internal_plan_status"}
                                             </h4>
-
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
-                                                {"Ghi chú"}
+                                                {dataLang?.internal_plan_creators || "internal_plan_creators"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.import_branch || "import_branch"}
+                                            </h4>
+                                            <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
+                                                {dataLang?.recall_noteChild || "recall_noteChild"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
                                                 {dataLang?.import_action || "import_action"}
@@ -829,7 +357,7 @@ const Index = (props) => {
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
                                                     {listData?.data?.map((e) => (
                                                         <div
-                                                            className="relative  grid grid-cols-8 items-center py-1.5  hover:bg-slate-100/40 group"
+                                                            className="relative  grid grid-cols-9 items-center py-1.5  hover:bg-slate-100/40 group"
                                                             key={e.id.toString()}
                                                         >
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
@@ -847,6 +375,9 @@ const Index = (props) => {
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-left capitalize">
                                                                 {e.plan_name}
+                                                            </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
+                                                                {""}
                                                             </h6>
                                                             <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
                                                                 <div className="relative">
@@ -884,23 +415,21 @@ const Index = (props) => {
                                                                     {e?.created_by_full_name}
                                                                 </h6>
                                                             </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
-                                                                {e.note}
-                                                            </h6>
 
                                                             <h6 className="col-span-1 w-fit ">
                                                                 <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2">
                                                                     {e?.name_branch}
                                                                 </div>
                                                             </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
+                                                                {e.note}
+                                                            </h6>
                                                             <div className="col-span-1 flex justify-center">
                                                                 <BtnAction
                                                                     onRefresh={_ServerFetching.bind(this)}
-                                                                    onRefreshGroup={_ServerFetching_group.bind(this)}
                                                                     dataLang={dataLang}
-                                                                    warehouseman_id={e?.warehouseman_id}
                                                                     id={e?.id}
-                                                                    type="returnSales"
+                                                                    type="internal_plan"
                                                                     className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
                                                                 />
                                                             </div>
@@ -926,28 +455,6 @@ const Index = (props) => {
                                 </div>
                             </div>
                         </div>
-                        {/* <div className="grid grid-cols-10 bg-gray-100 items-center rounded-md">
-                            <div className="col-span-3 p-2 text-center">
-                                <h3 className="uppercase text-gray-600 font-medium 3xl:text-[14px] 2xl:text-[12px] xl:text-[11.5px] text-[9px]">
-                                    {dataLang?.import_total || "import_total"}
-                                </h3>
-                            </div>
-                            <div className="col-span-1 text-right">
-                                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                                    {formatNumber(total?.total_price)}
-                                </h3>
-                            </div>
-                            <div className="col-span-1 text-right ">
-                                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                                    {formatNumber(total?.total_tax_price)}
-                                </h3>
-                            </div>
-                            <div className="col-span-1 text-right">
-                                <h3 className="2xl:text-base xl:text-xs text-zinc-600 font-medium text-[8px] px-4 col-span-1 text-right">
-                                    {formatNumber(total?.total_amount)}
-                                </h3>
-                            </div>
-                        </div> */}
                         {listData.data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6 className="">

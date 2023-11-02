@@ -1,4 +1,3 @@
-import { data } from "autoprefixer";
 import Image from "next/image";
 import { useState } from "react";
 import dynamic from "next/dynamic";

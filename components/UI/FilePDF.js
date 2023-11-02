@@ -11,6 +11,7 @@ import {
     uppercaseTextHeaderTabel,
 } from "./stylePdf/style";
 import { VscFilePdf } from "react-icons/vsc";
+import { lineHeght, titleFooter, titleHeader } from "./stylePdf/receiptsEndPayment";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const FilePDF = ({
@@ -23,7 +24,6 @@ const FilePDF = ({
     dataProductSerial,
 }) => {
     const [url, setUrl] = useState(null);
-
     // uppercase text header table
     const uppercaseText = (text, style, alignment) => {
         return { text: text.toUpperCase(), style: style, alignment: alignment };
@@ -115,7 +115,7 @@ const FilePDF = ({
                 ],
                 columnGap: 10,
             },
-            { canvas: [{ type: "line", x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, color: "#e2e8f0" }] },
+            { canvas: lineHeght() },
             {
                 stack: [
                     {
@@ -246,7 +246,8 @@ const FilePDF = ({
                             uppercaseTextHeaderTabel("Ghi chú", "headerTable", "center"),
                         ],
                         // Data rows
-                        ...(data && data?.items.length > 0
+                        ...((data && props?.type === "price_quote") ||
+                        (props?.type === "sales_product" && data?.items.length > 0)
                             ? data?.items.map((item, index) => {
                                   return [
                                       {
@@ -538,17 +539,7 @@ const FilePDF = ({
                 columnGap: 10,
             },
             {
-                canvas: [
-                    {
-                        type: "line",
-                        x1: 0,
-                        y1: 0,
-                        x2: 520,
-                        y2: 0,
-                        lineWidth: 1,
-                        color: "#e2e8f0",
-                    },
-                ],
+                canvas: lineHeght(),
             },
             {
                 stack: [
@@ -1971,17 +1962,7 @@ const FilePDF = ({
                 columnGap: 10,
             },
             {
-                canvas: [
-                    {
-                        type: "line",
-                        x1: 0,
-                        y1: 0,
-                        x2: 520,
-                        y2: 0,
-                        lineWidth: 1,
-                        color: "#e2e8f0",
-                    },
-                ],
+                canvas: lineHeght(),
             },
             {
                 stack: [
@@ -2296,6 +2277,221 @@ const FilePDF = ({
         },
     };
 
+    const docDefinitionInternalPlan = {
+        pageOrientation: "portrait",
+        info: {
+            title: `${`${"Kế hoạch nội bộ"} - ${data?.internalPlans?.reference_no}`}`,
+            author: "Foso",
+            subject: "Quotation",
+            keywords: "PDF",
+        },
+        content: [
+            {
+                columns: titleHeader(props, dataCompany),
+                columnGap: 10,
+            },
+            {
+                canvas: lineHeght(),
+            },
+            {
+                stack: [
+                    {
+                        text: uppercaseText(`Kế hoạch nội bộ`, "contentTitle"),
+                    },
+                ],
+                margin: [0, 8, 0, 0],
+            },
+            {
+                columns: [
+                    {
+                        text: "",
+                        width: "80%",
+                    },
+                    {
+                        width: "20%",
+                        stack: [
+                            {
+                                text: [
+                                    {
+                                        text: `${
+                                            props.dataLang?.import_code_vouchers + ": " || "import_code_vouchers"
+                                        }`,
+                                        inline: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                    {
+                                        text: `${data?.internalPlans?.reference_no}`,
+                                        bold: true,
+                                        fontSize: 7,
+                                        italics: true,
+                                    },
+                                ],
+                                italic: true,
+                                margin: [0, 10, 0, 2],
+                            },
+                            {
+                                text: [
+                                    {
+                                        text: `${props.dataLang?.import_day_vouchers + ": " || "import_day_vouchers"}`,
+                                        inline: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                    {
+                                        text: `${moment(data?.internalPlans?.date).format("DD/MM/YYYY")}`,
+                                        bold: true,
+                                        fontSize: 8,
+                                        italics: true,
+                                    },
+                                ],
+                                italic: true,
+                                margin: [0, 2, 0, 2],
+                            },
+                        ],
+                    },
+                ],
+                columnGap: 2,
+            },
+            {
+                text: [
+                    {
+                        text: `${"Tên kế hoạch"}: `,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    {
+                        text: `${data?.internalPlans?.plan_name}`,
+                        bold: true,
+                        fontSize: 10,
+                    },
+                ],
+                margin: [0, 2, 0, 2],
+            },
+
+            {
+                text: [
+                    {
+                        text: `${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}: `,
+                        inline: true,
+                        fontSize: 10,
+                    },
+                    { text: `${data?.internalPlans?.note}`, bold: true, fontSize: 10 },
+                ],
+                margin: [0, 2, 0, 10],
+            },
+            {
+                table: {
+                    widths: "100%",
+                    headerRows: 0,
+                    widths: props?.type == "internal_plan" && ["auto", "auto", "auto", "auto", "auto", "*"],
+                    body: [
+                        // Header row
+                        [
+                            uppercaseTextHeaderTabel("STT", "headerTable", "center"),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.inventory_items || "inventory_items"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.PDF_infoItem || "PDF_infoItem"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                            uppercaseTextHeaderTabel(`${"ĐVT"}`, "headerTable", "center"),
+                            uppercaseTextHeaderTabel(`${"SL"}`, "headerTable", "center"),
+                            uppercaseTextHeaderTabel(
+                                `${props.dataLang?.serviceVoucher_note || "serviceVoucher_note"}`,
+                                "headerTable",
+                                "center"
+                            ),
+                        ],
+
+                        // Data rows
+                        ...(data && props?.type == "internal_plan" && data?.internalPlansItems.length > 0
+                            ? data?.internalPlansItems.map((item, index) => {
+                                  const stack = [];
+                                  const stackBt = [];
+                                  stack.push({
+                                      text: item?.item_name ? item?.item_name : "",
+                                      fontSize: 10,
+                                      margin: styleMarginChild,
+                                  });
+                                  stackBt.push({
+                                      text: `Biến thể: ${item?.product_variation}`,
+                                      fontSize: 9,
+                                      italics: true,
+                                      margin: styleMarginChild,
+                                  });
+
+                                  return [
+                                      {
+                                          text: `${index + 1}`,
+                                          alignment: "center",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          stack: stack,
+                                      },
+                                      //   location_name
+                                      {
+                                          stack: stackBt,
+                                      },
+                                      {
+                                          text: item?.unit_name ? item?.unit_name : "",
+                                          alignment: "center",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.quantity ? formatNumber(item?.quantity) : "",
+                                          fontSize: 10,
+                                          alignment: "center",
+                                          margin: styleMarginChild,
+                                      },
+                                      {
+                                          text: item?.note_item ? item?.note_item : "",
+                                          fontSize: 10,
+                                          margin: styleMarginChild,
+                                      },
+                                  ];
+                              })
+                            : ""),
+                        [
+                            {
+                                text: `${"Tổng số lượng"}`,
+                                bold: true,
+                                colSpan: 2,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                            "",
+                            {
+                                text: `${formatNumber(data?.internalPlans?.total_quantity)}`,
+                                bold: true,
+                                alignment: "right",
+                                colSpan: 4,
+                                fontSize: 10,
+                                margin: styleMarginChildTotal,
+                            },
+                        ],
+                    ],
+                },
+            },
+            { style: "dateTexts", text: `${currentDate}`, alignment: "right" },
+            titleFooter(props, ""),
+        ],
+        styles: styles,
+        dontBreakRows: true,
+        images: {
+            logo: {
+                url: `${dataCompany?.company_logo}`,
+            },
+        },
+    };
+
     const handlePrintPdf = (type) => {
         if (
             (props?.type == "sales_product" || props?.type == "price_quote") &&
@@ -2343,7 +2539,14 @@ const FilePDF = ({
         }
         if (type == "noprice" && data !== undefined && dataCompany !== undefined && props?.type == "returnSales") {
             const pdfGenerator = pdfMake.createPdf(docDefinitionReturnSalesNoPrice);
-            console.log(data);
+            pdfGenerator.open((blob) => {
+                const url = URL.createObjectURL(blob);
+                setUrl(url);
+            });
+            setOpenAction(false);
+        }
+        if (data !== undefined && dataCompany !== undefined && props?.type == "internal_plan") {
+            const pdfGenerator = pdfMake.createPdf(docDefinitionInternalPlan);
             pdfGenerator.open((blob) => {
                 const url = URL.createObjectURL(blob);
                 setUrl(url);
@@ -2351,7 +2554,6 @@ const FilePDF = ({
             setOpenAction(false);
         }
     };
-
     return (
         <>
             {/* <button
@@ -2431,6 +2633,20 @@ const FilePDF = ({
                         </button>
                     </div>
                 </React.Fragment>
+            )}
+            {props?.type == "internal_plan" && (
+                <button
+                    onClick={handlePrintPdf}
+                    className="transition-all ease-in-out flex items-center gap-2 group  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5  rounded py-2.5 w-full"
+                >
+                    <VscFilePdf
+                        size={20}
+                        className="group-hover:text-[#65a30d] group-hover:scale-110 group-hover:shadow-md "
+                    />
+                    <p className="group-hover:text-[#65a30d]">
+                        {props?.dataLang?.btn_table_print || "btn_table_print"}
+                    </p>
+                </button>
             )}
         </>
     );
