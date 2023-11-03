@@ -116,7 +116,7 @@ const Index = (props) => {
                             };
                         })
                     );
-                    checkValue({
+                    sIdChange({
                         code: data?.internalPlans?.reference_no,
                         date: moment(data?.internalPlans?.date).toDate(),
                         idBranch: {
@@ -265,7 +265,9 @@ const Index = (props) => {
         };
         onChange[type]?.();
     };
-
+    useEffect(() => {
+        id && sFetchingData((e) => ({ ...e, onFetchingDetail: true }));
+    }, []);
     useEffect(() => {
         router.query && sFetchingData((e) => ({ ...e, onFetching: true }));
     }, [router.query]);
