@@ -9,11 +9,12 @@ import DatePicker from "react-datepicker";
 import { useSelector } from "react-redux";
 import Loading from "@/components/UI/loading";
 import { BsCalendarEvent } from "react-icons/bs";
+import Select, { components } from "react-select";
 import { NumericFormat } from "react-number-format";
 import React, { useState, useEffect } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
-import Select, { components } from "react-select";
 import { routerInternalPlan } from "@/components/UI/router/internalPlan";
+import TransitionMotion from "@/components/UI/transition/motionTransition";
 import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
 import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
 
@@ -48,9 +49,6 @@ const Index = (props) => {
     const dataLang = props?.dataLang;
     const trangthaiExprired = useSelector((state) => state?.trangthaiExprired);
     const [fetChingData, sFetchingData] = useState(initsFetching);
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-    const [dataProductSerial, sDataProductSerial] = useState({});
     const [dataSelect, sDataSelect] = useState(initsArr);
     const [idChange, sIdChange] = useState(initsValue);
     const [errors, sErrors] = useState(initsErors);
@@ -83,110 +81,60 @@ const Index = (props) => {
         fetChingData.onFetching && _ServerFetching();
     }, [fetChingData.onFetching]);
 
-    const _ServerFetchingCondition = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                let data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            sFetchingData((e) => ({ ...e, onFetchingCondition: true }));
-        });
-    };
-
-    useEffect(() => {
-        fetChingData.onFetchingCondition && _ServerFetchingCondition();
-    }, [fetChingData.onFetchingCondition]);
-
-    useEffect(() => {
-        id && sFetchingData((e) => ({ ...e, onFetchingCondition: true }));
-    }, []);
-
-    useEffect(() => {
-        JSON.stringify(dataMaterialExpiry) === "{}" &&
-            JSON.stringify(dataProductExpiry) === "{}" &&
-            JSON.stringify(dataProductSerial) === "{}" &&
-            sFetchingData((e) => ({ ...e, onFetchingCondition: true }));
-    }, [
-        JSON.stringify(dataMaterialExpiry) === "{}",
-        JSON.stringify(dataProductExpiry) === "{}",
-        JSON.stringify(dataProductSerial) === "{}",
-    ]);
-
     const options = dataSelect.dataItems?.map((e) => ({
         label: `${e.name}
-            <span style={{display: none}}>${e.code}</span>
-            <span style={{display: none}}>${e.product_letiation} </span>
-            <span style={{display: none}}>${e.serial} </span>
-            <span style={{display: none}}>${e.lot} </span>
-            <span style={{display: none}}>${e.expiration_date} </span>
+            <spa style={{display: none}}>${e.code}</spa
             <span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
         value: e.id,
         e,
     }));
 
     const _ServerFetchingDetailPage = () => {
-        Axios("GET", `/api_web/Api_return_order/getDetail/${id}?csrf_protection=true`, {}, (err, response) => {
-            if (!err) {
-                let rResult = response.data;
-                sListData(
-                    rResult?.items.map((e) => {
-                        const newData = {
-                            id: Number(ce?.id),
-                            disabledDate:
-                                (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "1" && false) ||
-                                (e.item?.text_type == "material" && dataMaterialExpiry?.is_enable == "0" && true) ||
-                                (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "1" && false) ||
-                                (e.item?.text_type == "products" && dataProductExpiry?.is_enable == "0" && true),
-                            unit: e?.item?.unit_name,
-                            quantity: Number(e?.quantity),
-                            note: e?.note,
-                        };
-                        return {
-                            id: e?.item?.id,
-                            idParenBackend: e?.item?.id,
-                            matHang: {
-                                e: e?.item,
-                                label: `${e.item?.name} <span style={{display: none}}>${
-                                    e.item?.code + e.item?.product_letiation + e.item?.text_type + e.item?.unit_name
-                                }</span>`,
-                                value: e.item?.id,
-                            },
-                            ...newData,
-                        };
-                    })
-                );
-                sIdChange({
-                    code: rResult.code,
-                    date: moment(rResult?.date).toDate(),
-                    idBranch: {
-                        label: rResult?.branch_name,
-                        value: rResult?.branch_id,
-                    },
-                    namePlan: "",
-                    note: rResult?.note,
-                });
+        Axios(
+            "GET",
+            `/api_web/api_internal_plan/detailInternalPlan/${id}?csrf_protection=true`,
+            {},
+            (err, response) => {
+                if (!err) {
+                    let { data } = response?.data;
+                    sListData(
+                        data?.internalPlansItems.map((e) => {
+                            return {
+                                id: e?.id,
+                                idParenBackend: e?.id,
+                                matHang: {
+                                    e: e,
+                                    label: `${e?.item_name} <span style={{display: none}}>${
+                                        e?.code + e?.product_variation + e?.text_type + e?.unit_name
+                                    }</span>`,
+                                    value: e?.item_id,
+                                },
+                                unit: e?.unit_name,
+                                quantity: Number(e?.quantity),
+                                note: e?.note_item,
+                                date: moment(e?.date_needed).toDate(),
+                            };
+                        })
+                    );
+                    checkValue({
+                        code: data?.internalPlans?.reference_no,
+                        date: moment(data?.internalPlans?.date).toDate(),
+                        idBranch: {
+                            label: data?.internalPlans?.name_branch,
+                            value: data?.internalPlans?.branch_id,
+                        },
+                        namePlan: data?.internalPlans.plan_name,
+                        note: data?.internalPlans?.note,
+                    });
+                }
+                sFetchingData((e) => ({ ...e, onFetchingDetail: false }));
             }
-            sFetchingData((e) => ({ ...e, onFetchingDetail: false }));
-        });
+        );
     };
 
     useEffect(() => {
         fetChingData.onFetchingDetail && _ServerFetchingDetailPage();
     }, [fetChingData.onFetchingDetail]);
-
-    useEffect(() => {
-        id &&
-            JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}" &&
-            sFetchingData((e) => ({ ...e, onFetchingDetail: true }));
-    }, [
-        JSON.stringify(dataMaterialExpiry) !== "{}" &&
-            JSON.stringify(dataProductExpiry) !== "{}" &&
-            JSON.stringify(dataProductSerial) !== "{}",
-    ]);
 
     const _ServerFetching_ItemsAll = () => {
         Axios(
@@ -315,7 +263,6 @@ const Index = (props) => {
             branch: () => handleBranchChange(value),
             dateAll: () => handleDateAllChange(value),
         };
-
         onChange[type]?.();
     };
 
@@ -342,24 +289,15 @@ const Index = (props) => {
     };
 
     const _DataValueItem = (value) => {
-        const newChild = {
-            id: uuidv4(),
-            disabledDate:
-                (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "1" && false) ||
-                (value?.e?.text_type === "material" && dataMaterialExpiry?.is_enable === "0" && true) ||
-                (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "1" && false) ||
-                (value?.e?.text_type === "products" && dataProductExpiry?.is_enable === "0" && true),
-            unit: value?.e?.unit_name,
-            quantity: null,
-            date: idChange.dateAll ? idChange.dateAll : "",
-            note: null,
-        };
         return {
             parent: {
                 id: uuidv4(),
                 matHang: value,
                 idParenBackend: "",
-                ...newChild,
+                unit: value?.e?.unit_name,
+                quantity: null,
+                date: idChange.dateAll ? idChange.dateAll : "",
+                note: null,
             },
         };
     };
@@ -445,7 +383,7 @@ const Index = (props) => {
                     </div>
                     <div>
                         <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                            {option.e?.name}
+                            {option.e?.item_name}
                         </h3>
                         <div className="flex gap-2">
                             <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
@@ -513,7 +451,7 @@ const Index = (props) => {
             "POST",
             `${
                 id
-                    ? `/api_web/Api_return_order/return_order/${id}?csrf_protection=true`
+                    ? `/api_web/api_internal_plan/handling/${id}?csrf_protection=true`
                     : "/api_web/api_internal_plan/handling?csrf_protection=true"
             }`,
             {
@@ -830,154 +768,168 @@ const Index = (props) => {
                             ) : (
                                 <>
                                     {listData?.map((e) => (
-                                        <div key={e?.id?.toString()} className="grid grid-cols-12  my-1 items-center ">
-                                            <div className="col-span-3 h-full ">
-                                                <div className="relative">
-                                                    <Select
-                                                        options={options}
-                                                        value={e?.matHang}
-                                                        onInputChange={_HandleSeachApi.bind(this)}
-                                                        className=""
-                                                        onChange={_HandleChangeValue.bind(this, e?.id)}
-                                                        menuPortalTarget={document.body}
-                                                        formatOptionLabel={selectItemsLabel}
-                                                        style={{
-                                                            border: "none",
-                                                            boxShadow: "none",
-                                                            outline: "none",
-                                                        }}
-                                                        theme={(theme) => ({
-                                                            ...theme,
-                                                            colors: {
-                                                                ...theme.colors,
-                                                                primary25: "#EBF5FF",
-                                                                primary50: "#92BFF7",
-                                                                primary: "#0F4F9E",
-                                                            },
-                                                        })}
-                                                        styles={{
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: "#cbd5e1",
-                                                            }),
-                                                            menuPortal: (base) => ({
-                                                                ...base,
-                                                                // zIndex: 9999,
-                                                            }),
-                                                            control: (base, state) => ({
-                                                                ...base,
-                                                                ...(state.isFocused && {
-                                                                    border: "0 0 0 1px #92BFF7",
-                                                                    boxShadow: "none",
+                                        <TransitionMotion>
+                                            <div
+                                                key={e?.id?.toString()}
+                                                className="grid grid-cols-12  my-1 items-center "
+                                            >
+                                                <div className="col-span-3 h-full ">
+                                                    <div className="relative">
+                                                        <Select
+                                                            options={options}
+                                                            value={e?.matHang}
+                                                            onInputChange={_HandleSeachApi.bind(this)}
+                                                            className=""
+                                                            onChange={_HandleChangeValue.bind(this, e?.id)}
+                                                            menuPortalTarget={document.body}
+                                                            formatOptionLabel={selectItemsLabel}
+                                                            style={{
+                                                                border: "none",
+                                                                boxShadow: "none",
+                                                                outline: "none",
+                                                            }}
+                                                            theme={(theme) => ({
+                                                                ...theme,
+                                                                colors: {
+                                                                    ...theme.colors,
+                                                                    primary25: "#EBF5FF",
+                                                                    primary50: "#92BFF7",
+                                                                    primary: "#0F4F9E",
+                                                                },
+                                                            })}
+                                                            styles={{
+                                                                placeholder: (base) => ({
+                                                                    ...base,
+                                                                    color: "#cbd5e1",
                                                                 }),
-                                                            }),
-                                                            menu: (provided, state) => ({
-                                                                ...provided,
-                                                                width: "100%",
-                                                            }),
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-5 items-center col-span-9 border divide-x ml-1">
-                                                <div className="col-span-1 py-5 flex justify-center items-center text-sm">
-                                                    {e.unit}
-                                                </div>
-                                                <div className="col-span-1 py-5 relative">
-                                                    <div className="flex items-center justify-center h-full p-0.5">
-                                                        <button
-                                                            disabled={
-                                                                e.quantity === 1 ||
-                                                                e.quantity === "" ||
-                                                                e.quantity === null ||
-                                                                e.quantity === 0
-                                                            }
-                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                            onClick={_HandleChangeChild.bind(this, e?.id, "decrease")}
-                                                        >
-                                                            <Minus
-                                                                className="2xl:scale-100 xl:scale-100 scale-50"
-                                                                size="16"
-                                                            />
-                                                        </button>
-                                                        <NumericFormat
-                                                            onValueChange={_HandleChangeChild.bind(
-                                                                this,
-                                                                e.id,
-                                                                "quantity"
-                                                            )}
-                                                            value={e.quantity || null}
-                                                            className={`${
-                                                                errors.errQuantity &&
-                                                                (e.quantity == null ||
-                                                                    e.quantity == "" ||
-                                                                    e.quantity == 0)
-                                                                    ? "border-b border-red-500"
-                                                                    : "border-b border-gray-200"
-                                                            } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
-                                                            allowNegative={false}
-                                                            decimalScale={0}
-                                                            isNumericString={true}
-                                                            thousandSeparator=","
-                                                            isAllowed={(values) => {
-                                                                const { value } = values;
-                                                                const newValue = +value;
-
-                                                                return true;
+                                                                menuPortal: (base) => ({
+                                                                    ...base,
+                                                                    // zIndex: 9999,
+                                                                }),
+                                                                control: (base, state) => ({
+                                                                    ...base,
+                                                                    ...(state.isFocused && {
+                                                                        border: "0 0 0 1px #92BFF7",
+                                                                        boxShadow: "none",
+                                                                    }),
+                                                                }),
+                                                                menu: (provided, state) => ({
+                                                                    ...provided,
+                                                                    width: "100%",
+                                                                }),
                                                             }}
                                                         />
-                                                        <button
-                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                            onClick={_HandleChangeChild.bind(this, e?.id, "increase")}
-                                                        >
-                                                            <Add
-                                                                className="2xl:scale-100 xl:scale-100 scale-50"
-                                                                size="16"
-                                                            />
-                                                        </button>
                                                     </div>
                                                 </div>
-                                                <div className="col-span-1 py-3 flex justify-center items-center">
-                                                    <div className="h-full w-fit">
-                                                        <DatePicker
-                                                            selected={e.date}
-                                                            dateFormat="dd/MM/yyyy"
-                                                            onChange={_HandleChangeChild.bind(this, e?.id, "date")}
-                                                            isClearable
-                                                            value={e.date}
-                                                            placeholderText="Chọn ngày"
-                                                            className={`outline-none ${
-                                                                errors.errDate && (e.date == null || e.date == "")
-                                                                    ? "border-b border-red-500"
-                                                                    : "border-b border-gray-200"
-                                                            } border py-2 px-1 rounded-md placeholder:text-xs w-fit`}
+                                                <div className="grid grid-cols-5 items-center col-span-9 border divide-x ml-1">
+                                                    <div className="col-span-1 py-5 flex justify-center items-center text-sm">
+                                                        {e.unit}
+                                                    </div>
+                                                    <div className="col-span-1 py-5 relative">
+                                                        <div className="flex items-center justify-center h-full p-0.5">
+                                                            <button
+                                                                disabled={
+                                                                    e.quantity === 1 ||
+                                                                    e.quantity === "" ||
+                                                                    e.quantity === null ||
+                                                                    e.quantity === 0
+                                                                }
+                                                                className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
+                                                                onClick={_HandleChangeChild.bind(
+                                                                    this,
+                                                                    e?.id,
+                                                                    "decrease"
+                                                                )}
+                                                            >
+                                                                <Minus
+                                                                    className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                    size="16"
+                                                                />
+                                                            </button>
+                                                            <NumericFormat
+                                                                onValueChange={_HandleChangeChild.bind(
+                                                                    this,
+                                                                    e.id,
+                                                                    "quantity"
+                                                                )}
+                                                                value={e.quantity || null}
+                                                                className={`${
+                                                                    errors.errQuantity &&
+                                                                    (e.quantity == null ||
+                                                                        e.quantity == "" ||
+                                                                        e.quantity == 0)
+                                                                        ? "border-b border-red-500"
+                                                                        : "border-b border-gray-200"
+                                                                } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
+                                                                allowNegative={false}
+                                                                decimalScale={0}
+                                                                isNumericString={true}
+                                                                thousandSeparator=","
+                                                                isAllowed={(values) => {
+                                                                    const { value } = values;
+                                                                    const newValue = +value;
+
+                                                                    return true;
+                                                                }}
+                                                            />
+                                                            <button
+                                                                className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
+                                                                onClick={_HandleChangeChild.bind(
+                                                                    this,
+                                                                    e?.id,
+                                                                    "increase"
+                                                                )}
+                                                            >
+                                                                <Add
+                                                                    className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                    size="16"
+                                                                />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-span-1 py-3 flex justify-center items-center">
+                                                        <div className="h-full w-fit">
+                                                            <DatePicker
+                                                                selected={e.date}
+                                                                dateFormat="dd/MM/yyyy"
+                                                                onChange={_HandleChangeChild.bind(this, e?.id, "date")}
+                                                                isClearable
+                                                                value={e.date}
+                                                                placeholderText="Chọn ngày"
+                                                                className={`outline-none ${
+                                                                    errors.errDate && (e.date == null || e.date == "")
+                                                                        ? "border-b border-red-500"
+                                                                        : "border-b border-gray-200"
+                                                                } border py-2 px-1 rounded-md placeholder:text-xs w-fit`}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-span-1 py-5 flex items-center justify-center ">
+                                                        <input
+                                                            value={e.note}
+                                                            onChange={_HandleChangeChild.bind(this, e.id, "note")}
+                                                            placeholder={
+                                                                dataLang?.delivery_receipt_note ||
+                                                                "delivery_receipt_note"
+                                                            }
+                                                            type="text"
+                                                            className="  placeholder:text-slate-300 text-xs px-1 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal outline-none "
                                                         />
                                                     </div>
-                                                </div>
-                                                <div className="col-span-1 py-5 flex items-center justify-center ">
-                                                    <input
-                                                        value={e.note}
-                                                        onChange={_HandleChangeChild.bind(this, e.id, "note")}
-                                                        placeholder={
-                                                            dataLang?.delivery_receipt_note || "delivery_receipt_note"
-                                                        }
-                                                        type="text"
-                                                        className="  placeholder:text-slate-300 px-1 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal outline-none "
-                                                    />
-                                                </div>
-                                                <div className="col-span-1  h-full flex items-center justify-center">
-                                                    <div>
-                                                        <button
-                                                            title="Xóa"
-                                                            onClick={_HandleDeleteParent.bind(this, e.id)}
-                                                            className=" text-red-500 flex p-1 justify-center items-center hover:scale-110 bg-red-50  rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
-                                                        >
-                                                            <IconDelete size={24} />
-                                                        </button>
+                                                    <div className="col-span-1  h-full flex items-center justify-center">
+                                                        <div>
+                                                            <button
+                                                                title="Xóa"
+                                                                onClick={_HandleDeleteParent.bind(this, e.id)}
+                                                                className=" text-red-500 flex p-1 justify-center items-center hover:scale-110 bg-red-50  rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
+                                                            >
+                                                                <IconDelete size={24} />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </TransitionMotion>
                                     ))}
                                 </>
                             )}

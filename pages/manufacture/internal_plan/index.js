@@ -11,11 +11,13 @@ import { SearchNormal1 as IconSearch } from "iconsax-react";
 import React, { useState, useEffect, useTransition } from "react";
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
+import NoData from "@/components/UI/noData/nodata";
 import Pagination from "@/components/UI/pagination";
 import ImageErrors from "@/components/UI/imageErrors";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import { routerInternalPlan } from "@/components/UI/router/internalPlan";
+import TransitionMotion from "@/components/UI/transition/motionTransition";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
@@ -85,8 +87,8 @@ const Index = (props) => {
     };
 
     // filter
-    const _ServerFetching_filter = async () => {
-        await Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
+    const _ServerFetching_filter = () => {
+        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
             if (!err) {
                 let { rResult } = response.data;
                 sListData((e) => ({ ...e, listBr: rResult.map((e) => ({ label: e.name, value: e.id })) }));
@@ -322,7 +324,7 @@ const Index = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="min:h-[200px] 3xl:h-[82%] 2xl:h-[82%] xl:h-[72%] lg:h-[82%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                                <div className="min:h-[200px] 3xl:h-[90%] 2xl:h-[87%] xl:h-[78%] lg:h-[90%] max:h-[400px] overflow-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
                                     <div className="pr-2 w-[100%] lg:w-[100%] ">
                                         <div className="grid grid-cols-9 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1 text-center ">
@@ -354,102 +356,93 @@ const Index = (props) => {
                                             <Loading className="h-80" color="#0f4f9e" />
                                         ) : listData.data?.length > 0 ? (
                                             <>
-                                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                                                    {listData?.data?.map((e) => (
-                                                        <div
-                                                            className="relative  grid grid-cols-9 items-center py-1.5  hover:bg-slate-100/40 group"
-                                                            key={e.id.toString()}
-                                                        >
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
-                                                                {e?.date != null
-                                                                    ? moment(e?.date).format("DD/MM/YYYY")
-                                                                    : ""}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer ">
-                                                                <PopupDetail
-                                                                    dataLang={dataLang}
-                                                                    className="text-left"
-                                                                    name={e?.reference_no}
-                                                                    id={e?.id}
-                                                                />
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-left capitalize">
-                                                                {e.plan_name}
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
-                                                                {""}
-                                                            </h6>
-                                                            <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
-                                                                <div className="relative">
-                                                                    <ModalImage
-                                                                        small={
-                                                                            e?.created_by_profile_image
-                                                                                ? e?.created_by_profile_image
-                                                                                : "/user-placeholder.jpg"
-                                                                        }
-                                                                        large={
-                                                                            e?.created_by_profile_image
-                                                                                ? e?.created_by_profile_image
-                                                                                : "/user-placeholder.jpg"
-                                                                        }
-                                                                        className="h-6 w-6 rounded-full object-cover "
-                                                                    >
-                                                                        <div className="">
-                                                                            <ImageErrors
-                                                                                src={e?.created_by_profile_image}
-                                                                                width={25}
-                                                                                height={25}
-                                                                                defaultSrc="/user-placeholder.jpg"
-                                                                                alt="Image"
-                                                                                className="object-cover  rounded-[100%] text-left cursor-pointer"
-                                                                            />
-                                                                        </div>
-                                                                    </ModalImage>
-                                                                    <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                                        <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
-                                                                        </span>
-                                                                    </span>
-                                                                </div>
-                                                                <h6 className="capitalize">
-                                                                    {e?.created_by_full_name}
+                                                <TransitionMotion>
+                                                    <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[900px]">
+                                                        {listData?.data?.map((e) => (
+                                                            <div
+                                                                className="relative  grid grid-cols-9 items-center py-1.5  hover:bg-slate-100/40 group"
+                                                                key={e.id.toString()}
+                                                            >
+                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
+                                                                    {e?.date != null
+                                                                        ? moment(e?.date).format("DD/MM/YYYY")
+                                                                        : ""}
                                                                 </h6>
-                                                            </h6>
+                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer ">
+                                                                    <PopupDetail
+                                                                        dataLang={dataLang}
+                                                                        className="text-left"
+                                                                        name={e?.reference_no}
+                                                                        id={e?.id}
+                                                                    />
+                                                                </h6>
+                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-left capitalize">
+                                                                    {e.plan_name}
+                                                                </h6>
+                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
+                                                                    {""}
+                                                                </h6>
+                                                                <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
+                                                                    <div className="relative">
+                                                                        <ModalImage
+                                                                            small={
+                                                                                e?.created_by_profile_image
+                                                                                    ? e?.created_by_profile_image
+                                                                                    : "/user-placeholder.jpg"
+                                                                            }
+                                                                            large={
+                                                                                e?.created_by_profile_image
+                                                                                    ? e?.created_by_profile_image
+                                                                                    : "/user-placeholder.jpg"
+                                                                            }
+                                                                            className="h-6 w-6 rounded-full object-cover "
+                                                                        >
+                                                                            <div className="">
+                                                                                <ImageErrors
+                                                                                    src={e?.created_by_profile_image}
+                                                                                    width={25}
+                                                                                    height={25}
+                                                                                    defaultSrc="/user-placeholder.jpg"
+                                                                                    alt="Image"
+                                                                                    className="object-cover  rounded-[100%] text-left cursor-pointer"
+                                                                                />
+                                                                            </div>
+                                                                        </ModalImage>
+                                                                        <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
+                                                                            <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
+                                                                                <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                                            </span>
+                                                                        </span>
+                                                                    </div>
+                                                                    <h6 className="capitalize">
+                                                                        {e?.created_by_full_name}
+                                                                    </h6>
+                                                                </h6>
 
-                                                            <h6 className="col-span-1 w-fit ">
-                                                                <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2">
-                                                                    {e?.name_branch}
+                                                                <h6 className="col-span-1 w-fit ">
+                                                                    <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2">
+                                                                        {e?.name_branch}
+                                                                    </div>
+                                                                </h6>
+                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
+                                                                    {e.note}
+                                                                </h6>
+                                                                <div className="col-span-1 flex justify-center">
+                                                                    <BtnAction
+                                                                        onRefresh={_ServerFetching.bind(this)}
+                                                                        dataLang={dataLang}
+                                                                        id={e?.id}
+                                                                        type="internal_plan"
+                                                                        className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                                                    />
                                                                 </div>
-                                                            </h6>
-                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
-                                                                {e.note}
-                                                            </h6>
-                                                            <div className="col-span-1 flex justify-center">
-                                                                <BtnAction
-                                                                    onRefresh={_ServerFetching.bind(this)}
-                                                                    dataLang={dataLang}
-                                                                    id={e?.id}
-                                                                    type="internal_plan"
-                                                                    className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
-                                                                />
                                                             </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
+                                                        ))}
+                                                    </div>
+                                                </TransitionMotion>
                                             </>
                                         ) : (
-                                            <div className=" max-w-[352px] mt-24 mx-auto">
-                                                <div className="text-center">
-                                                    <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
-                                                        <IconSearch />
-                                                    </div>
-                                                    <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                        {dataLang?.price_quote_table_item_not_found ||
-                                                            "price_quote_table_item_not_found"}
-                                                    </h1>
-                                                    <div className="flex items-center justify-around mt-6 "></div>
-                                                </div>
-                                            </div>
+                                            <NoData />
                                         )}
                                     </div>
                                 </div>

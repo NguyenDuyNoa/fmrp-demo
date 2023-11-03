@@ -14,6 +14,7 @@ import ToatstNotifi from "./alerNotification/alerNotification";
 import PopupEdit from "/components/UI/popup";
 import { VscFilePdf } from "react-icons/vsc";
 import { routerDeliveryReceipt, routerReturnSales } from "./router/sellingGoods";
+import { routerInternalPlan } from "./router/internalPlan";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -278,6 +279,10 @@ const BtnAction = React.memo((props) => {
             } else {
                 router.push(`${routerReturnSales.form}?id=${props.id}`);
             }
+        }
+        ///Kế hoạc nội bộ internal_plan
+        if (props?.id && props?.type === "internal_plan") {
+            router.push(`${routerInternalPlan.form}?id=${props.id}`);
         }
     };
 

@@ -1,9 +1,8 @@
-import React, { useRef, useState } from "react";
-import Head from "next/head";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+import moment from "moment/moment";
 import ModalImage from "react-modal-image";
+import React, { useState, useEffect } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import {
     Grid6 as IconExcel,
@@ -11,30 +10,16 @@ import {
     Calendar as IconCalendar,
     SearchNormal1 as IconSearch,
     ArrowDown2 as IconDown,
-    TickCircle,
 } from "iconsax-react";
-
-import moment from "moment/moment";
-
 const ScrollArea = dynamic(() => import("react-scrollbar"), {
     ssr: false,
 });
-import PopupEdit from "/components/UI/popup";
-import Loading from "components/UI/loading";
 import { _ServerInstance as Axios } from "/services/axios";
-import Swal from "sweetalert2";
-import ReactExport from "react-data-export";
-import { useEffect } from "react";
-import ExpandableContent from "components/UI/more";
-import ImageErrors from "components/UI/imageErrors";
-
-const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true,
-});
+import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
+import ExpandableContent from "@/components/UI/more";
+import ImageErrors from "@/components/UI/imageErrors";
+import TransitionMotion from "@/components/UI/transition/motionTransition";
 
 const PopupDetail = (props) => {
     const [open, sOpen] = useState(false);
@@ -72,24 +57,8 @@ const PopupDetail = (props) => {
     };
 
     useEffect(() => {
-        (onFetching && _ServerFetching_detailOrder()) || (onFetching && _ServerFetching());
+        onFetching && _ServerFetching_detailOrder();
     }, [open]);
-
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
-    const [dataProductExpiry, sDataProductExpiry] = useState({});
-    const [dataProductSerial, sDataProductSerial] = useState({});
-
-    const _ServerFetching = () => {
-        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
-            if (!err) {
-                var data = response.data;
-                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
-                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
-                sDataProductSerial(data.find((x) => x.code == "product_serial"));
-            }
-            sOnFetching(false);
-        });
-    };
 
     return (
         <>
@@ -211,40 +180,41 @@ const PopupDetail = (props) => {
                                             >
                                                 <div className="divide-y divide-slate-200 min:h-[250px]  max:h-[250px]">
                                                     {data?.internalPlansItems?.map((e) => (
-                                                        <div
-                                                            className="grid grid-cols-12 hover:bg-slate-50 items-center border-b"
-                                                            key={e.id?.toString()}
-                                                        >
-                                                            <h6 className="text-[13px]  px-2 py-2 col-span-4 text-left ">
-                                                                <div className="flex items-center gap-2">
-                                                                    <div className="">
-                                                                        {e?.images != null ? (
-                                                                            <ModalImage
-                                                                                small={e?.images}
-                                                                                large={e?.images}
-                                                                                alt="Product Image"
-                                                                                className="custom-modal-image object-cover rounded w-[40px] h-[40px] mx-auto"
-                                                                            />
-                                                                        ) : (
-                                                                            <div className="w-[40px] h-[40px] object-cover  mx-auto ">
+                                                        <TransitionMotion>
+                                                            <div
+                                                                className="grid grid-cols-12 hover:bg-slate-50 items-center border-b"
+                                                                key={e.id?.toString()}
+                                                            >
+                                                                <h6 className="text-[13px]  px-2 py-2 col-span-4 text-left ">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <div className="">
+                                                                            {e?.images != null ? (
                                                                                 <ModalImage
-                                                                                    small="/no_img.png"
-                                                                                    large="/no_img.png"
-                                                                                    className="w-full h-full rounded object-contain p-1"
-                                                                                >
-                                                                                    {" "}
-                                                                                </ModalImage>
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                    <div>
-                                                                        <h6 className="text-[13px] text-left font-medium capitalize">
-                                                                            {e?.item_name}
-                                                                        </h6>
-                                                                        <h6 className="text-[13px] text-left font-medium capitalize">
-                                                                            {e?.product_variation}
-                                                                        </h6>
-                                                                        {/* <div className="flex items-center font-oblique flex-wrap">
+                                                                                    small={e?.images}
+                                                                                    large={e?.images}
+                                                                                    alt="Product Image"
+                                                                                    className="custom-modal-image object-cover rounded w-[40px] h-[40px] mx-auto"
+                                                                                />
+                                                                            ) : (
+                                                                                <div className="w-[40px] h-[40px] object-cover  mx-auto ">
+                                                                                    <ModalImage
+                                                                                        small="/no_img.png"
+                                                                                        large="/no_img.png"
+                                                                                        className="w-full h-full rounded object-contain p-1"
+                                                                                    >
+                                                                                        {" "}
+                                                                                    </ModalImage>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                        <div>
+                                                                            <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                                {e?.item_name}
+                                                                            </h6>
+                                                                            <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                                {e?.product_variation}
+                                                                            </h6>
+                                                                            {/* <div className="flex items-center font-oblique flex-wrap">
                                                                             {dataProductSerial.is_enable === "1" ? (
                                                                                 <div className="flex gap-0.5">
                                                                                     <h6 className="text-[12px]">
@@ -292,27 +262,28 @@ const PopupDetail = (props) => {
                                                                                 ""
                                                                             )}
                                                                         </div> */}
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                            </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-2 font-medium text-center ">
-                                                                {e?.unit_name}
-                                                            </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-2 font-medium text-center ">
-                                                                {formatNumber(e?.quantity)}
-                                                            </h6>
-                                                            <h6 className="text-[13px]   py-2 col-span-2 font-medium text-center ">
-                                                                {moment(e?.date_needed).format("DD/MM/YYYY")}
-                                                            </h6>
+                                                                </h6>
+                                                                <h6 className="text-[13px]   py-2 col-span-2 font-medium text-center ">
+                                                                    {e?.unit_name}
+                                                                </h6>
+                                                                <h6 className="text-[13px]   py-2 col-span-2 font-medium text-center ">
+                                                                    {formatNumber(e?.quantity)}
+                                                                </h6>
+                                                                <h6 className="text-[13px]   py-2 col-span-2 font-medium text-center ">
+                                                                    {moment(e?.date_needed).format("DD/MM/YYYY")}
+                                                                </h6>
 
-                                                            <h6 className="text-[13px]   py-2 col-span-2 font-medium text-left ml-3.5">
-                                                                {e?.note_item != undefined ? (
-                                                                    <ExpandableContent content={e?.note_item} />
-                                                                ) : (
-                                                                    ""
-                                                                )}
-                                                            </h6>
-                                                        </div>
+                                                                <h6 className="text-[13px]   py-2 col-span-2 font-medium text-left ml-3.5">
+                                                                    {e?.note_item != undefined ? (
+                                                                        <ExpandableContent content={e?.note_item} />
+                                                                    ) : (
+                                                                        ""
+                                                                    )}
+                                                                </h6>
+                                                            </div>
+                                                        </TransitionMotion>
                                                     ))}
                                                 </div>
                                             </ScrollArea>
