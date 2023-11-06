@@ -343,6 +343,7 @@ const Index = (props) => {
                                                         },
                                                         ...dataTable.listBr,
                                                     ]}
+                                                    isClearable={true}
                                                     value={valueChange.idBranch}
                                                     onChange={onchangFilter("idBranch")}
                                                     placeholder={
@@ -362,6 +363,7 @@ const Index = (props) => {
                                                         },
                                                         ...dataTable.listClients,
                                                     ]}
+                                                    isClearable={true}
                                                     onChange={onchangFilter("idClient")}
                                                     value={valueChange.idClient}
                                                     placeholder={

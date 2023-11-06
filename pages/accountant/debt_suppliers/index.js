@@ -376,6 +376,7 @@ const Index = (props) => {
                                                         },
                                                         ...listBr_filter,
                                                     ]}
+                                                    isClearable={true}
                                                     value={idBranch}
                                                     onChange={onchang_filter.bind(this, "branch")}
                                                     placeholder={
@@ -394,6 +395,7 @@ const Index = (props) => {
                                                         },
                                                         ...listBr_filter,
                                                     ]}
+                                                    isClearable={true}
                                                     value={idSupplier}
                                                     onChange={onchang_filter.bind(this, "supplier")}
                                                     placeholder={

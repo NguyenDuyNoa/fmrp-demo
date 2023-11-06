@@ -219,12 +219,12 @@ const Index = (props) => {
                     },
                 },
             ],
-            data: listData?.dataExcel?.map((e) => [
+            data: listData?.dataExcel?.map((e, index) => [
                 { value: `${e?.id ? e.id : ""}`, style: { numFmt: "0" } },
                 { value: `${e?.date ? e?.date : ""}` },
                 { value: `${e?.reference_no ? e?.reference_no : ""}` },
                 { value: `${e?.plan_name ? e?.plan_name : ""}` },
-                { value: `` },
+                { value: `${index % 2 == 0 ? "Chưa lập KHNVL" : "Đã lập KHNVL"}` },
                 { value: `${e?.created_by_full_name ? e?.created_by_full_name : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
                 { value: `${e?.name_branch ? e?.name_branch : ""}` },
