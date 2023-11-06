@@ -287,7 +287,7 @@ const Popup_chitiet = (props) => {
                                                 <div className="divide-y divide-slate-200 min:h-[170px]  max:h-[170px]">
                                                     {data?.items?.map((e) => (
                                                         <div
-                                                            className="grid grid-cols-12 hover:bg-slate-50 items-center border-b"
+                                                            className="grid grid-cols-12 hover:bg-slate-50 items-center "
                                                             key={e.id?.toString()}
                                                         >
                                                             <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left ">

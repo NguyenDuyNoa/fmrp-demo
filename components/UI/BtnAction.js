@@ -1,7 +1,7 @@
 import { useRouter } from "next/dist/client/router";
 import React, { useEffect, useState, useRef } from "react";
 import Popup from "reactjs-popup";
-import { ArrowDown2 } from "iconsax-react";
+import { ArrowDown2, Box1 } from "iconsax-react";
 import Swal from "sweetalert2";
 import { _ServerInstance as Axios } from "/services/axios";
 
@@ -15,6 +15,7 @@ import PopupEdit from "/components/UI/popup";
 import { VscFilePdf } from "react-icons/vsc";
 import { routerDeliveryReceipt, routerReturnSales } from "./router/sellingGoods";
 import { routerInternalPlan } from "./router/internalPlan";
+import Popup_KeepStock from "pages/sales_export_product/salesOrder/(PopupDetail)/PopupKeepStock";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -449,13 +450,13 @@ const BtnAction = React.memo((props) => {
                                 data={data}
                             />
                         )}
-
                         {/* <button
                             onClick={() => handleDelete(props?.id)}
                             className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer 2xl:px-5 2xl:py-2.5 px-5 py-1.5 rounded  w-full"
                         >
                             {props?.dataLang?.btn_table_delete || "btn_table_delete"}
                         </button> */}
+                        {props.type == "sales_product" && <Popup_KeepStock {...props} />}
                         <button
                             onClick={() => handleDelete(props?.id)}
                             className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"

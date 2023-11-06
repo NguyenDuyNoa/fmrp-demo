@@ -191,9 +191,9 @@ const PopupDetail = (props) => {
                                                 smoothScrolling={true}
                                             >
                                                 <div className="divide-y divide-slate-200 min:h-[250px]  max:h-[250px]">
-                                                    {data?.internalPlansItems?.map((e) => (
+                                                    {data?.internalPlansItems?.map((e, index) => (
                                                         <div
-                                                            className="grid grid-cols-12 hover:bg-slate-50 items-center border-b"
+                                                            className={`grid grid-cols-12 hover:bg-slate-50 items-center`}
                                                             key={e.id?.toString()}
                                                         >
                                                             <h6 className="text-[13px]  px-2 py-2 col-span-4 text-left ">

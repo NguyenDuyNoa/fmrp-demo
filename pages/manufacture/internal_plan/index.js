@@ -247,7 +247,6 @@ const Index = (props) => {
                         <h6>{dataLang?.internal_plan || "internal_plan"}</h6>
                     </div>
                 )}
-
                 <div className="grid grid-cols gap-1 h-[100%] overflow-hidden">
                     <div className="col-span-7 h-[100%] flex flex-col justify-between overflow-hidden">
                         <div className="space-y-0.5 h-[96%] overflow-hidden">

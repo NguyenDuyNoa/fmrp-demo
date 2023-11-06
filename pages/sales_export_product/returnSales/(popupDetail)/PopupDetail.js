@@ -290,7 +290,7 @@ const PopupDetail = (props) => {
                                                         // (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-12" :dataMaterialExpiry.is_enable == "1" ? "grid-cols-12" :"grid-cols-10" ) :
                                                         // (dataMaterialExpiry.is_enable != dataProductExpiry.is_enable ? "grid-cols-11" : (dataMaterialExpiry.is_enable == "1" ? "grid-cols-11" :"grid-cols-9") ) }  grid hover:bg-slate-50 `} key={e.id?.toString()}>
                                                         <div
-                                                            className="grid grid-cols-14 hover:bg-slate-50 items-center border-b"
+                                                            className="grid grid-cols-14 hover:bg-slate-50 items-center "
                                                             key={e.id?.toString()}
                                                         >
                                                             {/* <h6 className="text-[13px]   py-0.5 col-span-1 text-center">
