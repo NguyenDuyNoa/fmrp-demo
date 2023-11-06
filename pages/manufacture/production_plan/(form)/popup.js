@@ -4,7 +4,6 @@ import { v4 as uuid } from "uuid";
 import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
-import TransitionMotion from "@/components/UI/transition/motionTransition";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 
 const PopupEditer = ({}) => {
@@ -71,116 +70,114 @@ const PopupEditer = ({}) => {
                         <Loading className="h-80" color="#0f4f9e" />
                     ) : (
                         [...Array(10)].map((e, _) => (
-                            <TransitionMotion>
-                                <div key={_} className="grid grid-cols-11 items-center border-b border-[#E7EAEE] ">
-                                    <h3 className="text-[#64748B] col-span-3 py-2 text-center font-medium 3xl:text-sm text-xs capitalize flex items-center">
-                                        <h3 className="text-[#64748B] text-center w-fit py-2 px-9 font-medium 3xl:text-sm text-xs capitalize">
-                                            {_ + 1}
-                                        </h3>
-                                        <h3 className="text-[#64748B] w-full py-2 px-1 font-medium 3xl:text-sm text-xs capitalize">
-                                            {"COAOTHUN"}
-                                        </h3>
+                            <div key={_} className="grid grid-cols-11 items-center border-b border-[#E7EAEE] ">
+                                <h3 className="text-[#64748B] col-span-3 py-2 text-center font-medium 3xl:text-sm text-xs capitalize flex items-center">
+                                    <h3 className="text-[#64748B] text-center w-fit py-2 px-9 font-medium 3xl:text-sm text-xs capitalize">
+                                        {_ + 1}
                                     </h3>
-                                    <h3 className="text-[#64748B] col-span-4 py-3 font-medium 3xl:text-sm text-xs capitalize flex items-center gap-2">
-                                        <Image
-                                            src={"/productionPlan/coaothun.png"}
-                                            width={36}
-                                            height={36}
-                                            alt=""
-                                            className="object-cover rounded-md"
-                                        />
-                                        <h2 className="text-[#000000] 3xl:text-base text-sm font-medium">Cổ áo</h2>
+                                    <h3 className="text-[#64748B] w-full py-2 px-1 font-medium 3xl:text-sm text-xs capitalize">
+                                        {"COAOTHUN"}
                                     </h3>
-                                    <h3 className=" text-[#64748B] col-span-2 py-3 px-3 text-center font-medium 3xl:text-sm text-xs uppercase">
-                                        <SelectComponent
-                                            classNamePrefix={"productionSmoothing"}
-                                            placeholder={"BOM"}
-                                            menuPortalTarget={document.body}
-                                            options={[
-                                                { label: "test1", value: 1 },
-                                                { label: "test2", value: 2 },
-                                            ]}
-                                            formatOptionLabel={(options) => {
-                                                return <div className="3xl:text-sm text-xs">{options.label}</div>;
-                                            }}
-                                            noOptionsMessage={() => {
-                                                return <div className="3xl:text-sm text-xs">Không có dữ liệu</div>;
-                                            }}
-                                            menuShouldBlockScroll
-                                            styles={{
-                                                placeholder: (base) => ({
-                                                    ...base,
-                                                    color: "#cbd5e1",
+                                </h3>
+                                <h3 className="text-[#64748B] col-span-4 py-3 font-medium 3xl:text-sm text-xs capitalize flex items-center gap-2">
+                                    <Image
+                                        src={"/productionPlan/coaothun.png"}
+                                        width={36}
+                                        height={36}
+                                        alt=""
+                                        className="object-cover rounded-md"
+                                    />
+                                    <h2 className="text-[#000000] 3xl:text-base text-sm font-medium">Cổ áo</h2>
+                                </h3>
+                                <h3 className=" text-[#64748B] col-span-2 py-3 px-3 text-center font-medium 3xl:text-sm text-xs uppercase">
+                                    <SelectComponent
+                                        classNamePrefix={"productionSmoothing"}
+                                        placeholder={"BOM"}
+                                        menuPortalTarget={document.body}
+                                        options={[
+                                            { label: "test1", value: 1 },
+                                            { label: "test2", value: 2 },
+                                        ]}
+                                        formatOptionLabel={(options) => {
+                                            return <div className="3xl:text-sm text-xs">{options.label}</div>;
+                                        }}
+                                        noOptionsMessage={() => {
+                                            return <div className="3xl:text-sm text-xs">Không có dữ liệu</div>;
+                                        }}
+                                        menuShouldBlockScroll
+                                        styles={{
+                                            placeholder: (base) => ({
+                                                ...base,
+                                                color: "#cbd5e1",
+                                                fontSize: "11px !important",
+                                                "@media screen and (max-width: 1600px)": {
                                                     fontSize: "11px !important",
-                                                    "@media screen and (max-width: 1600px)": {
-                                                        fontSize: "11px !important",
-                                                    },
-                                                    "@media screen and (max-width: 1400px)": {
-                                                        fontSize: "11px !important",
-                                                    },
-                                                    "@media screen and (max-width: 1536px)": {
-                                                        fontSize: "8.5px !important",
-                                                    },
-                                                    "@media screen and (max-width: 1280px)": {
-                                                        fontSize: "9px !important",
-                                                    },
-                                                    "@media screen and (max-width: 1024px)": {
-                                                        fontSize: "7px !important",
-                                                    },
-                                                }),
-                                                menuPortal: (base) => ({
-                                                    ...base,
-                                                    zIndex: 999,
-                                                }),
-                                            }}
-                                        />
-                                    </h3>
-                                    <h3 className="text-[#64748B] col-span-2 py-3 px-3 text-center font-medium 3xl:text-sm text-xs uppercase">
-                                        <SelectComponent
-                                            classNamePrefix={"productionSmoothing"}
-                                            placeholder={"Công đoạn"}
-                                            menuPortalTarget={document.body}
-                                            options={[
-                                                { label: "test", value: 1 },
-                                                { label: "test2", value: 2 },
-                                            ]}
-                                            formatOptionLabel={(options) => {
-                                                return <div className="3xl:text-sm text-xs">{options.label}</div>;
-                                            }}
-                                            noOptionsMessage={() => {
-                                                return <div className="3xl:text-sm text-xs">Không có dữ liệu</div>;
-                                            }}
-                                            menuShouldBlockScroll
-                                            styles={{
-                                                placeholder: (base) => ({
-                                                    ...base,
-                                                    color: "#cbd5e1",
+                                                },
+                                                "@media screen and (max-width: 1400px)": {
                                                     fontSize: "11px !important",
-                                                    "@media screen and (max-width: 1600px)": {
-                                                        fontSize: "11px !important",
-                                                    },
-                                                    "@media screen and (max-width: 1400px)": {
-                                                        fontSize: "11px !important",
-                                                    },
-                                                    "@media screen and (max-width: 1536px)": {
-                                                        fontSize: "8.5px !important",
-                                                    },
-                                                    "@media screen and (max-width: 1280px)": {
-                                                        fontSize: "9px !important",
-                                                    },
-                                                    "@media screen and (max-width: 1024px)": {
-                                                        fontSize: "7px !important",
-                                                    },
-                                                }),
-                                                menuPortal: (base) => ({
-                                                    ...base,
-                                                    zIndex: 999,
-                                                }),
-                                            }}
-                                        />
-                                    </h3>
-                                </div>
-                            </TransitionMotion>
+                                                },
+                                                "@media screen and (max-width: 1536px)": {
+                                                    fontSize: "8.5px !important",
+                                                },
+                                                "@media screen and (max-width: 1280px)": {
+                                                    fontSize: "9px !important",
+                                                },
+                                                "@media screen and (max-width: 1024px)": {
+                                                    fontSize: "7px !important",
+                                                },
+                                            }),
+                                            menuPortal: (base) => ({
+                                                ...base,
+                                                zIndex: 999,
+                                            }),
+                                        }}
+                                    />
+                                </h3>
+                                <h3 className="text-[#64748B] col-span-2 py-3 px-3 text-center font-medium 3xl:text-sm text-xs uppercase">
+                                    <SelectComponent
+                                        classNamePrefix={"productionSmoothing"}
+                                        placeholder={"Công đoạn"}
+                                        menuPortalTarget={document.body}
+                                        options={[
+                                            { label: "test", value: 1 },
+                                            { label: "test2", value: 2 },
+                                        ]}
+                                        formatOptionLabel={(options) => {
+                                            return <div className="3xl:text-sm text-xs">{options.label}</div>;
+                                        }}
+                                        noOptionsMessage={() => {
+                                            return <div className="3xl:text-sm text-xs">Không có dữ liệu</div>;
+                                        }}
+                                        menuShouldBlockScroll
+                                        styles={{
+                                            placeholder: (base) => ({
+                                                ...base,
+                                                color: "#cbd5e1",
+                                                fontSize: "11px !important",
+                                                "@media screen and (max-width: 1600px)": {
+                                                    fontSize: "11px !important",
+                                                },
+                                                "@media screen and (max-width: 1400px)": {
+                                                    fontSize: "11px !important",
+                                                },
+                                                "@media screen and (max-width: 1536px)": {
+                                                    fontSize: "8.5px !important",
+                                                },
+                                                "@media screen and (max-width: 1280px)": {
+                                                    fontSize: "9px !important",
+                                                },
+                                                "@media screen and (max-width: 1024px)": {
+                                                    fontSize: "7px !important",
+                                                },
+                                            }),
+                                            menuPortal: (base) => ({
+                                                ...base,
+                                                zIndex: 999,
+                                            }),
+                                        }}
+                                    />
+                                </h3>
+                            </div>
                         ))
                     )}
                 </div>

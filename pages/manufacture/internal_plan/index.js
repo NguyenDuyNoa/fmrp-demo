@@ -7,8 +7,8 @@ import { useSelector } from "react-redux";
 import ModalImage from "react-modal-image";
 import "react-datepicker/dist/react-datepicker.css";
 import { _ServerInstance as Axios } from "/services/axios";
-import { SearchNormal1 as IconSearch } from "iconsax-react";
 import React, { useState, useEffect, useTransition } from "react";
+import { SearchNormal1 as IconSearch, TickCircle } from "iconsax-react";
 import Loading from "@/components/UI/loading";
 import BtnAction from "@/components/UI/BtnAction";
 import NoData from "@/components/UI/noData/nodata";
@@ -17,13 +17,11 @@ import ImageErrors from "@/components/UI/imageErrors";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import { routerInternalPlan } from "@/components/UI/router/internalPlan";
-import TransitionMotion from "@/components/UI/transition/motionTransition";
 import SearchComponent from "@/components/UI/filterComponents/searchComponent";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
 import DatepickerComponent from "@/components/UI/filterComponents/dateTodateComponent";
 const PopupDetail = dynamic(() => import("./(popupDetail)/PopupDetail"), { ssr: false });
-
 const Index = (props) => {
     const dataLang = props.dataLang;
     const router = useRouter();
@@ -138,6 +136,7 @@ const Index = (props) => {
             },
         });
     };
+
     const handleOnChangeKeySearch = ({ target: { value } }) => {
         startEvent(() => {
             sKeySearch(value);
@@ -356,90 +355,102 @@ const Index = (props) => {
                                             <Loading className="h-80" color="#0f4f9e" />
                                         ) : listData.data?.length > 0 ? (
                                             <>
-                                                <TransitionMotion>
-                                                    <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[900px]">
-                                                        {listData?.data?.map((e) => (
-                                                            <div
-                                                                className="relative  grid grid-cols-9 items-center py-1.5  hover:bg-slate-100/40 group"
-                                                                key={e.id.toString()}
-                                                            >
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
-                                                                    {e?.date != null
-                                                                        ? moment(e?.date).format("DD/MM/YYYY")
-                                                                        : ""}
-                                                                </h6>
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer ">
-                                                                    <PopupDetail
-                                                                        dataLang={dataLang}
-                                                                        className="text-left"
-                                                                        name={e?.reference_no}
-                                                                        id={e?.id}
-                                                                    />
-                                                                </h6>
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-left capitalize">
-                                                                    {e.plan_name}
-                                                                </h6>
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
-                                                                    {""}
-                                                                </h6>
-                                                                <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
-                                                                    <div className="relative">
-                                                                        <ModalImage
-                                                                            small={
-                                                                                e?.created_by_profile_image
-                                                                                    ? e?.created_by_profile_image
-                                                                                    : "/user-placeholder.jpg"
-                                                                            }
-                                                                            large={
-                                                                                e?.created_by_profile_image
-                                                                                    ? e?.created_by_profile_image
-                                                                                    : "/user-placeholder.jpg"
-                                                                            }
-                                                                            className="h-6 w-6 rounded-full object-cover "
-                                                                        >
-                                                                            <div className="">
-                                                                                <ImageErrors
-                                                                                    src={e?.created_by_profile_image}
-                                                                                    width={25}
-                                                                                    height={25}
-                                                                                    defaultSrc="/user-placeholder.jpg"
-                                                                                    alt="Image"
-                                                                                    className="object-cover  rounded-[100%] text-left cursor-pointer"
-                                                                                />
-                                                                            </div>
-                                                                        </ModalImage>
-                                                                        <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
-                                                                            <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
-                                                                                <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
-                                                                            </span>
-                                                                        </span>
-                                                                    </div>
-                                                                    <h6 className="capitalize">
-                                                                        {e?.created_by_full_name}
-                                                                    </h6>
-                                                                </h6>
+                                                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[900px]">
+                                                    {listData?.data?.map((e, index) => (
+                                                        <div
+                                                            className="relative  grid grid-cols-9 items-center py-1.5  hover:bg-slate-100/40 group"
+                                                            key={e.id.toString()}
+                                                        >
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
+                                                                {e?.date != null
+                                                                    ? moment(e?.date).format("DD/MM/YYYY")
+                                                                    : ""}
+                                                            </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] px-2 col-span-1 text-center text-[#0F4F9E] hover:text-[#5599EC] transition-all ease-linear cursor-pointer ">
+                                                                <PopupDetail
+                                                                    dataLang={dataLang}
+                                                                    className="text-left"
+                                                                    name={e?.reference_no}
+                                                                    id={e?.id}
+                                                                />
+                                                            </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-left capitalize">
+                                                                {e.plan_name}
+                                                            </h6>
+                                                            <h6 className="3xl:text-base mx-auto 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
+                                                                {index % 2 === 0 ? (
+                                                                    <span className="block font-normal text-orange-500  rounded-xl py-[1px] px-2 w-fit min-w-[136px] bg-orange-200 text-center text-[13px]">
+                                                                        {"Chưa lập KHNVL"}
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-[1px] px-2 w-fit min-w-[136px]  bg-lime-200 text-center text-[13px]">
+                                                                        <TickCircle
+                                                                            className="bg-lime-500 rounded-full"
+                                                                            color="white"
+                                                                            size={15}
+                                                                        />
+                                                                        {"Đã lập KHNVL"}
+                                                                    </span>
+                                                                )}
+                                                            </h6>
 
-                                                                <h6 className="col-span-1 w-fit ">
-                                                                    <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2">
-                                                                        {e?.name_branch}
-                                                                    </div>
-                                                                </h6>
-                                                                <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
-                                                                    {e.note}
-                                                                </h6>
-                                                                <div className="col-span-1 flex justify-center">
-                                                                    <BtnAction
-                                                                        onRefresh={_ServerFetching.bind(this)}
-                                                                        dataLang={dataLang}
-                                                                        id={e?.id}
-                                                                        type="internal_plan"
-                                                                        className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
-                                                                    />
+                                                            <h6 className="col-span-1 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 py-1  rounded-md text-left flex items-center space-x-1">
+                                                                <div className="relative">
+                                                                    <ModalImage
+                                                                        small={
+                                                                            e?.created_by_profile_image
+                                                                                ? e?.created_by_profile_image
+                                                                                : "/user-placeholder.jpg"
+                                                                        }
+                                                                        large={
+                                                                            e?.created_by_profile_image
+                                                                                ? e?.created_by_profile_image
+                                                                                : "/user-placeholder.jpg"
+                                                                        }
+                                                                        className="h-6 w-6 rounded-full object-cover "
+                                                                    >
+                                                                        <div className="">
+                                                                            <ImageErrors
+                                                                                src={e?.created_by_profile_image}
+                                                                                width={25}
+                                                                                height={25}
+                                                                                defaultSrc="/user-placeholder.jpg"
+                                                                                alt="Image"
+                                                                                className="object-cover  rounded-[100%] text-left cursor-pointer"
+                                                                            />
+                                                                        </div>
+                                                                    </ModalImage>
+                                                                    <span className="h-2 w-2 absolute 3xl:bottom-full 3xl:translate-y-[150%] 3xl:left-1/2  3xl:translate-x-[100%] 2xl:bottom-[80%] 2xl:translate-y-full 2xl:left-1/2 bottom-[50%] left-1/2 translate-x-full translate-y-full">
+                                                                        <span className="inline-flex relative rounded-full h-2 w-2 bg-lime-500">
+                                                                            <span className="animate-ping  inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 absolute"></span>
+                                                                        </span>
+                                                                    </span>
                                                                 </div>
+                                                                <h6 className="capitalize">
+                                                                    {e?.created_by_full_name}
+                                                                </h6>
+                                                            </h6>
+
+                                                            <h6 className="col-span-1 w-fit mx-auto">
+                                                                <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase ml-2">
+                                                                    {e?.name_branch}
+                                                                </div>
+                                                            </h6>
+                                                            <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left capitalize">
+                                                                {e.note}
+                                                            </h6>
+                                                            <div className="col-span-1 flex justify-center">
+                                                                <BtnAction
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    dataLang={dataLang}
+                                                                    id={e?.id}
+                                                                    type="internal_plan"
+                                                                    className="bg-slate-100 xl:px-4 px-2 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[9px]"
+                                                                />
                                                             </div>
-                                                        ))}
-                                                    </div>
-                                                </TransitionMotion>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </>
                                         ) : (
                                             <NoData />

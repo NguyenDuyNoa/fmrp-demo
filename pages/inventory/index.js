@@ -73,14 +73,9 @@ const Index = (props) => {
                     search: keySearch,
                     limit: limit,
                     page: router.query?.page || 1,
-                    "filter[branch_id]":
-                        idBranch?.value != null ? idBranch?.value : null,
-                    "filter[start_date]":
-                        valueDate?.startDate != null
-                            ? valueDate?.startDate
-                            : null,
-                    "filter[end_date]":
-                        valueDate?.endDate != null ? valueDate?.endDate : null,
+                    "filter[branch_id]": idBranch?.value != null ? idBranch?.value : null,
+                    "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
+                    "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
                 },
             },
             (err, response) => {
@@ -107,32 +102,26 @@ const Index = (props) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 const id = event;
-                Axios(
-                    "DELETE",
-                    `/api_web/api_inventory/inventory/${id}`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var { isSuccess, message, data_export } =
-                                response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: dataLang[message],
-                                });
-                            } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: dataLang[message],
-                                });
-                                if (data_export?.length > 0) {
-                                    sData_export(data_export);
-                                }
+                Axios("DELETE", `/api_web/api_inventory/inventory/${id}`, {}, (err, response) => {
+                    if (!err) {
+                        var { isSuccess, message, data_export } = response.data;
+                        if (isSuccess) {
+                            Toast.fire({
+                                icon: "success",
+                                title: dataLang[message],
+                            });
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                title: dataLang[message],
+                            });
+                            if (data_export?.length > 0) {
+                                sData_export(data_export);
                             }
                         }
-                        _ServerFetching();
                     }
-                );
+                    _ServerFetching();
+                });
             }
         });
     };
@@ -145,22 +134,15 @@ const Index = (props) => {
         }
     };
 
-    const listBr_filter = listBr
-        ? listBr?.map((e) => ({ label: e.name, value: e.id }))
-        : [];
+    const listBr_filter = listBr ? listBr?.map((e) => ({ label: e.name, value: e.id })) : [];
 
     const _ServerFetching_filter = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branch/?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sListBr(rResult);
-                }
+        Axios("GET", `/api_web/Api_Branch/branch/?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sListBr(rResult);
             }
-        );
+        });
         sOnFetching_filter(false);
     };
 
@@ -195,16 +177,8 @@ const Index = (props) => {
             (keySearch && sOnFetching(true)) ||
             sOnFetching_filter(true) ||
             (idBranch != null && sOnFetching(true)) ||
-            (valueDate.startDate != null &&
-                valueDate.endDate != null &&
-                sOnFetching(true));
-    }, [
-        limit,
-        router.query?.page,
-        idBranch,
-        valueDate.endDate,
-        valueDate.startDate,
-    ]);
+            (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true));
+    }, [limit, router.query?.page, idBranch, valueDate.endDate, valueDate.startDate]);
 
     const multiDataSet = [
         {
@@ -300,9 +274,7 @@ const Index = (props) => {
                     }`,
                 },
                 {
-                    value: `${
-                        e?.staff_create_name ? e?.staff_create_name : ""
-                    }`,
+                    value: `${e?.staff_create_name ? e?.staff_create_name : ""}`,
                 },
                 { value: `${e?.branch_name ? e?.branch_name : ""}` },
                 { value: `${e?.note ? e?.note : ""}` },
@@ -319,24 +291,17 @@ const Index = (props) => {
             </Head>
             <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
                 {data_export.length > 0 && (
-                    <Popup_status
-                        className="hidden"
-                        data_export={data_export}
-                        dataLang={dataLang}
-                    />
+                    <Popup_status className="hidden" data_export={data_export} dataLang={dataLang} />
                 )}
                 {trangthaiExprired ? (
                     <div className="p-2"></div>
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
                         <h6 className="text-[#141522]/40">
-                            {dataLang?.inventory_title_head ||
-                                "inventory_title_head"}
+                            {dataLang?.inventory_title_head || "inventory_title_head"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>
-                            {dataLang?.inventory_title || "inventory_title"}
-                        </h6>
+                        <h6>{dataLang?.inventory_title || "inventory_title"}</h6>
                     </div>
                 )}
                 <div className="grid grid-cols gap-5 h-[99%] overflow-hidden">
@@ -344,16 +309,14 @@ const Index = (props) => {
                         <div className="space-y-3 h-[96%] overflow-hidden">
                             <div className="flex justify-between">
                                 <h2 className="text-2xl text-[#52575E]">
-                                    {dataLang?.inventory_title ||
-                                        "inventory_title"}
+                                    {dataLang?.inventory_title || "inventory_title"}
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Link
                                         href="/inventory/form"
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105 outline-none"
                                     >
-                                        {dataLang?.inventory_add ||
-                                            "inventory_add"}
+                                        {dataLang?.inventory_add || "inventory_add"}
                                     </Link>
                                 </div>
                             </div>
@@ -362,19 +325,12 @@ const Index = (props) => {
                                     <div className="bg-slate-100 w-full rounded flex items-center justify-between xl:p-3 p-2">
                                         <div className="flex gap-2">
                                             <form className="flex items-center relative  w-[15vw]">
-                                                <IconSearch
-                                                    size={20}
-                                                    className="absolute left-3 z-10 text-[#cccccc]"
-                                                />
+                                                <IconSearch size={20} className="absolute left-3 z-10 text-[#cccccc]" />
                                                 <input
                                                     className=" relative bg-white outline-[#D0D5DD] focus:outline-[#0F4F9E] pl-10 pr-5 py-1.5 rounded-md w-[400px]"
                                                     type="text"
-                                                    onChange={_HandleOnChangeKeySearch.bind(
-                                                        this
-                                                    )}
-                                                    placeholder={
-                                                        dataLang?.branch_search
-                                                    }
+                                                    onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                    placeholder={dataLang?.branch_search}
                                                 />
                                             </form>
                                             <div className="ml-1 w-[15vw]">
@@ -389,21 +345,14 @@ const Index = (props) => {
                                                         },
                                                         ...listBr_filter,
                                                     ]}
-                                                    onChange={onchang_filter.bind(
-                                                        this,
-                                                        "branch"
-                                                    )}
+                                                    onChange={onchang_filter.bind(this, "branch")}
                                                     value={idBranch}
-                                                    placeholder={
-                                                        dataLang?.client_list_filterbrand
-                                                    }
+                                                    placeholder={dataLang?.client_list_filterbrand}
                                                     hideSelectedOptions={false}
                                                     isClearable={true}
                                                     className="rounded-md bg-white  xl:text-base text-[14.5px] z-20"
                                                     isSearchable={true}
-                                                    noOptionsMessage={() =>
-                                                        "Không có dữ liệu"
-                                                    }
+                                                    noOptionsMessage={() => "Không có dữ liệu"}
                                                     closeMenuOnSelect={true}
                                                     style={{
                                                         border: "none",
@@ -414,31 +363,23 @@ const Index = (props) => {
                                                         ...theme,
                                                         colors: {
                                                             ...theme.colors,
-                                                            primary25:
-                                                                "#EBF5FF",
-                                                            primary50:
-                                                                "#92BFF7",
+                                                            primary25: "#EBF5FF",
+                                                            primary50: "#92BFF7",
                                                             primary: "#0F4F9E",
                                                         },
                                                     })}
                                                     styles={{
-                                                        placeholder: (
-                                                            base
-                                                        ) => ({
+                                                        placeholder: (base) => ({
                                                             ...base,
                                                             color: "#cbd5e1",
                                                         }),
-                                                        control: (
-                                                            base,
-                                                            state
-                                                        ) => ({
+                                                        control: (base, state) => ({
                                                             ...base,
                                                             border: "none",
                                                             outline: "none",
                                                             boxShadow: "none",
                                                             ...(state.isFocused && {
-                                                                boxShadow:
-                                                                    "0 0 0 1.5px #0F4F9E",
+                                                                boxShadow: "0 0 0 1.5px #0F4F9E",
                                                             }),
                                                         }),
                                                     }}
@@ -449,23 +390,16 @@ const Index = (props) => {
                                                     value={valueDate}
                                                     i18n={"vi"}
                                                     primaryColor={"blue"}
-                                                    onChange={onchang_filter.bind(
-                                                        this,
-                                                        "date"
-                                                    )}
+                                                    onChange={onchang_filter.bind(this, "date")}
                                                     showShortcuts={true}
                                                     displayFormat={"DD/MM/YYYY"}
                                                     configs={{
                                                         shortcuts: {
                                                             today: "Hôm nay",
-                                                            yesterday:
-                                                                "Hôm qua",
-                                                            past: (period) =>
-                                                                `${period}  ngày qua`,
-                                                            currentMonth:
-                                                                "Tháng này",
-                                                            pastMonth:
-                                                                "Tháng trước",
+                                                            yesterday: "Hôm qua",
+                                                            past: (period) => `${period}  ngày qua`,
+                                                            currentMonth: "Tháng này",
+                                                            pastMonth: "Tháng trước",
                                                         },
                                                         footer: {
                                                             cancel: "Từ bỏ",
@@ -479,9 +413,7 @@ const Index = (props) => {
                                         </div>
                                         <div className="flex space-x-2 items-center">
                                             <button
-                                                onClick={_HandleFresh.bind(
-                                                    this
-                                                )}
+                                                onClick={_HandleFresh.bind(this)}
                                                 type="button"
                                                 className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none"
                                             >
@@ -497,14 +429,8 @@ const Index = (props) => {
                                                     title="Dskkk"
                                                     element={
                                                         <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 xl:text-sm text-xs flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
-                                                            <IconExcel
-                                                                size={18}
-                                                            />
-                                                            <span>
-                                                                {
-                                                                    dataLang?.client_list_exportexcel
-                                                                }
-                                                            </span>
+                                                            <IconExcel size={18} />
+                                                            <span>{dataLang?.client_list_exportexcel}</span>
                                                         </button>
                                                     }
                                                 >
@@ -515,23 +441,14 @@ const Index = (props) => {
                                                     />
                                                 </ExcelFile>
                                             )}
-                                            <label className="font-[300] text-slate-400">
-                                                {dataLang?.display}
-                                            </label>
+                                            <label className="font-[300] text-slate-400">{dataLang?.display}</label>
                                             <select
                                                 className="outline-none"
-                                                onChange={(e) =>
-                                                    sLimit(e.target.value)
-                                                }
+                                                onChange={(e) => sLimit(e.target.value)}
                                                 value={limit}
                                             >
-                                                <option
-                                                    disabled
-                                                    className="hidden"
-                                                >
-                                                    {limit == -1
-                                                        ? "Tất cả"
-                                                        : limit}
+                                                <option disabled className="hidden">
+                                                    {limit == -1 ? "Tất cả" : limit}
                                                 </option>
                                                 <option value={15}>15</option>
                                                 <option value={20}>20</option>
@@ -546,47 +463,35 @@ const Index = (props) => {
                                     <div className="xl:w-[100%] w-[110%] pr-2">
                                         <div className="grid grid-cols-11 sticky top-0  rounded shadow-sm bg-white divide-x p-2 z-10 ">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                                {dataLang?.inventory_dayvouchers ||
-                                                    "inventory_dayvouchers"}
+                                                {dataLang?.inventory_dayvouchers || "inventory_dayvouchers"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                                {dataLang?.inventory_vouchercode ||
-                                                    "inventory_vouchercode"}
+                                                {dataLang?.inventory_vouchercode || "inventory_vouchercode"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                                {dataLang?.inventory_warehouse ||
-                                                    "inventory_warehouse"}
+                                                {dataLang?.inventory_warehouse || "inventory_warehouse"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                                {dataLang?.inventory_total_item ||
-                                                    "inventory_total_item"}
+                                                {dataLang?.inventory_total_item || "inventory_total_item"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                                {dataLang?.inventory_status ||
-                                                    "inventory_status"}
+                                                {dataLang?.inventory_status || "inventory_status"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                                {dataLang?.inventory_creator ||
-                                                    "inventory_creator"}
+                                                {dataLang?.inventory_creator || "inventory_creator"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                                {dataLang?.inventory_branch ||
-                                                    "inventory_branch"}
+                                                {dataLang?.inventory_branch || "inventory_branch"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-3 text-center">
-                                                {dataLang?.inventory_note ||
-                                                    "inventory_note"}
+                                                {dataLang?.inventory_note || "inventory_note"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600] col-span-1 text-center">
-                                                {dataLang?.inventory_operatione ||
-                                                    "inventory_operatione"}
+                                                {dataLang?.inventory_operatione || "inventory_operatione"}
                                             </h4>
                                         </div>
                                         {onFetching ? (
-                                            <Loading
-                                                className="h-80"
-                                                color="#0f4f9e"
-                                            />
+                                            <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[600px]">
@@ -597,9 +502,7 @@ const Index = (props) => {
                                                         >
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  col-span-1 text-center">
                                                                 {e?.date != null
-                                                                    ? moment(
-                                                                          e?.date
-                                                                      ).format(
+                                                                    ? moment(e?.date).format(
                                                                           // "DD/MM/YYYY, h:mm:ss"
                                                                           "DD/MM/YYYY"
                                                                       )
@@ -607,13 +510,9 @@ const Index = (props) => {
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px]  px-2 col-span-1 text-center text-[#0F4F9E] hover:text-blue-500 transition-all duration-200 ease-linear cursor-pointer">
                                                                 <Popup_chitiet
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
+                                                                    dataLang={dataLang}
                                                                     className="text-left"
-                                                                    name={
-                                                                        e?.code
-                                                                    }
+                                                                    name={e?.code}
                                                                     id={e?.id}
                                                                 />
                                                             </h6>
@@ -626,85 +525,46 @@ const Index = (props) => {
                                                             <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600  text-xs col-span-1 text-center cursor-pointer">
                                                                 <Popup
                                                                     className="dropdown-avt "
-                                                                    key={
-                                                                        e?.staff_create_id
-                                                                    }
-                                                                    trigger={(
-                                                                        open
-                                                                    ) => (
+                                                                    key={e?.staff_create_id}
+                                                                    trigger={(open) => (
                                                                         <span className="border border-orange-500 text-orange-500 p-1 rounded-md">
                                                                             {" "}
-                                                                            {e?.adjusted.split(
-                                                                                "|||"
-                                                                            )
-                                                                                .length +
+                                                                            {e?.adjusted.split("|||").length +
                                                                                 " " +
                                                                                 " Điều chỉnh"}
                                                                         </span>
                                                                     )}
                                                                     position="top center"
-                                                                    on={[
-                                                                        "hover",
-                                                                    ]}
-                                                                    arrow={
-                                                                        false
-                                                                    }
+                                                                    on={["hover"]}
+                                                                    arrow={false}
                                                                 >
                                                                     <span className="bg-[#0f4f9e] text-white rounded p-1.5 ">
                                                                         {e?.adjusted
-                                                                            ?.split(
-                                                                                "|||"
-                                                                            )
-                                                                            ?.map(
-                                                                                (
-                                                                                    item
-                                                                                ) =>
-                                                                                    item?.split(
-                                                                                        "--"
-                                                                                    )[1]
-                                                                            )
-                                                                            ?.map(
-                                                                                (
-                                                                                    e
-                                                                                ) =>
-                                                                                    e
-                                                                            )
-                                                                            .join(
-                                                                                ", "
-                                                                            )}{" "}
+                                                                            ?.split("|||")
+                                                                            ?.map((item) => item?.split("--")[1])
+                                                                            ?.map((e) => e)
+                                                                            .join(", ")}{" "}
                                                                     </span>
                                                                 </Popup>
                                                             </h6>
                                                             <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-1  flex items-center space-x-2">
                                                                 <img
-                                                                    src={
-                                                                        e?.staff_create_image
-                                                                    }
+                                                                    src={e?.staff_create_image}
                                                                     className="object-cover rounded-[100%] w-6 h-6 text-left"
                                                                 ></img>{" "}
-                                                                <span className="">
-                                                                    {
-                                                                        e?.staff_create_name
-                                                                    }{" "}
-                                                                </span>
+                                                                <span className="">{e?.staff_create_name} </span>
                                                             </h6>
-                                                            <h6 className="col-span-1 w-fit">
-                                                                <span className="3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px] text-[#0F4F9E] font-[300] px-2 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
-                                                                    {
-                                                                        e?.branch_name
-                                                                    }
-                                                                </span>
+                                                            <h6 className="col-span-1 w-fit mx-auto">
+                                                                <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
+                                                                    {e?.branch_name}
+                                                                </div>
                                                             </h6>
                                                             <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-3 text-left">
                                                                 {e?.note}
                                                             </h6>
                                                             <h6 className="px-2 py-2.5 3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 col-span-1 text-center">
                                                                 <button
-                                                                    onClick={() =>
-                                                                        handleDelete(
-                                                                            e.id
-                                                                        )
-                                                                    }
+                                                                    onClick={() => handleDelete(e.id)}
                                                                     className="xl:text-base text-xs "
                                                                 >
                                                                     <IconDelete color="red" />
@@ -721,16 +581,14 @@ const Index = (props) => {
                                                         <IconSearch />
                                                     </div>
                                                     <h1 className="textx-[#141522] text-base opacity-90 font-medium">
-                                                        {dataLang?.inventory_notfound ||
-                                                            "inventory_notfound"}
+                                                        {dataLang?.inventory_notfound || "inventory_notfound"}
                                                     </h1>
                                                     <div className="flex items-center justify-around mt-6 ">
                                                         <Link
                                                             href="/inventory/form"
                                                             className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105 outline-none"
                                                         >
-                                                            {dataLang?.inventory_add ||
-                                                                "inventory_add"}
+                                                            {dataLang?.inventory_add || "inventory_add"}
                                                         </Link>
                                                     </div>
                                                 </div>
@@ -743,17 +601,12 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display}{" "}
-                                    {totalItems?.iTotalDisplayRecords}{" "}
-                                    {dataLang?.among}{" "}
-                                    {totalItems?.iTotalRecords}{" "}
-                                    {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {totalItems?.iTotalRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(
-                                        totalItems?.iTotalDisplayRecords
-                                    )}
+                                    totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />

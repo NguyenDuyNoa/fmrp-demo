@@ -902,7 +902,7 @@ const Index = (props) => {
                                                                         ))}
                                                                 </h6>
                                                                 <h6 className="col-span-1 w-fit mx-auto">
-                                                                    <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#086FFC] font-[300] px-1.5 py-0.5 border border-[#086FFC] bg-white rounded-[5.5px] uppercase">
+                                                                    <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
                                                                         {e?.branch_name}
                                                                     </div>
                                                                 </h6>

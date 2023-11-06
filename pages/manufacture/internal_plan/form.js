@@ -14,7 +14,6 @@ import { NumericFormat } from "react-number-format";
 import React, { useState, useEffect } from "react";
 import { _ServerInstance as Axios } from "/services/axios";
 import { routerInternalPlan } from "@/components/UI/router/internalPlan";
-import TransitionMotion from "@/components/UI/transition/motionTransition";
 import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
 import { Add, Trash as IconDelete, Image as IconImage, Minus } from "iconsax-react";
 
@@ -770,168 +769,154 @@ const Index = (props) => {
                             ) : (
                                 <>
                                     {listData?.map((e) => (
-                                        <TransitionMotion>
-                                            <div
-                                                key={e?.id?.toString()}
-                                                className="grid grid-cols-12  my-1 items-center "
-                                            >
-                                                <div className="col-span-3 h-full ">
-                                                    <div className="relative">
-                                                        <Select
-                                                            options={options}
-                                                            value={e?.matHang}
-                                                            onInputChange={_HandleSeachApi.bind(this)}
-                                                            className=""
-                                                            onChange={_HandleChangeValue.bind(this, e?.id)}
-                                                            menuPortalTarget={document.body}
-                                                            formatOptionLabel={selectItemsLabel}
-                                                            style={{
-                                                                border: "none",
-                                                                boxShadow: "none",
-                                                                outline: "none",
+                                        <div key={e?.id?.toString()} className="grid grid-cols-12  my-1 items-center ">
+                                            <div className="col-span-3 h-full ">
+                                                <div className="relative">
+                                                    <Select
+                                                        options={options}
+                                                        value={e?.matHang}
+                                                        onInputChange={_HandleSeachApi.bind(this)}
+                                                        className=""
+                                                        onChange={_HandleChangeValue.bind(this, e?.id)}
+                                                        menuPortalTarget={document.body}
+                                                        formatOptionLabel={selectItemsLabel}
+                                                        style={{
+                                                            border: "none",
+                                                            boxShadow: "none",
+                                                            outline: "none",
+                                                        }}
+                                                        theme={(theme) => ({
+                                                            ...theme,
+                                                            colors: {
+                                                                ...theme.colors,
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
+                                                            },
+                                                        })}
+                                                        styles={{
+                                                            placeholder: (base) => ({
+                                                                ...base,
+                                                                color: "#cbd5e1",
+                                                            }),
+                                                            menuPortal: (base) => ({
+                                                                ...base,
+                                                                // zIndex: 9999,
+                                                            }),
+                                                            control: (base, state) => ({
+                                                                ...base,
+                                                                ...(state.isFocused && {
+                                                                    border: "0 0 0 1px #92BFF7",
+                                                                    boxShadow: "none",
+                                                                }),
+                                                            }),
+                                                            menu: (provided, state) => ({
+                                                                ...provided,
+                                                                width: "100%",
+                                                            }),
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-5 items-center col-span-9 border divide-x ml-1">
+                                                <div className="col-span-1 py-5 flex justify-center items-center text-sm">
+                                                    {e.unit}
+                                                </div>
+                                                <div className="col-span-1 py-5 relative">
+                                                    <div className="flex items-center justify-center h-full p-0.5">
+                                                        <button
+                                                            disabled={
+                                                                e.quantity === 1 ||
+                                                                e.quantity === "" ||
+                                                                e.quantity === null ||
+                                                                e.quantity === 0
+                                                            }
+                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
+                                                            onClick={_HandleChangeChild.bind(this, e?.id, "decrease")}
+                                                        >
+                                                            <Minus
+                                                                className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                size="16"
+                                                            />
+                                                        </button>
+                                                        <NumericFormat
+                                                            onValueChange={_HandleChangeChild.bind(
+                                                                this,
+                                                                e.id,
+                                                                "quantity"
+                                                            )}
+                                                            value={e.quantity || null}
+                                                            className={`${
+                                                                errors.errQuantity &&
+                                                                (e.quantity == null ||
+                                                                    e.quantity == "" ||
+                                                                    e.quantity == 0)
+                                                                    ? "border-b border-red-500"
+                                                                    : "border-b border-gray-200"
+                                                            } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
+                                                            allowNegative={false}
+                                                            decimalScale={0}
+                                                            isNumericString={true}
+                                                            thousandSeparator=","
+                                                            isAllowed={(values) => {
+                                                                const { value } = values;
+                                                                const newValue = +value;
+
+                                                                return true;
                                                             }}
-                                                            theme={(theme) => ({
-                                                                ...theme,
-                                                                colors: {
-                                                                    ...theme.colors,
-                                                                    primary25: "#EBF5FF",
-                                                                    primary50: "#92BFF7",
-                                                                    primary: "#0F4F9E",
-                                                                },
-                                                            })}
-                                                            styles={{
-                                                                placeholder: (base) => ({
-                                                                    ...base,
-                                                                    color: "#cbd5e1",
-                                                                }),
-                                                                menuPortal: (base) => ({
-                                                                    ...base,
-                                                                    // zIndex: 9999,
-                                                                }),
-                                                                control: (base, state) => ({
-                                                                    ...base,
-                                                                    ...(state.isFocused && {
-                                                                        border: "0 0 0 1px #92BFF7",
-                                                                        boxShadow: "none",
-                                                                    }),
-                                                                }),
-                                                                menu: (provided, state) => ({
-                                                                    ...provided,
-                                                                    width: "100%",
-                                                                }),
-                                                            }}
+                                                        />
+                                                        <button
+                                                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
+                                                            onClick={_HandleChangeChild.bind(this, e?.id, "increase")}
+                                                        >
+                                                            <Add
+                                                                className="2xl:scale-100 xl:scale-100 scale-50"
+                                                                size="16"
+                                                            />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="col-span-1 py-3 flex justify-center items-center">
+                                                    <div className="h-full w-fit">
+                                                        <DatePicker
+                                                            selected={e.date}
+                                                            dateFormat="dd/MM/yyyy"
+                                                            onChange={_HandleChangeChild.bind(this, e?.id, "date")}
+                                                            isClearable
+                                                            value={e.date}
+                                                            placeholderText="Chọn ngày"
+                                                            className={`outline-none ${
+                                                                errors.errDate && (e.date == null || e.date == "")
+                                                                    ? "border-b border-red-500"
+                                                                    : "border-b border-gray-200"
+                                                            } border py-2 px-1 rounded-md placeholder:text-xs w-fit`}
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="grid grid-cols-5 items-center col-span-9 border divide-x ml-1">
-                                                    <div className="col-span-1 py-5 flex justify-center items-center text-sm">
-                                                        {e.unit}
-                                                    </div>
-                                                    <div className="col-span-1 py-5 relative">
-                                                        <div className="flex items-center justify-center h-full p-0.5">
-                                                            <button
-                                                                disabled={
-                                                                    e.quantity === 1 ||
-                                                                    e.quantity === "" ||
-                                                                    e.quantity === null ||
-                                                                    e.quantity === 0
-                                                                }
-                                                                className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                                onClick={_HandleChangeChild.bind(
-                                                                    this,
-                                                                    e?.id,
-                                                                    "decrease"
-                                                                )}
-                                                            >
-                                                                <Minus
-                                                                    className="2xl:scale-100 xl:scale-100 scale-50"
-                                                                    size="16"
-                                                                />
-                                                            </button>
-                                                            <NumericFormat
-                                                                onValueChange={_HandleChangeChild.bind(
-                                                                    this,
-                                                                    e.id,
-                                                                    "quantity"
-                                                                )}
-                                                                value={e.quantity || null}
-                                                                className={`${
-                                                                    errors.errQuantity &&
-                                                                    (e.quantity == null ||
-                                                                        e.quantity == "" ||
-                                                                        e.quantity == 0)
-                                                                        ? "border-b border-red-500"
-                                                                        : "border-b border-gray-200"
-                                                                } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
-                                                                allowNegative={false}
-                                                                decimalScale={0}
-                                                                isNumericString={true}
-                                                                thousandSeparator=","
-                                                                isAllowed={(values) => {
-                                                                    const { value } = values;
-                                                                    const newValue = +value;
-
-                                                                    return true;
-                                                                }}
-                                                            />
-                                                            <button
-                                                                className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
-                                                                onClick={_HandleChangeChild.bind(
-                                                                    this,
-                                                                    e?.id,
-                                                                    "increase"
-                                                                )}
-                                                            >
-                                                                <Add
-                                                                    className="2xl:scale-100 xl:scale-100 scale-50"
-                                                                    size="16"
-                                                                />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-span-1 py-3 flex justify-center items-center">
-                                                        <div className="h-full w-fit">
-                                                            <DatePicker
-                                                                selected={e.date}
-                                                                dateFormat="dd/MM/yyyy"
-                                                                onChange={_HandleChangeChild.bind(this, e?.id, "date")}
-                                                                isClearable
-                                                                value={e.date}
-                                                                placeholderText="Chọn ngày"
-                                                                className={`outline-none ${
-                                                                    errors.errDate && (e.date == null || e.date == "")
-                                                                        ? "border-b border-red-500"
-                                                                        : "border-b border-gray-200"
-                                                                } border py-2 px-1 rounded-md placeholder:text-xs w-fit`}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-span-1 py-5 flex items-center justify-center ">
-                                                        <input
-                                                            value={e.note}
-                                                            onChange={_HandleChangeChild.bind(this, e.id, "note")}
-                                                            placeholder={
-                                                                dataLang?.delivery_receipt_note ||
-                                                                "delivery_receipt_note"
-                                                            }
-                                                            type="text"
-                                                            className="  placeholder:text-slate-300 text-xs px-1 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal outline-none "
-                                                        />
-                                                    </div>
-                                                    <div className="col-span-1  h-full flex items-center justify-center">
-                                                        <div>
-                                                            <button
-                                                                title="Xóa"
-                                                                onClick={_HandleDeleteParent.bind(this, e.id)}
-                                                                className=" text-red-500 flex p-1 justify-center items-center hover:scale-110 bg-red-50  rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
-                                                            >
-                                                                <IconDelete size={24} />
-                                                            </button>
-                                                        </div>
+                                                <div className="col-span-1 py-5 flex items-center justify-center ">
+                                                    <input
+                                                        value={e.note}
+                                                        onChange={_HandleChangeChild.bind(this, e.id, "note")}
+                                                        placeholder={
+                                                            dataLang?.delivery_receipt_note || "delivery_receipt_note"
+                                                        }
+                                                        type="text"
+                                                        className="  placeholder:text-slate-300 text-xs px-1 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal outline-none "
+                                                    />
+                                                </div>
+                                                <div className="col-span-1  h-full flex items-center justify-center">
+                                                    <div>
+                                                        <button
+                                                            title="Xóa"
+                                                            onClick={_HandleDeleteParent.bind(this, e.id)}
+                                                            className=" text-red-500 flex p-1 justify-center items-center hover:scale-110 bg-red-50  rounded-md hover:bg-red-200 transition-all ease-linear animate-bounce-custom"
+                                                        >
+                                                            <IconDelete size={24} />
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </TransitionMotion>
+                                        </div>
                                     ))}
                                 </>
                             )}

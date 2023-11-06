@@ -121,14 +121,9 @@ const Index = (props) => {
                     page: router.query?.page || 1,
                     "filter[status_bar]": tabPage ? tabPage : null,
                     "filter[id]": idCode != null ? idCode?.value : null,
-                    "filter[branch_id]":
-                        idBranch != null ? idBranch.value : null,
-                    "filter[start_date]":
-                        valueDate?.startDate != null
-                            ? valueDate?.startDate
-                            : null,
-                    "filter[end_date]":
-                        valueDate?.endDate != null ? valueDate?.endDate : null,
+                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
+                    "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
+                    "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
                 },
             },
             (err, response) => {
@@ -155,43 +150,24 @@ const Index = (props) => {
     };
 
     const _ServerFetching_filter = () => {
-        Axios(
-            "GET",
-            `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, result } = response.data;
-                    sListBr(
-                        result?.map((e) => ({ label: e.name, value: e.id }))
-                    );
-                }
+        Axios("GET", `/api_web/Api_Branch/branchCombobox/?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, result } = response.data;
+                sListBr(result?.map((e) => ({ label: e.name, value: e.id })));
             }
-        );
-        Axios(
-            "GET",
-            `/api_web/Api_service/serviceCombobox/?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { isSuccess, result } = response.data;
-                    sDataCode(
-                        result?.map((e) => ({ label: e?.code, value: e?.id }))
-                    );
-                }
+        });
+        Axios("GET", `/api_web/Api_service/serviceCombobox/?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { isSuccess, result } = response.data;
+                sDataCode(result?.map((e) => ({ label: e?.code, value: e?.id })));
             }
-        );
-        Axios(
-            "GET",
-            `/api_web/Api_staff/staffOption?csrf_protection=true`,
-            {},
-            (err, response) => {
-                if (!err) {
-                    var { rResult } = response.data;
-                    sListUser(rResult);
-                }
+        });
+        Axios("GET", `/api_web/Api_staff/staffOption?csrf_protection=true`, {}, (err, response) => {
+            if (!err) {
+                var { rResult } = response.data;
+                sListUser(rResult);
             }
-        );
+        });
         sOnFetching_filter(false);
     };
 
@@ -211,9 +187,7 @@ const Index = (props) => {
             (err, response) => {
                 if (!err) {
                     var { isSuccess, result } = response?.data;
-                    sDataCode(
-                        result?.map((e) => ({ label: e?.code, value: e?.id }))
-                    );
+                    sDataCode(result?.map((e) => ({ label: e?.code, value: e?.id })));
                 }
             }
         );
@@ -228,14 +202,9 @@ const Index = (props) => {
                     limit: 0,
                     search: keySearch,
                     "filter[id]": idCode != null ? idCode?.value : null,
-                    "filter[branch_id]":
-                        idBranch != null ? idBranch.value : null,
-                    "filter[start_date]":
-                        valueDate?.startDate != null
-                            ? valueDate?.startDate
-                            : null,
-                    "filter[end_date]":
-                        valueDate?.endDate != null ? valueDate?.endDate : null,
+                    "filter[branch_id]": idBranch != null ? idBranch.value : null,
+                    "filter[start_date]": valueDate?.startDate != null ? valueDate?.startDate : null,
+                    "filter[end_date]": valueDate?.endDate != null ? valueDate?.endDate : null,
                 },
             },
             (err, response) => {
@@ -275,8 +244,7 @@ const Index = (props) => {
     };
 
     useEffect(() => {
-        (onFetching && _ServerFetching()) ||
-            (onFetching && _ServerFetching_group());
+        (onFetching && _ServerFetching()) || (onFetching && _ServerFetching_group());
     }, [onFetching]);
 
     useEffect(() => {
@@ -286,18 +254,8 @@ const Index = (props) => {
             (idBranch != null && sOnFetching(true)) ||
             (idCode != null && sOnFetching(true)) ||
             (router.query?.tab && sOnFetching_filter(true)) ||
-            (valueDate.startDate != null &&
-                valueDate.endDate != null &&
-                sOnFetching(true));
-    }, [
-        limit,
-        router.query?.page,
-        router.query?.tab,
-        idBranch,
-        idCode,
-        valueDate.endDate,
-        valueDate.startDate,
-    ]);
+            (valueDate.startDate != null && valueDate.endDate != null && sOnFetching(true));
+    }, [limit, router.query?.page, router.query?.tab, idBranch, idCode, valueDate.endDate, valueDate.startDate]);
 
     const formatNumber = (number) => {
         if (!number && number !== 0) return 0;
@@ -320,10 +278,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.serviceVoucher_day_vouchers ||
-                        "serviceVoucher_day_vouchers"
-                    }`,
+                    title: `${dataLang?.serviceVoucher_day_vouchers || "serviceVoucher_day_vouchers"}`,
                     width: { wpx: 100 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -331,10 +286,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.serviceVoucher_voucher_code ||
-                        "serviceVoucher_voucher_code"
-                    }`,
+                    title: `${dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -342,10 +294,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.serviceVoucher_supplier ||
-                        "serviceVoucher_supplier"
-                    }`,
+                    title: `${dataLang?.serviceVoucher_supplier || "serviceVoucher_supplier"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -353,10 +302,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.serviceVoucher_total_amount ||
-                        "serviceVoucher_total_amount"
-                    }`,
+                    title: `${dataLang?.serviceVoucher_total_amount || "serviceVoucher_total_amount"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -364,10 +310,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.serviceVoucher_tax_money ||
-                        "serviceVoucher_tax_money"
-                    }`,
+                    title: `${dataLang?.serviceVoucher_tax_money || "serviceVoucher_tax_money"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -375,10 +318,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.serviceVoucher_into_money ||
-                        "serviceVoucher_into_money"
-                    }`,
+                    title: `${dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -386,10 +326,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.serviceVoucher_status_of_spending ||
-                        "serviceVoucher_status_of_spending"
-                    }`,
+                    title: `${dataLang?.serviceVoucher_status_of_spending || "serviceVoucher_status_of_spending"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -397,9 +334,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.serviceVoucher_note || "serviceVoucher_note"
-                    }`,
+                    title: `${dataLang?.serviceVoucher_note || "serviceVoucher_note"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -407,10 +342,7 @@ const Index = (props) => {
                     },
                 },
                 {
-                    title: `${
-                        dataLang?.serviceVoucher_branch ||
-                        "serviceVoucher_branch"
-                    }`,
+                    title: `${dataLang?.serviceVoucher_branch || "serviceVoucher_branch"}`,
                     width: { wch: 40 },
                     style: {
                         fill: { fgColor: { rgb: "C7DFFB" } },
@@ -424,21 +356,13 @@ const Index = (props) => {
                 { value: `${e?.code ? e?.code : ""}` },
                 { value: `${e?.supplier_name ? e?.supplier_name : ""}` },
                 {
-                    value: `${
-                        e?.total_price ? formatNumber(e?.total_price) : ""
-                    }`,
+                    value: `${e?.total_price ? formatNumber(e?.total_price) : ""}`,
                 },
                 {
-                    value: `${
-                        e?.total_tax_price
-                            ? formatNumber(e?.total_tax_price)
-                            : ""
-                    }`,
+                    value: `${e?.total_tax_price ? formatNumber(e?.total_tax_price) : ""}`,
                 },
                 {
-                    value: `${
-                        e?.total_amount ? formatNumber(e?.total_amount) : ""
-                    }`,
+                    value: `${e?.total_amount ? formatNumber(e?.total_amount) : ""}`,
                 },
                 // {value: `${e?.status_pay ? e?.status_pay === "0" && "Chưa nhập" || e?.status_pay === "1" && "Nhập 1 phần" ||  e?.status_pay === "2"  && "Đã nhập đủ đủ" : ""}`},
                 { value: `${"Chưa chi"}` },
@@ -453,9 +377,7 @@ const Index = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>
-                    {dataLang?.serviceVoucher_title || "serviceVoucher_title"}{" "}
-                </title>
+                <title>{dataLang?.serviceVoucher_title || "serviceVoucher_title"} </title>
             </Head>
             <div className="px-10 xl:pt-24 pt-[88px] pb-10 space-y-4 overflow-hidden h-screen">
                 {trangthaiExprired ? (
@@ -463,14 +385,10 @@ const Index = (props) => {
                 ) : (
                     <div className="flex space-x-3 xl:text-[14.5px] text-[12px]">
                         <h6 className="text-[#141522]/40">
-                            {dataLang?.serviceVoucher_title ||
-                                "serviceVoucher_title"}
+                            {dataLang?.serviceVoucher_title || "serviceVoucher_title"}
                         </h6>
                         <span className="text-[#141522]/40">/</span>
-                        <h6>
-                            {dataLang?.serviceVoucher_title_lits ||
-                                "serviceVoucher_title_lits"}
-                        </h6>
+                        <h6>{dataLang?.serviceVoucher_title_lits || "serviceVoucher_title_lits"}</h6>
                     </div>
                 )}
 
@@ -479,20 +397,16 @@ const Index = (props) => {
                         <div className="space-y-3 h-[96%] overflow-hidden">
                             <div className="flex justify-between">
                                 <h2 className="text-2xl text-[#52575E] capitalize">
-                                    {dataLang?.serviceVoucher_title_lits ||
-                                        "serviceVoucher_title_lits"}
+                                    {dataLang?.serviceVoucher_title_lits || "serviceVoucher_title_lits"}
                                 </h2>
                                 <div className="flex justify-end items-center">
                                     <Popup_servie
-                                        onRefreshGr={_ServerFetching_group.bind(
-                                            this
-                                        )}
+                                        onRefreshGr={_ServerFetching_group.bind(this)}
                                         onRefresh={_ServerFetching.bind(this)}
                                         dataLang={dataLang}
                                         className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5 bg-gradient-to-l from-[#0F4F9E] via-[#0F4F9E] via-[#296dc1] to-[#0F4F9E] text-white rounded btn-animation hover:scale-105"
                                     >
-                                        {dataLang?.serviceVoucher_create_new ||
-                                            "serviceVoucher_create_new"}
+                                        {dataLang?.serviceVoucher_create_new || "serviceVoucher_create_new"}
                                     </Popup_servie>
                                 </div>
                             </div>
@@ -504,23 +418,16 @@ const Index = (props) => {
                                             <div>
                                                 <TabStatus
                                                     style={{
-                                                        backgroundColor:
-                                                            "#e2f0fe",
+                                                        backgroundColor: "#e2f0fe",
                                                     }}
                                                     dataLang={dataLang}
                                                     key={e.id}
-                                                    onClick={_HandleSelectTab.bind(
-                                                        this,
-                                                        `${e.id}`
-                                                    )}
+                                                    onClick={_HandleSelectTab.bind(this, `${e.id}`)}
                                                     total={e.count}
                                                     active={e.id}
-                                                    className={
-                                                        "text-[#0F4F9E] "
-                                                    }
+                                                    className={"text-[#0F4F9E] "}
                                                 >
-                                                    {dataLang[e?.name] ||
-                                                        e?.name}
+                                                    {dataLang[e?.name] || e?.name}
                                                 </TabStatus>
                                             </div>
                                         );
@@ -540,12 +447,8 @@ const Index = (props) => {
                                                         <input
                                                             className=" relative bg-white  outline-[#D0D5DD] focus:outline-[#0F4F9E]  2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5  py-2.5 rounded 2xl:text-base text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
                                                             type="text"
-                                                            onChange={_HandleOnChangeKeySearch.bind(
-                                                                this
-                                                            )}
-                                                            placeholder={
-                                                                dataLang?.branch_search
-                                                            }
+                                                            onChange={_HandleOnChangeKeySearch.bind(this)}
+                                                            placeholder={dataLang?.branch_search}
                                                         />
                                                     </form>
                                                 </div>
@@ -561,24 +464,16 @@ const Index = (props) => {
                                                             },
                                                             ...listBr,
                                                         ]}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "branch"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "branch")}
                                                         value={idBranch}
                                                         placeholder={
-                                                            dataLang?.serviceVoucher_branch ||
-                                                            "serviceVoucher_branch"
+                                                            dataLang?.serviceVoucher_branch || "serviceVoucher_branch"
                                                         }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
                                                         isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
+                                                        noOptionsMessage={() => "Không có dữ liệu"}
                                                         closeMenuOnSelect={true}
                                                         style={{
                                                             border: "none",
@@ -589,33 +484,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -623,9 +508,7 @@ const Index = (props) => {
                                                 </div>
                                                 <div className="ml-1 col-span-1">
                                                     <Select
-                                                        onInputChange={_HandleSeachApi.bind(
-                                                            this
-                                                        )}
+                                                        onInputChange={_HandleSeachApi.bind(this)}
                                                         options={[
                                                             {
                                                                 value: "",
@@ -636,24 +519,17 @@ const Index = (props) => {
                                                             },
                                                             ...dataCode,
                                                         ]}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "code"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "code")}
                                                         value={idCode}
                                                         placeholder={
                                                             dataLang?.serviceVoucher_voucher_code ||
                                                             "serviceVoucher_voucher_code"
                                                         }
-                                                        hideSelectedOptions={
-                                                            false
-                                                        }
+                                                        hideSelectedOptions={false}
                                                         isClearable={true}
                                                         className="rounded-md bg-white  2xl:text-base xl:text-xs text-[10px]  z-20"
                                                         isSearchable={true}
-                                                        noOptionsMessage={() =>
-                                                            "Không có dữ liệu"
-                                                        }
+                                                        noOptionsMessage={() => "Không có dữ liệu"}
                                                         style={{
                                                             border: "none",
                                                             boxShadow: "none",
@@ -663,33 +539,23 @@ const Index = (props) => {
                                                             ...theme,
                                                             colors: {
                                                                 ...theme.colors,
-                                                                primary25:
-                                                                    "#EBF5FF",
-                                                                primary50:
-                                                                    "#92BFF7",
-                                                                primary:
-                                                                    "#0F4F9E",
+                                                                primary25: "#EBF5FF",
+                                                                primary50: "#92BFF7",
+                                                                primary: "#0F4F9E",
                                                             },
                                                         })}
                                                         styles={{
-                                                            placeholder: (
-                                                                base
-                                                            ) => ({
+                                                            placeholder: (base) => ({
                                                                 ...base,
                                                                 color: "#cbd5e1",
                                                             }),
-                                                            control: (
-                                                                base,
-                                                                state
-                                                            ) => ({
+                                                            control: (base, state) => ({
                                                                 ...base,
                                                                 border: "none",
                                                                 outline: "none",
-                                                                boxShadow:
-                                                                    "none",
+                                                                boxShadow: "none",
                                                                 ...(state.isFocused && {
-                                                                    boxShadow:
-                                                                        "0 0 0 1.5px #0F4F9E",
+                                                                    boxShadow: "0 0 0 1.5px #0F4F9E",
                                                                 }),
                                                             }),
                                                         }}
@@ -700,27 +566,16 @@ const Index = (props) => {
                                                         value={valueDate}
                                                         i18n={"vi"}
                                                         primaryColor={"blue"}
-                                                        onChange={onchang_filter.bind(
-                                                            this,
-                                                            "date"
-                                                        )}
+                                                        onChange={onchang_filter.bind(this, "date")}
                                                         showShortcuts={true}
-                                                        displayFormat={
-                                                            "DD/MM/YYYY"
-                                                        }
+                                                        displayFormat={"DD/MM/YYYY"}
                                                         configs={{
                                                             shortcuts: {
                                                                 today: "Hôm nay",
-                                                                yesterday:
-                                                                    "Hôm qua",
-                                                                past: (
-                                                                    period
-                                                                ) =>
-                                                                    `${period}  ngày qua`,
-                                                                currentMonth:
-                                                                    "Tháng này",
-                                                                pastMonth:
-                                                                    "Tháng trước",
+                                                                yesterday: "Hôm qua",
+                                                                past: (period) => `${period}  ngày qua`,
+                                                                currentMonth: "Tháng này",
+                                                                pastMonth: "Tháng trước",
                                                             },
                                                             footer: {
                                                                 cancel: "Từ bỏ",
@@ -736,9 +591,7 @@ const Index = (props) => {
                                         <div className="col-span-1">
                                             <div className="flex justify-end items-center gap-2">
                                                 <button
-                                                    onClick={_HandleFresh.bind(
-                                                        this
-                                                    )}
+                                                    onClick={_HandleFresh.bind(this)}
                                                     type="button"
                                                     className="bg-green-50 hover:bg-green-200 hover:scale-105 group p-2 rounded-md transition-all ease-in-out animate-pulse hover:animate-none"
                                                 >
@@ -757,25 +610,15 @@ const Index = (props) => {
                                                                 <button className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition">
                                                                     <IconExcel
                                                                         className="2xl:scale-100 xl:scale-100 scale-75"
-                                                                        size={
-                                                                            18
-                                                                        }
+                                                                        size={18}
                                                                     />
-                                                                    <span>
-                                                                        {
-                                                                            dataLang?.client_list_exportexcel
-                                                                        }
-                                                                    </span>
+                                                                    <span>{dataLang?.client_list_exportexcel}</span>
                                                                 </button>
                                                             }
                                                         >
                                                             <ExcelSheet
-                                                                dataSet={
-                                                                    multiDataSet
-                                                                }
-                                                                data={
-                                                                    multiDataSet
-                                                                }
+                                                                dataSet={multiDataSet}
+                                                                data={multiDataSet}
                                                                 name="Organization"
                                                             />
                                                         </ExcelFile>
@@ -787,20 +630,14 @@ const Index = (props) => {
                                                     </div>
                                                     <select
                                                         className="outline-none  text-[10px] xl:text-xs 2xl:text-sm"
-                                                        onChange={(e) =>
-                                                            sLimit(
-                                                                e.target.value
-                                                            )
-                                                        }
+                                                        onChange={(e) => sLimit(e.target.value)}
                                                         value={limit}
                                                     >
                                                         <option
                                                             className="text-[10px] xl:text-xs 2xl:text-sm hidden"
                                                             disabled
                                                         >
-                                                            {limit == -1
-                                                                ? "Tất cả"
-                                                                : limit}
+                                                            {limit == -1 ? "Tất cả" : limit}
                                                         </option>
                                                         <option
                                                             className="text-[10px] xl:text-xs 2xl:text-sm"
@@ -836,51 +673,39 @@ const Index = (props) => {
                                     <div className="pr-2 w-[100%] lx:w-[120%] ">
                                         <div className="grid grid-cols-12 items-center sticky top-0 p-2 z-10 rounded-xl shadow-sm bg-white divide-x">
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1  text-center">
-                                                {dataLang?.serviceVoucher_day_vouchers ||
-                                                    "serviceVoucher_day_vouchers"}
+                                                {dataLang?.serviceVoucher_day_vouchers || "serviceVoucher_day_vouchers"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1  text-center">
-                                                {dataLang?.serviceVoucher_voucher_code ||
-                                                    "serviceVoucher_voucher_code"}
+                                                {dataLang?.serviceVoucher_voucher_code || "serviceVoucher_voucher_code"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2  text-center">
-                                                {dataLang?.serviceVoucher_supplier ||
-                                                    "serviceVoucher_supplier"}
+                                                {dataLang?.serviceVoucher_supplier || "serviceVoucher_supplier"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1  text-center">
-                                                {dataLang?.serviceVoucher_total_amount ||
-                                                    "serviceVoucher_total_amount"}
+                                                {dataLang?.serviceVoucher_total_amount || "serviceVoucher_total_amount"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1  text-center">
-                                                {dataLang?.serviceVoucher_tax_money ||
-                                                    "serviceVoucher_tax_money"}
+                                                {dataLang?.serviceVoucher_tax_money || "serviceVoucher_tax_money"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1  text-center">
-                                                {dataLang?.serviceVoucher_into_money ||
-                                                    "serviceVoucher_into_money"}
+                                                {dataLang?.serviceVoucher_into_money || "serviceVoucher_into_money"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-2  text-center">
                                                 {dataLang?.serviceVoucher_status_of_spending ||
                                                     "serviceVoucher_status_of_spending"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1  text-center">
-                                                {dataLang?.serviceVoucher_note ||
-                                                    "serviceVoucher_note"}
+                                                {dataLang?.serviceVoucher_note || "serviceVoucher_note"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1  text-center">
-                                                {dataLang?.serviceVoucher_branch ||
-                                                    "serviceVoucher_branch"}
+                                                {dataLang?.serviceVoucher_branch || "serviceVoucher_branch"}
                                             </h4>
                                             <h4 className="2xl:text-[14px] xl:text-[10px] text-[8px] px-2 text-gray-600 uppercase  font-[600]  col-span-1  text-center">
-                                                {dataLang?.serviceVoucher_operation ||
-                                                    "serviceVoucher_operation"}
+                                                {dataLang?.serviceVoucher_operation || "serviceVoucher_operation"}
                                             </h4>
                                         </div>
                                         {onFetching ? (
-                                            <Loading
-                                                className="h-80"
-                                                color="#0f4f9e"
-                                            />
+                                            <Loading className="h-80" color="#0f4f9e" />
                                         ) : data?.length > 0 ? (
                                             <>
                                                 <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
@@ -891,79 +716,50 @@ const Index = (props) => {
                                                         >
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-center">
                                                                 {e?.date != null
-                                                                    ? moment(
-                                                                          e?.date
-                                                                      ).format(
-                                                                          "DD/MM/YYYY"
-                                                                      )
+                                                                    ? moment(e?.date).format("DD/MM/YYYY")
                                                                     : ""}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] hover:text-blue-600 transition-all ease-in-out px-2 col-span-1 text-center text-[#0F4F9E]  cursor-pointer">
                                                                 <Popup_chitiet
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
+                                                                    dataLang={dataLang}
                                                                     className="text-left"
-                                                                    name={
-                                                                        e?.code
-                                                                    }
+                                                                    name={e?.code}
                                                                     id={e?.id}
                                                                 />
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-2 text-left">
-                                                                {
-                                                                    e.supplier_name
-                                                                }
+                                                                {e.supplier_name}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(
-                                                                    e.total_price
-                                                                )}
+                                                                {formatNumber(e.total_price)}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(
-                                                                    e.total_tax_price
-                                                                )}
+                                                                {formatNumber(e.total_tax_price)}
                                                             </h6>
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-right">
-                                                                {formatNumber(
-                                                                    e.total_amount
-                                                                )}
+                                                                {formatNumber(e.total_amount)}
                                                             </h6>
                                                             <h6 className="3xl:items-center 3xl-text-[18px] 2xl:text-[16px] xl:text-xs text-[8px]  col-span-2 flex items-center w-fit mx-auto">
                                                                 <div className="mx-auto">
-                                                                    {(e?.status_pay ===
-                                                                        "not_spent" && (
+                                                                    {(e?.status_pay === "not_spent" && (
                                                                         <span className=" font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[135px]  bg-sky-200 text-center text-[13px]">
-                                                                            {
-                                                                                "Chưa chi"
-                                                                            }
+                                                                            {"Chưa chi"}
                                                                         </span>
                                                                     )) ||
-                                                                        (e?.status_pay ===
-                                                                            "spent_part" && (
+                                                                        (e?.status_pay === "spent_part" && (
                                                                             <span className=" font-normal text-orange-500 rounded-xl py-1 px-2 min-w-[135px]  bg-orange-200 text-center text-[13px]">
-                                                                                {
-                                                                                    "Chi 1 phần"
-                                                                                }{" "}
-                                                                                {`(${formatNumber(
-                                                                                    e?.amount_paid
-                                                                                )})`}
+                                                                                {"Chi 1 phần"}{" "}
+                                                                                {`(${formatNumber(e?.amount_paid)})`}
                                                                             </span>
                                                                         )) ||
-                                                                        (e?.status_pay ===
-                                                                            "spent" && (
+                                                                        (e?.status_pay === "spent" && (
                                                                             <span className="flex items-center justify-center gap-1 font-normal text-lime-500  rounded-xl py-1 px-2 min-w-[135px]  bg-lime-200 text-center text-[13px]">
                                                                                 <TickCircle
                                                                                     className="bg-lime-500 rounded-full"
                                                                                     color="white"
-                                                                                    size={
-                                                                                        15
-                                                                                    }
+                                                                                    size={15}
                                                                                 />
-                                                                                {
-                                                                                    "Đã chi đủ"
-                                                                                }
+                                                                                {"Đã chi đủ"}
                                                                             </span>
                                                                         ))}
                                                                     {/* <span className=' font-normal text-sky-500  rounded-xl py-1 px-2 min-w-[100px]  bg-sky-200 text-center 3xl:items-center 3xl-text-[18px] 2xl:text-[13px] xl:text-xs text-[8px]'>{"Chưa chi"}</span> */}
@@ -972,28 +768,18 @@ const Index = (props) => {
                                                             <h6 className="3xl:text-base 2xl:text-[12.5px] xl:text-[11px] font-medium text-[9px] text-zinc-600 px-2 col-span-1 text-left truncate ">
                                                                 {e.note}
                                                             </h6>
-                                                            <h6 className="col-span-1 w-fit ">
+                                                            <h6 className="col-span-1 w-fit mx-auto">
                                                                 <div className="cursor-default 3xl:text-[13px] 2xl:text-[10px] xl:text-[9px] text-[8px] text-[#0F4F9E] font-[300] px-1.5 py-0.5 border border-[#0F4F9E] bg-white rounded-[5.5px] uppercase">
-                                                                    {
-                                                                        e?.branch_name
-                                                                    }
+                                                                    {e?.branch_name}
                                                                 </div>
                                                             </h6>
                                                             <div className="col-span-1 flex justify-center">
                                                                 <BtnTacVu
                                                                     type="serviceVoucher"
-                                                                    onRefresh={_ServerFetching.bind(
-                                                                        this
-                                                                    )}
-                                                                    onRefreshGr={_ServerFetching_group.bind(
-                                                                        this
-                                                                    )}
-                                                                    dataLang={
-                                                                        dataLang
-                                                                    }
-                                                                    status_pay={
-                                                                        e?.status_pay
-                                                                    }
+                                                                    onRefresh={_ServerFetching.bind(this)}
+                                                                    onRefreshGr={_ServerFetching_group.bind(this)}
+                                                                    dataLang={dataLang}
+                                                                    status_pay={e?.status_pay}
                                                                     id={e?.id}
                                                                     className="bg-slate-100 xl:px-4 px-3 xl:py-1.5 py-1 rounded 2xl:text-base xl:text-xs text-[8px]"
                                                                 />
@@ -1046,17 +832,12 @@ const Index = (props) => {
                         {data?.length != 0 && (
                             <div className="flex space-x-5 items-center">
                                 <h6>
-                                    {dataLang?.display}{" "}
-                                    {totalItems?.iTotalDisplayRecords}{" "}
-                                    {dataLang?.among}{" "}
-                                    {totalItems?.iTotalRecords}{" "}
-                                    {dataLang?.ingredient}
+                                    {dataLang?.display} {totalItems?.iTotalDisplayRecords} {dataLang?.among}{" "}
+                                    {totalItems?.iTotalRecords} {dataLang?.ingredient}
                                 </h6>
                                 <Pagination
                                     postsPerPage={limit}
-                                    totalPosts={Number(
-                                        totalItems?.iTotalDisplayRecords
-                                    )}
+                                    totalPosts={Number(totalItems?.iTotalDisplayRecords)}
                                     paginate={paginate}
                                     currentPage={router.query?.page || 1}
                                 />
@@ -1078,9 +859,7 @@ const TabStatus = React.memo((props) => {
             onClick={props.onClick}
             className={`${props.className} justify-center min-w-[180px] flex gap-2 2xl:text-sm xl:text-sm text-xs items-center rounded-[5.5px] px-2 py-2 outline-none relative `}
         >
-            {router.query?.tab === `${props.active}` && (
-                <ArrowCircleDown size="20" color="#0F4F9E" />
-            )}
+            {router.query?.tab === `${props.active}` && <ArrowCircleDown size="20" color="#0F4F9E" />}
             {props.children}
             <span
                 className={`${
@@ -1104,30 +883,20 @@ const BtnTacVu = React.memo((props) => {
 
     const fetchDataSettingsCompany = () => {
         if (props?.id) {
-            Axios(
-                "GET",
-                `/api_web/Api_setting/CompanyInfo?csrf_protection=true`,
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var { data } = response.data;
-                        setDataCompany(data);
-                    }
+            Axios("GET", `/api_web/Api_setting/CompanyInfo?csrf_protection=true`, {}, (err, response) => {
+                if (!err) {
+                    var { data } = response.data;
+                    setDataCompany(data);
                 }
-            );
+            });
         }
         if (props?.id) {
-            Axios(
-                "GET",
-                `/api_web/Api_service/service/${props?.id}?csrf_protection=true`,
-                {},
-                (err, response) => {
-                    if (!err) {
-                        var db = response.data;
-                        setData(db);
-                    }
+            Axios("GET", `/api_web/Api_service/service/${props?.id}?csrf_protection=true`, {}, (err, response) => {
+                if (!err) {
+                    var db = response.data;
+                    setData(db);
                 }
-            );
+            });
         }
     };
     useEffect(() => {
@@ -1145,29 +914,24 @@ const BtnTacVu = React.memo((props) => {
             cancelButtonText: `${props.dataLang?.aler_cancel}`,
         }).then((result) => {
             if (result.isConfirmed) {
-                Axios(
-                    "DELETE",
-                    `/api_web/Api_service/service/${id}?csrf_protection=true`,
-                    {},
-                    (err, response) => {
-                        if (!err) {
-                            var { isSuccess, message } = response.data;
-                            if (isSuccess) {
-                                Toast.fire({
-                                    icon: "success",
-                                    title: props.dataLang[message],
-                                });
-                                props.onRefresh && props.onRefresh();
-                                props.onRefreshGr && props.onRefreshGr();
-                            } else {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: props.dataLang[message],
-                                });
-                            }
+                Axios("DELETE", `/api_web/Api_service/service/${id}?csrf_protection=true`, {}, (err, response) => {
+                    if (!err) {
+                        var { isSuccess, message } = response.data;
+                        if (isSuccess) {
+                            Toast.fire({
+                                icon: "success",
+                                title: props.dataLang[message],
+                            });
+                            props.onRefresh && props.onRefresh();
+                            props.onRefreshGr && props.onRefreshGr();
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                title: props.dataLang[message],
+                            });
                         }
                     }
-                );
+                });
             }
         });
     };
@@ -1186,16 +950,8 @@ const BtnTacVu = React.memo((props) => {
         <div>
             <Popup
                 trigger={
-                    <button
-                        type="button"
-                        className={
-                            `flex space-x-1 items-center ` + props.className
-                        }
-                    >
-                        <span>
-                            {props.dataLang?.purchase_action ||
-                                "purchase_action"}
-                        </span>
+                    <button type="button" className={`flex space-x-1 items-center ` + props.className}>
+                        <span>{props.dataLang?.purchase_action || "purchase_action"}</span>
                         <IconDown size={12} />
                     </button>
                 }
@@ -1225,8 +981,7 @@ const BtnTacVu = React.memo((props) => {
                                 id={props?.id}
                                 className="2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer  rounded py-2.5"
                             >
-                                {props.dataLang?.purchase_order_table_edit ||
-                                    "purchase_order_table_edit"}
+                                {props.dataLang?.purchase_order_table_edit || "purchase_order_table_edit"}
                             </Popup_servie>
                         </div>
                         <FilePDF
@@ -1245,8 +1000,7 @@ const BtnTacVu = React.memo((props) => {
                                 className="group-hover:text-[#f87171] group-hover:scale-110 group-hover:shadow-md "
                             />
                             <p className="group-hover:text-[#f87171]">
-                                {props.dataLang?.purchase_order_table_delete ||
-                                    "purchase_order_table_delete"}
+                                {props.dataLang?.purchase_order_table_delete || "purchase_order_table_delete"}
                             </p>
                         </button>
                     </div>

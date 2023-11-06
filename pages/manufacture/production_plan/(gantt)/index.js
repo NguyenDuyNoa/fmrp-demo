@@ -2,7 +2,6 @@ import Image from "next/image";
 import { v4 as uuid } from "uuid";
 import Popup from "reactjs-popup";
 import React, { useEffect, useRef, useState } from "react";
-import TransitionMotion from "@/components/UI/transition/motionTransition";
 
 const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending, timeLine }) => {
     const header = [
@@ -168,82 +167,80 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
                                         </div>
                                         {e.show &&
                                             e.listProducts.map((i, iIndex) => (
-                                                <TransitionMotion>
-                                                    <label
-                                                        key={i.id}
-                                                        htmlFor={i.id}
-                                                        className={`
+                                                <label
+                                                    key={i.id}
+                                                    htmlFor={i.id}
+                                                    className={`
                                                        cursor-pointer grid grid-cols-12 items-center my-2`}
-                                                    >
-                                                        <div className="flex items-center 3xl:gap-2 gap-1 col-span-3">
-                                                            {/* <input
+                                                >
+                                                    <div className="flex items-center 3xl:gap-2 gap-1 col-span-3">
+                                                        {/* <input
                                                             id={i.id}
                                                             type="checkbox"
                                                             className="h-5 w-5 rounded-full"
                                                             checked={i.checked}
                                                             onChange={() => handleCheked(e.id, i.id)}
                                                         /> */}
-                                                            <label htmlFor={i.id} className="inline-flex items-center">
-                                                                <input
-                                                                    id={i.id}
-                                                                    type="checkbox"
-                                                                    className="hidden"
-                                                                    checked={i.checked}
-                                                                    onChange={() => handleCheked(e.id, i.id)}
-                                                                />
-                                                                <div
-                                                                    className={`w-4 h-4 rounded-full  border border-gray-300 flex justify-center items-center ${
-                                                                        i.checked ? "bg-blue-600" : "bg-white"
-                                                                    }`}
-                                                                    onClick={() => handleCheked(e.id, i.id)}
-                                                                >
-                                                                    {i.checked && (
-                                                                        <svg
-                                                                            className="w-3 h-3 text-white"
-                                                                            fill="none"
-                                                                            stroke="currentColor"
-                                                                        >
-                                                                            <circle cx="50%" cy="50%" r="40%" />
-                                                                        </svg>
-                                                                    )}
-                                                                </div>
-                                                            </label>
-
-                                                            <Image
-                                                                src={i.images}
-                                                                width={36}
-                                                                height={36}
-                                                                alt=""
-                                                                className="object-cover rounded-md"
+                                                        <label htmlFor={i.id} className="inline-flex items-center">
+                                                            <input
+                                                                id={i.id}
+                                                                type="checkbox"
+                                                                className="hidden"
+                                                                checked={i.checked}
+                                                                onChange={() => handleCheked(e.id, i.id)}
                                                             />
-                                                            <div className="flex flex-col">
-                                                                <h1 className="text-[#000000] font-semibold 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px]">
-                                                                    {i.name}
-                                                                </h1>
-                                                                <h1 className="text-[#9295A4] font-normal 3xl:text-[10px] xxl:text-[8px] 2xl:text-[9px] xl:text-[8px] lg:text-[7px]">
-                                                                    {i.desription}
-                                                                </h1>
+                                                            <div
+                                                                className={`w-4 h-4 rounded-full  border border-gray-300 flex justify-center items-center ${
+                                                                    i.checked ? "bg-blue-600" : "bg-white"
+                                                                }`}
+                                                                onClick={() => handleCheked(e.id, i.id)}
+                                                            >
+                                                                {i.checked && (
+                                                                    <svg
+                                                                        className="w-3 h-3 text-white"
+                                                                        fill="none"
+                                                                        stroke="currentColor"
+                                                                    >
+                                                                        <circle cx="50%" cy="50%" r="40%" />
+                                                                    </svg>
+                                                                )}
                                                             </div>
+                                                        </label>
+
+                                                        <Image
+                                                            src={i.images}
+                                                            width={36}
+                                                            height={36}
+                                                            alt=""
+                                                            className="object-cover rounded-md"
+                                                        />
+                                                        <div className="flex flex-col">
+                                                            <h1 className="text-[#000000] font-semibold 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px]">
+                                                                {i.name}
+                                                            </h1>
+                                                            <h1 className="text-[#9295A4] font-normal 3xl:text-[10px] xxl:text-[8px] 2xl:text-[9px] xl:text-[8px] lg:text-[7px]">
+                                                                {i.desription}
+                                                            </h1>
                                                         </div>
-                                                        <h3
-                                                            className={`${
-                                                                (i.status == "outDate" && "text-[#EE1E1E]") ||
-                                                                (i.status == "sussces" && "text-[#0BAA2E]") ||
-                                                                (i.status == "unfulfilled" && "text-[#FF8F0D]")
-                                                            } font-medium 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3  px-4`}
-                                                        >
-                                                            {i.status == "outDate" && "Đã quá hạn"}
-                                                            {i.status == "sussces" && "Hoàn thành"}
-                                                            {i.status == "unfulfilled" && "Chưa thực hiện"}
-                                                        </h3>
-                                                        <h3 className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
-                                                            {i.quantity}
-                                                        </h3>
-                                                        <h3 className="text-[#667085] border-b w-fit font-medium 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3 ">
-                                                            {i.actions}
-                                                        </h3>
-                                                    </label>
-                                                </TransitionMotion>
+                                                    </div>
+                                                    <h3
+                                                        className={`${
+                                                            (i.status == "outDate" && "text-[#EE1E1E]") ||
+                                                            (i.status == "sussces" && "text-[#0BAA2E]") ||
+                                                            (i.status == "unfulfilled" && "text-[#FF8F0D]")
+                                                        } font-medium 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3  px-4`}
+                                                    >
+                                                        {i.status == "outDate" && "Đã quá hạn"}
+                                                        {i.status == "sussces" && "Hoàn thành"}
+                                                        {i.status == "unfulfilled" && "Chưa thực hiện"}
+                                                    </h3>
+                                                    <h3 className="text-[#52575E] font-normal 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3">
+                                                        {i.quantity}
+                                                    </h3>
+                                                    <h3 className="text-[#667085] border-b w-fit font-medium 3xl:text-sm  xxl:text-[11px] 2xl:text-[12px] xl:text-[11px] lg:text-[10px] text-[13px] col-span-3 ">
+                                                        {i.actions}
+                                                    </h3>
+                                                </label>
                                             ))}
                                     </div>
                                 </div>
@@ -297,62 +294,56 @@ const BodyGantt = ({ handleShowSub, handleCheked, handleSort, data, isAscending,
                                 {e.show &&
                                     e.listProducts.map((i, iIndex) => {
                                         return (
-                                            <TransitionMotion>
-                                                <div className="flex  w-[65%] h-[35px] my-2 ">
-                                                    {i.processArr.map((ce, ceIndex) => {
-                                                        return ce.days.map((ci, ciIndex) => {
-                                                            return (
-                                                                <div key={ci.id} className={`w-[80px] `}>
-                                                                    <Popup
-                                                                        className="popover-productionPlan"
-                                                                        arrow={true}
-                                                                        arrowStyle={{
-                                                                            color:
-                                                                                (ci.active &&
-                                                                                    !ci.outDate &&
-                                                                                    "#fecaca") ||
-                                                                                (ci.active && ci.outDate && "#bae6fd"),
-                                                                        }}
-                                                                        trigger={
+                                            <div className="flex  w-[65%] h-[35px] my-2 ">
+                                                {i.processArr.map((ce, ceIndex) => {
+                                                    return ce.days.map((ci, ciIndex) => {
+                                                        return (
+                                                            <div key={ci.id} className={`w-[80px] `}>
+                                                                <Popup
+                                                                    className="popover-productionPlan"
+                                                                    arrow={true}
+                                                                    arrowStyle={{
+                                                                        color:
+                                                                            (ci.active && !ci.outDate && "#fecaca") ||
+                                                                            (ci.active && ci.outDate && "#bae6fd"),
+                                                                    }}
+                                                                    trigger={
+                                                                        <div
+                                                                            className={`${
+                                                                                ci.active && ci.outDate
+                                                                                    ? "bg-[#5599EC] hover:bg-sky-200"
+                                                                                    : ""
+                                                                            }  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out `}
+                                                                        >
                                                                             <div
                                                                                 className={`${
-                                                                                    ci.active && ci.outDate
-                                                                                        ? "bg-[#5599EC] hover:bg-sky-200"
+                                                                                    ci.active && !ci.outDate
+                                                                                        ? "bg-[#EE1E1E] hover:bg-red-200"
                                                                                         : ""
-                                                                                }  h-[20px] w-[80px] relative  transition-all duration-200 ease-in-out `}
-                                                                            >
-                                                                                <div
-                                                                                    className={`${
-                                                                                        ci.active && !ci.outDate
-                                                                                            ? "bg-[#EE1E1E] hover:bg-red-200"
-                                                                                            : ""
-                                                                                    } 
+                                                                                } 
                                                                                  h-[20px] w-[80px] absolute top-0 left-0 transition-all duration-200 ease-in-out  `}
-                                                                                ></div>
-                                                                            </div>
-                                                                        }
-                                                                        position="top center"
-                                                                        on={["hover", "focus"]}
-                                                                    >
-                                                                        <div
-                                                                            className={`flex flex-col ${
-                                                                                (ci.active &&
-                                                                                    !ci.outDate &&
-                                                                                    "bg-red-200") ||
-                                                                                (ci.active &&
-                                                                                    ci.outDate &&
-                                                                                    "bg-sky-200")
-                                                                            } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize`}
-                                                                        >
-                                                                            {ci.type}
+                                                                            ></div>
                                                                         </div>
-                                                                    </Popup>
-                                                                </div>
-                                                            );
-                                                        });
-                                                    })}
-                                                </div>
-                                            </TransitionMotion>
+                                                                    }
+                                                                    position="top center"
+                                                                    on={["hover", "focus"]}
+                                                                >
+                                                                    <div
+                                                                        className={`flex flex-col ${
+                                                                            (ci.active &&
+                                                                                !ci.outDate &&
+                                                                                "bg-red-200") ||
+                                                                            (ci.active && ci.outDate && "bg-sky-200")
+                                                                        } px-2.5 py-0.5 font-medium text-sm rounded-sm capitalize`}
+                                                                    >
+                                                                        {ci.type}
+                                                                    </div>
+                                                                </Popup>
+                                                            </div>
+                                                        );
+                                                    });
+                                                })}
+                                            </div>
                                         );
                                     })}
                             </div>
