@@ -1,34 +1,227 @@
 import moment from "moment";
-import { Box1 } from "iconsax-react";
+import Swal from "sweetalert2";
+import dynamic from "next/dynamic";
+import ModalImage from "react-modal-image";
 import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
 import React, { useEffect, useState } from "react";
+import { NumericFormat } from "react-number-format";
 import { _ServerInstance as Axios } from "/services/axios";
+import Zoom from "@/components/UI/zoomElement/zoomElement";
+import formatNumber from "@/components/UI/formanumber/formanumber";
+const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
+import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+import { SearchNormal1 as IconSearch, Trash as IconDelete, Box1, TickCircle } from "iconsax-react";
+import SelectComponent from "@/components/UI/filterComponents/selectComponent";
 const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
     const [data, sData] = useState();
     const [open, sOpen] = useState(false);
     const _ToggleModal = (e) => sOpen(e);
+    const [onSending, sOnSending] = useState(false);
     const [onFetching, sOnFetching] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [dataWarehouse, sDataWarehouse] = useState([]);
+    const [isIdWarehouse, sIsIdWarehouse] = useState(null);
+    const [errorQuantity, sErrorQuantity] = useState(false);
+    const [onFetchingWarehouse, sOnFetchingWarehouse] = useState(false);
+    const [onFetchingCondition, sOnFetchingCondition] = useState(false);
+
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+    const [dataProductExpiry, sDataProductExpiry] = useState({});
+    const [dataProductSerial, sDataProductSerial] = useState({});
+    useEffect(() => {
+        id && open && sOnFetching(true);
+        id && open && sOnFetchingWarehouse(true);
+        id && sOnFetchingCondition(true);
+    }, [open, isIdWarehouse]);
+
+    const _ServerFetchingCondition = () => {
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                var data = response.data;
+                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+                sDataProductSerial(data.find((x) => x.code == "product_serial"));
+            }
+            sOnFetchingCondition(false);
+        });
+    };
+    const handleChangeValue = (name) => (e) => sIsIdWarehouse(e);
 
     useEffect(() => {
-        id && sOnFetching(true);
-    }, [open]);
+        onFetchingCondition && _ServerFetchingCondition();
+    }, [onFetchingCondition]);
+
+    useEffect(() => {
+        JSON.stringify(dataMaterialExpiry) === "{}" &&
+            JSON.stringify(dataProductExpiry) === "{}" &&
+            JSON.stringify(dataProductSerial) === "{}" &&
+            sOnFetchingCondition(true);
+    }, [
+        JSON.stringify(dataMaterialExpiry) === "{}",
+        JSON.stringify(dataProductExpiry) === "{}",
+        JSON.stringify(dataProductSerial) === "{}",
+    ]);
 
     const handleFetching = () => {
-        setLoading(true);
-        Axios("GET", `/api_web/Api_sale_order/saleOrder/${id}?csrf_protection=true`, {}, (err, response) => {
-            if (response && response?.data) {
-                var db = response?.data;
-                sData(db);
+        Axios(
+            "GET",
+            `/api_web/Api_sale_order/KeepStockOrder/${id}`,
+            {
+                params: {
+                    "filter[warehouse_id]": isIdWarehouse?.value,
+                },
+            },
+            (err, response) => {
+                if (response && response?.data) {
+                    let db = response?.data;
+                    sData(db);
+                }
                 sOnFetching(false);
-                setLoading(false);
             }
+        );
+    };
+    const handleFetchingWarehouse = () => {
+        Axios(
+            "GET",
+            "/api_web/Api_warehouse/warehouseCombobox_not_system/?csrf_protection=true",
+            {},
+            (err, response) => {
+                if (!err) {
+                    let data = response.data;
+                    sDataWarehouse(data.map((e) => ({ label: e.warehouse_name, value: e.id })));
+                }
+            }
+        );
+        sOnFetchingWarehouse(false);
+    };
+
+    const handleShow = (idParent, idChild) => {
+        sData({
+            ...data,
+            items: data.items?.map((e) => {
+                if (e?.id == idParent) {
+                    return {
+                        ...e,
+                        item: {
+                            ...e.item,
+                            warehouse_location: e.item.warehouse_location?.map((i) => {
+                                return {
+                                    ...i,
+                                    show: i.id == idChild ? !i.show : i.show,
+                                };
+                            }),
+                        },
+                    };
+                }
+            }),
         });
+    };
+
+    const handleDeleteParent = async () => {
+        const result = await Swal.fire({
+            title: `${"Bạn có muốn xóa mặt hàng"}`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#296dc1",
+            cancelButtonColor: "#d33",
+            confirmButtonText: `${dataLang?.aler_yes}`,
+            cancelButtonText: `${dataLang?.aler_cancel}`,
+        });
+
+        return result.isConfirmed;
+    };
+
+    const checkCountQuantity = (newData, idParent, idChild) => {
+        const db = newData?.find((e) => e?.id == idParent);
+        const ce = db.item?.warehouse_location?.find((child) => child?.id == idChild);
+        const quantityCount = db.item?.warehouse_location.reduce(
+            (sum, opt) => sum + parseFloat(opt?.quantity_export || 0),
+            0
+        );
+        if (quantityCount > +db.quantity_had_condition) {
+            ToatstNotifi(
+                "error",
+                `Tổng số lượng không được lớn ${formatNumber(db.quantity_had_condition)} hơn số lượng cần giữ`
+            );
+            ce.quantity_export = "";
+            HandTimeout();
+        }
+    };
+
+    const HandTimeout = () => {
+        setTimeout(() => {
+            sOnFetching(true);
+        }, 500);
+        setTimeout(() => {
+            sOnFetching(false);
+        }, 2000);
+    };
+
+    const handleChange = async (type, value, idParent, idChild) => {
+        let newData = [];
+        switch (type) {
+            case "quantity_export":
+                newData = data.items?.map((e) => {
+                    if (e?.id === idParent) {
+                        return {
+                            ...e,
+                            item: {
+                                ...e.item,
+                                warehouse_location: e.item.warehouse_location?.map((i) => {
+                                    return {
+                                        ...i,
+                                        quantity_export: i.id === idChild ? value.value : i.quantity_export,
+                                    };
+                                }),
+                            },
+                        };
+                    } else {
+                        return e;
+                    }
+                });
+                await checkCountQuantity(newData, idParent, idChild);
+                break;
+            case "deleteParent":
+                const shouldDelete = await handleDeleteParent();
+                if (shouldDelete) {
+                    newData = data.items?.filter((e) => e.id !== idParent);
+                    ToatstNotifi("success", "Xóa mặt hàng thành công");
+                } else {
+                    newData = data.items;
+                }
+                break;
+            default:
+                newData = data.items;
+        }
+        sData({ ...data, items: [...newData] });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const checkPropertyRecursive = data?.items.some((e) =>
+            e?.item?.warehouse_location?.some((i) => i.show && (i.quantity_export == "" || i.quantity_export == 0))
+        );
+        if (checkPropertyRecursive) {
+            checkPropertyRecursive && sErrorQuantity(true);
+            ToatstNotifi("error", `${dataLang?.required_field_null}`);
+        } else {
+            sOnSending(true);
+        }
     };
 
     useEffect(() => {
         onFetching && handleFetching();
-    }, [open]);
+    }, [onFetching]);
+
+    useEffect(() => {
+        onFetchingWarehouse && handleFetchingWarehouse();
+    }, [onFetchingWarehouse]);
+
+    // useEffect(() => {
+    //     isIdWarehouse != null && sOnFetching(true);
+    //     isIdWarehouse == null && sOnFetching(true);
+    // }, [isIdWarehouse]);
+
     return (
         <>
             <PopupEdit
@@ -48,7 +241,7 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                 }
             >
                 <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
-                <div className="3xl:w-[1200px] 2xl:w-[1100px] xl:w-[999px] w-[950px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
+                <div className="3xl:w-[1300px] 2xl:w-[1150px] xl:w-[999px] w-[950px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
                     <div className=" customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 flex flex-col">
                         <h2 className="font-normal bg-[#ECF0F4] 3xl:p-2 p-1 3xl:text-[16px] 2xl:text-[16px] xl:text-[15px] text-[15px]">
                             {dataLang?.detail_general_information || "detail_general_information"}
@@ -118,10 +311,25 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                                         {data?.branch_name}
                                     </h3>
                                 </div>
+                                <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
+                                    <label className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
+                                        {"Danh sách kho"}:
+                                    </label>
+                                    <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]  font-normal col-span-4">
+                                        <SelectComponent
+                                            className={"border rounded z-20"}
+                                            isClearable={true}
+                                            placeholder={"Chọn kho"}
+                                            options={dataWarehouse}
+                                            value={isIdWarehouse}
+                                            onChange={handleChangeValue("isIdWarehouse")}
+                                        />
+                                    </h3>
+                                </div>
                             </div>
                         </div>
                         <div className="w-[100%] lx:w-[110%] ">
-                            <div className="grid grid-cols-12 items-center sticky rounded-t-xl top-0 bg-slate-100 p-2 z-10">
+                            <div className="grid grid-cols-13 items-center sticky rounded-t-xl top-0 bg-slate-100 p-2 z-10">
                                 <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-3 font-[500] text-center whitespace-nowrap">
                                     {dataLang?.price_quote_item || "price_quote_item"}
                                 </h4>
@@ -144,15 +352,15 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                                 <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
                                     {"SL cần giữ"}
                                 </h4>
-                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-2 font-[500] text-center whitespace-nowrap">
+                                <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-3 font-[500] text-center whitespace-nowrap">
                                     {"Kho hàng"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
                                     {"Tác vụ"}
                                 </h4>
                             </div>
-                            {/* {loading ? (
-                                <Loading className="h-20 2xl:h-[160px]" color="#0f4f9e" />
+                            {onFetching ? (
+                                <Loading className="max-h-40 2xl:h-[160px]" color="#0f4f9e" />
                             ) : data?.items?.length > 0 ? (
                                 <>
                                     <ScrollArea
@@ -163,62 +371,218 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                                         <div className="divide-y divide-slate-200 min:h-[200px] h-[100%] max:h-[300px]">
                                             {data?.items?.map((e) => (
                                                 <div
-                                                    className="grid items-center grid-cols-12 3xl:py-1.5 py-0.5 px-2 hover:bg-slate-100/40"
-                                                    key={e.id?.toString()}
+                                                    className="grid items-center grid-cols-13 3xl:py-1.5 py-0.5 px-2 hover:bg-slate-100/40"
+                                                    key={e?.id?.toString()}
                                                 >
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]   py-0.5 col-span-1  rounded-md text-center">
-                                                        {e?.item?.images != null ? (
-                                                            <ModalImage
-                                                                small={e?.item?.images}
-                                                                large={e?.item?.images}
-                                                                alt="Product Image"
-                                                                className="custom-modal-image object-cover rounded w-[50px] h-[60px]"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
-                                                                <ModalImage
-                                                                    small="/no_img.png"
-                                                                    large="/no_img.png"
-                                                                    className="w-full h-full rounded object-contain p-1"
-                                                                />
+                                                    <h6 className="text-[13px] font-medium py-1 col-span-3 text-left">
+                                                        <div className="flex items-center gap-2">
+                                                            <div>
+                                                                {e?.item?.images != null ? (
+                                                                    <ModalImage
+                                                                        small={e?.item?.images}
+                                                                        large={e?.item?.images}
+                                                                        alt="Product Image"
+                                                                        className="custom-modal-image object-cover rounded w-[50px] h-[50px] mx-auto"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-[50px] h-[50px] object-cover  mx-auto">
+                                                                        <ModalImage
+                                                                            small="/no_img.png"
+                                                                            large="/no_img.png"
+                                                                            className="w-full h-full rounded object-contain p-1"
+                                                                        ></ModalImage>
+                                                                    </div>
+                                                                )}
                                                             </div>
-                                                        )}
-                                                    </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-left">
-                                                        {e?.item?.name}
-                                                    </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-left break-words">
-                                                        {e?.item?.product_variation}
+                                                            <div>
+                                                                <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                    {e?.item?.name}
+                                                                </h6>
+                                                                <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                    {e?.item?.product_variation}
+                                                                </h6>
+                                                            </div>
+                                                        </div>
                                                     </h6>
                                                     <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
                                                         {e?.item?.unit_name}
                                                     </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center">
+                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
                                                         {formatNumber(e?.quantity)}
                                                     </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-right">
-                                                        {formatNumber(e?.price)}
+                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
+                                                        {formatNumber(e?.quantity_delivery)}
                                                     </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center">
-                                                        {e?.discount_percent + "%"}
+                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
+                                                        {formatNumber(e?.quantity_plan)}
                                                     </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-right">
-                                                        {formatNumber(e?.price_after_discount)}
+                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
+                                                        {formatNumber(e?.quantity_condition)}
                                                     </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center">
-                                                        {formatNumber(e?.tax_rate) + "%"}
+                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1  rounded-md text-center break-words">
+                                                        {formatNumber(e?.quantity_had_condition)}
                                                     </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px]  px-2 py-0.5 col-span-1 pr-2 rounded-md text-right">
-                                                        {formatNumber(e?.amount)}
+                                                    <h6
+                                                        className={`2xl:text-[13px] flex items-start ${
+                                                            e?.item?.warehouse_location?.length > 0
+                                                                ? "justify-start"
+                                                                : "justify-center"
+                                                        }  flex-wrap gap-2 xl:text-[12px] text-[11px] py-0.5 col-span-3  rounded-md  break-words`}
+                                                    >
+                                                        {e?.item?.warehouse_location?.length > 0 ? (
+                                                            e?.item?.warehouse_location?.map((i) => {
+                                                                return (
+                                                                    <div
+                                                                        key={i.id}
+                                                                        className="w-[48%] grid grid-cols-1 items-start "
+                                                                    >
+                                                                        <Zoom>
+                                                                            <div
+                                                                                onClick={() => handleShow(e.id, i.id)}
+                                                                                className={`w-full text-[10px] font-medium bg-white hover:bg-gray-100 transition-all ease-in-out border-gray-400 border rounded-2xl py-1 px-2 flex items-center gap-1`}
+                                                                            >
+                                                                                <div>
+                                                                                    {i.show ? (
+                                                                                        <TickCircle
+                                                                                            className="bg-blue-600 rounded-full "
+                                                                                            color="white"
+                                                                                            size={15}
+                                                                                        />
+                                                                                    ) : (
+                                                                                        <div className="h-4 w-4 rounded-full bg-transparent border border-gray-300" />
+                                                                                    )}
+                                                                                </div>
+                                                                                <div className="flex flex-col items-start jus">
+                                                                                    <h3>
+                                                                                        {i.location_name} -
+                                                                                        <span className="text-blue-500 pl-1">
+                                                                                            {i.quantity}
+                                                                                        </span>
+                                                                                    </h3>
+                                                                                    <div className="flex items-center font-oblique flex-wrap">
+                                                                                        {dataProductSerial.is_enable ===
+                                                                                        "1" ? (
+                                                                                            <div className="flex gap-0.5">
+                                                                                                <h6 className="text-[8px]">
+                                                                                                    Serial:
+                                                                                                </h6>
+                                                                                                <h6 className="text-[9px] px-1  w-[full] text-left ">
+                                                                                                    {i.serial == null ||
+                                                                                                    i.serial == ""
+                                                                                                        ? "-"
+                                                                                                        : i?.serial}
+                                                                                                </h6>
+                                                                                            </div>
+                                                                                        ) : (
+                                                                                            ""
+                                                                                        )}
+                                                                                        {dataMaterialExpiry.is_enable ===
+                                                                                            "1" ||
+                                                                                        dataProductExpiry.is_enable ===
+                                                                                            "1" ? (
+                                                                                            <>
+                                                                                                <div className="flex gap-0.5">
+                                                                                                    <h6 className="text-[8px]">
+                                                                                                        Lot:
+                                                                                                    </h6>{" "}
+                                                                                                    <h6 className="text-[9px] px-1  w-[full] text-left ">
+                                                                                                        {i.lot ==
+                                                                                                            null ||
+                                                                                                        i.lot == ""
+                                                                                                            ? "-"
+                                                                                                            : i?.lot}
+                                                                                                    </h6>
+                                                                                                </div>
+                                                                                                <div className="flex gap-0.5">
+                                                                                                    <h6 className="text-[8px]">
+                                                                                                        Date:
+                                                                                                    </h6>{" "}
+                                                                                                    <h6 className="text-[9px] px-1  w-[full] text-center ">
+                                                                                                        {i?.expiration_date
+                                                                                                            ? moment(
+                                                                                                                  i?.expiration_date
+                                                                                                              ).format(
+                                                                                                                  "DD/MM/YYYY"
+                                                                                                              )
+                                                                                                            : "-"}
+                                                                                                    </h6>
+                                                                                                </div>
+                                                                                            </>
+                                                                                        ) : (
+                                                                                            ""
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </Zoom>
+                                                                        {i.show && (
+                                                                            <NumericFormat
+                                                                                className={`${
+                                                                                    i.show &&
+                                                                                    errorQuantity &&
+                                                                                    (i.quantity_export == "" ||
+                                                                                        i.quantity == 0)
+                                                                                        ? "border-red-500 focus:border-red-500"
+                                                                                        : "border-gray-300 focus:border-blue-400"
+                                                                                } py-1 px-2 my-1   border outline-none rounded-3xl w-full`}
+                                                                                onValueChange={(event) =>
+                                                                                    handleChange(
+                                                                                        "quantity_export",
+                                                                                        event,
+                                                                                        e.id,
+                                                                                        i.id
+                                                                                    )
+                                                                                }
+                                                                                id={`${i.id}`}
+                                                                                value={i.quantity_export}
+                                                                                allowNegative={false}
+                                                                                decimalScale={0}
+                                                                                isNumericString={true}
+                                                                                thousandSeparator=","
+                                                                                isAllowed={(values) => {
+                                                                                    const {
+                                                                                        value,
+                                                                                        formattedValue,
+                                                                                        floatValue,
+                                                                                    } = values;
+                                                                                    const newValue = +value;
+                                                                                    if (
+                                                                                        newValue >
+                                                                                        +e?.quantity_had_condition
+                                                                                    ) {
+                                                                                        ToatstNotifi(
+                                                                                            "error",
+                                                                                            `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                                                                                e?.quantity_had_condition
+                                                                                            )} số lượng cần giữ`
+                                                                                        );
+                                                                                        return;
+                                                                                    }
+                                                                                    return true;
+                                                                                }}
+                                                                            />
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })
+                                                        ) : (
+                                                            <span className="font-normal text-red-500  rounded-2xl py-1 px-3  bg-red-200">
+                                                                Tồn kho hết
+                                                            </span>
+                                                        )}
                                                     </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] col-span-1 rounded-md text-center whitespace-normal">
-                                                        {e?.delivery_date != null
-                                                            ? moment(e?.delivery_date).format("DD/MM/YYYY")
-                                                            : ""}
-                                                    </h6>
-                                                    <h6 className="2xl:text-[13px] xl:text-[12px] text-[11px] pl-4 col-span-1 rounded-md text-left whitespace-normal">
-                                                        {e?.note != undefined ? e?.note : ""}
-                                                    </h6>
+                                                    <div className="col-span-1 flex items-center justify-center">
+                                                        <button
+                                                            onClick={(event) =>
+                                                                handleChange("deleteParent", event, e.id)
+                                                            }
+                                                            type="button"
+                                                            title="Xóa"
+                                                            className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
+                                                        >
+                                                            <IconDelete />
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
@@ -234,13 +598,12 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                                             {dataLang?.price_quote_table_item_not_found ||
                                                 "price_quote_table_item_not_found"}
                                         </h1>
-                                        <div className="flex items-center justify-around mt-6 ">
-                                        </div>
+                                        <div className="flex items-center justify-around mt-6 "></div>
                                     </div>
                                 </div>
-                            )} */}
+                            )}
                         </div>
-                        <div className="text-right mt-2  grid grid-cols-12 flex-col justify-between">
+                        <div className="text-right mt-2  grid grid-cols-12 flex-col justify-between border-t">
                             <div className="col-span-7 font-medium grid grid-cols-7 text-left">
                                 <h3 className="3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px] ">
                                     {dataLang?.price_quote_note || "price_quote_note"}
@@ -260,6 +623,7 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                                         {"Hủy"}
                                     </button>
                                     <button
+                                        onClick={handleSubmit}
                                         type="submit"
                                         className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E] hover:scale-105 transition-all ease-linear"
                                     >
