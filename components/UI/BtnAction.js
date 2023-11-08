@@ -16,6 +16,7 @@ import { VscFilePdf } from "react-icons/vsc";
 import { routerDeliveryReceipt, routerReturnSales } from "./router/sellingGoods";
 import { routerInternalPlan } from "./router/internalPlan";
 import Popup_KeepStock from "pages/sales_export_product/salesOrder/(PopupDetail)/PopupKeepStock";
+import Popup_DetailKeepStock from "pages/sales_export_product/salesOrder/(PopupDetail)/PopupDetailKeepStock";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -457,9 +458,12 @@ const BtnAction = React.memo((props) => {
                             {props?.dataLang?.btn_table_delete || "btn_table_delete"}
                         </button> */}
                         {props.type == "sales_product" && <Popup_KeepStock {...props} />}
+                        {props.type == "sales_product" && <Popup_DetailKeepStock {...props} />}
                         <button
                             onClick={() => handleDelete(props?.id)}
-                            className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full"
+                            className={`group transition-all ease-in-out flex items-center ${
+                                props.type == "sales_product" ? "" : "justify-center"
+                            } gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
                         >
                             <RiDeleteBin6Line
                                 size={20}

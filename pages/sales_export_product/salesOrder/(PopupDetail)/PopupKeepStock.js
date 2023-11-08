@@ -2,37 +2,48 @@ import moment from "moment";
 import Swal from "sweetalert2";
 import dynamic from "next/dynamic";
 import ModalImage from "react-modal-image";
-import PopupEdit from "@/components/UI/popup";
-import Loading from "@/components/UI/loading";
 import React, { useEffect, useState } from "react";
 import { NumericFormat } from "react-number-format";
 import { _ServerInstance as Axios } from "/services/axios";
+const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
+import { SearchNormal1 as IconSearch, Trash as IconDelete, Box1, TickCircle } from "iconsax-react";
+import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
 import formatNumber from "@/components/UI/formanumber/formanumber";
-const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
-import { SearchNormal1 as IconSearch, Trash as IconDelete, Box1, TickCircle } from "iconsax-react";
 import SelectComponent from "@/components/UI/filterComponents/selectComponent";
-const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
-    const [data, sData] = useState();
+const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
+    const initialFetch = {
+        onSending: false,
+        onFetching: false,
+        onFetchingWarehouse: false,
+        onFetchingCondition: false,
+    };
+
+    const [data, sData] = useState({});
     const [open, sOpen] = useState(false);
-    const _ToggleModal = (e) => sOpen(e);
-    const [onSending, sOnSending] = useState(false);
-    const [onFetching, sOnFetching] = useState(false);
+    const [dataClone, sDataClone] = useState({});
     const [dataWarehouse, sDataWarehouse] = useState([]);
     const [isIdWarehouse, sIsIdWarehouse] = useState(null);
     const [errorQuantity, sErrorQuantity] = useState(false);
-    const [onFetchingWarehouse, sOnFetchingWarehouse] = useState(false);
-    const [onFetchingCondition, sOnFetchingCondition] = useState(false);
-
-    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+    const [isFetching, sIsFetching] = useState(initialFetch);
     const [dataProductExpiry, sDataProductExpiry] = useState({});
     const [dataProductSerial, sDataProductSerial] = useState({});
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+
+    const _ToggleModal = (e) => {
+        status == "approved"
+            ? sOpen(e)
+            : ToatstNotifi("error", "Trạng thái đơn hàng chưa được duyệt, vui lòng duyệt để giữ kho !");
+    };
+
+    const setIsFetch = (e) => sIsFetching((prve) => ({ ...prve, ...e }));
+
     useEffect(() => {
-        id && open && sOnFetching(true);
-        id && open && sOnFetchingWarehouse(true);
-        id && sOnFetchingCondition(true);
-    }, [open, isIdWarehouse]);
+        id && open && setIsFetch({ onFetching: true, onFetchingWarehouse: true, onFetchingCondition: true });
+        sIsIdWarehouse(null);
+    }, [open]);
 
     const _ServerFetchingCondition = () => {
         Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
@@ -42,20 +53,19 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                 sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
                 sDataProductSerial(data.find((x) => x.code == "product_serial"));
             }
-            sOnFetchingCondition(false);
+            setIsFetch({ onFetchingCondition: false });
         });
     };
-    const handleChangeValue = (name) => (e) => sIsIdWarehouse(e);
 
     useEffect(() => {
-        onFetchingCondition && _ServerFetchingCondition();
-    }, [onFetchingCondition]);
+        isFetching.onFetchingCondition && _ServerFetchingCondition();
+    }, [isFetching.onFetchingCondition]);
 
     useEffect(() => {
         JSON.stringify(dataMaterialExpiry) === "{}" &&
             JSON.stringify(dataProductExpiry) === "{}" &&
             JSON.stringify(dataProductSerial) === "{}" &&
-            sOnFetchingCondition(true);
+            setIsFetch({ onFetchingCondition: true });
     }, [
         JSON.stringify(dataMaterialExpiry) === "{}",
         JSON.stringify(dataProductExpiry) === "{}",
@@ -66,20 +76,18 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
         Axios(
             "GET",
             `/api_web/Api_sale_order/KeepStockOrder/${id}`,
-            {
-                params: {
-                    "filter[warehouse_id]": isIdWarehouse?.value,
-                },
-            },
+            { params: { "filter[warehouse_id]": isIdWarehouse?.value } },
             (err, response) => {
-                if (response && response?.data) {
+                if (!err) {
                     let db = response?.data;
                     sData(db);
+                    sDataClone(db);
                 }
-                sOnFetching(false);
             }
         );
+        setTimeout(() => setIsFetch({ onFetching: false }), 700);
     };
+
     const handleFetchingWarehouse = () => {
         Axios(
             "GET",
@@ -92,7 +100,8 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                 }
             }
         );
-        sOnFetchingWarehouse(false);
+
+        setIsFetch({ onFetchingWarehouse: false });
     };
 
     const handleShow = (idParent, idChild) => {
@@ -105,21 +114,26 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                         item: {
                             ...e.item,
                             warehouse_location: e.item.warehouse_location?.map((i) => {
-                                return {
-                                    ...i,
-                                    show: i.id == idChild ? !i.show : i.show,
-                                };
+                                if (i.id == idChild) {
+                                    return {
+                                        ...i,
+                                        show: !i.show,
+                                        quantity_export: i.show ? i.quantity_export : 0,
+                                    };
+                                }
+                                return i;
                             }),
                         },
                     };
                 }
+                return e;
             }),
         });
     };
 
     const handleDeleteParent = async () => {
         const result = await Swal.fire({
-            title: `${"Bạn có muốn xóa mặt hàng"}`,
+            title: `Bạn có muốn xóa mặt hàng`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#296dc1",
@@ -131,30 +145,24 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
         return result.isConfirmed;
     };
 
-    const checkCountQuantity = (newData, idParent, idChild) => {
+    const validateQuantity = (newData, idParent, idChild) => {
         const db = newData?.find((e) => e?.id == idParent);
-        const ce = db.item?.warehouse_location?.find((child) => child?.id == idChild);
+
+        const warehouse = db.item?.warehouse_location?.find((child) => child?.id == idChild);
+
         const quantityCount = db.item?.warehouse_location.reduce(
             (sum, opt) => sum + parseFloat(opt?.quantity_export || 0),
             0
         );
+
         if (quantityCount > +db.quantity_had_condition) {
             ToatstNotifi(
                 "error",
-                `Tổng số lượng không được lớn ${formatNumber(db.quantity_had_condition)} hơn số lượng cần giữ`
+                `Tổng số lượng không được lớn hơn ${formatNumber(db.quantity_had_condition)} số lượng cần giữ`
             );
-            ce.quantity_export = "";
-            HandTimeout();
+            warehouse.quantity_export = "";
+            sData(dataClone);
         }
-    };
-
-    const HandTimeout = () => {
-        setTimeout(() => {
-            sOnFetching(true);
-        }, 500);
-        setTimeout(() => {
-            sOnFetching(false);
-        }, 2000);
     };
 
     const handleChange = async (type, value, idParent, idChild) => {
@@ -170,7 +178,7 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                                 warehouse_location: e.item.warehouse_location?.map((i) => {
                                     return {
                                         ...i,
-                                        quantity_export: i.id === idChild ? value.value : i.quantity_export,
+                                        quantity_export: i.id == idChild ? value.value : i.quantity_export,
                                     };
                                 }),
                             },
@@ -179,16 +187,20 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                         return e;
                     }
                 });
-                await checkCountQuantity(newData, idParent, idChild);
+
+                await validateQuantity(newData, idParent, idChild);
+
                 break;
             case "deleteParent":
                 const shouldDelete = await handleDeleteParent();
+
                 if (shouldDelete) {
                     newData = data.items?.filter((e) => e.id !== idParent);
                     ToatstNotifi("success", "Xóa mặt hàng thành công");
                 } else {
                     newData = data.items;
                 }
+
                 break;
             default:
                 newData = data.items;
@@ -198,45 +210,98 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
         const checkPropertyRecursive = data?.items.some((e) =>
-            e?.item?.warehouse_location?.some((i) => i.show && (i.quantity_export == "" || i.quantity_export == 0))
+            e?.item?.warehouse_location?.some(
+                (i) => i.show && (i.quantity_export == "" || i.quantity_export == 0 || i.quantity_export == "0")
+            )
         );
+
         if (checkPropertyRecursive) {
             checkPropertyRecursive && sErrorQuantity(true);
             ToatstNotifi("error", `${dataLang?.required_field_null}`);
         } else {
-            sOnSending(true);
+            setIsFetch({ onSending: true });
         }
     };
 
-    useEffect(() => {
-        onFetching && handleFetching();
-    }, [onFetching]);
+    const sendingData = () => {
+        let formData = new FormData();
+
+        formData.append("idOrder", data?.id);
+        formData.append("warehouse_id", isIdWarehouse?.value);
+
+        data?.items.forEach((e, index) => {
+            formData.append(`items[${index}][order_item_id]`, e?.id);
+            formData.append(`items[${index}][item]`, e?.item_complex_id);
+
+            e?.item?.warehouse_location.forEach((i, _) => {
+                if (i.show) {
+                    formData.append(`items[${index}][warehouse_location][${_}][id]`, i?.id);
+                    formData.append(`items[${index}][warehouse_location][${_}][quantity_export]`, i?.quantity_export);
+                }
+            });
+        });
+
+        Axios(
+            "POST",
+            `/api_web/Api_sale_order/AddKeepStockOrder?csrf_protection=true`,
+            {
+                data: formData,
+                headers: { "Content-Type": "multipart/form-data" },
+            },
+            (err, response) => {
+                if (!err) {
+                    var { isSuccess, message } = response.data;
+                    if (isSuccess) {
+                        ToatstNotifi("success", `${dataLang[message] || message}`);
+                        sOpen(false);
+                    } else {
+                        ToatstNotifi("error", `${dataLang[message] || message}`);
+                    }
+                }
+                setIsFetch({ onSending: false });
+            }
+        );
+    };
 
     useEffect(() => {
-        onFetchingWarehouse && handleFetchingWarehouse();
-    }, [onFetchingWarehouse]);
+        setIsFetch({ onFetching: true });
+    }, [isIdWarehouse]);
 
-    // useEffect(() => {
-    //     isIdWarehouse != null && sOnFetching(true);
-    //     isIdWarehouse == null && sOnFetching(true);
-    // }, [isIdWarehouse]);
+    useEffect(() => {
+        isFetching.onSending && sendingData();
+    }, [isFetching.onSending]);
+
+    useEffect(() => {
+        isFetching.onFetching && handleFetching();
+    }, [isFetching.onFetching]);
+
+    useEffect(() => {
+        isFetching.onFetchingWarehouse && handleFetchingWarehouse();
+    }, [isFetching.onFetchingWarehouse]);
 
     return (
         <>
             <PopupEdit
-                title={"Chi tiết giữ kho"}
+                title={dataLang?.salesOrder_warehouse_details || "salesOrder_warehouse_details"}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
                 onClose={_ToggleModal.bind(this, false)}
                 classNameBtn={""}
                 button={
-                    <button className="group transition-all ease-in-out flex items-center justify-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full">
+                    <button
+                        className={`${
+                            props.type == "sales_product" ? "" : "justify-center"
+                        } group transition-all ease-in-out flex items-center gap-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded py-2.5 w-full`}
+                    >
                         <Box1
                             size={20}
                             className="group-hover:text-orange-500 group-hover:scale-110 group-hover:shadow-md "
                         />
-                        <p className="group-hover:text-orange-500 pr-4">{"Giữ kho"}</p>
+                        <p className="group-hover:text-orange-500 pr-4">
+                            {dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock"}
+                        </p>
                     </button>
                 }
             >
@@ -313,16 +378,19 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                                 </div>
                                 <div className="xl:my-4 my-3 font-medium grid grid-cols-6">
                                     <label className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] col-span-2">
-                                        {"Danh sách kho"}:
+                                        {dataLang?.salesOrder_warehouse_list || "salesOrder_warehouse_list"}:
                                     </label>
                                     <h3 className="3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px]  font-normal col-span-4">
                                         <SelectComponent
                                             className={"border rounded z-20"}
                                             isClearable={true}
-                                            placeholder={"Chọn kho"}
+                                            placeholder={
+                                                dataLang?.salesOrder_select_warehouse || "salesOrder_select_warehouse"
+                                            }
                                             options={dataWarehouse}
                                             value={isIdWarehouse}
-                                            onChange={handleChangeValue("isIdWarehouse")}
+                                            maxMenuHeight={150}
+                                            onChange={(e) => sIsIdWarehouse(e)}
                                         />
                                     </h3>
                                 </div>
@@ -341,25 +409,25 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                                     {dataLang?.price_quote_quantity || "price_quote_quantity"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
-                                    {"SL đã giao"}
+                                    {dataLang?.salesOrder_qty_delivered || "salesOrder_qty_delivered"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center ">
-                                    {"SL sản xuất"}
+                                    {dataLang?.salesOrder_qty_production || "salesOrder_qty_production"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
-                                    {"SL đã giữ"}
+                                    {dataLang?.salesOrder_qty_kept || "salesOrder_qty_kept"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
-                                    {"SL cần giữ"}
+                                    {dataLang?.salesOrder_qty_nedds_kept || "salesOrder_qty_nedds_kept"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-3 font-[500] text-center whitespace-nowrap">
-                                    {"Kho hàng"}
+                                    {dataLang?.salesOrder_warehouse || "salesOrder_warehouse"}
                                 </h4>
                                 <h4 className="3xl:text-[12px] 2xl:text-[11px] xl:text-[12px] text-[10px] text-[#667085] uppercase col-span-1 font-[500] text-center whitespace-nowrap">
-                                    {"Tác vụ"}
+                                    {dataLang?.salesOrder_action || "salesOrder_action"}
                                 </h4>
                             </div>
-                            {onFetching ? (
+                            {isFetching.onFetching ? (
                                 <Loading className="max-h-40 2xl:h-[160px]" color="#0f4f9e" />
                             ) : data?.items?.length > 0 ? (
                                 <>
@@ -439,7 +507,7 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                                                                         <Zoom>
                                                                             <div
                                                                                 onClick={() => handleShow(e.id, i.id)}
-                                                                                className={`w-full text-[10px] font-medium bg-white hover:bg-gray-100 transition-all ease-in-out border-gray-400 border rounded-2xl py-1 px-2 flex items-center gap-1`}
+                                                                                className={`border-gray-400  w-full text-[10px] font-medium bg-white hover:bg-gray-100 transition-all ease-in-out  border rounded-2xl py-1 px-2 flex items-center gap-1`}
                                                                             >
                                                                                 <div>
                                                                                     {i.show ? (
@@ -521,7 +589,8 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                                                                                     i.show &&
                                                                                     errorQuantity &&
                                                                                     (i.quantity_export == "" ||
-                                                                                        i.quantity == 0)
+                                                                                        i.quantity_export == 0 ||
+                                                                                        i.quantity_export == "0")
                                                                                         ? "border-red-500 focus:border-red-500"
                                                                                         : "border-gray-300 focus:border-blue-400"
                                                                                 } py-1 px-2 my-1   border outline-none rounded-3xl w-full`}
@@ -546,6 +615,13 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                                                                                         floatValue,
                                                                                     } = values;
                                                                                     const newValue = +value;
+                                                                                    if (newValue > +i.quantity) {
+                                                                                        ToatstNotifi(
+                                                                                            "error",
+                                                                                            "Số lượng vượt quá số tồn kho."
+                                                                                        );
+                                                                                        return;
+                                                                                    }
                                                                                     if (
                                                                                         newValue >
                                                                                         +e?.quantity_had_condition
@@ -620,14 +696,14 @@ const Popup_KeepStock = ({ dataLang, id, onRefresh, ...props }) => {
                                         onClick={_ToggleModal.bind(this, false)}
                                         className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD] hover:scale-105 transition-all ease-linear"
                                     >
-                                        {"Hủy"}
+                                        {dataLang?.branch_popup_exit || "branch_popup_exit"}
                                     </button>
                                     <button
                                         onClick={handleSubmit}
                                         type="submit"
                                         className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E] hover:scale-105 transition-all ease-linear"
                                     >
-                                        {"Lưu"}
+                                        {dataLang?.branch_popup_save || "branch_popup_save"}
                                     </button>
                                 </div>
                             </div>
