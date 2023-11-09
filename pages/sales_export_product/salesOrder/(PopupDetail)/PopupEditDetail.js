@@ -1,0 +1,448 @@
+import moment from "moment";
+import Swal from "sweetalert2";
+import dynamic from "next/dynamic";
+import { BiEdit } from "react-icons/bi";
+import ModalImage from "react-modal-image";
+import { useEffect, useState } from "react";
+import { NumericFormat } from "react-number-format";
+import { _ServerInstance as Axios } from "/services/axios";
+const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
+import { SearchNormal1 as IconSearch, Trash as IconDelete, SearchNormal1 } from "iconsax-react";
+
+import PopupEdit from "@/components/UI/popup";
+import Loading from "@/components/UI/loading";
+import formatNumber from "@/components/UI/formanumber/formanumber";
+import ToatstNotifi from "@/components/UI/alerNotification/alerNotification";
+
+const Popup_EditDetail = (props) => {
+    const { dataLang, id, dataClone, sIsFetchingParent } = props;
+
+    const initialFetch = {
+        onSending: false,
+        onLoading: false,
+        onFetchingCondition: false,
+    };
+    const [data, sData] = useState({});
+    const [open, sOpen] = useState(false);
+    const [isKeySearch, sIsKeySearch] = useState("");
+    const [isFetching, sIsFetching] = useState(initialFetch);
+    const [errorQuantity, sErrorQuantity] = useState(false);
+    const [dataProductExpiry, sDataProductExpiry] = useState({});
+    const [dataProductSerial, sDataProductSerial] = useState({});
+    const [dataMaterialExpiry, sDataMaterialExpiry] = useState({});
+
+    const _ToggleModal = (e) => {
+        if (e) {
+            sOpen(e);
+        } else {
+            sIsFetchingParent({ onFetching: true });
+            sOpen(e);
+        }
+    };
+
+    const newData = dataClone?.transfer?.find((e) => e.id == id);
+
+    const setIsFetch = (e) => sIsFetching((prve) => ({ ...prve, ...e }));
+
+    useEffect(() => {
+        open && sData(dataClone?.transfer?.find((e) => e.id == id));
+        open && sErrorQuantity(false);
+    }, [open]);
+
+    useEffect(() => {
+        JSON.stringify(dataMaterialExpiry) === "{}" &&
+            JSON.stringify(dataProductExpiry) === "{}" &&
+            JSON.stringify(dataProductSerial) === "{}" &&
+            setIsFetch({ onFetchingCondition: true });
+    }, [
+        JSON.stringify(dataMaterialExpiry) === "{}",
+        JSON.stringify(dataProductExpiry) === "{}",
+        JSON.stringify(dataProductSerial) === "{}",
+    ]);
+
+    const _ServerFetchingCondition = () => {
+        Axios("GET", "/api_web/api_setting/feature/?csrf_protection=true", {}, (err, response) => {
+            if (!err) {
+                let data = response.data;
+                sDataMaterialExpiry(data.find((x) => x.code == "material_expiry"));
+                sDataProductExpiry(data.find((x) => x.code == "product_expiry"));
+                sDataProductSerial(data.find((x) => x.code == "product_serial"));
+            }
+            setIsFetch({ onFetchingCondition: false });
+        });
+    };
+
+    useEffect(() => {
+        isFetching.onFetchingCondition && _ServerFetchingCondition();
+    }, [isFetching.onFetchingCondition]);
+
+    const handleChange = async (type, value, idParent) => {
+        let newData = [];
+
+        switch (type) {
+            case "quantity":
+                newData = data?.items?.map((e) => {
+                    if (e.id == idParent) {
+                        return {
+                            ...e,
+                            quantity: value.value,
+                        };
+                    }
+                    return e;
+                });
+                break;
+            case "deleteItem":
+                const shouldDelete = await handleDeleteItem();
+                if (shouldDelete) {
+                    data.items?.forEach((e) => {
+                        if (e.quantity_delivery > 0) {
+                            ToatstNotifi("error", "Mặt hàng đã giao không thể xóa");
+                        } else {
+                            newData = data.items?.filter((e) => e.quantity_delivery == 0 && e.id !== idParent);
+                            ToatstNotifi("success", "Xóa mặt hàng thành công");
+                        }
+                    });
+                } else {
+                    newData = data.items;
+                }
+                break;
+
+            default:
+                newData = data;
+        }
+        sData({ ...data, items: newData });
+    };
+
+    const handleSearch = (inputValue) => {
+        const keyword = inputValue.target.value;
+        sIsKeySearch(keyword);
+        if (keyword.trim() === "") {
+            sData({ ...newData });
+        } else {
+            const fieldsToSearch = ["item", "warehouse_location_to", "warehouse_location"];
+            const filteredItems = newData?.items?.filter((e) =>
+                fieldsToSearch.some((field) => {
+                    return Object.values(e[field]).some(
+                        (value) => typeof value === "string" && value.toLowerCase().includes(keyword.toLowerCase())
+                    );
+                })
+            );
+            sData({ ...data, items: [...filteredItems] });
+        }
+    };
+
+    const handleDeleteItem = async () => {
+        const result = await Swal.fire({
+            title: `Bạn có muốn xóa mặt hàng`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#296dc1",
+            cancelButtonColor: "#d33",
+            confirmButtonText: `${dataLang?.aler_yes}`,
+            cancelButtonText: `${dataLang?.aler_cancel}`,
+        });
+
+        return result.isConfirmed;
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        const checkErrorQuantity = data?.items?.some((e) => e.quantity == "" || e.quantity == 0 || e.quantity == "0");
+
+        if (checkErrorQuantity) {
+            checkErrorQuantity && sErrorQuantity(true);
+            ToatstNotifi("error", `${dataLang?.required_field_null}`);
+        } else {
+            setIsFetch({ onSending: true });
+        }
+    };
+
+    const sendingData = () => {
+        let formData = new FormData();
+        formData.append("idTranfer", data?.id);
+        formData.append("idOrder", dataClone?.order?.id);
+        data?.items.forEach((e, index) => {
+            formData.append(`items[${index}][id]`, e?.id ? e?.id : "");
+            formData.append(`items[${index}][quantity]`, e?.quantity ? e?.quantity : "");
+        });
+        Axios(
+            "POST",
+            `/api_web/Api_sale_order/EditKeepStockOrder?csrf_protection=true`,
+            {
+                data: formData,
+                headers: { "Content-Type": "multipart/form-data" },
+            },
+            (err, response) => {
+                if (!err) {
+                    var { isSuccess, message } = response.data;
+                    if (isSuccess) {
+                        ToatstNotifi("success", `${dataLang[message] || message}`);
+                        sOpen(false);
+                    } else {
+                        ToatstNotifi("error", `${dataLang[message] || message}`);
+                    }
+                }
+                setIsFetch({ onSending: false });
+            }
+        );
+    };
+
+    useEffect(() => {
+        isFetching.onSending && sendingData();
+    }, [isFetching.onSending]);
+
+    return (
+        <PopupEdit
+            title={dataLang?.salesOrder_warehouse_details || "salesOrder_warehouse_details"}
+            onClickOpen={_ToggleModal.bind(this, true)}
+            open={open}
+            onClose={_ToggleModal.bind(this, false)}
+            classNameBtn={""}
+            button={
+                <button className="group transition-all ease-in-out p-2  2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50  cursor-pointer rounded ">
+                    <BiEdit
+                        size={23}
+                        className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
+                    />
+                </button>
+            }
+        >
+            <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
+            <div className="3xl:w-[1300px] 2xl:w-[1150px] xl:w-[999px] w-[950px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
+                <div className=" customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 flex flex-col">
+                    <div className="grid grid-cols-12">
+                        <form className="flex items-center relative col-span-3">
+                            <SearchNormal1
+                                size={20}
+                                className="absolute 2xl:left-3 z-10 text-[#cccccc] xl:left-[4%] left-[1%]"
+                            />
+                            <input
+                                className="relative border outline-none focus:outline-none focus:border-blue-400 2xl:text-left 2xl:pl-10 xl:pl-0 p-0 2xl:py-1.5 py-2.5 rounded 2xl:text-sm text-xs xl:text-center text-center 2xl:w-full xl:w-full w-[100%]"
+                                type="text"
+                                value={isKeySearch}
+                                onChange={(e) => handleSearch(e)}
+                                placeholder={dataLang?.salesOrder_search || "salesOrder_search"}
+                            />
+                        </form>
+                    </div>
+                    <div className=" w-[100%]">
+                        <div className={`grid-cols-10  grid sticky top-0 bg-white shadow-lg  z-10 rounded `}>
+                            <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-3 text-center whitespace-nowrap">
+                                {dataLang?.inventory_items || "inventory_items"}
+                            </h4>
+                            <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                {dataLang?.warehouseTransfer_receivingLocation || "warehouseTransfer_receivingLocation"}
+                            </h4>
+                            <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-2 text-center whitespace-nowrap">
+                                {dataLang?.warehouseTransfer_receivingLocation || "warehouseTransfer_receivingLocation"}
+                            </h4>
+                            <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                                {dataLang?.salesOrder_Slkeeps_stocks || "salesOrder_Slkeeps_stocks"}
+                            </h4>
+                            <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                                {dataLang?.salesOrder_Sl_delivered || "salesOrder_Sl_delivered"}
+                            </h4>
+                            <h4 className="text-[13px] px-2 py-2 text-gray-600 uppercase  font-[600] col-span-1 text-center whitespace-nowrap">
+                                {dataLang?.salesOrder_action || "salesOrder_action"}
+                            </h4>
+                        </div>
+                        {isFetching.onLoading ? (
+                            <Loading className="max-h-28" color="#0f4f9e" />
+                        ) : data?.items?.length > 0 ? (
+                            <>
+                                <ScrollArea
+                                    className="min-h-[90px] max-h-[170px] 2xl:max-h-[250px] overflow-hidden"
+                                    speed={1}
+                                    smoothScrolling={true}
+                                >
+                                    <div className=" divide-slate-200 min:h-[170px]  max:h-[170px]">
+                                        {data?.items?.map((e) => (
+                                            <div
+                                                className="grid grid-cols-10 hover:bg-slate-50 items-center border-b"
+                                                key={e.id}
+                                            >
+                                                <h6 className="text-[13px]  px-2 py-2 col-span-3 text-left ">
+                                                    <div className="flex items-center gap-2">
+                                                        <div>
+                                                            {e?.item?.images != null ? (
+                                                                <ModalImage
+                                                                    small={e?.item?.images}
+                                                                    large={e?.item?.images}
+                                                                    alt="Product Image"
+                                                                    className="custom-modal-image object-cover rounded w-[50px] h-[60px] mx-auto"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-[50px] h-[60px] object-cover  mx-auto">
+                                                                    <ModalImage
+                                                                        small="/no_img.png"
+                                                                        large="/no_img.png"
+                                                                        className="w-full h-full rounded object-contain p-1"
+                                                                    ></ModalImage>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                {e?.item?.name}
+                                                            </h6>
+                                                            <h6 className="text-[13px] text-left font-medium capitalize">
+                                                                {e?.item?.product_variation}
+                                                            </h6>
+                                                            <div className="flex items-center font-oblique flex-wrap">
+                                                                {dataProductSerial.is_enable === "1" ? (
+                                                                    <div className="flex gap-0.5">
+                                                                        <h6 className="text-[12px]">Serial:</h6>
+                                                                        <h6 className="text-[12px]  px-2   w-[full] text-left ">
+                                                                            {e?.item?.serial == null ||
+                                                                            e?.item?.serial == ""
+                                                                                ? "-"
+                                                                                : e?.item?.serial}
+                                                                        </h6>
+                                                                    </div>
+                                                                ) : (
+                                                                    ""
+                                                                )}
+                                                                {dataMaterialExpiry.is_enable === "1" ||
+                                                                dataProductExpiry.is_enable === "1" ? (
+                                                                    <>
+                                                                        <div className="flex gap-0.5">
+                                                                            <h6 className="text-[12px]">Lot:</h6>{" "}
+                                                                            <h6 className="text-[12px]  px-2   w-[full] text-left ">
+                                                                                {e?.item?.lot == null ||
+                                                                                e?.item?.lot == ""
+                                                                                    ? "-"
+                                                                                    : e?.item?.lot}
+                                                                            </h6>
+                                                                        </div>
+                                                                        <div className="flex gap-0.5">
+                                                                            <h6 className="text-[12px]">Date:</h6>{" "}
+                                                                            <h6 className="text-[12px]  px-2   w-[full] text-center ">
+                                                                                {e?.item?.expiration_date
+                                                                                    ? moment(
+                                                                                          e?.item?.expiration_date
+                                                                                      ).format("DD/MM/YYYY")
+                                                                                    : "-"}
+                                                                            </h6>
+                                                                        </div>
+                                                                    </>
+                                                                ) : (
+                                                                    ""
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </h6>
+                                                <h6 className="text-[13px]   px-2 py-2 col-span-2 text-center break-words">
+                                                    <h6 className="font-medium">
+                                                        {e?.warehouse_location?.location_name}
+                                                    </h6>
+                                                </h6>
+                                                <h6 className="text-[13px]   px-2 py-2 col-span-2 text-center break-words">
+                                                    <h6 className="font-medium">
+                                                        {e?.warehouse_location_to?.location_name}
+                                                    </h6>
+                                                </h6>
+                                                <h6 className="text-[13px]   py-2 col-span-1 font-medium break-words">
+                                                    <NumericFormat
+                                                        className={`${
+                                                            errorQuantity &&
+                                                            (e?.quantity == 0 ||
+                                                                e?.quantity == "" ||
+                                                                e?.quantity == "0")
+                                                                ? "border-b-red-500"
+                                                                : "border-b-gray-300"
+                                                        } appearance-none bg-transparent  text-center focus:border-b-blue-400 py-1 px-2 my-1   border-b outline-none  w-full`}
+                                                        onValueChange={(event) => handleChange("quantity", event, e.id)}
+                                                        value={e?.quantity}
+                                                        allowNegative={false}
+                                                        decimalScale={0}
+                                                        isNumericString={true}
+                                                        thousandSeparator=","
+                                                        isAllowed={(values) => {
+                                                            const { value, formattedValue, floatValue } = values;
+                                                            const newValue = +floatValue;
+                                                            if (newValue == 0) {
+                                                                ToatstNotifi("error", "Số lượng không được bằng 0.");
+                                                                return;
+                                                            }
+                                                            if (newValue < +e?.quantity_delivery) {
+                                                                ToatstNotifi(
+                                                                    "error",
+                                                                    `Số lượng không được bé hơn số lượng đã giao`
+                                                                );
+                                                                return;
+                                                            }
+                                                            return true;
+                                                        }}
+                                                    />
+                                                </h6>
+                                                <h6 className="text-[13px]   py-2 col-span-1 font-medium text-center break-words">
+                                                    {formatNumber(e?.quantity_delivery)}
+                                                </h6>
+                                                <button
+                                                    type="button"
+                                                    title="Xóa"
+                                                    onClick={(event) => handleChange("deleteItem", event, e.id)}
+                                                    className="group col-span-1 transition h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
+                                                >
+                                                    <IconDelete
+                                                        size={23}
+                                                        className="group-hover:text-red-500 group-hover:scale-110 group-hover:shadow-md "
+                                                    />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </ScrollArea>
+                            </>
+                        ) : (
+                            <div className=" max-w-[352px] mt-24 mx-auto">
+                                <div className="text-center">
+                                    <div className="bg-[#EBF4FF] rounded-[100%] inline-block ">
+                                        <IconSearch />
+                                    </div>
+                                    <h1 className="textx-[#141522] text-base opacity-90 font-medium">
+                                        {dataLang?.purchase_order_table_item_not_found ||
+                                            "purchase_order_table_item_not_found"}
+                                    </h1>
+                                    <div className="flex items-center justify-around mt-6 "></div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <div className="text-right mt-2  grid grid-cols-12 flex-col justify-between border-t">
+                        <div className="col-span-7 font-medium grid grid-cols-7 text-left">
+                            {/* <h3 className="3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px] ">
+                       {dataLang?.price_quote_note || "price_quote_note"}
+                   </h3>
+                   <h3 className="3xl:text-[15px] 2xl:text-[14px] xl:text-[12px] text-[11px] col-span-5 font-normal rounded-lg">
+                       {dataClone?.order?.note}
+                   </h3> */}
+                        </div>
+                        <div className="col-span-3 space-y-2"></div>
+                        <div className="col-span-2 space-y-2">
+                            <div className="text-right mt-5 mr-2 space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={_ToggleModal.bind(this, false)}
+                                    className="button text-[#344054] font-normal text-base py-2 px-4 rounded-[5.5px] border border-solid border-[#D0D5DD] hover:scale-105 transition-all ease-linear"
+                                >
+                                    {dataLang?.branch_popup_exit || "branch_popup_exit"}
+                                </button>
+                                <button
+                                    onClick={handleSubmit}
+                                    type="submit"
+                                    className="button text-[#FFFFFF]  font-normal text-base py-2 px-4 rounded-[5.5px] bg-[#0F4F9E] hover:scale-105 transition-all ease-linear"
+                                >
+                                    {dataLang?.branch_popup_save || "branch_popup_save"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </PopupEdit>
+    );
+};
+export default Popup_EditDetail;

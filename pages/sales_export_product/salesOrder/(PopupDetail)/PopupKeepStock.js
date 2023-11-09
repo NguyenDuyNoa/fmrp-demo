@@ -7,6 +7,7 @@ import { NumericFormat } from "react-number-format";
 import { _ServerInstance as Axios } from "/services/axios";
 const ScrollArea = dynamic(() => import("react-scrollbar"), { ssr: false });
 import { SearchNormal1 as IconSearch, Trash as IconDelete, Box1, TickCircle } from "iconsax-react";
+
 import PopupEdit from "@/components/UI/popup";
 import Loading from "@/components/UI/loading";
 import Zoom from "@/components/UI/zoomElement/zoomElement";
@@ -41,7 +42,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     const setIsFetch = (e) => sIsFetching((prve) => ({ ...prve, ...e }));
 
     useEffect(() => {
-        id && open && setIsFetch({ onFetching: true, onFetchingWarehouse: true, onFetchingCondition: true });
+        id && open && setIsFetch({ onFetching: true, onFetchingWarehouse: true });
         sIsIdWarehouse(null);
     }, [open]);
 
@@ -229,18 +230,24 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
         let formData = new FormData();
 
         formData.append("idOrder", data?.id);
-        formData.append("warehouse_id", isIdWarehouse?.value);
+        formData.append("warehouse_id", isIdWarehouse?.value ? isIdWarehouse?.value : "");
 
         data?.items.forEach((e, index) => {
-            formData.append(`items[${index}][order_item_id]`, e?.id);
-            formData.append(`items[${index}][item]`, e?.item_complex_id);
-
-            e?.item?.warehouse_location.forEach((i, _) => {
-                if (i.show) {
-                    formData.append(`items[${index}][warehouse_location][${_}][id]`, i?.id);
-                    formData.append(`items[${index}][warehouse_location][${_}][quantity_export]`, i?.quantity_export);
-                }
-            });
+            formData.append(`items[${index}][order_item_id]`, e?.id ? e?.id : "");
+            formData.append(`items[${index}][item]`, e?.item_complex_id ? e?.item_complex_id : "");
+            if (e?.item?.warehouse_location?.length > 0) {
+                e?.item?.warehouse_location.forEach((i, _) => {
+                    if (i.show) {
+                        formData.append(`items[${index}][warehouse_location][${_}][id]`, i?.id ? i?.id : "");
+                        formData.append(
+                            `items[${index}][warehouse_location][${_}][quantity_export]`,
+                            i?.quantity_export ? i?.quantity_export : ""
+                        );
+                    }
+                });
+            } else {
+                formData.append(`items[${index}][warehouse_location]`, "");
+            }
         });
 
         Axios(
@@ -284,7 +291,7 @@ const Popup_KeepStock = ({ dataLang, status, id, onRefresh, ...props }) => {
     return (
         <>
             <PopupEdit
-                title={dataLang?.salesOrder_warehouse_details || "salesOrder_warehouse_details"}
+                title={dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock"}
                 onClickOpen={_ToggleModal.bind(this, true)}
                 open={open}
                 onClose={_ToggleModal.bind(this, false)}
