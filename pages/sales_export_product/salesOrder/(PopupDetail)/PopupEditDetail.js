@@ -394,15 +394,26 @@ const Popup_EditDetail = (props) => {
                                                         thousandSeparator=","
                                                         isAllowed={(values) => {
                                                             const { value, formattedValue, floatValue } = values;
-                                                            const newValue = +floatValue;
+                                                            const newValue = +value;
                                                             if (newValue == 0) {
                                                                 ToatstNotifi("error", "Số lượng không được bằng 0.");
+                                                                return;
+                                                            }
+                                                            if (newValue > +e.quantity_net) {
+                                                                ToatstNotifi(
+                                                                    "error",
+                                                                    `Số lượng không lớn hơn ${formatNumber(
+                                                                        e?.quantity_net
+                                                                    )} số lượng giữ kho`
+                                                                );
                                                                 return;
                                                             }
                                                             if (newValue < +e?.quantity_delivery) {
                                                                 ToatstNotifi(
                                                                     "error",
-                                                                    `Số lượng không được bé hơn số lượng đã giao`
+                                                                    `Số lượng không được bé hơn ${formatNumber(
+                                                                        e?.quantity_delivery
+                                                                    )} số lượng đã giao`
                                                                 );
                                                                 return;
                                                             }
