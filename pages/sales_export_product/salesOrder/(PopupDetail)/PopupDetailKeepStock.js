@@ -310,12 +310,14 @@ const Popup_DetailKeepStock = (props) => {
                             ))}
                             <div className="col-span-5 justify-end flex items-center gap-1 mr-2">
                                 <OnResetData sOnFetching={sIsFetching} />
-                                <ExcelFileComponent
-                                    multiDataSet={multiDataSet}
-                                    dataLang={dataLang}
-                                    filename={"Danh sách giữ kho"}
-                                    title={"Danh sách giữ kho"}
-                                />
+                                {dataClone?.transfer?.length > 0 && (
+                                    <ExcelFileComponent
+                                        multiDataSet={multiDataSet}
+                                        dataLang={dataLang}
+                                        filename={"Danh sách giữ kho"}
+                                        title={"Danh sách giữ kho"}
+                                    />
+                                )}
                             </div>
                         </div>
                         <div className=" w-[100%]">
